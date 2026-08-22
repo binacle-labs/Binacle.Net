@@ -77,7 +77,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **The auth token rate limit no longer partitions on a caller-supplied header.** It partitions on the connection's remote address, which forwarded headers resolve to the real caller wherever a proxy is trusted. Before this, varying the header reset your own login throttle.  
 
 ### 🎨 UI Module
-- The Protocol Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.  
+- The ViPaq Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.  
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.  

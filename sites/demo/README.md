@@ -1,16 +1,15 @@
 # Binacle.Net Demo Site
 
-The demo site, built with [Jekyll](https://jekyllrb.com/). It covers the product home, the apps listing, and
-the two interactive apps. Its host is <https://demo.binacle.net>.
+The demo site, built with [Jekyll](https://jekyllrb.com/). A chooser index and the two interactive demos.
+Its host is <https://demo.binacle.net>.
 
 ## 📂 What is in it
 
 | Path | What it is |
 |---|---|
-| `pages/` | The site itself - `index.html`, the apps listing, `404.html`, `robots.txt` |
-| `collections/_apps/` | The two interactive apps - the packing demo and the ViPaq protocol decoder |
-| `collections/_sitemaps/` | The sitemap sources, one per collection |
-| `_data/` | Header, footer and includes configuration |
+| `pages/` | The whole site - the chooser `index.html`, `packing.html`, `vipaq.html`, `404.html`, `robots.txt` |
+| `collections/_sitemaps/` | The sitemap source. One file, one collection |
+| `_data/` | Header, footer, script includes, and `exits.yml` - the links out to the docs and to `www`, shared by the nav and the footer |
 | `_layouts/`, `_includes/`, `_sass/`, `css/` | Templates, partials and styles |
 | `_js/` | The three webpack entry points - `main.js`, `packing_demo.js`, `protocol_decoder.js` |
 
@@ -32,9 +31,9 @@ a script or style change appears to do nothing.
 Run `just install` once on a fresh clone, and `just assets` after changing anything under the repo-root
 [`assets/`](../../assets) folder - the site serves its own copy, so a new logo does not show up until that runs.
 
-## 🧩 The two apps
+## 🧩 The two demos
 
-Both live in `collections/_apps/` as a page, with their behaviour in a `_js/` entry point that imports the
+Both are a page in `pages/` marked `applet: true`, with their behaviour in a `_js/` entry point that imports the
 shared packages from [`packages/`](../../packages) - `binacle-net-ui` for the packing demo and the decoder,
 `theme-switcher` for the site chrome. They are resolved through the npm workspace, not copied, so editing a
 package changes the site on the next webpack pass.

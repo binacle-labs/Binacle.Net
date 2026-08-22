@@ -4,7 +4,13 @@
             {% include logo.html %}
         </div>
 
-        <h5 class="max center-align">{{ site.title }}</h5>
+        <h5 class="max center-align">{{ site.display_title }}</h5>
+
+        {% assign website = site.data.exits.website %}
+        <a href="{{ website.url }}" title="{{ website.title }}" target="_blank">
+            <i>{{ website.icon }}</i>
+        </a>
+
         {% for link in site.data.header.links %}
         <a href="{{ link.url }}" title="{{ link.title }}" target="{{ link.target }}">
             {% if link.image != nil %}

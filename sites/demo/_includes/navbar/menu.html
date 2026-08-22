@@ -1,4 +1,5 @@
-{% for item in site.apps %}
+{% assign applets = site.pages | where: 'applet', true | sort: 'order' %}
+{% for item in applets %}
 {% assign is_active = false %}
 {% if item.url == page.url %}
 {% assign is_active = true %}
@@ -22,3 +23,13 @@
 {% endif %}
 
 {% endfor %}
+
+<hr class="{{ include.divider_class }}">
+
+{% assign docs = site.data.exits.docs %}
+<a href="{{ docs.url }}">
+    <i>
+        {{ docs.icon }}
+    </i>
+    <span>{{ docs.title }}</span>
+</a>

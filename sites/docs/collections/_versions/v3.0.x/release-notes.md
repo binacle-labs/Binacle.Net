@@ -105,7 +105,7 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   whole `192.168.1.0/24` - that is what CIDR notation means - but the startup log now says so.
 
 ### 🎨 UI Module
-- The Protocol Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.
+- The ViPaq Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.

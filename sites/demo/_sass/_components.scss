@@ -44,3 +44,11 @@ button.destructive:is(:hover, :focus) {
 button[type="submit"]:not(.border):not(.transparent) {
   color: var(--on-primary-container);
 }
+
+// A whole card is one link. Beercss styles `article` as an element, so the anchor sits inside and fills it.
+// Without the block, beercss's `a { display: inline-flex; align-items: center }` puts the title beside the copy.
+a.card {
+  display: block;
+  block-size: 100%;
+  color: inherit;
+}

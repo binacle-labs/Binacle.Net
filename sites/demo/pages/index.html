@@ -1,44 +1,34 @@
 ---
-title: Welcome to Binacle.Net
+title: Binacle.Net Demo
+seo_title: Try the 3D bin packing API in your browser - Binacle.Net
+meta_description: Try Binacle.Net in your browser. Put in your own box sizes and a list of items and watch them packed in 3D, or decode a ViPaq string. No signup.
 layout: homepage
 permalink: /
 excerpt: |
- Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.
- It enables fast, efficient packing solutions for ecommerce, logistics, and warehousing applications.
-
+  Try the 3D bin packing API in your browser. Put in your own bins and items and watch them packed, or
+  decode a ViPaq string into a 3D view.
 ---
-
 
 <article class="middle-align center-align">
   <div>
     <h1>{{ page.title }}</h1>
     <p>
-      Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.
-    </p>
-
-    <p>
-      It enables fast, efficient packing solutions for ecommerce, logistics, and warehousing applications.
+      Binacle.Net answers which box an order goes in, in milliseconds. Two demos - pick one.
     </p>
   </div>
 </article>
 
-<div class="grid medium space">
-  {% assign items = site.pages | where: 'layout', 'homepage' | where_exp: 'item', 'item.permalink != "/"' %}
-  {% for item in items %}
+{% assign applets = site.pages | where: 'applet', true | sort: 'order' %}
+<div class="grid medium-space">
+  {% for item in applets %}
   <article class="s12 m6 no-padding">
-    <div class="grid no-space">
-      <div class="s12">
-        <div class="padding">
-          <h5>{{ item.title }}</h5>
-          <p>{{ item.excerpt | default: item.description }}</p>
-          <nav>
-            <a href="{% link pages/apps.html %}" class="button">
-              Explore More
-            </a>
-          </nav>
-        </div>
+    <a href="{{ item.url | relative_url }}" class="card wave padding">
+      <div class="row">
+        <i>{{ item.icon }}</i>
+        <h5 class="max">{{ item.title }}</h5>
       </div>
-    </div>
+      <p>{{ item.description }}</p>
+    </a>
   </article>
   {% endfor %}
 </div>

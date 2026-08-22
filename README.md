@@ -65,7 +65,7 @@ just build image                 # publish, then tag binacle-net:local
 
 This work is dual-licensed under the GNU General Public License v3.0 and the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
 
-`SPDX-License-Identifier: GPL-3.0 AND CC-BY-SA-4.0`
+`SPDX-License-Identifier: GPL-3.0-only AND CC-BY-SA-4.0`
 
 ### Code
 The code in this project is licensed under the GNU General Public License v3.0. <br/>
@@ -76,7 +76,8 @@ See the [LICENSE.GPL-3.0](LICENSE.GPL-3.0) file for details.
 All documentation, images, and other content files in this project are licensed under the
 [Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
 
-See [LICENSE.CC-BY-SA-4.0](LICENSE.CC-BY-SA-4.0) for the full license text.
+[CONTENT-TERMS.md](CONTENT-TERMS.md) is a plain-English summary of what that allows. The full
+license text is at [creativecommons.org](https://creativecommons.org/licenses/by-sa/4.0/legalcode).
 
 ### Third-Party Libraries
 Binacle.Net uses third-party libraries and dependencies. 

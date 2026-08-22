@@ -2,6 +2,9 @@
 # Site settings
 ############################################################
 title                   : "Binacle.Net Docs"
+
+# The link-preview image every page falls back to. A page overrides it with main_img.
+og_image                : /media/logo/binacle-logo-512x512.png
 description             : >-
   Welcome to Binacle.Net Docs! Here you'll find comprehensive guides and documentation to help you get started and make the most out of Binacle.Net.
 
@@ -181,7 +184,6 @@ defaults:
       type           : "versions"
     values:
       layout          : "versions/default"
-      title           : "NOTITLE"
       path_prefix     : "version"
       locale          : "en_US"
       hreflang        : "en"

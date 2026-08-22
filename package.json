@@ -12,7 +12,6 @@
     "copy-assets-to-uimodule": "gulp copy-assets-to-uimodule"
   },
   "author": "Chris Mavrommatis",
-  "license": "GPL-3.0 AND CC-BY-SA-4.0",
   "private": true,
   "workspaces": [
     "packages/*",

@@ -1,34 +1,39 @@
 {% assign page_title = site.title %}
-{% if page.title %}
-{% assign page_title = page.title | append: ' | ' | append: site.title %}
+{% if page.seo_title %}
+{% assign page_title = page.seo_title %}
+{% elsif page.title %}
+{% assign page_title = page.title | append: ' - ' | append: site.title %}
 {% endif %}
 
-<title>
-    {{ page_title }}
-</title>
+{% comment %} No newlines inside the tag - some scrapers keep the whitespace and print it in the result. {% endcomment %}
+<title>{{ page_title }}</title>
 
 {% assign site_meta_description = site.description | markdownify | clean_content: 160 %}
 {% assign content_meta_description = page.content | markdownify | clean_content: 160 %}
 {% assign excerpt_meta_description = page.excerpt | markdownify | clean_content: 160 %}
-{% assign meta_description = excerpt_meta_description | default: content_meta_description | default: site_meta_description %}
+{% assign meta_description = page.meta_description | default: excerpt_meta_description | default: content_meta_description | default: site_meta_description %}
 
 <meta name="description" content="{{ meta_description }}">
 
 <link rel="canonical" href="{{ page.url | remove: "index.html" | absolute_url }}">
 
+{% assign meta_image = page.main_img | default: site.og_image %}
+
 <meta property="og:title" content="{{ page_title }}" />
 
-{% if page.main_img %}
-<meta property="og:image" content="{{ page.main_img  | absolute_url}}" />
+{% if meta_image %}
+<meta property="og:image" content="{{ meta_image | absolute_url }}" />
 {% endif %}
 
 <meta property="og:url" content="{{ page.url | absolute_url | remove: "index.html"  }}" />
-<meta property="og:type" content="article">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ site.title }}" />
 <meta property="og:description" content="{{ meta_description }}" />
 <meta property="og:locale" content="{{ page.locale }}" />
 
 
+{% comment %} summary, not summary_large_image: og_image is a square logo and a wide card crops it.
+   Both change together the day a 1200x630 image exists. {% endcomment %}
 <meta name="twitter:card" content="summary">
 
 {% if site.twitter_url %}
@@ -37,8 +42,8 @@
 
 <meta name="twitter:title" content="{{ page_title }}" />
 
-{% if page.main_img %}
-<meta name="twitter:image" content="{{ page.main_img | absolute_url }}" />
+{% if meta_image %}
+<meta name="twitter:image" content="{{ meta_image | absolute_url }}" />
 {% endif %}
 
 <meta name="twitter:url" content="{{ page.url | absolute_url | remove: "index.html"  }}" />

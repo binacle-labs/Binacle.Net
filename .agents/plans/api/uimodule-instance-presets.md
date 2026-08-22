@@ -96,7 +96,7 @@ missed.
 
 ## The markup exists twice, and it is not this plan's to fix
 
-`sites/demo/collections/_apps/packing-demo.html` and `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` are
+`sites/demo/pages/packing.html` and `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` are
 the same page. That is known and separately owned. It is a build-system change and it would swallow anything
 it is attached to.
 

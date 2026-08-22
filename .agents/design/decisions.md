@@ -1,14 +1,15 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, and how the agent reference layer is kept honest against the code.
-verified: 2026-08-19
-check: D1 against the copyright lines in NOTICE, README.md, LICENSE.CC-BY-SA-4.0, the root package.json author, Footer.razor and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, and how the agent reference layer is kept honest against the code.
+verified: 2026-08-23
+check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs
 paths:
   - "NOTICE"
   - "README.md"
   - "SECURITY.md"
   - "CHANGELOG.md"
   - "Dockerfile"
+  - "CONTENT-TERMS.md"
   - "sites/docs/**"
 ---
 
@@ -24,11 +25,11 @@ so a later session does not undo a deliberate choice.
 The repo has lived at `binacle-labs/Binacle.Net` since 2026-08-16.
 
 **Copyright and authorship stay on the person, everywhere they appear** — `NOTICE` and `README.md`
-("Copyright (c) 2023-2026 Chris Mavrommatis"), `LICENSE.CC-BY-SA-4.0` ("© 2026"), the root `package.json`
-`author`, `Footer.razor`'s rendered `CopyrightNotice`, and the `authors` in both `.gemspec` files. Moving a
-repository into a GitHub organization does not move copyright, and `binacle-labs` is a namespace rather than a
-legal entity — there is nothing for it to hold. Writing the org name into a copyright line would make that line
-less true.
+("Copyright (c) 2023-2026 Chris Mavrommatis"), `CONTENT-TERMS.md` ("© 2026"), the root `package.json`
+`author`, the copyright line in the UI module's `Pages/Shared/_Footer.cshtml`, and the `authors` in both
+`.gemspec` files. Moving a repository into a GitHub organization does not move copyright, and `binacle-labs`
+is a namespace rather than a legal entity — there is nothing for it to hold. Writing the org name into a
+copyright line would make that line less true.
 
 **A `repository.url` is the opposite case and does carry the org**: both `package.json` files point at
 `github.com/binacle-labs/Binacle.Net`, which is where the repository actually is. `packages/binacle-net-ui/package.json`
@@ -42,6 +43,36 @@ list**, so the `Dockerfile` value is what reaches published images.
 
 **This is written down because a sweep that replaces one string tends to replace the other.** The copyright
 lines are correct as they are. Do not tidy them.
+
+### D6 — the licence file keeps its name, and two other things fix the badge
+
+GitHub reported the repository's licence as `NOASSERTION`. **The cause was measured with `licensee`, the gem
+GitHub runs, not reasoned about** — an earlier plan blamed the GPL file's name and was wrong.
+
+| Root files present | `licensee detect` reports |
+|---|---|
+| `LICENSE` alone | `GPL-3.0` |
+| `LICENSE.GPL-3.0` alone | `GPL-3.0` |
+| `LICENSE` + `CONTENT-LICENSE.md` | **`NOASSERTION`** |
+| `LICENSE` + root `package.json` carrying `GPL-3.0-only AND CC-BY-SA-4.0` | **`NOASSERTION`** |
+| `LICENSE.GPL-3.0` + `CONTENT-TERMS.md`, no `license` field | `GPL-3.0` |
+
+Measured 23 Aug 2026, licensee 10.1.0.
+
+**Two causes, neither of them the GPL file's name.** Licensee matches any root filename containing `LICENSE`,
+`LICENCE`, `COPYING` or `COPYRIGHT`, so `LICENSE.CC-BY-SA-4.0` and `CONTENT-LICENSE.md` are both candidates —
+and their content is a plain-English summary matching no known licence, which is what makes the set
+unresolvable. Separately, licensee reads the root `package.json` `license` field and cannot resolve a
+**compound SPDX expression**; an `AND` there is enough on its own.
+
+**So `LICENSE.GPL-3.0` keeps its name.** Renaming it to `LICENSE` would have been free tidiness with a
+permanent cost: `Footer.razor` in every published image — `2.1.1`, `3.0.0-beta.3`, `3.0.0-beta.4` — hardcodes
+`{GitHub}/blob/main/LICENSE.GPL-3.0`, and an image cannot be fixed after it ships. The live marketing site
+serves the same URL from a stale build. **A path a shipped artifact points at is not free to move.**
+
+**The root `package.json` declares no licence at all.** It is `private: true` and never published, so the
+field was decorative; the honest options were a single ID narrower than the truth or no field, and no field
+makes no false claim. `NOTICE` and `README.md` carry the real dual-licence statement.
 
 ### D2 — a version's published page must match what that version's image serves
 

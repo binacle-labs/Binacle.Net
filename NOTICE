@@ -3,11 +3,12 @@ Binacle.Net
 Copyright (c) 2023-2026 Chris Mavrommatis. All rights reserved.
 
 This product is dual-licensed:
-- Code is licensed under the GNU General Public License v3.0 (GPL-3.0)
+- Code is licensed under the GNU General Public License v3.0 (GPL-3.0-only)
   See LICENSE.GPL-3.0 or https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.GPL-3.0
 
 - Documentation and content are licensed under Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)
-  See LICENSE.CC-BY-SA-4.0 or https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.CC-BY-SA-4.0
+  See CONTENT-TERMS.md for a summary, or https://creativecommons.org/licenses/by-sa/4.0/legalcode
+  for the full text
 
 ================================================================================
 THIRD-PARTY SOFTWARE NOTICES

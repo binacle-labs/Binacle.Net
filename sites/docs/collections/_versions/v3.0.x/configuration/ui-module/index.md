@@ -31,8 +31,8 @@ item data and observing how items are packed into bins.
 - 🔹 Step-by-step Interaction: Users can navigate through the packing process, handling items one by one.
 - 🔹 Real-time Visualization: Watch as each item is placed inside the bins in real-time.
 
-## 📜 Protocol Decoder
-The Protocol Decoder enables users to decode ViPaq-encoded packing data and visualize the container layouts interactively.
+## 📜 ViPaq Decoder
+The ViPaq Decoder enables users to decode ViPaq-encoded packing data and visualize the container layouts interactively.
 It helps analyze packing arrangements and navigate through the layout easily.
 
 - 📌 To obtain ViPaq data, set `includeViPaqData` on a packing request in

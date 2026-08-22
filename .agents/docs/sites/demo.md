@@ -1,6 +1,6 @@
 ---
 id: sites/demo
-description: The published Jekyll demo site at sites/demo/ — product home, apps listing, and interactive packing demo. `$sites/demo` always means sites/demo/.
+description: The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/.
 verified: 2026-08-22
 check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; the demo/prefetch script split still matches sites/demo/_data/includes.yml; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
 also_update:
@@ -28,11 +28,15 @@ just build demo   # the same site built once, into artifacts/demo
 
 | Page | Route | What it is |
 |---|---|---|
-| `pages/index.html` | `/` | Landing page |
-| `pages/apps.html` | `/apps/` | List of apps using Binacle.Net |
-| `collections/_apps/` | `/apps/:name/` | Individual app pages |
-| `collections/_sitemaps/` | `/sitemap/:name:output_ext` | Generated sitemaps |
-| `pages/404.html` | `/404` | Error page |
+| `pages/index.html` | `/` | The chooser — one card per tool, and the card is the link |
+| `pages/packing.html` | `/packing/` | The packing demo |
+| `pages/vipaq.html` | `/vipaq/` | The ViPaq decoder |
+| `collections/_sitemaps/sitemap.xml` | `/sitemap.xml` | The one sitemap |
+| `pages/404.html` | `/404.html` | Error page |
+
+**There is no collection for the tools.** They are pages carrying `applet: true` and an `order`, and the
+chooser, the two navs and the JSON-LD block all key off that flag. `sitemaps` stays a collection because a
+sitemap under `pages/` inherits the `pages/**` defaults and would list itself.
 
 ## JS Bundles
 
@@ -47,7 +51,7 @@ Webpack bundles from `sites/demo/_js/` and npm packages into `sites/demo/js/`:
 | `binacle-vipaq.js` | Built from `vipaq/packages/binacle-vipaq` — TypeScript ViPaq decoder |
 | `runtime.js` | Webpack runtime, loaded on every page |
 | `vendors.js` | Shared npm dependencies, loaded on every page |
-| `three.js` | Three.js on its own, **524 KiB** — demo pages only |
+| `three.js` | Three.js on its own, **601 KiB** — demo pages only |
 
 Only `main`, `packing_demo` and `protocol_decoder` are webpack entry points; the rest are split chunks or
 package builds.

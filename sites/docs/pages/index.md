@@ -1,5 +1,6 @@
 ---
 title: Welcome to Binacle.Net Docs
+seo_title: Binacle.Net Docs
 permalink: /
 breadcrumbs: false
 nav:

@@ -3,14 +3,14 @@ links:
     url: 'https://github.com/binacle-labs/Binacle.Net'
     image:
       url: 'media/github/github-mark-white.png'
-      alt: 'Github'
+      alt: 'GitHub'
       height: 20
     target: '_blank'
   - title: 'Visit Binacle.Net on Dockerhub'
     url: 'https://hub.docker.com/r/binacle/binacle-net'
     image:
       url: 'media/docker/docker-mark-white.png'
-      alt: 'Dockerhub'
+      alt: 'Docker Hub'
       height: 20
     target: '_blank'
 

@@ -169,7 +169,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: sites/demo.md
-  description: "The published Jekyll demo site at sites/demo/ — product home, apps listing, and interactive packing demo. `$sites/demo` always means sites/demo/."
+  description: "The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/."
   paths: ["sites/demo/**"]
 - file: sites/docs.md
   description: "The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/."

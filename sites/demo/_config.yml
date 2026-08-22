@@ -2,8 +2,11 @@
 # Site settings
 ############################################################
 title                   : "Binacle.Net"
+# What the header and the index call this host. site.title stays the brand, for <title> and og:site_name.
+display_title           : "Binacle.Net Demo"
 description             : >-
-  Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.
+  Binacle.Net answers which box an order goes in, in milliseconds. Try the free and open source 3D bin
+  packing API in your browser - no signup.
 
 author:
   name                  : "Chris Mavrommatis"
@@ -17,6 +20,9 @@ gtm                     : ''
 logo:
   src                  : /media/logo/binacle-logo-16x16.svg
   alt                  : "Binacle.Net Logo"
+
+# The link-preview image every page falls back to. A page overrides it with main_img.
+og_image                : /media/logo/binacle-logo-512x512.png
 
 default_theme: "dark"
 
@@ -35,12 +41,9 @@ sass:
   cache             : false
   style             : compressed
 collections:
-  apps:
-    output          : true
-    permalink       : /apps/:name/
   sitemaps:
     output          : true
-    permalink       : /sitemap/:name:output_ext
+    permalink       : /:name:output_ext
     
 ############################################################
 # Handling Reading
@@ -141,19 +144,6 @@ defaults:
       type           : "pages"
     values:
       layout          : "default"
-      locale          : "en_US"
-      hreflang        : "en"
-      sitemap:
-        lastmod       : "current"
-        changefreq    : "monthly"
-        priority      : 1.0
-        exclude       : false
-  - scope:
-      path            : "**/**"
-      type            : "apps"
-    values:
-      layout          : "default"
-      title           : "NOTITLE"
       locale          : "en_US"
       hreflang        : "en"
       sitemap:
