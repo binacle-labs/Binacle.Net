@@ -14,6 +14,8 @@
 // sites read as framework demos.
 .site-header {
 	padding-block: var(--s-5);
+
+	@media (max-width: 719px) { padding-block: var(--s-4); }
 }
 
 .header-inner {
@@ -21,6 +23,33 @@
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--s-3) var(--s-5);
+}
+
+// On a phone the flex row put the wordmark, the nav and the theme control on four separate rows - about
+// 200px of header before a reader reaches anything. The nav still wraps to two rows, which the design
+// allows; what it does not need is a row of its own for the toggle.
+@media (max-width: 719px) {
+	.header-inner {
+		display: grid;
+		grid-template-columns: auto auto;
+		justify-content: space-between;
+		align-items: center;
+		row-gap: var(--s-3);
+	}
+
+	// Placed explicitly. Left to source order the nav spans both columns, takes row 2, and pushes the toggle
+	// onto a row of its own - which is the four-row header this exists to stop.
+	.wordmark { grid-area: 1 / 1; }
+
+	.theme-toggle {
+		grid-area: 1 / 2;
+		justify-self: end;
+	}
+
+	.site-nav {
+		grid-area: 2 / 1 / 3 / -1;
+		margin-right: 0;
+	}
 }
 
 .wordmark {
@@ -73,4 +102,16 @@
 	a { color: var(--muted); }
 
 	span { margin-inline: var(--s-1); }
+
+	// These are navigation, not prose, so the inline-link exemption does not cover them. At 13px in a tight
+	// row they were a 15px tap target. Bigger type and real vertical padding on the links themselves.
+	@media (max-width: 719px) {
+		font-size: 0.875rem;
+		line-height: 2.2;
+
+		a {
+			display: inline-block;
+			padding-block: var(--s-1);
+		}
+	}
 }

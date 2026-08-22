@@ -13,15 +13,15 @@ internal class AppletsService
 				Title = "Packing Demo",
 				Icon = "deployed_code",
 				ShortDescription = "Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them.",
-				Description = "An interactive tool that lets you test different packing algorithms with your own bins and items, and see how each one arranges them inside the bin.",
+				Description = "Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them in 3D. Each algorithm searches differently, so the same items can land in different places.",
 				Page = "/Packing"
 			},
 			new Models.Applet
 			{
 				Title = "ViPaq Decoder",
 				Icon = "deployed_code_update",
-				ShortDescription = "Decode, analyze, and visualize packing layouts with the ViPaq Protocol",
-				Description = "The ViPaq Decoder enables you to decode ViPaq-encoded packing data, providing clear, interactive visualizations of container layouts for easy analysis and validation.",
+				ShortDescription = "Paste a ViPaq string from a response and see the packing drawn in 3D.",
+				Description = "Paste a ViPaq string from a Binacle.Net response and see the packing drawn in 3D. The string carries the whole layout, so it is decoded here in your browser and nothing is sent anywhere.",
 				Page = "/Vipaq"
 			},
 			new Models.Applet

@@ -47,6 +47,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **The image now creates `/app/data` and gives it to the app user.** A volume mounted there is writable with no extra setup. Previously docker created the mount point as root, the app does not run as root, and packing logs and the SQLite database could not be written to a fresh named volume.  
 - The image ships `libgssapi-krb5-2`, so Npgsql stops printing `Cannot load library libgssapi_krb5.so.2` at every start. Nothing was broken — the app authenticates with a password, not Kerberos — but the message read like a fatal error.  
 - The image carries **OCI labels** — title, description, source, url, documentation, vendor, licence and base image — plus version, revision and created per build.  
+- **The description at the top of every API document changed.** The same one-line summary now appears in Swagger UI, Scalar and the image's `description` label.  
 - **The image is signed, and ships an SBOM and build provenance.** Signing is keyless, so there is no public key to fetch — the signature is checked against the workflow that produced it — and it covers the digest, so it holds for every tag pointing at that image:
 
   ```bash
@@ -78,6 +79,8 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 
 ### 🎨 UI Module
 - The ViPaq Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.  
+- The **Packing Demo** and **ViPaq Decoder** descriptions were rewritten. Neither tool changed.  
+- The instance page now links to **GitHub Discussions**.  
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.  

@@ -4,9 +4,10 @@ WORKDIR /app
 # Constant OCI labels only. version, revision and created are per-build and are applied by the build command
 # (--label in build.just, metadata-action in CI), so they add no layer and never bust this cache. In CI
 # metadata-action overrides the keys it also emits (title, description, source, url, licenses); documentation,
-# vendor and base.name are set nowhere else, so they survive from here.
+# vendor and base.name are set nowhere else, so they survive from here. description is pinned to this same
+# string in release-docker-image.yml - change both or the published image says something else.
 LABEL org.opencontainers.image.title="Binacle.Net" \
-      org.opencontainers.image.description="Binacle.Net is an API created to address the 3D Bin Packing Problem in real time." \
+      org.opencontainers.image.description="Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds." \
       org.opencontainers.image.source="https://github.com/binacle-labs/Binacle.Net" \
       org.opencontainers.image.url="https://www.binacle.net" \
       org.opencontainers.image.documentation="https://docs.binacle.net" \

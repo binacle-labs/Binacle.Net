@@ -163,7 +163,13 @@
 
 		thead { display: none; }
 
-		tr + tr { margin-top: var(--s-5); }
+		// Restacked, the six cells run together as one list and the three rows stop being three. A hairline
+		// says where one row ends, which the header row does on a wide screen.
+		tr + tr {
+			margin-top: var(--s-5);
+			padding-top: var(--s-5);
+			border-top: 1px solid var(--line);
+		}
 
 		td {
 			padding: 0 0 var(--s-2);
@@ -232,6 +238,15 @@
 	margin-block: var(--s-6);
 	background: var(--surface);
 
+	// Gutter to gutter on a phone. The shell's padding and the card's own padding were costing the code pane
+	// nearly 100px of the 390 it has - which is the difference between reading two thirds of a response line
+	// and reading two fifths.
+	@media (max-width: 719px) {
+		margin-inline: calc(var(--s-5) * -1);
+		border-inline: none;
+		border-radius: 0;
+	}
+
 	// Light mode may use one soft shadow, on this card and nowhere else. Dark uses none at all.
 	box-shadow: 0 18px 40px -28px rgb(0 0 0 / 0.35);
 }
@@ -241,6 +256,8 @@
 	align-items: center;
 	gap: var(--s-3);
 	padding: var(--s-3) var(--s-5);
+
+	@media (max-width: 719px) { padding-inline: var(--s-4); }
 }
 
 .exchange-path {
@@ -252,32 +269,43 @@
 }
 
 // The card is the most valuable element on the site, so a response that is visibly chopped off mid-token
-// reads as a rendering fault rather than as something to scroll. Two things stop that: the code sets a size
-// of its own so a full response line fits the hero column, and the pane fades at its right edge so what does
-// overflow reads as "there is more" instead of "this is broken".
+// reads as a rendering fault rather than as something to scroll.
+//
+// The pane scrolls at every width and a scroll-driven fade marks whichever edge still has content behind it,
+// so what overflows reads as "there is more" rather than "this is broken".
 .exchange-code {
 	padding: var(--s-3) var(--s-5) var(--s-5);
 
 	pre {
 		overflow-x: auto;
 		overscroll-behavior-x: contain;
-		mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
 	}
 
-	// Nothing to fade when nothing overflows, and a mask on a non-scrolling pane just dims the last word.
-	pre:not(:hover) { mask-image: none; }
-
+	// Only where the browser can say whether there is anything to scroll to. A static mask dims the last word
+	// of a pane that fits, which is worse than no mask - and the earlier version keyed it on :hover, which
+	// means it never appeared on the touch devices that need it most.
 	@supports (animation-timeline: scroll()) {
 		pre {
-			mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
-			animation: fade-when-scrollable linear;
+			animation: code-edge-fade linear both;
 			animation-timeline: scroll(self inline);
 		}
 	}
+
+	// Narrow: still scrolling, and deliberately so. Wrapping was tried and it is worse - a wrapped line starts
+	// at a different indent from the line it continues, so the JSON's own structure stops being readable, and
+	// the card grew to about 1900px tall. A developer scrolls a code block on a phone without thinking about
+	// it. What actually helps is giving the pane more room and less type, below.
+	@media (max-width: 719px) {
+		padding: var(--s-3) var(--s-4) var(--s-4);
+		font-size: 0.8125rem;
+
+		pre, code { font-size: 0.8125rem; }
+	}
 }
 
-@keyframes fade-when-scrollable {
-	to { mask-image: linear-gradient(to right, transparent, #000 40px); }
+@keyframes code-edge-fade {
+	from { mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+	to   { mask-image: linear-gradient(to right, transparent, #000 40px); }
 }
 
 // A 32px strip on --bg with a hairline above and below, carrying one word.
@@ -286,6 +314,8 @@
 	align-items: center;
 	height: 32px;
 	padding-inline: var(--s-5);
+
+	@media (max-width: 719px) { padding-inline: var(--s-4); }
 	background: var(--bg);
 	border-block: 1px solid var(--line);
 	font-size: 0.8125rem;
@@ -297,6 +327,8 @@
 	margin: 0;
 	padding: var(--s-4) var(--s-5);
 	border-top: 1px solid var(--line);
+
+	@media (max-width: 719px) { padding-inline: var(--s-4); }
 }
 
 // ---------------------------------------------------------------- the command line

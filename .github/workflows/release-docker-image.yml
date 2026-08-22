@@ -137,11 +137,13 @@ jobs:
           images: ${{ env.STAGING_IMAGE }}
           tags: |
             type=semver,pattern={{version}}
-          # The only two labels metadata-action gets wrong: licenses auto-detects to NOASSERTION on a
-          # dual-licensed repo, and url auto-fills the repo instead of the landing site.
+          # Three labels metadata-action gets wrong: licenses auto-detects to NOASSERTION on a dual-licensed
+          # repo, url auto-fills the repo instead of the landing site, and description auto-fills the GitHub
+          # repo blurb, silently beating the Dockerfile's caption.
           labels: |
             org.opencontainers.image.licenses=GPL-3.0-only AND CC-BY-SA-4.0
             org.opencontainers.image.url=https://www.binacle.net
+            org.opencontainers.image.description=Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds.
 
       - name: Assemble the staging reference
         id: ref

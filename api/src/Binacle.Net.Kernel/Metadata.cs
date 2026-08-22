@@ -2,7 +2,7 @@ namespace Binacle.Net;
 
 public static class Metadata
 {
-	public const string Description = "Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.";
+	public const string Description = "Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds.";
 	public const string License = "GNU General Public License v3.0";
 
 	public const string GitHub = "https://github.com/binacle-labs/Binacle.Net";

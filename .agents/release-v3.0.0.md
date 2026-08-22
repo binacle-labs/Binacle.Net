@@ -6,7 +6,8 @@ description: Release - Binacle.Net v3.0.0
 
 **Status:** In progress. Betas 1 to 4 published; `v3.0.0-beta.4` is the tag deployed on the test server. The
 pipeline is rebuilt and proven end to end, the architecture branch is merged, the suite is green and the
-OpenAPI documents are proven unmoved. **What is left is the last commit and the tag**, plus the immutability
+OpenAPI contracts are proven unmoved - the top-line `info.description` changed on 2026-08-23, and no path,
+schema or response did. **What is left is the last commit and the tag**, plus the immutability
 rule that holds nothing up, and the docs deploy that follows.
 
 **Betas 1 and 2 are deleted from Docker Hub.** Only `3.0.0-beta.3` and `3.0.0-beta.4` still resolve. Anything
@@ -222,11 +223,14 @@ plus six edits that must go out with it.
       -> `swagger/v4.json`; the generator's file names differ from what the site expects, so the rename is part
       of the handover.
 
-      **The diff is already measured - 2026-08-14, do not re-derive it.** The **only** differences are: both
-      documents gain a `servers` entry with the single relative `/`, and **the `429` responses come out** - 4
-      mentions in v3 and 14 in v4 go to zero. Nothing else moves. No schema name changed despite the namespace
-      restructure. For v3 this **restores** the shape v2.1.x shipped, so nothing about the frozen v3 contract
-      moves. It is still a visible change to the published spec, so mention it wherever the update is described.
+      **Re-measured 2026-08-23, and the 2026-08-14 figure no longer applies.** The `servers` entry and the
+      removal of the `429` responses are **already in the committed files** - both carry `servers: [{"url":
+      "/"}]` and zero `429`. Against a fresh `just openapi generate`, sorted-key diffs of both documents show
+      **one changed line each: `info.description`.** Nothing else moves, in either document.
+
+      **The description is what moved, and it moved on purpose** - the caption replacing *"an API created to
+      address the 3D Bin Packing Problem in real time"*. It is still a visible change to the published spec,
+      so mention it wherever the update is described.
 - [ ] **Write the client-generation page.** **Pulled in on 2026-08-14 at the maintainer's call.** It was the
       last item in the `api/openapi-spec-followups` idea, which held nothing else - that file was deleted on
       2026-08-20 and this row is now the only place the work is written down.

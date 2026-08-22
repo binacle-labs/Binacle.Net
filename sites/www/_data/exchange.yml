@@ -213,7 +213,8 @@ locker:
 # is the primary conversion and it fails with "manifest unknown" today.
 command:
   tag: "3.0"
+  # ONE LINE, no backslash continuations. They were tried and they wrap into nonsense on a phone: pre-wrap
+  # keeps both the newlines and the continuation indents and then wraps on top of them, which left a stray
+  # "-e" alone on its own line in the middle of the primary conversion. A single line wraps at its spaces.
   text: |
-    docker run -d --name binacle-net -p 8080:8080 \
-      -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True \
-      binacle/binacle-net:3.0
+    docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3.0

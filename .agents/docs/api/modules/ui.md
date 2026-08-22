@@ -1,7 +1,7 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-08-22
+verified: 2026-08-23
 check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing
 also_update:
   - packages
@@ -39,7 +39,7 @@ internal types. `Applet`, `AppletsService`, `UIModuleOptions` and every PageMode
 | `/` | `Index` | Three cards, one per applet. The whole card is the link; the page has no button |
 | `/packing` | `Packing` | The packing demo. Calls the pack API from the browser |
 | `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. Calls nothing |
-| `/instance` | `Instance` | Version, the switch list, and the presets this instance loaded |
+| `/instance` | `Instance` | Version, the switch list, the presets this instance loaded, and a link to GitHub Discussions |
 | `/error/{errorCode?}` | `Error` | The error page, and the `UseStatusCodePagesWithReExecute` target |
 
 `RouteOptions.LowercaseUrls` is true globally. **Every internal link uses the `asp-page` tag helper, never a
