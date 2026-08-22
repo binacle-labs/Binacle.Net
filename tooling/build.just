@@ -4,8 +4,9 @@
 #   just build image [version]    publish, then docker build -t binacle-net:<version>
 #   just build docs               the documentation site into artifacts/docs
 #   just build demo               the demo site into artifacts/demo
+#   just build www                the marketing site into artifacts/www
 #
-# The two site recipes mirror `just serve docs` / `just serve demo`: same site, built once instead of served
+# The three site recipes mirror `just serve docs` / `demo` / `www`: same site, built once instead of served
 # and watched. They are the build half of the pair, which is why they are here rather than in `serve`.
 #
 # All of them are written to be callable from CI as they stand - nothing interactive, no sudo, no local-only
@@ -74,7 +75,7 @@ image version="local": publish
       --label "org.opencontainers.image.created=${created}" \
       -t "binacle-net:{{ version }}" .
 
-# The two Jekyll sites. Three steps in a fixed order, and skipping any of them produces a site that looks
+# The three Jekyll sites. Three steps in a fixed order, and skipping any of them produces a site that looks
 # built: the asset copy fills the site's gitignored lib/ and media/, webpack compiles _js/ into its gitignored
 # js/, and only then does jekyll have everything to assemble. `jekyll build` alone succeeds and ships a site
 # with no scripts and no logo - which is exactly the failure worth catching before a deploy rather than after.
@@ -93,6 +94,9 @@ docs: (_build-site 'docs' 'sites/docs')
 
 # The demo site into artifacts/demo
 demo: (_build-site 'demo' 'sites/demo')
+
+# The marketing site into artifacts/www
+www: (_build-site 'www' 'sites/www')
 
 [private]
 _build-site name dir:

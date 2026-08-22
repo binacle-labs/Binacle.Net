@@ -1,8 +1,8 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-08-20
-check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js
+verified: 2026-08-23
+check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL
 paths:
   - "sites/docs/**"
 ---
@@ -61,6 +61,22 @@ matter, so **`vlink` cannot be used** — build the URL from `site.data.versions
 `_layouts/redirect.html` and `_includes/sidebar.html` do, and it follows `current` with no edit. And never
 hardcode a version or `latest` in prose or a command without saying what it tracks.
 
+## Page metadata
+
+**Every page carries a written `meta_description`** in its front matter - all 118, every version line
+included. `_includes/seo.html` still falls back to cutting body copy at 160 characters, which severs it
+mid-word; that fallback is a safety net for a page that forgets, not the mechanism.
+
+**`seo_title` overrides the composed title verbatim.** The composed form is
+`<title> (<version>) - <site.title>`; a page that sets `seo_title` gets exactly that string and **nothing is
+appended**, so a page using it writes its own suffix.
+
+**Nav labels and breadcrumbs use `menu_title` where a page sets one**, falling back to `title`
+(`_includes/versions/menu.html`, `_includes/breadcrumbs.html`). It exists so a page can carry a title that is
+unique across the site while the sidebar keeps a short label - two sample pages named `Minimal` under
+different parents read fine in a tree and collide in a `<title>`. **`nav.parent` still matches on `title`, not
+on `menu_title`**, so renaming a page that has children breaks the tree.
+
 ## Versioning model
 
 **Every folder is a version; there is no moving folder.** Folders are `vMAJOR.MINOR.x` — one per minor line
@@ -68,9 +84,29 @@ hardcode a version or `latest` in prose or a command without saying what it trac
 is copied and the old one is never touched again. `/version/latest/` survives only as a **redirect** to
 `current`, holding no content.
 
-**The one knob:** `current` in `sites/docs/_data/versions.yml` says which folder is current and where the
-`latest` redirect points. One edit per new line. That file also carries `list`, the rendered version order —
-newest first, because the order is read from the file rather than sorted.
+**The one knob:** `current` in `sites/docs/_data/versions.yml` says which folder is current, where the
+`latest` redirect points, and which folder search engines may index. One edit per new line. That file also
+carries `list`, the rendered version order — newest first, because the order is read from the file rather
+than sorted.
+
+### What `current` decides about search {#search-and-current}
+
+Everything below reads `current`; nothing names a version.
+
+| | Current version | Every other version |
+|---|---|---|
+| `<meta name="robots">` | none | `noindex, follow` |
+| Listed in a sitemap | yes | no |
+
+- `_includes/seo.html` emits the `noindex` and appends the version to the `<title>` — `Quick Start (v3.0.x) -
+  Binacle.Net Docs` — so a versioned page cannot collide with the same page at the site root or with another
+  version of itself. `_layouts/versions/swagger.html` has its own head and does the same.
+- `collections/_sitemaps/version-current.xml` is the only versioned sitemap. Its layout,
+  `_layouts/sitemap-version.xml`, selects `site.data.versions.current`. `pages.xml` covers `pages/` and
+  `_common_pages/`.
+- Swagger pages are `noindex` in every version, current included, and a `**/swagger/**` defaults block in
+  `_config.yml` keeps them out of the sitemap. A submitted `noindex` URL is a Search Console error.
+- `robots.txt` lists whatever sitemaps exist, so no version-agnostic edit is needed there either.
 
 **Why per-minor, not per-major.** A folder answers "what does my image do", and the API set is what changes:
 versions are **added at minors** (v1.2.0 added API v3) and **removed at majors** (v2.0.0 removed v1, v3.0.0

@@ -1,0 +1,342 @@
+// The page structure: bands, the hero, tables, the trade-off trio, buttons and the two conversion
+// components. Built to the specification in the design plan.
+//
+// The rhythm is the design. With no imagery, the swing between a large empty band and a dense card is the
+// page's only dynamic range - the empty space is load-bearing and it is the first thing anyone will try to cut.
+
+// ---------------------------------------------------------------- bands
+
+// Separating sections without imagery, in order of use: space, then a 4% ground shift, then a hairline where
+// two same-ground sections meet, then one blue rule on the page's most important section.
+// No diagonal dividers, no wave separators, no gradient fades.
+.band {
+	padding-block: clamp(4rem, 9vw, 7rem);
+	background: var(--bg);
+
+	// Never more than two consecutive sections on the same ground.
+	&.alt { background: var(--surface); }
+
+}
+
+// Only where two same-ground sections meet, and never together with a ground change. The pages alternate
+// strictly today so this never fires - it is here so it stays correct if a section is added or moved.
+.band:not(.alt) + .band:not(.alt),
+.band.alt + .band.alt { border-top: 1px solid var(--line); }
+
+// One per page, on the section that matters most. At most one full-strength blue element per screen.
+// A real border on the content column, not an absolutely positioned bar on the band: the band is full-bleed,
+// so left:0 put the rule against the window edge with the content floating away from it.
+// The padding gives back exactly what the border takes, so nothing else shifts.
+.rule > .shell {
+	border-left: 3px solid var(--action);
+	padding-left: calc(var(--s-5) - 3px);
+
+	@media (min-width: 720px) { padding-left: calc(var(--s-6) - 3px); }
+}
+
+// ---------------------------------------------------------------- type helpers
+
+.lead {
+	font-size: 1.25rem;
+	line-height: 1.5;
+}
+
+// Block to block is 40px; heading to body and paragraph to paragraph come from _base.
+.prose > * + h2,
+.prose > * + h3 { margin-top: var(--s-7); }
+
+.prose ul { padding-left: 1.25em; }
+.prose li { margin-bottom: var(--s-2); }
+
+// Violet, small caps, above a section heading. Specified in the design and then not built, which is a large
+// part of why the pages read as typed rather than composed. It is the only place violet appears besides the
+// caveat callout.
+.eyebrow {
+	margin-bottom: var(--s-3);
+	font-size: 0.8125rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--accent);
+}
+
+.prose > .eyebrow + h2 { margin-top: 0; }
+
+// A 2px left rule and 20px of padding. No background fill, no border box, no icon, no "Note:" label.
+// Violet for a limit or a caveat. Two per page maximum.
+.callout {
+	border-left: 2px solid var(--tertiary);
+	padding-left: 20px;
+	color: var(--muted);
+}
+
+// ---------------------------------------------------------------- hero
+
+.hero-grid {
+	display: grid;
+	gap: var(--s-7);
+
+	// One column, and the card runs the full shell beneath the copy.
+	//
+	// The design asked for two columns at roughly 55/45. That does not survive contact with the payload: a
+	// real fit response is 757px of monospace at its longest line, and a 45% column is about 517px. Nothing
+	// fixes that - shrinking the type to fit needs 11px, and reflowing the JSON to short lines doubles the
+	// card's height. The card was chopping mid-token, which on the most valuable element of the site reads
+	// as a rendering fault rather than as something you scroll.
+	//
+	// Full width, the response is complete and legible at 15px, and the h1 gets the whole measure instead of
+	// a 179px sliver. The two-column version is recoverable the day the hero shows a shorter exchange.
+	> * { min-width: 0; }
+}
+
+.hero-repo { font-size: 0.9375rem; }
+
+// ---------------------------------------------------------------- buttons
+
+// Two styles, not three. Identical metrics. No shadow, no gradient, no hover transform.
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--s-3);
+	margin-block: var(--s-6) var(--s-5);
+}
+
+.button {
+	display: inline-block;
+	padding: 12px 22px;
+	border-radius: var(--s-2);
+	font-weight: 600;
+	text-decoration: none;
+
+	&.primary {
+		background: var(--action);
+		border: 1px solid var(--action);
+		color: var(--on-action);
+	}
+
+	&.secondary {
+		background: none;
+		border: 1px solid var(--line);
+		color: var(--text);
+	}
+
+	&:hover { text-decoration: none; }
+}
+
+// ---------------------------------------------------------------- the scope table
+
+// The table carries the positioning, so it is real <table> markup: Google lifts table content for
+// comparison-shaped queries and divs pretending to be tables get nothing.
+//
+// No vertical rules, no zebra striping, no outer border.
+.table-wrap {
+	margin-top: var(--s-6);
+	overflow-x: auto;
+}
+
+.scope {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+
+	th {
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--muted);
+		border-bottom: 1px solid var(--line);
+	}
+
+	td { border-bottom: 1px solid color-mix(in oklab, var(--bg), var(--fg) 8%); }
+
+	tbody tr:last-child td { border-bottom: none; }
+
+	th, td { padding: 12px 16px; }
+
+	// The first cell aligns with the prose above it. That alignment is what stops a table looking bolted on.
+	th:first-child, td:first-child { padding-left: 0; }
+
+	// A three-row table restacks rather than scrolls - scrolling three rows is worse than stacking them.
+	@media (max-width: 640px) {
+		&, thead, tbody, tr, th, td { display: block; }
+
+		thead { display: none; }
+
+		tr + tr { margin-top: var(--s-5); }
+
+		td {
+			padding: 0 0 var(--s-2);
+			border-bottom: none;
+		}
+
+		td::before {
+			content: attr(data-label);
+			display: block;
+			font-size: 0.8125rem;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: var(--muted);
+		}
+	}
+}
+
+// ---------------------------------------------------------------- the trade-off trio
+
+.tradeoffs {
+	display: grid;
+	gap: var(--s-7);
+	margin-block: var(--s-6);
+
+	@media (min-width: 800px) { grid-template-columns: repeat(3, 1fr); gap: var(--s-6); }
+}
+
+.tradeoff h3 { margin-bottom: var(--s-4); }
+
+.algo-code {
+	margin-top: calc(var(--s-4) * -1);
+	margin-bottom: var(--s-4);
+	color: var(--muted);
+}
+
+// His tick-and-scales notation. The glyph says which line this is; the hidden word says it again for a
+// screen reader.
+.verdicts {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	li {
+		display: flex;
+		gap: var(--s-3);
+		margin-bottom: var(--s-3);
+	}
+
+	.glyph { margin-top: 0.45em; }
+
+	// His tick-and-scales notation is the most personal formatting decision in the project, and as two grey
+	// 12px marks it disappeared entirely. Colour on the glyph only - the text stays neutral, and the marks
+	// are small enough that this is not blue doing a second job.
+	.verdict-tick .glyph { color: var(--action); }
+	.verdict-scales .glyph { color: var(--accent); }
+
+	.verdict-scales { color: var(--muted); }
+}
+
+// ---------------------------------------------------------------- the exchange card
+
+// One card, one border, one radius. Five rows: the ask, the request, a RESPONSE seam, the response, and the
+// verdict. The seam is what makes it one exchange instead of two blocks; the verdict row is the whole reason
+// the card is marketing rather than documentation.
+.exchange {
+	margin-block: var(--s-6);
+	background: var(--surface);
+
+	// Light mode may use one soft shadow, on this card and nowhere else. Dark uses none at all.
+	box-shadow: 0 18px 40px -28px rgb(0 0 0 / 0.35);
+}
+
+.exchange-ask {
+	display: flex;
+	align-items: center;
+	gap: var(--s-3);
+	padding: var(--s-3) var(--s-5);
+}
+
+.exchange-path {
+	flex: 1;
+	min-width: 0;
+	color: var(--muted);
+	white-space: nowrap;
+	overflow-x: auto;
+}
+
+// The card is the most valuable element on the site, so a response that is visibly chopped off mid-token
+// reads as a rendering fault rather than as something to scroll. Two things stop that: the code sets a size
+// of its own so a full response line fits the hero column, and the pane fades at its right edge so what does
+// overflow reads as "there is more" instead of "this is broken".
+.exchange-code {
+	padding: var(--s-3) var(--s-5) var(--s-5);
+
+	pre {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+	}
+
+	// Nothing to fade when nothing overflows, and a mask on a non-scrolling pane just dims the last word.
+	pre:not(:hover) { mask-image: none; }
+
+	@supports (animation-timeline: scroll()) {
+		pre {
+			mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+			animation: fade-when-scrollable linear;
+			animation-timeline: scroll(self inline);
+		}
+	}
+}
+
+@keyframes fade-when-scrollable {
+	to { mask-image: linear-gradient(to right, transparent, #000 40px); }
+}
+
+// A 32px strip on --bg with a hairline above and below, carrying one word.
+.exchange-seam {
+	display: flex;
+	align-items: center;
+	height: 32px;
+	padding-inline: var(--s-5);
+	background: var(--bg);
+	border-block: 1px solid var(--line);
+	font-size: 0.8125rem;
+	letter-spacing: 0.06em;
+	color: var(--muted);
+}
+
+.exchange-verdict {
+	margin: 0;
+	padding: var(--s-4) var(--s-5);
+	border-top: 1px solid var(--line);
+}
+
+// ---------------------------------------------------------------- the command line
+
+// Not a button. A code line with an orange prompt and a Copy control as text.
+.command {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--s-3);
+	margin-block: var(--s-6);
+	padding: var(--s-4) var(--s-5);
+	background: var(--surface);
+
+	code {
+		flex: 1;
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+}
+
+// Text, not an icon.
+.copy {
+	flex: none;
+	background: none;
+	border: 1px solid var(--line);
+	border-radius: var(--s-1);
+	color: var(--muted);
+	font: inherit;
+	font-size: 0.8125rem;
+	padding: 2px var(--s-2);
+	cursor: pointer;
+
+	&:hover { color: var(--text); }
+	&[hidden] { display: none; }
+}
+
+// No glow, no neon, no shadow at all in dark. A dark page held together only by borders reads as a TUI, so
+// surfaces lift and lines do the edges.
+:root[data-theme="dark"] .exchange { box-shadow: none; }
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .exchange { box-shadow: none; }
+}

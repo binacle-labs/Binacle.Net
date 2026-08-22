@@ -1,5 +1,8 @@
 ---
 title: Packing Logs
+meta_description: >-
+  Record every fit and pack request as NDJSON so you can see which bin sizes and functions get used. The
+  configuration was flattened in v3.0.0.
 nav:
   parent: Diagnostics Module
   order: 3

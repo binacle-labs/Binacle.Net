@@ -1,5 +1,8 @@
 ---
 title: Core Concepts
+meta_description: >-
+  The three heuristic algorithms Binacle.Net packs with, FFD, WFD and BFD, what each one trades away, and the
+  difference between fitting and packing.
 nav:
   order: 2
   icon: 🔍
@@ -9,8 +12,8 @@ nav:
 Binacle.Net is designed to solve the 3D Bin Packing Problem efficiently using specialized 
 **heuristic algorithms** and **real-time computation techniques**. 
 
-By balancing speed and accuracy, it provides optimized packing solutions for logistics, warehousing, 
-and e-commerce applications.
+By balancing speed and accuracy, it picks the smallest bin that holds your items, for logistics, 
+warehousing and e-commerce.
 
 ---
 
@@ -80,11 +83,11 @@ The Fitting function evaluates if a given set of items can fit into a specified 
 - ✅ Provides a quick, real-time assessment of bin suitability
 
 ### 📦 Packing
-The Packing function goes beyond simple fitting. It determines where each item is placed within the bin. If all items don't fit, it optimizes placement to pack as many items as possible.
+The Packing function goes beyond simple fitting. It determines where each item is placed within the bin. If all items don't fit, it packs as many of them as it can.
 
 **Why use Packing?**
 - ✅ Tracks the exact position of each item within the bin
-- ✅ Optimizes space usage, maximizing packing efficiency
+- ✅ Shows how the bin was filled, so you can see the room that is left
 - ✅ Helps fulfillment teams by providing step-by-step instructions for packing
 
 

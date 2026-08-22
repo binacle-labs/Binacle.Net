@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, and how the agent reference layer is kept honest against the code.
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, and how the agent reference layer is kept honest against the code.
 verified: 2026-08-23
-check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs
+check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL
 paths:
   - "NOTICE"
   - "README.md"
@@ -89,6 +89,35 @@ GitHub redirects them forever, and rewriting them makes them false.
 
 **The swagger json under each version folder is generated output.** Regenerate it, never hand-edit it — the
 rule and the generator are in `$sites/docs`.
+
+### D7 — an old docs version is de-indexed, and after that it is only ever bug-fixed
+
+Four documentation versions are published and only one is current. Before 2026-08-23 all four were indexable,
+all four were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
+title and a meta description with a sibling, and five said `Quick Start - Binacle.Net Docs`. A search engine
+had nothing to choose on, so readers landed on documentation for image tags that will never ship again.
+
+**Only `current` is indexable.** Every other version is served `noindex, follow` and is in no sitemap, and
+every versioned title carries its version. `follow`, not `nofollow` — an old page's links still lead
+somewhere worth crawling. The mechanism is in `$sites/docs#search-and-current`; it reads
+`_data/versions.yml` and names no version, so opening a new line is still the one edit it always was.
+
+**Swagger pages leave the sitemaps too, current version included.** They were already `noindex` and still
+listed, which Search Console reports as "Submitted URL marked 'noindex'" — an error, ranked with real
+breakage, so it buries it.
+
+**What this buys: an old version is not worth editing except to fix a bug.** Nobody arrives on it from
+search, so a wording improvement there reaches nobody and a typo costs nothing. That is a change of policy,
+not just of tone — the site used to carry the risk that a stale page was someone's first result. It does not
+now. The freeze on old folders was already structural (`$sites/docs`); de-indexing is what makes leaving them
+alone safe rather than merely convenient.
+
+**It is deliberately cheap to reverse, and that is why the old versions have written descriptions.** Every
+legacy page carries a hand-written `meta_description` naming the version it documents, written on the same day
+the versions were de-indexed. **That was the maintainer's call and the reasoning is the point:** if indexing an
+old line ever turns out to be worth it, flipping it back is a change to `current` and a sitemap, not a writing
+project across seventy-four pages. **De-index freely; do not also let the copy rot** — the two decisions look
+like one and are not.
 
 ### D3 — the signing identity moved with the repository, and there are three bands
 

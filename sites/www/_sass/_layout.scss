@@ -1,0 +1,76 @@
+// The shell, the header and the footer. Everything else is the design system's.
+
+.shell {
+	max-width: var(--shell);
+	margin-inline: auto;
+	padding-inline: var(--s-5);
+
+	@media (min-width: 720px) { padding-inline: var(--s-6); }
+}
+
+.prose { max-width: var(--measure); }
+
+// No coloured header bar and no coloured footer. Large flat fills are a large part of why the other two
+// sites read as framework demos.
+.site-header {
+	padding-block: var(--s-5);
+}
+
+.header-inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--s-3) var(--s-5);
+}
+
+.wordmark {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--s-2);
+	font-weight: 700;
+	font-size: 1.0625rem;
+	text-decoration: none;
+	color: var(--text);
+
+	img { width: 28px; height: 28px; }
+}
+
+// Five text items, no hamburger. They wrap to a second row on a phone and that is fine.
+.site-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--s-3) var(--s-5);
+	margin-right: auto;
+
+	a {
+		color: var(--muted);
+		text-decoration: none;
+
+		&:hover { color: var(--text); }
+		&[aria-current="page"] { color: var(--text); }
+	}
+}
+
+.theme-toggle {
+	background: none;
+	border: 1px solid var(--line);
+	border-radius: var(--s-2);
+	color: var(--text);
+	font: inherit;
+	font-size: 0.8125rem;
+	padding: var(--s-1) var(--s-3);
+	cursor: pointer;
+
+	&[hidden] { display: none; }
+}
+
+.site-footer {
+	padding-block: var(--s-8);
+	color: var(--muted);
+	font-size: 0.8125rem;
+	text-align: center;
+
+	a { color: var(--muted); }
+
+	span { margin-inline: var(--s-1); }
+}

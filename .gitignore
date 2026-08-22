@@ -81,3 +81,13 @@ sites/demo/*.ico
 sites/demo/*.png
 
 
+
+## Marketing site - css/ joins js/ here, unlike the other two sites. Jekyll compiles no sass on www; the
+## sass CLI writes css/main.css from _sass/, so it is build output like the bundle.
+artifacts/www
+sites/www/js
+sites/www/css
+sites/www/media
+sites/www/lib
+sites/www/*.ico
+sites/www/*.png

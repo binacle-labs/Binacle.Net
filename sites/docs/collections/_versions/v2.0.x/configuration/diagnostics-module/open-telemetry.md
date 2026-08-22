@@ -1,5 +1,8 @@
 ---
 title: Open Telemetry
+meta_description: >-
+  Push traces, metrics and logs from Binacle.Net v2.0.x to Grafana, Jaeger, Prometheus or Azure Application
+  Insights. The OpenTelemetry.json settings.
 nav:
   parent: Diagnostics Module
   order: 4

@@ -1,5 +1,9 @@
 ---
-title: Users
+title: Users API
+menu_title: Users
+meta_description: >-
+  The User Management API in Binacle.Net v1.3.x, available once the Service Module is on. Auth tokens, admin-
+  only management, and the rules.
 nav:
   parent: API
   order: 4

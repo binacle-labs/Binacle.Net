@@ -1,5 +1,8 @@
 ---
 title: Service Module
+meta_description: >-
+  Why the Service Module in Binacle.Net v2.0.x has no public documentation, and what the rewrite to accounts and
+  subscriptions changed.
 permalink: /version/v2.0.x/configuration/service-module/
 nav:
   parent: Configuration

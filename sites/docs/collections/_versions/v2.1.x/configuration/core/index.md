@@ -1,5 +1,8 @@
 ---
 title: Core
+meta_description: >-
+  The Core module in Binacle.Net v2.1.x: presets, Swagger UI, and the configuration files under
+  /app/Config_Files, with the defaults for each.
 permalink: /version/v2.1.x/configuration/core/
 nav:
   parent: Configuration

@@ -1,5 +1,8 @@
 ---
 title: Kubernetes
+meta_description: >-
+  Run Binacle.Net v2.0.x on a cluster you already have, beside your shops and not exposed. What the Kubernetes
+  samples assume.
 permalink: /version/v2.0.x/samples/kubernetes/
 nav:
   order: 2

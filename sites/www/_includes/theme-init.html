@@ -1,0 +1,14 @@
+{%- comment -%}
+Inline, in <head>, and it has to stay both. It runs before first paint so a reader who chose light does not
+get a dark flash on every navigation. An external file cannot do this - it loads after the first paint.
+
+try/catch because localStorage throws outright in a private window and in some embedded browsers. When it
+throws, or when nothing is stored, no attribute is set and the stylesheet's prefers-color-scheme query
+decides - which is the toggle defaulting to system preference. data-default-theme on <html> is the last
+resort, for a browser that reports no preference at all.
+
+Keep it this small. Anything longer belongs in _js/main.ts, which loads deferred.
+{%- endcomment -%}
+<script>
+(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}})();
+</script>

@@ -1,0 +1,13 @@
+{%- comment -%}
+The docker run line. It is NOT a button - it is a code line on --surface with a 1px border, an orange $
+prompt and a Copy control as text. Making the primary action look like a command rather than a button is the
+most honest thing on the page and also the most distinctive.
+
+The tag comes from _data/exchange.yml, so it moves in one place when the line moves.
+{%- endcomment -%}
+{%- assign id = include.id | default: 'run' -%}
+<div class="command">
+    <span class="prompt" aria-hidden="true">$</span>
+    <code id="{{ id }}-text">{{ site.data.exchange.command.text | strip }}</code>
+    <button type="button" class="copy" data-copy="{{ id }}-text" hidden>Copy</button>
+</div>

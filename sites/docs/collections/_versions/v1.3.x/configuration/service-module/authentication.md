@@ -1,5 +1,8 @@
 ---
 title: Authentication
+meta_description: >-
+  JWT authentication for the Service Module in Binacle.Net v1.3.x. The JwtAuth.json settings, and how a token
+  bypasses the rate limiter.
 nav:
   parent: Service Module
   order: 2

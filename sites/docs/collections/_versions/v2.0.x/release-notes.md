@@ -1,5 +1,8 @@
 ---
 title: Release Notes
+meta_description: >-
+  What changed in the Binacle.Net v2.0.x line, newest release first. v2.0.0 removed the V1 endpoints and rewrote
+  the Service Module.
 nav:
   order: 2
   icon: 🛠️

@@ -1,5 +1,8 @@
 ---
 title: Release Notes
+meta_description: >-
+  What changed in the Binacle.Net v1.3.x line, newest release first. v1.3.0 adds OpenTelemetry and removes
+  Application Insights.
 nav:
   order: 4
   icon: 🛠️

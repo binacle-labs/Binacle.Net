@@ -1,5 +1,8 @@
 ---
 title: Samples
+meta_description: >-
+  Starting points for running Binacle.Net: five Docker Compose setups and a minimal Kubernetes deployment.
+  Download a folder and edit the presets.
 permalink: /version/v3.0.x/samples/
 nav:
   order: 20

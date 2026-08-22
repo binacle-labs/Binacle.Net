@@ -11,7 +11,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: decisions.md
-  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, and how the agent reference layer is kept honest against the code."
+  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, and how the agent reference layer is kept honest against the code."
   paths: ["NOTICE", "README.md", "SECURITY.md", "CHANGELOG.md", "Dockerfile", "CONTENT-TERMS.md", "sites/docs/**"]
 ```
 
@@ -40,6 +40,14 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: lib/findings.md
   description: "Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions."
   paths: ["lib/**"]
+```
+
+## Sites
+
+```yaml
+- file: sites/decisions.md
+  description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate."
+  paths: ["sites/demo/**", "sites/docs/**"]
 ```
 
 ## ViPaq

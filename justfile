@@ -25,7 +25,7 @@ mod regen 'tooling/regen.just'
 # CHANGELOG.md sections: `just changelog extract <version|Unreleased>`, `just changelog check <version>`.
 mod changelog 'tooling/changelog.just'
 
-# Run from source: `just serve api [profile]`, `just serve docs`, `just serve demo`, `just serve services-up`.
+# Run from source: `just serve api [profile]`, `just serve docs|demo|www`, `just serve services-up`.
 mod serve 'tooling/serve.just'
 
 # Make the API image: `just build publish` for the app, `just build image [version]` for the container.
@@ -37,7 +37,7 @@ mod image 'tooling/image.just'
 # Smoke the built image: `just smoke all`, `just smoke test-structure`, `just smoke test <profile>`.
 mod smoke 'tooling/smoke.just'
 
-# Check what was built: `just check links` for both sites, `just check links <site>` for one.
+# Check what was built: `just check links` for every site, `just check links <site>` for one.
 mod check 'tooling/check.just'
 
 # Two recipes rather than an `install` module: you want all of it on a fresh clone, and the only part worth
@@ -49,11 +49,13 @@ install:
     npm install
     cd sites/docs && bundle install
     cd sites/demo && bundle install
+    cd sites/www && bundle install
     @just assets
 
-# Copy assets/ into the docs and demo sites and the UI module - run it after changing anything under assets/
+# Copy assets/ into the three sites and the UI module - run it after changing anything under assets/
 [group('dev')]
 assets:
     npm run copy-assets-to-docs
     npm run copy-assets-to-demo
+    npm run copy-assets-to-www
     npm run copy-assets-to-uimodule

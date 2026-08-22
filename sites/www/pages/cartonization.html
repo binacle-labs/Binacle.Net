@@ -1,0 +1,153 @@
+---
+permalink: /cartonization/
+title: Cartonization API you can self-host
+heading: Cartonization you can run yourself.
+description: >-
+  Cartonization is picking the right box for an order. Binacle.Net answers in milliseconds, as a free and
+  open source API you host yourself.
+---
+
+{%- comment -%}
+Twelve paid products rank for this word and not one of them shows a request you can run. That gap is
+structural - their product is not self-hostable, so they cannot copy the answer. The code block below is the
+entire edge of this page.
+
+Never name a competitor and never write a comparison table against unnamed ones - it only sends the reader
+off to find them. Beat them on modifiers: free, open source, self-hosted, no per-call fee.
+
+One conversion action on this page: copying the docker run line.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <h1>{{ page.heading }}</h1>
+
+            <p class="lead">Cartonization is choosing which box an order goes in before anyone packs it. It is
+                the name warehouse and shipping software gives the job, and underneath it is one question: do
+                these items fit in this box, and which box is the smallest that holds them.</p>
+
+            <p>Binacle.Net answers that question in milliseconds, on hardware you control.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">What it does</p>
+                <h2>What it does of it</h2>
+
+            <p>Give it your box sizes and a list of items. It tells you which of those boxes hold the order and
+                which is the smallest that does. Ask the pack endpoints instead and it also returns the
+                coordinates of every item inside the box.</p>
+
+            <p>The answer comes back as JSON your backend can act on: the box, the items that went in, the items
+                that did not, and how full the box ends up.</p>
+        </div>
+        </div>
+</section>
+
+{%- comment -%}
+by-preset rather than by-custom: the box set is configured once in the image, so the request carries only the
+order. That is both the shorter request the plan asks for and the shape a real integration uses.
+{%- endcomment -%}
+<section class="band rule">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">A worked example</p>
+            <h2>One request, and the answer</h2>
+            <p>Configure your box set once, then send nothing but the order.</p>
+        </div>
+
+        {% include exchange.html id="carton" block=site.data.exchange.carton
+           verdict="The Medium box is the smallest of the three that holds this order." %}
+
+        <div class="prose">
+            <p>Every box in the set comes back with its own verdict, so your code can apply whatever rule it
+                already has - smallest by volume, cheapest to ship, whatever is in stock this morning.</p>
+
+            <p>It is free and open source, you host it yourself, and there is no per-call fee. Run it beside
+                your order service and your customers' dimensions never leave your network.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+The table form, not four sentences of denial. It is a specification, not an apology.
+{%- endcomment -%}
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Scope</p>
+            <h2>Where it stops</h2>
+            <p>Binacle.Net works one box at a time.</p>
+        </div>
+
+        <div class="table-wrap">
+            <table class="scope">
+                <thead>
+                    <tr>
+                        <th scope="col">It answers</th>
+                        <th scope="col">It does not answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="It answers">Does this order fit in this box?</td>
+                        <td data-label="It does not answer">How do I split an order across boxes?</td>
+                    </tr>
+                    <tr>
+                        <td data-label="It answers">Which of my boxes is the smallest that holds it?</td>
+                        <td data-label="It does not answer">How many boxes do I need?</td>
+                    </tr>
+                    <tr>
+                        <td data-label="It answers">Where does every item sit?</td>
+                        <td data-label="It does not answer">Which carrier or rate is cheapest?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="prose">
+            <p>Carrier selection and rate shopping are a different job and Binacle.Net does not do them. It
+                hands you a box and the placement; what you spend on shipping it is yours to decide.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band" id="run">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Get started</p>
+            <h2>Run it</h2>
+            <p>One image, one port.</p>
+        </div>
+
+        {% include command.html id="run" %}
+
+        <div class="prose">
+            <p>Box sets are configured as presets, which
+                <a href="https://docs.binacle.net/integration-guide/">the integration guide</a> covers along
+                with how to get your product dimensions into a shape it can use.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Next</p>
+                <h2>Where to go next</h2>
+
+            <p>If your customers collect from a locker rather than a doorstep, the same call answers
+                <a href="{{ '/parcel-lockers/' | relative_url }}">whether an order fits a locker
+                compartment</a>.</p>
+
+            <p>If you are evaluating it, <a href="{{ '/how-it-works/' | relative_url }}">how the packing
+                works</a> covers the two functions, the three algorithms, and what a yes and a no each mean.</p>
+
+            <p>Under the trade's word, this is a <a href="{{ '/' | relative_url }}">3D bin packing API</a> - the
+                term most people search for, and the same problem.</p>
+        </div>
+        </div>
+</section>

@@ -1,0 +1,5 @@
+url                     : "https://www.binacle.net"
+api_url                 : "https://api.binacle.net"
+# The same container the other two sites carry. "Arrived at www, clicked through to the demo" is only
+# answerable while all three are on one.
+gtm                     : 'GTM-W5S5LWMV'

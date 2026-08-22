@@ -1,5 +1,8 @@
 ---
 title: Service Module
+meta_description: >-
+  The Service Module turns Binacle.Net into a hosted service with accounts and subscriptions. It has no public
+  documentation, and this page says why.
 permalink: /version/v3.0.x/configuration/service-module/
 nav:
   parent: Configuration

@@ -1,0 +1,254 @@
+---
+permalink: /
+title: 3D bin packing API you can self-host
+heading: Will it fit in the box?
+description: >-
+  Binacle.Net answers which box an order goes in, in milliseconds. A free and open source 3D bin packing API
+  you host yourself, in one Docker command.
+structured_data: true
+---
+
+{%- comment -%}
+Nothing above the h1 - no eyebrow, no badge. The h1 asks the question in English and the card beside it asks
+the same question in HTTP and answers it in JSON.
+
+The sub-line and supporting line are canonical strings and are not edited here. Spine, expansion, identity,
+then the checkout line.
+{%- endcomment -%}
+<section class="band hero">
+    <div class="shell hero-grid">
+        <div class="hero-copy prose">
+            <h1>{{ page.heading }}</h1>
+
+            <p class="lead">Binacle.Net answers which box an order goes in, in milliseconds. Give it your box
+                sizes and a list of items and it returns the smallest box that holds them, and where every
+                item sits. It is a free and open source 3D bin packing API that you host yourself.</p>
+
+            <p>Built for checkout: your customer picks a locker or a box, and Binacle.Net says whether the
+                order fits before they pay.</p>
+
+            {%- comment -%} At most two buttons on the whole homepage, and these are them. {%- endcomment -%}
+            <p class="actions">
+                <a class="button primary" href="#run">Run it</a>
+                <a class="button secondary" href="https://demo.binacle.net">Try the demo</a>
+            </p>
+
+            <p class="hero-repo"><a href="https://github.com/binacle-labs/Binacle.Net">Read the source on
+                GitHub</a></p>
+        </div>
+
+        <div class="hero-card">
+            {% include exchange.html id="hero" block=site.data.exchange.fit
+               verdict="The medium locker holds all three items. The small one takes only one of them." %}
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+The only prose-only block on the page, and the only place written from the reader's side. No card and no
+columns - that is what gives it weight. Under 90 words on purpose.
+{%- endcomment -%}
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">The problem</p>
+            <h2>Checkout has to answer before the customer pays.</h2>
+
+            <p>Your customer picks a locker size or a box, and something has to say yes or no while they are
+                still on the page. Not in a warehouse an hour later.</p>
+
+            <p>Get it wrong and someone repacks the order, prints a second label, or sends a parcel to a
+                locker that will not take it. The customer has already paid.</p>
+
+            <p>Working out whether the items go in is a 3D packing problem, and checkout does not have long
+                to wait.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+A specification, not an apology. No "unfortunately", no "only", no "just". The table carries the negatives so
+the prose does not have to. Real <table> markup - Google lifts table content for comparison-shaped queries
+and divs pretending to be tables get nothing.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Scope</p>
+            <h2>What it answers</h2>
+            <p>Binacle.Net works one box at a time.</p>
+        </div>
+
+        <div class="table-wrap">
+            <table class="scope">
+                <thead>
+                    <tr>
+                        <th scope="col">It answers</th>
+                        <th scope="col">It does not answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="It answers">Does this order fit in this box?</td>
+                        <td data-label="It does not answer">How do I split an order across boxes?</td>
+                    </tr>
+                    <tr>
+                        <td data-label="It answers">Which of my boxes is the smallest that holds it?</td>
+                        <td data-label="It does not answer">How many boxes do I need?</td>
+                    </tr>
+                    <tr>
+                        <td data-label="It answers">Where does every item sit?</td>
+                        <td data-label="It does not answer">Which carrier or rate is cheapest?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+His tick-and-scales device promoted from a bullet list to a layout. Each column states its own cost. A
+project stating its own limits is more persuasive here than a benefits list, and the middle column is the
+heuristics paragraph doing its real job instead of sitting in a footnote.
+
+This is the section carrying the page's one blue structural rule.
+{%- endcomment -%}
+<section class="band alt rule">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Trade-offs</p>
+            <h2>What you get, and what it costs</h2>
+        </div>
+
+        <div class="tradeoffs">
+            <div class="tradeoff">
+                <h3>You run it yourself</h3>
+                {% include verdicts.html
+                   tick="Your customers' dimensions never leave your network"
+                   scales="Uptime is yours" %}
+            </div>
+            <div class="tradeoff">
+                <h3>A yes is reliable</h3>
+                {% include verdicts.html
+                   tick="If it says the items fit, they fit, and the pack routes show you how"
+                   scales="A no is not a proof - there may be an arrangement it did not find" %}
+            </div>
+            <div class="tradeoff">
+                <h3>Free and open source</h3>
+                {% include verdicts.html
+                   tick="GPL-3.0, no signup, no tier"
+                   scales="Support is a GitHub discussion, not an SLA" %}
+            </div>
+        </div>
+
+        {%- comment -%}
+        This paragraph has an expiry date. The day Binacle.Net distributes an order across several boxes it
+        becomes false and comes out. Whoever ships that feature deletes it.
+        It is also the one place "cartonization" is said on this page.
+        {%- endcomment -%}
+        <div class="prose">
+            <p>Strictly, that makes this the single-container case - a 3D knapsack rather than bin packing,
+                and the word the logistics trade uses is cartonization. Most people looking for it search for
+                3D bin packing, so that is the term used here.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">The API</p>
+            <h2>What you can ask it</h2>
+
+            <p>Two functions. <strong>Fit</strong> checks whether a set of items goes into a box.
+                <strong>Pack</strong> works out where each one sits.</p>
+
+            <p>Either takes your boxes in the request - <code>by-custom</code> - or by the name of a preset
+                you configured once - <code>by-preset/{preset}</code>.</p>
+
+            {%- comment -%}
+            Load-bearing. The expansion beat promises "where every item sits", and a fit response does not
+            carry coordinates. Without this sentence the page promises something the hero card does not show.
+            {%- endcomment -%}
+            <p>The pack endpoints run the same algorithms and also return the position of every item. A fit
+                response tells you what went in and what did not; it has no coordinates in it.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+Three sentences, one link each, into the other three pages. Not a card grid. Anchor text is a phrase, never
+"learn more". "3D bin packing API" is repeated here - the exact phrase belongs on this page and is repeated
+on it.
+{%- endcomment -%}
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Use cases</p>
+            <h2>Where people use it</h2>
+
+            <p>The same 3D bin packing API answers three different questions, depending on who is asking.</p>
+
+            <p>Warehouse and shipping teams call it
+                <a href="{{ '/cartonization/' | relative_url }}">picking the right box for an order</a>.</p>
+
+            <p>If your customers collect from a locker, the question is
+                <a href="{{ '/parcel-lockers/' | relative_url }}">whether an order fits a parcel
+                compartment</a> before they choose one.</p>
+
+            <p>If you are deciding whether to integrate it, read
+                <a href="{{ '/how-it-works/' | relative_url }}">how the packing itself works</a> - the two
+                functions, the three algorithms, and what a yes and a no each mean.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+Every clause here is evidenced. The name is on NOTICE and the GitHub profile; the authorship is git log, 948
+of 957 commits, first one 28 Feb 2023; Discussions is where the org profile already sends questions.
+
+Invent nothing further - no motivation, no job, no years of experience. No origin story and no
+bin-plus-pinnacle. "Binacle Labs" is a GitHub organisation, not a company, and does not appear on this site.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">The maintainer</p>
+            <h2>Who makes this</h2>
+            <p><a href="https://github.com/ChrisMavrommatis">Chris Mavrommatis</a> builds Binacle.Net. Every
+                commit since February 2023 is his. Questions go to
+                <a href="https://github.com/binacle-labs/Binacle.Net/discussions">GitHub Discussions</a>.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+The close. The command is not a button - the stylesheet makes it a command line with an orange prompt.
+Warmth goes here, at the end, near the command. Never in the opener.
+{%- endcomment -%}
+<section class="band alt" id="run">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Get started</p>
+            <h2>Run it</h2>
+            <p>One image, one port.</p>
+        </div>
+
+        {% include command.html id="run" %}
+
+        <div class="prose">
+            <p>The three flags turn on three optional pages, and the API needs none of them.</p>
+
+            <ul>
+                <li><code>UI_MODULE</code> - the packing demo, at <code>/</code></li>
+                <li><code>SWAGGER_UI</code> - Swagger UI, at <code>/swagger/</code></li>
+                <li><code>SCALAR_UI</code> - Scalar, at <code>/scalar/</code></li>
+            </ul>
+
+            <p>The API itself is under <code>/api/v3</code>. Everything else is optional, and
+                <a href="https://docs.binacle.net/quick-start/">the quick start</a> has the rest.</p>
+
+            <p>Try it out.</p>
+        </div>
+    </div>
+</section>

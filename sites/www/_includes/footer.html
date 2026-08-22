@@ -1,0 +1,19 @@
+{%- comment -%}
+The replace has to happen in an assign tag, not inside the output tag. Liquid's variable parser trips over
+the closing brace of the {now} placeholder when it sits inside {{ }}.
+{%- endcomment -%}
+{%- assign now_year = site.time | date: "%Y" -%}
+{%- assign copyright = site.data.footer.copyright | replace: "{now}", now_year -%}
+<footer class="site-footer">
+  <div class="shell">
+    <p>
+        <span>{{ copyright }}</span>
+        <span aria-hidden="true">&middot;</span>
+        <a href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
+        {%- for link in site.data.footer.links %}
+        <span aria-hidden="true">&middot;</span>
+        <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor %}
+    </p>
+  </div>
+</footer>

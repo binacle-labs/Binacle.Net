@@ -177,7 +177,7 @@ stay four.
 ## The docs deploy - after the tag
 
 **The config half is done:** `main` carries `current: v3.0.x`, `- id: v3.0.x` back at the top of `list`, and
-`sites/docs/collections/_sitemaps/version-3-0-x.xml` restored - all verified 2026-08-14. What is left is the deploy
+the version sitemap restored - all verified 2026-08-14. What is left is the deploy
 plus six edits that must go out with it.
 
 **`sites/docs/` is off limits to a coding session.** This is the docs session's work, written here for it.

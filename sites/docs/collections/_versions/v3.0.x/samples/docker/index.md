@@ -1,5 +1,8 @@
 ---
 title: Docker
+meta_description: >-
+  Five Docker Compose setups for Binacle.Net, from minimal to everything switched on, and how to choose between
+  the prod and service ones.
 permalink: /version/v3.0.x/samples/docker/
 nav:
   order: 1

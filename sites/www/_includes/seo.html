@@ -1,0 +1,51 @@
+{%- comment -%}
+Written for this site, not copied from the other two - theirs carry five live defects and every one of them
+comes with the file. What is different here, and why, in the order it appears:
+
+  1. `description` is front matter on every page and is never derived from the excerpt. Deriving it through a
+     truncating filter is what cut the live homepage snippet mid-word at "and war". The excerpt fallback is
+     for a page that forgot; every page here has a written one.
+  2. `og:type` is `website`. `article` is wrong for a product page and it was hardcoded.
+  3. `og:image` and `twitter:image` are on every page, from a site-wide default. Without one, every link
+     pasted into Slack, Reddit or Hacker News renders a grey card - and the announcement is a link pasted
+     into exactly those places.
+  4. `twitter:card` is `summary`, because og_image is a square logo and a wide card crops a square image. It
+     becomes `summary_large_image` the day a 1200x630 file exists - the two change together.
+  5. The <title> tag emits with no whitespace inside it. The live site wraps its value in newlines and some
+     scrapers keep them.
+
+The separator is " - ", not "|". Every absolute URL comes from `absolute_url`, so `url` in _config.yml is the
+only line in the build that names the host.
+{%- endcomment -%}
+
+{%- assign page_title = site.title -%}
+{%- if page.seo_title -%}
+  {%- assign page_title = page.seo_title -%}
+{%- elsif page.title -%}
+  {%- assign page_title = page.title | append: ' - ' | append: site.title -%}
+{%- endif -%}
+
+{%- assign canonical_url = page.url | remove: "index.html" | absolute_url -%}
+
+{%- assign excerpt_description = page.excerpt | strip_html | normalize_whitespace | strip -%}
+{%- assign meta_description = page.description | default: excerpt_description | default: site.description | strip_html | normalize_whitespace | strip -%}
+
+{%- assign meta_image = page.og_image | default: site.og_image | absolute_url -%}
+
+<title>{{ page_title }}</title>
+<meta name="description" content="{{ meta_description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ meta_description }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:image" content="{{ meta_image }}">
+<meta property="og:locale" content="{{ page.locale }}">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ page_title }}">
+<meta name="twitter:description" content="{{ meta_description }}">
+<meta name="twitter:url" content="{{ canonical_url }}">
+<meta name="twitter:image" content="{{ meta_image }}">

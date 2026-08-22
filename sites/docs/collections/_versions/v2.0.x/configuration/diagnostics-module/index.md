@@ -1,5 +1,8 @@
 ---
 title: Diagnostics Module
+meta_description: >-
+  The Diagnostics Module in Binacle.Net v2.0.x: logging on by default, with health checks, OpenTelemetry and
+  packing logs on request.
 permalink: /version/v2.0.x/configuration/diagnostics-module/
 nav:
   parent: Configuration

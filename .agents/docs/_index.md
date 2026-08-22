@@ -175,8 +175,11 @@ table of [README.md](README.md).
   description: "The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/."
   paths: ["sites/docs/**"]
 - file: sites/README.md
-  description: "Every published site lives under sites/, one directory each. What the two share, and what is per-site."
+  description: "Every published site lives under sites/, one directory each. What the three share, and what is per-site."
   paths: ["sites/**"]
+- file: sites/www.md
+  description: "The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile."
+  paths: ["sites/www/**"]
 ```
 
 ## Tooling

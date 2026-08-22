@@ -1,0 +1,186 @@
+---
+permalink: /how-it-works/
+title: How the packing works
+heading: How Binacle.Net packs a box.
+description: >-
+  Binacle.Net runs three heuristic packing algorithms. What a yes means, what a no does not mean, and where
+  the API stops.
+---
+
+{%- comment -%}
+The evaluator's page. That reader converts by looking at code, so the conversion action here is opening the
+repository and the docker run line is secondary.
+
+The one text link to the demo lives on this page and nowhere else except the footer.
+
+No benchmark numbers. The engine timings in the repo are real, but no surface carries a number that invites
+checking, and "in milliseconds" in the spine stands in for them. Do not reintroduce microseconds here just
+because the page is technical.
+
+Every instance of "optimal" is rewritten, not softened - it is a claim about bin packing that no heuristic
+can make.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <h1>{{ page.heading }}</h1>
+
+            <p class="lead">Two functions and three algorithms. Fit answers whether a set of items goes into a
+                box. Pack answers the same thing and works out where each item sits.</p>
+
+            <p>Both are part of the same <a href="{{ '/' | relative_url }}">3D bin packing API</a>: one image,
+                and you call whichever answer you need.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">The two functions</p>
+                <h2>Fit and pack</h2>
+
+            <p><strong>Fit</strong> is the pre-check. It takes your boxes and your items and returns a verdict
+                per box, with the items that went in and the items that did not. Use it at checkout, where you
+                need a yes or a no and nothing else.</p>
+
+            <p><strong>Pack</strong> runs the same algorithms and returns the position of every item as well.
+                Use it when someone downstream has to build the box, or when you want to draw the layout.</p>
+
+            <p>A fit response has no coordinates in it. If you need placement, call pack.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band rule">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">A worked example</p>
+            <h2>A pack request, and where every item lands</h2>
+            <p>Same shape as a fit request. The difference is in the response.</p>
+        </div>
+
+        {% include exchange.html id="pack" block=site.data.exchange.pack
+           verdict="All three items are placed, and the response says exactly where each one sits." %}
+
+        <div class="prose">
+            <p>The coordinates are the corner of each item inside the box, in the same units you sent. The
+                first item sits at the origin; the two after it are placed against what is already there.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+His own tick-and-scales notation, from core-concepts.md, with every instance of "optimal" rewritten. The
+closing note is his too - it is the anti-benchmark line and it stays.
+{%- endcomment -%}
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Algorithms</p>
+            <h2>The three algorithms</h2>
+            <p>All three sort the items by decreasing size and then differ in where they put each one. You
+                pick one per request.</p>
+        </div>
+
+        <div class="tradeoffs">
+            <div class="tradeoff">
+                <h3>First Fit Decreasing</h3>
+                <p class="algo-code"><code>FFD</code></p>
+                {% include verdicts.html
+                   tick="Places each item in the first space it finds that holds it, without looking for a better one"
+                   scales="May leave space unused that a slower search would have filled" %}
+            </div>
+            <div class="tradeoff">
+                <h3>Worst Fit Decreasing</h3>
+                <p class="algo-code"><code>WFD</code></p>
+                {% include verdicts.html
+                   tick="Places each item in the space that leaves the most room around it"
+                   scales="Spreads items out, which helps with distribution more often than with space" %}
+            </div>
+            <div class="tradeoff">
+                <h3>Best Fit Decreasing</h3>
+                <p class="algo-code"><code>BFD</code></p>
+                {% include verdicts.html
+                   tick="Keeps the space left around each placement as small as it can"
+                   scales="Examines the candidate spaces for each item rather than taking the first that fits" %}
+            </div>
+        </div>
+
+        <div class="prose">
+            <p class="callout">Which one is fastest, or packs tightest, depends on your data and on the
+                version you run. These describe what each algorithm does, not how they rank against each
+                other. If it matters to your workload, measure all three on your own boxes and items.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">What the answer means</p>
+                <h2>What a yes means, and what a no does not</h2>
+
+            <p>All three are heuristics. They are built to run in the time a checkout page has, and that choice
+                has a consequence in each direction.</p>
+
+            <p><strong>A yes is reliable.</strong> When Binacle.Net says the items fit, they fit. It does not
+                report a placement it could not make, and the pack endpoints will show you the placement it
+                found.</p>
+
+            <p><strong>A no is weaker.</strong> It means this algorithm did not find an arrangement, not that no
+                arrangement exists. In rare cases another algorithm, or the same items in a different order,
+                finds one. That is the trade the speed is bought with.</p>
+
+            <p>If a no is expensive for you, run a second algorithm before you act on it. If a yes is expensive
+                to get wrong, you are on the safe side already.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Versions</p>
+                <h2>Which version to call</h2>
+
+            <p><strong>Use v3.</strong> It is stable, it is what every example on this site uses, and it is what
+                the docs cover.</p>
+
+            <p><strong>v4 is experimental for the whole 3.0.x line.</strong> It ships in the same image, under
+                <code>/api/v4</code>, and its routes and responses can change in a patch release. Do not
+                integrate against it by accident.</p>
+
+            <p><a href="https://docs.binacle.net/version/latest/">The API reference</a> covers both, and the
+                <a href="https://docs.binacle.net/version/v3.0.x/swagger/v3.html">v3 OpenAPI document</a> is the
+                contract itself.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band" id="run">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Get started</p>
+            <h2>Read the code</h2>
+
+            <p>All of it is in <a href="https://github.com/binacle-labs/Binacle.Net">one repository</a>, under
+                GPL-3.0 - the packing engine, the API, and the tests that hold the algorithms to what this page
+                says they do.</p>
+
+            <p>If you would rather watch it than read it,
+                <a href="https://demo.binacle.net/packing/">the packing demo</a> runs the three algorithms in
+                the browser on boxes and items you type in.</p>
+
+            <p>Or run the image and point your own data at it:</p>
+        </div>
+
+        {% include command.html id="run" %}
+
+        <div class="prose">
+            <p>Start with <a href="https://docs.binacle.net/quick-start/">the quick start</a>, or
+                <a href="https://docs.binacle.net/core-concepts/">core concepts</a> for the longer version of
+                this page.</p>
+        </div>
+    </div>
+</section>

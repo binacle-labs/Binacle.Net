@@ -1,5 +1,8 @@
 ---
 title: Database
+meta_description: >-
+  The Service Module in Binacle.Net v1.3.x keeps user data in Azure Tables. The ConnectionStrings.json settings
+  and the supported databases.
 nav:
   parent: Service Module
   order: 1

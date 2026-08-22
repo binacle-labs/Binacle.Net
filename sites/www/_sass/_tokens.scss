@@ -1,0 +1,86 @@
+// The four brand hues are copied from sites/demo/_sass/_theme.scss, not shared with it. Four duplicated hex
+// values are cheaper than a build step that can break three sites at once.
+//
+// The neutrals are derived from --bg and --fg with color-mix, which is what keeps the palette at four hues
+// while still giving the site a full text ramp. Nothing here adds a fifth colour.
+//
+// No brand hue is ever the colour of running text. #448aff on #fdfcff measures about 3.4:1 - it passes for
+// large text and UI and fails for body copy, and the dark variants fail on #101010 for the same reason.
+
+:root {
+	color-scheme: dark light;
+
+	--primary: #448aff;
+	--secondary: #ff9100;
+	--tertiary: #7a4d93;
+
+	--bg: #fdfcff;
+	--fg: #14161a;
+
+	// 6%, not the 4% first specified. At 4% the alternating ground was invisible - it is the second-strongest
+	// separator the design has after space, and it was doing nothing at all.
+	--surface: color-mix(in oklab, var(--bg), var(--fg) 6%);
+	--line: color-mix(in oklab, var(--bg), var(--fg) 14%);
+	--muted: color-mix(in oklab, var(--bg), var(--fg) 62%);
+	--text: color-mix(in oklab, var(--bg), var(--fg) 88%);
+
+	// System stack only, on purpose. A marketing site for a self-hosted tool loading a font from a third
+	// party is a needless request and a bad look.
+	// The interactive blue, and it is NOT --primary. The palette's dark --primary is deliberately desaturated
+	// so it recedes, which is right for a rule or a marker and wrong for the one button that has to be
+	// pressed - in dark it turned the call to action into a dead grey-blue. This one is full strength in both
+	// themes. The label on it is near-black in both, because white on #448aff measures about 3.4:1 and fails.
+	--action: #448aff;
+	--on-action: #0b0f14;
+
+	// Same problem as --action, one hue over. The palette's dark --tertiary is #5b2d70, which is right for a
+	// 2px rule and unreadable as text on #101010. --tertiary stays the rule colour; this is the one that
+	// carries a word.
+	--accent: #6f3f8c;
+
+	--font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+	// 8px base, one scale. The rhythm is the design: with no imagery, the swing between a large empty band
+	// and a dense card is the page's only dynamic range.
+	--s-1: 4px;
+	--s-2: 8px;
+	--s-3: 12px;
+	--s-4: 16px;
+	--s-5: 24px;
+	--s-6: 32px;
+	--s-7: 48px;
+	--s-8: 64px;
+	--s-9: 96px;
+	--s-10: 128px;
+
+	// Prose runs 62ch. Documentation runs 90-100ch. It is the cheapest signal separating the two registers
+	// and nobody reads it as a decision - they read a page that feels like prose.
+	--measure: 62ch;
+	--shell: 1080px;
+	--radius: 10px;
+}
+
+// The dark variants are darker than their light counterparts on purpose. They recede, which is what a
+// designed dark theme does and a terminal never does.
+@mixin dark-tokens {
+	--primary: #3c5d8b;
+	--secondary: #9c6e2d;
+	--tertiary: #5b2d70;
+
+	--bg: #101010;
+	--fg: #e6e5e7;
+
+	// A dark surface needs a bigger lift than a light one to read as a separate ground at all.
+	--surface: color-mix(in oklab, var(--bg), var(--fg) 9%);
+
+	--accent: #c0a0d6;
+}
+
+// No stored choice: follow the system. This is the toggle "defaulting to system preference".
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) { @include dark-tokens; }
+}
+
+// A stored choice wins in both directions. _includes/theme-init.html sets the attribute before first paint.
+:root[data-theme="dark"] { @include dark-tokens; }

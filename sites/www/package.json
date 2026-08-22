@@ -1,0 +1,29 @@
+{
+  "name": "binacle-net-www",
+  "version": "1.0.0",
+  "description": "The marketing site for Binacle.Net.",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "sass --no-source-map --style=compressed _sass/main.scss css/main.css",
+    "build:js": "webpack --env build=dist",
+    "serve": "bundle exec jekyll serve",
+    "watch": "concurrently --names 'css,js' 'npm:watch:css' 'npm:watch:js'",
+    "watch:css": "sass --watch _sass/main.scss css/main.css",
+    "watch:js": "webpack --watch --env build=watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binacle-labs/Binacle.Net.git"
+  },
+  "author": "Chris Mavrommatis",
+  "license": "GPL-3.0-only AND CC-BY-SA-4.0",
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "sass": "^1.93.2",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  }
+}

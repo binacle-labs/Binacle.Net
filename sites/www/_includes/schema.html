@@ -1,0 +1,43 @@
+{%- comment -%}
+Two blocks, and they are on `/` only. A page opts in with `structured_data: true` in its front matter.
+
+The `offers` price of 0 is the only property here with a real payoff: every product in this category is paid,
+and a free row is exactly what the directories have none of.
+
+`sameAs` on the Organization ties this site to the Docker Hub listing, which currently outranks it for every
+category query. That is the whole reason the second block exists.
+
+Deliberately absent, so nobody adds them back: BreadcrumbList (four flat pages), FAQPage (rich results
+withdrawn, and it invites writing fake questions), WebSite + SearchAction (no site search), HowTo (deprecated).
+{%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Binacle.Net",
+  "url": {{ "/" | absolute_url | jsonify }},
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Docker",
+  "license": "https://spdx.org/licenses/GPL-3.0-only.html",
+  "codeRepository": "https://github.com/binacle-labs/Binacle.Net",
+  "description": {{ site.description | strip_html | normalize_whitespace | strip | jsonify }},
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Binacle.Net",
+  "url": {{ "/" | absolute_url | jsonify }},
+  "logo": {{ site.og_image | absolute_url | jsonify }},
+  "sameAs": [
+    "https://github.com/binacle-labs",
+    "https://hub.docker.com/r/binacle/binacle-net"
+  ]
+}
+</script>

@@ -1,0 +1,96 @@
+name: Deploy WWW Site
+
+on:
+  workflow_dispatch:
+
+# Never cancelled: a stopped run leaves the site deployed with no marker tag, so it maps back to no commit.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy the site
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    environment:
+      name: binacle-net-www
+      url: https://www.binacle.net
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build - www site
+        uses: ./.github/actions/build-jekyll-site
+        with:
+          site: www
+          directory: sites/www
+
+      - name: Install - lychee
+        uses: ./.github/actions/install-lychee
+
+      # Offline. The absolute URLs point at pages this run has not published yet, so they all 404 here.
+      - name: Check - links
+        run: just check links www
+
+      # From git, not the event: `workflow_dispatch` carries no commit payload. Stripped of the characters
+      # that would break out of the quoted argument below.
+      - name: Describe the deploy
+        run: |
+          set -euo pipefail
+          # tr wants a literal backslash in the set, and single quotes are how you pass one.
+          # shellcheck disable=SC1003
+          subject=$(git log -1 --format=%s "$GITHUB_SHA" | tr -d '"`$\\' | cut -c1-90)
+          echo "DEPLOY_MESSAGE=${GITHUB_SHA:0:8} - ${subject}" >> "$GITHUB_ENV"
+
+      # Uploads what the link check just read - artifacts/www, named as `directory` in the config file.
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config tooling/cloudflare/www.wrangler.jsonc --message "${{ env.DEPLOY_MESSAGE }}"
+
+  tag:
+    name: Tag the deployed commit
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    env:
+      # Must not start with `v` followed by a digit - the release workflow fires on `v[0-9]*`.
+      TAG_NAME: www-${{ github.run_number }}
+      COMMIT: ${{ github.sha }}
+      URL: https://www.binacle.net
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Push the marker tag
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG_NAME" "$COMMIT"
+          git push origin "$TAG_NAME"
+
+      - name: Summarise the deploy
+        run: |
+          set -euo pipefail
+          # A `|` in the subject would end the table row.
+          subject=$(git log -1 --format=%s "$COMMIT" | sed 's/|/\\|/g')
+          {
+            echo "## ${URL#https://} deployed"
+            echo
+            echo '| | |'
+            echo '|---|---|'
+            echo "| Commit | \`${COMMIT:0:8}\` - ${subject} |"
+            echo "| Marker tag | \`${TAG_NAME}\` |"
+            echo "| Site | ${URL} |"
+          } >> "$GITHUB_STEP_SUMMARY"

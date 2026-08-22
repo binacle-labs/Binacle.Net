@@ -1,0 +1,20 @@
+# One centred line: copyright, licence, links.
+#
+# No shields.io badges - a third-party request on every page, and a six-star badge argues against you.
+# No four-column marketing footer - there is not enough site to fill one.
+# No category sentence. The other two sites' footers still carry the old one.
+copyright: "(c) 2023-{now} Chris Mavrommatis"
+
+license:
+  title: "GPL-3.0"
+  url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.GPL-3.0"
+
+links:
+  - title: 'Documentation'
+    url: 'https://docs.binacle.net'
+  - title: 'GitHub'
+    url: 'https://github.com/binacle-labs/Binacle.Net'
+  - title: 'Docker Hub'
+    url: 'https://hub.docker.com/r/binacle/binacle-net'
+  - title: 'Demo'
+    url: 'https://demo.binacle.net'

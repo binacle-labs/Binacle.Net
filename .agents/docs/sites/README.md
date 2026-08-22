@@ -1,8 +1,8 @@
 ---
 id: sites
-description: Every published site lives under sites/, one directory each. What the two share, and what is per-site.
-verified: 2026-08-21
-check: The directory list matches sites/; both sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js
+description: Every published site lives under sites/, one directory each. What the three share, and what is per-site.
+verified: 2026-08-23
+check: The directory list matches sites/; all three sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
 paths:
   - "sites/**"
 ---
@@ -15,6 +15,7 @@ Every site this repo publishes, one directory each.
 |---|---|---|
 | `sites/docs/` | the documentation site | `$sites/docs` |
 | `sites/demo/` | the demo site | `$sites/demo` |
+| `sites/www/` | the marketing site | `$sites/www` |
 
 **All of it is off limits from a coding session.** Each site is written in its own session; see
 `.agents/README.md` for the rule and its one carve-out.
@@ -24,8 +25,8 @@ Every site this repo publishes, one directory each.
 Read this once, then the per-site doc for what differs.
 
 - **Jekyll + webpack + TypeScript.** Its own `Gemfile`, its own `package.json`, its own `webpack.config.js`.
-  **Both are root npm workspace members**, so one `npm ci` at the root covers them and neither has a lock file
-  of its own. Ruby is still per site: `bundle install` runs in each.
+  **All three are root npm workspace members**, so one `npm ci` at the root covers them and none has a lock
+  file of its own. Ruby is still per site: `bundle install` runs in each.
 - **Two configs.** `_config.yml` holds everything; `_config.prod.yml` overrides the few values that differ off
   localhost. A build passes both, in that order.
 - **Output goes to `artifacts/<site>`**, set as `destination` in `_config.yml` — two levels up from the site.
@@ -38,3 +39,10 @@ Read this once, then the per-site doc for what differs.
   they are what a move breaks first.
 - **Deployed by hand, one workflow each.** `workflow_dispatch` only, and the workflow builds the site, link
   checks what it built, and hands that same directory to the host — see `$ci-cd`.
+
+## Where `www` breaks the pattern
+
+Two of the lines above do not hold for it, and both are decisions. **Jekyll compiles no sass there** — the
+sass CLI does, from `package.json`, so `css/` is build output and gitignored rather than committed source.
+And it **runs no CSS framework**, so the gulp copy skips `assets/lib/` for that target. `$sites/www` has both
+in full.

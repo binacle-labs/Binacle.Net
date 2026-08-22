@@ -1,5 +1,8 @@
 ---
 title: Release Notes
+meta_description: >-
+  What changed in the Binacle.Net v3.0.x line, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
+  so read the migration guide.
 nav:
   order: 2
   icon: 🛠️

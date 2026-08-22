@@ -1,5 +1,8 @@
 ---
 title: Full
+meta_description: >-
+  Every part of Binacle.Net switched on at once, including /_debug, so you can see what each one does. Do not
+  deploy it where others can reach it.
 permalink: /version/v3.0.x/samples/docker/full/
 nav:
   order: 5

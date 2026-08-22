@@ -3,7 +3,9 @@ layout: null
 ---
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {% assign entries = site.versions | where: "version", page.version %}
+  {% comment %} Only the current version is listed. An old version is noindex, and submitting a noindex URL
+     is an error in Search Console, not a warning. {% endcomment %}
+  {% assign entries = site.versions | where: "version", site.data.versions.current %}
   {% for entry in entries %}
     {% if entry.sitemap != nil and entry.sitemap.exclude == false %}
       <url>

@@ -1,6 +1,6 @@
 # Checks that inspect what the repo produced, loaded by the root justfile as the `check` module.
 #
-#   just check links                   internal links in both built sites
+#   just check links                   internal links in every built site
 #   just check links <site>            one of them
 #   just check links-external <site>   every link, other people's servers included
 #   just check workflows               actionlint over .github/workflows
@@ -33,12 +33,12 @@ lychee_config := justfile_directory() / "tooling" / "lychee.toml"
 default:
     @just --list check
 
-# Internal links in the built sites - both with no argument, or one [site]
+# Internal links in the built sites - all three with no argument, or one [site]
 links site="":
     #!/usr/bin/env bash
     set -euo pipefail
     sites="{{ site }}"
-    [ -n "$sites" ] || sites="docs demo"
+    [ -n "$sites" ] || sites="docs demo www"
     for s in $sites; do
         just check _lychee "$s" --offline
     done

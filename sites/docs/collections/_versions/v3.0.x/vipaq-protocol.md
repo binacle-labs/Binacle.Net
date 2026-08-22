@@ -1,5 +1,8 @@
 ---
 title: ViPaq Protocol
+meta_description: >-
+  The ViPaq wire format as Binacle.Net v3.0.x writes and reads it: header, body and compression. The format
+  changed in v3.0.0 and has no fallback reader.
 nav:
   order: 7
   icon: 🗜️

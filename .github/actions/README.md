@@ -35,6 +35,6 @@ installs the same ones. Change one, change the other, or CI and a laptop stop te
 
 ## 🏗️ Building
 
-`build-jekyll-site` builds one of the two sites as a pre-flight check - it takes the site name and its
+`build-jekyll-site` builds one of the three sites as a pre-flight check - it takes the site name and its
 directory, and calls the same `just build <site>` recipe you would run locally. **Deploying is the caller's
 job**; this action only proves the site builds.

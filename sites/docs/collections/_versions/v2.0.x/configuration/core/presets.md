@@ -1,5 +1,8 @@
 ---
 title: Presets
+meta_description: >-
+  Define your bins once in Presets.json and reuse them across requests instead of sending dimensions every time.
+  The preset format in v2.0.x.
 nav:
   parent: Core
   order: 1

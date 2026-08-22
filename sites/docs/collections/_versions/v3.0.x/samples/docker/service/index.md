@@ -1,5 +1,8 @@
 ---
 title: Service
+meta_description: >-
+  Docker Compose for Binacle.Net offered to callers you do not control: accounts, JWT authentication, per-caller
+  rate limiting and a database.
 permalink: /version/v3.0.x/samples/docker/service/
 nav:
   order: 4

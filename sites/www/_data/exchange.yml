@@ -1,0 +1,219 @@
+# Every request and response on this site lives here, in one file, and every one of them is a real exchange
+# that was run - never hand-written. A response that looks plausible but is not what the API returns is the
+# one lie this audience catches, and it is the audience least likely to forgive it.
+#
+# HOW TO RE-RUN THEM
+#   just serve api            then POST the request below to https://localhost:7194
+#   or: docker run ... binacle/binacle-net:<tag>   and POST to http://localhost:8080
+# Paste the response back verbatim and update `verified` on the block you changed.
+#
+# Every example is v3. v4 is experimental for the whole 3.0.x line and a marketing page must not hand a
+# stranger an unstable contract. The v3 routes are fit/by-custom, fit/by-preset/{preset}, pack/by-custom,
+# pack/by-preset/{preset} and GET presets. Anything named fit/bin, fit/smallest-bin or pack/smallest-bin
+# is v4 and does not belong on this site.
+#
+# `parameters` is required on every fit and pack request - a body without it returns 400. Confirmed against
+# the API on 23 Aug 2026, so do not trim it out of an example to make one shorter.
+#
+# BEFORE GO-LIVE: both blocks were run against the working tree, not against a published tag. Re-run them
+# against the tag the docker run line names, so the page and the image a reader pulls agree.
+
+fit:
+  verified: "2026-08-23, source build of the 3.0.x line"
+  method: "POST"
+  path: "/api/v3/fit/by-custom"
+  request: |
+    {
+      "parameters": { "algorithm": "FFD" },
+      "bins": [
+        { "id": "locker-S", "length": 30, "width": 20, "height": 15 },
+        { "id": "locker-M", "length": 40, "width": 30, "height": 20 }
+      ],
+      "items": [
+        { "id": "box-a", "quantity": 2, "length": 10, "width": 10, "height": 10 },
+        { "id": "box-b", "quantity": 1, "length": 25, "width": 18, "height": 12 }
+      ]
+    }
+  response: |
+    {
+      "result": "Success",
+      "data": [
+        {
+          "result": "NotAllItemsFit",
+          "bin": { "id": "locker-S", "length": 30, "width": 20, "height": 15 },
+          "fittedItems": [ { "id": "box-b", "length": 25, "width": 18, "height": 12 } ],
+          "unfittedItems": [ { "id": "box-a", "quantity": 2 } ],
+          "fittedBinVolumePercentage": 60.0,
+          "fittedItemsVolumePercentage": 72.97
+        },
+        {
+          "result": "AllItemsFit",
+          "bin": { "id": "locker-M", "length": 40, "width": 30, "height": 20 },
+          "fittedItems": [
+            { "id": "box-b", "length": 25, "width": 18, "height": 12 },
+            { "id": "box-a", "length": 10, "width": 10, "height": 10 },
+            { "id": "box-a", "length": 10, "width": 10, "height": 10 }
+          ],
+          "unfittedItems": [],
+          "fittedBinVolumePercentage": 30.83,
+          "fittedItemsVolumePercentage": 100
+        }
+      ]
+    }
+
+# The page that pays off "and where every item sits". A fit response carries no coordinates - only pack does,
+# so any sentence near a fit example promising placement is wrong.
+pack:
+  verified: "2026-08-23, source build of the 3.0.x line"
+  method: "POST"
+  path: "/api/v3/pack/by-custom"
+  request: |
+    {
+      "parameters": { "algorithm": "FFD" },
+      "bins": [ { "id": "locker-M", "length": 40, "width": 30, "height": 20 } ],
+      "items": [
+        { "id": "box-a", "quantity": 2, "length": 10, "width": 10, "height": 10 },
+        { "id": "box-b", "quantity": 1, "length": 25, "width": 18, "height": 12 }
+      ]
+    }
+  response: |
+    {
+      "result": "Success",
+      "data": [
+        {
+          "result": "FullyPacked",
+          "bin": { "id": "locker-M", "length": 40, "width": 30, "height": 20 },
+          "packedItems": [
+            { "id": "box-b", "length": 25, "width": 18, "height": 12, "x": 0,  "y": 0,  "z": 0 },
+            { "id": "box-a", "length": 10, "width": 10, "height": 10, "x": 25, "y": 0,  "z": 0 },
+            { "id": "box-a", "length": 10, "width": 10, "height": 10, "x": 0,  "y": 18, "z": 0 }
+          ],
+          "unpackedItems": [],
+          "packedItemsVolumePercentage": 100,
+          "packedBinVolumePercentage": 30.83
+        }
+      ]
+    }
+
+# /cartonization/ - a shorter request than the homepage's, and the whole edge of that page. Twelve paid
+# products rank for the word and not one of them shows a request you can run.
+# by-preset: the box set is configured once in the image, so the request is only the order.
+carton:
+  verified: "2026-08-23, source build of the 3.0.x line"
+  method: "POST"
+  path: "/api/v3/fit/by-preset/rectangular-cuboids"
+  request: |
+    {
+      "parameters": { "algorithm": "FFD" },
+      "items": [
+        { "id": "shoes", "quantity": 1, "length": 33, "width": 22, "height": 13 },
+        { "id": "mug",   "quantity": 2, "length": 12, "width": 9,  "height": 11 }
+      ]
+    }
+  response: |
+    {
+      "result": "Success",
+      "data": [
+        {
+          "result": "NotAllItemsFit",
+          "bin": { "id": "Small", "length": 60, "width": 40, "height": 10 },
+          "fittedItems": [],
+          "unfittedItems": [
+            { "id": "shoes", "quantity": 1 },
+            { "id": "mug", "quantity": 2 }
+          ],
+          "fittedBinVolumePercentage": 0,
+          "fittedItemsVolumePercentage": 0
+        },
+        {
+          "result": "AllItemsFit",
+          "bin": { "id": "Medium", "length": 60, "width": 40, "height": 20 },
+          "fittedItems": [
+            { "id": "shoes", "length": 33, "width": 22, "height": 13 },
+            { "id": "mug", "length": 12, "width": 9, "height": 11 },
+            { "id": "mug", "length": 12, "width": 9, "height": 11 }
+          ],
+          "unfittedItems": [],
+          "fittedBinVolumePercentage": 24.61,
+          "fittedItemsVolumePercentage": 100
+        },
+        {
+          "result": "AllItemsFit",
+          "bin": { "id": "Large", "length": 60, "width": 40, "height": 30 },
+          "fittedItems": [
+            { "id": "shoes", "length": 33, "width": 22, "height": 13 },
+            { "id": "mug", "length": 12, "width": 9, "height": 11 },
+            { "id": "mug", "length": 12, "width": 9, "height": 11 }
+          ],
+          "unfittedItems": [],
+          "fittedBinVolumePercentage": 16.41,
+          "fittedItemsVolumePercentage": 100
+        }
+      ]
+    }
+
+# /parcel-lockers/ - three compartment sizes and one order. The compartment heights are the shape a locker
+# bank actually has; they are NOT a carrier's published figures and no carrier is named. Real sizes come
+# from whoever runs the lockers.
+#
+# One item on purpose. A multi-item order against a compartment nothing fits produces an empty fittedItems
+# row that reads as a bug unless the page explains the sort order, and that is not a marketing page's job.
+locker:
+  verified: "2026-08-23, source build of the 3.0.x line"
+  method: "POST"
+  path: "/api/v3/fit/by-custom"
+  request: |
+    {
+      "parameters": { "algorithm": "FFD" },
+      "bins": [
+        { "id": "compartment-S", "length": 61, "width": 44, "height": 8 },
+        { "id": "compartment-M", "length": 61, "width": 44, "height": 19 },
+        { "id": "compartment-L", "length": 61, "width": 44, "height": 41 }
+      ],
+      "items": [
+        { "id": "kettle-boxed", "quantity": 1, "length": 24, "width": 20, "height": 28 }
+      ]
+    }
+  response: |
+    {
+      "result": "Success",
+      "data": [
+        {
+          "result": "NotAllItemsFit",
+          "bin": { "id": "compartment-S", "length": 61, "width": 44, "height": 8 },
+          "fittedItems": [],
+          "unfittedItems": [ { "id": "kettle-boxed", "quantity": 1 } ],
+          "fittedBinVolumePercentage": 0,
+          "fittedItemsVolumePercentage": 0
+        },
+        {
+          "result": "NotAllItemsFit",
+          "bin": { "id": "compartment-M", "length": 61, "width": 44, "height": 19 },
+          "fittedItems": [],
+          "unfittedItems": [ { "id": "kettle-boxed", "quantity": 1 } ],
+          "fittedBinVolumePercentage": 0,
+          "fittedItemsVolumePercentage": 0
+        },
+        {
+          "result": "AllItemsFit",
+          "bin": { "id": "compartment-L", "length": 61, "width": 44, "height": 41 },
+          "fittedItems": [ { "id": "kettle-boxed", "length": 24, "width": 20, "height": 28 } ],
+          "unfittedItems": [],
+          "fittedBinVolumePercentage": 12.21,
+          "fittedItemsVolumePercentage": 100
+        }
+      ]
+    }
+
+# The primary conversion on three of the four pages. The tag is a variable so it is changed in one place when
+# the line moves; it must name a tag that is actually published.
+# CHECKED 23 Aug 2026: the tag below IS NOT PUBLISHED YET. Docker Hub's newest tags are 3.0.0-beta.4 and
+# 3.0.0-beta.3, and `latest` still resolves to 2.1.1 from January. The release workflow publishes `3.0` when
+# 3.0.0 ships, and go-live sits behind that - but the site must not go live before it, because this command
+# is the primary conversion and it fails with "manifest unknown" today.
+command:
+  tag: "3.0"
+  text: |
+    docker run -d --name binacle-net -p 8080:8080 \
+      -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True \
+      binacle/binacle-net:3.0

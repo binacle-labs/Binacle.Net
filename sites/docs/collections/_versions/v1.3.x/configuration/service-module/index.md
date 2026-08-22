@@ -1,5 +1,8 @@
 ---
 title: Service Module
+meta_description: >-
+  The Service Module in Binacle.Net v1.3.x adds rate limiting, user management and JWT authentication. It is off
+  by default.
 permalink: /version/v1.3.x/configuration/service-module/
 nav:
   parent: Configuration

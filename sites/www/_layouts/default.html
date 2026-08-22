@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{ page.hreflang | default: 'en' }}" data-default-theme="{{ site.default_theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ '/favicon-32x32.png' | relative_url }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ '/favicon-16x16.png' | relative_url }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}">
+
+    {% include seo.html %}
+    {% include links.html items=site.data.includes.links %}
+    {% include theme-init.html %}
+    {% if page.structured_data %}{% include schema.html %}{% endif %}
+    {% gtm_head site.gtm %}
+</head>
+<body>
+    {% gtm_body site.gtm %}
+
+    {% include glyphs.html %}
+
+    {% include header.html %}
+
+    <main id="content">
+        {{ content }}
+    </main>
+
+    {% include footer.html %}
+
+    {% include scripts.html items=site.data.includes.scripts_body_end %}
+</body>
+</html>

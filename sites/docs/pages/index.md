@@ -1,6 +1,9 @@
 ---
 title: Welcome to Binacle.Net Docs
-seo_title: Binacle.Net Docs
+meta_description: >-
+  Binacle.Net answers which box an order goes in, in milliseconds. Documentation for the free and open source 3D
+  bin packing API you host yourself.
+seo_title: Open source 3D bin packing API - Binacle.Net Docs
 permalink: /
 breadcrumbs: false
 nav:
@@ -10,11 +13,12 @@ nav:
 ---
 
 
-Binacle.Net is an API created to address the 3D Bin Packing Problem in real time. 
-It enables fast, efficient packing solutions for ecommerce, logistics, and warehousing applications.
+Binacle.Net answers which box an order goes in, in milliseconds. Give it your box sizes and a list of items
+and it returns the smallest box that holds them, and where every item sits. It is a free and open source 3D bin
+packing API that you run yourself, shipped as a Docker image.
 
-This documentation site provides comprehensive guides, references, and versioned information to help developers 
-and users get started quickly and make the most of Binacle.Net's capabilities.
+These docs cover the HTTP API, configuration, deployment, and the ViPaq result format. If you just want to see
+it work, start with the quick start.
 
 ---
 

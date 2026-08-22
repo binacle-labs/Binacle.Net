@@ -122,5 +122,8 @@
     <Project Path="sites/demo/demo.proj" Type="Shared">
       <Platform Project="AnyCPU" />
     </Project>
+    <Project Path="sites/www/www.proj" Type="Shared">
+      <Platform Project="AnyCPU" />
+    </Project>
   </Folder>
 </Solution>

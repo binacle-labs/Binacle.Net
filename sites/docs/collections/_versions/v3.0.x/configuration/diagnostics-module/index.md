@@ -1,5 +1,8 @@
 ---
 title: Diagnostics Module
+meta_description: >-
+  The Diagnostics Module is always on: logging by default, health checks, OpenTelemetry and packing logs on
+  request. Where its config files live.
 permalink: /version/v3.0.x/configuration/diagnostics-module/
 nav:
   parent: Configuration

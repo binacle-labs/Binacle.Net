@@ -1,0 +1,135 @@
+---
+permalink: /parcel-lockers/
+title: Check if an order fits a parcel locker
+heading: Which locker size does this order need?
+description: >-
+  Check whether an order fits a parcel locker before your customer pays. A free and open source API you host
+  yourself, answering in milliseconds.
+---
+
+{%- comment -%}
+The original use case for this project, and a query nobody answers. Locker APIs exist - they return
+locations, opening hours and which compartments are free. None of them says whether the order fits one.
+
+The h1 is deliberately not "Will it fit in the locker?" - too close to the homepage h1, and two pages on one
+domain asking near-identical questions split each other.
+
+Do not name a carrier and do not imply an integration with one. There is none.
+No downloadable preset file of real compartment sizes: that only ships under an explicit grant from a
+partner, because of the legal exposure. Same rule as not naming a carrier.
+
+One conversion action on this page: copying the docker run line.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <h1>{{ page.heading }}</h1>
+
+            <p class="lead">A customer at checkout picks a locker to collect from. Your carrier's API tells you
+                where the lockers are and which compartments are free. It does not tell you whether the order
+                fits one.</p>
+
+            <p>Send Binacle.Net the compartment sizes and the items, and it answers before the customer
+                commits.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">The problem</p>
+                <h2>What it costs when nobody checks</h2>
+
+            <p>The order is packed and labelled for a compartment it does not go into. Someone finds that out at
+                the locker, not at the desk. The parcel is rerouted to an address or comes back to you, and the
+                customer has already paid for the delivery they chose.</p>
+
+            <p>The check itself is one call, and it happens while the locker options are still on screen.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band rule">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">A worked example</p>
+            <h2>One order, three compartment sizes</h2>
+            <p>Send the compartments you can actually book, and the items in the cart.</p>
+        </div>
+
+        {% include exchange.html id="locker" block=site.data.exchange.locker
+           verdict="Only the large compartment takes this order. Offer that one, or offer a courier." %}
+
+        <div class="prose">
+            <p>Every compartment comes back with its own verdict, so the checkout page can grey out the sizes
+                that will not work instead of letting the customer pick one that fails later.</p>
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+Straight from his integration guide and already in his voice. The weight line is a real limit and is
+volunteered rather than waited for.
+{%- endcomment -%}
+<section class="band alt">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Integrating</p>
+                <h2>What it needs from you</h2>
+
+            <ul>
+                <li>Use centimetres for all measurements, and keep the values as integers.</li>
+                <li>Represent products as rectangular prisms - length, width, height. Irregular shapes have to be
+                    boxed first.</li>
+                <li>Use the maximum measurement of a product, not the nominal one. A box that is 24 cm on the
+                    label and 24.6 cm in the hand is the one that comes back.</li>
+                <li>Track weight yourself. Binacle.Net measures space and nothing else, so the carrier's weight
+                    limit is a check your code still has to make.</li>
+            </ul>
+
+            <p><a href="https://docs.binacle.net/integration-guide/">The integration guide</a> has the rest,
+                including the two ways to choose a bin set and where the call goes in a checkout flow.</p>
+        </div>
+        </div>
+</section>
+
+{%- comment -%}
+Say this plainly on the page. The sizes in the example are the shape a locker bank has, not anyone's
+published figures.
+{%- endcomment -%}
+<section class="band">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">A limit</p>
+                <h2>Compartment sizes come from your carrier</h2>
+
+            <p>The numbers in the request above are the shape a locker bank tends to have. They are not any
+                carrier's published dimensions, and Binacle.Net ships no list of them. Get the real sizes from
+                whoever runs the lockers you ship to, and configure them as your bin set.</p>
+
+            <p>There is no integration with any locker network, and none is implied. Binacle.Net answers the
+                geometry question; booking the compartment stays between you and your carrier.</p>
+        </div>
+        </div>
+</section>
+
+<section class="band alt" id="run">
+    <div class="shell">
+        <div class="prose">
+            <p class="eyebrow">Get started</p>
+            <h2>Run it</h2>
+            <p>One image, one port.</p>
+        </div>
+
+        {% include command.html id="run" %}
+
+        <div class="prose">
+            <p>If your team calls this
+                <a href="{{ '/cartonization/' | relative_url }}">picking the right box for an order</a>, it
+                is the same call with your own boxes in place of the compartments.</p>
+
+            <p>The rest of what it does is on the <a href="{{ '/' | relative_url }}">homepage</a>.</p>
+        </div>
+    </div>
+</section>

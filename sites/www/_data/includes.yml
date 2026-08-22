@@ -1,0 +1,11 @@
+# One stylesheet and one script. Both are build output - css/ and js/ are gitignored on this site.
+links:
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: '/css/main.css'
+
+scripts_body_end:
+  - type: 'text/javascript'
+    src: '/js/main.js'
+  # The consent banner slot. The maintainer runs one and will replace it with his own
+  # github.com/ChrisMavrommatis/consentio in a dedicated session. Adding it is one entry here.

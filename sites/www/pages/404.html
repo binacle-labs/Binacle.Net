@@ -1,0 +1,20 @@
+---
+permalink: /404.html
+title: Page not found
+heading: Nothing is at this address.
+description: >-
+  The page you asked for is not on this site.
+nav:
+  exclude: true
+sitemap:
+  exclude: true
+---
+
+<div class="shell">
+    <h1>{{ page.heading }}</h1>
+    <p class="prose">
+        The page you asked for is not on this site. Start from the
+        <a href="{{ '/' | relative_url }}">homepage</a>, or go to the
+        <a href="https://docs.binacle.net">documentation</a> if you were looking for the API reference.
+    </p>
+</div>

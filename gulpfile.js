@@ -24,10 +24,14 @@ const ASSETS = {
 //
 // material-dynamic-colors stays everywhere at 72 KB: sites/demo/_data/includes.yml keeps a commented-out
 // script tag for it, so dropping it breaks that line the moment anyone uncomments it.
+//
+// www runs no framework at all - no BeerCSS, no material-dynamic-colors - so it takes the media and the
+// favicons and none of assets/lib/.
 const IGNORE = {
 	docs: [],
 	demo: ['assets/lib/swagger-ui/**'],
-	uimodule: ['assets/lib/swagger-ui/**']
+	uimodule: ['assets/lib/swagger-ui/**'],
+	www: ['assets/lib/**']
 };
 
 // ----------------- Begin Functions  ----------------- //
@@ -61,6 +65,10 @@ task('copy-assets-to-demo', async function(){
 
 task('copy-assets-to-docs', async function(){
 	return copyAssets('sites/docs', IGNORE.docs);
+});
+
+task('copy-assets-to-www', async function(){
+	return copyAssets('sites/www', IGNORE.www);
 });
 
 task('copy-assets-to-uimodule', async function(){

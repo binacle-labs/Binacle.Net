@@ -6,7 +6,8 @@ title                   : "Binacle.Net Docs"
 # The link-preview image every page falls back to. A page overrides it with main_img.
 og_image                : /media/logo/binacle-logo-512x512.png
 description             : >-
-  Welcome to Binacle.Net Docs! Here you'll find comprehensive guides and documentation to help you get started and make the most out of Binacle.Net.
+  Binacle.Net answers which box an order goes in, in milliseconds. Docs for the free and open source 3D bin
+  packing API you host yourself.
 
 author:
   name                  : "Chris Mavrommatis"
@@ -226,6 +227,15 @@ defaults:
     values:
       version: "v3.0.x"
       version_tag: "3.0"
+  # Swagger pages are noindex - they are a UI shell, not a page to land on. A sitemap that lists a noindex URL
+  # is an error in Search Console, so they are kept out of it. Longest matching path wins, so this beats the
+  # `**/**` block above.
+  - scope:
+      path: "**/swagger/**"
+      type: "versions"
+    values:
+      sitemap:
+        exclude: true
 
 
 
