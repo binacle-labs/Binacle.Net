@@ -1,7 +1,7 @@
 ---
 id: ci-cd
-description: CI/CD — the nine GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-08-22
+description: CI/CD — the ten GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
+verified: 2026-08-23
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -14,12 +14,12 @@ paths:
 
 # CI/CD
 
-Nine workflows in `.github/workflows/`, over nine shared actions in `.github/actions/`. They gate a pull
-request, analyse it, release the Docker image, write its Docker Hub page, and deploy the two Jekyll sites. This doc covers what runs,
-when, and the conventions every one of them follows. The release pipeline has its own page
-(`$ci-cd/release-pipeline`) because it is seven jobs with an ordering that matters.
+Ten workflows in `.github/workflows/`, over nine shared actions in `.github/actions/`. They gate a pull
+request, analyse it, release the Docker image, write its Docker Hub page, and deploy the three Jekyll sites.
+This doc covers what runs, when, and the conventions every one of them follows. The release pipeline has its
+own page (`$ci-cd/release-pipeline`) because it is seven jobs with an ordering that matters.
 
-**Three of the nine carry a `shared-` prefix**, which means something else calls them — the release pipeline
+**Three of the ten carry a `shared-` prefix**, which means something else calls them — the release pipeline
 calls all three, and the pull request gate calls the test suite. It does **not** mean private: both keep
 `workflow_dispatch`, so both can be run by hand. Nothing here is a workflow nobody can press.
 
@@ -32,7 +32,7 @@ described in `$tooling`. Nothing about a recipe's behaviour is repeated here.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `pull-request.yml` | `pull_request` | The gate. Works out whether anything outside guidance and the two sites changed, then runs the test suite, an image build and the two `.github/` lints if it did. `gate` reports either way — see below |
+| `pull-request.yml` | `pull_request` | The gate. Works out whether anything outside guidance and the sites changed, then runs the test suite, an image build and the two `.github/` lints if it did. `gate` reports either way — see below |
 | `shared-test-suite.yml` | `workflow_dispatch`, `workflow_call` | Every test leaf, plus `just openapi lint`. One job so setup and build happen once; one step per leaf so a red check names the suite. Postgres and Azurite run as job services, one ServiceModule step per storage backend. Called by the release pipeline as its "this commit passed CI" gate, so the release gets the lint too |
 | `sonar-analysis.yml` | `workflow_dispatch` | Build plus `just coverage all sonar` between `Sonar begin`/`Sonar end`, published to SonarCloud. **By hand, and never on a schedule** — a nightly run re-analyses a commit nothing changed and reports the same numbers |
 | `codeql-analysis.yml` | `push` on `main`, weekly `schedule`, `workflow_dispatch` | CodeQL over four languages — `actions`, `csharp`, `javascript-typescript`, `ruby` — one matrix job each, all buildless. Findings land in the Security tab, not on a check. **On a schedule as well as on merge** — the query packs change, so an untouched commit reports new findings later. That is the one analysis a schedule earns |
@@ -41,12 +41,13 @@ described in `$tooling`. Nothing about a recipe's behaviour is repeated here.
 | `shared-smoke-image.yml` | `workflow_dispatch`, `workflow_call` | Pulls a published image and runs the structure check plus all five smoke profiles. Called by the release pipeline as its gate, or run by hand against any tag |
 | `deploy-docs-site.yml` | `workflow_dispatch` | Two jobs — build `sites/docs/` (`$sites/docs`), check its links, hand the built directory to the host, then tag the commit `docs-<run>` |
 | `deploy-demo-site.yml` | `workflow_dispatch` | The same for `sites/demo/` (`$sites/demo`), tagging `demo-<run>` |
+| `deploy-www-site.yml` | `workflow_dispatch` | The same for `sites/www/` (`$sites/www`), tagging `www-<run>` |
 
-**Three of the nine run on their own.** `pull-request.yml` on every pull request, `codeql-analysis.yml` on
-every merge to `main` and weekly, and the release pipeline on a tag. The other six are `workflow_dispatch` —
+**Three of the ten run on their own.** `pull-request.yml` on every pull request, `codeql-analysis.yml` on
+every merge to `main` and weekly, and the release pipeline on a tag. The other seven are `workflow_dispatch` —
 somebody presses a button.
 
-**For the two site deploys that is the end state, not the current one** — publishing to the internet is a
+**For the three site deploys that is the end state, not the current one** — publishing to the internet is a
 deliberate act and never a side effect of a commit, which is `$ci-cd/decisions#D17`. The other three are
 open to changing.
 
@@ -58,7 +59,7 @@ names *are* job names, so every rename silently breaks protection, and a require
 leaves every pull request waiting on it forever with nothing saying why.
 
 **It also makes skipping safe, which is the whole reason the shape exists.** Roughly two thirds of recent
-commits touch only `.agents/`, the two sites or markdown — 38 of the last 60 — and a full suite with a Postgres
+commits touch only `.agents/`, the sites or markdown — 38 of the last 60 — and a full suite with a Postgres
 and an Azurite container is wasted on every one of them. The obvious fix is the trap above: `on: pull_request` with
 `paths-ignore` means the workflow never triggers, so the required check never reports. Instead:
 
@@ -84,12 +85,12 @@ the real one. A conditional step is not the fix — that gives the release a gat
 **What the release does not get is this workflow's own jobs.** Everything on `main` passed through the gate to
 reach it, so that is a choice rather than an oversight.
 
-**Three workflows push git tags, and the namespaces must not overlap.** The release pipeline fires on
-`v[0-9]*`; the two deploy workflows create `docs-<run>` and `demo-<run>`. That is the whole
+**Four workflows push git tags, and the namespaces must not overlap.** The release pipeline fires on
+`v[0-9]*`; the three deploy workflows create `docs-<run>`, `demo-<run>` and `www-<run>`. That is the whole
 reason the release trigger is not the looser `v*` — a deploy tag must never build and publish an image. Any new
 workflow that pushes a tag has to stay out of the `v<digit>` namespace.
 
-**The two marker tags are pushed after a successful deploy, not before it.** The tag exists so a live site maps
+**The three marker tags are pushed after a successful deploy, not before it.** The tag exists so a live site maps
 back to a commit; pushed first, it claims that of a deploy that then failed. Each deploy workflow is two jobs
 in that order — **build-and-deploy, then tag** — chained by `needs:`, which is the gate: a job with an
 unsatisfied `needs:` is skipped, so a failed deploy never reaches the tag. No `if:` is written for this.
@@ -120,8 +121,9 @@ its caller's run, so a group of its own would have it queue behind the caller th
 | `release-docker-image.yml` | `${{ github.workflow }}-${{ github.ref }}` | **false** |
 | `deploy-docs-site.yml` | `${{ github.workflow }}` | **false** |
 | `deploy-demo-site.yml` | `${{ github.workflow }}` | **false** |
+| `deploy-www-site.yml` | `${{ github.workflow }}` | **false** |
 
-**Cancelling is right for the first three and wrong for the last three, and the difference is whether a
+**Cancelling is right for the first three and wrong for the last four, and the difference is whether a
 half-done run leaves anything behind.** A cancelled pull request run leaves nothing — a newer push supersedes it
 and nobody was going to read the old result. A cancelled Sonar or CodeQL run is the same: both show the
 branch's latest state, so the superseded findings were going to be overwritten anyway.
@@ -132,10 +134,11 @@ leaves a deploy half-done with no marker tag, so the live site maps back to no c
 instead.
 
 **`github.ref` is what makes the key specific** and it differs per event: `refs/pull/<n>/merge` on a pull
-request, `refs/heads/main` on a merge, `refs/tags/<tag>` on a release. The two deploys leave it out on purpose
-— they are `workflow_dispatch` from any branch, and two deploys of the same site must not run at once whichever
-branch fired them. **`sonar-analysis.yml` is `workflow_dispatch` too and keeps `github.ref` anyway**, because
-SonarCloud tracks a branch at a time: two branches analysing at once is fine, the same branch twice is not.
+request, `refs/heads/main` on a merge, `refs/tags/<tag>` on a release. The three deploys leave it out on
+purpose — they are `workflow_dispatch` from any branch, and two deploys of the same site must not run at once
+whichever branch fired them. **`sonar-analysis.yml` is `workflow_dispatch` too and keeps `github.ref`
+anyway**, because SonarCloud tracks a branch at a time: two branches analysing at once is fine, the same
+branch twice is not.
 
 ## What the run page says without opening a log
 
@@ -148,7 +151,7 @@ not already say. A table that restates the job list is a heading with no fact in
 |---|---|---|
 | `pull-request.yml` | `gate` | The job-by-job result table. On a red gate it names the job that did it; on a green one it shows what was skipped, which is how you tell "nothing relevant changed" from "the suite ran". |
 | `release-docker-image.yml` | `release` | Version, digest, every public tag, the release link and the verify command. |
-| `deploy-docs-site.yml`, `deploy-demo-site.yml` | `tag` | The commit and its subject, the marker tag and the site URL — three greps through a log otherwise. |
+| `deploy-docs-site.yml`, `deploy-demo-site.yml`, `deploy-www-site.yml` | `tag` | The commit and its subject, the marker tag and the site URL — three greps through a log otherwise. |
 | `sonar-analysis.yml` | `analyze` | The quality gate and every condition with its value. The numbers live on another site and no gate blocks on them yet, so this is where they get read. |
 | `codeql-analysis.yml` | `summary` | Open alert counts by severity. The matrix has no last job, so this one exists for the summary; it does not repeat the per-language results the job list already shows. |
 | `shared-smoke-image.yml` | `smoke` | The image, the digest its tag resolved to, and each profile's result — **only on a `workflow_dispatch`**, where this workflow is the whole run. The release calls it too, and a block there would sit beside the one `release` writes for no new fact. |
@@ -232,7 +235,7 @@ short**, or the required check name becomes unreadable at exactly the moment som
   only reason either has it. The CodeQL job takes `security-events: write` to upload its findings — GitHub's
   template also lists `actions: read` and `packages: read`, which are for private repositories and private
   query packs and so are left out here. A job that needs nothing says `permissions: {}` rather than leaving it
-  out — the two deploy jobs do, since neither reads the repository.
+  out — `gate` in `pull-request.yml` is the one that does, since it only reads the results of the jobs above it.
 - **Every job declares `timeout-minutes`.** The default is six hours, which is what a hung container or a
   wedged smoke profile would otherwise burn.
 - **`npm ci --ignore-scripts`**, so an install-time lifecycle hook cannot run arbitrary code. Nothing in the
@@ -276,10 +279,10 @@ reimplement what the flag already does. The action's `description` says it insta
 declared where a reader meets it.
 
 **The deploy is in the workflow, not in an action.** `build-jekyll-site` covers the part that is the same for
-both sites and would drift if copied; deploying is one `uses:` of a vendor action, and wrapping it buys
+every site and would drift if copied; deploying is one `uses:` of a vendor action, and wrapping it buys
 nothing. Two things it costs, though, and both matter more: the marker tag's `git push` is visible next to the
 `contents: write` that allows it, and the host is named where you would look for it. Changing host is then an
-edit to one step in each of two workflows, not to the inside of something called "deploy site".
+edit to one step in each of three workflows, not to the inside of something called "deploy site".
 
 **`actionlint` does not cover these files, and there is no flag that makes it.** Hand it an `action.yml` and it
 reports `"jobs" section is missing` — it treats every input as a workflow. What it *does* check from the
@@ -309,7 +312,7 @@ step names the tool rather than the pair — which is why these are two files an
   that explained why you must not write it. `just check actions` greps for this now, because actionlint
   cannot.
 - **Job keys stay with the caller.** `runs-on`, `services:`, `environment:`, `permissions:` and
-  `timeout-minutes` cannot be set from an action. This is why the two deploy workflows still declare their own
+  `timeout-minutes` cannot be set from an action. This is why the three deploy workflows still declare their own
   `environment:` — it carries the deployment URL and differs per site — and why the test suite is a workflow at
   all, since Postgres and Azurite are `services:`.
 - **An action is read out of the working copy**, so a job must check out before it can use one. The release
@@ -364,15 +367,16 @@ reads**, and every tag the pipeline publishes lands there.
 
 ## Environments
 
-The two deploy workflows declare a GitHub environment, which is what carries the deployment URL in the Actions
-UI: `binacle-net-docs` (https://docs.binacle.net) and `binacle-net-demo` (https://demo.binacle.net). Nothing
-else uses an environment.
+The three deploy workflows declare a GitHub environment, which is what carries the deployment URL in the
+Actions UI: `binacle-net-docs` (https://docs.binacle.net), `binacle-net-demo` (https://demo.binacle.net) and
+`binacle-net-www` (https://www.binacle.net). Nothing else uses an environment.
 
-**`binacle-net-demo` has never been deployed.** The workflow was renamed from `deploy-web-site.yml` before it
-was ever dispatched, so neither the environment nor the Worker exists on either side yet.
+**Neither `binacle-net-demo` nor `binacle-net-www` has ever been deployed.** The demo workflow was renamed from
+`deploy-web-site.yml` before it was ever dispatched and the www workflow is newer still, so for both of them
+neither the environment nor the Worker exists on either side yet.
 
-Both deploy workflows also push a marker tag after deploying, so a deployed site maps back to a commit. The
-workflow table above names each one.
+All three deploy workflows also push a marker tag after deploying, so a deployed site maps back to a commit.
+The workflow table above names each one.
 
 ## What CI does not cover
 

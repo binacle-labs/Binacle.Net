@@ -1,5 +1,7 @@
 ---
 description: TestsKernel - grow the shared fixture cases
+state: ready
+waits-on: "nothing"
 paths:
   - "shared/**"
 ---
@@ -11,6 +13,10 @@ suite and custom-problems stay in `shared/data/` because more than one slice rea
 `lib/data/result-selection/` and is embedded by the new `lib/test/Binacle.Lib.TestsKernel`, whose manifest prefix
 is `ResultSelection.`. Only the "review and grow the cases" work below remains. Delete this file when nothing
 pending is left.
+
+**It collides with the heavy architecture tools** - ArchUnitNET and its xunit v3 adapter. Both touch the test
+leaves, so whichever runs second reads the other's result, and the `xunit.v3.mtp-v2` pin in
+`Directory.Packages.props` bites both.
 
 A new JSON file dropped into the right data folder is picked up automatically (each `.csproj` embeds its set with a
 `*.json` glob), so growing coverage is just authoring files. Provenance and the thpack1–7 vs thpack8/9 caveat live

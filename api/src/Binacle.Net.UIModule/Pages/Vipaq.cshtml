@@ -43,7 +43,9 @@
 					<div class="grid no-space max">
 						<span class="s4" x-text="resultTitle(result)"></span>
 						<span class="s8 right-align" x-text="resultBinPercentageText(result)"></span>
-						<progress :value="result.packedBinVolumePercentage()" max="100"
+						@* value="0" keeps the bar determinate - without it beercss animates a 0% result. Same
+						   trap as the packing page, which carries the long version. *@
+						<progress value="0" :value="result.packedBinVolumePercentage()" max="100"
 						          class="s12 surface-container-lowest"></progress>
 						<div class="s4" x-text="result.items.length + ' Items'"></div>
 					</div>

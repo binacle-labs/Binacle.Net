@@ -1,23 +1,3 @@
-{%- comment -%}
-The exchange card - the most valuable element on the site. One card, one border, one radius. Not two code
-blocks. No browser chrome, no traffic lights, no tab bar, no fake terminal.
-
-Five rows: the ask, the request, a RESPONSE seam, the response, and a plain-English verdict. The seam is what
-makes it one exchange instead of two blocks, and the verdict row is the whole reason the card is marketing
-rather than documentation.
-
-It is an include and not page markup on purpose. The card appears on all four pages and its payloads must
-stay real - one _data/exchange.yml and one template means re-running the call updates every page. Inline
-copies would be re-run in one page and rot in the other three.
-
-The JSON goes through markdownify so Rouge marks it up. The classes it emits are in _sass/_code.scss -
-that file is the two-tone mapping and it is where the colours are decided. No
-syntax rainbow, and it is the single biggest lever on whether the card reads as marketing or as a docs snippet.
-
-Usage:
-  {% include exchange.html id="hero" block=site.data.exchange.fit
-     verdict="The 40x30x20 locker holds all three items. The small one does not." %}
-{%- endcomment -%}
 
 {%- assign block = include.block -%}
 {%- capture request_md %}```json

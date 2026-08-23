@@ -5,8 +5,8 @@
 //   .nl  key names          .s2  strings        .mi / .mf  integers and floats
 //   .p   punctuation        .w   whitespace     .kc  true / false / null
 //
-// Everything else about the card - the border, the seam, the verdict row, the response line markers - is the
-// design system's, and it is written in its own session.
+// Everything else about the card - the border, the seam, the verdict row, the response line markers - is in
+// _content.scss.
 
 .exchange-code {
 	// Keys recede, values carry. Punctuation lighter than either.

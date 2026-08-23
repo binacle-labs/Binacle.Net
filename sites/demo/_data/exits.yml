@@ -1,5 +1,3 @@
-# Docs is the only exit in the left rail. The website sits in the top bar with the other brand links.
-# The footer lists all four.
 docs:
   title: 'Docs'
   icon: 'menu_book'

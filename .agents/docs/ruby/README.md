@@ -1,22 +1,22 @@
 ---
 id: ruby
-description: Ruby gems under ruby/ — Jekyll plugins used by the two sites under sites/.
-verified: 2026-08-19
-check: Gem list, filter names and tag names match ruby/ source; the gtm tags still take the id as an argument; both sites still load the gems through their Gemfile :jekyll_plugins group and list them under plugins: in _config.yml
+description: Ruby gems under ruby/ — Jekyll plugins used by all three sites under sites/.
+verified: 2026-08-23
+check: Gem list, filter names and tag names match ruby/ source; the gtm tags still take the id as an argument; every site under sites/ still loads the gems through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml
 paths:
   - "ruby/**"
 ---
 
 # Gems
 
-Jekyll plugins used by both the `sites/docs/` and `sites/demo/` sites.
+Jekyll plugins used by all three sites — `sites/docs/`, `sites/demo/` and `sites/www/`.
 
 | Gem | What it adds |
 |---|---|
 | `jekyll-filters` | Two Liquid filters: `clean_content`, `capitalize_all` |
 | `jekyll-gtm` | Two Liquid tags: `{% gtm_head %}`, `{% gtm_body %}` |
 
-**Both sites load them twice over, and both halves are needed.** Each site's `Gemfile` names the gem inside its
+**Every site loads them twice over, and both halves are needed.** Each site's `Gemfile` names the gem inside its
 `group :jekyll_plugins` block with `path: "../ruby/<gem>"` — that is what resolves the local directory, since
 neither gem is published. Each site's `_config.yml` then lists the gem under `plugins:`. Dropping either half
 stops the plugin loading.
@@ -41,8 +41,8 @@ nothing.
 - **`{% gtm_head <id> %}`** — the GTM `<script>` snippet, for `<head>`.
 - **`{% gtm_body <id> %}`** — the `<noscript>` fallback, for the top of `<body>`.
 
-**An empty or missing id renders an empty string** rather than a broken snippet. Both sites currently set
-`gtm: ''`, so GTM is off on both.
+**An empty or missing id renders an empty string** rather than a broken snippet. All three sites currently set
+`gtm: ''`, so GTM is off everywhere.
 
 Source: `ruby/jekyll-gtm/lib/` — `gtm_head_tag.rb`, `gtm_body_tag.rb`, registered in `jekyll-gtm.rb`.
 

@@ -1,5 +1,4 @@
-// The page structure: bands, the hero, tables, the trade-off trio, buttons and the two conversion
-// components. Built to the specification in the design plan.
+// The page structure: bands, the hero, tables, the trade-off trio, buttons and the two calls to action.
 //
 // The rhythm is the design. With no imagery, the swing between a large empty band and a dense card is the
 // page's only dynamic range - the empty space is load-bearing and it is the first thing anyone will try to cut.
@@ -48,8 +47,7 @@
 .prose ul { padding-left: 1.25em; }
 .prose li { margin-bottom: var(--s-2); }
 
-// Violet, small caps, above a section heading. Specified in the design and then not built, which is a large
-// part of why the pages read as typed rather than composed. It is the only place violet appears besides the
+// Violet, small caps, above a section heading. The only place violet appears besides the
 // caveat callout.
 .eyebrow {
 	margin-bottom: var(--s-3);
@@ -341,6 +339,7 @@
 	margin-block: var(--s-6);
 	padding: var(--s-4) var(--s-5);
 	background: var(--surface);
+	border: 1px solid var(--line);
 
 	code {
 		flex: 1;

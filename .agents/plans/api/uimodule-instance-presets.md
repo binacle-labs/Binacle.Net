@@ -1,5 +1,7 @@
 ---
 description: The instance page reads its presets over HTTP from the browser - move it to server-side state
+state: ready
+waits-on: "nothing"
 paths:
   - "api/src/Binacle.Net.UIModule/**"
   - "api/src/Binacle.Net.Kernel/**"
@@ -111,11 +113,20 @@ Run `just test api-ui-unit` and `just test api-ui-integration` after touching th
 
 ## Done when
 
-- The instance page renders its preset list from server-side state, with no HTTP call from either side.
-- The reload question is answered in code and the answer is readable at the point it was taken.
-- `_js/instance.js` is gone, along with its webpack entry.
-- `Kernel` has gained one plain options type and no new project reference.
-- The UI module doc describes what is there, including why the fetch went away.
-- The image builds and `just smoke all` is green.
+**Every box carries the check that proves it.** A tick with nothing beside it is somebody's claim.
+
+- [ ] The instance page renders its preset list from server-side state, with no HTTP call from either side.
+      `grep -rn "fetch\|XMLHttpRequest" api/src/Binacle.Net.UIModule/_js/` finds nothing for presets.
+- [ ] The reload question is answered in code and the answer is readable at the point it was taken.
+      **By eye.** Find the answer in the file that takes it. If it is only in this plan, the box is open.
+- [ ] `_js/instance.js` is gone, along with its webpack entry.
+      `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` and no `instance:` line in
+      `api/src/Binacle.Net.UIModule/webpack.config.js:10`.
+- [ ] `Kernel` has gained one plain options type and no new project reference.
+      One new file under `api/src/Binacle.Net.Kernel/`, and `git diff` on its `.csproj` is empty.
+- [ ] The UI module doc describes what is there, including why the fetch went away.
+      `.agents/docs/api/modules/ui.md` says it, and its `verified:` date is not older than the code change.
+- [ ] The image builds and `just smoke all` is green.
+      Run it.
 
 **Do not commit.** Everything lands in the working tree.

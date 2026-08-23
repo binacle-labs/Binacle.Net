@@ -1,7 +1,7 @@
 ---
 id: commands
-description: How to set up a clone, run the API and the two sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-22
+description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
+verified: 2026-08-23
 check: Test leaves match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -27,18 +27,19 @@ Do not repeat any of it here, and do not answer a setup question from memory: re
 at it. This section exists only to say where it is.
 
 The short version, for judging whether a command in this doc can run at all: .NET SDK 10.x, Node 22 (`.nvmrc`),
-Ruby 3.4.7 (`sites/docs/.ruby-version`, `sites/demo/.ruby-version` — **both** sites need it), `just`, and docker
-for anything touching the image.
+Ruby 3.4.7 (`.ruby-version` in `sites/docs/`, `sites/demo/` and `sites/www/` — **all three** sites need it),
+`just`, and docker for anything touching the image.
 
 ## Set up a fresh clone
 
 ```bash
-just install                           # npm workspaces, both jekyll sites' gems, then the asset copy
+just install                           # npm workspaces, all three jekyll sites' gems, then the asset copy
 just assets                            # only the asset copy - after changing anything under assets/
 ```
 
-`assets` copies `assets/**` into `sites/docs/` and `sites/demo/` via gulp. Both sites serve their copy, so a
-changed logo does not show up until this runs.
+`assets` copies `assets/**` into the three sites and into the UI module's `wwwroot/` via gulp. Each serves its
+own copy, so a changed logo does not show up until this runs. **`sites/www` gets a smaller set** — the gulp
+target skips `assets/lib/`, because that site runs no CSS framework; see `$sites/www`.
 
 ## Run from source
 
@@ -46,6 +47,7 @@ changed logo does not show up until this runs.
 just serve api [N|S|U|All]             # the API
 just serve docs                        # docs site: jekyll serve + webpack watch, one terminal
 just serve demo                        # demo site: same
+just serve www                         # marketing site: jekyll serve + sass and webpack watches
 just serve services-up [-d]            # what the API talks to: aspire-dashboard, azurite, postgres
 just serve services-down [-v]          # only needed after -d; Ctrl-C is enough otherwise
 ```
@@ -60,8 +62,9 @@ The API launch profiles:
 - `U` / `WithUiModuleOnly` — with UIModule
 - `All` / `WithAllModules` — everything
 
-`docs` and `demo` run both halves under `concurrently --kill-others`, so one Ctrl-C stops the pair. They need
-`just install` to have run first.
+`docs` and `demo` run both halves under `concurrently --kill-others`, so one Ctrl-C stops the pair. `www` runs
+three, because its `npm run watch` is itself a sass and webpack pair. All of them need `just install` to have
+run first.
 
 ## Run Tests
 
@@ -234,13 +237,13 @@ many times as needed, then `just smoke down prod -v`.
 
 ```bash
 just agents all                        # all five
-just agents generate-index plans       # one [docs|design|plans|memory|ideas]
+just agents generate-index plans       # one [rules|docs|design|plans|memory]
 ```
 
-Rewrites the `_index.md` manifest for `.agents/docs`, `.agents/design`, `.agents/plans`, `.agents/memory` and
-`.agents/ideas` (grouped by area). Each entry's description comes from the file's `description:` frontmatter,
+Rewrites the `_index.md` manifest for `.agents/rules`, `.agents/docs`, `.agents/design`, `.agents/plans` and
+`.agents/memory` (grouped by area). Each entry's description comes from the file's `description:` frontmatter,
 falling back to its first heading. Run it after adding, renaming, or re-describing any
-`.agents/{docs,design,plans,ideas,memory}/*.md` file. A name that isn't one of the five is rejected, so a typo
+`.agents/{rules,docs,design,plans,memory}/*.md` file. A name that isn't one of the five is rejected, so a typo
 can't leave an index untouched and look like it worked.
 
 ## Regenerate committed data
@@ -279,20 +282,24 @@ staging layout for the `just` recipes and the remaining `tooling/*.sh` scripts. 
 ## Build
 
 ```bash
-just build publish                     # dotnet publish -> artifacts/binacle-net
+just build publish                     # asset copy + UI bundles, then dotnet publish -> artifacts/binacle-net
 just build image [version]             # publish, then docker build -t binacle-net:<version> (default local)
 just build docs                        # the documentation site -> artifacts/docs
 just build demo                        # the demo site -> artifacts/demo
+just build www                         # the marketing site -> artifacts/www
 ```
 
-`image` always re-publishes first — `docker build` copies whatever is in `artifacts/binacle-net`, so skipping the
-publish is how a stale image gets tagged. The version becomes both the image tag and `BINACLE_VERSION` inside
-the container, which is what the running app reports.
+`publish` runs the asset copy and the UI module's own `npm run build` before `dotnet publish`, because dotnet
+collects static web assets at publish time and nothing fails when `wwwroot/` is empty — the image just ships
+pages with no styling and demos that do nothing. `image` always re-publishes first — `docker build` copies
+whatever is in `artifacts/binacle-net`, so skipping the publish is how a stale image gets tagged. The version
+becomes both the image tag and `BINACLE_VERSION` inside the container, which is what the running app reports.
 
 Then run it with `just image up`, which prepares the bind-mounted folders first.
 
-`docs` and `demo` are the build half of `just serve docs` / `just serve demo` — same site, built once instead of
-served and watched. Three steps in a fixed order: copy the assets, run webpack over `_js/`, then
+`docs`, `demo` and `www` are the build half of `just serve <site>` — same site, built once instead of
+served and watched. **The deploy workflows call these and hand `artifacts/<site>` straight to the host**, so
+what they build is what gets served. Three steps in a fixed order: copy the assets, run webpack over `_js/`, then
 `jekyll build` with `_config.yml,_config.prod.yml`. **Skipping any of them still produces a site**, just one
 with no scripts and no logo, because `js/`, `lib/` and `media/` are gitignored and filled by the first two
 steps. The prod config overrides the three values that differ off localhost: the site url, the api url and the
@@ -301,7 +308,7 @@ analytics container.
 ## Checks
 
 ```bash
-just check links                       # internal links in both built sites
+just check links                       # internal links in all three built sites
 just check links docs                  # one of them
 just check links-external docs         # every link, other people's servers included
 just check workflows                   # actionlint over .github/workflows

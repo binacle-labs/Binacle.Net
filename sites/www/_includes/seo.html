@@ -1,22 +1,3 @@
-{%- comment -%}
-Written for this site, not copied from the other two - theirs carry five live defects and every one of them
-comes with the file. What is different here, and why, in the order it appears:
-
-  1. `description` is front matter on every page and is never derived from the excerpt. Deriving it through a
-     truncating filter is what cut the live homepage snippet mid-word at "and war". The excerpt fallback is
-     for a page that forgot; every page here has a written one.
-  2. `og:type` is `website`. `article` is wrong for a product page and it was hardcoded.
-  3. `og:image` and `twitter:image` are on every page, from a site-wide default. Without one, every link
-     pasted into Slack, Reddit or Hacker News renders a grey card - and the announcement is a link pasted
-     into exactly those places.
-  4. `twitter:card` is `summary`, because og_image is a square logo and a wide card crops a square image. It
-     becomes `summary_large_image` the day a 1200x630 file exists - the two change together.
-  5. The <title> tag emits with no whitespace inside it. The live site wraps its value in newlines and some
-     scrapers keep them.
-
-The separator is " - ", not "|". Every absolute URL comes from `absolute_url`, so `url` in _config.yml is the
-only line in the build that names the host.
-{%- endcomment -%}
 
 {%- assign page_title = site.title -%}
 {%- if page.seo_title -%}

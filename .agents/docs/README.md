@@ -56,12 +56,12 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/` | OR-library packing benchmark data |
 | `assets/` | Shared images, js, css and fonts, copied into both Jekyll sites and the UI module by `gulpfile.js` |
 | `results/` | The hand-curated measurement vault — benchmark and size reports, never auto-written (`$build-topology`) |
-| `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `openapi/`, `tests/`, `coverage/`. Never edit |
+| `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `www/`, `openapi/`, `tests/`, `coverage/`. Never edit |
 
 ## Commands
 
-See Commands (`$commands`) — how to set up a clone, run the API and the two sites, run tests and benchmarks,
-and build the Docker image.
+See Commands (`$commands`) — how to set up a clone, run the API and the three sites, run tests and
+benchmarks, and build the Docker image.
 
 ## Common Tasks
 

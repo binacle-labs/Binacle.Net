@@ -1,23 +1,26 @@
 ---
-description: A plan or idea says what the work is, never when it happens. Scheduling lives on the board and in the release set.
+description: A plan says what the work is, never when it happens. Readiness is a key; shipping is the release set.
 load: on-trigger
-when: writing or editing a plan or an idea
-paths: [".agents/plans/**", ".agents/ideas/**"]
+when: writing or editing a plan
+paths: [".agents/plans/**"]
 ---
 
 # A plan says what, not when
 
-**Never write scheduling into a plan or an idea.** No "after v3.0.0", no "not a release item", no "not
+**Never write scheduling into a plan.** No "after v3.0.0", no "not a release item", no "not
 urgent", no "low priority", no "likely done together with X".
 
 Where scheduling lives instead:
 
 | Question | Answer lives in |
 |---|---|
-| Is this ready, blocked or deferred? | `board.md` |
-| What does it wait on? | `board.md` |
-| In what order do these two go? | `board.md` |
+| Is this ready, blocked or deferred? | the plan's own `state:` key |
+| What does it wait on? | its `waits-on:` key |
+| In what order do these two go? | it is the maintainer's call |
 | Does it ship in this version? | the `release-v<version>` set |
+
+**The two keys are the whole exception.** Readiness is one word in the front matter, where a generated index
+can collect it. In the body of the plan there is still no scheduling at all.
 
 A plan holds **what the work is, why it is worth doing, and what will bite whoever does it.** That is all.
 
@@ -41,8 +44,8 @@ carrying its own timing goes stale the moment that decision changes, and it goes
 fails, the sentence just quietly starts lying.
 
 It also puts the decision in the wrong hands. **When and whether something ships is the maintainer's call**,
-made across the whole board with everything else in view. A plan file only ever sees itself, so a schedule
-written there is a guess made with the least possible context - and it is a guess a later reader tends to
+made with everything else in view. A plan file only ever sees itself, so a schedule written there is a guess
+made with the least possible context - and it is a guess a later reader tends to
 obey.
 
 This bit for real: four plans were proposed for v3.0.0 and each carried its own contradictory timing note,

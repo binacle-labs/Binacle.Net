@@ -21,9 +21,8 @@ scripts_body_end:
     type: 'text/javascript'
 
 
-#   What only the two app pages execute - three.js alone is 601 KiB. `demo: true` in a page's front matter
-#   loads them; every other page prefetches this same list instead, so arriving at a demo costs no
-#   download. One list, so the two can never drift.
+#   What only the two app pages execute. `demo: true` in a page's front matter loads them; every other
+#   page prefetches this same list. One list, so the two can never drift.
 demo_scripts:
   - src: '/js/three.js'
     type: 'text/javascript'

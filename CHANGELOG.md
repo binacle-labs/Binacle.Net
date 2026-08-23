@@ -19,6 +19,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **Packing Logs** configuration was flattened, with breaking changes for existing integrations.  
 - **Forwarded headers** are now supported, so the real caller is resolved when running behind a proxy or CDN.  
 - **Health check IP restrictions** are matched differently, with breaking changes for existing allow-lists.  
+- **The demo UI was rebuilt**, its page addresses changed, and it gained a page describing the instance you are on.  
 - **The image creates `/app/data`** and gives it to the app user, so a volume mounted there is writable.  
 - **The image is signed**, and carries an SBOM and build provenance, so you can verify what you pull.  
 - **The image is about a third smaller** — it uses the .NET runtime from its base image instead of bundling a second copy.  
@@ -59,7 +60,8 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
   The SPDX SBOM and SLSA provenance travel inside the image index; `docker buildx imagetools inspect binacle/binacle-net:3.0.0` lists them.  
 - **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is written into the signature and does not redirect — a stale one fails the check rather than warning.  
 - **The image is smaller — around 103 MB, where the same image built the old way was 150 MB.** The app is published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead of carrying a second copy of it. Nothing about running the container changes.  
-- Existing environment variables are unchanged.  
+- **One environment variable was removed — `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the demo at another API host. The rebuilt module reads no configuration and always calls the API it is served from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went with it, and the image no longer ships a `UiModule` config folder.  
+- Every other environment variable is unchanged.  
 
 ### 🧪 Diagnostics Module
 - Packing Logs configuration was **flattened** — `Path`, `FileName`, `DateFormat`, and `ChannelLimit` now sit directly under `PackingLogs`.  
@@ -78,9 +80,13 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **The auth token rate limit no longer partitions on a caller-supplied header.** It partitions on the connection's remote address, which forwarded headers resolve to the real caller wherever a proxy is trusted. Before this, varying the header reset your own login throttle.  
 
 ### 🎨 UI Module
-- The ViPaq Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.  
-- The **Packing Demo** and **ViPaq Decoder** descriptions were rewritten. Neither tool changed.  
-- The instance page now links to **GitHub Discussions**.  
+- **The demo UI was rebuilt.** It was Blazor with an interactive server render mode; it is now Razor Pages, with everything interactive running in the browser. **No SignalR circuit and no WebSocket**, so the demo works behind a proxy or CDN that does not forward one.  
+- **The page addresses changed** — `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and `/Error` is now `/error`. Old links no longer resolve.  
+- **The Protocol Decoder is now the ViPaq Decoder.** Same tool. It reads the **new ViPaq format only**, and strings from earlier versions are rejected.  
+- **A new page, `/instance`.** The version and environment this container is running, which features are switched on and where each one answers, and the presets it loaded — so you can see whether your configuration arrived the way you meant it to. It also links to **GitHub Discussions**.  
+- **The Packing Demo starts from a random sample rather than a fixed one**, and its two randomize buttons are now one. Bins are rolled first and items are sized to the largest of them, so a sample is never impossible to pack.  
+- **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.  
+- **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup — see Core Changes for the variable that went.  
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.  
@@ -136,7 +142,13 @@ To upgrade to **v3.0.0**, follow these steps:
    - Drop any leading zeros — `010.10.10.10` becomes `10.10.10.10`, and note it used to admit `8.10.10.10`, so check that host was not the one you meant. Write IPv6 entries in the short lowercase form: `2001:0DB8::1` becomes `2001:db8::1`.  
    - If Binacle.Net runs behind a proxy, load balancer or CDN, enable **forwarded headers** as well. Without it the list is compared against the proxy's address and can never match your monitoring system.
 
-7. **Update any pinned `cosign verify` command**  
+7. **Drop `BINACLEAPI_CONNECTION_STRING`**  
+   - Delete it from any compose file, Kubernetes manifest or environment file. It is ignored, not rejected, so nothing fails to start and nothing warns.
+   - Only affects you if you set it. Pointing the shipped demo at a different API host is no longer possible; the demo calls the API it is served from.
+   - Any `Config_Files/UiModule/` directory you mounted or edited can be removed. The image no longer reads it.
+   - Bookmarks to `/PackingDemo` or `/ProtocolDecoder` need updating to `/packing` and `/vipaq`.
+
+8. **Update any pinned `cosign verify` command**  
    - The repository moved to the `binacle-labs` organization and the certificate identity moved with it. Replace `ChrisMavrommatis` with `binacle-labs` in `--certificate-identity-regexp`.  
    - Only affects you if you verify signatures in a script or a pipeline. A stale identity **fails** the check, it does not warn — so it reads as a tampered image rather than an out-of-date command.
 

@@ -1,7 +1,7 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-08-22
+verified: 2026-08-23
 check: Every solution folder and project count matches Binacle.Net.slnx (45 projects); Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
@@ -131,14 +131,16 @@ webpack together under a single Ctrl-C), and its only scripts are the asset-copy
 
 - `npm run copy-assets-to-docs` → `gulp copy-assets-to-docs`
 - `npm run copy-assets-to-demo` → `gulp copy-assets-to-demo`
+- `npm run copy-assets-to-www` → `gulp copy-assets-to-www`
 - `npm run copy-assets-to-uimodule` → `gulp copy-assets-to-uimodule`
 
-`just assets` runs all three, and `just install` runs it after the npm and bundler installs.
+`just assets` runs all four, and `just install` runs it after the npm and bundler installs.
 
-`gulpfile.js` copies shared `assets/` (images, js, css, fonts) into the two Jekyll sites and the UI module's
-`wwwroot/`. One `IGNORE` block holds what each target skips, with the weight it saves beside each line. Each
-of the three runs its own webpack build — see docs site (`$sites/docs`), demo site (`$sites/demo`) and the UI
-module (`$api/modules/ui`).
+`gulpfile.js` copies shared `assets/` (images, js, css, fonts) into the three Jekyll sites and the UI module's
+`wwwroot/`. One `IGNORE` block holds what each target skips, with the weight it saves beside each line — `www`
+skips `lib/` outright, because that site runs no CSS framework. Each of the four runs its own webpack build —
+see docs site (`$sites/docs`), demo site (`$sites/demo`), marketing site (`$sites/www`) and the UI module
+(`$api/modules/ui`).
 
 **To re-measure that `IGNORE` block**, grep each target for `lib/<name>` outside its own `lib/` folder; what
 nothing references is what can be skipped. The copy is one-way and never deletes, so a target that stopped

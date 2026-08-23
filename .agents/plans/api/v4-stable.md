@@ -1,8 +1,14 @@
 ---
 description: v4 - flip from experimental to stable
+state: blocked
+waits-on: "an endpoint added to v4 that reshapes no existing contract - none has been chosen"
 paths:
   - "api/**"
 ---
+
+**The endpoint it is waiting on.** `api/pack-first-bin-endpoint.md` is the only candidate written up. Nothing
+else has been costed.
+
 
 # v4 — flip from experimental to stable
 

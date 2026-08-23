@@ -1,5 +1,7 @@
 ---
 description: A test harness for the UI
+state: blocked
+waits-on: "a Sonar run - state and blocker chosen by an agent, strike them if wrong"
 ---
 
 # A test harness for the UI
@@ -22,6 +24,9 @@ description: A test harness for the UI
 through `_dotnet_test`, the same way every other suite does - but no Sonar run has happened since they
 landed, so **nobody has seen the numbers arrive there**. Until someone dispatches `sonar-analysis.yml` and
 reads the result, "coverage reaches Sonar" is an assumption.
+
+**This is also why the Sonar coverage gate is red.** `new_coverage` is the only failing condition, and it goes
+green when the UI gets tested - not by configuration.
 
 Two things to check when that run happens, because both would look like success:
 

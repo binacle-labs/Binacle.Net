@@ -3,15 +3,12 @@
 {% assign page_title = page.seo_title %}
 {% elsif page.title %}
 {% assign page_title = page.title %}
-{% comment %} A versioned page carries its version, or it collides with the same page at the site root and
-   with every other version of itself. Keep the whole title under 60 characters. {% endcomment %}
 {% if page.version %}
 {% assign page_title = page_title | append: ' (' | append: page.version | append: ')' %}
 {% endif %}
 {% assign page_title = page_title | append: ' - ' | append: site.title %}
 {% endif %}
 
-{% comment %} No newlines inside the tag - some scrapers keep the whitespace and print it in the result. {% endcomment %}
 <title>{{ page_title }}</title>
 
 {% assign site_meta_description = site.description | markdownify | clean_content: 160 %}
@@ -23,8 +20,6 @@
 
 <link rel="canonical" href="{{ page.url | remove: "index.html" | absolute_url }}">
 
-{% comment %} Only the version named `current` in _data/versions.yml is indexable. `follow`, not `nofollow`:
-   the links out of an old page still lead somewhere worth crawling. {% endcomment %}
 {% if page.version and page.version != site.data.versions.current %}
 <meta name="robots" content="noindex, follow">
 {% endif %}
@@ -43,9 +38,6 @@
 <meta property="og:description" content="{{ meta_description }}" />
 <meta property="og:locale" content="{{ page.locale }}" />
 
-
-{% comment %} summary, not summary_large_image: og_image is a square logo and a wide card crops it.
-   Both change together the day a 1200x630 image exists. {% endcomment %}
 <meta name="twitter:card" content="summary">
 
 {% if site.twitter_url %}

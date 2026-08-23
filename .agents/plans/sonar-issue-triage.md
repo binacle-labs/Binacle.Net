@@ -1,5 +1,7 @@
 ---
 description: Sonar - what is left after the 2026-08-09 sweep
+state: ready
+waits-on: "nothing"
 ---
 
 # Sonar - what is left after the 2026-08-09 sweep

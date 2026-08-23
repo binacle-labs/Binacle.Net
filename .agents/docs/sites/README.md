@@ -3,6 +3,12 @@ id: sites
 description: Every published site lives under sites/, one directory each. What the three share, and what is per-site.
 verified: 2026-08-23
 check: The directory list matches sites/; all three sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
+also_update:
+  - commands
+  - ci-cd
+  - tooling
+  - build-topology
+  - ruby
 paths:
   - "sites/**"
 ---

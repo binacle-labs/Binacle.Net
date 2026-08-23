@@ -205,9 +205,6 @@ excerpt: |
 								</span>
                 <span class="s8 right-align" x-text="resultBinPercentageText(result)">
 								</span>
-                {% comment %} value="0" is not a default - it is what keeps the bar determinate. Alpine skips its own assignment
-                   when el.value already equals the bound one, and an indeterminate progress reads 0, so a
-                   0% result would never get the attribute and beercss animates every progress that lacks it. {% endcomment %}
                 <progress value="0" :value="result.packedBinVolumePercentage" max="100"
                           class="s12 surface-container-lowest"
                           :class="colorClass(result) + '-text'">

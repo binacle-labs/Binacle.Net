@@ -1,8 +1,15 @@
 ---
 description: pack/first-bin endpoint
+state: idea
+waits-on: nobody waiting - but v4-stable is waiting on this one, or on another candidate
 paths:
   - "api/**"
 ---
+
+**`api/v4-stable` is blocked on this file.** v4 cannot go stable until one endpoint is added that reshapes no
+existing contract, and this is the only candidate anyone has worked through. **Promote it, pick another, or
+accept that v4 stays experimental** - all three are answers; having none is not.
+
 
 # Idea: pack/first-bin endpoint
 

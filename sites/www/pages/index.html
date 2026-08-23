@@ -8,13 +8,6 @@ description: >-
 structured_data: true
 ---
 
-{%- comment -%}
-Nothing above the h1 - no eyebrow, no badge. The h1 asks the question in English and the card beside it asks
-the same question in HTTP and answers it in JSON.
-
-The sub-line and supporting line are canonical strings and are not edited here. Spine, expansion, identity,
-then the checkout line.
-{%- endcomment -%}
 <section class="band hero">
     <div class="shell hero-grid">
         <div class="hero-copy prose">
@@ -27,7 +20,6 @@ then the checkout line.
             <p>Built for checkout: your customer picks a locker or a box, and Binacle.Net says whether the
                 order fits before they pay.</p>
 
-            {%- comment -%} At most two buttons on the whole homepage, and these are them. {%- endcomment -%}
             <p class="actions">
                 <a class="button primary" href="#run">Run it</a>
                 <a class="button secondary" href="https://demo.binacle.net">Try the demo</a>
@@ -44,10 +36,6 @@ then the checkout line.
     </div>
 </section>
 
-{%- comment -%}
-The only prose-only block on the page, and the only place written from the reader's side. No card and no
-columns - that is what gives it weight. Under 90 words on purpose.
-{%- endcomment -%}
 <section class="band alt">
     <div class="shell">
         <div class="prose">
@@ -66,11 +54,6 @@ columns - that is what gives it weight. Under 90 words on purpose.
     </div>
 </section>
 
-{%- comment -%}
-A specification, not an apology. No "unfortunately", no "only", no "just". The table carries the negatives so
-the prose does not have to. Real <table> markup - Google lifts table content for comparison-shaped queries
-and divs pretending to be tables get nothing.
-{%- endcomment -%}
 <section class="band">
     <div class="shell">
         <div class="prose">
@@ -106,13 +89,6 @@ and divs pretending to be tables get nothing.
     </div>
 </section>
 
-{%- comment -%}
-His tick-and-scales device promoted from a bullet list to a layout. Each column states its own cost. A
-project stating its own limits is more persuasive here than a benefits list, and the middle column is the
-heuristics paragraph doing its real job instead of sitting in a footnote.
-
-This is the section carrying the page's one blue structural rule.
-{%- endcomment -%}
 <section class="band alt rule">
     <div class="shell">
         <div class="prose">
@@ -141,11 +117,6 @@ This is the section carrying the page's one blue structural rule.
             </div>
         </div>
 
-        {%- comment -%}
-        This paragraph has an expiry date. The day Binacle.Net distributes an order across several boxes it
-        becomes false and comes out. Whoever ships that feature deletes it.
-        It is also the one place "cartonization" is said on this page.
-        {%- endcomment -%}
         <div class="prose">
             <p>Strictly, that makes this the single-container case - a 3D knapsack rather than bin packing,
                 and the word the logistics trade uses is cartonization. Most people looking for it search for
@@ -166,21 +137,12 @@ This is the section carrying the page's one blue structural rule.
             <p>Either takes your boxes in the request - <code>by-custom</code> - or by the name of a preset
                 you configured once - <code>by-preset/{preset}</code>.</p>
 
-            {%- comment -%}
-            Load-bearing. The expansion beat promises "where every item sits", and a fit response does not
-            carry coordinates. Without this sentence the page promises something the hero card does not show.
-            {%- endcomment -%}
             <p>The pack endpoints run the same algorithms and also return the position of every item. A fit
                 response tells you what went in and what did not; it has no coordinates in it.</p>
         </div>
     </div>
 </section>
 
-{%- comment -%}
-Three sentences, one link each, into the other three pages. Not a card grid. Anchor text is a phrase, never
-"learn more". "3D bin packing API" is repeated here - the exact phrase belongs on this page and is repeated
-on it.
-{%- endcomment -%}
 <section class="band alt">
     <div class="shell">
         <div class="prose">
@@ -203,13 +165,6 @@ on it.
     </div>
 </section>
 
-{%- comment -%}
-Every clause here is evidenced. The name is on NOTICE and the GitHub profile; the authorship is git log, 948
-of 957 commits, first one 28 Feb 2023; Discussions is where the org profile already sends questions.
-
-Invent nothing further - no motivation, no job, no years of experience. No origin story and no
-bin-plus-pinnacle. "Binacle Labs" is a GitHub organisation, not a company, and does not appear on this site.
-{%- endcomment -%}
 <section class="band">
     <div class="shell">
         <div class="prose">
@@ -222,10 +177,6 @@ bin-plus-pinnacle. "Binacle Labs" is a GitHub organisation, not a company, and d
     </div>
 </section>
 
-{%- comment -%}
-The close. The command is not a button - the stylesheet makes it a command line with an orange prompt.
-Warmth goes here, at the end, near the command. Never in the opener.
-{%- endcomment -%}
 <section class="band alt" id="run">
     <div class="shell">
         <div class="prose">

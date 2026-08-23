@@ -32,5 +32,4 @@ hold them to a standard good enough to generate from.
 The clean spec makes that a config job rather than a project, so the decision stays cheap to change — publish
 an SDK because somebody asked, never in anticipation.
 
-Non-developer integration (store plugins and the like) is a separate question and is not covered by this — a
-plugin user never runs a generator.
+**This covers developers only** - anyone integrating without writing code never runs a generator.

@@ -48,7 +48,18 @@ HTTP 200
 GET http://localhost:8080/_content/Binacle.Net.UIModule/js/protocol_decoder.js
 HTTP 200
 
+# The shared chunks, which _AppletScripts.cshtml loads before either demo entry. A missing one leaves the
+# page at 200 with a demo that does nothing, so an entry bundle alone is not enough to assert.
+GET http://localhost:8080/_content/Binacle.Net.UIModule/js/vendors.js
+HTTP 200
+
 GET http://localhost:8080/_content/Binacle.Net.UIModule/js/three.js
+HTTP 200
+
+GET http://localhost:8080/_content/Binacle.Net.UIModule/js/binacle-net-ui.js
+HTTP 200
+
+GET http://localhost:8080/_content/Binacle.Net.UIModule/js/binacle-vipaq.js
 HTTP 200
 
 GET http://localhost:8080/_content/Binacle.Net.UIModule/css/main.css

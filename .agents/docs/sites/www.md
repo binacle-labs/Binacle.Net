@@ -56,9 +56,6 @@ processes where the other two run two.
 | `/404.html` | permalink kept at the root — Cloudflare's `not_found_handling` wants it there |
 | `/robots.txt`, `/sitemap.xml` | per host |
 
-`/plugins/` is reserved and deliberately unwritten. Which platform gets the first plugin is unanswered, and
-that question decides the page's contents.
-
 ## The metadata include is new, not copied
 
 `_includes/seo.html` was written for this site. **Do not replace it with the one from `docs` or `demo`** —
@@ -81,12 +78,12 @@ image is worse than either.
 ## Structured data
 
 Two JSON-LD blocks in `_includes/schema.html`, emitted only where a page sets `structured_data: true`, which
-is `/` alone. `SoftwareApplication` carries `offers` at price `0` — the whole category is paid, so a free row
-is what the directories lack. `Organization` carries `sameAs` pointing at the GitHub org and the Docker Hub
-page, tying the site to the listing that currently outranks it.
+is `/` alone. `SoftwareApplication` carries `offers` at price `0`, which is what the software is.
+`Organization` carries `sameAs` pointing at the GitHub org and the Docker Hub page, so the three surfaces
+resolve to one identity.
 
-`BreadcrumbList`, `FAQPage`, `WebSite` + `SearchAction` and `HowTo` were all considered and rejected. The
-reasons are in `_includes/schema.html` so nobody adds them back.
+`BreadcrumbList`, `FAQPage`, `WebSite` + `SearchAction` and `HowTo` were all considered and rejected - the
+reasons are `$sites/www-design#W8`.
 
 ## Every code block is a real response
 

@@ -73,8 +73,7 @@ following links that go nowhere, or dropping `follow` from seventy-four pages th
 `sites/demo/_data/footer.yml` fetches one `img.shields.io` badge, for the published image version. The GitHub
 stars badge that sat beside it is gone.
 
-**A star count is negative proof until it is large**, and it rendered as the last thing a visitor read on the
-page. The version badge is the opposite case: it is a fact that stays true without anyone maintaining it,
+**A third-party badge is a request on every page**, and it rendered as the last thing a visitor read. The version badge is the opposite case: it is a fact that stays true without anyone maintaining it,
 which is the whole argument for a badge.
 
 **Rendering it at build time was considered and rejected.** Nothing in the site knows the published version —

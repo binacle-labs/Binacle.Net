@@ -18,11 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // Find the active span
     const activeSpans = document.querySelectorAll('span[data-active]');
     if (!!activeSpans){
         activeSpans.forEach(activeSpan => {
-            // Start from the active span and walk up, opening all parent <details>
             let parent = activeSpan.closest('details');
             let count = 0;
             while (parent && count < 10) { // Limit to 10 levels to prevent infinite loop
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	if(!!closeButtons) {
 		closeButtons.forEach(button => {
 			button.addEventListener('click', function () {
-				// emulate escape key
 				const dialog = button.closest('dialog');
 				if(!!dialog){
 					dialog.close();

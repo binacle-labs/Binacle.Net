@@ -10,12 +10,11 @@ The whole rule, in one table. Nothing else states any part of it.
 
 | File type | May reference | Never references |
 |---|---|---|
-| **docs** (permanent) | code, paths, READMEs, **other docs** | design, plans, ideas, memory |
-| **design** (permanent) | code, paths, READMEs, **docs, other design** | plans, ideas, memory |
+| **docs** (permanent) | code, paths, READMEs, **other docs** | design, plans, memory |
+| **design** (permanent) | code, paths, READMEs, **docs, other design** | plans, memory |
 | **plans** (ephemeral) | code, paths, READMEs - **nothing under `.agents/`** | every layer, including each other |
-| **ideas** (ephemeral) | code, paths, READMEs - **nothing under `.agents/`** | every layer, including each other |
-| **memory** (ephemeral) | ideally nothing; a doc or design only if it truly must | plans, ideas, other memory |
-| **rules** | code, paths, other rules | docs, design, plans, ideas, memory |
+| **memory** (ephemeral) | ideally nothing; a doc or design only if it truly must | plans, other memory |
+| **rules** | code, paths, other rules | docs, design, plans, memory |
 | **slice READMEs** | whatever its own layer may | whatever its own layer may not |
 | **anything outside `.agents/`** | code, paths, itself | **`.agents/` - anything at all** |
 
@@ -23,10 +22,10 @@ The whole rule, in one table. Nothing else states any part of it.
 
 - **Docs never point at design.** Docs are "what is true now"; design is the "why" and can change under them.
   Design points at docs; docs never point back.
-- **Nothing permanent points at anything ephemeral.** A plan or idea is deleted when built or dropped, and a
+- **Nothing permanent points at anything ephemeral.** A plan is deleted when built or dropped, and a
   memory can stop being true, so the link dangles. If a permanent file needs the content, it was not
   ephemeral - move it into a doc or design record first.
-- **Plans and ideas cite no `$` reference at all** - not a doc, not a design record, not each other. Name the
+- **Plans cite no `$` reference at all** - not a doc, not a design record, not each other. Name the
   area in plain words ("the ServiceModule doc") and inline the fact. A plan is a scratchpad that gets deleted;
   a `$` reference out of one is a maintenance debt for a file that will not outlive the work.
 - **Nothing outside `.agents/` may point into it.** Three shapes, all banned: a filename (`see decisions.md`),
@@ -43,8 +42,7 @@ Each may point at anything, and **nothing may point back at them**.
 
 - **`CLAUDE.md`** - the door. Something has to say `.agents/` exists.
 - **`.agents/README.md`** - the map. It may *name* any file as navigation.
-- **`board.md`** and the **`release-v<version>` set** - permanent files whose contents are entirely ephemeral.
-  A release file may name the board in plain words but may not link it: "nothing points at the board" wins.
-  `post-release-v<version>.md` is the only file that may link into `ideas/`.
+- **the `release-v<version>` set** - permanent files whose contents are entirely ephemeral. A release file
+  names the plans it took a slice of, and nothing points back at it.
 
 Navigation is not citation. A README that lists its folder's files is indexing them, not citing them.

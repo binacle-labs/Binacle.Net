@@ -11,7 +11,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
 
 ```yaml
 - file: comments-are-for-humans.md
-  description: "Comments explain the trap in front of them, for the person editing that line. Thin. Anything an agent needs goes in .agents/."
+  description: "A comment carries the one thing that is not obvious from the code. Short. The reasoning goes in design/, never in both."
   when: "writing or editing a code comment"
   load: on-trigger
   paths: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.csproj", "**/*.props", "**/*.just", "**/*.yml"]
@@ -54,22 +54,22 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "writing any doc, comment or explanation"
   load: on-trigger
 - file: plans-do-not-schedule-themselves.md
-  description: "A plan or idea says what the work is, never when it happens. Scheduling lives on the board and in the release set."
-  when: "writing or editing a plan or an idea"
+  description: "A plan says what the work is, never when it happens. Readiness is a key; shipping is the release set."
+  when: "writing or editing a plan"
   load: on-trigger
 - file: ref-codes-stay-in-the-agent-docs.md
   description: "A label like D16 is an agent cross-reference. Never put a bare code in anything a human reads."
   when: "writing anything a human reads outside .agents/ - a comment, release notes, PR text, a chat reply"
   load: on-trigger
 - file: talking-to-the-maintainer.md
-  description: "In chat, use plain English and simple language. Less is more."
+  description: "In chat - plain English, no flattery, say where he is wrong, and answer a question before changing anything."
   when: "every reply you write to the maintainer"
   load: always
-- file: the-board-and-the-release-set.md
-  description: "The board and the release set divide all work between them. An agent maintains both, but never decides placement, readiness or priority."
-  when: "touching board.md or a release file, or deciding what to work on next"
+- file: the-release-set.md
+  description: "The release set holds what must ship with a version. An agent maintains it and never decides priority."
+  when: "touching a release file, or deciding what to work on next"
   load: on-trigger
-  paths: [".agents/board.md", ".agents/release-v*.md", ".agents/post-release-v*.md"]
+  paths: [".agents/release-v*.md", ".agents/post-release-v*.md"]
 - file: who-references-whom.md
   description: "The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions."
   when: "adding any link, $ reference or pointer, anywhere in the repo"

@@ -1,6 +1,6 @@
 # One centred line: copyright, licence, links.
 #
-# No shields.io badges - a third-party request on every page, and a six-star badge argues against you.
+# No shields.io badges - a third-party request on every page.
 # No four-column marketing footer - there is not enough site to fill one.
 # No category sentence. The other two sites' footers still carry the old one.
 copyright: "(c) 2023-{now} Chris Mavrommatis"

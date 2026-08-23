@@ -1,5 +1,7 @@
 ---
 description: testing techniques not in use
+state: idea
+waits-on: "nobody waiting"
 ---
 
 # Idea: testing techniques not in use

@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-08-19
+verified: 2026-08-23
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -102,6 +102,43 @@ Used in `Program.cs` to conditionally call `AddServiceModule()` and `AddUIModule
 
 Flags checked in `Program.cs`: `SERVICE_MODULE`, `UI_MODULE`, `SWAGGER_UI`, `SCALAR_UI`.
 See `$api/modules` for what each flag enables and how modules use them.
+
+## FeatureOptions
+
+**`Feature.Manager` answers "is this switched on" before the container exists. `FeatureOptions` is the
+in-container record of what actually got switched on**, and the two are separate on purpose: a flag can be set
+and the feature still not registered.
+
+```csharp
+options.AddFeature("SwaggerUI", "/swagger");   // name, and where it answers
+options.IsFeatureEnabled("SwaggerUI");
+options.PathFor("SwaggerUI");                  // null for a feature with no URL
+```
+
+**The path is recorded by whoever switches the feature on**, because some of them are configurable and nothing
+else can know where one ended up — the health check path comes from `HealthChecks.json`, so only the
+DiagnosticsModule can supply it. `AddFeature` is a dictionary write, so registering the same name twice
+replaces rather than duplicates.
+
+The UI module's instance page reads it one feature at a time, through `IsFeatureEnabled` and `PathFor`.
+`SystemHealthCheck` and `/_debug` list the lot: `EnabledFeatures` is the dictionary's key set, in no order, so
+both sort it before printing.
+
+## ReservedPathOptions
+
+Path prefixes the API serves that **must never answer with a web page**.
+
+```csharp
+options.AddPrefix("/api");                     // a prefix with no leading slash gets one
+reservedPaths.Covers(context.Request.Path);    // StartsWithSegments against every prefix
+```
+
+`Program.cs` reserves `/api`, `/openapi`, `/swagger` and `/scalar` whether or not the UI serving them is on;
+each module adds its own. `AddPrefix` ignores an empty value and prepends the slash a `PathString` comparison
+requires, so a prefix written `api` cannot fail every request. **Who declares what, and what the UI module does
+with the answer, is in `$api/modules`** — nothing here decides policy.
+
+Also surfaced by `SystemHealthCheck` and `/_debug`, beside the feature list.
 
 ## IModuleMarker / IApiMarker
 

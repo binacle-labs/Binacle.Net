@@ -5,7 +5,6 @@
 {% assign page_title = page.title | append: ' - ' | append: site.title %}
 {% endif %}
 
-{% comment %} No newlines inside the tag - some scrapers keep the whitespace and print it in the result. {% endcomment %}
 <title>{{ page_title }}</title>
 
 {% assign site_meta_description = site.description | markdownify | clean_content: 160 %}
@@ -30,8 +29,6 @@
 <meta property="og:description" content="{{ meta_description }}" />
 <meta property="og:locale" content="{{ page.locale }}" />
 
-{% comment %} summary, not summary_large_image: og_image is a square logo and a wide card crops it.
-   Both change together the day a 1200x630 image exists. {% endcomment %}
 <meta name="twitter:card" content="summary">
 
 {% if site.twitter_url %}

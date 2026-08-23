@@ -1,5 +1,7 @@
 ---
 description: Decide what happens to the three `Parallel*` processors
+state: ready
+waits-on: "nothing"
 paths:
   - "lib/**"
 ---

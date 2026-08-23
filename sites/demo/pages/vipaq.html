@@ -38,7 +38,6 @@ excerpt: |
 
   </article>
 
-
   <div class="s12 m7 l9">
     {% include components/packing-visualizer.html %}
   </div>
@@ -59,7 +58,7 @@ excerpt: |
 							</span>
             <span class="s8 right-align" x-text="resultBinPercentageText(result)">
 							</span>
-            <progress :value="result.packedBinVolumePercentage()" max="100"
+            <progress value="0" :value="result.packedBinVolumePercentage()" max="100"
                       class="s12 surface-container-lowest"
             >
             </progress>
@@ -71,7 +70,6 @@ excerpt: |
           </button>
         </a>
       </template>
-
 
     </fieldset>
   </article>

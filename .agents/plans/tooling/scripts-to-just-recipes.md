@@ -1,5 +1,7 @@
 ---
 description: Convert the last `tooling/*.sh` scripts to `just` recipes
+state: ready
+waits-on: "nothing"
 paths:
   - "tooling/**"
 ---

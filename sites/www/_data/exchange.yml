@@ -95,9 +95,7 @@ pack:
       ]
     }
 
-# /cartonization/ - a shorter request than the homepage's, and the whole edge of that page. Twelve paid
-# products rank for the word and not one of them shows a request you can run.
-# by-preset: the box set is configured once in the image, so the request is only the order.
+# /cartonization/ - by-preset: the box set is configured once in the image, so the request is only the order.
 carton:
   verified: "2026-08-23, source build of the 3.0.x line"
   method: "POST"
@@ -152,9 +150,8 @@ carton:
       ]
     }
 
-# /parcel-lockers/ - three compartment sizes and one order. The compartment heights are the shape a locker
-# bank actually has; they are NOT a carrier's published figures and no carrier is named. Real sizes come
-# from whoever runs the lockers.
+# /parcel-lockers/ - three compartment sizes and one order. The heights are the shape a locker bank has, not
+# anyone's published figures. The page says so.
 #
 # One item on purpose. A multi-item order against a compartment nothing fits produces an empty fittedItems
 # row that reads as a bug unless the page explains the sort order, and that is not a marketing page's job.

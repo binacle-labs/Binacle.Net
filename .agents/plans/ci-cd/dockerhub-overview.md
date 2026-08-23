@@ -1,5 +1,7 @@
 ---
 description: The Docker Hub repository page
+state: ready
+waits-on: "nothing"
 paths:
   - ".github/workflows/**"
 ---
@@ -37,8 +39,7 @@ a logo that assumes one will look broken in the other.
 **Categories.** The repo has one, "Integration & delivery", and three are allowed. That category is about
 CI/CD tooling, which this is not - it is the leftover of a single hurried pick. **"Developer Tools" is the
 closer fit and should lead**, with "Integration & delivery" kept only if a third genuinely better one cannot
-be found in the list Docker offers. Categories feed Hub search, so this is the only item here that changes who
-arrives at the page.
+be found in the list Docker offers.
 
 Then delete this file.
 

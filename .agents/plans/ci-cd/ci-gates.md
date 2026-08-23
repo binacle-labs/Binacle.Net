@@ -1,5 +1,7 @@
 ---
 description: CI - make the PR gate mean something
+state: deferred
+waits-on: "gate 2 the all-modules integration tests, gate 3 the UI test harness - neither has anything to gate yet"
 paths:
   - ".github/workflows/**"
 ---

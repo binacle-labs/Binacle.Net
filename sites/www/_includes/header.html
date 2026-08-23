@@ -1,9 +1,5 @@
 <header class="site-header">
   <div class="shell header-inner">
-    {%- comment -%}
-    The mark is the vector file, not a downscaled png. The raster copies turn to mush below 48px - that is a
-    downscaling problem and it does not reach an svg, which is why this one is crisp at 28.
-    {%- endcomment -%}
     <a class="wordmark" href="{{ '/' | relative_url }}">
         <img src="{{ site.logo.src | relative_url }}" alt="" width="28" height="28">
         <span>{{ site.data.header.wordmark }}</span>
@@ -19,10 +15,6 @@
         {%- endfor -%}
     </nav>
 
-    {%- comment -%}
-    Hidden until main.js reveals it. With JavaScript off the toggle cannot work, and a control that does
-    nothing is worse than no control - the pages have to be complete with JavaScript off.
-    {%- endcomment -%}
     <button type="button" class="theme-toggle" hidden aria-pressed="false">
         <span data-theme-label>Theme</span>
     </button>

@@ -36,7 +36,7 @@ outlives the release is in the docs and the decisions ledgers, not here.
 
 **Where a plan does the work, this file names the slice it took and nothing more.** The plan file itself never
 says what ships when. When a slice lands, cut that part out of the plan; when nothing is left in the plan,
-delete it. Whatever the release did not take stays on the board.
+delete it. Whatever the release did not take stays in the plan.
 
 **Two lists.** The gate is what must be green before the tag. "Runs alongside" does **not** hold the tag - if
 one is not ready, the release goes without it.
@@ -65,7 +65,7 @@ A prerelease gets its immutable tag only, never `3.0` or `latest`. The release b
 ### 7. The Docker Hub page's quick start
 
 **The slice this release takes from [ci-cd/dockerhub-overview](plans/ci-cd/dockerhub-overview.md): section 1,
-the `curl` example.** Everything else in that plan stays on the board.
+the `curl` example.** Everything else in that plan stays in it.
 
 **Why it is on the gate rather than alongside - state chosen by an agent, strike it if wrong.** The `page` job
 runs at the end of the release and publishes the file as it stands, so there is no "goes without it". The tag
@@ -127,7 +127,7 @@ the `3.0` bump on `main` long before tagging.**
 ## Runs alongside - does not hold the tag
 
 **The Docker Hub logo and categories are not here.** They are the rest of the `ci-cd/dockerhub-overview` plan
-and they sit on the board, not in this release - the release only takes that plan's `curl` example. Recorded so
+and they stay in it, not in this release - the release only takes that plan's `curl` example. Recorded so
 they are not mistaken for release work that got dropped.
 
 ### Docker Hub tag immutability - the rule only
@@ -135,7 +135,7 @@ they are not mistaken for release work that got dropped.
 **The slice this release takes from
 [ci-cd/dockerhub-tag-immutability](plans/ci-cd/dockerhub-tag-immutability.md): correct the rule, leave the
 switch off.** The plan holds the trap, the regexp and why prereleases are excluded; the switch and the
-scratch-repo test stay in it and are on the board.
+scratch-repo test stay in it.
 
 - [ ] **Correct the rule to released versions only, and read the value back from the API.** The stored value
       on 2026-08-13 was `".*"`, which would freeze `latest` and `3.0` - the two tags the release moves. **The
@@ -200,13 +200,14 @@ plus six edits that must go out with it.
       interim wording because the tag did not exist when the pages were written. Swap the italic line for
       *"Released &lt;date&gt; - [release on GitHub](.../releases/tag/v3.0.0)"*, matching every other version
       folder.
-- [ ] **Carry three additions from `CHANGELOG.md` into `v3.0.x/release-notes.md`.** Same notes in two places,
-      and the release body gained content on 2026-08-10 the page does not have.
+- [ ] **Carry five additions from `CHANGELOG.md` into `v3.0.x/release-notes.md`.** Same notes in two places,
+      and the release body gained content on 2026-08-10 and again on 2026-08-23 the page does not have.
 
       **Decided 2026-08-14: this page stays hand-copied.** It is not generated from `CHANGELOG.md`. The drift is
       the accepted cost, so **this checklist is the control** - every future release's docs handover has to list
       what the changelog gained since the page was last written. Run `just changelog extract Unreleased` to see
-      the current text. All three go in the `## v3.0.0` section, in the page's plain-ASCII style:
+      the current text. The first four go in the `## v3.0.0` section, in the page's plain-ASCII style; the
+      fifth is a migration step:
   - **Overview**, one bullet after the health check line: the image creates `/app/data` and gives it to the app
     user, so a volume mounted there is writable.
   - **Core Changes**, replacing *"The `Dockerfile` and existing environment variables are unchanged"* - which is
@@ -218,6 +219,15 @@ plus six edits that must go out with it.
   - **A `🔌 Service Module` section**, between Diagnostics and UI Module: the auth token rate limit partitions
     on the connection's remote address instead of a caller-supplied header, so varying the header no longer
     resets your own login throttle.
+  - **The whole `🎨 UI Module` section, plus one Overview bullet and one Core Changes bullet.** Rewritten in
+    `CHANGELOG.md` on 2026-08-23: the section it replaced said "neither tool changed" and was written before
+    the 21-22 Aug rebuild. What the page needs is the rebuild itself (Blazor to Razor Pages, no SignalR
+    circuit), the route changes `/PackingDemo` -> `/packing` and `/ProtocolDecoder` -> `/vipaq`, the Protocol
+    Decoder renamed to ViPaq Decoder, the new `/instance` page, the randomizer, and that the module reads no
+    configuration. The Core Changes bullet is the removal of `BINACLEAPI_CONNECTION_STRING` - it replaces
+    "existing environment variables are unchanged", which was false.
+  - **Migration step 7, `Drop BINACLEAPI_CONNECTION_STRING`**, which pushed the `cosign verify` step to 8.
+    The docs page numbers its own steps, so renumber there too.
 - [ ] **Replace the two swagger documents under `sites/docs/collections/_versions/v3.0.x/swagger/`.** Copy
       `artifacts/openapi/Binacle.Net_v3.json` -> `swagger/v3.json` and `artifacts/openapi/Binacle.Net_v4.json`
       -> `swagger/v4.json`; the generator's file names differ from what the site expects, so the rename is part
@@ -293,7 +303,7 @@ versioned page should pin the spec it describes; do not repoint it at `main`.
 
 ## Not in this release
 
-Everything else has a plan or an idea of its own and is on the board, grouped by area with its blockers named.
+Everything else has a plan of its own, with its state and its blocker named there.
 **Do not pull any of it in.**
 
 **Held back on 2026-08-14, with reasons that still hold:**

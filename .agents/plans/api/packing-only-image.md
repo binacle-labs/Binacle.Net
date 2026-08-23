@@ -1,5 +1,7 @@
 ---
 description: a packing-only image variant, without the ServiceModule assemblies
+state: idea
+waits-on: "nobody waiting"
 paths:
   - "api/**"
 ---

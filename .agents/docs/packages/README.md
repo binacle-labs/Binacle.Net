@@ -1,7 +1,7 @@
 ---
 id: packages
 description: TypeScript packages under packages/ (npm workspaces) — UI components, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-08-22
+verified: 2026-08-23
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
@@ -43,7 +43,7 @@ TypeScript mirror of the C# `Binacle.CompactNotation` — the shared compact tex
 ## cookies
 
 Vendored fork of js-cookie v3.0.5, MIT, kept close to upstream so a re-sync stays cheap. Reached through
-`theme-switcher` by both sites and the UIModule. No dependencies.
+`theme-switcher` by the docs and demo sites and by the UIModule. No dependencies.
 
 `Cookies` is a static class, not the upstream factory: there is no `withConverter` or `withAttributes`.
 Defaults are `path=/`, `expires` 90 days, `sameSite=Lax`, `secure` — **so a caller that takes the defaults on
@@ -52,8 +52,9 @@ caller that also runs inside the image has to decide, and `theme-switcher` is th
 
 ## theme-switcher
 
-Custom HTML element (`<theme-switcher>`) for switching light/dark themes. Used by both sites under `sites/`
-and by the UIModule. Depends on the `cookies` workspace package; no external dependencies.
+Custom HTML element (`<theme-switcher>`) for switching light/dark themes. Used by `sites/docs`, `sites/demo`
+and the UIModule — **not by `sites/www`**, which has no npm dependencies and does its own theme read from
+`localStorage`; see `$sites/www`. Depends on the `cookies` workspace package; no external dependencies.
 
 **It sets `secure` only on an https page**, rather than taking the cookies default. The API image is
 commonly served over plain http on a LAN, and a secure cookie is dropped there — so the theme reset on every

@@ -1,5 +1,7 @@
 ---
 description: Derive the repo's dependency graph into a generated file, draw it, and lint it with a small ruleset.
+state: ready
+waits-on: "nothing - state chosen by an agent, strike it if wrong"
 ---
 
 # Architecture checks - derive the facts, lint the rules
@@ -48,7 +50,7 @@ picture turns out to matter, publishing it as a CI build artifact is the cheap a
 ### Never abbreviate architecture to "arch"
 
 **Recipes, folders, files, job names, output paths - spell it out.** `arch` already means CPU architecture in
-this repo, and there is a plan on the board to publish images for a second one. `just architecture`, not
+this repo, and there is a plan to publish images for a second one. `just architecture`, not
 `just arch`. `artifacts/architecture/`, not `artifacts/arch/`. A name that means two things is a name that
 sends someone to the wrong file.
 
@@ -266,6 +268,9 @@ Three things to settle before adopting ArchUnitNET:
   repo pins `xunit.v3.mtp-v2` 3.2.2 precisely because mixing the MTP v1 and v2 adapters throws
   `TypeLoadException` before a test runs. If `.xUnitV3` pulls plain `xunit.v3`, the test leaf reproduces it.
   **That trap decides whether this is an afternoon or a week.**
+- **It collides with the work growing the shared TestsKernel fixtures.** Both touch the test leaves, so
+  whichever runs second reads the other's result, and the runner pin above bites both. Only these heavy tools
+  are affected - the generator and the ruleset collide with neither.
 - **Decide which graph is authoritative.** ArchUnitNET measures *type* dependencies from loaded assemblies; the
   generated graph comes from project references. They disagree - `api/src/Binacle.Net/Binacle.Net.csproj:73`
   declares `<Using Include="Binacle.Geometry" />` with no reference to it.

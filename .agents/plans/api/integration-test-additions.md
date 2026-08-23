@@ -1,5 +1,7 @@
 ---
 description: "Integration tests: cover what the harness cannot see today"
+state: ready
+waits-on: "nothing"
 paths:
   - "api/**"
 ---
@@ -118,3 +120,7 @@ does not build any of it; it decides whether this list is right.
 
 The CI side - running these on every PR - is tracked with the other PR gates. This plan is about writing the
 tests; a gate that runs them is a separate change and should not hold this up.
+
+**The Azure Storage provider is a hole in every layer of coverage.** Since `service-azure` was folded into
+`service` it has no dedicated sample, no CI coverage and no smoke profile, and nobody has written down whether
+it stays or goes.

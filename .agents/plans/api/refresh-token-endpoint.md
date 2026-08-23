@@ -1,8 +1,15 @@
 ---
 description: add refresh-token support to ServiceModule
+state: idea
+waits-on: the maintainer - how far the ServiceModule is taken
 paths:
   - "api/**"
 ---
+
+**How far the ServiceModule is taken is one question, not three.** Simplifying the module, migrating its store
+and growing its auth all move together, and the answer is the maintainer's. **Ask before widening this plan
+into a redesign of the module.**
+
 
 # Idea: add refresh-token support to ServiceModule
 

@@ -1,5 +1,7 @@
 ---
 description: Migrate the shipped UI clients off the v3 API
+state: blocked
+waits-on: "the site half waits on api.binacle.net serving a v3.0.x image; the module half can start today"
 paths:
   - "api/**"
   - "packages/binacle-net-ui/**"
@@ -21,6 +23,12 @@ the module now serves the same TypeScript component the demo site does, so both 
 Check what the component does with the response. If it only shows the winning bin, `pack/smallest-bin` already
 covers it and exists today - that is a smaller request and a smaller response than fetching every bin's result
 and throwing most of it away.
+
+## The two hosts are not equally ready
+
+The demo inside the image calls its own instance on a relative URL and is unaffected. The demo site's copy
+calls `api.binacle.net`, which serves image `2.1.1` and answers 404 on v4 - probed 22 Aug 2026. Moving that
+copy to v4 breaks the live demo until that host serves a v3.0.x image.
 
 ## Watch out
 

@@ -29,6 +29,9 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: ci-cd/decisions.md
   description: "CI/CD decisions ledger — why the release pipeline is tag-triggered, stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, and the open questions about the PR gate and supply-chain attestation."
   paths: [".github/workflows/**"]
+- file: ci-cd/github-surface.md
+  description: "What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly"
+  paths: [".github/**"]
 ```
 
 ## Lib
@@ -48,6 +51,15 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: sites/decisions.md
   description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate."
   paths: ["sites/demo/**", "sites/docs/**"]
+- file: sites/demo-and-image-boundary.md
+  description: "The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is"
+  paths: ["sites/demo/**", "packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**"]
+- file: sites/docs-and-demo.md
+  description: "Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget."
+  paths: ["sites/demo/**", "sites/docs/**"]
+- file: sites/www.md
+  description: "Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing."
+  paths: ["sites/www/**"]
 ```
 
 ## ViPaq

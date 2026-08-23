@@ -1,6 +1,6 @@
 # The .agents/ manifests, loaded by the root justfile as the `agents` module.
 #
-#   just agents all                      rewrite all six _index.md
+#   just agents all                      rewrite all five _index.md
 #   just agents generate-index plans     rewrite one
 #
 # Run it after adding, renaming, moving or re-describing any file under those directories - the index is the
@@ -27,7 +27,7 @@ default:
 all:
     #!/usr/bin/env bash
     set -euo pipefail
-    for name in rules docs design plans memory ideas; do
+    for name in rules docs design plans memory; do
         just agents::generate-index "$name"
     done
 
@@ -35,7 +35,7 @@ all:
 # rather than in a script the recipe would only call. The three tables come first and the rest is the
 # algorithm, so adding an index or renaming a group never means reading the generator.
 
-# Rewrite one manifest [rules|docs|design|plans|memory|ideas]
+# Rewrite one manifest [rules|docs|design|plans|memory]
 generate-index name:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -48,7 +48,6 @@ generate-index name:
         [design]="Agent Design Index"
         [plans]="Agent Plans Index"
         [memory]="Agent Memory Index"
-        [ideas]="Agent Ideas Index"
     )
 
     # index -> the blurb under that heading. The wrapped lines sit flush with the body's own indent on
@@ -63,11 +62,10 @@ generate-index name:
         [design]="Every design record in \`.agents/design/\`, grouped by area. The settled design behind the docs — the
     decisions (why) and the findings (measured evidence). Permanent and citable; read the one you need."
         [plans]="Every plan in \`.agents/plans/\` (recursive), grouped by area. Plans are work not yet done — read the one
-    you need, and trim or delete it once the work lands."
+    you need, and trim or delete it once the work lands. \`state:\` and \`waits-on:\` say where each one stands;
+    [README.md](README.md) defines the five states."
         [memory]="Every memory in \`.agents/memory/\`, grouped by area. Durable facts with no home in a doc or plan —
     conventions, decisions, gotchas. See [README.md](README.md) for when and how to add one."
-        [ideas]="Every idea in \`.agents/ideas/\`, grouped by area. Ideas are rough and unvetted — read the one you need,
-    and move it to \`.agents/plans/\` once it's picked up. See [README.md](README.md) for the conventions."
     )
 
     # group -> heading, for the groups whose capitalisation we can't guess. Any other group gets its first
@@ -81,7 +79,7 @@ generate-index name:
 
     index='{{ name }}'
     heading="${headings[$index]:-}"
-    [[ -n "$heading" ]] || { echo "Unknown index '$index'. Use rules, docs, design, plans, memory or ideas." >&2; exit 1; }
+    [[ -n "$heading" ]] || { echo "Unknown index '$index'. Use rules, docs, design, plans or memory." >&2; exit 1; }
 
     dir=".agents/$index"
     [[ -d "$dir" ]] || { echo "$dir does not exist." >&2; exit 1; }
@@ -158,6 +156,11 @@ generate-index name:
           echo "  description: \"$(describe "$f" | sed 's/"/\\"/g')\""
           w=$(field "$f" when);   [[ -n "$w" ]] && echo "  when: \"${w//\"/\\\"}\""
           l=$(field "$f" load);   [[ -n "$l" ]] && echo "  load: $l"
+          # Plans only: where the work stands. Every other index would carry two empty keys.
+          if [[ "$index" == "plans" ]]; then
+            s=$(field "$f" state);     [[ -n "$s" ]] && echo "  state: $s"
+            o=$(field "$f" waits-on);  [[ -n "$o" ]] && echo "  waits-on: \"${o//\"/\\\"}\""
+          fi
           g=$(list  "$f" paths);  [[ -n "$g" ]] && echo "  paths: [$g]"
         } >> "$index_file"
       done

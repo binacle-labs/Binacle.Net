@@ -1,5 +1,7 @@
 ---
 description: take the shared model leaf further
+state: idea
+waits-on: "nobody waiting"
 paths:
   - "shared/**"
 ---

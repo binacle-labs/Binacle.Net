@@ -1,5 +1,7 @@
 ---
 description: Harden and slim the base image
+state: ready
+waits-on: "nothing"
 ---
 
 # Harden and slim the base image

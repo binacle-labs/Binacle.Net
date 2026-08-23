@@ -23,7 +23,7 @@ paths: ["**/*.cs", "**/*.ts"]
 ```
 
 **Before you edit, read the rule that covers what you are about to touch** - a code comment, a user-facing
-message, a doc, a plan, the board. `.agents/rules/README.md` is a trigger table: match the row, open that one
+message, a doc, a plan. `.agents/rules/README.md` is a trigger table: match the row, open that one
 file. It is short; read it once at the start of any task that writes anything.
 
 ## Where to look

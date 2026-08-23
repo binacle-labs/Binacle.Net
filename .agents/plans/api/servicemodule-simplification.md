@@ -1,5 +1,7 @@
 ---
 description: simplify ServiceModule - collapse the ceremony, keep the provider seam
+state: idea
+waits-on: the maintainer - how far the ServiceModule is taken. The other two api/ plans wait on the same answer
 paths:
   - "api/**"
 ---

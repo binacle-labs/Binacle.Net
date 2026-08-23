@@ -1,5 +1,7 @@
 ---
 description: TODOs
+state: ready
+waits-on: "nothing"
 ---
 
 # TODOs

@@ -1,5 +1,7 @@
 ---
 description: Refresh the curated lib benchmark ledger
+state: deferred
+waits-on: "someone needing the numbers"
 paths:
   - "lib/**"
 ---

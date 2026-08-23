@@ -68,8 +68,10 @@ escaping.
 
 `just build publish` runs all three before `dotnet publish`, because static web assets are collected at
 publish time. **A missing bundle fails nothing** — the image ships pages that return 200 and do nothing —
-which is why `full.hurl` and `quickstart.hurl` request every page route, every entry bundle and the
-stylesheet directly, against a built image.
+which is why `full.hurl` and `quickstart.hurl` request every page route, every entry bundle, the four shared
+chunks `_AppletScripts.cshtml` loads, and the stylesheet directly, against a built image. **The shared chunks
+are asserted separately from the entries** — a demo entry is 227 bytes and everything it needs is in
+`vendors`, `three`, `binacle-net-ui` and `binacle-vipaq`, so an entry alone answering 200 proves nothing.
 
 The webpack entries are `main`, `instance`, `packing_demo` and `protocol_decoder`. The chunk names and
 priorities match `sites/demo/webpack.config.js`; both compile the same package source, so there is one

@@ -1,5 +1,7 @@
 ---
 description: CI - what is left after the workflow restructure landed, and the gap the next workflows session inherits
+state: blocked
+waits-on: "branch protection pointing at Pull Request / Gate - state chosen by an agent, strike it if wrong"
 paths:
   - ".github/**"
 ---

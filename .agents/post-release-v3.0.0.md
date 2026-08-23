@@ -13,7 +13,7 @@ item needed a plan, it was not a post-release check. The one exception is the la
 the release deliberately deferred.
 
 **That is the test for anything proposed for this file.** If working it needs a decision, a credential, a new
-file or a workflow, it belongs in the release plan while there is still time, or on the board if there is not.
+file or a workflow, it belongs in the release plan while there is still time, or in a plan of its own if not.
 
 **Delete this file once the list is clear.** The tag does not delete it; working through it does.
 
@@ -96,24 +96,25 @@ Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20.
 - [ ] **Decide the immutability switch, now that a real release is behind it.** The switch is off and the rule
       is whatever the release left it at. Turning it on means testing it on a scratch repo first - there is no
       undo, and an immutable tag cannot be deleted either, so a release tag pushed by mistake is permanent.
-      The plan on the board holds the test procedure. **If you decide not to turn it on, write that down as a
+      The plan holds the test procedure. **If you decide not to turn it on, write that down as a
       decision and drop the plan.** Leaving it as a permanently open question is the one outcome with no value.
 
 ## Tidy up
 
 - [ ] **Delete `release-v3.0.0.md`** once the release is out and the docs are deployed.
-- [ ] **Move anything left in it to the board** rather than carrying it forward. If it was not done for the
+- [ ] **Move anything left in it back into a plan** rather than carrying it forward. If it was not done for the
       release, it is standing work now.
 - [ ] **Delete this file** when its own list is clear.
 
 ## Then what
 
-**The board.** It holds every plan and idea not tied to this release, grouped by area with blockers named, and
-it carries a recommended order.
+**The plans.** `plans/_index.md` lists every one not tied to this release, with its state and what it waits
+on.
 
 **Three things were held back from v3.0.0 and are waiting there:** the heavy architecture tools (ArchUnitNET,
 dependency-cruiser, lychee), CI gates 2 and 3, and the last of the UI test harness the coverage gate hangs on.
-**Each is waiting on something specific**, and the board row names it.
+**Each is waiting on something specific**, and its `waits-on:` names it.
 
-**The first thing to do is not a build.** The ServiceModule direction decision places five ideas, two one-liners
-and the Azure Storage removal question in one sitting. **Pick from the board once this list is clear.**
+**The first thing to do is not a build.** How far the ServiceModule is taken is the maintainer's call, and it
+settles the three plans under `plans/api/`, the two ServiceModule one-liners in `plans/todos.md` and the Azure
+Storage removal question at once. **Pick the next thing once this list is clear.**

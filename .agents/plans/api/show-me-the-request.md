@@ -1,5 +1,7 @@
 ---
 description: The packing demo shows the HTTP call it just made, against this host, ready to copy
+state: idea
+waits-on: "nobody waiting"
 paths:
   - "api/src/Binacle.Net.UIModule/**"
   - "packages/binacle-net-ui/**"

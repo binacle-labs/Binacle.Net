@@ -15,7 +15,7 @@ table of [README.md](README.md).
   description: "Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects"
   paths: ["Binacle.Net.slnx", "Directory.*.props", "global.json", "**/*.csproj", "Dockerfile"]
 - file: commands.md
-  description: "How to set up a clone, run the API and the two sites, run tests and benchmarks, and build the Docker image"
+  description: "How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image"
   paths: ["justfile", "tooling/**"]
 - file: concepts.md
   description: "Fit exits early on first failure; pack continues and returns positions. Both return the same result shape — packed items and unpacked items. Used by both Lib algorithms and API endpoints."
@@ -85,7 +85,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ci-cd/README.md
-  description: "CI/CD — the nine GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
+  description: "CI/CD — the ten GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
   paths: [".github/workflows/**", ".github/actions/**"]
 - file: ci-cd/release-pipeline.md
   description: "The release pipeline in release-docker-image.yml — seven jobs from a pushed tag to a published GitHub release, GHCR as the staging registry, the copy-to-Docker-Hub step every tag reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
@@ -142,7 +142,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ruby/README.md
-  description: "Ruby gems under ruby/ — Jekyll plugins used by the two sites under sites/."
+  description: "Ruby gems under ruby/ — Jekyll plugins used by all three sites under sites/."
   paths: ["ruby/**"]
 ```
 

@@ -1,5 +1,7 @@
 ---
 description: Turn on Docker Hub tag immutability, for release tags only
+state: blocked
+waits-on: "a shipped release behind the rule"
 paths:
   - ".github/workflows/**"
 ---
