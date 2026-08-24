@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-meta_description: >-
+description: >-
   Run Binacle.Net v2.1.x with one Docker command, with Swagger UI, Scalar UI and the UI Module on so you can try
   it from a browser.
 nav:

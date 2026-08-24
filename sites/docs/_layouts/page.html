@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" />
+    {% link_tags site.data.includes.icons %}
 
-    {% include seo.html %}
-    {% include links.html items=site.data.includes.links %}
+    {% page_meta %}
+    {% structured_data %}
+    {% link_tags site.data.includes.links %}
     {% gtm_head site.gtm %}
 </head>
 <body class="{{ site.default_theme }}">
     {% gtm_body site.gtm %}
     {{ content }}
 
-    {% include scripts.html items=site.data.includes.scripts_body_end %}
+    {% script_tags site.data.includes.scripts_body_end %}
 </body>
 </html>

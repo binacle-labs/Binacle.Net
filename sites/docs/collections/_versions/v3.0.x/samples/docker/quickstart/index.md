@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-meta_description: >-
+description: >-
   Docker Compose for a first look at Binacle.Net, with Swagger UI, Scalar UI and the web UI demo on. Download
   two files and run one command.
 permalink: /version/v3.0.x/samples/docker/quickstart/

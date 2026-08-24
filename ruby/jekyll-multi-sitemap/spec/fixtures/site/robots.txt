@@ -1,0 +1,10 @@
+---
+layout: null
+sitemap:
+  exclude: true
+---
+User-Agent: *
+
+# urls: {{ site.sitemaps.urls | join: " " }}
+
+{% sitemap_links %}

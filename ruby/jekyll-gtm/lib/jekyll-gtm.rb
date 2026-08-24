@@ -1,5 +1,10 @@
-require_relative 'gtm_head_tag'
-require_relative 'gtm_body_tag'
+# frozen_string_literal: true
 
-Liquid::Template.register_tag('gtm_head', Jekyll::GTMHeadTag)
-Liquid::Template.register_tag('gtm_body', Jekyll::GTMBodyTag)
+require 'jekyll'
+
+require_relative 'jekyll-gtm/tag'
+require_relative 'jekyll-gtm/head_tag'
+require_relative 'jekyll-gtm/body_tag'
+
+Liquid::Template.register_tag('gtm_head', Jekyll::GTM::HeadTag)
+Liquid::Template.register_tag('gtm_body', Jekyll::GTM::BodyTag)

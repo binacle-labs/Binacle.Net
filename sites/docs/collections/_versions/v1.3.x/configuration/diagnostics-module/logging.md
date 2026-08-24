@@ -1,6 +1,6 @@
 ---
 title: Logging
-meta_description: >-
+description: >-
   Serilog logging in Binacle.Net v1.3.x: console and daily file output, the supported settings, and where the
   log files are written.
 nav:

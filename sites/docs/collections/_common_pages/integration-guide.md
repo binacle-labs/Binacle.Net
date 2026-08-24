@@ -1,6 +1,6 @@
 ---
 title: Integration Guide
-meta_description: >-
+description: >-
   Wire Binacle.Net into checkout: how to size products in centimeters, choose your bin set, and call the API
   when a customer picks a locker.
 nav:

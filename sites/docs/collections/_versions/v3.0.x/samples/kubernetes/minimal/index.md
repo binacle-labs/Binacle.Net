@@ -1,7 +1,7 @@
 ---
 title: Kubernetes Minimal
 menu_title: Minimal
-meta_description: >-
+description: >-
   A minimal Kubernetes deployment of Binacle.Net: deployment, service, a presets ConfigMap and a PVC for logs.
   Four manifests to download and apply.
 permalink: /version/v3.0.x/samples/kubernetes/minimal/

@@ -1,8 +1,8 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-08-23
-check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; the seo include still emits front-matter descriptions, og:type website and a default og:image; sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
+verified: 2026-08-24
+check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
 paths:
   - "sites/www/**"
 ---
@@ -41,9 +41,11 @@ processes where the other two run two.
 | Path | What it is |
 |---|---|
 | `pages/` | The four pages, plus `404.html` and `robots.txt` |
-| `collections/_sitemaps/` | `sitemap.xml`, served at `/sitemap.xml` |
 | `_data/exchange.yml` | Every request and response the site shows, as data |
-| `_includes/` | `seo.html`, `schema.html`, header, footer, and the two conversion components |
+| `_includes/` | Header, footer, theme init, and the two conversion components |
+
+**There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
+`_config.yml`, and `pages/robots.txt` writes its `Sitemap:` line with `{% sitemap_links %}`.
 
 ### The URL map
 
@@ -56,31 +58,33 @@ processes where the other two run two.
 | `/404.html` | permalink kept at the root — Cloudflare's `not_found_handling` wants it there |
 | `/robots.txt`, `/sitemap.xml` | per host |
 
-## The metadata include is new, not copied
+## The metadata comes from a gem
 
-`_includes/seo.html` was written for this site. **Do not replace it with the one from `docs` or `demo`** —
-theirs carry five live defects and every one of them comes with the file:
+**There is no seo include on any of the three sites.** `{% page_meta %}` writes the head from
+`jekyll-page-meta`, and the five defects the three hand-written copies used to disagree over — a description
+cut from body copy, `og:type` as `article`, a missing `og:image`, an unexamined `twitter:card`, whitespace
+inside `<title>` — cannot come back one site at a time, because there is one implementation.
 
-| Defect | What this one does |
-|---|---|
-| description derived from the excerpt and truncated mid-word at 160 chars | `description` is front matter on every page; the excerpt is only a fallback |
-| `og:type` hardcoded `article` | `website` |
-| no `og:image` on any page, so every shared link renders a grey card | a site-wide default on every page |
-| `twitter:card` never revisited | `summary`, because `og_image` is a square logo and a wide card crops one |
-| `<title>` value wrapped in newlines and indentation | emitted with no whitespace inside the tag |
-
-Separator is ` - `, not `|`. Every absolute URL comes from `absolute_url`, so `url` in `_config.yml` is the
-only line in the build that names the host.
+`description` is front matter on every page here; the excerpt is only a fallback. Separator is ` - `, not
+`|`, and it is `page_meta: title_separator:` in `_config.yml`. Every absolute URL is built from `url` in
+`_config.yml`, so the host is named on one line.
 
 **The day a 1200x630 image exists**, `og_image` and `twitter:card` change together — a wide card and a square
 image is worse than either.
 
 ## Structured data
 
-Two JSON-LD blocks in `_includes/schema.html`, emitted only where a page sets `structured_data: true`, which
-is `/` alone. `SoftwareApplication` carries `offers` at price `0`, which is what the software is.
-`Organization` carries `sameAs` pointing at the GitHub org and the Docker Hub page, so the three surfaces
-resolve to one identity.
+One JSON-LD graph per page, written by `{% structured_data %}`. `_includes/schema.html` is gone and its two
+unconnected blocks are now two nodes joined by `@id`.
+
+`/` is the only page that names a type — `structured_data: type: SoftwareApplication` in its front matter,
+with `name: Binacle.Net` because the node names the software, not the browser title. Its `offers` at price
+`0`, `license` and `codeRepository` come from `structured_data: defaults: SoftwareApplication:` in
+`_config.yml`. Every other page gets the organisation alone, which means no block at all.
+
+**The `Organization` block is identical in all three sites' `_config.yml`, `@id` and all.** That pinned
+`@id` — `https://www.binacle.net/#organization` — is what makes www, docs and demo one publisher rather than
+three, and it is never derived from `url`. `sameAs` points at the GitHub org and the Docker Hub page.
 
 `BreadcrumbList`, `FAQPage`, `WebSite` + `SearchAction` and `HowTo` were all considered and rejected - the
 reasons are `$sites/www-design#W8`.

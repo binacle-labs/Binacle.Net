@@ -1,6 +1,6 @@
 ---
 title: Samples
-meta_description: >-
+description: >-
   Sample configurations for running Binacle.Net v1.3.x with Docker Compose: a minimal setup, a full deployment,
   or the UI Module only.
 permalink: /version/v1.3.x/samples/

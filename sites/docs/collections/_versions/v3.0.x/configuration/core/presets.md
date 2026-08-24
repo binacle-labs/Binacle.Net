@@ -1,6 +1,6 @@
 ---
 title: Presets
-meta_description: >-
+description: >-
   Define your bins once in Presets.json and call them by name instead of sending dimensions on every request.
   The file format and the defaults.
 nav:

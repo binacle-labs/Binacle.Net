@@ -1,6 +1,6 @@
 ---
 title: Core Concepts
-meta_description: >-
+description: >-
   The three heuristic algorithms Binacle.Net packs with, FFD, WFD and BFD, what each one trades away, and the
   difference between fitting and packing.
 nav:

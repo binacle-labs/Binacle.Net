@@ -1,3 +1,19 @@
+# The icon files land in the site root from assets/, copied by gulp.
+icons:
+  - rel: 'icon'
+    href: '/favicon.ico'
+  - rel: 'icon'
+    type: 'image/png'
+    sizes: '32x32'
+    href: '/favicon-32x32.png'
+  - rel: 'icon'
+    type: 'image/png'
+    sizes: '16x16'
+    href: '/favicon-16x16.png'
+  - rel: 'apple-touch-icon'
+    sizes: '180x180'
+    href: '/apple-touch-icon.png'
+
 links:
   - type: 'text/css'
     rel: 'stylesheet'
@@ -8,25 +24,25 @@ links:
 
 
 scripts_body_end:
-  - src: '/lib/beercss/beer.min.js'
-    type: 'module'
+  - type: 'module'
+    src: '/lib/beercss/beer.min.js'
 #   We recommend using the material-dynamic-colors only when your app needs to change theme at runtime
 #  - src: '/lib/material-dynamic-colors/material-dynamic-colors.min.js'
 #    type: 'module'
-  - src: "/js/runtime.js"
-    type: "text/javascript"
-  - src: '/js/main.js'
-    type: 'text/javascript'
-  - src: '/js/vendors.js'
-    type: 'text/javascript'
+  - type: "text/javascript"
+    src: "/js/runtime.js"
+  - type: 'text/javascript'
+    src: '/js/main.js'
+  - type: 'text/javascript'
+    src: '/js/vendors.js'
 
 
 #   What only the two app pages execute. `demo: true` in a page's front matter loads them; every other
 #   page prefetches this same list. One list, so the two can never drift.
 demo_scripts:
-  - src: '/js/three.js'
-    type: 'text/javascript'
-  - src: '/js/binacle-net-ui.js'
-    type: 'text/javascript'
-  - src: '/js/binacle-vipaq.js'
-    type: 'text/javascript'
+  - type: 'text/javascript'
+    src: '/js/three.js'
+  - type: 'text/javascript'
+    src: '/js/binacle-net-ui.js'
+  - type: 'text/javascript'
+    src: '/js/binacle-vipaq.js'

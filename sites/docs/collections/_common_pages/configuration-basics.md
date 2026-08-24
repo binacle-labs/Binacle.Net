@@ -1,6 +1,6 @@
 ---
 title: Configuration Basics
-meta_description: >-
+description: >-
   How Binacle.Net is configured: the files under /app/Config_Files, environment variable overrides, production
   overrides, and which one wins.
 nav:

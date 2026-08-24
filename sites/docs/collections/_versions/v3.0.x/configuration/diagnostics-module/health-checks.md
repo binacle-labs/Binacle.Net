@@ -1,6 +1,6 @@
 ---
 title: Health Checks
-meta_description: >-
+description: >-
   Turn on health checks in Binacle.Net, restrict them by IP, and wire them to a load balancer or Prometheus. IP
   matching changed in v3.0.0.
 nav:

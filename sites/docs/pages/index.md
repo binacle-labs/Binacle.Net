@@ -1,6 +1,6 @@
 ---
 title: Welcome to Binacle.Net Docs
-meta_description: >-
+description: >-
   Binacle.Net answers which box an order goes in, in milliseconds. Documentation for the free and open source 3D
   bin packing API you host yourself.
 seo_title: Open source 3D bin packing API - Binacle.Net Docs

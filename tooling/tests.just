@@ -50,6 +50,13 @@ all:
     test_leaf packages-net-ui-unit
     test_leaf packages-cookies-unit
     test_leaf packages-theme-switcher-unit
+    test_leaf ruby-docs-versions-unit
+    test_leaf ruby-filters-unit
+    test_leaf ruby-gtm-unit
+    test_leaf ruby-multi-sitemap-unit
+    test_leaf ruby-page-meta-unit
+    test_leaf ruby-resource-tags-unit
+    test_leaf ruby-structured-data-unit
     test_leaf api-core-unit
     test_leaf api-kernel-unit
     test_leaf api-diagnostics-unit
@@ -96,6 +103,34 @@ packages-cookies-unit: (_jest_test 'cookies')
 # theme-switcher unit (TS)
 [group('packages')]
 packages-theme-switcher-unit: (_jest_test 'theme-switcher')
+
+# binacle-docs-versions unit
+[group('ruby')]
+ruby-docs-versions-unit: (_rspec_test 'binacle-docs-versions')
+
+# jekyll-filters unit
+[group('ruby')]
+ruby-filters-unit: (_rspec_test 'jekyll-filters')
+
+# jekyll-gtm unit
+[group('ruby')]
+ruby-gtm-unit: (_rspec_test 'jekyll-gtm')
+
+# jekyll-multi-sitemap unit
+[group('ruby')]
+ruby-multi-sitemap-unit: (_rspec_test 'jekyll-multi-sitemap')
+
+# jekyll-page-meta unit
+[group('ruby')]
+ruby-page-meta-unit: (_rspec_test 'jekyll-page-meta')
+
+# jekyll-resource-tags unit
+[group('ruby')]
+ruby-resource-tags-unit: (_rspec_test 'jekyll-resource-tags')
+
+# jekyll-structured-data unit
+[group('ruby')]
+ruby-structured-data-unit: (_rspec_test 'jekyll-structured-data')
 
 # The api leaves run units first, then integrations, so a bare `just test all` reports the cheap failures
 # before it spends minutes in a test host.
@@ -189,6 +224,16 @@ _dotnet_test project:
         --report-ctrf --report-ctrf-filename "$name.ctrf.json" \
         --coverage --coverage-output-format "$output_format" \
         --coverage-output "$coverage/$name.xml"
+
+# Runs one gem's specs. Bundler walks up from the gem folder and finds ruby/Gemfile, so every leaf uses the
+# same Jekyll the sites are locked to rather than whatever is installed. Running from ruby/ itself does not
+# work: a spec_helper is only on the load path when rspec starts inside its own gem.
+#
+# COVERAGE_FORMAT is ignored here. Ruby's collector is simplecov and it is not in the bundle, so a coverage
+# run executes these leaves and writes nothing for them - they are absent from the table rather than at zero.
+[private]
+_rspec_test gem:
+    cd ruby/{{ gem }} && bundle exec rspec
 
 # Runs one TS package - the jest half of _dotnet_test, same two modes.
 #

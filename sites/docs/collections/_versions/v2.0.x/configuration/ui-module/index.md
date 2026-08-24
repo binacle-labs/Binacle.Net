@@ -1,6 +1,6 @@
 ---
 title: UI Module
-meta_description: >-
+description: >-
   The UI Module in Binacle.Net v2.0.x adds a browser interface for trying the API. Off by default. Its
   configuration files and settings.
 permalink: /version/v2.0.x/configuration/ui-module/

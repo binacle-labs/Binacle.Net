@@ -1,6 +1,6 @@
 ---
 title: API
-meta_description: >-
+description: >-
   The two API versions in Binacle.Net v3.0.x: V3, which is stable and recommended, and V4, which is
   experimental. V2 was removed in v3.0.0.
 permalink: /version/v3.0.x/api/

@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-meta_description: >-
+description: >-
   Run Binacle.Net with one Docker command, or deploy it to Azure, AWS, Google Cloud, Koyeb or Digital Ocean.
   Swagger UI and the web UI are included.
 nav:

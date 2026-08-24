@@ -1,6 +1,6 @@
 ---
 title: UI Setup
-meta_description: >-
+description: >-
   Docker Compose for Binacle.Net v2.0.x with the UI Module enabled, so you can try packing from a browser. The
   files to download and run.
 permalink: /version/v2.0.x/samples/docker/ui-setup/

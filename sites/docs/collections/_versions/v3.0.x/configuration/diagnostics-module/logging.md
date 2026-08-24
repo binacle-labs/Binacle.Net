@@ -1,6 +1,6 @@
 ---
 title: Logging
-meta_description: >-
+description: >-
   Binacle.Net logs with Serilog to the console and to daily NDJSON files. The supported settings, log levels,
   and where the files are written.
 nav:

@@ -1,6 +1,6 @@
 ---
 title: Samples
-meta_description: >-
+description: >-
   Sample configurations for running Binacle.Net v2.1.x with Docker Compose, or on a Kubernetes cluster you
   already have. Download a folder and edit it.
 permalink: /version/v2.1.x/samples/

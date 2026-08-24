@@ -1,8 +1,8 @@
 ---
 id: sites/demo
 description: The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/.
-verified: 2026-08-22
-check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; the demo/prefetch script split still matches sites/demo/_data/includes.yml; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
+verified: 2026-08-24
+check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; sites/demo/_includes/ still has no seo.html and pages/index.html still prints item.summary on the cards; the demo/prefetch script split still matches sites/demo/_data/includes.yml; the sitemaps: block in _config.yml still writes one file and /sitemap.xml still lists the three pages; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
 also_update:
   - packages
 paths:
@@ -31,12 +31,14 @@ just build demo   # the same site built once, into artifacts/demo
 | `pages/index.html` | `/` | The chooser — one card per tool, and the card is the link |
 | `pages/packing.html` | `/packing/` | The packing demo |
 | `pages/vipaq.html` | `/vipaq/` | The ViPaq decoder |
-| `collections/_sitemaps/sitemap.xml` | `/sitemap.xml` | The one sitemap |
 | `pages/404.html` | `/404.html` | Error page |
 
 **There is no collection for the tools.** They are pages carrying `applet: true` and an `order`, and the
-chooser, the two navs and the JSON-LD block all key off that flag. `sitemaps` stays a collection because a
-sitemap under `pages/` inherits the `pages/**` defaults and would list itself.
+chooser, the two navs and the JSON-LD block all key off that flag.
+
+**There is no sitemap file and no sitemaps collection.** `jekyll-multi-sitemap` generates `/sitemap.xml` from
+the `sitemaps:` block in `_config.yml`, and `pages/robots.txt` writes its `Sitemap:` line with
+`{% sitemap_links %}`.
 
 ## JS Bundles
 
@@ -61,9 +63,24 @@ it.** `runtime.js`, `main.js` and `vendors.js` load on every page. `three.js`, `
 `binacle-vipaq.js` load only where the front matter says `demo: true`; every other page **prefetches** that same
 list, so arriving at a demo costs no download. Both halves read the one list, so they cannot drift apart.
 
+**`{% prefetch_tags %}` writes the prefetch links and `{% script_tags %}` executes them**, off that one
+`demo_scripts` list. The prefetch links carry the list's `type: text/javascript` as well, which the old
+hand-written include dropped.
+
 ## Plugins
 
-Same as the docs site: `jekyll-gtm`, `jekyll-filters`, `jekyll-tidy` (no `VLink` — no versioned docs here).
+Same as the docs site: `jekyll-gtm`, `jekyll-filters`, `jekyll-multi-sitemap`, `jekyll-resource-tags`,
+`jekyll-page-meta`, `jekyll-structured-data`, `jekyll-tidy` — everything but `binacle-docs-versions`, which
+is the docs site's own.
+
+**The head is `{% page_meta %}` then `{% structured_data %}`, and there is no seo include.** The two demo
+pages name their node with `structured_data: type: WebApplication` in front matter; the `offers`,
+`applicationCategory`, `operatingSystem` and `browserRequirements` under it come from
+`structured_data: defaults:` in `_config.yml`, and the `organization:` block there is byte-identical to the
+one in www and docs.
+
+**`description` is the search sentence and `summary` is the card copy.** The chooser on `/` prints
+`item.summary`; putting the card blurb back on `description` ships it as a search snippet.
 
 ## Vendor Libs
 

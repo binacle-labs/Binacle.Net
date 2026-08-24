@@ -1,6 +1,6 @@
 ---
 title: Configuration
-meta_description: >-
+description: >-
   How Binacle.Net v3.0.x is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
   modules each need.
 permalink: /version/v3.0.x/configuration/

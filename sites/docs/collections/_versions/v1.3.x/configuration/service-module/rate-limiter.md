@@ -1,6 +1,6 @@
 ---
 title: Rate Limiter
-meta_description: >-
+description: >-
   Rate limiting on the calculation endpoints in Binacle.Net v1.3.x. The RateLimiter.json settings, and how
   signed-in callers bypass it.
 nav:

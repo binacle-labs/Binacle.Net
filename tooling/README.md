@@ -58,6 +58,10 @@ just test api-service-integration Postgres
 Postgres and AzureStorage need their service up first (`just serve services-up -d`); with no argument the harness
 falls back to SQLite.
 
+The `ruby` group is the six Jekyll plugin gems, one leaf each - `just test ruby-gtm-unit`. They are in
+`just test all` because they need nothing brought up, and they carry no coverage: Ruby's collector is
+simplecov and it is not in the bundle, so a coverage run executes them and writes nothing for them.
+
 ---
 
 ## 📊 Coverage

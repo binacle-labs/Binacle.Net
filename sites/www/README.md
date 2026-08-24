@@ -15,7 +15,7 @@ below.
 | `_sass/` | The stylesheet source. Compiled by the sass CLI, **not by Jekyll** |
 | `_js/` | The TypeScript source. Two behaviours - the theme toggle and the copy controls |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
-| `_includes/` | `seo.html`, the JSON-LD, the header and footer, and the two conversion components |
+| `_includes/` | The header and footer, the theme init, and the two conversion components |
 
 ## 🛠️ Building and serving
 

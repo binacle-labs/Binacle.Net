@@ -1,0 +1,58 @@
+links:
+  - rel: stylesheet
+    type: text/css
+    href: /css/main.css
+  - rel: icon
+    type: image/png
+    href: /icon.png
+
+links_reordered:
+  - type: text/css
+    rel: stylesheet
+    href: /css/main.css
+
+scripts:
+  - type: text/javascript
+    src: /js/main.js
+    defer: true
+
+flags:
+  - src: /js/flags.js
+    defer: true
+    async: false
+
+blank_value:
+  - rel: stylesheet
+    type:
+    href: /css/blank.css
+
+whole_path:
+  - rel: stylesheet
+    href: https://cdn.example.org/main.css
+  - rel: preconnect
+    href: //fonts.example.org
+
+no_path:
+  - rel: stylesheet
+    type: text/css
+  - rel: stylesheet
+    href: /css/kept.css
+
+quoted:
+  - rel: stylesheet
+    title: 'He said "stop" > here'
+    href: /css/quoted.css
+
+prefetch_own_rel:
+  - rel: preload
+    src: /js/preloaded.js
+
+empty: []
+
+script_only:
+  - src: /js/script-only.js
+    type: text/javascript
+    crossorigin: anonymous
+    defer: true
+    async: true
+    nomodule: true

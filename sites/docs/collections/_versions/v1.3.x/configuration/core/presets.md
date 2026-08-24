@@ -1,6 +1,6 @@
 ---
 title: Presets
-meta_description: >-
+description: >-
   Define your bins once in Presets.json and reuse them across requests instead of sending dimensions every time.
   The preset format in v1.3.x.
 nav:

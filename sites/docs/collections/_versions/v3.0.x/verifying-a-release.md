@@ -1,6 +1,6 @@
 ---
 title: Verifying a Release
-meta_description: >-
+description: >-
   Check that a Binacle.Net image is the one the release workflow built. Two commands: cosign verify, then
   inspect the SBOM and build provenance.
 nav:

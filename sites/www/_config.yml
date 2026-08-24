@@ -1,6 +1,6 @@
-############################################################
+################################################################
 # Site settings
-############################################################
+################################################################
 title                   : "Binacle.Net"
 
 # The site-level fallback. Every page writes its own `description` in front matter - this one is what the
@@ -10,8 +10,8 @@ description             : >-
   Binacle.Net answers which box an order goes in, in milliseconds. A free and open source 3D bin packing API
   you host yourself, in one Docker command.
 
-# The link-preview image every page falls back to. Square today, so twitter:card stays `summary` - see
-# _includes/seo.html. Both change together the day a 1200x630 image exists.
+# The link-preview image every page falls back to. Square today, so twitter_card stays `summary`.
+# Both change together the day a 1200x630 image exists.
 og_image                : /media/logo/binacle-logo-512x512.png
 
 author:
@@ -30,9 +30,9 @@ logo:
 
 default_theme: "dark"
 
-############################################################
+################################################################
 # Where things are
-############################################################
+################################################################
 source              : ./
 destination         : ../../artifacts/www
 collections_dir     : collections
@@ -43,14 +43,10 @@ data_dir            : _data
 # No `sass:` block, and that is deliberate. The sass CLI compiles _sass/main.scss to css/main.css from
 # package.json, the way api/src/Binacle.Net.UIModule does. Adding the block back gives two compilers a claim
 # on the same files.
-collections:
-  sitemaps:
-    output          : true
-    permalink       : /:name:output_ext
 
-############################################################
+################################################################
 # Handling Reading
-############################################################
+################################################################
 safe                : false
 include             :
   - ".htaccess"
@@ -76,17 +72,17 @@ encoding            : "utf-8"
 markdown_ext        : "markdown,mkdown,mkdn,mkd,md"
 strict_front_matter : false
 
-############################################################
+################################################################
 # Filtering Content
-############################################################
+################################################################
 show_drafts         : false
 limit_posts         : 0
 future              : false
 unpublished         : false
 
-############################################################
+################################################################
 # Serving
-############################################################
+################################################################
 detach              : false
 port                : 7197
 host                : 127.0.0.1
@@ -94,18 +90,18 @@ baseurl             : ""    # does not include hostname
 show_dir_listing    : false
 disable_disk_cache  : true
 
-############################################################
+################################################################
 # Conversion
-############################################################
+################################################################
 markdown            : kramdown
 highlighter         : rouge
 lsi                 : false
 excerpt_separator   : "\n\n"
 incremental         : false
 
-############################################################
+################################################################
 # Outputting
-############################################################
+################################################################
 permalink           : date        #pretty
 paginate_path       : /page:num
 timezone            : "Europe/Athens"
@@ -116,9 +112,9 @@ liquid:
   strict_filters    : false
   strict_variables  : false
 
-############################################################
+################################################################
 # Markdown Processors
-############################################################
+################################################################
 kramdown:
   auto_ids          : true
   entity_output     : as_char
@@ -130,18 +126,22 @@ kramdown:
   show_warnings     : false
   parse_block_html  : true
 
-############################################################
+################################################################
 # Plugins
-############################################################
+################################################################
 whitelist           : []
 plugins             :
   - jekyll-tidy
   - jekyll-gtm
   - jekyll-filters
+  - jekyll-multi-sitemap
+  - jekyll-resource-tags
+  - jekyll-page-meta
+  - jekyll-structured-data
 
-############################################################
+################################################################
 # Front Matter Defaults
-############################################################
+################################################################
 defaults:
   -
     scope:
@@ -158,24 +158,58 @@ defaults:
         changefreq    : "monthly"
         priority      : 1.0
         exclude       : false
-  -
-    scope:
-      path            : "**/**"
-      type            : "sitemaps"
-    values:
-      title           : "Sitemap"
 
-############################################################
+################################################################
 ################### END OF BASE CONFIG #####################
-############################################################
+################################################################
 
-############################################################
+################################################################
 # jekyll-tidy
-############################################################
+################################################################
 jekyll_tidy:
   exclude       :         # an array of files to exclude from tidying.
     - "**/*.txt"
     - "**/*.json"
-    - "**/*.xml"
+    - "*.xml"
   ignore_env    : null     # a JEKYLL_ENV string on which to skip tidying entirely.
   compress_html : false    # a flag for whether or not to compress the HTML output
+
+################################################################
+# jekyll-multi-sitemap
+################################################################
+sitemaps:
+  path: /                  # /sitemap.xml is the path a crawler probes unasked
+  files:
+    - name: sitemap
+      include: [pages]
+
+################################################################
+# jekyll-page-meta
+################################################################
+page_meta:
+  title_separator: " - "
+
+################################################################
+# jekyll-structured-data
+################################################################
+structured_data:
+  # Written out in full, and identical in all three configs. Derived from site.url it would be a
+  # different organisation on each host.
+  organization:
+    "@id": https://www.binacle.net/#organization
+    name: Binacle.Net
+    url: https://www.binacle.net/
+    logo: /media/logo/binacle-logo-512x512.png
+    same_as:
+      - https://github.com/binacle-labs
+      - https://hub.docker.com/r/binacle/binacle-net
+  defaults:
+    SoftwareApplication:
+      applicationCategory: DeveloperApplication
+      operatingSystem: Docker
+      license: https://spdx.org/licenses/GPL-3.0-only.html
+      codeRepository: https://github.com/binacle-labs/Binacle.Net
+      offers:
+        "@type": Offer
+        price: "0"
+        priceCurrency: USD

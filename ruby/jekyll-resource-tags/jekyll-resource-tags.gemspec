@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+Gem::Specification.new do |spec|
+  spec.name = 'jekyll-resource-tags'
+  spec.version = '1.0.0'
+  spec.authors = ['Chris Mavrommatis']
+  spec.licenses = ['MIT']
+  spec.summary = 'Liquid tags that render link, script and prefetch elements from a data list'
+  spec.files = Dir['lib/**/*.rb']
+  spec.require_paths = ['lib']
+  spec.required_ruby_version = Gem::Requirement.new('>= 3.1')
+  spec.add_dependency 'jekyll', '>= 4.2'
+  spec.add_development_dependency 'rspec', '~> 3.0'
+end

@@ -1,7 +1,7 @@
 ---
 title: Users Configuration
 menu_title: Users
-meta_description: >-
+description: >-
   Admin accounts in the Service Module of Binacle.Net v1.3.x. The Users.json settings, the default admin, and
   how to manage other users.
 nav:

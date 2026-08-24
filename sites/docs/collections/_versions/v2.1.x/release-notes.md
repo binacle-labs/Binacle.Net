@@ -1,6 +1,6 @@
 ---
 title: Release Notes
-meta_description: >-
+description: >-
   What changed in the Binacle.Net v2.1.x line, newest release first, with every patch on one page. Nothing in
   this line breaks an integration.
 nav:

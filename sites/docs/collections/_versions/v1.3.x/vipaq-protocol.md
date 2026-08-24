@@ -1,6 +1,6 @@
 ---
 title: ViPaq Protocol
-meta_description: >-
+description: >-
   The ViPaq wire format as Binacle.Net v1.3.x writes and reads it. Strings from this version do not decode in
   v3.0.0 or later.
 nav:

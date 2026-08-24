@@ -1,0 +1,7 @@
+---
+layout: null
+sitemap:
+  exclude: true
+---
+{%- assign entries = site.versions | where: "version", site.data.versions.current -%}
+{%- sitemap_urlset entries -%}

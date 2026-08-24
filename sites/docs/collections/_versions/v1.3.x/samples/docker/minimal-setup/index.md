@@ -1,6 +1,6 @@
 ---
 title: Minimal Setup
-meta_description: >-
+description: >-
   A minimal Docker Compose setup for Binacle.Net v1.3.x with your own presets and basic API functionality. The
   files to download and run.
 permalink: /version/v1.3.x/samples/docker/minimal-setup/

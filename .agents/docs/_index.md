@@ -142,7 +142,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ruby/README.md
-  description: "Ruby gems under ruby/ — Jekyll plugins used by all three sites under sites/."
+  description: "Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site."
   paths: ["ruby/**"]
 ```
 

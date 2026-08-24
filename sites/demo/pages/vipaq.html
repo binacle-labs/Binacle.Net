@@ -3,13 +3,16 @@ title: ViPaq Decoder
 permalink: /vipaq/
 applet: true
 order: 2
+structured_data:
+  type: WebApplication
+  name: ViPaq Decoder
 icon: deployed_code_update
-description: Decode, analyze, and visualize packing layouts with the ViPaq Protocol
-meta_description: Paste a ViPaq string from a Binacle.Net response and see the packing layout drawn in 3D. Free and open source, no signup.
+summary: Decode, analyze, and visualize packing layouts with the ViPaq Protocol
+description: Paste a ViPaq string from a Binacle.Net response and see the packing layout drawn in 3D. Free and open source, no signup.
 demo: true
 scripts:
-  - src: "/js/protocol_decoder.js"
-    type: "text/javascript"
+  - type: "text/javascript"
+    src: "/js/protocol_decoder.js"
 excerpt: |
   The ViPaq Decoder enables you to decode ViPaq-encoded packing data, providing clear, interactive visualizations of
   container layouts for easy analysis and validation.

@@ -1,0 +1,8 @@
+title: Example
+url: https://example.com
+
+collections:
+  common_pages:
+    output: true
+  versions:
+    output: true

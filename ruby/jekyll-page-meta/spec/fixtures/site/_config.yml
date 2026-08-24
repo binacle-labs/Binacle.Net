@@ -1,0 +1,14 @@
+title: Example
+url: https://example.com
+description: The site description, in one plain sentence.
+locale: en_US
+
+collections:
+  docs:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: page

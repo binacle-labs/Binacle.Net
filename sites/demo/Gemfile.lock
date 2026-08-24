@@ -10,6 +10,30 @@ PATH
     jekyll-gtm (1.0.0)
       jekyll (>= 4.2)
 
+PATH
+  remote: ../../ruby/jekyll-multi-sitemap
+  specs:
+    jekyll-multi-sitemap (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-page-meta
+  specs:
+    jekyll-page-meta (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-resource-tags
+  specs:
+    jekyll-resource-tags (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-structured-data
+  specs:
+    jekyll-structured-data (1.0.0)
+      jekyll (>= 4.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -99,6 +123,10 @@ DEPENDENCIES
   jekyll-filters!
   jekyll-gtm!
   jekyll-include-cache
+  jekyll-multi-sitemap!
+  jekyll-page-meta!
+  jekyll-resource-tags!
+  jekyll-structured-data!
   jekyll-tidy
   kramdown-parser-gfm
   tzinfo (>= 1, < 3)

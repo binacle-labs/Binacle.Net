@@ -1,0 +1,25 @@
+# One config for every gem under ruby/. Run it with `just ruby lint` from the repo root.
+
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  Exclude:
+    - '*/spec/fixtures/**/*'
+
+# A Jekyll plugin's entry file has to be named after the gem, hyphen and all, because `plugins:` requires
+# it by that name.
+Naming/FileName:
+  Exclude:
+    - '*/lib/*-*.rb'
+
+# The specs describe behaviour, so their blocks are long on purpose, and a render method that writes a
+# vendor snippet is one long string.
+Metrics:
+  Enabled: false
+
+# A comment above every class saying what the class is called.
+Style/Documentation:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 120

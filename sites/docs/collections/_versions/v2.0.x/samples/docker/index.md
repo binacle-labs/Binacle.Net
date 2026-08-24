@@ -1,6 +1,6 @@
 ---
 title: Docker
-meta_description: >-
+description: >-
   Docker Compose samples for Binacle.Net v2.0.x: a minimal setup with the API alone, and one with the UI Module
   enabled for trying it in a browser.
 permalink: /version/v2.0.x/samples/docker/

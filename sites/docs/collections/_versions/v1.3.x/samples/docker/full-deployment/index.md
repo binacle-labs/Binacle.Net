@@ -1,6 +1,6 @@
 ---
 title: Full Deployment
-meta_description: >-
+description: >-
   Docker Compose for Binacle.Net v1.3.x with everything on: Azurite for the Service Module, OpenTelemetry, and
   the Aspire Dashboard.
 permalink: /version/v1.3.x/samples/docker/full-deployment/

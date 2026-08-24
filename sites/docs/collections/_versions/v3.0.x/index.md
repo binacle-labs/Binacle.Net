@@ -1,6 +1,6 @@
 ---
 title       : Welcome to Binacle.Net Docs!
-meta_description: >-
+description: >-
   Documentation for Binacle.Net v3.0.x: quick start, the HTTP API, configuration, Docker and Kubernetes samples,
   and the release notes.
 menu_title  : v3.0.x

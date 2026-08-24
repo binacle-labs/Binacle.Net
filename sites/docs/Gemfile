@@ -25,6 +25,11 @@ group :jekyll_plugins do
   gem "jekyll-tidy"
   gem "jekyll-gtm", path: "../../ruby/jekyll-gtm"
   gem "jekyll-filters", path: "../../ruby/jekyll-filters"
+  gem "jekyll-multi-sitemap", path: "../../ruby/jekyll-multi-sitemap"
+  gem "jekyll-resource-tags", path: "../../ruby/jekyll-resource-tags"
+  gem "jekyll-page-meta", path: "../../ruby/jekyll-page-meta"
+  gem "jekyll-structured-data", path: "../../ruby/jekyll-structured-data"
+  gem "binacle-docs-versions", path: "../../ruby/binacle-docs-versions"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem

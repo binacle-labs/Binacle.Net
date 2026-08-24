@@ -1,6 +1,6 @@
 ---
 title: Forwarded Headers
-meta_description: >-
+description: >-
   Put the caller's real address back when a proxy, load balancer, CDN or tunnel sits in front of Binacle.Net.
   New in v3.0.0, and nothing crashes without it.
 nav:

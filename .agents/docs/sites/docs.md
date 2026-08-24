@@ -1,8 +1,8 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-08-23
-check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL
+verified: 2026-08-24
+check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL; sites/docs/_plugins/ is still empty and every plugin the site loads is a gem under ruby/; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
 paths:
   - "sites/docs/**"
 ---
@@ -28,7 +28,6 @@ just build docs   # the same site built once, into artifacts/docs
 |---|---|
 | `collections/_versions/` | Versioned docs — each subfolder is a version |
 | `collections/_common_pages/` | Pages shared across all versions |
-| `collections/_sitemaps/` | Sitemap XML files |
 | `pages/` | Top-level pages (index, 404, robots.txt) |
 
 Versioned docs are served at `/version/:path/`. See "Versioning model" below.
@@ -63,12 +62,13 @@ hardcode a version or `latest` in prose or a command without saying what it trac
 
 ## Page metadata
 
-**Every page carries a written `meta_description`** in its front matter - all 118, every version line
-included. `_includes/seo.html` still falls back to cutting body copy at 160 characters, which severs it
-mid-word; that fallback is a safety net for a page that forgets, not the mechanism.
+**Every page carries a written `description`** in its front matter - all 118, every version line included.
+`jekyll-page-meta` still falls back to the excerpt and then the site description, cut at 160 characters,
+which severs mid-word; that fallback is a safety net for a page that forgets, not the mechanism.
 
 **`seo_title` overrides the composed title verbatim.** The composed form is
-`<title> (<version>) - <site.title>`; a page that sets `seo_title` gets exactly that string and **nothing is
+`<title> (<version>) - <site.title>`, where the version half is the `title_suffix` that
+`binacle-docs-versions` stamps; a page that sets `seo_title` gets exactly that string and **nothing is
 appended**, so a page using it writes its own suffix.
 
 **Nav labels and breadcrumbs use `menu_title` where a page sets one**, falling back to `title`
@@ -98,15 +98,19 @@ Everything below reads `current`; nothing names a version.
 | `<meta name="robots">` | none | `noindex, follow` |
 | Listed in a sitemap | yes | no |
 
-- `_includes/seo.html` emits the `noindex` and appends the version to the `<title>` — `Quick Start (v3.0.x) -
-  Binacle.Net Docs` — so a versioned page cannot collide with the same page at the site root or with another
-  version of itself. `_layouts/versions/swagger.html` has its own head and does the same.
-- `collections/_sitemaps/version-current.xml` is the only versioned sitemap. Its layout,
-  `_layouts/sitemap-version.xml`, selects `site.data.versions.current`. `pages.xml` covers `pages/` and
-  `_common_pages/`.
-- Swagger pages are `noindex` in every version, current included, and a `**/swagger/**` defaults block in
-  `_config.yml` keeps them out of the sitemap. A submitted `noindex` URL is a Search Console error.
-- `robots.txt` lists whatever sitemaps exist, so no version-agnostic edit is needed there either.
+- **Neither value is written by a layout any more.** `binacle-docs-versions` stamps `robots` and
+  `title_suffix` onto every versioned document at a high priority, and `{% page_meta %}` writes them out —
+  `Quick Start (v3.0.x) - Binacle.Net Docs` — so a versioned page cannot collide with the same page at the
+  site root or with another version of itself. `_layouts/versions/swagger.html` calls the same tag.
+- **The sitemaps are generated, not written.** `jekyll-multi-sitemap` reads the `sitemaps:` block in
+  `_config.yml`: `version-current.xml` selects the `versions` collection where `version` matches
+  `site.data.versions.current`, and `pages.xml` covers `pages/` and `_common_pages/`. Both are served under
+  `/sitemap/`, with an index over them at `/sitemap.xml`.
+- Swagger pages are `noindex, nofollow` in every version, current included. A `**/swagger/**` defaults block
+  in `_config.yml` sets that `robots` value in page data, where the stamp leaves it alone, and keeps them out
+  of the sitemap. A submitted `noindex` URL is a Search Console error.
+- `robots.txt` writes its `Sitemap:` line with `{% sitemap_links %}`, which emits the index alone, so no
+  version-agnostic edit is needed there either.
 
 **Why per-minor, not per-major.** A folder answers "what does my image do", and the API set is what changes:
 versions are **added at minors** (v1.2.0 added API v3) and **removed at majors** (v2.0.0 removed v1, v3.0.0
@@ -140,7 +144,7 @@ A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.
 6. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
 
 **Watch out:**
-- `vlink` (`sites/docs/_plugins/VLink.rb`) **raises and fails the build** on a missing target. Removing a page
+- `vlink` (`ruby/binacle-docs-versions`) **raises and fails the build** on a missing target. Removing a page
   without removing its `vlink` references breaks the build — grep the page name before deleting.
 - Selector order comes from `list` in `_data/versions.yml`, newest first. It is read, not sorted — Jekyll's
   own ordering is by path, which would put `v3.10.x` before `v3.2.x`.
@@ -151,10 +155,17 @@ A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.
 |---|---|
 | `jekyll-gtm` | `ruby/jekyll-gtm` |
 | `jekyll-filters` | `ruby/jekyll-filters` |
+| `jekyll-multi-sitemap` | `ruby/jekyll-multi-sitemap` |
+| `jekyll-resource-tags` | `ruby/jekyll-resource-tags` |
+| `jekyll-page-meta` | `ruby/jekyll-page-meta` |
+| `jekyll-structured-data` | `ruby/jekyll-structured-data` |
+| `binacle-docs-versions` | `ruby/binacle-docs-versions` |
 | `jekyll-tidy` | gem |
-| `VLink` | `sites/docs/_plugins/VLink.rb` (local) |
 
-**VLink** (`{% vlink path %}`) — resolves a relative path to the correct versioned URL based on the
+**`sites/docs/_plugins/` is empty.** VLink lived there and moved into `binacle-docs-versions` with the
+version stamps, which is where it gets a spec suite; nothing under `sites/` has one.
+
+**vlink** (`{% vlink path %}`) — resolves a relative path to the correct versioned URL based on the
 current page's `version` front matter. Use it instead of plain links inside `_versions/` pages
 so links stay correct across versions.
 

@@ -35,14 +35,12 @@ has to stay. These two are the exceptions.
 
 ## Ruby gems
 
-- **Neither gem under `ruby/` has a `Gemfile`**, so `bundle exec rspec` in `ruby/jekyll-filters` or
-  `ruby/jekyll-gtm` fails with "Could not locate Gemfile or .bundle/ directory". Both declare `rspec` as a
-  development dependency in their gemspec, and both have a full `spec/` suite that **nothing has ever run** -
-  no workflow, no `just` recipe. Found 2026-08-19 while verifying the ruby doc.
+- **No workflow runs the gem leaves.** The six `ruby-*-unit` leaves joined `just test all` on 24 Aug 2026, so
+  a local run covers them, but the PR gate names its steps and none of them is ruby. **Whether they go on the
+  gate is a separate call.**
 
-  The mechanical half is a two-line `Gemfile` in each directory (`gemspec` plus the rspec group). **Whether
-  the suites then go on the PR gate is a separate call** - if it grows past adding the file, it needs its own
-  plan.
+- **Rubocop has never been run.** `ruby/.rubocop.yml` exists, rubocop is not in `ruby/Gemfile` and no recipe
+  calls it. It lands red before it lands green, which is why it is not wired to anything yet.
 
 ## ServiceModule
 

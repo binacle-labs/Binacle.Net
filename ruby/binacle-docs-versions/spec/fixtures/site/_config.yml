@@ -1,0 +1,18 @@
+title: Example
+url: https://example.com
+
+collections:
+  versions:
+    output: true
+
+defaults:
+  - scope:
+      path: "**/v1.0.x/**"
+      type: "versions"
+    values:
+      version: v1.0.x
+  - scope:
+      path: "**/v2.0.x/**"
+      type: "versions"
+    values:
+      version: v2.0.x

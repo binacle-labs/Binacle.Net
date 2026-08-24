@@ -1,6 +1,6 @@
 ---
 title: Health Checks
-meta_description: >-
+description: >-
   Configure health checks in Binacle.Net v2.1.x: the endpoints, IP restrictions, and wiring them to a load
   balancer or Prometheus.
 nav:

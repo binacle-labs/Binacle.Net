@@ -1,6 +1,6 @@
 --- 
 title: ViPaq Protocol
-meta_description: >-
+description: >-
   ViPaq packs one bin and its items into a single copy-pastable string. What it carries, and why strings do not
   move between Binacle.Net versions.
 nav:

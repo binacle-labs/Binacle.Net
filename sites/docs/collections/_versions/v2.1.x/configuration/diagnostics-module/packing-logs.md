@@ -1,6 +1,6 @@
 ---
 title: Packing Logs
-meta_description: >-
+description: >-
   Record fit and pack requests as NDJSON in Binacle.Net v2.1.x, so you can see which bin sizes and which
   functions your callers use most.
 nav:

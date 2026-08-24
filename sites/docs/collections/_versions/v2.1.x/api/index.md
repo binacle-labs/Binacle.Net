@@ -1,6 +1,6 @@
 ---
 title: API
-meta_description: >-
+description: >-
   The two API versions documented for Binacle.Net v2.1.x: V2, where the algorithm is fixed, and V3, where you
   choose it and can get ViPaq results.
 permalink: /version/v2.1.x/api/

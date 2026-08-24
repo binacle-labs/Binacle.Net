@@ -1,4 +1,10 @@
 PATH
+  remote: ../../ruby/binacle-docs-versions
+  specs:
+    binacle-docs-versions (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
   remote: ../../ruby/jekyll-filters
   specs:
     jekyll-filters (1.0.0)
@@ -8,6 +14,30 @@ PATH
   remote: ../../ruby/jekyll-gtm
   specs:
     jekyll-gtm (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-multi-sitemap
+  specs:
+    jekyll-multi-sitemap (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-page-meta
+  specs:
+    jekyll-page-meta (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-resource-tags
+  specs:
+    jekyll-resource-tags (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-structured-data
+  specs:
+    jekyll-structured-data (1.0.0)
       jekyll (>= 4.2)
 
 GEM
@@ -94,11 +124,16 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  binacle-docs-versions!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)
   jekyll-filters!
   jekyll-gtm!
   jekyll-include-cache
+  jekyll-multi-sitemap!
+  jekyll-page-meta!
+  jekyll-resource-tags!
+  jekyll-structured-data!
   jekyll-tidy
   kramdown-parser-gfm
   tzinfo (>= 1, < 3)

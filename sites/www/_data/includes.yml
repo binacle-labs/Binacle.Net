@@ -1,3 +1,19 @@
+# The icon files land in the site root from assets/, copied by gulp.
+icons:
+  - rel: 'icon'
+    href: '/favicon.ico'
+  - rel: 'icon'
+    type: 'image/png'
+    sizes: '32x32'
+    href: '/favicon-32x32.png'
+  - rel: 'icon'
+    type: 'image/png'
+    sizes: '16x16'
+    href: '/favicon-16x16.png'
+  - rel: 'apple-touch-icon'
+    sizes: '180x180'
+    href: '/apple-touch-icon.png'
+
 # One stylesheet and one script. Both are build output - css/ and js/ are gitignored on this site.
 links:
   - rel: 'stylesheet'
@@ -7,5 +23,6 @@ links:
 scripts_body_end:
   - type: 'text/javascript'
     src: '/js/main.js'
+    defer: true
   # The consent banner slot. The maintainer runs one and will replace it with his own
   # github.com/ChrisMavrommatis/consentio in a dedicated session. Adding it is one entry here.

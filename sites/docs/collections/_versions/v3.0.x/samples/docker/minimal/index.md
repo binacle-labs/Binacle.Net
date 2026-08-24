@@ -1,7 +1,7 @@
 ---
 title: Docker Minimal
 menu_title: Minimal
-meta_description: >-
+description: >-
   The smallest Docker Compose setup that still answers requests: the API, your presets, and somewhere to write
   logs. Nothing else is switched on.
 permalink: /version/v3.0.x/samples/docker/minimal/

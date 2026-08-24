@@ -1,6 +1,6 @@
 ---
 title: Kubernetes
-meta_description: >-
+description: >-
   Run Binacle.Net on a cluster you already have, beside your shops and not exposed. What the Kubernetes samples
   assume before you start.
 permalink: /version/v3.0.x/samples/kubernetes/

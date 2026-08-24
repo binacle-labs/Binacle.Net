@@ -1,0 +1,11 @@
+source "https://rubygems.org"
+
+# One bundle for every gem here. Bundler walks up from a gem's own directory and finds this file, so
+# `bundle exec rspec` works from inside any of them.
+gemspec path: "binacle-docs-versions"
+gemspec path: "jekyll-filters"
+gemspec path: "jekyll-gtm"
+gemspec path: "jekyll-multi-sitemap"
+gemspec path: "jekyll-page-meta"
+gemspec path: "jekyll-resource-tags"
+gemspec path: "jekyll-structured-data"
