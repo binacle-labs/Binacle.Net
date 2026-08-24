@@ -17,7 +17,8 @@ file or a workflow, it belongs in the release plan while there is still time, or
 
 **Delete this file once the list is clear.** The tag does not delete it; working through it does.
 
-Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20.
+Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20. Extended 2026-08-24 with the
+checks the rebuilt sites added.
 
 ---
 
@@ -63,6 +64,11 @@ Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20.
       be off and the rule should be whatever the release left it at - the publish should have written `3.0.0`,
       `3.0` and `latest` with no interference.
 
+- [ ] **Read the licence GitHub detects for the repository, back off the API.** Detection runs server side, so
+      pushing is the only way to find out. The repository declares GPL-3.0 and the expected answer is
+      `GPL-3.0`. **This is a read, not a fix** - if it comes back wrong, that is a finding for a plan, not
+      something to chase here.
+
 ## Read what the release published
 
 - [ ] **Read the Docker Hub page - the release run published it, and that step had never run before.** The
@@ -80,16 +86,31 @@ Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20.
 - [ ] **Run the verification checks against the real `3.0.0`, from a clean shell.** They were proven against
       `3.0.0-beta.3` and `3.0.0-beta.4`, both single-tag copies. This is the first time the copy writes three
       tags. **Confirm the invocation printed on the Docker Hub page and in `SECURITY.md` is the one that
-      actually works** - a
-      published command that fails reads as our bug.
+      actually works** - a published command that fails reads as our bug.
+
+- [ ] **Read the UI module in a browser, from the published image.** `docker run` it with `UI_MODULE=True` and
+      open `/`, `/packing`, `/vipaq` and `/instance`. The theme switcher and every page under it were rebuilt
+      twice this release. **The pre-tag pass read a local build; this reads what shipped.**
 
 - [ ] **Check the docs site is on v3.0.x.** Confirm `/version/latest/` lands on `v3.0.x` and the version picker
       shows four versions. **This is the item most likely to have been silently skipped**, because nothing
       fails when it is - the site just keeps presenting v2.1.x.
 
+- [ ] **Read the deployed docs site, not just the built one.** The deploy carried a rebuild that reached all
+      four version folders. Four things only the live site settles:
+  - `/robots.txt` serves the full body and the `Sitemap:` lines.
+  - The web app manifest is served, is linked from the pages, and its icon paths resolve. **Check it in a
+    browser's application panel** - a wrong icon path fails with no console error.
+  - `/version/latest/` still redirects, is still `noindex`, and its canonical points at `/version/<current>/`.
+  - Pages in `v1.3.x`, `v2.0.x` and `v2.1.x` still carry a title, a description and a canonical.
+
 - [ ] **Confirm no public surface still names a beta.** Betas 1 and 2 are deleted from Docker Hub, so anything
       left pointing at one is a 404 rather than an old number. `grep -rn "3\.0\.0-beta" --exclude-dir=.agents`
       over the repo, and read the docs site's verifying-a-release page.
+
+      **One expected hit, and it is not a public surface.** `sites/www/_data/exchange.yml` carries a YAML
+      comment Jekyll never renders, saying the `3.0` tag is unpublished. **That comment is stale from the tag
+      onward - delete it rather than re-reading it every release.**
 
 ## The one decision the release deferred
 
@@ -114,6 +135,9 @@ on.
 **Three things were held back from v3.0.0 and are waiting there:** the heavy architecture tools (ArchUnitNET,
 dependency-cruiser, lychee), CI gates 2 and 3, and the last of the UI test harness the coverage gate hangs on.
 **Each is waiting on something specific**, and its `waits-on:` names it.
+
+**Two more joined them on 2026-08-24**, when the gem work landed: no job on the pull request gate runs the ten
+Ruby suites, and rubocop has never been run. Both are in `plans/todos.md`.
 
 **The first thing to do is not a build.** How far the ServiceModule is taken is the maintainer's call, and it
 settles the three plans under `plans/api/`, the two ServiceModule one-liners in `plans/todos.md` and the Azure

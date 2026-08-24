@@ -7,8 +7,12 @@ description: Release - Binacle.Net v3.0.0
 **Status:** In progress. Betas 1 to 4 published; `v3.0.0-beta.4` is the tag deployed on the test server. The
 pipeline is rebuilt and proven end to end, the architecture branch is merged, the suite is green and the
 OpenAPI contracts are proven unmoved - the top-line `info.description` changed on 2026-08-23, and no path,
-schema or response did. **What is left is the last commit and the tag**, plus the immutability
-rule that holds nothing up, and the docs deploy that follows.
+schema or response did.
+
+**The site and gem work landed on 2026-08-24 and it reaches this release in two places.** The theme switcher
+is shared code that the UI module ships, so it goes into the image. The docs site is rebuilt on eight gems, so
+it goes out with the docs deploy. **What is left is a browser pass over the switcher, one decision, a few
+changelog lines, the last commit and the tag**, plus the immutability rule that holds nothing up.
 
 **Betas 1 and 2 are deleted from Docker Hub.** Only `3.0.0-beta.3` and `3.0.0-beta.4` still resolve. Anything
 that quotes a real tag or a real response has to name one of those two, or `3.0.0` once it exists.
@@ -19,7 +23,7 @@ that quotes a real tag or a real response has to name one of those two, or `3.0.
 nothing else is.**
 
 **Created:** 2026-07-16. **Rewritten for the GHCR pipeline:** 2026-08-11. **Scope reset:** 2026-08-14.
-**Pruned to pending work only:** 2026-08-20.
+**Pruned to pending work only:** 2026-08-20. **Reorganised after the gem work landed:** 2026-08-24.
 
 The orchestrator for v3.0.0 (drops v2, adds experimental v4, rebuilt ViPaq). This is the **one exception** to
 the reference rules: it may point at any file to coordinate the release, and **nothing points back at it**.
@@ -46,6 +50,9 @@ and the smoked digest is **copied** to Docker Hub - so nothing unsmoked reaches 
 A prerelease gets its immutable tag only, never `3.0` or `latest`. The release body is extracted from
 `CHANGELOG.md` by the workflow, and the last job writes the Docker Hub page.
 
+**Three deploy workflows exist and this release owns one of them.** The docs deploy is release work and has
+its own section below. The demo and www deploys are not, and **nothing in this release dispatches them.**
+
 ---
 
 ## The gate - all of this before the tag
@@ -58,11 +65,76 @@ A prerelease gets its immutable tag only, never `3.0` or `latest`. The release b
 | 4 | Beta 3, and its three live checks | done - 2026-08-19 |
 | 5 | Admin read endpoints | done - 2026-08-19 |
 | 6 | Beta 4, deployed to the test server | done - 2026-08-19 |
-| 7 | The Docker Hub page's quick start | open |
-| 8 | The last commit: pins, prose and the changelog rename | open |
-| 9 | Tag `v3.0.0` | open |
+| 7 | The site and gem work | landed 2026-08-24 - what it adds to this release is rows 8 to 10 |
+| 8 | The theme switcher, read in a browser | open |
+| 9 | The default theme the module ships | open - **a decision, not work** |
+| 10 | The changelog lines the last two branches force | open |
+| 11 | The description caption's comment | open |
+| 12 | The Docker Hub page's quick start | open |
+| 13 | The last commit: pins, prose and the changelog rename | open |
+| 14 | Tag `v3.0.0` | open |
 
-### 7. The Docker Hub page's quick start
+### 7. What the site and gem work added to this release
+
+**Landed 2026-08-24. Recorded here because two halves of it ship with v3.0.0 and neither was planned as
+release work.**
+
+- **The image half.** `packages/theme-switcher` was rewritten and the UI module takes it, along with changes to
+  `_Layout.cshtml`, `_Header.cshtml` and two stylesheets. **This is user-visible in the shipped image.** It is
+  why rows 8, 9 and 10 exist.
+- **The docs half.** The docs site now builds on eight gems, and the change reaches all four version folders,
+  not only `v3.0.x`. It goes out with the docs deploy below. **There is no separate deploy for it.**
+
+**The three site plans it closed are deleted:** the robots tag, the redirect layout's own head, and the two
+unreferenced android icons. Nothing is left of them to carry.
+
+**Nothing else in that work touches the image.** The gems build Jekyll sites; the image builds from `npm` and
+`dotnet`. `just build image` does not need Ruby.
+
+### 8. The theme switcher, read in a browser
+
+**The slice this release takes from [todos](plans/todos.md): the four checks in its Theme section, and the
+`Dockerfile` comment under Comments.** Everything else in that file stays in it. **The checks themselves are
+written there, once - do not copy them here.**
+
+**Why they are on the gate.** Every check a command can settle has been run. These four cannot be, and the
+switcher ships inside the image, so the tag is the last moment anyone can look. Read the UI module with
+`UI_MODULE=True`, and the three built sites.
+
+- [ ] **All four checks pass, on all four hosts.**
+
+### 9. The default theme the module ships
+
+- [ ] **Decide, then either change one line or record the answer.** `ModuleDefinition.cs` sets
+      `DefaultTheme = "light"` for the UI module while all three Jekyll sites default to dark. **One of the two
+      is what a first-time reader sees, and they disagree.** It is one line either way and it is baked into the
+      image at the tag.
+
+### 10. The changelog lines the last two branches force
+
+Four edits to `CHANGELOG.md`, all in the `[Unreleased]` section.
+
+- [ ] **A line for the theme switcher, or a recorded decision that it needs none.** The `🎨 UI Module` section
+      was written on 2026-08-23, before the switcher was rewritten. The test is whether a self-hoster running
+      `UI_MODULE=True` notices.
+- [ ] **`/Error` is written as `/error`.** It is `/error/{errorCode?}`.
+- [ ] **A `### 🧪 Diagnostics Module` bullet.** `/_health`'s `System` entry gained `ReservedPaths`, and
+      `Features` now lists `HealthChecks`. `tooling/smoke/prod.hurl` moved from `count == 0` to `count == 1`
+      for exactly this, so anyone parsing `/_health` sees it.
+- [ ] **One sentence on the 2026-08-14 precedent**, in the release notes section below. That precedent says the
+      restructure gets no changelog line because nothing user-observable moved. **The UI rebuild was tested
+      against that bar and failed it** - moved routes, a dropped variable. Say so, or a later reader applies it
+      to the wrong thing.
+
+### 11. The description caption's comment
+
+- [ ] **`Dockerfile:8` names two places; there are three.** The caption is pinned in the `Dockerfile` label,
+      in `release-docker-image.yml`, and in `api/src/Binacle.Net.Kernel/Metadata.cs`, which is what reaches
+      Swagger UI, Scalar and both published OpenAPI documents. Change two of the three and the image label and
+      the API document disagree, silently. **One comment.** Do it while the reason is in front of someone,
+      because the next person to change that string will read the comment and believe it.
+
+### 12. The Docker Hub page's quick start
 
 **The slice this release takes from [ci-cd/dockerhub-overview](plans/ci-cd/dockerhub-overview.md): section 1,
 the `curl` example.** Everything else in that plan stays in it.
@@ -85,7 +157,7 @@ every reader to pull `binacle/binacle-net:3.0`, which does not resolve yet - the
 placeholders, it does not check the tag exists. **The stale 2.x page is the lesser wrong until the tag.** The
 local render above is the pre-tag check.
 
-### 8. The last commit before the tag - all in one
+### 13. The last commit before the tag - all in one
 
 - [ ] **Rename `## [Unreleased]` to `## 3.0.0`** in `CHANGELOG.md`.
 - [ ] **Move six pins from `3.0.0-beta.4` to `3.0`:**
@@ -102,8 +174,8 @@ local render above is the pre-tag check.
       publishes.**
 - [ ] **Rewrite the same reason in prose in `samples/README.md` and `samples/docker/README.md`.** Both name
       `3.0.0-beta.4` and explain why; both become `3.0` with the explanation cut.
-- [ ] **Re-confirm `ApiV4Document.IsExperimental` is still `true`.** Shipping v4 as stable would lock contracts
-      meant to keep moving. The flip is 3.1.0 work.
+- [ ] **Re-confirm `ApiV4Document.IsExperimental` is still `true`.** Read on 2026-08-24 and it is. Shipping v4
+      as stable would lock contracts meant to keep moving. The flip is 3.1.0 work.
 - [ ] **Preview the body:** `just changelog extract 3.0.0` after the rename. That is exactly what publishes.
 
 **One decision, and it is open.** `README.md` was moved to `binacle/binacle-net:3.0` early, on 2026-08-17, when
@@ -115,7 +187,7 @@ early-move trade was taken deliberately for `tooling/README.md` and `tooling/smo
 moved early once before, on 2026-08-07, and sat on `main` naming an image that did not exist. **Do not leave
 the `3.0` bump on `main` long before tagging.**
 
-### 9. Tag
+### 14. Tag
 
 - [ ] **Tag `v3.0.0`.** The pipeline does the rest: the changelog gate, the suite, the GHCR build, the smoke,
       the Docker Hub copy under all three tags, the signature, the release created from the `3.0.0` section,
@@ -129,6 +201,19 @@ the `3.0` bump on `main` long before tagging.**
 **The Docker Hub logo and categories are not here.** They are the rest of the `ci-cd/dockerhub-overview` plan
 and they stay in it, not in this release - the release only takes that plan's `curl` example. Recorded so
 they are not mistaken for release work that got dropped.
+
+### The pull request gate builds the image with no Node
+
+**Verified 2026-08-24 and still true.** `release-docker-image.yml` has a Node step and an `npm ci`.
+`pull-request.yml`'s `image` job does not - it sets up `just` and `.NET`, then runs `just build image`, whose
+`publish` dependency runs `npm run copy-assets-to-uimodule` and `npm run build` inside the UI module. Both
+resolve `gulp`, `sass` and `webpack` out of a `node_modules` nothing installed.
+
+**It costs a merge, not an image**, which is why it is here and not on the gate. It is red on the required
+check on every pull request that touches code.
+
+- [ ] **Copy the two steps from the release workflow into `pull-request.yml`'s `image` job**, and prove it on
+      a pull request.
 
 ### Docker Hub tag immutability - the rule only
 
@@ -166,22 +251,38 @@ Three mechanics:
   on every beta release page until then. Left as it is deliberately.
 
 **This section is also what the docs site copies.** The `## 3.0.0` body is hand-carried into the v3.0.x
-release-notes page, and a v3.0.1 appends rather than replaces. The three additions that page is missing are in
-the docs deploy checklist below.
+release-notes page, and a v3.0.1 appends rather than replaces. The additions that page is missing are in the
+docs deploy checklist below.
 
 **The restructure gets no changelog line - decided 2026-08-14.** No user-observable behaviour changes, nothing
 is published to NuGet, and no contract moves - the OpenAPI diff proves the last one. The four breaking changes
-stay four.
+stay four. **Row 10 above adds the sentence saying the UI rebuild was measured against this bar and failed it.**
 
 ---
 
 ## The docs deploy - after the tag
 
 **The config half is done:** `main` carries `current: v3.0.x`, `- id: v3.0.x` back at the top of `list`, and
-the version sitemap restored - all verified 2026-08-14. What is left is the deploy
-plus six edits that must go out with it.
+the version sitemap restored - all verified 2026-08-14. What is left is the deploy plus the edits that must go
+out with it.
 
 **`sites/docs/` is off limits to a coding session.** This is the docs session's work, written here for it.
+
+- [ ] **Read the rebuilt docs site before dispatching anything.** The gem work changed pages in all four
+      version folders - `v1.3.x`, `v2.0.x`, `v2.1.x` and `v3.0.x` - plus the landing, the 404, the sitemaps,
+      `robots.txt`, the typography and the code-block styles. **This deploy publishes every one of those,
+      not only the `v3.0.x` edits below.** Build it and read it. **Placement chosen by an agent - strike it if
+      you would rather this were its own pass.**
+
+      Four things a build settles, and nothing else does:
+
+  - Every version's pages still carry a title, a description and a canonical.
+  - `/version/latest/` still redirects, is still `noindex`, and its canonical still points at
+    `/version/<current>/` rather than at itself.
+  - The three sites' `robots.txt` files are byte identical to each other apart from the host in the
+    `Sitemap:` lines, and each is byte identical to what it was before.
+  - The site serves and links a web app manifest, and the icon paths in it resolve. **Check it in a
+    browser's application panel** - a wrong icon path fails with no console error.
 
 - [ ] **Re-cut the worked example in `v3.0.x/verifying-a-release.md` against the real `3.0.0`.** It is the
       **last place any public surface still names a beta image**, and it cannot be fixed before the tag because
@@ -200,14 +301,16 @@ plus six edits that must go out with it.
       interim wording because the tag did not exist when the pages were written. Swap the italic line for
       *"Released &lt;date&gt; - [release on GitHub](.../releases/tag/v3.0.0)"*, matching every other version
       folder.
-- [ ] **Carry five additions from `CHANGELOG.md` into `v3.0.x/release-notes.md`.** Same notes in two places,
-      and the release body gained content on 2026-08-10 and again on 2026-08-23 the page does not have.
+- [ ] **Carry the additions from `CHANGELOG.md` into `v3.0.x/release-notes.md`.** Same notes in two places,
+      and the release body gained content on 2026-08-10, 2026-08-23 and again at row 10 above that the page
+      does not have.
 
       **Decided 2026-08-14: this page stays hand-copied.** It is not generated from `CHANGELOG.md`. The drift is
       the accepted cost, so **this checklist is the control** - every future release's docs handover has to list
       what the changelog gained since the page was last written. Run `just changelog extract Unreleased` to see
-      the current text. The first four go in the `## v3.0.0` section, in the page's plain-ASCII style; the
-      fifth is a migration step:
+      the current text. **Row 10 above adds to this list, so read the changelog rather than only this page.**
+      The first four go in the `## v3.0.0` section, in the page's plain-ASCII style; the fifth is a migration
+      step:
   - **Overview**, one bullet after the health check line: the image creates `/app/data` and gives it to the app
     user, so a volume mounted there is writable.
   - **Core Changes**, replacing *"The `Dockerfile` and existing environment variables are unchanged"* - which is
@@ -219,13 +322,15 @@ plus six edits that must go out with it.
   - **A `🔌 Service Module` section**, between Diagnostics and UI Module: the auth token rate limit partitions
     on the connection's remote address instead of a caller-supplied header, so varying the header no longer
     resets your own login throttle.
+  - **A `🧪 Diagnostics Module` section**, carrying the `/_health` bullet from row 10.
   - **The whole `🎨 UI Module` section, plus one Overview bullet and one Core Changes bullet.** Rewritten in
     `CHANGELOG.md` on 2026-08-23: the section it replaced said "neither tool changed" and was written before
     the 21-22 Aug rebuild. What the page needs is the rebuild itself (Blazor to Razor Pages, no SignalR
     circuit), the route changes `/PackingDemo` -> `/packing` and `/ProtocolDecoder` -> `/vipaq`, the Protocol
-    Decoder renamed to ViPaq Decoder, the new `/instance` page, the randomizer, and that the module reads no
-    configuration. The Core Changes bullet is the removal of `BINACLEAPI_CONNECTION_STRING` - it replaces
-    "existing environment variables are unchanged", which was false.
+    Decoder renamed to ViPaq Decoder, the new `/instance` page, the randomizer, that the module reads no
+    configuration, and whatever row 10 settled about the theme switcher. The Core Changes bullet is the removal
+    of `BINACLEAPI_CONNECTION_STRING` - it replaces "existing environment variables are unchanged", which was
+    false.
   - **Migration step 7, `Drop BINACLEAPI_CONNECTION_STRING`**, which pushed the `cosign verify` step to 8.
     The docs page numbers its own steps, so renumber there too.
 - [ ] **Replace the two swagger documents under `sites/docs/collections/_versions/v3.0.x/swagger/`.** Copy
@@ -241,9 +346,7 @@ plus six edits that must go out with it.
       **The description is what moved, and it moved on purpose** - the caption replacing *"an API created to
       address the 3D Bin Packing Problem in real time"*. It is still a visible change to the published spec,
       so mention it wherever the update is described.
-- [ ] **Write the client-generation page.** **Pulled in on 2026-08-14 at the maintainer's call.** It was the
-      last item in the `api/openapi-spec-followups` idea, which held nothing else - that file was deleted on
-      2026-08-20 and this row is now the only place the work is written down.
+- [ ] **Write the client-generation page.** **Pulled in on 2026-08-14 at the maintainer's call.**
 
       A short page with copy-paste commands that generate a client from the published per-version spec -
       `hey-api` for TypeScript, `kiota` for C#, and whatever else is worth naming. Today the spec is published
@@ -258,8 +361,8 @@ plus six edits that must go out with it.
       **Do not publish SDKs to close this.** The deliverable is a spec plus a generation guide, not shipped
       packages.
 - [ ] **The UI module no longer reads any configuration.** The rebuild deleted the `BinacleApi` connection
-      string and `Config_Files/UiModule/` with it, so three pages under `v3.0.x` describe a file the image does
-      not ship. All three are wrong for 3.0.0, not merely stale.
+      string and `Config_Files/UiModule/` with it, so five files under `v3.0.x` describe a file the image does
+      not ship. All five are wrong for 3.0.0, not merely stale. **Confirmed by grep on 2026-08-24.**
   - **`configuration/ui-module/index.md`** - delete the `## ⚙️ Configuration` block (the
     `/app/Config_Files/UiModule` sentence and the directory tree) and the whole `## 🛠️ Configuration`
     section at the bottom - the auto-detect paragraph, the `BinacleApi` JSON sample, and the link to
@@ -275,13 +378,22 @@ plus six edits that must go out with it.
       **Leave `v1.3.x`, `v2.0.x` and `v2.1.x` alone.** Those versions really did read the file. Only `v3.0.x`
       is wrong.
 
+- [ ] **Two framework defaults nobody overrode. Placement chosen by an agent - strike it if you would rather
+      it waited.** Both are on the docs site and both go out with this deploy or not at all until the next one.
+  - **Code samples render in the body sans-serif.** They need a monospace stack.
+  - **Wide tables are clipped rather than scrolled.** They need a scrolling container.
+        Checked on 2026-08-24: no `overflow-x` exists anywhere in `sites/docs/_sass/`.
+
+- [ ] **The ViPaq rename on the docs landing.** The landing still calls it the Protocol Decoder. The image and
+      the changelog both call it the ViPaq Decoder from 3.0.0. **Placement chosen by an agent - strike it if
+      wrong.** The rest of that page's rewrite is not release work and is not here.
+
 - [ ] **Deploy.** It is `workflow_dispatch` only.
 
 **This is the single most losable item in the release** - nothing fails if the deploy is skipped, the site just
 quietly keeps serving v2.1.x as current. **It has to run after the tag**, because the notes need the date and
 the `releases/tag/v3.0.0` link, and `main` already says v3.0.x is current, so deploying earlier presents an
-unreleased version as current. It has to land before anything is announced. **Tag, then deploy the docs, then
-announce.**
+unreleased version as current. It has to land before anything is announced.
 
 **One deliberate 404, do not "fix" it.** The `v3.0.x` ViPaq page links the wire spec at
 `github.com/binacle-labs/Binacle.Net/blob/v3.0.0/vipaq/PROTOCOL.md`, which 404s until the tag is pushed. A
@@ -291,13 +403,14 @@ versioned page should pin the spec it describes; do not repoint it at `main`.
 
 ## The sequence
 
-1. **The Docker Hub page's quick start**, and the immutability rule whenever it suits.
-2. **The last commit:** changelog rename, six pins, six comment blocks, two READMEs, and the `IsExperimental`
+1. **The theme switcher in a browser**, the default-theme decision, and the changelog lines those force.
+2. **The caption comment.** The immutability rule and the pull request gate's Node steps whenever they suit.
+3. **The Docker Hub page's quick start.**
+4. **The last commit:** changelog rename, six pins, six comment blocks, two READMEs, and the `IsExperimental`
    re-confirm.
-3. **Tag `v3.0.0`.** The pipeline does the rest, page included.
-4. **Deploy the docs**, with the six edits above.
-5. **Announce.**
-6. **Work `post-release-v3.0.0.md`**, then delete both files.
+5. **Tag `v3.0.0`.** The pipeline does the rest, page included.
+6. **Deploy the docs**, with the edits above.
+7. **Work `post-release-v3.0.0.md`**, then delete both files.
 
 ---
 
@@ -314,3 +427,11 @@ Everything else has a plan of its own, with its state and its blocker named ther
 | **CI gates 2 and 3** | Gate 2 runs the all-modules integration tests, which are not being written here. Gate 3 is Sonar and coverage, and its own plan says do not make coverage blocking yet. Gate 1 ships; these two have nothing to gate. |
 | **Raising test coverage** | **Decided 2026-08-14: do not test the UIModule until it is rebuilt**, so the tests are not written twice in two languages. The rebuild landed on 2026-08-21 and the suites followed on 2026-08-22 - all four of them, plus an integration suite for the module. None of that shipped here: what did is the modest bump the rate limiter tests brought, and nothing more. |
 | **The workflow restructure's last item** | The branch protection edit. It landed 2026-08-18 and left the release on 2026-08-19 - it gates nothing here. |
+
+**Held back on 2026-08-24, when the gem work landed:**
+
+| Item | Why not |
+|---|---|
+| **The Ruby gems on the pull request gate** | Ten gem suites run in `just test all`, and no job on the gate is Ruby. A gem regression is invisible to CI. **It gates nothing in this release** - the image does not build from Ruby - and adding a job is a workflow change, which is the class of thing this release stopped taking. |
+| **Rubocop** | `ruby/.rubocop.yml` exists, rubocop is in no `Gemfile` and no recipe calls it. It lands red before it lands green. |
+| **The demo and www deploys** | Neither site is part of this release and neither has a row here. **Do not dispatch either workflow as part of it.** |
