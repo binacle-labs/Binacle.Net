@@ -70,9 +70,10 @@ its own section below. The demo and www deploys are not, and **nothing in this r
 | 9 | The default theme the module ships | open - **a decision, not work** |
 | 10 | The changelog lines the last two branches force | open |
 | 11 | The description caption's comment | open |
-| 12 | The Docker Hub page's quick start | open |
-| 13 | The last commit: pins, prose and the changelog rename | open |
-| 14 | Tag `v3.0.0` | open |
+| 12 | Every test leaf on the CI suite | open |
+| 13 | The Docker Hub page's quick start | open |
+| 14 | The last commit: pins, prose and the changelog rename | open |
+| 15 | Tag `v3.0.0` | open |
 
 ### 7. What the site and gem work added to this release
 
@@ -134,7 +135,29 @@ Four edits to `CHANGELOG.md`, all in the `[Unreleased]` section.
       the API document disagree, silently. **One comment.** Do it while the reason is in front of someone,
       because the next person to change that string will read the comment and believe it.
 
-### 12. The Docker Hub page's quick start
+### 12. Every test leaf on the CI suite
+
+**The slice this release takes from
+[ci-cd/test-leaves-reach-ci](plans/ci-cd/test-leaves-reach-ci.md): the whole plan.** Nothing is left in it, so
+it is deleted when this lands.
+
+**Why it is on the gate rather than alongside.** The release workflow calls `shared-test-suite.yml` as its
+*"this commit passed CI"* proof. Ten of the twenty-six test leaves have no step there, so that proof is
+currently incomplete - **the tag would be cut on a green check for suites nobody ran.** That is the argument;
+placement is still yours to strike.
+
+- [ ] **Give the ten Ruby leaves a step each**, and add `Setup - Ruby` pointed at `ruby/` - to the test suite
+      and to the Sonar workflow, which runs the same leaves through `just coverage all` and today cannot start
+      them at all.
+- [ ] **Group the leaves in the test module** - one list per slice, `all` their sum - so the list of leaves
+      exists once.
+- [ ] **Add `just check test-steps`** and put it on the pull request gate, so a leaf added after the tag
+      cannot go missing the same way.
+
+**Steps stay per leaf, not per group - decided 24 Aug 2026.** A red check has to name the suite. The plan
+carries what that costs and why the check is the answer to it.
+
+### 13. The Docker Hub page's quick start
 
 **The slice this release takes from [ci-cd/dockerhub-overview](plans/ci-cd/dockerhub-overview.md): section 1,
 the `curl` example.** Everything else in that plan stays in it.
@@ -157,7 +180,7 @@ every reader to pull `binacle/binacle-net:3.0`, which does not resolve yet - the
 placeholders, it does not check the tag exists. **The stale 2.x page is the lesser wrong until the tag.** The
 local render above is the pre-tag check.
 
-### 13. The last commit before the tag - all in one
+### 14. The last commit before the tag - all in one
 
 - [ ] **Rename `## [Unreleased]` to `## 3.0.0`** in `CHANGELOG.md`.
 - [ ] **Move six pins from `3.0.0-beta.4` to `3.0`:**
@@ -187,7 +210,7 @@ early-move trade was taken deliberately for `tooling/README.md` and `tooling/smo
 moved early once before, on 2026-08-07, and sat on `main` naming an image that did not exist. **Do not leave
 the `3.0` bump on `main` long before tagging.**
 
-### 14. Tag
+### 15. Tag
 
 - [ ] **Tag `v3.0.0`.** The pipeline does the rest: the changelog gate, the suite, the GHCR build, the smoke,
       the Docker Hub copy under all three tags, the signature, the release created from the `3.0.0` section,
@@ -214,6 +237,19 @@ check on every pull request that touches code.
 
 - [ ] **Copy the two steps from the release workflow into `pull-request.yml`'s `image` job**, and prove it on
       a pull request.
+
+### Ruby coverage - the decision only
+
+**The slice this release takes from [ruby-gem-coverage](plans/ruby-gem-coverage.md): the answer, not the
+build.** The ten gemspecs, the ten spec helpers and the Sonar property stay in the plan.
+
+- [ ] **Decide whether the gems produce coverage at all.** They produce none today, and the coverage table
+      builds its rows from the reports that exist - so they are absent from it rather than sitting at zero.
+      **If the answer is no, write that down where the coverage pipeline's reasoning lives and drop the plan.**
+      Leaving it open means the next reader of that table re-discovers ten missing suites from scratch.
+
+**Placement chosen by an agent - strike it if wrong.** It is here rather than on the gate because nothing
+about the image or the docs changes either way.
 
 ### Docker Hub tag immutability - the rule only
 
@@ -404,7 +440,8 @@ versioned page should pin the spec it describes; do not repoint it at `main`.
 ## The sequence
 
 1. **The theme switcher in a browser**, the default-theme decision, and the changelog lines those force.
-2. **The caption comment.** The immutability rule and the pull request gate's Node steps whenever they suit.
+2. **The caption comment, and every test leaf on the CI suite.** The immutability rule, the Ruby coverage
+   answer and the pull request gate's Node steps whenever they suit.
 3. **The Docker Hub page's quick start.**
 4. **The last commit:** changelog rename, six pins, six comment blocks, two READMEs, and the `IsExperimental`
    re-confirm.
@@ -432,6 +469,5 @@ Everything else has a plan of its own, with its state and its blocker named ther
 
 | Item | Why not |
 |---|---|
-| **The Ruby gems on the pull request gate** | Ten gem suites run in `just test all`, and no job on the gate is Ruby. A gem regression is invisible to CI. **It gates nothing in this release** - the image does not build from Ruby - and adding a job is a workflow change, which is the class of thing this release stopped taking. |
 | **Rubocop** | `ruby/.rubocop.yml` exists, rubocop is in no `Gemfile` and no recipe calls it. It lands red before it lands green. |
 | **The demo and www deploys** | Neither site is part of this release and neither has a row here. **Do not dispatch either workflow as part of it.** |

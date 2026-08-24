@@ -27,6 +27,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "mutation testing with Stryker.NET"
   state: idea
   waits-on: "nobody waiting"
+- file: ruby-gem-coverage.md
+  description: "The ten Ruby gems produce no coverage, so they are absent from the coverage table and from Sonar. Adding simplecov collides with the rule that a gem must be droppable into an unrelated site."
+  state: proposed
+  waits-on: "a yes or a no - it is ten gems' published surface, and the alternative is writing down that Ruby coverage is deliberately absent"
+  paths: ["ruby/**", "tooling/**"]
 - file: sonar-issue-triage.md
   description: "Sonar - what is left after the 2026-08-09 sweep"
   state: ready
@@ -123,6 +128,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "an answer to whether anyone runs this on ARM"
   paths: [".github/workflows/**"]
+- file: ci-cd/test-leaves-reach-ci.md
+  description: "Ten of the twenty-six test leaves run on no pipeline. Give every leaf a step, group the leaves for a laptop, and add a check so the two lists cannot drift again."
+  state: ready
+  waits-on: "nothing"
+  paths: [".github/workflows/**", "tooling/**"]
 - file: ci-cd/workflow-restructure.md
   description: "CI - what is left after the workflow restructure landed, and the gap the next workflows session inherits"
   state: blocked
