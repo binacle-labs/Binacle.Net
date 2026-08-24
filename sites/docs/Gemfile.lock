@@ -5,6 +5,12 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: ../../ruby/binacle-robots
+  specs:
+    binacle-robots (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
   remote: ../../ruby/jekyll-breadcrumb-trail
   specs:
     jekyll-breadcrumb-trail (1.0.0)
@@ -44,6 +50,12 @@ PATH
   remote: ../../ruby/jekyll-structured-data
   specs:
     jekyll-structured-data (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../ruby/jekyll-webmanifest
+  specs:
+    jekyll-webmanifest (1.0.0)
       jekyll (>= 4.2)
 
 GEM
@@ -131,6 +143,7 @@ PLATFORMS
 
 DEPENDENCIES
   binacle-docs-versions!
+  binacle-robots!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)
   jekyll-breadcrumb-trail!
@@ -142,6 +155,7 @@ DEPENDENCIES
   jekyll-resource-tags!
   jekyll-structured-data!
   jekyll-tidy
+  jekyll-webmanifest!
   kramdown-parser-gfm
   tzinfo (>= 1, < 3)
   tzinfo-data

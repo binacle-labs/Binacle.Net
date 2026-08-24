@@ -44,6 +44,47 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     expect(doc(build_site, 'v1.0.x/guide.md').data['suffix_seen_at_low']).to eq('(v1.0.x)')
   end
 
+  describe 'the redirect stamps' do
+    it 'points a redirect page at the current version index' do
+      site = build_site
+
+      expect(doc(site, 'redirect.md').data['redirect_to']).to eq(doc(site, 'v2.0.x/index.md').url)
+    end
+
+    it 'gives it a canonical that is the page it points at, not itself' do
+      page = doc(build_site, 'redirect.md')
+
+      expect(page.data['canonical']).to eq(page.data['redirect_to'])
+    end
+
+    it 'makes it unindexable' do
+      expect(doc(build_site, 'redirect.md').data['robots']).to eq('noindex')
+    end
+
+    it 'moves the redirect when the one knob moves' do
+      site = build_with_current('v1.0.x')
+
+      expect(doc(site, 'redirect.md').data['redirect_to']).to eq(doc(site, 'v1.0.x/index.md').url)
+    end
+
+    it 'never overwrites a value the page set itself' do
+      page = doc(build_site, 'redirect-own.md')
+
+      expect(page.data['redirect_to']).to eq('/pinned/')
+      expect(page.data['canonical']).to eq('/elsewhere/')
+      expect(page.data['robots']).to eq('none')
+    end
+
+    it 'leaves a page on another layout alone' do
+      expect(doc(build_site, 'unversioned.md').data).not_to have_key('redirect_to')
+    end
+
+    it 'fails the build when the current version has no index to point at' do
+      expect { build_site({}, NO_INDEX_SITE) }
+        .to raise_error(Binacle::DocsVersions::Error, %r{_versions/v1.0.x/index has no document})
+    end
+  end
+
   it 'fails the build when the site has no versions data' do
     expect { build_site('data_dir' => '_nothing') }
       .to raise_error(Binacle::DocsVersions::Error, /current is not set/)

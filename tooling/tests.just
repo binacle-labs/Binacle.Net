@@ -51,6 +51,7 @@ all:
     test_leaf packages-cookies-unit
     test_leaf packages-theme-switcher-unit
     test_leaf ruby-docs-versions-unit
+    test_leaf ruby-robots-unit
     test_leaf ruby-breadcrumb-trail-unit
     test_leaf ruby-filters-unit
     test_leaf ruby-gtm-unit
@@ -58,6 +59,7 @@ all:
     test_leaf ruby-page-meta-unit
     test_leaf ruby-resource-tags-unit
     test_leaf ruby-structured-data-unit
+    test_leaf ruby-webmanifest-unit
     test_leaf api-core-unit
     test_leaf api-kernel-unit
     test_leaf api-diagnostics-unit
@@ -109,6 +111,10 @@ packages-theme-switcher-unit: (_jest_test 'theme-switcher')
 [group('ruby')]
 ruby-docs-versions-unit: (_rspec_test 'binacle-docs-versions')
 
+# binacle-robots unit
+[group('ruby')]
+ruby-robots-unit: (_rspec_test 'binacle-robots')
+
 # jekyll-breadcrumb-trail unit
 [group('ruby')]
 ruby-breadcrumb-trail-unit: (_rspec_test 'jekyll-breadcrumb-trail')
@@ -136,6 +142,10 @@ ruby-resource-tags-unit: (_rspec_test 'jekyll-resource-tags')
 # jekyll-structured-data unit
 [group('ruby')]
 ruby-structured-data-unit: (_rspec_test 'jekyll-structured-data')
+
+# jekyll-webmanifest unit
+[group('ruby')]
+ruby-webmanifest-unit: (_rspec_test 'jekyll-webmanifest')
 
 # The api leaves run units first, then integrations, so a bare `just test all` reports the cheap failures
 # before it spends minutes in a test host.

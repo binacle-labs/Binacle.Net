@@ -49,8 +49,23 @@ defaults:
 
 ## 🏷️ The stamps
 
+On every versioned document:
+
 - `title_suffix` - `(v2.1.x)`, for whatever writes the page title.
 - `robots` - `noindex, follow` on every version that is not `current`.
+
+On every page whose layout is `redirect`:
+
+- `redirect_to` - the url of the current version's index, for the layout to send a reader to.
+- `canonical` - the same url, so a crawler is told the redirect and its target are one destination.
+- `robots` - `noindex`.
+
+**A redirect page's canonical points at the page it redirects to, not at itself.** That is the whole
+purpose of the page, and it is why the value cannot live in front matter: it moves when `current` moves.
+Both keys carry one computed url, so the head and the redirect can never disagree.
+
+**The current version has to have an index for a redirect to point at.** Where it does not and a redirect
+page exists, the build stops.
 
 `current` is the one knob. It names the version search engines may index; move it at release time and
 nothing else changes. A document with no `version` is left alone, and so is a site with no versioned

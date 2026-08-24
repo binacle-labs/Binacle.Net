@@ -27,10 +27,13 @@ const ASSETS = {
 //
 // www runs no framework at all - no BeerCSS, no material-dynamic-colors - so it takes the media and the
 // favicons and none of assets/lib/.
+//
+// The two android icons go to the three sites, which name them in a web app manifest. The UI module has no
+// manifest and links only favicon.ico, so they were 60 KB of nothing in the image.
 const IGNORE = {
 	docs: [],
 	demo: ['assets/lib/swagger-ui/**'],
-	uimodule: ['assets/lib/swagger-ui/**'],
+	uimodule: ['assets/lib/swagger-ui/**', 'assets/android-chrome-*.png'],
 	www: ['assets/lib/**']
 };
 

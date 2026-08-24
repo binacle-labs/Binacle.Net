@@ -5,6 +5,12 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: binacle-robots
+  specs:
+    binacle-robots (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
   remote: jekyll-breadcrumb-trail
   specs:
     jekyll-breadcrumb-trail (1.0.0)
@@ -44,6 +50,12 @@ PATH
   remote: jekyll-structured-data
   specs:
     jekyll-structured-data (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: jekyll-webmanifest
+  specs:
+    jekyll-webmanifest (1.0.0)
       jekyll (>= 4.2)
 
 GEM
@@ -139,6 +151,7 @@ PLATFORMS
 
 DEPENDENCIES
   binacle-docs-versions!
+  binacle-robots!
   jekyll-breadcrumb-trail!
   jekyll-filters!
   jekyll-gtm!
@@ -146,6 +159,7 @@ DEPENDENCIES
   jekyll-page-meta!
   jekyll-resource-tags!
   jekyll-structured-data!
+  jekyll-webmanifest!
   rspec (~> 3.0)
 
 BUNDLED WITH

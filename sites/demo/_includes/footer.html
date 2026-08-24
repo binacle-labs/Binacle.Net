@@ -24,9 +24,7 @@
     </div>
 
     <nav class="center-align wrap small-text">
-        {% assign now_year = site.time | date: "%Y" %}
-        {% assign copyright = site.data.footer.copyright | replace: "{now}", now_year %}
-        <span>{{ copyright }}</span>
+        <span>{{ site.data.footer.copyright | expand_year }}</span>
         <a href="{{ site.data.footer.license.url }}" target="{{ site.data.footer.license.target }}">
             {{ site.data.footer.license.title }}
         </a>

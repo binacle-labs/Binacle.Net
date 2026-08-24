@@ -34,7 +34,7 @@ plugins:
   then cuts to 160 characters. Pass a length to change the cut: `clean_content: 200`.
 - `capitalize_all` - capitalizes every word.
 - `expand_year` - replaces `{now}` with the year of the build. Pass your own placeholder as an argument if
-  `{now}` does not suit you.
+  `{now}` does not suit you, but keep `}` out of it - see the gotchas.
 
 Write the placeholder into your data and let the filter fill it in:
 
@@ -55,6 +55,11 @@ copyright: "(c) 2023-{now} Your Name"
 - All three return an empty string for nil, so a missing front matter key never fails a build.
 - `expand_year` reads `site.time`, so every page of one build carries the same year even if the build runs
   over midnight. Called outside Jekyll it falls back to the clock.
+- **A placeholder holding a `}` cannot be passed inside `{{ }}`.** `{{ x | expand_year: "{now}" }}` fails the
+  build with `Variable was not properly terminated` - Liquid stops the output tag at the first `}` it meets,
+  before the filter is ever reached. This is why `{now}` is the default: leave the argument off and the
+  placeholder never appears in a template. If you must name it, do it in an `assign`, where the rule
+  does not apply.
 
 ## 🧪 Tests
 

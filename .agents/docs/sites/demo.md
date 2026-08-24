@@ -37,8 +37,11 @@ just build demo   # the same site built once, into artifacts/demo
 chooser, the two navs and the JSON-LD block all key off that flag.
 
 **There is no sitemap file and no sitemaps collection.** `jekyll-multi-sitemap` generates `/sitemap.xml` from
-the `sitemaps:` block in `_config.yml`, and `pages/robots.txt` writes its `Sitemap:` line with
-`{% sitemap_links %}`.
+the `sitemaps:` block in `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and
+`{% sitemap_links %}` for its `Sitemap:` line.
+
+**Its `robots.txt` gained a `nav: exclude: true` line** on 24 Aug 2026, so the three sites' files are one
+file. Only docs reads `nav.exclude`, and only for its sidebar, so the line does nothing here.
 
 ## JS Bundles
 

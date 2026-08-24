@@ -22,6 +22,11 @@ RSpec.describe Jekyll::SiteFilters::Dates do
       expect(filter.expand_year('(c) %%YEAR%%', '%%YEAR%%')).to eq("(c) #{Time.now.year}")
     end
 
+    it 'is why the placeholder is a default: naming one with a brace fails the parse, not the filter' do
+      expect { Liquid::Template.parse('{{ s | expand_year: "{now}" }}') }.to raise_error(Liquid::SyntaxError)
+      expect { Liquid::Template.parse('{{ s | expand_year }}') }.not_to raise_error
+    end
+
     it 'handles nil input gracefully' do
       expect(filter.expand_year(nil)).to eq('')
     end

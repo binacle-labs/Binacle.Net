@@ -2,7 +2,7 @@
 id: ruby
 description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
 verified: 2026-08-24
-check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list
+check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy
 paths:
   - "ruby/**"
 ---
@@ -20,6 +20,8 @@ Jekyll plugins for the three sites — `sites/docs/`, `sites/demo/` and `sites/w
 | `jekyll-resource-tags` | Three Liquid tags: `{% link_tags %}`, `{% script_tags %}`, `{% prefetch_tags %}` | all three sites |
 | `jekyll-structured-data` | One Liquid tag: `{% structured_data %}` | all three sites |
 | `jekyll-breadcrumb-trail` | A generator that resolves `page.breadcrumb_trail`, and `{% breadcrumbs %}` | **docs only** |
+| `jekyll-webmanifest` | A generator that writes the manifest file, and `{% webmanifest_link %}` | all three sites |
+| `binacle-robots` | One Liquid tag: `{% robots %}`, the shared `robots.txt` body | all three sites |
 | `binacle-docs-versions` | A generator that stamps two version keys, and `{% vlink %}` | **docs only** |
 
 **Every gem has the same shape**: `<name>.gemspec`, one entry file at `lib/<name>.rb` that Jekyll requires by
@@ -202,6 +204,53 @@ four rather than depending on `jekyll-filters`, because no gem requires another.
 Source: `ruby/jekyll-breadcrumb-trail/lib/jekyll-breadcrumb-trail/` — `trail.rb` is the one computation,
 `nav.rb` the markup, `labels.rb` the four operations.
 
+## jekyll-webmanifest
+
+**Built and wired into all three sites on 24 Aug 2026.** No site writes a manifest page any more; each has a
+`webmanifest:` block and nothing else. **None of them uses `{% webmanifest_link %}`** - the `rel="manifest"`
+link is already an entry under `icons:` in each site's `_data/includes.yml`, and the tag would write it
+twice.
+
+**A generator, not a tag**, because every value is config, `site.title` or `site.description`, so it waits
+on nothing and owns the whole file — which is what lets a site delete its manifest page rather than shorten
+it. `$ruby/decisions#R6` is the rule and why `binacle-robots` had to go the other way.
+
+Config is `webmanifest:` and every key has a default except the two colours: `path` (`/site.webmanifest`),
+`name` (`site.title`), `description` (`site.description`), `start_url` (`/`), `display` (`standalone`) and
+`icons`. **`theme_color` and `background_color` have no default**, because a guess at someone's colour is
+worse than no key. **No `webmanifest:` block writes no file at all** rather than an empty one.
+
+**Every key the gem does not know goes into the JSON untouched**, the way `structured_data:` keys do, so a
+site adds `orientation`, `categories`, `shortcuts` or `screenshots` without the gem learning what they are.
+Only `path` and `url` are held back. **`url` is what the generator publishes back into the same block**, so
+without that hold-back a `jekyll serve` rebuild would write it into the manifest as a member.
+
+**A path something else already writes fails the build.** Both would claim one url and the winner would be
+whichever ran last, so the gem raises instead. That is what a site hits if it adds the config block before
+deleting its own manifest page.
+
+**The built path is published as `site.webmanifest.url`**, carrying the baseurl, the way
+`jekyll-multi-sitemap` publishes `site.sitemaps.urls`. `{% webmanifest_link %}` writes
+`<link rel="manifest" href="...">` from it; a site rendering its head links from a data list can ignore the
+tag and name the path itself.
+
+**The JSON comes from Ruby's JSON library**, so a quote in a name is escaped rather than breaking the file.
+**Its whitespace is `JSON.pretty_generate`'s**, which is not the whitespace of a hand-written manifest — the
+icon objects sit one key per line rather than inline. That, and only that, is what changed in the built
+manifests when the sites moved over; the keys, the values and their order are the same.
+
+**A beautifier will flatten it, and a recursive glob will not stop one.** The page is made in memory, so its
+path is the bare filename - `File.fnmatch("**/*.webmanifest", "site.webmanifest")` is false and `jekyll-tidy`
+strips the indentation and the trailing newline. All three sites exclude it as `*.webmanifest`, next to the
+`*.xml` line that is there for the generated sitemap for the same reason. **This is invisible in a gem spec**
+- a fixture site runs no beautifier, and the real build is where it showed up.
+
+**The gem names no product and its specs build a throwaway site at `https://example.com`.**
+`ruby/jekyll-webmanifest/README.md` is written for that reader and holds the config and the tag.
+
+Source: `ruby/jekyll-webmanifest/lib/jekyll-webmanifest/` — `config.rb` reads the block and holds the
+reserved keys, `manifest.rb` builds the members, `json.rb` serialises, `generator.rb` writes the page.
+
 ## The shape every gem has
 
 Settled 24 Aug 2026, when the two oldest gems were moved onto what the other four already did.
@@ -211,10 +260,36 @@ Settled 24 Aug 2026, when the two oldest gems were moved onto what the other fou
 - **Everything else under `lib/<gem-name>/`**, required from the entry file with `require_relative`. A flat
   `lib/element.rb` would sit on the shared load path where another gem's file of that name could shadow it.
 - **One module per gem, inside `Jekyll`** — `Jekyll::MultiSitemap`, `Jekyll::GTM`, `Jekyll::PageMeta`,
-  `Jekyll::ResourceTags`, `Jekyll::StructuredData`, `Jekyll::BreadcrumbTrail`, `Jekyll::SiteFilters`.
+  `Jekyll::ResourceTags`, `Jekyll::StructuredData`, `Jekyll::BreadcrumbTrail`, `Jekyll::Webmanifest`,
+  `Jekyll::SiteFilters`. The two product-named gems sit in `Binacle::` instead — `Binacle::DocsVersions`,
+  `Binacle::Robots`.
 - **`# frozen_string_literal: true` at the top of every `.rb`**, gemspecs and specs included.
 - **`ruby/.rubocop.yml` covers every gem.** It disables `Metrics`, allows any hyphenated entry filename and
   sets the line length to 120. How to run it, and what it reports, is under "Running the specs".
+
+## binacle-robots
+
+**The second gem named for the product rather than for Jekyll**, and for the same reason: what it carries
+belongs to one publisher. `{% robots %}` writes the `robots.txt` body - the content-signal preamble, the
+Article 4 rights reservation under EU directive 2019/790, and `User-Agent: *`.
+
+**It was worth a gem for what the text is, not for its size.** Three hand-kept copies of a legal statement
+drift, and the copy that drifts is the one that stops saying what was meant. Nobody would notice until they
+read all three side by side.
+
+**A tag, not a generator**, because it needs the sitemap urls and a generator could not be ordered after
+the one that produces them. `$ruby/decisions#R6`.
+
+**No config.** A body that can be configured per site is a body that can differ per site.
+
+**The text is a data file**, `lib/binacle-robots/robots.txt`, read once at load and written out unchanged.
+Nothing is substituted into it. The tag emits no trailing newline - the newline after it in the site's file
+supplies that, and `{%- robots -%}` would eat it and change the bytes.
+
+**The content signals are commented out**, and a spec pins that. Turning them on is a decision, and it would
+reach all three sites at once.
+
+Source: `ruby/binacle-robots/lib/binacle-robots/` — `body.rb` reads the file, `tag.rb` writes it.
 
 ## binacle-docs-versions
 
@@ -223,10 +298,18 @@ version scheme of `sites/docs` — the front matter key `version`, the data path
 collection folder `_versions` — all hardcoded, because a shared gem holding one site's vocabulary is the
 thing this split exists to avoid.
 
-**A generator stamps two plain keys** onto every versioned document at `:high` priority: `title_suffix`
-(`(v2.1.x)`) and, on every version that is not `current`, `robots: noindex, follow`. `jekyll-page-meta`
-writes both out and knows nothing about versions. **It never overwrites a key the page already set**, which
-is how the swagger pages keep `noindex, nofollow` from their `defaults:` scope.
+**A generator stamps plain keys** at `:high` priority. On every versioned document: `title_suffix`
+(`(v2.1.x)`) and, on every version that is not `current`, `robots: noindex, follow`. On every page whose
+layout is `redirect`: `redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all
+out and knows nothing about versions. **It never overwrites a key the page already set**, which is how the
+swagger pages keep `noindex, nofollow` from their `defaults:` scope.
+
+**The redirect stamps landed 24 Aug 2026 and closed the last head under `sites/` that composed its own.**
+`sites/docs/_layouts/redirect.html` built its title, canonical and `robots` inline, because its canonical
+points at `/version/<current>/` rather than at itself and front matter cannot hold a value that moves. The
+generator computes that url once; the layout reads `page.redirect_to` for the script, the meta refresh and
+the visible link, and `jekyll-page-meta` reads `canonical` for the head. **Stamping only the canonical would
+have left the layout computing the same url a second time** - the exact split this design exists to stop.
 
 **`versions.current` has to name a version the site has, or the build stops.** A `current` that matches
 nothing would noindex all 118 pages while the sitemap still lists them, and nothing else would say so. A
@@ -244,7 +327,7 @@ Source: `ruby/binacle-docs-versions/lib/binacle-docs-versions/` — `generator.r
 ## Running the specs
 
 Each gem has an RSpec suite under `spec/` and declares `rspec` as a development dependency in its gemspec.
-All eight pass. The counts move as the gems grow, so they are not written down here.
+All ten pass. The counts move as the gems grow, so they are not written down here.
 
 **One `Gemfile` covers every gem, at `ruby/`, and no gem has one of its own.** It names each gem with
 `gemspec path:`, which also pulls in that gemspec's development dependencies. `ruby/Gemfile.lock` is
@@ -254,7 +337,7 @@ committed, so every spec run uses the same Jekyll — 4.4.1 — rather than what
 by itself. Plain `rspec` also works and ignores the lock. `bundle exec rspec` from `ruby/` itself does not:
 each `spec/spec_helper.rb` is only on the load path when rspec runs from inside that gem.
 
-**Each gem is a test leaf**, added 24 Aug 2026 — `just test ruby-gtm-unit`, and all eight are in `just test all`
+**Each gem is a test leaf**, added 24 Aug 2026 — `just test ruby-gtm-unit`, and all ten are in `just test all`
 because they need nothing brought up. The leaf runs `bundle exec rspec` from inside the gem folder, which is the
 only place a `spec_helper` is on the load path.
 

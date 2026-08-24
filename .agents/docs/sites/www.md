@@ -46,7 +46,8 @@ processes where the other two run two.
 | `_includes/` | Header, footer, and the two conversion components |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
-`_config.yml`, and `pages/robots.txt` writes its `Sitemap:` line with `{% sitemap_links %}`.
+`_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its
+`Sitemap:` line.
 
 ### The URL map
 

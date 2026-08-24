@@ -160,27 +160,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: ["shared/**"]
 ```
 
-## Sites
-
-```yaml
-- file: sites/android-icons.md
-  description: "Two android icons are copied into all three sites and the UI module and referenced by nothing. Either a web app manifest names them, or they stop being copied."
-  state: proposed
-  waits-on: "a call - write the manifest, or drop the two files"
-- file: sites/docs-redirect-canonical.md
-  description: "sites/docs/_layouts/redirect.html is the last head on any site that writes its own metadata. It can only move onto the tag once something stamps the canonical it needs."
-  state: ready
-  waits-on: "nothing"
-- file: sites/robots-tag.md
-  description: "robots.txt is three byte-identical copies of a legal text. Replace the body with a {% robots %} tag in ruby/."
-  state: ready
-  waits-on: "nothing"
-- file: sites/ruby-plugin-tidy.md
-  description: "The three footers each replace {now} with the build year by hand. jekyll-filters now has expand_year; move the footers onto it."
-  state: ready
-  waits-on: "nothing - site session work"
-```
-
 ## Tooling
 
 ```yaml

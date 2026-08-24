@@ -1,9 +1,7 @@
-{%- assign now_year = site.time | date: "%Y" -%}
-{%- assign copyright = site.data.footer.copyright | replace: "{now}", now_year -%}
 <footer class="site-footer">
   <div class="shell">
     <p>
-        <span>{{ copyright }}</span>
+        <span>{{ site.data.footer.copyright | expand_year }}</span>
         <span aria-hidden="true">&middot;</span>
         <a href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
         {%- for link in site.data.footer.links %}

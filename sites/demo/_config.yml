@@ -130,10 +130,12 @@ plugins             :
   - jekyll-tidy
   - jekyll-gtm
   - jekyll-filters
+  - binacle-robots
   - jekyll-multi-sitemap
   - jekyll-resource-tags
   - jekyll-page-meta
   - jekyll-structured-data
+  - jekyll-webmanifest
 
 ################################################################
 # Front Matter Defaults
@@ -165,9 +167,21 @@ jekyll_tidy:
   exclude:                 # an array of files to exclude from tidying.
     - "**/*.txt"
     - "**/*.json"
+    - "*.webmanifest"
     - "*.xml"
   ignore_env    : null     # a JEKYLL_ENV string on which to skip tidying entirely.
   compress_html : false    # a flag for whether or not to compress the HTML output
+
+################################################################
+# Web app manifest
+################################################################
+webmanifest:
+  name: "Binacle.Net Demo"
+  theme_color: "#3c5d8b"
+  background_color: "#101010"
+  icons:
+    - { src: /android-chrome-192x192.png, sizes: 192x192, type: image/png }
+    - { src: /android-chrome-512x512.png, sizes: 512x512, type: image/png }
 
 ################################################################
 # jekyll-multi-sitemap

@@ -2,7 +2,7 @@
 id: sites/decisions
 description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate.
 verified: 2026-08-23
-check: S1 against the og:image and twitter:card lines in both sites/demo/_includes/seo.html and sites/docs/_includes/seo.html, which must still agree with each other; S2 against the separator in both seo.html files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against the collections block in sites/demo/_config.yml, which must contain sitemaps and nothing else
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against the collections block in sites/demo/_config.yml, which must contain sitemaps and nothing else
 paths:
   - "sites/demo/**"
   - "sites/docs/**"

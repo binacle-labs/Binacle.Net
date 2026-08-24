@@ -2,7 +2,7 @@
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
 verified: 2026-08-24
-check: W1 against the assign in _includes/footer.html; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
+check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
 paths:
   - "sites/www/**"
 ---
@@ -12,11 +12,19 @@ paths:
 **These were Liquid comments in the templates until 23 Aug 2026.** They are here because a comment in a
 published site is a comment in a public repository.
 
-## W1 - the `{now}` replace has to be an assign
+## W1 - `expand_year` is called with no argument, and that is the whole point
 
-`_includes/footer.html` does its `replace` in an `assign` tag, never inside the output tag. **Liquid's
-variable parser trips over the closing brace of the `{now}` placeholder when it sits inside `{{ }}`.** It
-fails at build, not at render, and the message does not name the placeholder.
+`_includes/footer.html` was `{% assign %}` plus a `replace` until 24 Aug 2026, because **Liquid's variable
+parser stops an output tag at the first `}` it meets**, and `{now}` has one. `{{ x | replace: "{now}", y }}`
+fails the build with `Variable was not properly terminated`, at parse, with a message that does not name the
+placeholder.
+
+**The trap did not go away with the assign.** `expand_year` takes the placeholder as an optional argument,
+and `{{ x | expand_year: "{now}" }}` fails exactly the same way. `{now}` is the filter's default so that the
+placeholder never has to be written in a template at all - which is what lets the footer be one output tag.
+
+**Leave the argument off.** If a site ever needs a different placeholder, either give it one with no brace
+in it or set it in an `assign`, where the rule does not apply.
 
 ## W2 - the theme read is a separate bundle, loaded blocking in `<head>`
 

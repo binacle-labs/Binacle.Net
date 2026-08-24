@@ -45,6 +45,14 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   paths: ["lib/**"]
 ```
 
+## Ruby
+
+```yaml
+- file: ruby/decisions.md
+  description: "Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator."
+  paths: ["ruby/**"]
+```
+
 ## Sites
 
 ```yaml
@@ -57,6 +65,9 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: sites/docs-and-demo.md
   description: "Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget."
   paths: ["sites/demo/**", "sites/docs/**"]
+- file: sites/webmanifest.md
+  description: "Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither."
+  paths: ["sites/**", "gulpfile.js"]
 - file: sites/www.md
   description: "Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing."
   paths: ["sites/www/**"]

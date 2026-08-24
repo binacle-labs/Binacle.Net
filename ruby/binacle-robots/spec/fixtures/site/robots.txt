@@ -1,0 +1,8 @@
+---
+permalink: /robots.txt
+layout: null
+---
+
+{% robots %}
+
+Sitemap: https://example.com/sitemap.xml

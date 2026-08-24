@@ -9,6 +9,7 @@ Jekyll.logger.log_level = :error
 
 FIXTURE_SITE = File.expand_path('fixtures/site', __dir__).freeze
 BROKEN_SITE = File.expand_path('fixtures/broken', __dir__).freeze
+NO_INDEX_SITE = File.expand_path('fixtures/no-index', __dir__).freeze
 TMP_ROOT = Dir.mktmpdir('binacle-docs-versions').freeze
 
 at_exit { FileUtils.rm_rf(TMP_ROOT) }

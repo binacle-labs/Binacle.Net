@@ -78,6 +78,26 @@ The organisation lives in one config block with a pinned `@id`, written identica
 is what makes three hosts one publisher. A page names its node with `structured_data: type:` in front matter.
 All three sites load it. `jekyll-structured-data/README.md` has the config and the front matter.
 
+### 📱 `jekyll-webmanifest`
+
+Writes a site's web app manifest - the JSON file a browser reads to install the site to a home screen - from
+one config block, so the site keeps no `site.webmanifest` page of its own. Every key it does not know is
+written into the JSON untouched, so a site can add `orientation` or `shortcuts` without the gem learning what
+they are.
+
+The built path is readable as `site.webmanifest.url`, and `{% webmanifest_link %}` writes the head element
+from it. `jekyll-webmanifest/README.md` has the config and the tag.
+
+### 🤖 `binacle-robots`
+
+The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal
+preamble, the Article 4 rights reservation and `User-Agent: *`; the `Sitemap:` lines come from
+`{% sitemap_links %}` on the next line. There is no config - a body that can be configured per site is a
+body that can differ per site.
+
+Like `binacle-docs-versions`, the name says it is not portable. `binacle-robots/README.md` has the file
+shape and the traps.
+
 ### 📚 `binacle-docs-versions`
 
 The one gem here written for a single site. It carries the version scheme of `sites/docs` - a generator
@@ -104,7 +124,7 @@ cd ruby/jekyll-multi-sitemap && bundle exec rspec
 From the repo root each gem is a test leaf, so `just test ruby-gtm-unit` runs one and `just test all` runs
 them with everything else. They carry no coverage - simplecov is not in the bundle.
 
-For style there is `.rubocop.yml`, covering all eight gems. Rubocop is not in the bundle either, so install it
+For style there is `.rubocop.yml`, covering all ten gems. Rubocop is not in the bundle either, so install it
 once with `gem install rubocop` and run it from here:
 
 ```bash

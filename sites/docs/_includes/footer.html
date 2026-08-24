@@ -1,13 +1,10 @@
 <footer class="responsive max secondary-container">
     <div class="grid center-align">
         <div class="s6">
-            {% assign now_year = site.time | date: "%Y" %}
-            {% assign copyright = site.data.footer.copyright | replace: "{now}", now_year %}
-            {{ copyright }}
+            {{ site.data.footer.copyright | expand_year }}
         </div>
         <div class="s6">
-            {% assign license = site.data.footer.license | replace: "{now}", now_year %}
-            {{ license }}
+            {{ site.data.footer.license | expand_year }}
         </div>
     </div>
 </footer>

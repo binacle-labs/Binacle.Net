@@ -109,7 +109,8 @@ Everything below reads `current`; nothing names a version.
 - Swagger pages are `noindex, nofollow` in every version, current included. A `**/swagger/**` defaults block
   in `_config.yml` sets that `robots` value in page data, where the stamp leaves it alone, and keeps them out
   of the sitemap. A submitted `noindex` URL is a Search Console error.
-- `robots.txt` writes its `Sitemap:` line with `{% sitemap_links %}`, which emits the index alone, so no
+- `robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for the `Sitemap:` line, which
+  emits the index alone, so no
   version-agnostic edit is needed there either.
 
 **Why per-minor, not per-major.** A folder answers "what does my image do", and the API set is what changes:
@@ -172,6 +173,12 @@ page, versioned or not. The two thirty-line includes and the branch that chose b
 starting at its own version; **drop it and every breadcrumb on the site silently gains two crumbs.**
 A page still turns its trail off with `breadcrumbs: false`, which now works everywhere rather than only on
 versioned pages.
+
+**The redirect layout is on `{% page_meta %}` like every other head**, since 24 Aug 2026.
+`_layouts/redirect.html` reads `page.redirect_to`, which `binacle-docs-versions` stamps from
+`versions.current`, for the script, the meta refresh and the visible link; the canonical comes from the same
+stamp. **Moving `versions.current` moves where `/version/latest/` goes and what it declares canonical**, and
+nothing in the layout needs editing.
 
 **vlink** (`{% vlink path %}`) — resolves a relative path to the correct versioned URL based on the
 current page's `version` front matter. Use it instead of plain links inside `_versions/` pages

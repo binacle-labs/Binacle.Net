@@ -1,0 +1,4 @@
+---
+layout: redirect
+title: Latest
+---
