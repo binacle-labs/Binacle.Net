@@ -167,14 +167,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Two android icons are copied into all three sites and the UI module and referenced by nothing. Either a web app manifest names them, or they stop being copied."
   state: proposed
   waits-on: "a call - write the manifest, or drop the two files"
-- file: sites/breadcrumb-trail-gem.md
-  description: "Build ruby/jekyll-breadcrumb-trail - a generator that computes a page's trail once, and a tag that renders it as standard accessible breadcrumb markup. The gem only."
-  state: ready
-  waits-on: "nothing"
-- file: sites/breadcrumb-trail-wiring.md
-  description: "Move the documentation site onto the breadcrumb trail gem - two thirty-line includes and a layout branch out, one tag and one config block in, plus the stylesheet rule the list markup needs."
-  state: blocked
-  waits-on: "the gem existing at ruby/jekyll-breadcrumb-trail with a passing spec suite"
 - file: sites/docs-redirect-canonical.md
   description: "sites/docs/_layouts/redirect.html is the last head on any site that writes its own metadata. It can only move onto the tag once something stamps the canonical it needs."
   state: ready
@@ -197,4 +189,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing"
   paths: ["tooling/**"]
+- file: tooling/typescript-linting.md
+  description: "No linter exists for any TypeScript or JavaScript in the repository - decide whether one lands, and what it gates"
+  state: idea
+  waits-on: "a yes or a no, and it is not urgent - nothing is broken by the gap"
+  paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**"]
 ```

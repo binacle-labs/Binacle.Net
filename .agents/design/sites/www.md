@@ -1,8 +1,8 @@
 ---
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
-verified: 2026-08-23
-check: W1 against the assign in _includes/footer.html; W2 against the inline script in _includes/theme-init.html being in head and unwrapped; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
+verified: 2026-08-24
+check: W1 against the assign in _includes/footer.html; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
 paths:
   - "sites/www/**"
 ---
@@ -18,17 +18,28 @@ published site is a comment in a public repository.
 variable parser trips over the closing brace of the `{now}` placeholder when it sits inside `{{ }}`.** It
 fails at build, not at render, and the message does not name the placeholder.
 
-## W2 - the theme script is inline, in `<head>`, and stays both
+## W2 - the theme read is a separate bundle, loaded blocking in `<head>`
 
-`_includes/theme-init.html` runs before first paint. **An external file cannot do this** - it loads after the
-first paint, so a reader who chose light gets a dark flash on every navigation.
+`js/theme-init.js` runs before first paint. **A deferred or module script cannot do this** - it runs after
+the first paint, so a reader who chose light gets a dark flash on every navigation. It is `<script src>`
+with no `defer` and no `async` on purpose.
 
-`try`/`catch` is not defensive habit: **`localStorage` throws outright in a private window and in some
-embedded browsers.** When it throws, or when nothing is stored, no attribute is set and the stylesheet's
-`prefers-color-scheme` query decides - which is the toggle defaulting to system preference.
-`data-default-theme` on `<html>` is the last resort, for a browser reporting no preference at all.
+**It cannot touch `document.body`** - the parser has not reached it - which is why the theme is `data-theme`
+on `<html>` and not a class on `<body>`, on this site and on the other three.
 
-**Keep it small.** Anything longer belongs in `_js/main.ts`, which loads deferred.
+**It is a second webpack config, not a second entry.** The main config splits every entry into a runtime
+chunk and a vendors chunk, and a head script has to be one self-contained file. Both write into `js/`, so
+the main config's `clean` keeps `theme-init.js` - without that the two race and the file is deleted after
+it is written.
+
+It overrides ts-loader to `module: 'esnext'` for this bundle alone - the tsconfigs emit commonjs, which
+webpack can neither tree-shake nor concatenate. Without that the bundle is twice the size and the package
+needs a second entry point to keep the switcher element out of it. **1.21 KiB minified, 587 gzipped.**
+What is in it and why is `$packages`.
+
+**Nothing stored, and the stylesheet's `prefers-color-scheme` query decides** - which is the toggle
+defaulting to the machine. `data-default-theme` on `<html>` is the last resort, for a browser reporting no
+preference at all.
 
 ## W3 - the stylesheet is built by the sass CLI, not by Jekyll
 

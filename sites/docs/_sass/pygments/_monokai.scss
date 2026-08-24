@@ -1,5 +1,8 @@
+@use '../theme-modes' as *;
+
 :root,
-body.light {
+body.light,
+body.dark {
   --hl-bg: #f8f8f2;
   --hl-fg: #333333;
   --hl-comment: #75715e;
@@ -18,7 +21,7 @@ body.light {
   --hl-emph: italic;
 }
 
-body.dark {
+@include when-dark {
   --hl-bg: #272822;
   --hl-fg: #f8f8f2;
   --hl-comment: #75715e;

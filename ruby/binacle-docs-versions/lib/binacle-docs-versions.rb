@@ -2,6 +2,7 @@
 
 require 'jekyll'
 
+require_relative 'binacle-docs-versions/error'
 require_relative 'binacle-docs-versions/generator'
 require_relative 'binacle-docs-versions/vlink_tag'
 

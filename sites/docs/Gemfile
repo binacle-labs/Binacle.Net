@@ -29,6 +29,7 @@ group :jekyll_plugins do
   gem "jekyll-resource-tags", path: "../../ruby/jekyll-resource-tags"
   gem "jekyll-page-meta", path: "../../ruby/jekyll-page-meta"
   gem "jekyll-structured-data", path: "../../ruby/jekyll-structured-data"
+  gem "jekyll-breadcrumb-trail", path: "../../ruby/jekyll-breadcrumb-trail"
   gem "binacle-docs-versions", path: "../../ruby/binacle-docs-versions"
 end
 

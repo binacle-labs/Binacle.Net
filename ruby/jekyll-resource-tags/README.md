@@ -22,7 +22,8 @@ Hand `prefetch_tags` the script list you later execute, and the two can never dr
 
 ## 🚀 Quick start
 
-Both lines are needed. Miss the second and nothing fails - Jekyll prints the tag name as text.
+Both lines are needed. Miss the second and the build fails: Liquid raises `Unknown tag 'link_tags'` on the
+first page that uses one.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins

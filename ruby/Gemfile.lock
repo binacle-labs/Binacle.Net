@@ -5,6 +5,12 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: jekyll-breadcrumb-trail
+  specs:
+    jekyll-breadcrumb-trail (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
   remote: jekyll-filters
   specs:
     jekyll-filters (1.0.0)
@@ -133,6 +139,7 @@ PLATFORMS
 
 DEPENDENCIES
   binacle-docs-versions!
+  jekyll-breadcrumb-trail!
   jekyll-filters!
   jekyll-gtm!
   jekyll-multi-sitemap!

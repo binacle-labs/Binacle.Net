@@ -3,3 +3,7 @@ api_url                 : "https://api.binacle.net"
 # The same container the other two sites carry. "Arrived at www, clicked through to the demo" is only
 # answerable while all three are on one.
 gtm                     : 'GTM-W5S5LWMV'
+
+# Shared across www, demo, docs and api, so a theme chosen on one is the theme on all. Absent from
+# _config.yml on purpose: a local build is not on this domain and the browser would drop the cookie.
+cookie_domain           : ".binacle.net"

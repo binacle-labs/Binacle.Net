@@ -16,8 +16,14 @@ Every include, layout, sitemap template, `robots.txt` and `_config.yml` in `site
 `sites/docs`, read on 24 Aug 2026.
 
 **The scope is what a gem can carry unchanged into an unrelated Jekyll site.** A gem qualifies only if
-someone can drop it in, write a config block, and have it work. **No product name appears in gem code, in a
-spec or in a README.** Specs build a throwaway site at `https://example.com`.
+someone can drop it in, write a config block, and have it work. **Nothing in a portable gem refers to this
+product - not in code, not in a spec, not in a README.** Specs build a throwaway site at
+`https://example.com`.
+
+**The name is the smaller half of that.** Fixture copy naming what the product does is the same leak
+wearing different words: a page meta fixture described bin packing and a structured data fixture was called
+"Packing Demo", and `grep -i binacle` was clean through all of it. A gem that carries the product in its own
+name - `binacle-docs-versions` - is exempt, because it says so on the tin and no other site will load it.
 
 ## The design every gem follows
 
@@ -30,6 +36,8 @@ plain key. **No gem requires another, and no gem guards on another's constant be
 |---|---|---|
 | `jekyll-breadcrumb-trail` | `page.breadcrumb_trail` | its own tag, and `jekyll-structured-data` |
 | `jekyll-page-meta` | `page.meta.title` `page.meta.description` `page.meta.canonical` `page.meta.image` | its own tag, and `jekyll-structured-data` |
+| `binacle-docs-versions` | `page.title_suffix` | `jekyll-page-meta`'s resolver, into the title |
+| `binacle-docs-versions`, or the page | `page.robots` | `jekyll-page-meta`'s tag, and `jekyll-structured-data` |
 
 `page.meta` is free - nothing on any of the three sites uses it.
 
@@ -37,10 +45,11 @@ plain key. **No gem requires another, and no gem guards on another's constant be
 are free to disagree, and the failure is invisible - the page stays right while the markup quietly stops
 matching it. One computation is the only fix that holds.
 
-**What this costs, and it is silent when wrong.** Generator order is now load-bearing. Anything that stamps
-a key a resolver then reads - a version suffix, for instance - must run **before** that resolver. Stamping
-generators run at a high priority, resolvers at a low one, and each gem's README says which it is. Get it
-backwards and nothing errors; the value is simply missing from the resolved key.
+**What this costs, and it is silent when wrong.** Generator order is load-bearing for a key one generator
+stamps and another generator resolves. `title_suffix` is the only one: stamped at `priority :high`,
+resolved into the title at `:low`. Get it backwards and nothing errors - 118 titles quietly lose their
+version. **`robots` and `breadcrumb_trail` are read at render time and survive any order**; only a key read
+inside another generator is at risk.
 
 **The contract can rot.** Rename a key in one gem and the other stops finding it, with no error. It is
 written down in both READMEs and asserted in both spec suites.
@@ -78,45 +87,49 @@ Nothing left. See `docs/ruby/README.md`. Two decisions moved while it was built:
 `structured_data: type:` rather than `schema:`, because a key is named after what it produces and `seo:`
 produces nothing; and docs sets `default_type: WebPage`, without which its 118 pages get no node at all.
 
-### `jekyll-breadcrumb-trail` [docs]
+### `jekyll-breadcrumb-trail` [docs] - **built and wired, 24 Aug 2026**
 
-**Replaces** `docs/_includes/breadcrumbs.html` and `docs/_includes/versions/breadcrumbs.html` - the same
-thirty lines of nested path-splitting Liquid, twice - and the branch in `docs/_includes/header.html` that
-chooses between them.
+Nothing left. See `docs/ruby/README.md`. `sites/docs` renders one `{% breadcrumbs %}` in its header and both
+thirty-line includes are gone. **111 of its 118 trails came out byte-identical**, and the seven that moved
+are the ones named below. The stylesheet cost one declaration block, not the handful expected - beercss
+already lays out `nav > ol > li`, so only the separator was ours. `$sites/docs-and-demo-design#D6`.
 
-A generator writes `page.breadcrumb_trail`; the tag renders the nav from it.
+**The config keys are not the ones sketched here first. They are the ones the wider ecosystem already
+uses**, which is this file's own naming rule applied to a survey of what exists:
 
-```yaml
-breadcrumbs:
-  hide: ["version", "*.*"]     # glob patterns. Default: hide nothing
-  home_label: Home
-  nav_class: tiny-space
-  separator: "<span>/</span>"
-  home_html: '<i class="small">home</i>'
-  link_last: false
-```
+| Sketched | Built | Where the name comes from |
+|---|---|---|
+| `hide` | `exclude` | Jekyll's own word - site `exclude:`, `sitemap: exclude:`, `nav_exclude` |
+| `label_from` | `title_from`, defaulting to `[crumbtitle, title]` | `crumbtitle` is what the published `jekyll-breadcrumbs` reads |
+| `home_label`, `home_html` | `home.title`, `home.html` | nesting matches `page_meta`'s `description.from` |
+| `nav_class` | `class` | it is one extra class; the list and item classes are always written |
+| `separator` | **gone** | the standard markup draws the separator in CSS, not in the list |
+| - | `label` | the nav's `aria-label`, so a site in another language can set it |
 
-**The gem ships no hide list.** A default naming `version` is one site's vocabulary. **Leaving the block
-out is silent** - every docs breadcrumb simply gains two crumbs.
+The markup is the ARIA authoring practices pattern with Bootstrap's class names - `<nav aria-label>`,
+`<ol class="breadcrumb">`, `<li class="breadcrumb-item">`, `active` and `aria-current="page"` on the current
+page. Inert where nobody styles them, and a working trail where Bootstrap is already loaded.
 
-**The markup strings are config with today's values as defaults.** The framework classes belong to the
-site, not to a gem.
+The tag is `{% breadcrumbs %}`. `breadcrumb_trail` is the key; it is not what a template author types.
 
-**The home crumb points at the deepest hidden prefix.** On a versioned docs page with
-`["version", "*.*"]` hidden that is `/version/v3.0.x/`, which is what the versioned include resolves to
-today. **Hidden segments stay in every URL**, so the trail a crawler follows is real.
+**One thing the survey got wrong and the gem does not.** The label transform is four operations, and three
+of them lived in the include, not in `capitalize_all`: hyphens to spaces, `.html` off, then the filter.
+The order is load-bearing - `capitalize` touches only the first letter, so `getting-started` humanized
+before the hyphens go is `Getting-started`. "Match `capitalize_all` exactly" would have shifted every label
+on the site. The gem carries its own copy of all four, pinned by spec.
 
-**Three visible changes, all deliberate:** the four version index pages gain a crumb; `docs/pages/404.html`
-finally gets its `breadcrumbs: false` honoured, which only the versioned copy ever did; and seven swagger
-pages stop appending a slash to a `.html` file - invisible today, a 404 the moment it goes into markup.
+**Seven pages changed and every one of them was on the list.** The four version index pages gained their
+crumb; `404.html` and the documentation home page render no trail at all; `/version/latest/` lost a crumb
+and its home moved into `/version/`. The seven swagger pages changed nothing, because their layout includes
+no header - the list had claimed them as a visible fix and they never were one.
 
-**`capitalize_all` must produce the same strings as the filter of that name**, or every label on the site
-shifts at once.
+**The `BreadcrumbList` that had no writer now has one.** `jekyll-structured-data` has read
+`page.breadcrumb_trail` since it shipped and found nothing there; 34 indexable pages now carry the node.
 
 ### One filter, no new gem [www, demo, docs]
 
-Three footers do the same two lines: read `site.data.footer.copyright`, replace `{now}` with the build
-year. It is a filter, and `ruby/jekyll-filters` already exists. `{{ ... | expand_year }}`. No `Gemfile`
+Four call sites do the same two lines: read a string from `site.data.footer`, replace `{now}` with the
+build year. `sites/docs/_includes/footer.html` does it twice - once for the copyright, once for the licence. It is a filter, and `ruby/jekyll-filters` already exists. `{{ ... | expand_year }}`. No `Gemfile`
 line, no `plugins:` line.
 
 ## Not in pass 1
@@ -163,13 +176,12 @@ All are in `plans/sites/`. **Where one contradicts this file, this file is the d
 into them; the one question it carried that no gem answers - the two android icons nothing references - is
 `plans/sites/android-icons.md`.
 
-**The page meta and structured data work is three files** - `plans/sites/page-meta-gem.md` and
-`plans/sites/structured-data-gem.md` build the two gems, and `plans/sites/page-meta-wiring.md` moves the
-sites onto both **in one change**, because deleting a site's `seo.html` deletes the JSON-LD living inside
-it. `seo-tag-gem.md` was folded into all three and deleted.
+**The page meta and structured data gems landed on 24 Aug 2026 and all three of their plans are deleted** -
+the two that built the gems, and the one that moved the sites onto both in a single change, because deleting
+a site's `seo.html` deletes the JSON-LD living inside it. `seo-tag-gem.md` was folded into them first.
 
-**The breadcrumb work is `plans/sites/breadcrumb-trail-gem.md` and `plans/sites/breadcrumb-trail-wiring.md`.**
-`breadcrumbs-tag.md` was folded into them and deleted.
+**The breadcrumb gem landed on 24 Aug 2026 and `breadcrumb-trail-gem.md` is deleted.**
+`plans/sites/breadcrumb-trail-wiring.md` is the site session that is left, and it is no longer blocked.
 
 **Every wiring plan is site-session work.** The standing rule keeps `sites/` out of an ordinary coding
 session, and its answer is a written plan carried out by the session that owns that content.
@@ -182,19 +194,22 @@ and how it is configured is in `docs/ruby/README.md` and the gem's own README.
 | Plan | What is still worth reading | What it gets wrong |
 |---|---|---|
 | `robots-tag.md` | what the body is and why it must not be reworded | nothing. It is simply not pass 1 |
-| `docs-version-rules.md` | the rules, and the swagger and redirect `robots` values that must move into page data | its generator runs at a low priority. Under this design a stamping generator runs high, or the suffix never reaches the resolved title |
+| `docs-redirect-canonical.md` | the one head left that writes its own metadata | nothing. It waits on something stamping a canonical |
 | `ruby-plugin-tidy.md` | all of it | nothing. Untouched by this |
 
 ## Done when
 
-- [ ] Every pass 1 gem exists in `ruby/` with a gemspec, a `README.md`, a `Gemfile` and a passing spec suite.
-      `ls ruby/*/[a-z]*.gemspec` lists one per gem, and `rspec` passes in each
-- [ ] No gem names the product, in code, spec or README.
-      `grep -rni "binacle" ruby/jekyll-multi-sitemap ruby/jekyll-resource-tags ruby/jekyll-page-meta ruby/jekyll-structured-data ruby/jekyll-breadcrumb-trail` finds nothing
-- [ ] No site holds a copy the gems replaced.
+- [x] Every pass 1 gem exists in `ruby/` with a gemspec, a `README.md` and a passing spec suite, and a
+      `gemspec path:` line in the one shared `ruby/Gemfile`.
+      `ls ruby/*/[a-z]*.gemspec` lists one per gem, and `bundle exec rspec` passes in each
+- [x] No portable gem refers to the product, in code, spec or README.
+      `grep -rniE "binacle|vipaq|packing|pallet|truck|bins?|boxes?" ruby/jekyll-*` finds nothing.
+      **The name is the easy half** - grep the subject matter too, and read the fixture copy by eye. A gem
+      named after the product is exempt; that is what the name is for
+- [x] No site holds a copy the gems replaced.
       `ls sites/*/_includes/seo.html sites/*/_includes/links.html sites/*/_includes/scripts.html` finds nothing;
       `grep -rn "page_last_mod\|entry_last_mod\|split: '/'" sites/` finds nothing
-- [ ] A value read by two gems is computed by one.
+- [x] A value read by two gems is computed by one.
       **By eye.** Find the one place each key in the contract table is written. A second writer is a bug
 - [ ] The `Sitemap:` lines are still in all three built `robots.txt`.
       `grep -c "^Sitemap:" artifacts/*/robots.txt`

@@ -1,0 +1,8 @@
+title: Example
+url: https://example.com
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: page

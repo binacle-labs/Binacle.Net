@@ -23,7 +23,7 @@ logo:
   alt                  : "Binacle.Net Logo"
 
 default_theme: "dark"
-
+theme_storage: "cookie"
 ################################################################
 # Where things are
 ################################################################
@@ -139,6 +139,7 @@ plugins             :
   - jekyll-resource-tags
   - jekyll-page-meta
   - jekyll-structured-data
+  - jekyll-breadcrumb-trail
   - binacle-docs-versions
 
 ################################################################
@@ -276,6 +277,16 @@ sitemaps:
 ################################################################
 page_meta:
   title_separator: " - "
+
+################################################################
+# jekyll-breadcrumb-trail
+################################################################
+breadcrumbs:
+  exclude: ["version", "*.*"]
+  class: tiny-space
+  title_from: [menu_title, title]
+  home:
+    html: '<i class="small">home</i>'
 
 ################################################################
 # jekyll-structured-data

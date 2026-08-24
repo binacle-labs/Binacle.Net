@@ -51,6 +51,7 @@ all:
     test_leaf packages-cookies-unit
     test_leaf packages-theme-switcher-unit
     test_leaf ruby-docs-versions-unit
+    test_leaf ruby-breadcrumb-trail-unit
     test_leaf ruby-filters-unit
     test_leaf ruby-gtm-unit
     test_leaf ruby-multi-sitemap-unit
@@ -107,6 +108,10 @@ packages-theme-switcher-unit: (_jest_test 'theme-switcher')
 # binacle-docs-versions unit
 [group('ruby')]
 ruby-docs-versions-unit: (_rspec_test 'binacle-docs-versions')
+
+# jekyll-breadcrumb-trail unit
+[group('ruby')]
+ruby-breadcrumb-trail-unit: (_rspec_test 'jekyll-breadcrumb-trail')
 
 # jekyll-filters unit
 [group('ruby')]

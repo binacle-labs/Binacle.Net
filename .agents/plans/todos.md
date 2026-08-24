@@ -42,6 +42,20 @@ has to stay. These two are the exceptions.
 - **Rubocop has never been run.** `ruby/.rubocop.yml` exists, rubocop is not in `ruby/Gemfile` and no recipe
   calls it. It lands red before it lands green, which is why it is not wired to anything yet.
 
+## Theme
+
+**The theme switcher landed on 24 Aug 2026 and nobody has looked at it in a browser.** Every check a
+command can settle was run. These four cannot be:
+
+- **No host flashes the wrong theme.** Choose light, reload all four with a warm cache. No dark frame.
+- **Every host follows the machine with JavaScript off.** Turn it off, flip the machine light to dark,
+  reload each host.
+- **The switcher works from a keyboard and announces itself.** Tab, Enter, Space, then a screen reader.
+  **Nothing could reach it from a keyboard before this change**, so there is no earlier behaviour to
+  compare against.
+- **The switcher sits right in each header.** It renders a button inside a `display: contents` wrapper
+  now, and the host's classes moved from the element to that button.
+
 ## ServiceModule
 
 - `api/src/Binacle.Net.ServiceModule/Services/ApiUsageRateLimitingPolicy.cs:34`

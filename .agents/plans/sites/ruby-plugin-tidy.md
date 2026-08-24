@@ -6,14 +6,14 @@ waits-on: "nothing - site session work"
 
 # The three footers use the year filter
 
-Three copies of the same two lines, one per site's footer: read `site.data.footer.copyright`, replace `{now}`
-with `site.time | date: "%Y"`.
+Every footer assigns `now_year` from `site.time` and replaces `{now}` with it by hand. Three footers, four
+replaces - `sites/docs/_includes/footer.html` does it twice, once for `copyright` and again for `license`.
 
 **The filter exists.** `ruby/jekyll-filters` gained `expand_year` on 24 Aug 2026, with a spec. **No new gem
 and no new line in any `Gemfile` or `plugins:` list** - all three sites already load `jekyll-filters`.
 
-What is left is the site half: drop the two `{% assign %}` lines from each footer and pipe the value through
-the filter instead.
+What is left is the site half: drop the `now_year` assign and the replace, and pipe the value through the
+filter instead.
 
 ```liquid
 {{ site.data.footer.copyright | expand_year }}
@@ -21,9 +21,8 @@ the filter instead.
 
 ## What will bite
 
-**docs uses the placeholder twice.** `site.data.footer.license` carries `{now}` as well as `copyright`, and
-today one `now_year` assign feeds both. Both lines need the filter, or the licence line ships the placeholder
-as text.
+**One `now_year` assign feeds both docs lines.** Convert `copyright` alone and the licence line loses the
+value it was reading, so it ships `{now}` as text.
 
 **The filter reads `site.time`**, which is what the footers read today. The built strings do not change.
 

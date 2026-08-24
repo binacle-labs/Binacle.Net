@@ -13,12 +13,13 @@ Jekyll plugins for the three sites — `sites/docs/`, `sites/demo/` and `sites/w
 
 | Gem | What it adds | Loaded by |
 |---|---|---|
-| `jekyll-filters` | Three Liquid filters: `clean_content`, `capitalize_all`, `expand_year` | all three sites |
+| `jekyll-filters` | Three Liquid filters: `clean_content`, `capitalize_all`, `expand_year` | all three, used by docs |
 | `jekyll-gtm` | Two Liquid tags: `{% gtm_head %}`, `{% gtm_body %}` | all three sites |
 | `jekyll-multi-sitemap` | A generator that writes the sitemap files, and three tags | all three sites |
 | `jekyll-page-meta` | A generator that resolves four page keys, and `{% page_meta %}` | all three sites |
 | `jekyll-resource-tags` | Three Liquid tags: `{% link_tags %}`, `{% script_tags %}`, `{% prefetch_tags %}` | all three sites |
 | `jekyll-structured-data` | One Liquid tag: `{% structured_data %}` | all three sites |
+| `jekyll-breadcrumb-trail` | A generator that resolves `page.breadcrumb_trail`, and `{% breadcrumbs %}` | **docs only** |
 | `binacle-docs-versions` | A generator that stamps two version keys, and `{% vlink %}` | **docs only** |
 
 **Every gem has the same shape**: `<name>.gemspec`, one entry file at `lib/<name>.rb` that Jekyll requires by
@@ -31,11 +32,16 @@ half stops the plugin loading.
 
 ## jekyll-filters
 
-**`clean_content(input, length = 160)`** — strips HTML tags, collapses newlines and runs of spaces, trims,
-truncates to `length`, then trims again so a cut landing on a space leaves none. Used to generate meta description strings from page content.
+**All three sites load it, and one filter of the three has a caller.** `sites/docs` pipes `capitalize_all`
+through its two breadcrumb includes. Nothing calls the other two.
 
-**`capitalize_all(input)`** — capitalises every space-separated word. It lowercases the rest of each word,
-so `API` becomes `Api`.
+**`clean_content(input, length = 160)`** — strips HTML tags, collapses newlines and runs of spaces, trims,
+truncates to `length`, then trims again so a cut landing on a space leaves none. **No site calls it.**
+`jekyll-page-meta` builds its own description in `text.rb`, which took the job when the seo includes went.
+
+**`capitalize_all(input)`** — capitalises every whitespace-separated word. It lowercases the rest of each
+word, so `API` becomes `Api`, and `String#capitalize` reaches only the first letter, so `getting-started`
+becomes `Getting-started`. Runs of whitespace collapse to one space and the ends are trimmed.
 
 **`expand_year(input, placeholder = "{now}")`** — replaces the placeholder with the year of `site.time`.
 Added 24 Aug 2026. **No site calls it yet** - all three footers still do the replace with
@@ -92,8 +98,10 @@ Source: `ruby/jekyll-multi-sitemap/lib/jekyll-multi-sitemap/`.
 `{% page_meta %}` tag writes the head elements from those keys and resolves nothing itself. **A value two
 plugins need is computed once**, which is why the resolver is a generator rather than logic in the tag.
 
-**It runs at `:low` priority**, so a plugin stamping `title_suffix` or `robots` must run higher. Stamp after
-the resolver and the suffix is silently missing from the title.
+**It runs at `:low` priority, and `title_suffix` is the only key that makes order matter.** The resolver
+reads it, so a plugin stamping it must run higher; stamp after the resolver and the suffix is silently
+missing from the title. `robots` is read at render, by `head.rb` here and by `graph.rb` in
+`jekyll-structured-data`, so no generator order can lose it.
 
 Config is `page_meta:` and every key has a default: `title_separator`, `description.from`,
 `description.truncate`, `twitter_card`, `twitter_site`. The description chain is
@@ -156,6 +164,44 @@ out of the block.
 Source: `ruby/jekyll-structured-data/lib/jekyll-structured-data/` — `graph.rb` assembles the nodes,
 `config.rb` holds the organisation, `json.rb` serialises and escapes.
 
+## jekyll-breadcrumb-trail
+
+**Built and wired into `sites/docs` on 24 Aug 2026.** The other two sites are flat, have no trail to draw,
+and load neither the gem nor the tag. 111 of the site's 118 trails came out byte-identical; the seven that
+moved are in `$sites/docs-and-demo-design#D6` and the site's own doc.
+
+**A generator and a tag.** The generator resolves `page.breadcrumb_trail`, a list of `name` and `url` with
+the first crumb first; `{% breadcrumbs %}` renders the nav from it and works nothing out. `name` and `url`
+are schema.org `ListItem` words, and `jekyll-structured-data` has read that key since it shipped — its
+breadcrumb branch has been dead the whole time for want of a writer.
+
+**The config keys are the ones the ecosystem already uses, not the ones the design file sketched.**
+`exclude` is Jekyll's own word for leaving things out. `title_from` defaults to `[crumbtitle, title]`, and
+`crumbtitle` is what the published `jekyll-breadcrumbs` reads, so a site moving off it works unchanged.
+There is no `separator`: the standard markup draws it in CSS.
+
+**The markup is the ARIA authoring practices pattern with Bootstrap's class names** — a nav landmark with
+`aria-label`, an ordered list, `breadcrumb-item`, and `active` plus `aria-current="page"` on the current
+page. The class names are inert where nobody styles them and correct where Bootstrap is already loaded.
+
+**`exclude` suppresses a label, never a url.** The segment keeps its place in every crumb below it, so the
+trail a crawler follows is real. **The home crumb is the deepest excluded segment above the current page**,
+not the site root, which is what keeps a versioned trail inside its own version. **The current page is
+never excluded**, whatever it matches.
+
+**It runs at `priority :low`, not `:high`.** It resolves a title, so anything stamping one has to have run;
+nothing needs to run after it because its key is read at render time. A fixture generator at `:high` stamps
+a `crumbtitle` and a spec asserts the trail picks it up, so the order is pinned rather than assumed.
+
+**The label transform is four operations and the order is load-bearing.** Hyphens to spaces, `.html` off,
+then capitalize each word. Three of them lived in the site's include rather than in `capitalize_all`, and
+`String#capitalize` touches only the first letter — matching the filter alone would have turned
+`getting-started` into `Getting-started` on every label on the site. The gem carries its own copy of all
+four rather than depending on `jekyll-filters`, because no gem requires another.
+
+Source: `ruby/jekyll-breadcrumb-trail/lib/jekyll-breadcrumb-trail/` — `trail.rb` is the one computation,
+`nav.rb` the markup, `labels.rb` the four operations.
+
 ## The shape every gem has
 
 Settled 24 Aug 2026, when the two oldest gems were moved onto what the other four already did.
@@ -165,12 +211,10 @@ Settled 24 Aug 2026, when the two oldest gems were moved onto what the other fou
 - **Everything else under `lib/<gem-name>/`**, required from the entry file with `require_relative`. A flat
   `lib/element.rb` would sit on the shared load path where another gem's file of that name could shadow it.
 - **One module per gem, inside `Jekyll`** — `Jekyll::MultiSitemap`, `Jekyll::GTM`, `Jekyll::PageMeta`,
-  `Jekyll::ResourceTags`, `Jekyll::StructuredData`, `Jekyll::SiteFilters`.
+  `Jekyll::ResourceTags`, `Jekyll::StructuredData`, `Jekyll::BreadcrumbTrail`, `Jekyll::SiteFilters`.
 - **`# frozen_string_literal: true` at the top of every `.rb`**, gemspecs and specs included.
-- **`ruby/.rubocop.yml` covers all seven.** It disables `Metrics`, allows any hyphenated entry filename and
-  sets the line length to 120. **Rubocop is not in `ruby/Gemfile`** — it needs `gem install rubocop`, then
-  `rubocop` from `ruby/`. First run was 24 Aug 2026: everything is clean except `Gemspec/RequireMFA` and
-  `Gemspec/DevelopmentDependencies`, which fire on every gem and nobody has decided on.
+- **`ruby/.rubocop.yml` covers every gem.** It disables `Metrics`, allows any hyphenated entry filename and
+  sets the line length to 120. How to run it, and what it reports, is under "Running the specs".
 
 ## binacle-docs-versions
 
@@ -184,6 +228,11 @@ thing this split exists to avoid.
 writes both out and knows nothing about versions. **It never overwrites a key the page already set**, which
 is how the swagger pages keep `noindex, nofollow` from their `defaults:` scope.
 
+**`versions.current` has to name a version the site has, or the build stops.** A `current` that matches
+nothing would noindex all 118 pages while the sitemap still lists them, and nothing else would say so. A
+missing `current` stops the build too, for the mirror reason: it would leave every old version indexable.
+The suffix is stamped from the page's own `version` and does not read `current` at all.
+
 **`{% vlink /path %}` moved here from `sites/docs/_plugins/VLink.rb`** unchanged in behaviour, and gained a
 spec suite in the move — nothing runs a `.rb` under `sites/`. `sites/docs/_plugins/` is now empty.
 
@@ -195,7 +244,7 @@ Source: `ruby/binacle-docs-versions/lib/binacle-docs-versions/` — `generator.r
 ## Running the specs
 
 Each gem has an RSpec suite under `spec/` and declares `rspec` as a development dependency in its gemspec.
-All seven pass. The counts move as the gems grow, so they are not written down here.
+All eight pass. The counts move as the gems grow, so they are not written down here.
 
 **One `Gemfile` covers every gem, at `ruby/`, and no gem has one of its own.** It names each gem with
 `gemspec path:`, which also pulls in that gemspec's development dependencies. `ruby/Gemfile.lock` is
@@ -205,13 +254,20 @@ committed, so every spec run uses the same Jekyll — 4.4.1 — rather than what
 by itself. Plain `rspec` also works and ignores the lock. `bundle exec rspec` from `ruby/` itself does not:
 each `spec/spec_helper.rb` is only on the load path when rspec runs from inside that gem.
 
-**Each gem is a test leaf**, added 24 Aug 2026 — `just test ruby-gtm-unit`, and all seven are in `just test all`
+**Each gem is a test leaf**, added 24 Aug 2026 — `just test ruby-gtm-unit`, and all eight are in `just test all`
 because they need nothing brought up. The leaf runs `bundle exec rspec` from inside the gem folder, which is the
 only place a `spec_helper` is on the load path.
 
-**Style is `ruby/.rubocop.yml`, one config for all seven.** Rubocop is not in the bundle: `gem install rubocop`,
-then run `rubocop` from `ruby/`. Two gemspec cops fire on every gem — `Gemspec/RequireMFA` and
-`Gemspec/DevelopmentDependencies` — and nothing else does.
+**Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is not in the bundle:
+`gem install rubocop`, then run `rubocop` from `ruby/`. **It does not come back clean.** As of
+24 Aug 2026 it reports, all of it autocorrectable and none of it decided on:
+
+- **every gemspec** — `Gemspec/RequireMFA` and `Gemspec/DevelopmentDependencies`.
+- **`ruby/Gemfile`** — `Style/FrozenStringLiteralComment`, and `Style/StringLiterals` on every
+  `gemspec path:` line.
+- **`jekyll-multi-sitemap`** — `Style/SafeNavigation`, `Layout/EmptyLineAfterGuardClause`,
+  `Lint/UnusedMethodArgument`, and `Style/StringLiterals` in one spec.
+- **`jekyll-resource-tags`** — `Style/StringConcatenation` and `Style/RedundantRegexpEscape`.
 
 **They carry no coverage.** Ruby's collector is simplecov and it is not in the bundle, so a `just coverage` run
 executes them and writes no file for them — they are absent from the table rather than sitting at zero.

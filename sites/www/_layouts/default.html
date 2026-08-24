@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.hreflang | default: 'en' }}" data-default-theme="{{ site.default_theme }}">
+<html lang="{{ page.hreflang | default: 'en' }}" data-default-theme="{{ site.default_theme }}" data-theme-storage="{{ site.theme_storage | default: 'cookie' }}"{% if site.cookie_domain %} data-theme-domain="{{ site.cookie_domain }}"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     {% page_meta %}
     {% structured_data %}
     {% link_tags site.data.includes.links %}
-    {% include theme-init.html %}
+    <script src="{{ '/js/theme-init.js' | relative_url }}"></script>
     {% gtm_head site.gtm %}
 </head>
 <body>

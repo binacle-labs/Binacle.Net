@@ -25,6 +25,7 @@ public static class ModuleDefinition
 		builder.Services.Configure<UIModuleOptions>(options =>
 		{
 			options.ApiBaseUrl = string.Empty;
+			options.DefaultTheme = "light";
 		});
 
 		// Static web assets. A missing bundle is a 404, never a page.

@@ -79,20 +79,20 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
     it 'cuts on characters, not on words' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => 20 } })
 
-      expect(meta(site, 'long.html')['description']).to eq('Bin packing keeps bo')
+      expect(meta(site, 'long.html')['description']).to eq('A page holding enoug')
     end
 
     it 'cuts nothing when truncate is zero' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => 0 } })
 
       expect(meta(site, 'long.html')['description'])
-        .to eq('Bin packing keeps boxes off the floor and pallets on the truck.')
+        .to eq('A page holding enough words that a description has to be cut.')
     end
 
     it 'cuts nothing when truncate is false' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => false } })
 
-      expect(meta(site, 'long.html')['description'].length).to eq(63)
+      expect(meta(site, 'long.html')['description'].length).to eq(61)
     end
 
     it 'raises when truncate is not a whole number' do

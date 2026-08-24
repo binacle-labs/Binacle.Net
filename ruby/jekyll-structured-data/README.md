@@ -25,7 +25,8 @@ you like. A key it cannot find is a field it leaves out.
 
 ## 🚀 Quick start
 
-Both lines are needed. Miss the second and nothing fails - Jekyll prints the tag name as text.
+Both lines are needed. Miss the second and the build fails: Liquid raises `Unknown tag 'structured_data'`
+on the first page that uses it.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins
@@ -80,7 +81,7 @@ resolved against the organisation's own `url`, not against the page.
 ```yaml
 structured_data:
   type: WebApplication
-  name: Packing Demo      # optional. The resolved page title otherwise
+  name: Example App       # optional. The resolved page title otherwise
 ```
 
 `type` picks the node's `@type`. Every other key under `structured_data:` is written into the node as it

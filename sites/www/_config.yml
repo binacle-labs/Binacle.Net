@@ -29,7 +29,7 @@ logo:
   alt                   : "Binacle.Net Logo"
 
 default_theme: "dark"
-
+theme_storage: "cookie"
 ################################################################
 # Where things are
 ################################################################

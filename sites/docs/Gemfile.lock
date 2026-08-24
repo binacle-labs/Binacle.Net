@@ -5,6 +5,12 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: ../../ruby/jekyll-breadcrumb-trail
+  specs:
+    jekyll-breadcrumb-trail (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
   remote: ../../ruby/jekyll-filters
   specs:
     jekyll-filters (1.0.0)
@@ -127,6 +133,7 @@ DEPENDENCIES
   binacle-docs-versions!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)
+  jekyll-breadcrumb-trail!
   jekyll-filters!
   jekyll-gtm!
   jekyll-include-cache

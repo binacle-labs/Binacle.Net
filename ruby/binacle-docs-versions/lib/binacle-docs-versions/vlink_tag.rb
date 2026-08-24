@@ -22,12 +22,9 @@ module Binacle
 
         relative_path = Liquid::Template.parse(@relative_path).render(context)
         versioned_path = Jekyll::PathManager.join(COLLECTION, Jekyll::PathManager.join(version, relative_path))
-        # A static file carries a leading slash on its relative path and a document does not.
-        with_leading_slash = Jekyll::PathManager.join('', versioned_path)
 
         site.each_site_file do |item|
           return relative_url(item) if item.relative_path == versioned_path
-          return relative_url(item) if item.relative_path == with_leading_slash
         end
 
         raise ArgumentError, <<~MSG

@@ -1,3 +1,5 @@
+@use 'theme-modes' as *;
+
 // Variables
 $font-h1: 2.25rem;
 $font-h2: 1.75rem;
@@ -22,7 +24,7 @@ main {
 }
 
 // Dark Mode Overrides
-body.dark {
+@include when-dark {
   main {
     a {
       color: $secondary;

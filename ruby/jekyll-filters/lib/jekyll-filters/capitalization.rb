@@ -4,7 +4,7 @@ module Jekyll
   module SiteFilters
     module Capitalization
       def capitalize_all(input)
-        input.to_s.split(' ').map(&:capitalize).join(' ')
+        input.to_s.split.map(&:capitalize).join(' ')
       end
     end
   end

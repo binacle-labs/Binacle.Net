@@ -89,8 +89,6 @@
 	font-size: 0.8125rem;
 	padding: var(--s-1) var(--s-3);
 	cursor: pointer;
-
-	&[hidden] { display: none; }
 }
 
 .site-footer {
@@ -114,4 +112,16 @@
 			padding-block: var(--s-1);
 		}
 	}
+}
+
+// The element is a definition point, not a box: the button it renders has to sit directly in the
+// header's layout, where the host's classes expect it.
+theme-switcher {
+	display: contents;
+}
+
+// Until main.js defines it the element is not a control, just its own contents. A dead control is worse
+// than no control.
+theme-switcher:not(:defined) {
+	display: none;
 }

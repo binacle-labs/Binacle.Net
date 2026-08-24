@@ -72,10 +72,10 @@ which severs mid-word; that fallback is a safety net for a page that forgets, no
 appended**, so a page using it writes its own suffix.
 
 **Nav labels and breadcrumbs use `menu_title` where a page sets one**, falling back to `title`
-(`_includes/versions/menu.html`, `_includes/breadcrumbs.html`). It exists so a page can carry a title that is
-unique across the site while the sidebar keeps a short label - two sample pages named `Minimal` under
-different parents read fine in a tree and collide in a `<title>`. **`nav.parent` still matches on `title`, not
-on `menu_title`**, so renaming a page that has children breaks the tree.
+(`_includes/versions/menu.html`, and the `title_from` list in the site's `breadcrumbs:` config). It exists
+so a page can carry a title that is unique across the site while the sidebar keeps a short label - two
+sample pages named `Minimal` under different parents read fine in a tree and collide in a `<title>`.
+**`nav.parent` still matches on `title`, not on `menu_title`**, so renaming a page that has children breaks the tree.
 
 ## Versioning model
 
@@ -159,11 +159,19 @@ A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.
 | `jekyll-resource-tags` | `ruby/jekyll-resource-tags` |
 | `jekyll-page-meta` | `ruby/jekyll-page-meta` |
 | `jekyll-structured-data` | `ruby/jekyll-structured-data` |
+| `jekyll-breadcrumb-trail` | `ruby/jekyll-breadcrumb-trail` |
 | `binacle-docs-versions` | `ruby/binacle-docs-versions` |
 | `jekyll-tidy` | gem |
 
 **`sites/docs/_plugins/` is empty.** VLink lived there and moved into `binacle-docs-versions` with the
 version stamps, which is where it gets a spec suite; nothing under `sites/` has one.
+
+**breadcrumbs** (`{% breadcrumbs %}`) — one call in `_includes/header.html` renders the trail for every
+page, versioned or not. The two thirty-line includes and the branch that chose between them went on
+24 Aug 2026. `breadcrumbs: exclude: ["version", "*.*"]` in `_config.yml` is what keeps a versioned trail
+starting at its own version; **drop it and every breadcrumb on the site silently gains two crumbs.**
+A page still turns its trail off with `breadcrumbs: false`, which now works everywhere rather than only on
+versioned pages.
 
 **vlink** (`{% vlink path %}`) — resolves a relative path to the correct versioned URL based on the
 current page's `version` front matter. Use it instead of plain links inside `_versions/` pages

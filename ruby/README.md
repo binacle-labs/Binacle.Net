@@ -11,6 +11,17 @@ gem name, and everything else under `lib/<name>/`.
 
 ## 📦 Gems
 
+### 🧭 `jekyll-breadcrumb-trail`
+
+Works out a page's breadcrumb trail from its url and publishes it as `page.breadcrumb_trail`, a list of
+`name` and `url`; `{% breadcrumbs %}` renders the nav landmark, ordered list and `aria-current` from that
+key and works nothing out for itself. That is what lets the structured data gem build a `BreadcrumbList`
+from the same values the visible trail shows.
+
+`exclude` suppresses a segment's label without taking it out of any url, and the home crumb points at the
+deepest excluded segment rather than the site root. `jekyll-breadcrumb-trail/README.md` has the config and
+the rules.
+
 ### 🔤 `jekyll-filters`
 
 Custom Liquid filters:
@@ -93,7 +104,7 @@ cd ruby/jekyll-multi-sitemap && bundle exec rspec
 From the repo root each gem is a test leaf, so `just test ruby-gtm-unit` runs one and `just test all` runs
 them with everything else. They carry no coverage - simplecov is not in the bundle.
 
-For style there is `.rubocop.yml`, covering all seven gems. Rubocop is not in the bundle either, so install it
+For style there is `.rubocop.yml`, covering all eight gems. Rubocop is not in the bundle either, so install it
 once with `gem install rubocop` and run it from here:
 
 ```bash

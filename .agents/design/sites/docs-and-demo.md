@@ -1,8 +1,8 @@
 ---
 id: sites/docs-and-demo-design
 description: Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget.
-verified: 2026-08-23
-check: D1 against the progress elements in sites/demo/pages/packing.html and vipaq.html, which must both still carry value="0"; D2 against the four overrides in sites/demo/_sass/_components.scss; D4 against the prefetch list in sites/demo/_data/includes.yml
+verified: 2026-08-24
+check: D6 against sites/docs/_sass/_breadcrumbs.scss, which must stay one rule; D1 against the progress elements in sites/demo/pages/packing.html and vipaq.html, which must both still carry value="0"; D2 against the four overrides in sites/demo/_sass/_components.scss; D4 against the prefetch list in sites/demo/_data/includes.yml
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -63,3 +63,24 @@ Shown on every page of a version that is not current. **The site exists so someo
 read that image's docs** - without the notice, an old page is indistinguishable from a current one.
 
 It reuses `.block-warning` from `_sass/_blockquote.scss`, which supplies the label and the dark mode.
+
+## D6 - the breadcrumb stylesheet is one rule because beercss already does the rest
+
+`sites/docs/_sass/_breadcrumbs.scss` holds a single declaration block, and that is not an oversight.
+
+The trail is `<nav class="tiny-space"><ol class="breadcrumb"><li class="breadcrumb-item">`, which is the
+markup `jekyll-breadcrumb-trail` emits everywhere. beercss already carries rules for exactly that shape,
+written for its drawer navigation: `nav>:is(ol,ul){all:inherit;flex:auto}` makes the list inherit the nav's
+`display:flex` and `align-items:center`, and `nav>:is(ol,ul)>li{all:unset}` strips the list marker and the
+list-item display. The crumbs lay out in a row with no help from us.
+
+**`class: tiny-space` in the config block is load-bearing.** beercss sets `:is(nav,.row,li).tiny-space{gap:.5rem}`
+on the nav, and `all:inherit` is what carries that gap down to the list. Drop the class and the crumbs run
+together, because the gap is the only spacing between them.
+
+**What is left is the separator**, and it is ours because the standard breadcrumb markup has none in the
+list - Bootstrap, which the class names come from, draws it with `::before` and so do we. The old markup put
+a literal `<span>/</span>` between the crumbs, which is a slash a screen reader reads aloud.
+
+The Bootstrap class names are inert here. beercss has no `.breadcrumb` rule, so they cost nothing and they
+are the selector this file needs.

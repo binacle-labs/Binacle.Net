@@ -40,9 +40,17 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     expect(doc(site, 'v2.0.x/guide.md').data['robots']).to eq('noindex, follow')
   end
 
-  it 'stamps nothing when the site has no versions data' do
-    site = build_site('data_dir' => '_nothing')
+  it 'stamps the suffix before a generator at :low reads it' do
+    expect(doc(build_site, 'v1.0.x/guide.md').data['suffix_seen_at_low']).to eq('(v1.0.x)')
+  end
 
-    expect(doc(site, 'v1.0.x/guide.md').data).not_to have_key('robots')
+  it 'fails the build when the site has no versions data' do
+    expect { build_site('data_dir' => '_nothing') }
+      .to raise_error(Binacle::DocsVersions::Error, /current is not set/)
+  end
+
+  it 'fails the build when current names a version the site does not have' do
+    expect { build_with_current('v9.9.x') }
+      .to raise_error(Binacle::DocsVersions::Error, /"v9.9.x", which is not one of v1.0.x, v2.0.x/)
   end
 end

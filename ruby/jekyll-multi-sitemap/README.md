@@ -20,8 +20,8 @@ One renderer, three ways in. Each is a thinner wrapper than the one above it.
 
 ## 🚀 Quick start
 
-Both lines are needed. Miss the second and nothing fails - Jekyll prints the tag name as text and the
-generator never runs.
+Both lines are needed. Miss the second and the build fails on the first tag - Liquid raises
+`Unknown tag 'sitemap_links'`. A site using only the generator gets no error and no sitemap.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins

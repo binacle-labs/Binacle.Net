@@ -4,11 +4,7 @@
             <i>menu</i>
         </button>
         
-        {% if page.version != nil %}
-            {% include versions/breadcrumbs.html %}
-        {% else %}
-            {% include breadcrumbs.html %}
-        {% endif %}
+        {% breadcrumbs %}
         
         <div class="max center-align"></div>
 
@@ -20,7 +16,7 @@
         </a>
         {% endfor %}
 
-        <theme-switcher class="transparent circle" data-default-theme="{{ site.default_theme }}">
+        <theme-switcher data-button-class="transparent circle">
 
         </theme-switcher>
     </nav>

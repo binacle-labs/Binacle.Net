@@ -1,0 +1,5 @@
+ol.breadcrumb > li + li::before {
+  content: '/';
+  margin-inline-end: 0.5rem;
+  opacity: 0.6;
+}

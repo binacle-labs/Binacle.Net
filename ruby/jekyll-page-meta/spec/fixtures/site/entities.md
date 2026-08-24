@@ -1,4 +1,4 @@
 ---
-title: Bins & boxes
-description: Pack bins & boxes.
+title: Salt & pepper
+description: Pass the salt & pepper.
 ---

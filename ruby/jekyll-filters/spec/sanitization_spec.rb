@@ -38,5 +38,21 @@ RSpec.describe Jekyll::SiteFilters::Sanitization do
     it 'handles nil input gracefully' do
       expect { filter.clean_content(nil) }.not_to raise_error
     end
+
+    it 'leaves the carriage return of a CRLF behind' do
+      expect(filter.clean_content("hello\r\nworld")).to eq("hello\r world")
+    end
+
+    it 'never collapses a tab' do
+      expect(filter.clean_content("hello\t\tworld")).to eq("hello\t\tworld")
+    end
+
+    it 'eats prose between a < and the next >, because the strip is a regexp' do
+      expect(filter.clean_content('a < b > c')).to eq('a c')
+    end
+
+    it 'leaves an entity encoded, so it counts as five characters and reads as one' do
+      expect(filter.clean_content('AT&amp;T')).to eq('AT&amp;T')
+    end
   end
 end

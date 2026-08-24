@@ -7,8 +7,9 @@ There is nothing to configure. Each filter takes its input from the call.
 
 ## 🚀 Quick start
 
-Add the gem, then list it under `plugins:`. Both lines are needed - miss the second and Liquid renders
-nothing where the value should be.
+Add the gem, then list it under `plugins:`. Both lines are needed - miss the second and nothing fails.
+Liquid drops a filter it does not know and renders the value unfiltered, so the page ships
+`(c) 2023-{now} Your Name` with the placeholder still in it.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins

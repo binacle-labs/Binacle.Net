@@ -25,7 +25,7 @@ logo:
 og_image                : /media/logo/binacle-logo-512x512.png
 
 default_theme: "dark"
-
+theme_storage: "cookie"
 ################################################################
 # Where things are
 ################################################################

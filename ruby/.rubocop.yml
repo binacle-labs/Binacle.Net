@@ -1,4 +1,4 @@
-# One config for every gem under ruby/. Run it with `just ruby lint` from the repo root.
+# One config for every gem under ruby/. Rubocop is not in the bundle, so run `rubocop` from ruby/ itself.
 
 AllCops:
   TargetRubyVersion: 3.1

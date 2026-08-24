@@ -53,4 +53,21 @@ RSpec.describe Jekyll::GTM::Tag do
     output = render_tag(Jekyll::GTM::BodyTag, 'gtm_body_number', 'site.gtm', 'site' => { 'gtm' => 12_345 })
     expect(output).to include('id=12345')
   end
+
+  it 'renders nothing for a literal in the wrong case, which is not the shape of an id' do
+    output = render_tag(Jekyll::GTM::HeadTag, 'gtm_head_lower', 'GTM-lowercase')
+    expect(output.strip).to eq('')
+  end
+
+  it 'renders nothing for a literal with no GTM- prefix' do
+    output = render_tag(Jekyll::GTM::HeadTag, 'gtm_head_bare', 'gtm')
+    expect(output.strip).to eq('')
+  end
+
+  it 'writes a variable into the snippet raw, so the shape check never sees it' do
+    assigns = { 'site' => { 'gtm' => 'gtm-not an id"' } }
+    output = render_tag(Jekyll::GTM::HeadTag, 'gtm_head_raw', 'site.gtm', assigns)
+
+    expect(output).to include(%('gtm-not an id"'))
+  end
 end

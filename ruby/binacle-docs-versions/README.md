@@ -16,8 +16,8 @@ Two pieces, both keyed on the version the page belongs to.
 
 ## 🚀 Quick start
 
-Both lines are needed. Miss the second and nothing fails - the keys are never written and the tag renders as
-text.
+Both lines are needed. Miss the second and the build fails on the first `{% vlink %}` - Liquid raises
+`Unknown tag 'vlink'`. The generator just never runs, so the stamps go missing without a word.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins
@@ -53,7 +53,12 @@ defaults:
 - `robots` - `noindex, follow` on every version that is not `current`.
 
 `current` is the one knob. It names the version search engines may index; move it at release time and
-nothing else changes. A document with no `version` is left alone, and so is a site with no `versions` data.
+nothing else changes. A document with no `version` is left alone, and so is a site with no versioned
+documents at all.
+
+**`current` has to name a version the site has.** Where it does not, the build stops and names both the
+value it was given and the versions it found. A `current` nobody notices is wrong would put `noindex` on
+every page of the site while the sitemap still lists them.
 
 Neither key knows why it is set. Whatever renders them reads two ordinary values and needs to know nothing
 about versions.
@@ -73,8 +78,9 @@ front matter. A path that resolves to nothing fails the build rather than writin
 
 - The generator never overwrites a key the page already set. That is how a swagger page keeps
   `noindex, nofollow` while the rest of its version is `noindex, follow`.
-- It runs at Jekyll's `:high` priority, and whatever reads the keys must run lower. Resolve a title before
-  the suffix is stamped and the suffix is silently missing from it.
+- Only `title_suffix` is order-sensitive. It runs at Jekyll's `:high` priority because a generator resolves
+  the title from it; resolve the title first and the suffix is silently missing. `robots` is read at render,
+  so nothing that reads it can run too early.
 - A generator runs once, before render. A document another plugin creates later is not stamped.
 - `{% vlink %}` walks every file in the site per call. Fine at this size; it is a linear scan.
 

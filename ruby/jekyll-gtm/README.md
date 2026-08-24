@@ -6,7 +6,7 @@ layouts.
 ## 🚀 Quick start
 
 Add the gem, list it under `plugins:`, and put your container id in the config. Both lines are needed - miss
-the `plugins:` one and Jekyll prints the tag name as text.
+the `plugins:` one and the build fails: Liquid raises `Unknown tag 'gtm_head'` on the first page that uses it.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins

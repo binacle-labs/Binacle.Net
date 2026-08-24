@@ -1,77 +1,108 @@
-import { Cookies } from 'cookies';
+import {DEFAULT_OPTIONS, mergeOptions} from "./options";
+import type {ThemeStorage, ThemeSwitcherOptions} from "./options";
+import {applyTheme, currentTheme, isTheme, resolveDefault} from "./theme";
+import type {DefaultTheme, Theme} from "./theme";
+import {createStorage} from "./storage";
+
+// What render built. Held as one thing so nothing has to guard three fields that are only ever null
+// together, before render has run.
+interface Control {
+	button: HTMLButtonElement;
+	icon: HTMLElement | null;
+	text: HTMLElement | null;
+}
 
 export default class ThemeSwitcherButtonElement extends HTMLElement {
-	private _defaultMode = 'light';
-	private _themeIcon: HTMLElement | null = null;
+	private static options: ThemeSwitcherOptions = DEFAULT_OPTIONS;
 
-	connectedCallback() {
-		this._defaultMode = this.dataset.defaultTheme || 'light';
-		let themeValue = Cookies.get('theme');
-		if(!themeValue){
-			// No cookie set, use default mode
-			themeValue = this._defaultMode;
+	private storage: ThemeStorage | null = null;
+	private control: Control | null = null;
+	private readonly onClick = (): void => {
+		this.setTheme(currentTheme() === "dark" ? "light" : "dark");
+	};
+
+	// Custom elements are built by the parser, so there is nowhere to pass options. Call this before
+	// customElements.define.
+	static configure(options: Partial<ThemeSwitcherOptions>): void {
+		ThemeSwitcherButtonElement.options = mergeOptions(options);
+	}
+
+	connectedCallback(): void {
+		const options = ThemeSwitcherButtonElement.options;
+		this.storage = createStorage(options);
+		this.control = renderControl(this, this.onClick);
+
+		const chosen = this.storage.read()
+			?? resolveDefault(asDefaultTheme(this.dataset.defaultTheme) ?? options.defaultTheme);
+		applyTheme(chosen);
+
+		label(this.control, chosen);
+		swapAttributes(chosen);
+	}
+
+	disconnectedCallback(): void {
+		this.control?.button.removeEventListener("click", this.onClick);
+	}
+
+	private setTheme(theme: Theme): void {
+		applyTheme(theme);
+		this.storage?.write(theme);
+		if (this.control) {
+			label(this.control, theme);
 		}
-		if(themeValue === 'dark') {
-			document.body.classList.add('dark');
-			document.body.classList.remove('light');
-		} else if(themeValue === 'light') {
-			document.body.classList.add('light');
-			document.body.classList.remove('dark');
+		swapAttributes(theme);
+		window.dispatchEvent(new CustomEvent("themeChanged", {detail: {theme}}));
+	}
+}
+
+function renderControl(host: ThemeSwitcherButtonElement, onClick: () => void): Control {
+	// A custom element takes no focus and answers no key. Without a real button the theme cannot be
+	// changed from a keyboard or announced by a screen reader.
+	const button = document.createElement("button");
+	button.type = "button";
+	button.className = host.dataset.buttonClass ?? "";
+
+	// A host wanting words rather than an icon puts its own element in and gets its text kept in step.
+	// An empty switcher gets the material ligature the BeerCSS hosts expect.
+	const text = host.querySelector<HTMLElement>("[data-theme-label]");
+	let icon: HTMLElement | null = null;
+	if (text) {
+		button.appendChild(text);
+	} else {
+		icon = document.createElement("i");
+		icon.classList.add("page", "top", "active");
+		button.appendChild(icon);
+	}
+
+	button.addEventListener("click", onClick);
+	host.appendChild(button);
+	return {button, icon, text};
+}
+
+function label(control: Control, theme: Theme): void {
+	const dark = theme === "dark";
+	const offers = dark ? "light" : "dark";
+	if (control.icon) {
+		control.icon.textContent = `${offers}_mode`;
+	}
+	if (control.text) {
+		control.text.textContent = dark ? "Light" : "Dark";
+	}
+	control.button.setAttribute("aria-pressed", String(dark));
+	control.button.setAttribute("aria-label", `Switch to the ${offers} theme`);
+}
+
+// Makes something CSS cannot reach - an img src, say - follow the theme.
+function swapAttributes(theme: Theme): void {
+	document.querySelectorAll<HTMLElement>("[data-swap]").forEach(element => {
+		const attribute = element.dataset.swap;
+		const value = theme === "dark" ? element.dataset.darktheme : element.dataset.lighttheme;
+		if (attribute && value !== undefined) {
+			element.setAttribute(attribute, value);
 		}
+	});
+}
 
-		this.render();
-		this.changeThemeElementsAccordingToTheme();
-		this.addEventListener('click', this.changeTheme.bind(this));
-	}
-
-	disconectedCallback() {
-		this.removeEventListener('click', this.changeTheme.bind(this));
-	}
-
-	changeTheme(){
-		if(this.isDarkTheme()){
-			document.body.classList.remove("dark");
-			document.body.classList.add("light");
-			this._themeIcon!.textContent = "dark_mode";
-		}else {
-			document.body.classList.remove("light");
-			document.body.classList.add("dark");
-			this._themeIcon!.textContent = "light_mode";
-		}
-		const themeValue = this.isDarkTheme() ? 'dark' : 'light';
-
-		// Secure only where the browser will keep it. The cookies default is secure, and the API image is
-		// commonly served over plain http on a LAN - there the cookie is dropped and the theme resets on
-		// every page load.
-		Cookies.set('theme', themeValue, {expires: 365, secure: location.protocol === 'https:'});
-
-		this.changeThemeElementsAccordingToTheme();
-		const event = new CustomEvent('themeChanged', {detail: {theme: themeValue}});
-		window.dispatchEvent(event);
-	}
-
-	render() {
-		this._themeIcon = document.createElement('i');
-		this._themeIcon.classList.add('page', 'top', 'active');
-		this._themeIcon.textContent = this.isDarkTheme() ? "light_mode" : "dark_mode"
-		this.appendChild(this._themeIcon);
-	}
-
-	isDarkTheme(){
-		return document.body.classList.contains("dark");
-	}
-
-	changeThemeElementsAccordingToTheme() {
-		const themeChangingElements = document.querySelectorAll<HTMLElement>('[data-theme]');
-		themeChangingElements.forEach(element => {
-			const attribute = element.dataset.theme as string;
-
-			const themeValue = this.isDarkTheme()
-				? element.dataset.darktheme
-				: element.dataset.lighttheme;
-			// An element missing data-darktheme or data-lighttheme writes the literal string "undefined".
-			// The cast keeps that rather than skipping the element.
-			element.setAttribute(attribute, themeValue as string);
-		});
-	}
+function asDefaultTheme(value: string | undefined): DefaultTheme | undefined {
+	return value === "system" || isTheme(value) ? value : undefined;
 }

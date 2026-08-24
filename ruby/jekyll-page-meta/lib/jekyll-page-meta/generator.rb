@@ -4,7 +4,7 @@ module Jekyll
   module PageMeta
     class MetaGenerator < Jekyll::Generator
       safe true
-      # Anything stamping a key this reads - title_suffix, robots - runs high and must run first.
+      # title_suffix is the one key this reads off another plugin, so whatever stamps it has to run higher.
       priority :low
 
       def generate(site)

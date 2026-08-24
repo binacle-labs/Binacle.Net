@@ -29,7 +29,8 @@ which is the only other surface in the repo that compiles its own sass. Two cons
 back gives two compilers a claim on the same files, and **`css/` is gitignored** here, because it is build
 output. On `docs` and `demo` it is committed source.
 
-**No CSS framework and no npm dependencies.** `docs` and `demo` run BeerCSS; this one is plain CSS. The gulp
+**No CSS framework and one npm dependency.** `docs` and `demo` run BeerCSS; this one is plain CSS. Its
+only workspace import is `theme-switcher`, shared with the other three hosts. The gulp
 asset copy skips `assets/lib/` entirely for this target, so BeerCSS and material-dynamic-colors never arrive.
 There is no component library to reach for.
 
@@ -42,7 +43,7 @@ processes where the other two run two.
 |---|---|
 | `pages/` | The four pages, plus `404.html` and `robots.txt` |
 | `_data/exchange.yml` | Every request and response the site shows, as data |
-| `_includes/` | Header, footer, theme init, and the two conversion components |
+| `_includes/` | Header, footer, and the two conversion components |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` writes its `Sitemap:` line with `{% sitemap_links %}`.
@@ -148,8 +149,8 @@ Any grid holding a code pane also needs `min-width: 0` on its children - a grid 
 
 `_js/main.ts`, about 770 bytes gzipped, two behaviours, both degrading cleanly:
 
-- **A theme toggle.** The pre-paint read is *not* in this file — it has to run before first paint, so it is
-  inlined in `_includes/theme-init.html`. Moving it to an external file reintroduces the flash.
+- **A theme toggle.** `packages/theme-switcher`, the same element the other three hosts use. The pre-paint
+  read is *not* in this file — it is its own bundle, `js/theme-init.js`, loaded blocking in `<head>`.
 - **Clipboard copy controls.** The `docker run` line is the primary conversion on three of the four pages.
 
 Both controls are `hidden` in the markup and revealed by the script. **All four pages must be complete with

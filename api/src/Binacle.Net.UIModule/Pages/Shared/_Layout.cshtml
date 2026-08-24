@@ -1,9 +1,16 @@
 @inject AppletsService AppletsService
+@inject IOptions<UIModuleOptions> UIModuleOptions
 @{
-	var theme = Context.Request.Cookies["theme"] == "dark" ? "dark" : "light";
+	var defaultTheme = UIModuleOptions.Value.DefaultTheme;
+	var stored = Context.Request.Cookies["theme"];
+	var chosen = stored is "dark" or "light" ? stored : defaultTheme;
+	// Read server-side, so the image needs no script in the head to avoid painting the wrong theme.
+	// Null under "system", and Razor drops the whole attribute - no attribute is how the stylesheet is
+	// told to follow the machine.
+	string? theme = chosen is "dark" or "light" ? chosen : null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="@theme" data-default-theme="@defaultTheme" data-theme-storage="cookie">
 <head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -19,7 +26,7 @@
 
 	@await RenderSectionAsync("Head", required: false)
 </head>
-<body class="@theme">
+<body>
 
 <partial name="_Header"/>
 <partial name="_Navbar" model="AppletsService.Applets"/>

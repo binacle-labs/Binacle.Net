@@ -66,7 +66,7 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
       found = node(build_site(configured), 'extras.html', 'WebApplication')
 
       expect(found['applicationCategory']).to eq('BusinessApplication')
-      expect(found['name']).to eq('Packing Demo')
+      expect(found['name']).to eq('Example App')
     end
 
     it 'holds only what it was given when the page carries no meta' do

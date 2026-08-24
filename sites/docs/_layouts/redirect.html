@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.hreflang }}">
+<html lang="{{ page.hreflang }}" data-default-theme="{{ site.default_theme }}" data-theme-storage="{{ site.theme_storage | default: 'cookie' }}"{% if site.cookie_domain %} data-theme-domain="{{ site.cookie_domain }}"{% endif %}>
 
 <head>
 
@@ -21,8 +21,9 @@
     <meta http-equiv="refresh" content="0; url={{ redirect_to }}">
     <meta name="robots" content="noindex">
     {% link_tags site.data.includes.links %}
+    <script src="{{ '/js/theme-init.js' | relative_url }}"></script>
 </head>
-<body class="{{ site.default_theme }}">
+<body>
 
 {% include header.html %}
 <main class="responsive padding">

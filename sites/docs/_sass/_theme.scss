@@ -1,5 +1,8 @@
+@use 'theme-modes' as *;
+
 :root,
-body.light {
+body.light,
+body.dark {
   --primary: #448aff; /* Vibrant Blue */
   --on-primary: #ffffff; /* White for contrast */
   --primary-container: #82b1ff; /* Lighter Blue */
@@ -48,7 +51,9 @@ body.light {
   --surface-container-highest: #e2e2e6;
 }
 
-body.dark {
+@include when-dark {
+  color-scheme: dark;
+
   --primary: #3c5d8b; /* Muted, but noticeable blue */
   --on-primary: #ffffff; /* White for contrast */
   --primary-container: #253153; /* Deep blue */
@@ -97,6 +102,20 @@ body.dark {
   --surface-container-highest: #444444;
 }
 
+// A stored light choice has to move color-scheme too, or a reader who picks light on a dark
+// machine keeps dark scrollbars on a light page.
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+// The element is a definition point, not a box: the button it renders has to sit directly in the
+// header's layout, where the host's classes expect it.
 theme-switcher {
-  display: inline-flex;
+  display: contents;
+}
+
+// Until main.js defines it the element is not a control, just its own contents. A dead control is worse
+// than no control.
+theme-switcher:not(:defined) {
+  display: none;
 }

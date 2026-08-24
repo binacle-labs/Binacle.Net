@@ -75,8 +75,8 @@ RSpec.describe Jekyll::PageMeta::MetaTag do
   it 'escapes a value once, whatever the source did to it' do
     output = head(build_site, 'entities.md')
 
-    expect(output).to include('<title>Bins &amp; boxes - Example</title>')
-    expect(output).to include('<meta name="description" content="Pack bins &amp; boxes.">')
+    expect(output).to include('<title>Salt &amp; pepper - Example</title>')
+    expect(output).to include('<meta name="description" content="Pass the salt &amp; pepper.">')
     expect(output).not_to include('&amp;amp;')
   end
 end

@@ -20,7 +20,8 @@ carries instead of working out its own.
 
 ## 🚀 Quick start
 
-Both lines are needed. Miss the second and nothing fails - Jekyll prints the tag name as text.
+Both lines are needed. Miss the second and the build fails on the first `{% page_meta %}` - Liquid raises
+`Unknown tag 'page_meta'`. The generator just never runs, so nothing publishes the four keys.
 
 ```ruby
 # Gemfile, inside group :jekyll_plugins
