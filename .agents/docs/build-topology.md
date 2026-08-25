@@ -1,8 +1,8 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-08-23
-check: Every solution folder and project count matches Binacle.Net.slnx (45 projects); Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
+verified: 2026-08-25
+check: Every solution folder and project count matches Binacle.Net.slnx (46 projects); Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
   - samples
@@ -22,7 +22,7 @@ Docker build. For the commands themselves see `$commands`.
 
 ## Solution — `Binacle.Net.slnx`
 
-The repo uses the XML `.slnx` solution format. **45 projects** — 34 `.csproj`, six `.proj`, five `.dcproj` —
+The repo uses the XML `.slnx` solution format. **46 projects** — 34 `.csproj`, seven `.proj`, five `.dcproj` —
 grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/test/` — `Binacle.Lib` (the only src project) + four lib test projects, one of them `Binacle.Lib.TestsKernel`
@@ -118,8 +118,8 @@ standalone runner executable.
 
 ## JS workspaces & asset copy
 
-Root `package.json` (name `binacle-net`, `private`) declares five workspace entries: `packages/*`,
-`vipaq/packages/binacle-vipaq`, `api/src/Binacle.Net.UIModule`, `sites/docs` and `sites/demo`.
+Root `package.json` (name `binacle-net`, `private`) declares six workspace entries: `packages/*`,
+`vipaq/packages/binacle-vipaq`, `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo` and `sites/www`.
 
 **Every javascript build in the repo is a member, and `package-lock.json` at the root is the only lock file.**
 One `npm ci` installs all of them. That is what keeps a single copy of `three` in the tree: `binacle-net-ui`
@@ -172,9 +172,9 @@ look at `artifacts/` says which artifact is which.
 ## Content projects (`Microsoft.Build.NoTargets`)
 
 Several `.proj` files don't compile anything — they use the `Microsoft.Build.NoTargets` SDK to pull non-code files
-into the solution (and travel with build output). There are six: `assets/assets.proj`, `tooling/tooling.proj`,
-`sites/docs/docs.proj`, `sites/demo/demo.proj`, `api/requests/requests.proj` and
-`samples/kubernetes/minimal/minimal.proj`.
+into the solution (and travel with build output). There are seven: `assets/assets.proj`,
+`tooling/tooling.proj`, `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`,
+`api/requests/requests.proj` and `samples/kubernetes/minimal/minimal.proj`.
 The Docker samples use `Microsoft.Docker.Sdk` `.dcproj` files instead. None of these affect the C# build.
 
 **`results/` is deliberately not in the solution.** The curated benchmark vault is read and hand-edited, never
@@ -184,6 +184,6 @@ built, so it carries no `.proj` and has no solution folder — open the markdown
 
 `tooling/` holds **every task the repo can run**, CI included — the `tests.just`, `coverage.just`, `openapi.just`,
 `agents.just`, `serve.just` and `build.just` modules for `just`, the scripts that have not moved yet (the
-per-slice `performance.*`, `benchmarks.*`, `tmux.sh`), local compose files, and emulator state. `samples/` are
+per-slice `performance.*` and `benchmarks.*`), local compose files, and emulator state. `samples/` are
 **user-facing deployment starting points** to copy and run the published image. See `$commands` for
 the scripts and samples (`$samples`) for the deployment examples.

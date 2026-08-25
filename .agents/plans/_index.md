@@ -11,6 +11,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## General
 
 ```yaml
+- file: agents-doc-drift.md
+  description: "The guidance drift a third site left, and the repository gaps nothing watches. A findings list - each item is fixed, moved onto the plan it concerns, or written down as a decision not to act."
+  state: ready
+  waits-on: "nothing"
+  paths: [".agents/**", "sites/**", ".github/workflows/**"]
 - file: architecture-checks.md
   description: "Derive the repo's dependency graph into a generated file, draw it, and lint it with a small ruleset."
   state: ready
@@ -168,6 +173,26 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing"
   paths: ["shared/**"]
+```
+
+## Sites
+
+```yaml
+- file: sites/code-blocks-and-wide-tables.md
+  description: "Two framework defaults nobody overrode - code samples on the docs site render in the body sans-serif, and wide tables are clipped rather than scrolled"
+  state: proposed
+  waits-on: "a yes or a no from the maintainer"
+  paths: ["sites/docs/**"]
+- file: sites/docs-client-generation.md
+  description: "A docs page with copy-paste commands that generate a client from the published OpenAPI spec"
+  state: ready
+  waits-on: "nothing"
+  paths: ["sites/docs/**"]
+- file: sites/docs-v3-deploy.md
+  description: "The v3.0.x corrections the docs site needs and the deploy that publishes them - five pages describing configuration the image no longer ships, a worked example quoting a deleted tag, and two stale OpenAPI copies"
+  state: ready
+  waits-on: "the v3.0.0 tag - three of its items quote the released tag, its date or its digest"
+  paths: ["sites/docs/**"]
 ```
 
 ## Tooling

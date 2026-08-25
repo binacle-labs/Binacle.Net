@@ -22,17 +22,12 @@ Five are left:
 - `tooling/benchmarks.vipaq.sh`
 - `tooling/performance.lib.sh`
 - `tooling/performance.vipaq.sh`
-- `tooling/tmux.sh`
 
 ## Why bother, given they work
 
 `just --list` answers "what can I run here", and recipe names complete on tab. Nothing in `tooling/` completes
 anything, so these five are findable only by knowing they exist. That is the whole benefit - it is real, but it
 is small, and this plan should not be allowed to grow past it.
-
-**Open question: `tmux.sh` may be the one that stays.** It builds a session and attaches. No arguments, nothing
-to parameterise, and a recipe that only calls a script is two files where there was one. If it stays, say so in
-a line at the top of the script and delete it from this list.
 
 ## How, from the moves that already landed
 

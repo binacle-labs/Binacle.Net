@@ -70,6 +70,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - The default log path changed from `data/pack-logs/packing/` to `data/pack-logs/`.  
 - Packing log entries now include a `Timestamp` field.  
 - Added **`RetentionDays`** to `PackingLogs`. When set, packing log files older than that many days are deleted once a day, and each deletion is logged. **Off by default** (`null`) — files are kept until you remove them yourself. Only files matching the configured `FileName` pattern in the configured `Path` are touched, and only at the top level.  
+- **`/_health` now reports what the instance is running.** Its `System` entry carried only `Processors`. It now also carries `Version`, `Environment`, `StartedAt` and `Uptime`, plus `Features` — the names of everything switched on, such as `HealthChecks`, `UIModule` or `SwaggerUI` — and `ReservedPaths`, the path prefixes that never answer with a web page. `Processors` is unchanged, so an existing parser keeps working; the new keys are there to check that a configuration arrived the way you meant it to.  
 - Health check **`RestrictedIPs` now uses CIDR notation correctly**. The value after `/` was previously read as an address mask, so `192.168.1.0/24` covered nearly the whole IPv4 range instead of 256 addresses. Existing CIDR entries are now **much narrower** than they were.  
 - Health check `RestrictedIPs` now matches **IPv4 callers in containers**. Addresses arriving in IPv4-mapped IPv6 form are unmapped before comparison, which they previously were not — no IPv4 entry could match.  
 - Removed the **`start-end` range form** from `RestrictedIPs`. Entries such as `192.168.1.0-192.168.1.255` now fail startup validation. Use CIDR instead.  
@@ -81,11 +82,12 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 
 ### 🎨 UI Module
 - **The demo UI was rebuilt.** It was Blazor with an interactive server render mode; it is now Razor Pages, with everything interactive running in the browser. **No SignalR circuit and no WebSocket**, so the demo works behind a proxy or CDN that does not forward one.  
-- **The page addresses changed** — `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and `/Error` is now `/error`. Old links no longer resolve.  
+- **The page addresses changed** — `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and `/Error` is now `/error/{errorCode?}`. Old links no longer resolve.  
 - **The Protocol Decoder is now the ViPaq Decoder.** Same tool. It reads the **new ViPaq format only**, and strings from earlier versions are rejected.  
 - **A new page, `/instance`.** The version and environment this container is running, which features are switched on and where each one answers, and the presets it loaded — so you can see whether your configuration arrived the way you meant it to. It also links to **GitHub Discussions**.  
 - **The Packing Demo starts from a random sample rather than a fixed one**, and its two randomize buttons are now one. Bins are rolled first and items are sized to the largest of them, so a sample is never impossible to pack.  
 - **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.  
+- **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept in the same `theme` cookie, so anyone who already picked one keeps it.  
 - **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup — see Core Changes for the variable that went.  
 
 ### 📈 Algorithms
@@ -94,7 +96,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - The separate fitting algorithm family was retired.  
 
 ### 🏗️ Internal Work
-- Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots.  
+- Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above — the demo UI rebuild was measured against the same bar and failed it, moving page addresses with no redirect and dropping an environment variable, so it appears under **UI Module** and **Core Changes** instead.  
 - Extracted **Binacle.Geometry** into its own library.  
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  

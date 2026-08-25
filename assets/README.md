@@ -1,6 +1,6 @@
 # Assets
 
-Static files the two sites share - the icons at the root, the third-party libraries they load, and the
+Static files the three sites share - the icons at the root, the third-party libraries they load, and the
 logos. Edit the originals here; the copies in the sites are overwritten on every build.
 
 ## 📂 What is in it

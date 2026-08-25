@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why the release pipeline is tag-triggered, stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-08-20
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against both deploy workflows' triggers, which must stay workflow_dispatch only
+verified: 2026-08-25
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only
 paths:
   - ".github/workflows/**"
 ---
@@ -445,7 +445,7 @@ a push trigger would produce a tag per commit and the tag would stop meaning "th
 concurrency group is never cancelled — `cancel-in-progress: false`, because a stopped deploy leaves App
 Platform mid-rollout — so a busy branch would queue rollouts behind each other rather than skip to the last.
 
-**This closes the question `$plans/ci-cd/workflow-restructure` left open.** It was not CI's to answer.
+**This closes the question the workflow restructure left open.** It was not CI's to answer.
 
 ## Open
 

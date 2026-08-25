@@ -1,8 +1,8 @@
 ---
 title: UI Module
 description: >-
-  The UI Module adds a browser interface for trying Binacle.Net without writing API calls. Off by default. Its
-  configuration files and settings.
+  The UI Module adds a browser interface for trying Binacle.Net without writing API calls. Off by default, and
+  it reads no configuration.
 permalink: /version/v3.0.x/configuration/ui-module/
 nav:
   parent: Configuration
@@ -15,17 +15,6 @@ This makes it easier to demonstrate and understand the system’s capabilities w
 
 > This module is disabled by default.
 {: .block-note}
-
-## ⚙️ Configuration
-All configuration files for the UI Module are located in the `/app/Config_Files/UiModule` directory.
-
-### 📑 Directory Structure
-```text
-app
-└── Config_Files
-    └── UiModule
-        └── ConnectionStrings.json
-```
 
 ## 📦 Packing Demo
 The Packing Demo allows users to interact with the packing process visually by submitting bin and
@@ -50,22 +39,5 @@ To enable the UIModule, set the environment variable:
 UI_MODULE=True
 ```
 
-## 🛠️ Configuration
-The UI Module attempts to auto-detect the **Binacle.Net API URL** by default.
-However, in some cases—particularly when using proxies or forwarding services—automatic detection may fail,
-leading to issues with the Packing Demo or API communication.
-
-If automatic detection fails, you can manually specify the API endpoint for **BinacleApi** in the
-`ConnectionStrings.json` file.
-
-**Default configuration:**
-```json
-{
-  "ConnectionStrings": {
-    "BinacleApi": "endpoint=https://localhost:8080/"
-  }
-}
-```
-
-🔗 For more details on how to configure connection strings, refer to the
-[Configuration Basics > Connection String Fallbacks]({% link _common_pages/configuration-basics.md %}#-connection-string-fallbacks) section.
+That is the whole setup. The module reads no configuration at all - both demos run in your browser and call
+the API they are served from, over relative URLs, so there is nothing to point anywhere.

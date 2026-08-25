@@ -13,9 +13,9 @@ a decision or a set of sub-steps gets its own plan file instead.
 
 ## CI
 
-**Nothing here.** The OpenAPI lint moved out on 2026-08-17 and into the v3.0.0 release plan, which owns it
-whole along with the `--fail-severity=warn` flag it needs. It had been written in both files and the two copies
-had already started to differ.
+**The OpenAPI lint moved out on 2026-08-17** and into the v3.0.0 release plan, which owns it whole along with
+the `--fail-severity=warn` flag it needs. It had been written in both files and the two copies had already
+started to differ.
 
 ## Comments
 
@@ -27,11 +27,11 @@ has to stay. These two are the exceptions.
   build stage** - the publish happens outside the file, in `just build publish`. Say that instead, and that
   the path is hardcoded here and allowlisted in `.dockerignore`, so publishing elsewhere builds an empty image.
 
-- `tooling/tmux.sh` carries ~40 comment lines that restate the line below them ("# Select the first pane" over
-  `tmux select-pane`), and two banners are wrong: window 5's block closes with a `WINDOW 6` banner and window
-  6's opens with `WINDOW 5`. Nothing here folds into `.agents` - it is deletable noise. **Do this with the
-  keep-or-convert decision in the scripts-to-just-recipes plan**, not before: if the script moves into a
-  shebang recipe body whole, the noise moves with it.
+- **`Dockerfile:8` names two places for the description caption; there are three.** It is pinned in the
+  `Dockerfile` label, in `release-docker-image.yml`, and in `api/src/Binacle.Net.Kernel/Metadata.cs`, which is
+  what reaches Swagger UI, Scalar and both published OpenAPI documents. Change two of the three and the image
+  label and the API document disagree, silently. **One comment**, and do it while the reason is in front of
+  someone - the next person to change that string will read the comment and believe it.
 
 ## Ruby gems
 
@@ -42,19 +42,19 @@ has to stay. These two are the exceptions.
 - **Rubocop has never been run.** `ruby/.rubocop.yml` exists, rubocop is not in `ruby/Gemfile` and no recipe
   calls it. It lands red before it lands green, which is why it is not wired to anything yet.
 
-## Theme
+## Sites
 
-**The theme switcher landed on 24 Aug 2026 and nobody has looked at it in a browser.** Every check a
-command can settle was run. These four cannot be:
+- **Three curly apostrophes and two lines of old-register prose on the docs site.** Found 2026-08-25 while
+  the v3.0.x pages were being corrected, and left alone because they were outside that job.
+  `configuration/ui-module/index.md:13-14` reads "provides a user-friendly interface" and "the system's
+  capabilities" and carries a curly apostrophe; `configuration/index.md` still calls the UI module "packing
+  demos and protocol decoding"; the docs landing has a curly apostrophe in "Binacle.Net's packing solutions".
+  **The apostrophes break the plain-ASCII rule for user-facing text.** A site session.
 
-- **No host flashes the wrong theme.** Choose light, reload all four with a warm cache. No dark frame.
-- **Every host follows the machine with JavaScript off.** Turn it off, flip the machine light to dark,
-  reload each host.
-- **The switcher works from a keyboard and announces itself.** Tab, Enter, Space, then a screen reader.
-  **Nothing could reach it from a keyboard before this change**, so there is no earlier behaviour to
-  compare against.
-- **The switcher sits right in each header.** It renders a button inside a `display: contents` wrapper
-  now, and the host's classes moved from the element to that button.
+- **The three sites still default to dark.** `default_theme: "dark"` in `sites/www/_config.yml`,
+  `sites/docs/_config.yml` and `sites/demo/_config.yml`. **Decided 2026-08-25: every surface follows the
+  machine**, and the UI module already does. Three lines to `"system"`. **A site session, not a coding
+  session.**
 
 ## ServiceModule
 

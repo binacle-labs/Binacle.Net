@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Binacle.Net API v4",
-    "description": "Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.\n\n**Warning: This API version is experimental and may change any time, introducing breaking changes.**\n\n\n\n[View on Github](https://github.com/binacle-labs/Binacle.Net)\n\n[🐳 Binacle.Net on Dockerhub](https://hub.docker.com/r/binacle/binacle-net)\n\n",
+    "description": "Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds.\n\n**Warning: This API version is experimental and may change any time, introducing breaking changes.**\n\n\n\n[View on Github](https://github.com/binacle-labs/Binacle.Net)\n\n[🐳 Binacle.Net on Dockerhub](https://hub.docker.com/r/binacle/binacle-net)\n\n",
     "contact": {
       "name": "Binacle.Net",
       "url": "https://github.com/binacle-labs/Binacle.Net"

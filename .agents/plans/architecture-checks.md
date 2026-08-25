@@ -7,9 +7,14 @@ waits-on: "nothing - state chosen by an agent, strike it if wrong"
 # Architecture checks - derive the facts, lint the rules
 
 **Status:** Designed 2026-08-12, twice revised, built once and reverted, then redesigned on 2026-08-17. The
-audit work behind it is done and holds: `architecture.yml` exists at the repo root and states the real shape,
-checked by re-deriving the graph from every `ProjectReference`. **What does not exist is anything that reads
-any of it.**
+audit work behind it is done and holds - the real shape was established by re-deriving the graph from every
+`ProjectReference`, and the findings are in this file.
+
+**The hand-written declaration is gone, deleted 2026-08-25 at the maintainer's call.** A root
+`architecture.yml` stated the shape and **nothing read it**, so it was a second copy of the truth that could
+drift from the tree in silence - and it did, twice. **This plan generates the declaration; it does not
+maintain one.** Everything below that describes what the file "says" is now a description of what the
+generator has to produce.
 
 **The comment rule is no longer part of this plan.** It was folded in because both were "checks", which is not
 a relationship. It has its own file now.
@@ -71,9 +76,10 @@ built end to end, run green, mutation-tested, and reverted. What it cost to lear
   it can be exhaustive at a fraction of the cost - there is no reconciliation layer, no shorthand to resolve,
   no entries that name things no tool can see.
 
-**`architecture.yml` stays, as prose.** It is the readable statement of intent and it earns its keep - see the
-preamble it already carries about what counts as a reference. For the parts a tool can see, it should point at
-the ruleset rather than restate the edges, so nothing is written twice and nothing can disagree.
+**The readable statement of intent belongs in the ruleset, not beside it.** The deleted file tried to be both
+a human-readable declaration and a thing tools would one day check, and it was neither - it was written twice
+and read never. The ruleset asserts, the generator derives, and what a tool cannot see is a labelled comment
+inside the ruleset.
 
 ### The rules to write - one per slice, and write them all
 
@@ -122,7 +128,7 @@ Two properties of this shape are the reason to prefer it:
 them. **The npm workspace packages are just as easy**, since each package file names the others it depends on.
 Together that is most of the code.
 
-**What no generator will read**, and what therefore stays prose in `architecture.yml`, labelled as such:
+**What no generator will read**, and what therefore has to be written by hand and labelled as such:
 
 - `docs` and `demo` depending on `ruby` - Gemfile `path:` gems.
 - `demo` and `api` depending on `packages` and `vipaq` - webpack chunk regexes, one config each.
@@ -142,9 +148,9 @@ Together that is most of the code.
 - **Do not reach for `xargs`.** Both traps recorded against the earlier attempt - exit code 123 when a batch
   matches nothing, and six algorithm folders whose names contain spaces - are `xargs` artifacts. Nothing in
   this repo uses it, and `grep` over a directory has neither problem.
-- **A bare target in `architecture.yml` means that slice's `src`.** Without that, the declared graph reads as
-  cyclic (`shared/test -> lib` against `lib/src -> shared`). It is a fact about how to read the file, not about
-  the generator, but anything comparing against the file needs it.
+- **A bare target means that slice's `src`.** Without that convention, the declared graph reads as cyclic
+  (`shared/test -> lib` against `lib/src -> shared`). It is a fact about how the declaration is read, not
+  about the generator, but whatever compares against it needs to know.
 
 ## The `InternalsVisibleTo` check
 
@@ -277,7 +283,7 @@ Three things to settle before adopting ArchUnitNET:
 - **Its test project must reference every slice it inspects**, becoming a node with an edge to everything.
   That exemption belongs in the declaration, not in the test.
 
-For dependency-cruiser, reading the file is the easy half. There is no root `tsconfig.json` - there are seven,
+For dependency-cruiser, reading the file is the easy half. There is no root `tsconfig.json` - there are nine,
 and `sites/demo/` has none despite running `ts-loader` - and imports are bare specifiers resolved through npm workspace
 symlinks (`packages/binacle-net-ui/src/core/protocolDecoder.ts:4` imports `"binacle-vipaq"`), so rules must be
 written against resolved real paths with symlink handling pinned.
@@ -292,7 +298,7 @@ re-derivation, and npm's own resolver.
 - **The repo has no upward edge.** Nothing under `shared/` references `lib/` or `api/`. The one inversion the
   2026-08-12 audit found was removed by the packing-contract extraction rather than documented.
 - **`vipaq/tools` reaches into both `lib` and `shared`.**
-- **The two sites are not graph leaves.** Both Gemfiles load `../../ruby/jekyll-gtm` by path, and
+- **The sites are not graph leaves.** Their Gemfiles load `../../ruby/jekyll-gtm` by path, and
   `sites/demo/webpack.config.js` names `packages/binacle-net-ui` and `vipaq/packages/binacle-vipaq`. "Agents
   must not edit it" and "it is a leaf in the graph" are different claims.
 - **`api/src/Binacle.Net.UIModule` is a javascript consumer too**, since 2026-08-21. It has its own
@@ -303,10 +309,9 @@ re-derivation, and npm's own resolver.
   single line that makes npm's graph look cyclic.
 - **`.github` is a slice.** It hashes `.config/dotnet-tools.json` and names `tooling/sonar-analysis.xml`, so it
   sits above `tooling`.
-- **The slice names differ between the agent guidance and disk.** `.github` is `ci-cd` there, and the two
-  sites moved under `sites/` on 2026-08-20 while `architecture.yml` still lists them flat, as `docs` and
-  `demo`. Anything reading both needs to know that, and the declaration needs a decision on how a `sites/`
-  slice is written.
+- **The slice names differ between the agent guidance and disk.** `.github` is `ci-cd` there. **And there are
+  three sites under `sites/`, not two** - whatever the generator emits has to name all three, and how a
+  `sites/` slice is written is still an open decision.
 
 ## Loose ends found during the audit
 

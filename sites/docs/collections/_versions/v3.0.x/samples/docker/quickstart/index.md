@@ -37,7 +37,7 @@ This launches the Binacle.Net API with:
 - 📖 **Custom Presets**: loaded from your `Presets.json`.
 - 🌐 **Swagger UI**: `http://localhost:8080/swagger/`
 - 🌐 **Scalar UI**: `http://localhost:8080/scalar/`
-- 🖥️ **UI Module**: `http://localhost:8080/` - the packing demo and the ViPaq protocol decoder.
+- 🖥️ **UI Module**: `http://localhost:8080/` - the packing demo and the ViPaq decoder.
 - 📂 **Logs Folder**: a `./data/logs` folder is created for application logs.
 
 ## 🔍 What to look at

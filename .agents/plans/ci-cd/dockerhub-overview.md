@@ -10,11 +10,11 @@ paths:
 
 **The wiring is done.** `.github/dockerhub-overview.md` is the page, `just image dockerhub-overview <version>`
 renders it, `shared-dockerhub-overview.yml` publishes it, and the release pipeline's `page` job calls that
-last and skips prereleases. `$ci-cd`, `$ci-cd/release-pipeline`, `$tooling` and `$commands` carry all of it.
+last and skips prereleases. The CI/CD, release pipeline, tooling and commands docs carry all of it.
 The short description on the repository was already correct.
 
 **The credential is answered.** `DOCKERHUB_TOKEN` writes the description - HTTP 200 on the existing registry
-push credential, proved 2026-08-19. No second secret, no password fallback. `$ci-cd` records it.
+push credential, proved 2026-08-19. No second secret, no password fallback. The CI/CD doc records it.
 
 Two things left, then this file goes.
 

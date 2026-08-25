@@ -39,6 +39,9 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **Packing Logs** configuration was flattened, with breaking changes for existing integrations.
 - **Forwarded headers** are now supported, so the real caller is resolved when running behind a proxy or CDN.
 - **Health check IP restrictions** are matched differently, with breaking changes for existing allow-lists.
+- **The demo UI was rebuilt**, its page addresses changed, and it gained a page describing the instance you are
+  on.
+- **The image creates `/app/data`** and gives it to the app user, so a volume mounted there is writable.
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.
 - **Versioned documentation** now covers every minor line, so older images keep their docs.
 
@@ -80,7 +83,19 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - A **startup warning** when a forwarding header arrives and does not take effect, either because the feature is
   off or because the trust list does not name your proxy. Logged once. Without it both states are silent and the
   app quietly reads the proxy as the caller.
-- The `Dockerfile` and existing environment variables are unchanged.
+- **The image now creates `/app/data` and gives it to the app user.** A volume mounted there is writable with no
+  extra setup. Previously docker created the mount point as root, the app does not run as root, and packing logs
+  and the SQLite database could not be written to a fresh named volume.
+- The image ships `libgssapi-krb5-2`, so Npgsql stops printing `Cannot load library libgssapi_krb5.so.2` at
+  every start. Nothing was broken - the app authenticates with a password, not Kerberos - but the message read
+  like a fatal error.
+- The image carries **OCI labels** - title, description, source, url, documentation, vendor, licence and base
+  image - plus version, revision and created per build.
+- **One environment variable was removed - `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the
+  demo at another API host. The rebuilt module reads no configuration and always calls the API it is served
+  from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went
+  with it, and the image no longer ships a `UiModule` config folder.
+- Every other environment variable is unchanged.
 
 ### 🧪 Diagnostics Module
 - Packing Logs configuration was **flattened** - `Path`, `FileName`, `DateFormat`, and `ChannelLimit` now sit
@@ -93,6 +108,11 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   once a day, and each deletion is logged. **Off by default** (`null`) - files are kept until you remove them
   yourself. Only files matching the configured `FileName` pattern in the configured `Path` are touched, and only
   at the top level.
+- **`/_health` now reports what the instance is running.** Its `System` entry carried only `Processors`. It now
+  also carries `Version`, `Environment`, `StartedAt` and `Uptime`, plus `Features` - the names of everything
+  switched on, such as `HealthChecks`, `UIModule` or `SwaggerUI` - and `ReservedPaths`, the path prefixes that
+  never answer with a web page. `Processors` is unchanged, so an existing parser keeps working; the new keys are
+  there to check that a configuration arrived the way you meant it to.
 - Health check **`RestrictedIPs` now uses CIDR notation correctly**. The value after `/` was previously read as
   an address mask, so `192.168.1.0/24` covered nearly the whole IPv4 range instead of 256 addresses. Existing
   CIDR entries are now **much narrower** than they were. See
@@ -107,8 +127,33 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   fail startup validation instead of quietly admitting a host you did not name. `192.168.1.1/24` still means the
   whole `192.168.1.0/24` - that is what CIDR notation means - but the startup log now says so.
 
+### 🛡️ Service Module
+- The Service Module is **exempt from these notes** - see the note at the top of this page. One fix is worth
+  calling out on its own.
+- **The auth token rate limit no longer partitions on a caller-supplied header.** It partitions on the
+  connection's remote address, which forwarded headers resolve to the real caller wherever a proxy is trusted.
+  Before this, varying the header reset your own login throttle.
+
 ### 🎨 UI Module
-- The ViPaq Decoder reads the **new ViPaq format only**. Strings from earlier versions are rejected.
+- **The demo UI was rebuilt.** It was Blazor with an interactive server render mode; it is now Razor Pages, with
+  everything interactive running in the browser. **No SignalR circuit and no WebSocket**, so the demo works
+  behind a proxy or CDN that does not forward one.
+- **The page addresses changed** - `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and
+  `/Error` is now `/error/{errorCode?}`. Old links no longer resolve.
+- **The Protocol Decoder is now the ViPaq Decoder.** Same tool. It reads the **new ViPaq format only**, and
+  strings from earlier versions are rejected.
+- **A new page, `/instance`.** The version and environment this container is running, which features are
+  switched on and where each one answers, and the presets it loaded - so you can see whether your configuration
+  arrived the way you meant it to. It also links to GitHub Discussions.
+- **The Packing Demo starts from a random sample rather than a fixed one**, and its two randomize buttons are
+  now one. Bins are rolled first and items are sized to the largest of them, so a sample is never impossible to
+  pack.
+- **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.
+- **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode
+  whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept
+  in the same `theme` cookie, so anyone who already picked one keeps it.
+- **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup - see Core Changes for the
+  variable that went, and [UI Module]({% vlink /configuration/ui-module/index.md %}) for the page.
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.
@@ -174,3 +219,11 @@ To upgrade to **v3.0.0**, follow these steps:
    - If Binacle.Net runs behind a proxy, load balancer or CDN, enable
      [Forwarded Headers]({% vlink /configuration/core/forwarded-headers.md %}) as well. Without it the list is
      compared against the proxy's address and can never match your monitoring system.
+
+7. **Drop `BINACLEAPI_CONNECTION_STRING`**
+   - Delete it from any compose file, Kubernetes manifest or environment file. It is ignored, not rejected, so
+     nothing fails to start and nothing warns.
+   - Only affects you if you set it. Pointing the shipped demo at a different API host is no longer possible;
+     the demo calls the API it is served from.
+   - Any `Config_Files/UiModule/` directory you mounted or edited can be removed. The image no longer reads it.
+   - Bookmarks to `/PackingDemo` or `/ProtocolDecoder` need updating to `/packing` and `/vipaq`.

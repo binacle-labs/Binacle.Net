@@ -74,6 +74,14 @@ jobs:
         with:
           dotnet-version: ${{ vars.DONET_VERSION }}
 
+      # `just build image` reaches `publish`, which bundles the UI module's javascript. Without node the
+      # bundlers resolve out of a `node_modules` nothing installed and this job fails.
+      - name: Setup - Node
+        uses: ./.github/actions/setup-node
+
+      - name: Install npm packages
+        run: npm ci --ignore-scripts
+
       # The recipe the release builds through, so this proves that path. No login, no push, no credentials.
       - name: Build - image
         run: just build image

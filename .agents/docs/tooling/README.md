@@ -1,7 +1,7 @@
 ---
 id: "tooling"
-description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image and smoke modules for just, the benchmark/performance scripts, the tmux script, the local compose stacks, and emulator state"
-verified: 2026-08-23
+description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image and smoke modules for just, the benchmark/performance scripts, the wrangler configs, the local compose stacks, and emulator state"
+verified: 2026-08-25
 check: "Script list, tests.just leaves, coverage.just recipes, openapi.just, agents.just, regen.just, changelog.just, serve.just, build.just (the API publish/image pair and the three site builds), check.just and its lychee.toml, image.just (stacks and the four verify checks, whose certificate identity must match SECURITY.md) and smoke.just recipes, and the compose stack/file/service table match tooling/"
 also_update:
   - commands
@@ -23,7 +23,7 @@ deployment starting points live in samples (`$samples`). For the quick "how do I
 
 | Script | What it does |
 |---|---|
-| `serve.just` | **Not a script** — the `serve` module for the root `justfile`, everything run **from source**. `just serve api [profile]` runs the API via `dotnet run -lp <profile>` (`Normal`/`WithServiceModuleOnly`/`WithUiModuleOnly`/`WithAllModules`, aliases `N/S/U/All`, default `Normal`); `just serve docs` and `just serve demo` run jekyll + webpack watch together from `sites/<site>`; `just serve services-up [-d]` / `just serve services-down` bring up what the API talks to |
+| `serve.just` | **Not a script** — the `serve` module for the root `justfile`, everything run **from source**. `just serve api [profile]` runs the API via `dotnet run -lp <profile>` (`Normal`/`WithServiceModuleOnly`/`WithUiModuleOnly`/`WithAllModules`, aliases `N/S/U/All`, default `Normal`); `just serve docs`, `just serve demo` and `just serve www` run jekyll + webpack watch together from `sites/<site>`; `just serve services-up [-d]` / `just serve services-down` bring up what the API talks to |
 | `tests.just` | **Not a script** — the `test` module for the root `justfile`. One recipe per suite, run with `just test <leaf>`; see `$commands` for the list |
 | `performance.<slice>.sh` | `dotnet run -c Release` for the slice's `PerformanceTests`. Slices `lib`, `vipaq`. Writes to gitignored `PerformanceTests.Artifacts` |
 | `benchmarks.<slice>.sh [alias]` | `dotnet run -c Release --filter <pattern>` from the slice's `Benchmarks` project. Slices `lib`, `vipaq`. No arg = all |
@@ -36,10 +36,10 @@ deployment starting points live in samples (`$samples`). For the quick "how do I
 | `changelog.just` | **Not a script** — the `changelog` module for the root `justfile`. Reads `CHANGELOG.md` at the repo root. `just changelog extract <version\|Unreleased>` prints one release's section, with its headings promoted from `###` back to `##` for a release body; `just changelog check <version\|Unreleased>` exits 1 if that section is missing or empty. The release workflow calls both, so CI and a laptop parse the file the same way and the exact body can be previewed before a tag is pushed — see `$ci-cd/release-pipeline` |
 | `image.just` | **Not a script** — the `image` module for the root `justfile`. Runs what `build.just` produced: `just image up [full\|volume\|bind]` (default `full`) and `just image down [name]`; extra arguments pass through to `docker compose`. `up` creates and opens the bind-mounted folders first, and every stack stops with a pointer to `just build image` if `binacle-net:local` is missing. **Two recipes are the odd ones out** — `just image verify <version> [check]` reads a *published* image off Docker Hub, and `just image dockerhub-overview <version>` renders the Docker Hub page; neither builds anything and neither logs in. See below |
 | `smoke.just` | **Not a script** — the `smoke` module for the root `justfile`. Tests the image rather than the code. `just smoke test-structure [image]` runs `container-structure-test` against `tooling/smoke/structure.yaml`; `just smoke test <profile> [image]` does up → hurl → down for one profile; `just smoke up`/`down` are the manual halves; `just smoke all [image]` builds, checks the structure once, then runs every profile. Every recipe takes the image last, default `binacle-net:local`, so a published tag can be smoked too |
-| `tmux.sh` | Builds/re-attaches the `binacle` tmux session (windows `api`/`docs`/`demo`/`tests`/`misc`/`bench_1..3`, the two site panes in `sites/`); panes are pre-`cd`'d, nothing auto-runs |
+| `cloudflare/` | **Not a script** — one wrangler config per site: `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and `www.wrangler.jsonc`, plus a `README.md`. They are the whole deployment configuration for the three sites. **Nothing here is run by hand** — the three deploy workflows call `wrangler deploy --config` against them; see `$ci-cd` |
 
 The launch profiles live in `serve.just`; the benchmark filters live inside the per-slice `benchmarks.*`
-scripts. `tmux.sh` is standalone — it has no aliases.
+scripts.
 
 The five TS leaves (`shared-ts-unit`, `vipaq-ts-unit`, `packages-net-ui-unit`, `packages-cookies-unit`,
 `packages-theme-switcher-unit`) run jest from the repo root. Run

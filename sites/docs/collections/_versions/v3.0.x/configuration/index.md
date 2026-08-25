@@ -43,13 +43,11 @@ app
     ├── Presets.json
     ├── Cors.json
     ├── ForwardedHeaders.json
-    ├── DiagnosticsModule
-    │   ├── HealthChecks.json
-    │   ├── OpenTelemetry.json
-    │   ├── PackingLogs.json
-    │   └── Serilog.json
-    └── UiModule
-        └── ConnectionStrings.json
+    └── DiagnosticsModule
+        ├── HealthChecks.json
+        ├── OpenTelemetry.json
+        ├── PackingLogs.json
+        └── Serilog.json
 ```
 
 `ForwardedHeaders.json` ships with the feature turned off. `Cors.json` is not in the image at all - add it only

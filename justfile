@@ -1,6 +1,6 @@
 # Binacle.Net task runner.
-# Setup, the dev loops and the test, coverage, openapi, agents and build modules live here. Benchmarks,
-# performance and the tmux session are still shell scripts.
+# Setup, the dev loops and the test, coverage, openapi, agents and build modules live here. Benchmarks and
+# performance are still shell scripts.
 # `just` with no args lists every task. Install: sudo apt install just
 
 # List all tasks

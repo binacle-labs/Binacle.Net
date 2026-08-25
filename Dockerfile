@@ -5,7 +5,9 @@ WORKDIR /app
 # (--label in build.just, metadata-action in CI), so they add no layer and never bust this cache. In CI
 # metadata-action overrides the keys it also emits (title, description, source, url, licenses); documentation,
 # vendor and base.name are set nowhere else, so they survive from here. description is pinned to this same
-# string in release-docker-image.yml - change both or the published image says something else.
+# string in two other places - release-docker-image.yml, and api/src/Binacle.Net.Kernel/Metadata.cs, which is
+# what Swagger UI, Scalar and both published OpenAPI documents read. Change all three, or the image label and
+# the API documents disagree with no error anywhere.
 LABEL org.opencontainers.image.title="Binacle.Net" \
       org.opencontainers.image.description="Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds." \
       org.opencontainers.image.source="https://github.com/binacle-labs/Binacle.Net" \

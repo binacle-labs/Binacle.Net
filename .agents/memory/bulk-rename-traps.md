@@ -16,9 +16,11 @@ downstream fails. Use `xargs -d '\n'`, `-print0`/`-0`, or a script that quotes p
 **Stage new files before moving a directory.** A file created earlier in the same session and never `git add`ed
 is invisible to `git mv`, and an `rm -rf` of the emptied directory takes it with it.
 
-**A global using is not always safe.** `<Using Include="Binacle.Packing" />` collides with
-`Binacle.Net.UIModule`'s own `Models.PackedItem` / `UnpackedItem`, and with the api's `v3.Contracts.Algorithm`
-and `v4.Contracts.Algorithm`. Those two projects need per-file usings; the other nine took the global cleanly.
+**A global using is not always safe.** `<Using Include="Binacle.Packing" />` collides with the api's
+`v3.Contracts.Algorithm` and `v4.Contracts.Algorithm`, so that project needs per-file usings. It also
+collided with `Binacle.Net.UIModule`'s own `Models.PackedItem` / `UnpackedItem` - **those types are gone as of
+the 2026-08 rebuild**, and that `Models/` folder is now `Applet.cs` and `FeatureSwitch.cs`. The collision is
+the point, not the two type names.
 
 **Fully-qualified names do not move themselves.** Sites that write `Binacle.Lib.Algorithm` or `Lib.Algorithm`
 outright are invisible to any using-line sweep. Grep for the bare type name too, not just the using.

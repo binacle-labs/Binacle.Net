@@ -35,7 +35,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "before any git command, and before saying a task is finished"
   load: always
 - file: never-edit-published-sites.md
-  description: "Everything under sites/ publishes to the internet and is written in its own session. Two carve-outs - the three repo-facing READMEs, and security fixes to sample files."
+  description: "Everything under sites/ publishes to the internet and is written in its own session. Two carve-outs - the four repo-facing READMEs, and security fixes to sample files."
   when: "before editing anything under sites/"
   load: always
   paths: ["sites/**"]

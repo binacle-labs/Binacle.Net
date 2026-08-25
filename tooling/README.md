@@ -285,9 +285,4 @@ Still scripts, one per slice. Both take `-c Release` and write into gitignored f
 The alias tables live at the top of each `benchmarks.*` script - that is the list to change when a benchmark
 class is added or renamed.
 
----
 
-## 🖥️ Tmux
-`tmux.sh` builds (or re-attaches to) a session named `binacle` with windows `api`, `docs`, `demo`, `tests`,
-`misc` and `bench_1..3`. Panes are pre-`cd`'d but nothing runs automatically - it is a staging layout, not a
-launcher.

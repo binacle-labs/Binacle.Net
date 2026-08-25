@@ -7,5 +7,5 @@ internal class UIModuleOptions
 
 	// "light", "dark" or "system". _Layout.cshtml renders it and the browser reads it back off the html
 	// element - one value, or the server paints one theme and the switcher changes to another.
-	public string DefaultTheme { get; set; } = "light";
+	public string DefaultTheme { get; set; } = "system";
 }

@@ -54,7 +54,7 @@ You need the .NET SDK, Node, Ruby, `just` and - for the container image only - D
 **[DEVELOPMENT.md](DEVELOPMENT.md)** has the versions, the pin files and the install commands.
 
 ```bash
-just install                     # npm workspaces, both sites' gems, then the asset copy
+just install                     # npm workspaces, all three sites' gems, then the asset copy
 just test all                    # every suite that needs nothing brought up
 just build image                 # publish, then tag binacle-net:local
 ```

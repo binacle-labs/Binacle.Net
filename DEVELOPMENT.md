@@ -14,8 +14,8 @@ meaning the same thing.
 | Tool | Version | Pin file | Needed for |
 |---|---|---|---|
 | .NET SDK | 10.x | none (`Directory.Build.props` sets `net10.0`) | the API, `lib`, `vipaq` - everything C# |
-| Node.js, via [nvm](https://github.com/nvm-sh/nvm) | 22 | `.nvmrc` | `just install`, the TS packages, `assets`, both sites' webpack |
-| Ruby, via [rbenv](https://github.com/rbenv/rbenv) | 3.4.7 | `sites/docs/.ruby-version`, `sites/demo/.ruby-version` | Jekyll, for **both** sites |
+| Node.js, via [nvm](https://github.com/nvm-sh/nvm) | 22 | `.nvmrc` | `just install`, the TS packages, `assets`, all three sites' webpack |
+| Ruby, via [rbenv](https://github.com/rbenv/rbenv) | 3.4.7 | `sites/docs/.ruby-version`, `sites/demo/.ruby-version`, `sites/www/.ruby-version` | Jekyll, for **all three** sites |
 | [just](https://github.com/casey/just#installation) | any recent | none | every recipe in this repo |
 | Docker | 28+ | none | the image, the `image` and `smoke` modules, the Postgres and AzureStorage test leaves |
 
@@ -216,7 +216,7 @@ a check that only passes with a credential is not checking a public artifact.
 ## First run
 
 ```bash
-just install                     # npm workspaces, both sites' gems, then the asset copy
+just install                     # npm workspaces, all three sites' gems, then the asset copy
 just test all                    # every suite that needs nothing brought up
 just build image                 # publish, then tag binacle-net:local
 ```

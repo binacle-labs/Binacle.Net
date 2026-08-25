@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-23
+verified: 2026-08-25
 check: Test leaves match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -11,9 +11,8 @@ paths:
 # Commands
 
 Setup, running things, tests, coverage, the OpenAPI documents, the image build, the smoke suite, the agent
-indexes and the committed generated data are `just` recipes; only the benchmarks, the performance runs and the
-tmux session are still scripts in
-`tooling/`. All are run
+indexes and the committed generated data are `just` recipes; only the benchmarks and the performance runs are
+still scripts in `tooling/`. All are run
 from the repo root. `just` with no arguments lists everything. For the `tooling/` directory anatomy (scripts,
 local compose, env, emulator state) see `$tooling`.
 
@@ -268,16 +267,6 @@ Every run is deterministic, so `check` runs everything and then asks whether the
 `.json` the generators write, because those folders also hold their own README and `vipaq/test-vectors` holds
 hand-authored vectors. **No workflow calls `check`** — it is for the maintainer who edited a tool or a source
 problem.
-
-## Dev session (tmux)
-
-```bash
-./tooling/tmux.sh
-```
-
-Builds (or re-attaches to) a tmux session named `binacle` with windows `api`, `docs`, `demo`, `tests`, `misc`, and
-`bench_1`/`bench_2`/`bench_3`. Each pane is pre-`cd`'d to the right folder but runs nothing automatically — it's a
-staging layout for the `just` recipes and the remaining `tooling/*.sh` scripts. Requires `tmux`.
 
 ## Build
 
