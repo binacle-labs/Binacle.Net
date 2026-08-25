@@ -68,6 +68,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting - but v4-stable is waiting on this one, or on another candidate"
   paths: ["api/**"]
+- file: api/packing-demo-bugs.md
+  description: "Ten correctness and accessibility bugs in the shared packing demo component - most of them ship inside the image as well as on the demo site"
+  state: ready
+  waits-on: "nothing"
+  paths: ["packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "a packing-only image variant, without the ServiceModule assemblies"
   state: idea
