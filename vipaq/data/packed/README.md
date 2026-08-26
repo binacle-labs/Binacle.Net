@@ -1,15 +1,16 @@
 # Packed placed-result data
 
-Frozen, packed results read by the ViPaq test kernel's `BischoffDataProvider` and `CustomProblemsDataProvider`
-(merged for curated runs by `CuratedScenarioProvider`). Each sample is a bin plus the
-**placed** items a packing run produced — dimensions **and** coordinates (`L x W x H (X,Y,Z)`) — which is what
-ViPaq serializes. The source problems carry only item *types* with a quantity and no coordinates, so the
-coordinates only exist after packing.
+Frozen, packed results read by the ViPaq test kernel's `BischoffDataProvider`, `CustomProblemsDataProvider`
+and `DemoSamplesDataProvider` (the first two merged for curated runs by `CuratedScenarioProvider`). Each
+sample is a bin plus the **placed** items a packing run produced — dimensions **and** coordinates
+(`L x W x H (X,Y,Z)`) — which is what ViPaq serializes. The source problems carry only item *types* with a
+quantity and no coordinates, so the coordinates only exist after packing.
 
 ## 🚫 Generated — do not hand-edit
 
 These files are produced by `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`. To change them, edit the source
-problems (`shared/data/bischoff-suite`, `shared/data/custom-problems`) or the tool, then regenerate:
+problems (`shared/data/bischoff-suite`, `shared/data/custom-problems`, `shared/data/demo-samples`) or the
+tool, then regenerate:
 
 ```
 just regen vipaq-packed-data
@@ -27,11 +28,16 @@ Split by source family, mirroring `shared/data`:
 
 - `custom-problems/` — `baseline`, `complex`, `simple`.
 - `bischoff-suite/` — `orlib_thpack1` .. `orlib_thpack7` (BR1–BR7).
+- `demo-samples/` — the demo site's sample set, `01-opening-set` .. `20-wfd-wins`.
 
 The **algorithm** rides on the file name as a `.<algo>` suffix, not a folder — e.g. `orlib_thpack1.ffd.json`.
-Only **FFD** is generated today; WFD/BFD can be added later (one more entry in the tool) and land as
-`.wfd.json` / `.bfd.json` files beside the FFD ones. Different algorithms place items differently, so their
-coordinates — and tokens — differ; the suffix keeps the sets apart without duplicating the folder tree.
+Every algorithm the packer offers is generated: `.ffd.json`, `.wfd.json` and `.bfd.json`, side by side in the
+same folder. The suffix names the family, not the implementation version — the tool packs through the same
+factory the API uses, which is the v2 implementation of each. Different algorithms place items differently, so
+their coordinates — and tokens — differ; the suffix keeps the sets apart without duplicating the folder tree.
+
+The test kernel reads a sample's name as `<problem>.<algo>`, so the same problem under three algorithms is
+three distinct scenarios.
 
 The tool prints a per-file and total sample/item count on each run; that console summary is the run's report,
 so there is no committed index file to keep in sync.

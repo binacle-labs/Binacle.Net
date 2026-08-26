@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Binacle.CompactNotation;
 using Binacle.Geometry;
+using Binacle.Packing;
 using Binacle.TestReporting;
 
 namespace Binacle.OrLibrary.Converter;
@@ -17,9 +18,11 @@ namespace Binacle.OrLibrary.Converter;
 public sealed class BischoffSuiteConverter : IConverter
 {
 	// Every Bischoff & Ratcliff instance fills the container to ~98% but never tessellates perfectly, so the
-	// outcome is always PartiallyPacked. Recorded once per operation. The tests kernel runs the real packer
-	// against this baseline, so a FullyPacked or NotPacked fails and signals a real change.
-	private const string ExpectedResult = "PartiallyPacked PartiallyPacked";
+	// outcome is always PartiallyPacked, and the same for every algorithm.
+	private const string ExpectedStatuses = "PartiallyPacked PartiallyPacked";
+
+	private static readonly IReadOnlyDictionary<string, string> ExpectedResult =
+		Enum.GetValues<Algorithm>().ToDictionary(algorithm => algorithm.ToString(), _ => ExpectedStatuses);
 
 	public void Convert()
 	{

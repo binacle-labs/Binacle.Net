@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "DemoSample_20_OrLibraryThpack1_58_587x233x220",
+    "Bin": "587x233x220",
+    "Metrics": "30070062 30089620 92 99.94",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "105x81x46 [38]",
+      "115x81x61 [22]",
+      "72x51x23 [32]"
+    ]
+  }
+]

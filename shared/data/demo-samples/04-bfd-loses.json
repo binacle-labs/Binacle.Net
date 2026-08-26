@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "DemoSample_04_BfdLoses_60x35x25",
+    "Bin": "60x35x25",
+    "Metrics": "46000 52500 10 87.62",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "16x25x10 [4]",
+      "25x8x25 [6]"
+    ]
+  }
+]

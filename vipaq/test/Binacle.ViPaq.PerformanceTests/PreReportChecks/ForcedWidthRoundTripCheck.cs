@@ -18,6 +18,7 @@ internal sealed class ForcedWidthRoundTripCheck : IPreReportCheck
 	{
 		AssertRoundTrips(CustomProblemsDataProvider.All);
 		AssertRoundTrips(BischoffDataProvider.All);
+		AssertRoundTrips(DemoSamplesDataProvider.All);
 	}
 
 	private static void AssertRoundTrips(IReadOnlyCollection<Scenario> scenarios)

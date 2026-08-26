@@ -12,7 +12,8 @@ internal static class ScenarioReader
 		public string? Name { get; set; }
 		public string? Bin{ get; set; }
 		public string? Metrics { get; set; }
-		public string? Result { get; set; }
+		// An object keyed by algorithm - read as a JsonElement so a wrong shape fails here, naming the scenario.
+		public JsonElement? Result { get; set; }
 		public string[]? Items { get; set; }
 	}
 
@@ -41,7 +42,7 @@ internal static class ScenarioReader
 				{
 					throw new ArgumentNullException("No metrics found in scenario");
 				}
-				if (string.IsNullOrWhiteSpace(readScenario.Result))
+				if (readScenario.Result is not { } result || result.ValueKind == JsonValueKind.Null)
 				{
 					throw new ArgumentNullException("No result found in scenario");
 				}
@@ -50,15 +51,20 @@ internal static class ScenarioReader
 					throw new ArgumentNullException("No items found in scenario");
 				}
 
-				var resultScenario = Scenario.Create(
+				if (result.ValueKind != JsonValueKind.Object)
+				{
+					throw new ArgumentException(
+						$"Invalid result in scenario {readScenario.Name}. Expected an object keyed by algorithm, "
+						+ "for example { \"FFD\": \"FullyPacked FullyPacked\" }.");
+				}
+
+				resultScenarios.Add(Scenario.Create(
 					readScenario.Name,
 					readScenario.Bin,
-					readScenario.Items, 
+					readScenario.Items,
 					readScenario.Metrics,
-					readScenario.Result
-				);
-
-				resultScenarios.Add(resultScenario);
+					result.EnumerateObject().ToDictionary(x => x.Name, x => x.Value.GetString()!)
+				));
 			}
 		}
 

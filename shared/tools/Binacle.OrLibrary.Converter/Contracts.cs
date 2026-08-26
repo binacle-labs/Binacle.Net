@@ -6,13 +6,13 @@ namespace Binacle.OrLibrary.Converter;
 //   Name    — "OrLibrary_thpack{file}_{problem index}", e.g. "OrLibrary_thpack1_1".
 //   Bin      — the container as "LxWxH".
 //   Metrics  — "ItemsVolume BinVolume ItemsCount Percentage": totals over all box types, and their volume ratio.
-//   Result   — "{PackingStatus} {FittingStatus}": the expected outcome the tests assert against.
+//   Result   — the expected outcome the tests assert against, keyed by algorithm: "{PackingStatus} {FittingStatus}".
 //   Items    — the box types as "LxWxH [Quantity]" (types with a count, not placed items — no coordinates).
 internal sealed class Scenario
 {
 	public required string Name { get; init; }
 	public required string Bin { get; init; }
 	public required string Metrics { get; init; }
-	public required string Result { get; init; }
+	public required IReadOnlyDictionary<string, string> Result { get; init; }
 	public required string[] Items { get; init; }
 }

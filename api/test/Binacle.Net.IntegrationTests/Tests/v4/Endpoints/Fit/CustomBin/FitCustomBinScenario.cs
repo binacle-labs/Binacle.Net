@@ -75,6 +75,6 @@ public class FitCustomBinScenario
 		result.PackedBinVolumePercentage
 			.ShouldBeLessThanOrEqualTo(scenario.Metrics.Percentage, new PercentageComparer());
 
-		scenario.Result.EvaluateResult(result);
+		scenario.Result.EvaluateResult(result, request.Parameters);
 	}
 }

@@ -22,6 +22,19 @@ A new JSON file dropped into the right data folder is picked up automatically (e
 `*.json` glob), so growing coverage is just authoring files. Provenance and the thpack1–7 vs thpack8/9 caveat live
 in the `README.md` beside each data folder — read those before touching the data.
 
+## Done 2026-08-26 — the demo's sample set is fixture data
+
+`shared/data/demo-samples/` holds 20 files, one per sample, 51 entries. Every `Result` was measured against a
+live API on all three algorithms and both endpoints. ViPaq packs them too, into
+`vipaq/data/packed/demo-samples/`.
+
+**The direction settled the other way from what this section first proposed.** The data is the source and the
+demo reads it: `just regen demo-samples` reassembles the files into
+`packages/binacle-net-ui/src/utils/sampleData.ts`. Nothing reads the demo package to write the data.
+
+**Nothing under this heading is open. It is here so the next reader knows it landed** rather than re-deriving
+it, and it goes when this file does.
+
 ## Pending — review and grow result-selection
 
 Result selection has the thinnest coverage: a single `baseline.json` per case (BestAlgorithm, BestBin, SmallestBin).
@@ -55,12 +68,15 @@ is the only hand-authored set, and adding a problem here reaches lib's algorithm
 
 ```json
 { "Name": "...", "Bin": "60x40x10", "Metrics": "125 24000 1 0.5",
-  "Result": "FullyPacked FullyPacked", "Items": ["5x5x5 [1]"] }
+  "Result": { "FFD": "FullyPacked FullyPacked", "WFD": "FullyPacked FullyPacked",
+              "BFD": "FullyPacked FullyPacked" },
+  "Items": ["5x5x5 [1]"] }
 ```
 
 `Metrics` is pure arithmetic (items volume, bin volume, item count, fill %) — computable, no packer needed.
-`Result` is the **expected** outcome, and the tests run the real packer and check against it. So you must know what
-the packer will do before you write the file — a new problem is a small piece of reasoning, not a paste.
+`Result` is the **expected** outcome, keyed by algorithm, and the tests run the real packer and check against it.
+So you must know what each algorithm will do before you write the file — a new problem is a small piece of
+reasoning, not a paste.
 
 Consider whether Bischoff already covers the algorithm cases well enough that `custom-problems` can stay small and
 targeted, growing only for the reasons above.

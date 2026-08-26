@@ -42,8 +42,12 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **The demo UI was rebuilt**, its page addresses changed, and it gained a page describing the instance you are
   on.
 - **The image creates `/app/data`** and gives it to the app user, so a volume mounted there is writable.
+- **The image is signed**, and carries an SBOM and build provenance, so you can verify what you pull.
+- **The image is about a third smaller** - it uses the .NET runtime from its base image instead of bundling a
+  second copy.
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.
 - **Versioned documentation** now covers every minor line, so older images keep their docs.
+- **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.
 
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.
@@ -83,6 +87,9 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - A **startup warning** when a forwarding header arrives and does not take effect, either because the feature is
   off or because the trust list does not name your proxy. Logged once. Without it both states are silent and the
   app quietly reads the proxy as the caller.
+- **No `Strict-Transport-Security` header is sent.** The `UseHsts` call arrived with the demo UI's template and
+  only ever ran when that UI was on. The image terminates no TLS, so the proxy or CDN in front of it is the only
+  thing that knows whether HSTS is safe to pin, and a browser honours it until it expires.
 - **The image now creates `/app/data` and gives it to the app user.** A volume mounted there is writable with no
   extra setup. Previously docker created the mount point as root, the app does not run as root, and packing logs
   and the SQLite database could not be written to a fresh named volume.
@@ -91,6 +98,27 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   like a fatal error.
 - The image carries **OCI labels** - title, description, source, url, documentation, vendor, licence and base
   image - plus version, revision and created per build.
+- **The description at the top of every API document changed.** The same one-line summary now appears in Swagger
+  UI, Scalar and the image's `description` label.
+- **The image is signed, and ships an SBOM and build provenance.** Signing is keyless, so there is no public key
+  to fetch - the signature is checked against the workflow that produced it - and it covers the digest, so it
+  holds for every tag pointing at that image:
+
+  ```bash
+  cosign verify binacle/binacle-net:3.0.0 \
+    --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com
+  ```
+
+  The SPDX SBOM and SLSA provenance travel inside the image index;
+  `docker buildx imagetools inspect binacle/binacle-net:3.0.0` lists them. See
+  [Verifying a Release]({% vlink verifying-a-release.md %}).
+- **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command
+  above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is
+  written into the signature and does not redirect - a stale one fails the check rather than warning.
+- **The image is smaller - around 108 MB, where the same image built the old way was 158 MB.** The app is
+  published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead
+  of carrying a second copy of it. Nothing about running the container changes.
 - **One environment variable was removed - `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the
   demo at another API host. The rebuilt module reads no configuration and always calls the API it is served
   from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went
@@ -140,18 +168,41 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   behind a proxy or CDN that does not forward one.
 - **The page addresses changed** - `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and
   `/Error` is now `/error/{errorCode?}`. Old links no longer resolve.
+- **The demo's static files moved under `/_content/Binacle.Net.UIModule/`.** `/favicon.ico`, `/css/main.css`,
+  `/js/`, `/vendor/` and `/assets/` no longer answer at the root.
+- **API paths never answer with the demo's error page.** A miss under `/api`, `/openapi`, `/swagger`, `/scalar`,
+  `/_health`, `/_debug` or `/_content` returns the bare status or the JSON the endpoint wrote. Only `/api`,
+  `/swagger` and `/scalar` were exempt before, so a miss on `/openapi` or a diagnostics path answered a caller
+  with a web page.
 - **The Protocol Decoder is now the ViPaq Decoder.** Same tool. It reads the **new ViPaq format only**, and
-  strings from earlier versions are rejected.
+  strings from earlier versions are rejected. See [ViPaq Protocol]({% vlink vipaq-protocol.md %}).
 - **A new page, `/instance`.** The version and environment this container is running, which features are
   switched on and where each one answers, and the presets it loaded - so you can see whether your configuration
   arrived the way you meant it to. It also links to GitHub Discussions.
-- **The Packing Demo starts from a random sample rather than a fixed one**, and its two randomize buttons are
-  now one. Bins are rolled first and items are sized to the largest of them, so a sample is never impossible to
-  pack.
+- **The footer is one line** - copyright, version, licence, GitHub and Docker Hub. The Swagger UI and Scalar
+  links that used to be footer badges are on the instance page, which also says whether each one is switched on.
+- **Nothing on a page is fetched from the internet.** The footer's `img.shields.io` badges are gone, and the
+  stylesheet, the icon font, the logos and the 3D library are all served from the image. An air-gapped install
+  renders the same as any other.
+- **The Packing Demo carries 17 worked examples instead of one**, and its two randomize buttons are now one. The
+  same example always loads, so a link to the page shows everyone the same thing; Randomize moves to a different
+  one. Each was checked against all three algorithms, and each is a set where the bins genuinely disagree -
+  which is the comparison the page exists to show.
+- **Add bin copies the bin above it, and Add item is sized to the bins you already have.** Both used to roll a
+  fresh random box, which could add an item no bin on the page could hold.
 - **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.
+- **Validation errors from the API are listed again.** The dialog built its message list wrong and always came
+  up empty, so a rejected request opened a dialog with nothing in it.
+- **A decoded bin with a zero side reads `0%` rather than `NaN%`** in the ViPaq Decoder. The bin comes out of a
+  string a visitor pastes in, so a zero side is reachable.
+- **The error page names the problem** - a separate line for 404, 403 and 500 instead of one sentence for all of
+  them - and links back to the home page.
 - **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode
   whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept
   in the same `theme` cookie, so anyone who already picked one keeps it.
+- **The theme now sticks on an instance served over plain http.** The `theme` cookie was always written
+  `Secure`, which a browser drops off https, so the demo reset to the default on every page load. It is marked
+  `Secure` only where the page is served over https.
 - **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup - see Core Changes for the
   variable that went, and [UI Module]({% vlink /configuration/ui-module/index.md %}) for the page.
 
@@ -161,13 +212,23 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - The separate fitting algorithm family was retired.
 
 ### 🏗️ Internal Work
-- Restructured the repository - the API, library, ViPaq, and shared test data now live in their own roots.
-- Extracted **Binacle.Geometry** into its own library.
-- Reworked the packing log pipeline, moving the generic parts into the Kernel.
-- Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.
-- Added cross-language ViPaq interop tests between C# and TypeScript.
 - Patched two **high-severity advisories** in transitive dependencies - `Microsoft.OpenApi` and the bundled
   **SQLite** native library.
+- Extracted **Binacle.Geometry** into its own library.
+- Reworked the packing log pipeline, moving the generic parts into the Kernel.
+
+Everything below is work on the repository. None of it reaches the image.
+
+- Restructured the repository - the API, library, ViPaq, and shared test data now live in their own roots. No
+  route, contract or configuration moved with it, which is why it is listed here rather than as a change above.
+- Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.
+- Added cross-language ViPaq interop tests between C# and TypeScript.
+- **Rebuilt the release pipeline.** A tag now builds the image once, smoke tests it in a staging registry, then
+  copies the tested digest to Docker Hub - so what is published is bit for bit what passed, and a failure
+  anywhere leaves Docker Hub untouched. The release body is the changelog, extracted by the workflow.
+- Renamed two top-level folders - `config/` is now `tooling/`, and build output goes to `artifacts/` instead of
+  `build/`.
+- Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.
 
 ### 📚 Versioned Docs
 - Documentation is now versioned per minor line - `v1.3.x`, `v2.0.x`, `v2.1.x`, `v3.0.x` - so any image can be
@@ -227,3 +288,10 @@ To upgrade to **v3.0.0**, follow these steps:
      the demo calls the API it is served from.
    - Any `Config_Files/UiModule/` directory you mounted or edited can be removed. The image no longer reads it.
    - Bookmarks to `/PackingDemo` or `/ProtocolDecoder` need updating to `/packing` and `/vipaq`.
+
+8. **Update any pinned `cosign verify` command**
+   - The repository moved to the `binacle-labs` organization and the certificate identity moved with it. Replace
+     `ChrisMavrommatis` with `binacle-labs` in `--certificate-identity-regexp`.
+   - Only affects you if you verify signatures in a script or a pipeline. A stale identity **fails** the check,
+     it does not warn - so it reads as a tampered image rather than an out-of-date command.
+   - See [Verifying a Release]({% vlink verifying-a-release.md %}) for the full command.

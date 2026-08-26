@@ -18,16 +18,22 @@ Same tests-kernel compact scenario format as the [Bischoff suite](../bischoff-su
   "Name": "Baseline_5x5x5-1_FitsIn_60x40x10",
   "Bin": "60x40x10",
   "Metrics": "125 24000 1 0.5",
-  "Result": "FullyPacked FullyPacked",
+  "Result": {
+    "FFD": "FullyPacked FullyPacked",
+    "WFD": "FullyPacked FullyPacked",
+    "BFD": "FullyPacked FullyPacked"
+  },
   "Items": ["5x5x5 [1]"]
 }
 ```
 
 - `Bin` — `LxWxH`; `Items` — `LxWxH [Quantity]` (types with a count, no coordinates).
-- `Metrics` — `ItemsVolume BinVolume ItemsCount Percentage` (totals, not packed amounts); `Result` —
-  `{PackingStatus} {FittingStatus}`.
+- `Metrics` — `ItemsVolume BinVolume ItemsCount Percentage` (totals, not packed amounts); `Result` — keyed by
+  algorithm, each key holding a `{PackingStatus} {FittingStatus}` pair.
 
 `Metrics` is pure arithmetic over `Bin` + `Items`. `Result` is the **expected** outcome the tests assert against
-— hand-set per case (these problems are authored, not converted from a source). This folder is the single source:
+— hand-set per case (these problems are authored, not converted from a source). Every problem here is small
+enough that all three algorithms land on the same answer, so each names the same pair three times. This folder
+is the single source:
 the tests kernel embeds these files directly (via `Link`/`LogicalName` in `Binacle.TestsKernel.csproj`) under the
 manifest name `Binacle.TestsKernel.Algorithms.Data.CustomProblems.<file>`, so there is no separate kernel copy.

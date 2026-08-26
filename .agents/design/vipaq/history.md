@@ -1,8 +1,8 @@
 ---
 id: vipaq/history
-description: ViPaq design history — superseded throwaway-prototype measurements (2026-07-05) that informed the locked decisions. Reference only, not current truth.
-verified: 2026-07-05
-check: Nothing. Frozen at the date it was measured — a history record is superseded, never re-verified. It declares no `paths:` on purpose, so a session working on live ViPaq code is not handed numbers that no longer describe it.
+description: ViPaq design history — superseded throwaway-prototype measurements (2026-07-05), the earlier framings of decisions that were later amended or reversed, and where the test files the v2 rebuild deleted ended up. Reference only, not current truth.
+verified: 2026-08-26
+check: The measurements are frozen and are never re-measured. What can rot is checked — every path in "Where the deleted test files went" still resolves under `vipaq/test/Binacle.ViPaq.UnitTests/` or `vipaq/packages/binacle-vipaq/`, and every claim about what the real library has since measured still matches `$vipaq/findings`. It declares no `paths:` on purpose, so a session working on live ViPaq code is not handed numbers that no longer describe it.
 ---
 
 # ViPaq — design history
@@ -42,9 +42,13 @@ them as current.
 ## Prototype performance — surviving conclusions
 The prototype's headline "decode ~10× faster" came from decompress-once-then-read-from-span. **That fix back-ports
 to v1 with no format change** — it was ported and re-measured on the real lib (`$vipaq/findings`, "Decode fix"; the
-real win was ~4–5×, not 10×). Two conclusions still stand and are unmeasured on the real lib:
-- **Fast-codec v2 encode was never directly benchmarked** (the throwaway codec was hardwired to q11).
-- **v2 allocates ~1.4–3.4× v1** on the prototype, so "encode ≈ v1" is optimistic.
+real win was ~4–5×, not 10×). Two conclusions were left open at the time; neither is open now:
+- **Fast-codec v2 encode was never directly benchmarked here** (the throwaway codec was hardwired to q11).
+  It has been since, on the real library — `$vipaq/findings`, "Compression cost, isolated": deflate encode is
+  ~2.75× the format-only encode, ~5–8 µs per pack.
+- **v2 allocates ~1.4–3.4× v1** on the prototype, so "encode ≈ v1" was optimistic. This can never be checked
+  on the real library: `$vipaq/decisions#D11` made the rebuild breaking and v1 is gone, so there is no v1 side
+  left to measure against. The prototype ratio is the only number there will be.
 
 ## Superseded decision framings
 
@@ -75,11 +79,14 @@ Recovered 2026-08-13 from comments during the comment-thinning pass. The v2 rebu
 files and folded their cases into new ones. Nothing recorded where they went, so "was this ever covered?" had no
 answer outside the comments that are now gone.
 
+C# paths are relative to `vipaq/test/Binacle.ViPaq.UnitTests/`, TypeScript paths to `vipaq/packages/binacle-vipaq/`.
+The named vector files are under `vipaq/test-vectors/`.
+
 | Deleted | Absorbed by | What happened to the cases |
 |---|---|---|
 | `ProtocolExtensionsTests`, `ProtocolExtensionsBehaviorTests` | `Tests/Protocol/LayoutCodecTests.cs` | The old extensions wrote and read a dimensions block field-by-field at a chosen width; that job moved to the layout codecs. "Unsupported BitSize rejected" became "LayoutCodecFactory rejects an unknown Layout code"; the over-ceiling read-reject case moved to the width-invalid vectors. |
 | `BitSizeHelperTests` | `Tests/Width/WidthSelectionTests.cs` | Its `255 -> Eight` / `256 -> Sixteen` rows now live in `width-selection.json`. |
 | `BitSizeHelperSaturationTests` | `Tests/Width/WidthInvalidTests.cs` | The old code capped every type at `2^53-1`; those cases became the "exceeds max (65536)" rows. |
-| `encodingInfo.test.ts`, `writeEncodingInfoToBuffer.test.ts` | `packages/binacle-vipaq/tests/utils/header.test.ts` | Both were written for the 1-byte header era. |
+| `encodingInfo.test.ts`, `writeEncodingInfoToBuffer.test.ts` | `tests/utils/header.test.ts` | Both were written for the 1-byte header era. |
 | `compressBuffer.test.ts`, `getDecodingDataStream.test.ts` | `tests/compression.test.ts`, `tests/decodeInvalid.test.ts` | Deleted with the reason "compression is deferred", which D16 then overtook - but the coverage came back in the v2 shape rather than as the old files. Round-trip per codec, deflate-vs-gzip wrapper size and "rejects bytes that are not its stream" are in `compression.test.ts`; the uncompressed-passthrough case is its `noOp leaves the body identical` test; the reserved-version rejection moved to the shared `decode-invalid.json` vectors. Only the gzip-magic-bytes assertion has no direct successor. |
 

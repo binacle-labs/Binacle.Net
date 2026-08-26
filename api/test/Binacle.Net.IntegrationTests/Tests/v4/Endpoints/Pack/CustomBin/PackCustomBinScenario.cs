@@ -86,6 +86,6 @@ public class PackCustomBinScenario
 			}
 		}
 
-		scenario.Result.EvaluateResult(result);
+		scenario.Result.EvaluateResult(result, request.Parameters);
 	}
 }

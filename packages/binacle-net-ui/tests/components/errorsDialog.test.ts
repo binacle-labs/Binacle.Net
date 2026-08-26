@@ -9,6 +9,27 @@ function createDialog() {
 	return errorsDialog(defaultTitle);
 }
 
+// jsdom 20 has HTMLDialogElement without showModal or close, so the two calls the component makes are
+// stubbed onto the element and open is driven through the attribute, which jsdom does reflect.
+function createMountedDialog() {
+	const root = document.createElement("div");
+	const element = document.createElement("dialog") as HTMLDialogElement;
+	root.append(element);
+
+	const showModal = jest.fn(() => element.setAttribute("open", ""));
+	const close = jest.fn(() => {
+		element.removeAttribute("open");
+		element.dispatchEvent(new Event("close"));
+	});
+	Object.assign(element, {showModal, close});
+
+	const dialog = errorsDialog(defaultTitle) as ReturnType<typeof errorsDialog> & {$root: HTMLElement};
+	dialog.$root = root;
+	dialog.init();
+
+	return {dialog, element, showModal, close};
+}
+
 describe("the starting state", () => {
 	test("the title is the default", () => {
 		const dialog = createDialog();
@@ -127,5 +148,69 @@ describe("the plugin", () => {
 		errorsDialogPlugin(alpine);
 
 		expect(registered).toEqual({errors_dialog: errorsDialog});
+	});
+});
+
+describe("opening it as a real dialog", () => {
+	test("an error opens it modally", () => {
+		const {dialog, showModal} = createMountedDialog();
+
+		dialog.onErrorOccurred(["first"]);
+
+		expect(showModal).toHaveBeenCalledTimes(1);
+	});
+
+	test("a second error while it is open does not open it twice", () => {
+		const {dialog, showModal} = createMountedDialog();
+		dialog.onErrorOccurred(["first"]);
+
+		dialog.onErrorOccurred(["second"]);
+
+		expect(showModal).toHaveBeenCalledTimes(1);
+	});
+
+	test("an empty error list leaves it shut", () => {
+		const {dialog, showModal} = createMountedDialog();
+
+		dialog.onErrorOccurred([]);
+
+		expect(showModal).not.toHaveBeenCalled();
+	});
+
+	test("closing it closes the element", () => {
+		const {dialog, close} = createMountedDialog();
+		dialog.onErrorOccurred(["first"]);
+
+		dialog.closeDialog();
+
+		expect(close).toHaveBeenCalledTimes(1);
+	});
+
+	// Escape closes a native dialog without going through closeDialog, which would leave the errors set.
+	test("the element closing on its own clears the errors", () => {
+		const {dialog, element} = createMountedDialog();
+		dialog.onErrorOccurred(["first"]);
+
+		element.dispatchEvent(new Event("close"));
+
+		expect(dialog.errors).toEqual([]);
+	});
+
+	test("closing with nothing open does not call close", () => {
+		const {dialog, close} = createMountedDialog();
+
+		dialog.closeDialog();
+
+		expect(close).not.toHaveBeenCalled();
+	});
+});
+
+describe("with no dialog element in reach", () => {
+	test("an error still lands", () => {
+		const dialog = createDialog();
+
+		dialog.onErrorOccurred(["first"]);
+
+		expect(dialog.errors).toEqual(["first"]);
 	});
 });

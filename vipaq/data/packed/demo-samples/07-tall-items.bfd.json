@@ -1,0 +1,19 @@
+[
+	{
+		"Name": "DemoSample_07_TallItems_20x20x60",
+		"WidthBits": 8,
+		"Bin": "20x20x60",
+		"Items": [
+			"8x8x55 (0,0,0)",
+			"8x8x55 (0,8,0)",
+			"8x8x55 (8,0,0)",
+			"8x8x55 (8,8,0)"
+		]
+	},
+	{
+		"Name": "DemoSample_07_TallItems_40x40x30",
+		"WidthBits": 8,
+		"Bin": "40x40x30",
+		"Items": []
+	}
+]

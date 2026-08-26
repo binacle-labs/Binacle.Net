@@ -1,5 +1,5 @@
 ---
-description: Post-release - the work v3.0.0 causes and the checks to run once it is out
+description: Post-release - what to look at once v3.0.0 is out, what the release caused, and the plans it stops blocking. None of it holds the release up.
 ---
 
 # Post-release - v3.0.0
@@ -7,61 +7,148 @@ description: Post-release - the work v3.0.0 causes and the checks to run once it
 **Status:** Open once `v3.0.0` is tagged and the pipeline has run. **None of it gates anything** - the release
 is already out by the time this file opens.
 
-**Two halves.** The work first, because it is what the release caused and it is the half that can be silently
-skipped. Then the checks, which are reads.
+**A pointer surface, like the release file.** Where a row names a plan, the plan holds the work. Where a row
+has no plan, it is a single mechanical act with a known answer and it lives here.
 
-- **The work** points at plans, the same way the release file does. Where a row has no plan, it is a single
-  mechanical act with a known answer and it lives here.
-- **The checks need no plan.** Every one is something you run, read or look at, and comes back yes or no.
-  **If working an item needs a decision, a credential, a new file or a workflow, it is not a check** - it is a
-  row in the work half, or a plan.
+**Three lists, and they are in the order they should be worked.**
 
-**Delete this file once both lists are clear.** The tag does not delete it; working through it does.
+| List | What is in it | How to tell |
+|---|---|---|
+| **Things to look at** | you run it, read it, and it comes back yes or no | if it needs a decision, a password, a new file or a workflow, it is not one of these |
+| **Things to do** | what the release *caused* and would be wrong to leave | it is only true because v3.0.0 shipped |
+| **Plans that stop being stuck** | plans that were waiting on the release and now are not | each has its own file, state and blocker |
 
-Rewritten 2026-08-14, when the release scope was reset. Pruned 2026-08-20. Extended 2026-08-24 with the
-checks the rebuilt sites added. **Split into work and checks 2026-08-25.**
+**Look first, because looking is cheap and it finds things.** The work comes second because it is the half
+that can be quietly skipped. **Delete this file once the first two lists are clear** - the third is plans, and
+plans outlive it.
+
+Rewritten 2026-08-14 when the release scope was reset. Pruned 2026-08-20. Extended 2026-08-24 with what the
+rebuilt sites added. Split into work and checks 2026-08-25. **Reworked into three lists, rewritten for the
+test-release-then-real-release order, and put into plain English, 2026-08-26.**
 
 ---
 
-## The work
+## Things to look at
 
-### 1. Move the sample pins to `3.0`
+### Check the release landed
 
-**Do this as soon as the publish job is green.** Until then `binacle/binacle-net:3.0` does not resolve, and
-**a pin on `main` must name an image that exists on Docker Hub.** The tree at tag `v3.0.0` carries a beta pin
-for the length of one run; that is the accepted cost of the rule.
+- [ ] **Run the published image and check it answers.** `just smoke all binacle/binacle-net:3.0.0`. About a
+      minute, nothing to bring up.
+
+      **This confirms, it does not protect.** The pipeline already runs and checks the staging copy before
+      anything is copied across, so a broken image cannot reach Docker Hub. What this still buys is the one
+      thing the pipeline cannot check: that the **copy** landed something that runs, not just something with
+      the right ID.
+
+- [ ] **Check that `3.0` and `latest` now point at the new image.** **This is the one thing no test release
+      could rehearse.** A test release publishes its own exact name and nothing else, so `3.0` and `latest`
+      are created for the first time here. Until now `latest` meant `2.1.1`.
+
+- [ ] **Check all three names point at exactly the same image.**
+      `docker buildx imagetools inspect binacle/binacle-net:3.0.0 --format '{{ .Manifest.Digest }}'`, then the
+      same for `3.0` and `latest`. Three identical strings.
+
+- [ ] **Check the signature and the build record on the real `3.0.0`.**
+      `cosign verify binacle/binacle-net:3.0.0` with **both** the certificate-identity regexp and the OIDC
+      issuer - the identity flag is the entire value, since anyone with a GitHub account can sign anything.
+      Then `docker buildx imagetools inspect` for the SBOM and provenance entries.
+
+      **Docker Hub only.** Only the release workflow touches the staging registry, so nothing ever reads the
+      staging copy's signature. This passed on every test release including `3.0.0-beta.5`, under the same
+      identity v3.0.0 uses. **All that is new is that the copy writes three names instead of one.**
+
+- [ ] **Check no image name got locked by accident.** Read `immutable_tags_settings` back from the repository
+      API. The publish should have written `3.0.0`, `3.0` and `latest` with nothing in its way.
+
+- [ ] **Check GitHub reads the licence as GPL-3.0.** Read it back off the API. GitHub works the licence out on
+      its own servers, so pushing is the only way to find out. **This is a read, not a fix** - if it comes
+      back wrong, that is a finding for a plan.
+
+### Read what the release put in front of people
+
+- [ ] **Read the repository's front page.** `README.md` is the most read file in the repo, and its pin
+      warning names `binacle/binacle-net:3.0` - a tag that only starts resolving with this release. **A wrong
+      pin there outlives every other miss**, and a stale one would not fail loudly, because every tag this
+      project has ever published is still pullable. You have to look.
+
+- [ ] **Read the Docker Hub page - the release wrote it, and that step had never run before.** No test
+      release reaches it; that job is skipped for them. So Docker Hub went from the old hand-written 2.x page
+      straight to this one in a single write. Check that the description names 3.x
+      rather than `2.1.1`, the version placeholders were substituted with real numbers, the hand-maintained
+      tag list is gone, the verification section is there, and the logo and categories took.
+
+      **Run the quick start off the page itself** - the `docker run` and the `curl` - and check the response
+      matches what the page prints. It is the first thing most readers do, and **the response on it was
+      taken from the test image**, so this is where you find out whether the two images agree.
+
+      **This is an eyeball, not a rewrite.** If it turns into a rewrite, the pre-tag half did not happen.
+
+- [ ] **Run the published verification commands from a clean shell.** **Check that the command printed on the
+      Docker Hub page and in `SECURITY.md` is the one that actually works** - a published command that fails
+      reads as our bug.
+
+- [ ] **Open the demo in a browser, from the published `3.0.0` image.** `docker run` it with `UI_MODULE=True`
+      and open `/`, `/packing`, `/vipaq` and `/instance`. **The test release covered the same code; this
+      confirms the copy to Docker Hub carried it.** Use the packing page like a visitor - type your own
+      numbers, press Add bin, press Clear all - and check none of them puts an error box on the screen.
+
+- [ ] **Check the documentation site now shows v3.0.x.** `/version/latest/` should land on `v3.0.x` and the
+      version picker should show four versions. **The item most likely to be quietly skipped**, because
+      nothing fails when it is. **The rest of the live-site reads are in the docs plan** - they are not
+      repeated here.
+
+- [ ] **Check nothing public still names a test release.** Test releases 1 and 2 are deleted from Docker Hub,
+      so anything left pointing at one is a dead link rather than an old number.
+      `grep -rn "3\.0\.0-beta" --exclude-dir=.agents` over the repo, and read the docs site's
+      verifying-a-release page.
+
+      **One expected hit, and nobody can see it.** `sites/www/_data/exchange.yml` carries a YAML
+      comment Jekyll never renders, saying the `3.0` tag is unpublished. **That comment is stale from the tag
+      onward - delete it rather than re-reading it every release.**
+
+---
+
+## Things to do
+
+### 1. Point the example files at `3.0`
+
+**Do this the moment the publish job goes green.** Until then `binacle/binacle-net:3.0` does not exist, and
+**an example on `main` must name an image someone can actually pull.** The tree at tag `v3.0.0` names a test
+image for the length of one run; that is the accepted cost of the rule. **The test release did not change
+this** - a test release creates no `3.0` name, so the examples correctly stayed on `3.0.0-beta.4` through
+both tags.
 
 - [ ] **Six `image:` lines move from `3.0.0-beta.4` to `3.0`.**
       `samples/docker/{minimal,quickstart,prod,service,full}/docker-compose.yml` and
       `samples/kubernetes/minimal/binacle-deployment.yaml`.
       `grep -rn '3\.0\.0-beta' samples/` returns nothing.
 - [ ] **Drop the expiring comment in the same six files.** Each `image:` line carries two extra lines - *"Pinned
-      to the beta patch for now because `binacle/binacle-net:3.0` does not exist on Docker Hub yet - move to
+      to the test build for now because `binacle/binacle-net:3.0` does not exist on Docker Hub yet - move to
       the 3.0 minor tag once v3.0.0 is published."* Delete those two, leaving only *"Pinned on purpose - a
       copied sample must not jump to a new major on the next pull."* **That reason expires the moment v3.0.0
       publishes; the second one does not.**
 - [ ] **Rewrite the same reason in prose in `samples/README.md` and `samples/docker/README.md`.** Both name
       `3.0.0-beta.4` and explain why; both become `3.0` with the explanation cut.
 
-**A copied sample carries its pin forward forever**, which is why this is worth doing on the day rather than
-at leisure.
+**Someone who copies an example keeps that version forever**, which is why this is worth doing on the day
+rather than at leisure.
 
-### 2. Deploy the docs
+### 2. Publish the documentation site
 
 **The whole of `plans/sites/docs-v3-deploy.md`.** It holds the `v3.0.x` corrections, the swagger copies, the
 release-notes carry-over and the deploy itself, with its own checks.
 
 **It has to be after the tag** - the notes need the date and the `releases/tag/v3.0.0` link, and the worked
-example in `verifying-a-release.md` quotes real output from the released image. **It has to land before
-anything is announced.**
+example in `verifying-a-release.md` quotes real output from the released image. It currently verifies
+`3.0.0-beta.2`, which is deleted from Docker Hub; re-cut it from `just image verify 3.0.0`.
 
 **This is the single most losable item in the release.** Nothing fails if the deploy is skipped. `main`
 already says `current: v3.0.x`, so the site just quietly keeps serving v2.1.x as current and nothing says so.
 
-### 3. Settle the immutability switch
+### 3. Decide whether image names can be locked
 
-**`plans/ci-cd/dockerhub-tag-immutability.md`** - it holds the trap, the regexp, why prereleases are excluded,
-and the scratch-repo test procedure.
+**`plans/ci-cd/dockerhub-tag-immutability.md`** - it holds the trap, the pattern, why test releases are left
+out, and how to try it on a throwaway repository first.
 
 - [ ] **Correct the rule to released versions only, and read the value back from the API.** The stored value on
       2026-08-13 was `".*"`, which would freeze `latest` and `3.0` - the two tags this release moves. The
@@ -71,80 +158,33 @@ and the scratch-repo test procedure.
       permanent. **If the answer is no, write that down as a decision and drop the plan.** Leaving it a
       permanently open question is the one outcome with no value.
 
+### 4. Decide what happens to the old test images
+
+**A decision, not a task, and it has no plan.** `3.0.0-beta.3`, `-beta.4` and `-beta.5` can still be pulled
+from Docker Hub; 1 and 2 were deleted. **Either delete the rest now that a real image exists, or write down
+that test builds are kept.** Whichever it is, the tag-policy table in `plans/ci-cd/dockerhub-overview.md` is
+where the answer belongs. **Putting this row here was my call - strike it if the answer is obviously "leave
+them".**
+
 ---
 
-## The checks
+## Plans that stop being stuck
 
-### Confirm the release landed
+**None of these blocks anything, and none is release work.** Each has its own file with its state and what it
+waits on. **They are named here because the release is what stopped being in their way**, not to schedule
+them.
 
-- [ ] **Smoke the published image.** `just smoke all binacle/binacle-net:3.0.0`. About a minute, nothing to
-      bring up.
+| Plan | What the release freed |
+|---|---|
+| `plans/api/packing-demo-bugs.md` | whatever the release did not take. **The demo site has its own copy of the same bugs** - `sites/demo/pages/packing.html` carries the same seven lines - plus the submit button giving no sign it was pressed, and nothing showing which items did not fit. A site session for the first, a coding session for the rest |
+| `plans/ci-cd/dockerhub-overview.md` | section 2 only - the logo and the categories. Section 1 was taken by the release. **Delete the file when both are done** |
+| `plans/todos.md` | the three sites' `default_theme: "dark"`, the `Dockerfile` comment naming a build stage that does not exist, and the docs site's curly apostrophes. All site or one-line work |
+| `plans/ci-cd/test-leaves-reach-ci.md` | the ten Ruby leaves reaching the PR gate. Held off the release gate because Ruby does not build the image |
+| `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
+| `plans/sites/docs-client-generation.md` | nothing was blocking it; it sits here because the docs deploy is the natural next docs session |
+| `plans/ruby-gem-coverage.md` | a yes or a no. Ten published gems have no tests measured, and the alternative is writing down that this is deliberate |
 
-      **This is a confirmation, not a safety net.** The pipeline smokes the GHCR copy before anything is copied
-      across, so a broken image cannot reach Docker Hub. What this still buys is the one thing the pipeline
-      cannot check: that the **copy** landed something runnable, not just something with the right digest.
-
-- [ ] **Confirm `3.0` resolves on Docker Hub, and that `latest` moved.** Both are written for the first time by
-      this release - every beta withheld them. Until now `latest` resolved to `2.1.1`.
-
-- [ ] **Confirm `3.0.0` resolves, and that all three tags share one digest.**
-      `docker buildx imagetools inspect binacle/binacle-net:3.0.0 --format '{{ .Manifest.Digest }}'`, then the
-      same for `3.0` and `latest`. **Three names, one hash, or the copy did not do what it claims.**
-
-- [ ] **Verify the signature and the attestations against the real `3.0.0`.**
-      `cosign verify binacle/binacle-net:3.0.0` with **both** the certificate-identity regexp and the OIDC
-      issuer - the identity flag is the entire value, since anyone with a GitHub account can sign anything.
-      Then `docker buildx imagetools inspect` for the SBOM and provenance entries.
-
-      **Docker Hub only.** Only the release workflow touches GHCR, so the staging copy's signature is read by
-      nothing. All of this ran green against `3.0.0-beta.3` and `3.0.0-beta.4` under the identity v3.0.0 uses.
-      **What is new is only that the copy writes three tags instead of one.**
-
-- [ ] **Confirm nothing froze.** Read `immutable_tags_settings` back from the repository API. The publish
-      should have written `3.0.0`, `3.0` and `latest` with no interference.
-
-- [ ] **Read the licence GitHub detects for the repository, back off the API.** Detection runs server side, so
-      pushing is the only way to find out. The repository declares GPL-3.0 and the expected answer is
-      `GPL-3.0`. **This is a read, not a fix** - if it comes back wrong, that is a finding for a plan.
-
-### Read what the release published
-
-- [ ] **Read the repo landing page by eye.** `README.md` is the most read file in the repo, and its pin warning
-      names `binacle/binacle-net:3.0` - a tag that only starts resolving with this release. **A wrong pin there
-      outlives every other miss**, and a stale one would not fail loudly, because every tag this project has
-      ever published is still pullable. You have to look.
-
-- [ ] **Read the Docker Hub page - the release run published it, and that step had never run before.** The
-      page was never dispatched by hand, so Docker Hub went from the old hand-written 2.x page straight to this
-      one in a single write. Check that the description names 3.x rather than `2.1.1`, the version placeholders
-      were substituted with real numbers, the hand-maintained tag list is gone, the verification section is
-      there, and the logo and categories took.
-
-      **Run the quick start off the page itself** - the `docker run` and the `curl` - and check the response
-      matches what the page prints. It is the first thing most readers do.
-
-      **This is an eyeball, not a rewrite.** If it turns into a rewrite, the pre-tag half did not happen.
-
-- [ ] **Run the verification checks against the real `3.0.0`, from a clean shell.** **Confirm the invocation
-      printed on the Docker Hub page and in `SECURITY.md` is the one that actually works** - a published
-      command that fails reads as our bug.
-
-- [ ] **Read the UI module in a browser, from the published image.** `docker run` it with `UI_MODULE=True` and
-      open `/`, `/packing`, `/vipaq` and `/instance`. The theme switcher and every page under it were rebuilt
-      twice this release. **The pre-tag pass read a local build; this reads what shipped.**
-
-- [ ] **Check the docs site is on v3.0.x.** Confirm `/version/latest/` lands on `v3.0.x` and the version picker
-      shows four versions. **The item most likely to be silently skipped**, because nothing fails when it is.
-      **The rest of the live-site reads are in the docs plan's own checks** - they are not repeated here.
-
-- [ ] **Confirm no public surface still names a beta.** Betas 1 and 2 are deleted from Docker Hub, so anything
-      left pointing at one is a 404 rather than an old number.
-      `grep -rn "3\.0\.0-beta" --exclude-dir=.agents` over the repo, and read the docs site's
-      verifying-a-release page.
-
-      **One expected hit, and it is not a public surface.** `sites/www/_data/exchange.yml` carries a YAML
-      comment Jekyll never renders, saying the `3.0` tag is unpublished. **That comment is stale from the tag
-      onward - delete it rather than re-reading it every release.**
+**`plans/_index.md` lists every plan, with its state and what it waits on.** Nothing above is a ranking.
 
 ---
 
@@ -153,16 +193,15 @@ and the scratch-repo test procedure.
 - [ ] **Delete `release-v3.0.0.md`** once the release is out and the docs are deployed.
 - [ ] **Move anything left in it back into a plan** rather than carrying it forward. If it was not done for the
       release, it is standing work now.
-- [ ] **Delete this file** when both of its lists are clear.
+- [ ] **Delete this file** when the first two lists are clear. **The third list is not a reason to keep it** -
+      those plans stand on their own.
 
 ## Then what
 
-**The plans.** `plans/_index.md` lists every one not tied to this release, with its state and what it waits on.
-
-**Held back from v3.0.0 and waiting there:** the heavy architecture tools (ArchUnitNET, dependency-cruiser,
-lychee), CI gates 2 and 3, the last of the UI test harness the coverage gate hangs on, every test leaf reaching
-CI, the Ruby coverage answer, and rubocop, which has never been run.
-
 **The first thing to do is not a build.** How far the ServiceModule is taken is the maintainer's call, and it
 settles the three plans under `plans/api/`, the two ServiceModule one-liners in `plans/todos.md` and the Azure
-Storage removal question at once. **Pick the next thing once this list is clear.**
+Storage removal question at once.
+
+**Held back from v3.0.0 and waiting in `plans/`:** the heavy architecture tools (ArchUnitNET,
+dependency-cruiser, lychee), CI gates 2 and 3, the last of the UI test harness the coverage gate hangs on, and
+rubocop, which has never been run.

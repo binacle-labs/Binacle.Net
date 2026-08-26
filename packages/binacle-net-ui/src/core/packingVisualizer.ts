@@ -2,6 +2,9 @@ import {
 	addItemToScene,
 	cameraFar,
 	cameraFov,
+	clearBinFromScene,
+	clearItemsFromScene,
+	containerAspectRatio,
 	defineComponent,
 	getBin,
 	getThemeColors,
@@ -36,25 +39,23 @@ function render() {
 	}
 }
 
-function windowResizeHandler() {
+function resizeHandler() {
 	const state = window.binacle?.visualizerState;
 	const rendererContainer = window.binacle?.rendererContainer;
-	if (!state) {
+	if (!state || !rendererContainer) {
 		return;
 	}
-	state.aspectRatio = window.innerWidth / window.innerHeight;
+	state.aspectRatio = containerAspectRatio(rendererContainer);
 	state.camera.aspect = state.aspectRatio;
 	state.camera.fov = cameraFov(state.aspectRatio);
 	const bin = getBin(state.scene);
 	state.camera.far = cameraFar(bin);
 	state.camera.updateProjectionMatrix();
 
-	if (rendererContainer) {
-		state.renderer.setSize(
-			rendererContainer.offsetWidth,
-			rendererContainer.offsetHeight
-		);
-	}
+	state.renderer.setSize(
+		rendererContainer.offsetWidth,
+		rendererContainer.offsetHeight
+	);
 }
 
 function themeChangedHandler(event: Event) {
@@ -105,6 +106,8 @@ export const packingVisualizer = defineComponent(() => ({
 					};
 					this.redrawScene(result.bin, result.items);
 					this.itemsRendered = this.sceneData.items.length;
+				} else {
+					this.clearScene();
 				}
 				this.controls.updateStatus(this.sceneData, this.itemsRendered);
 				if(window.binacle?.visualizerContainer){
@@ -120,6 +123,17 @@ export const packingVisualizer = defineComponent(() => ({
 				}
 
 			});
+	},
+	// A failed or empty request would otherwise leave the last result drawn while the panel reports none.
+	clearScene() {
+		this.sceneData = {bin: null, items: []};
+		this.itemsRendered = 0;
+		const state = window.binacle?.visualizerState;
+		if (!state) {
+			return;
+		}
+		clearItemsFromScene(state.scene);
+		clearBinFromScene(state.scene);
 	},
 	redrawScene(bin: Dimensions, items: (Dimensions & Coordinates)[] | null) {
 		const state = window.binacle?.visualizerState;
@@ -223,7 +237,7 @@ export const packingVisualizer = defineComponent(() => ({
 		const visualizerContainer = this.$refs.visualizercontainer;
 
 
-		const aspectRatio = window.innerWidth / window.innerHeight;
+		const aspectRatio = containerAspectRatio(rendererContainer);
 		const scene = new Scene();
 		const camera = new PerspectiveCamera(
 			cameraFov(aspectRatio),
@@ -253,7 +267,8 @@ export const packingVisualizer = defineComponent(() => ({
 
 		stopLoading(visualizerContainer);
 
-		window.addEventListener('resize', windowResizeHandler, false);
+		// The container, not the window: the camera aspect has to match the box the canvas is drawn into.
+		new ResizeObserver(resizeHandler).observe(rendererContainer);
 		window.addEventListener("themeChanged", themeChangedHandler, false);
 
 		window.binacle = {

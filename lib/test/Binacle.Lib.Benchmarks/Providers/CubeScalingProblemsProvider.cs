@@ -11,7 +11,12 @@ public static class CubeScalingProblemsProvider
             bin: "60x40x10",
             items: ["5x5x5 [192]"],
             metrics: "24000 24000 192 100.00",
-            result: "FullyPacked FullyPacked"
+            results: new Dictionary<string, string>
+            {
+                ["FFD"] = "FullyPacked FullyPacked",
+                ["WFD"] = "FullyPacked FullyPacked",
+                ["BFD"] = "FullyPacked FullyPacked"
+            }
         );
     }
 }

@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "DemoSample_03_ThreeAnswers_60x40x20",
+    "Bin": "60x40x20",
+    "Metrics": "23400 48000 13 48.75",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "12x10x15 [5]",
+      "18x10x12 [4]",
+      "8x15x12 [4]"
+    ]
+  }
+]

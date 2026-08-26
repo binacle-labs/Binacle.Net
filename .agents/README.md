@@ -12,7 +12,7 @@ reviewable. Read this first to know where things are.
 | `design/` | The settled design *behind* the docs — decisions (why) and findings (measured evidence). Permanent, but it can change. | Find it in `design/_index.md`. |
 | `plans/` | Work not yet done — from a rough idea nobody is waiting on to a plan that is ready to start. Each declares its `state:`. | Find the plan in `plans/_index.md`. Trim/delete an item once it lands. |
 | `memory/` | Durable "why" with no home in a doc or plan — gotchas, settled decisions, conventions. | Scan `memory/_index.md` at session start. Add a fact only if no doc/plan fits (`memory/README.md` says how). |
-| `release-v<version>.md` (+ companions) | The per-version release set, at root: the release plan, plus `release-notes-v<version>.md` (the GitHub release body) and `post-release-v<version>.md` (right-after-release work). | When cutting a release. The first two are deleted once the version is out; the post-release list goes when its own items are done. |
+| `release-v<version>.md` (+ companion) | The per-version release set, at root: the release plan, plus `post-release-v<version>.md` (right-after-release work). The GitHub release body is not here — it is the `## [Unreleased]` section of `CHANGELOG.md` at the repo root, which the release workflow extracts. | When cutting a release. The plan is deleted once the version is out; the post-release list goes when its own items are done. |
 
 Nothing here is loaded up front. `CLAUDE.md` carries the four always-on rules and points at this file; you
 fetch the rest on demand.
@@ -59,11 +59,13 @@ not to eagerly load unrelated context. Keep a new doc or plan in its slice folde
 - **memory = the leftover why.** Not product behaviour (that's docs) and not future work (that's plans).
   Durable but mutable — it can change. One fact per file. If a memory's fact moves into a doc/plan,
   delete the memory.
-- **the `release-v<version>` set = shipping.** At root, one set per version: the plan, its notes, and the
-  post-release list. The plan and notes are deleted once the version ships; the post-release list is deleted
-  when its own items are done, not by the tag. That list holds only what must happen **because** the release
-  shipped — standing work stays a plan. `rules/the-release-set.md` holds how it is kept and who decides what
-  goes on it.
+- **the `release-v<version>` set = shipping.** At root, two files per version: the plan and the post-release
+  list. The plan is deleted once the version ships; the post-release list is deleted when its own items are
+  done, not by the tag. That list holds only what must happen **because** the release shipped — standing work
+  stays a plan. **The release notes are not part of the set**: the GitHub release body is the
+  `## [Unreleased]` section of `CHANGELOG.md` at the repo root, renamed to the version before the real tag,
+  and `just changelog extract` is what reads it. `rules/the-release-set.md` holds how the set is kept and who
+  decides what goes on it.
 
 ## The `docs/` trap
 

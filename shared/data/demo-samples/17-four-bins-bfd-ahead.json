@@ -1,0 +1,62 @@
+[
+  {
+    "Name": "DemoSample_17_FourBinsBfdAhead_55x45x40",
+    "Bin": "55x45x40",
+    "Metrics": "30270 99000 14 30.58",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "18x18x18 [3]",
+      "14x12x10 [5]",
+      "9x9x9 [6]"
+    ]
+  },
+  {
+    "Name": "DemoSample_17_FourBinsBfdAhead_45x40x35",
+    "Bin": "45x40x35",
+    "Metrics": "30270 63000 14 48.05",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "18x18x18 [3]",
+      "14x12x10 [5]",
+      "9x9x9 [6]"
+    ]
+  },
+  {
+    "Name": "DemoSample_17_FourBinsBfdAhead_40x30x30",
+    "Bin": "40x30x30",
+    "Metrics": "30270 36000 14 84.08",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "18x18x18 [3]",
+      "14x12x10 [5]",
+      "9x9x9 [6]"
+    ]
+  },
+  {
+    "Name": "DemoSample_17_FourBinsBfdAhead_30x30x25",
+    "Bin": "30x30x25",
+    "Metrics": "30270 22500 14 134.53",
+    "Result": {
+      "FFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "WFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "BFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded"
+    },
+    "Items": [
+      "18x18x18 [3]",
+      "14x12x10 [5]",
+      "9x9x9 [6]"
+    ]
+  }
+]

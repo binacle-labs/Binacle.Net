@@ -1,7 +1,7 @@
 ---
 description: No linter exists for any TypeScript or JavaScript in the repository - decide whether one lands, and what it gates
 state: idea
-waits-on: "a yes or a no, and it is not urgent - nothing is broken by the gap"
+waits-on: "a yes or a no"
 paths:
   - "packages/**"
   - "sites/**"
@@ -16,8 +16,8 @@ person typed, and the only thing holding it is `.editorconfig` and `strict` in s
 `tsconfig.json`.
 
 **Ruby is not in the same position.** `ruby/.rubocop.yml` covers every gem and the style it enforces is
-written down. What has never happened there is a run - `$plans/todos` carries that, and it is a different
-gap from this one.
+written down. What has never happened there is a run - rubocop is not in `ruby/Gemfile` and no recipe calls
+it, so it lands red before it lands green. A different gap from this one.
 
 **Nothing is broken.** This is worth doing because the next person to touch a package cannot tell what the
 house style is without reading four files and guessing, not because anything is wrong today.
@@ -42,7 +42,7 @@ house style is without reading four files and guessing, not because anything is 
 
 - [ ] One tool is chosen and the reason is written down, or the answer is a recorded no.
       **By eye.** Either a config file exists at the root, or this plan is deleted and the no is a row
-      in `$decisions`.
+      in the general decisions ledger.
 - [ ] The indentation conflict is settled in `.editorconfig`, not left for an editor to lose.
       `grep -n 'indent_style' .editorconfig` agrees with the tool's config.
 - [ ] A `just` recipe runs it, and `just check` lists that recipe.

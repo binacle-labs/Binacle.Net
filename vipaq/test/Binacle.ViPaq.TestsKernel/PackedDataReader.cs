@@ -35,12 +35,14 @@ internal static class PackedDataReader
 
 			foreach (var record in records)
 			{
-				yield return ToScenario(record);
+				yield return ToScenario(record, file.Algorithm);
 			}
 		}
 	}
 
-	private static Scenario ToScenario(PackedRecord record)
+	// The source problem name repeats across algorithms, so the algorithm is part of the scenario name. Without
+	// it the providers' name-keyed dictionaries collide.
+	private static Scenario ToScenario(PackedRecord record, string algorithm)
 	{
 		// Parse as int, then narrow with a checked cast. The largest Bischoff coordinate is ~587, far below
 		// ushort's 65535, so the cast is a guard, not a lossy conversion.
@@ -69,7 +71,7 @@ internal static class PackedDataReader
 
 		return new Scenario
 		{
-			Name = record.Name,
+			Name = $"{record.Name}.{algorithm}",
 			WidthBits = record.WidthBits,
 			Spread = "real",
 			Bin = bin,

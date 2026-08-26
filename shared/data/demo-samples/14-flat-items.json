@@ -1,0 +1,41 @@
+[
+  {
+    "Name": "DemoSample_14_FlatItems_50x50x12",
+    "Bin": "50x50x12",
+    "Metrics": "23040 30000 8 76.8",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "24x24x5 [8]"
+    ]
+  },
+  {
+    "Name": "DemoSample_14_FlatItems_40x30x30",
+    "Bin": "40x30x30",
+    "Metrics": "23040 36000 8 64.0",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "24x24x5 [8]"
+    ]
+  },
+  {
+    "Name": "DemoSample_14_FlatItems_30x30x20",
+    "Bin": "30x30x20",
+    "Metrics": "23040 18000 8 128.0",
+    "Result": {
+      "FFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "WFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "BFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded"
+    },
+    "Items": [
+      "24x24x5 [8]"
+    ]
+  }
+]

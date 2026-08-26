@@ -1,0 +1,41 @@
+[
+  {
+    "Name": "DemoSample_15_SameVolumeDifferentShape_40x40x25",
+    "Bin": "40x40x25",
+    "Metrics": "27648 40000 16 69.12",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "12x12x12 [16]"
+    ]
+  },
+  {
+    "Name": "DemoSample_15_SameVolumeDifferentShape_50x25x32",
+    "Bin": "50x25x32",
+    "Metrics": "27648 40000 16 69.12",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "12x12x12 [16]"
+    ]
+  },
+  {
+    "Name": "DemoSample_15_SameVolumeDifferentShape_100x20x20",
+    "Bin": "100x20x20",
+    "Metrics": "27648 40000 16 69.12",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "12x12x12 [16]"
+    ]
+  }
+]

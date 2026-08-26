@@ -119,6 +119,30 @@ describe("init", () => {
 		expect(app.model.items.every(i => i.length <= bin.length && i.width <= bin.width && i.height <= bin.height))
 			.toBe(true);
 	});
+
+	test("opens on sample zero, the same set every time", () => {
+		const first = createApp().app;
+		const second = createApp().app;
+
+		first.init();
+		second.init();
+
+		expect(first.sampleIndex).toBe(0);
+		expect(second.model.bins.map(bin => bin.id)).toEqual(first.model.bins.map(bin => bin.id));
+		expect(second.model.items.map(item => item.id)).toEqual(first.model.items.map(item => item.id));
+	});
+
+	// Two visitors edit their own copies. A shared instance would put one visitor's edit in the next arrival's form.
+	test("editing the seeded model leaves the set alone", () => {
+		const first = createApp().app;
+		const second = createApp().app;
+		first.init();
+
+		first.model.bins[0].length = 1;
+		second.init();
+
+		expect(second.model.bins[0].length).not.toBe(1);
+	});
 });
 
 describe("isValid", () => {
@@ -172,16 +196,91 @@ describe("isValid", () => {
 		expect(valid).toBe(false);
 	});
 
-	// Both lists are checked with `every`, which is true on an empty list. See the report: an emptied form
-	// passes the guard and posts a request with no bins and no items.
-	test("an emptied model is reported as valid", () => {
+	// Both lists are checked with `every`, which is true on an empty list, so the emptied form used to pass
+	// the guard and post a request with no bins and no items.
+	test("an emptied model is not valid", () => {
 		const {app} = createApp();
 		app.model.bins = [];
 		app.model.items = [];
 
 		const valid = app.isValid();
 
-		expect(valid).toBe(true);
+		expect(valid).toBe(false);
+	});
+
+	test("no bins is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("no items is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+});
+
+describe("the empty-list messages", () => {
+	test("a full model has none", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const errors = app.listErrors();
+
+		expect(errors).toEqual([]);
+	});
+
+	test("an emptied model names both lists", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		const errors = app.listErrors();
+
+		expect(errors).toEqual(["Add at least one bin.", "Add at least one item."]);
+	});
+
+	test("submitting an emptied model shows them on the form", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(app.formErrors).toEqual(["Add at least one bin.", "Add at least one item."]);
+	});
+
+	test("submitting an emptied model sends nothing", () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(dispatched).toEqual([]);
+	});
+
+	test("a later good submit clears them", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+		app.onSubmit();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.formErrors).toEqual([]);
 	});
 });
 
@@ -214,7 +313,43 @@ describe("adding a bin", () => {
 
 		app.addBin["@click"].call(app);
 
-		expect(app.model.bins[2]).toEqual(new Bin(31, 32, 33));
+		const added = app.model.bins[2];
+		expect([added.length, added.width, added.height]).toEqual([31, 32, 33]);
+	});
+
+	// The id is the footprint, and the API rejects two bins with the same id.
+	test("the copy does not take the id of the bin it copied", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+
+		app.addBin["@click"].call(app);
+
+		expect(app.model.bins[1].id).not.toBe(app.model.bins[0].id);
+	});
+
+	test("a run of copies all get their own id", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+
+		const ids = app.model.bins.map(b => b.id);
+		expect(new Set(ids).size).toBe(4);
+	});
+
+	test("removing a copy does not free its id for the next one", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+		app.removeBin(1);
+
+		app.addBin["@click"].call(app);
+
+		const ids = app.model.bins.map(b => b.id);
+		expect(new Set(ids).size).toBe(3);
 	});
 
 	test("the copy is a new instance", () => {
@@ -337,8 +472,7 @@ describe("randomize", () => {
 	// The bug this replaced was two independent rolls, which could leave items no bin could hold.
 	test("the new items fit the new largest bin", () => {
 		const {app} = createApp();
-		app.model.bins = [new Bin(65535, 65535, 65535)];
-		app.model.items = [];
+		app.init();
 
 		app.randomize["@click"].call(app);
 
@@ -347,20 +481,32 @@ describe("randomize", () => {
 			.toBe(true);
 	});
 
-	test("the new items do not outgrow the new largest bin", () => {
+	test("never lands on the sample already on screen", () => {
 		const {app} = createApp();
-		app.model.bins = [new Bin(65535, 65535, 65535)];
-		app.model.items = [];
+		app.init();
+
+		const repeats = Array.from({length: 500}, () => {
+			const before = app.sampleIndex;
+			app.randomize["@click"].call(app);
+			return {before, after: app.sampleIndex};
+		}).filter(step => step.before === step.after);
+
+		expect(repeats).toEqual([]);
+	});
+
+	test("the bins and items on screen change with it", () => {
+		const {app} = createApp();
+		app.init();
+		const before = app.model.bins.map(bin => bin.id).join();
 
 		app.randomize["@click"].call(app);
 
-		const bin = largestBin(app.model.bins);
-		const itemsVolume = app.model.items.reduce((sum, i) => sum + i.length * i.width * i.height * i.quantity, 0);
-		expect(itemsVolume).toBeLessThanOrEqual(bin.length * bin.width * bin.height);
+		expect(app.model.bins.map(bin => bin.id).join()).not.toBe(before);
 	});
 
-	test("the rolled set is submittable", () => {
+	test("the picked set is submittable", () => {
 		const {app} = createApp();
+		app.init();
 
 		app.randomize["@click"].call(app);
 
@@ -443,6 +589,37 @@ describe("the request", () => {
 			{id: "10x20x30", length: 10, width: 20, height: 30},
 			{id: "40x50x60", length: 40, width: 50, height: 60},
 		]);
+	});
+
+	// x-model without the .number modifier stores the input's string, and the API declares these as int.
+	test("sends bin dimensions as numbers even when the model holds strings", async () => {
+		const {app, dispatched} = createApp();
+		const bin = new Bin(10, 20, 30);
+		Object.assign(bin, {length: "10", width: "20", height: "30"});
+		app.model.bins = [bin];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins[0])
+			.toEqual({id: "10x20x30", length: 10, width: 20, height: 30});
+	});
+
+	test("sends item dimensions and quantity as numbers even when the model holds strings", async () => {
+		const {app, dispatched} = createApp();
+		const item = new Item(2, 3, 4, 5);
+		Object.assign(item, {length: "2", width: "3", height: "4", quantity: "5"});
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [item];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items[0])
+			.toEqual({id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5});
 	});
 
 	test("maps the item view models to plain api items, quantity included", async () => {
@@ -831,6 +1008,32 @@ describe("result labels", () => {
 		const text = app.resultItemPercentageText(result);
 
 		expect(text).toBe("Packed Items Volume: 87%");
+	});
+
+	// The API sends its own enum names; none of them belongs on a page a visitor reads.
+	test.each([
+		["Unknown", "Unknown"],
+		["NotPacked", "Not packed"],
+		["PartiallyPacked", "Partially packed"],
+		["FullyPacked", "Fully packed"],
+		["EarlyFail_ContainerVolumeExceeded", "Items exceed bin volume"],
+		["EarlyFail_ContainerDimensionExceeded", "Item longer than bin"],
+	])("%s reads as %s", (status, expected) => {
+		const {app} = createApp();
+		const result = packedData({result: status});
+
+		const text = app.resultStatusText(result);
+
+		expect(text).toBe(expected);
+	});
+
+	test("a status the page does not know still reads as English", () => {
+		const {app} = createApp();
+		const result = packedData({result: "SomethingNew"});
+
+		const text = app.resultStatusText(result);
+
+		expect(text).toBe("Unknown");
 	});
 
 	test("only a fully packed result reports as fully packed", () => {

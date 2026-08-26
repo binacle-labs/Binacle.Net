@@ -1,5 +1,6 @@
 import {cameraFar} from "../../src/utils/cameraFar";
 import {cameraFov} from "../../src/utils/cameraFov";
+import {containerAspectRatio} from "../../src/utils/containerAspectRatio";
 import {getCameraPosition} from "../../src/utils/getCameraPosition";
 
 describe("cameraFar", () => {
@@ -62,5 +63,34 @@ describe("getCameraPosition", () => {
 		const position = getCameraPosition(bin);
 
 		expect(position).toEqual({x: 10, y: 10, z: 20});
+	});
+});
+
+describe("containerAspectRatio", () => {
+	function container(width: number, height: number) {
+		return {offsetWidth: width, offsetHeight: height} as HTMLElement;
+	}
+
+	test("is the container's own width over its own height", () => {
+		const aspectRatio = containerAspectRatio(container(800, 400));
+
+		expect(aspectRatio).toBe(2);
+	});
+
+	test("a portrait container is under one", () => {
+		const aspectRatio = containerAspectRatio(container(360, 720));
+
+		expect(aspectRatio).toBe(0.5);
+	});
+
+	// A container that has not been laid out yet measures 0, and that would make the projection NaN.
+	test.each([
+		["no width", 0, 400],
+		["no height", 800, 0],
+		["neither", 0, 0],
+	])("a container with %s falls back to one", (_name, width, height) => {
+		const aspectRatio = containerAspectRatio(container(width, height));
+
+		expect(aspectRatio).toBe(1);
 	});
 });

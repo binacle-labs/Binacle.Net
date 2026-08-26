@@ -23,6 +23,7 @@ Each one registers the set of Alpine components its page needs, so a page turns 
 | `src/models/` | Internal types - dimensions, coordinates, scene data, visualizer state |
 | `src/utils/` | The Three.js scene work: build the bin, add and clear items, camera position and field of view, theme colours |
 | `src/types/` | Ambient declarations for Alpine and the globals the pages set |
+| `tools/` | The sample-set generator. `just regen demo-samples` reads `shared/data/demo-samples` and writes `src/utils/sampleData.ts`, which is generated - edit the data, not the file |
 
 ## 🚀 Where it runs
 

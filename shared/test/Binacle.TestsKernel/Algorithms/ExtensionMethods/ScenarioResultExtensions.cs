@@ -3,7 +3,7 @@ namespace Binacle.TestsKernel.Algorithms.ExtensionMethods;
 
 public static class ScenarioResultExtensions
 {
-	public static void EvaluateResult(this Models.ScenarioResult expected, OperationResult actual)
+	public static void EvaluateResult(this Models.AlgorithmResult expected, OperationResult actual)
 	{
 		var expectedStatus = actual.AlgorithmOperation switch
 		{

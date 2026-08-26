@@ -17,21 +17,15 @@ a decision or a set of sub-steps gets its own plan file instead.
 the `--fail-severity=warn` flag it needs. It had been written in both files and the two copies had already
 started to differ.
 
-## Comments
+## Tests
 
-Found in a 2026-08-12 sweep of every comment outside `.agents`. The layer is in good shape overall - the
-`just` modules, the workflows and the sample compose files carry "why" at the point of use, which is where it
-has to stay. These two are the exceptions.
-
-- `Dockerfile`, the line above `COPY ["artifacts/binacle-net", "."]`, reads "from the 'build' stage". **There is no
-  build stage** - the publish happens outside the file, in `just build publish`. Say that instead, and that
-  the path is hardcoded here and allowlisted in `.dockerignore`, so publishing elsewhere builds an empty image.
-
-- **`Dockerfile:8` names two places for the description caption; there are three.** It is pinned in the
-  `Dockerfile` label, in `release-docker-image.yml`, and in `api/src/Binacle.Net.Kernel/Metadata.cs`, which is
-  what reaches Swagger UI, Scalar and both published OpenAPI documents. Change two of the three and the image
-  label and the API document disagree, silently. **One comment**, and do it while the reason is in front of
-  someone - the next person to change that string will read the comment and believe it.
+- **One flaky test, about 1 run in 19.** `packages/binacle-net-ui/tests/components/packingDemo.test.ts`,
+  *"the new items fit the new largest bin"*. It randomizes once, then asserts every item fits the
+  largest-by-volume bin side for side with no rotation. **That was a property of the old random roll**, where
+  items were sized against the largest bin. The demo now carries hand-picked samples and does not have it:
+  `07-tall-items` has bins 20x20x60 and 40x40x30 and an item 8x8x55, so the largest by volume is 40x40x30 and
+  55 beats every side of it. **The sample is right and the assertion is wrong.** It will fail in CI one day on
+  an unrelated commit. Found 2026-08-26.
 
 ## Ruby gems
 
@@ -50,6 +44,13 @@ has to stay. These two are the exceptions.
   capabilities" and carries a curly apostrophe; `configuration/index.md` still calls the UI module "packing
   demos and protocol decoding"; the docs landing has a curly apostrophe in "Binacle.Net's packing solutions".
   **The apostrophes break the plain-ASCII rule for user-facing text.** A site session.
+
+- **The demo site's packing page still carries the pre-rewrite copy.** Found 2026-08-26. The image's version
+  renders `AppletsService.cs`'s rewritten description; `sites/demo/pages/packing.html` hardcodes the old
+  register in two places - the body `<p>` and the front-matter `excerpt:` - both reading "An interactive tool
+  that lets you test different packing algorithms". **Two surfaces describe the same tool differently, and the
+  site has the older one.** The front-matter `description:` is a meta description and is meant to differ; the
+  body copy is not. A site session.
 
 - **The three sites still default to dark.** `default_theme: "dark"` in `sites/www/_config.yml`,
   `sites/docs/_config.yml` and `sites/demo/_config.yml`. **Decided 2026-08-25: every surface follows the

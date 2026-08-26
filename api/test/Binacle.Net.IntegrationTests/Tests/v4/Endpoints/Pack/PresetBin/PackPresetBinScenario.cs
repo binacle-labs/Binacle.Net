@@ -81,6 +81,6 @@ public class PackPresetBinScenario
 			}
 		}
 
-		scenario.Result.EvaluateResult(result);
+		scenario.Result.EvaluateResult(result, request.Parameters);
 	}
 }

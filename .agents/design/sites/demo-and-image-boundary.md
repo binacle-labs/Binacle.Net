@@ -82,3 +82,9 @@ is shared and the markup is not, **which is the shape that breaks silently**: th
 renders, the other does not.
 
 **It ends in a decision, not a build.**
+
+**It cost twice on 2026-08-26, which is what this section predicted.** Eight bugs were fixed in the packing
+form. The behaviour fixes landed once, in the package, and reached both hosts. **Four markup fixes had to be
+made twice** - `x-model.number` on seven inputs, the form-error region, `href` on the result rows, and the
+status-text call. The second pass needed its own session, because one host is under `sites/` and the other is
+not. **The shared half behaved exactly as designed; the duplicated half cost exactly what duplication costs.**

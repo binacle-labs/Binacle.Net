@@ -1,45 +1,19 @@
 import {Bin, Item} from "../../src/viewModels";
-import {largestBin, randomBin, randomItemFor, randomSample, Sample} from "../../src/utils/samples";
+import {largestBin, nextSampleIndex, randomBin, randomItemFor, sampleAt, sampleCount} from "../../src/utils/samples";
+import {sampleData} from "../../src/utils/sampleData";
 
 // The rolled numbers, restated here so a change to samples.ts has to be a deliberate change to the test.
 const minBinSide = 30;
 const maxBinSide = 60;
-const minItemSide = 8;
-const maxQuantity = 10;
 
 // Enough rolls that a one-in-a-thousand break shows up, few enough that the file stays under a second.
 const rolls = 5000;
 
-function volume(box: {length: number; width: number; height: number}) {
-	return box.length * box.width * box.height;
-}
+const everyIndex = Array.from({length: sampleCount}, (_, index) => index);
 
-// Rolls only. It asserts nothing, so each test keeps its own act and assert apart.
-function rollSamples(count: number): Sample[] {
-	const samples = [] as Sample[];
-	for (let i = 0; i < count; i++) {
-		samples.push(randomSample());
-	}
-	return samples;
+function duplicates(ids: string[]) {
+	return ids.filter((id, index) => ids.indexOf(id) !== index);
 }
-
-function fitsIn(bin: Bin, items: Item[]) {
-	const sideFits = items.every(
-		item => item.length <= bin.length && item.width <= bin.width && item.height <= bin.height
-	);
-	const volumeFits = items.reduce((sum, item) => sum + volume(item) * item.quantity, 0) <= volume(bin);
-	return sideFits && volumeFits;
-}
-
-// Feeds getRandomInt a fixed sequence. getRandomInt calls Math.random exactly once, so one value per roll.
-function stubRandom(values: number[]) {
-	let index = 0;
-	jest.spyOn(Math, "random").mockImplementation(() => values[index++]);
-}
-
-afterEach(() => {
-	jest.restoreAllMocks();
-});
 
 describe("randomBin", () => {
 	test("every side is a whole number inside the bin range", () => {
@@ -102,85 +76,124 @@ describe("randomItemFor", () => {
 	});
 });
 
-describe("randomSample", () => {
-	test("rolls between two and five bins", () => {
-		const samples = rollSamples(rolls);
-
-		const counts = samples.map(sample => sample.bins.length);
-
-		const outOfRange = counts.filter(count => count < 2 || count > 5);
-		expect(outOfRange).toEqual([]);
+// The guard on the set as a whole. It is generated from shared/data/demo-samples, so a bad file there is a
+// 422 on the demo page and nothing else here would catch it.
+describe("the sample set", () => {
+	test("holds one sample per source file", () => {
+		expect(sampleCount).toBe(sampleData.length);
+		expect(sampleCount).toBeGreaterThanOrEqual(10);
 	});
 
-	test("rolls between two and four item types, never none", () => {
-		const samples = rollSamples(rolls);
+	// The demo opens on the first, so the order the generator writes has to be the order of the file names.
+	test("keeps the source file order", () => {
+		const names = sampleData.map(sample => sample.name);
 
-		const counts = samples.map(sample => sample.items.length);
-
-		const outOfRange = counts.filter(count => count < 2 || count > 4);
-		expect(outOfRange).toEqual([]);
+		expect(names).toEqual([...names].sort());
+		expect(names[0]).toBe("01-opening-set");
 	});
 
-	test("every quantity is a whole number between one and ten", () => {
-		const samples = rollSamples(rolls);
+	test("every sample has at least one bin", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const empty = samples.filter(sample => sample.bins.length < 1);
+
+		expect(empty).toEqual([]);
+	});
+
+	test("every sample has at least one item", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const empty = samples.filter(sample => sample.items.length < 1);
+
+		expect(empty).toEqual([]);
+	});
+
+	test("no sample repeats a bin id", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const repeated = samples.flatMap(sample => duplicates(sample.bins.map(bin => bin.id)));
+
+		expect(repeated).toEqual([]);
+	});
+
+	test("no sample repeats an item id", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const repeated = samples.flatMap(sample => duplicates(sample.items.map(item => item.id)));
+
+		expect(repeated).toEqual([]);
+	});
+
+	test("every dimension is one the API accepts", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const boxes = samples.flatMap(sample => [...sample.bins, ...sample.items] as (Bin | Item)[]);
+
+		expect(boxes.filter(box => box.hasErrors())).toEqual([]);
+	});
+
+	test("every quantity is a whole number of at least one", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
 
 		const quantities = samples.flatMap(sample => sample.items.map(item => item.quantity));
 
-		const outOfRange = quantities.filter(
-			quantity => !Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity
+		expect(quantities.filter(quantity => !Number.isInteger(quantity) || quantity < 1)).toEqual([]);
+	});
+
+	test("covers bin counts from one to five", () => {
+		const samples = everyIndex.map(index => sampleAt(index));
+
+		const binCounts = new Set(samples.map(sample => sample.bins.length));
+
+		expect([...binCounts].sort()).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
+	});
+});
+
+describe("sampleAt", () => {
+	test("sample zero is the same set every call", () => {
+		const first = sampleAt(0);
+		const second = sampleAt(0);
+
+		expect(second.bins.map(bin => bin.id)).toEqual(first.bins.map(bin => bin.id));
+		expect(second.items.map(item => item.id)).toEqual(first.items.map(item => item.id));
+	});
+
+	// The demo binds its inputs straight to these objects, so a shared instance would let one edit change the set.
+	test("hands back a new Bin and Item every call", () => {
+		const first = sampleAt(0);
+		const second = sampleAt(0);
+
+		expect(second.bins[0]).not.toBe(first.bins[0]);
+		expect(second.items[0]).not.toBe(first.items[0]);
+	});
+
+	test("sample zero opens on more than one bin", () => {
+		const sample = sampleAt(0);
+
+		expect(sample.bins.length).toBeGreaterThan(1);
+	});
+});
+
+describe("nextSampleIndex", () => {
+	test("never returns the index it was given", () => {
+		const picks = everyIndex.flatMap(index =>
+			Array.from({length: rolls / sampleCount}, () => ({index, next: nextSampleIndex(index)}))
 		);
-		expect(outOfRange).toEqual([]);
+
+		expect(picks.filter(pick => pick.next === pick.index)).toEqual([]);
 	});
 
-	test("every item side is a whole number of at least eight", () => {
-		const samples = rollSamples(rolls);
+	test("stays inside the set", () => {
+		const picks = everyIndex.flatMap(index =>
+			Array.from({length: rolls / sampleCount}, () => nextSampleIndex(index))
+		);
 
-		const sides = samples.flatMap(sample => sample.items.flatMap(item => [item.length, item.width, item.height]));
-
-		const tooSmall = sides.filter(side => !Number.isInteger(side) || side < minItemSide);
-		expect(tooSmall).toEqual([]);
+		expect(picks.filter(next => !Number.isInteger(next) || next < 0 || next >= sampleCount)).toEqual([]);
 	});
 
-	// The contract of the whole file: a roll can never hand the demo a set the largest bin cannot hold.
-	// It is the largest bin only - see the next test.
-	test("the item set always fits the largest bin", () => {
-		const samples = rollSamples(rolls);
+	test("reaches every other sample", () => {
+		const picks = new Set(Array.from({length: rolls}, () => nextSampleIndex(0)));
 
-		const impossible = samples.filter(sample => !fitsIn(largestBin(sample.bins), sample.items));
-
-		expect(impossible).toEqual([]);
-	});
-
-	// The smaller bins are meant to fail. A test that asserted the set fits every bin would be asserting the
-	// demo page has nothing to show.
-	test("the smaller bins are often too small, which is the point of the page", () => {
-		const samples = rollSamples(rolls);
-
-		const withAFailingBin = samples.filter(sample => {
-			const largest = largestBin(sample.bins);
-			return sample.bins.some(bin => bin !== largest && !fitsIn(bin, sample.items));
-		});
-
-		expect(withAFailingBin.length).toBeGreaterThan(0);
-	});
-
-	// itemsFor divides the volume budget by the types still to come, so a near-maximum first item can floor to
-	// zero and be skipped. Pinned rather than left to chance: it is about one roll in 50,000.
-	test("drops an item type whose quantity floors to zero", () => {
-		stubRandom([
-			0, // two bins
-			0.99, 0.99, 0.99, // 60x60x60, the largest
-			0, 0, 0, // 30x30x30
-			0.99, // four item types
-			0, // budget of 45 percent
-			0.99, 0.99, 0.99, // 30x30x30 item, 27000, over a quarter of the 97200 budget - dropped
-			0, 0, 0, // 8x8x8
-			0, 0, 0, // 8x8x8
-			0, 0, 0, // 8x8x8
-		]);
-
-		const sample = randomSample();
-
-		expect(sample.items).toHaveLength(3);
+		expect([...picks].sort((a, b) => a - b)).toEqual(everyIndex.slice(1));
 	});
 });

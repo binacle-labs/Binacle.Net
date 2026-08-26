@@ -4,9 +4,10 @@
 #   just regen or-lib-scenarios        OR-Library text -> shared/data/bischoff-suite
 #   just regen vipaq-packed-data       those + custom-problems, packed -> vipaq/data/packed
 #   just regen vipaq-interop-vectors   the interop pair -> vipaq/test-vectors
+#   just regen demo-samples            shared/data/demo-samples -> the demo's sample set
 #   just regen check                   regenerate, then fail if any of that changed
 #
-# Every tool here rewrites files that are committed. All four take no arguments by design - a run does every
+# Every tool here rewrites files that are committed. All five take no arguments by design - a run does every
 # generator in its list, so it cannot half-run and leave the data inconsistent.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
@@ -17,6 +18,7 @@ set working-directory := '..'
 set no-exit-message := true
 
 ts_package := "vipaq/packages/binacle-vipaq"
+ui_package := "packages/binacle-net-ui"
 
 # List the recipes
 default:
@@ -25,7 +27,7 @@ default:
 # or-lib-scenarios writes what vipaq-packed-data reads, so the order is the recipe.
 
 # Run every generator
-all: or-lib-scenarios vipaq-packed-data vipaq-interop-vectors
+all: or-lib-scenarios vipaq-packed-data vipaq-interop-vectors demo-samples
 
 # OR-Library text -> the tests-kernel scenarios in shared/data/bischoff-suite
 or-lib-scenarios:
@@ -43,6 +45,10 @@ vipaq-interop-vectors:
     dotnet run --project vipaq/tools/Binacle.ViPaq.VectorGenerators
     npx ts-node --project {{ ts_package }}/tsconfig.json {{ ts_package }}/tools/generateVectors.ts
 
+# shared/data/demo-samples -> the demo's sample set in packages/binacle-net-ui
+demo-samples:
+    npx ts-node --project {{ ui_package }}/tsconfig.json {{ ui_package }}/tools/generateSamples.ts
+
 # Every generator is deterministic and its output is committed, so a clean tree after a full run is the whole
 # check. Nothing in CI calls this - it is here for the maintainer who edited a tool or a source problem.
 
@@ -51,14 +57,15 @@ check: all
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Only the .json the generators write. These folders also hold their own README, and vipaq/test-vectors
-    # as a whole holds the hand-authored vectors no generator touches.
+    # Only what the generators write. These folders also hold their own README, vipaq/test-vectors as a whole
+    # holds the hand-authored vectors no generator touches, and the demo's package is otherwise hand-written.
     generated=(
         ':(glob)shared/data/bischoff-suite/**/*.json'
         ':(glob)vipaq/data/packed/**/*.json'
         ':(glob)vipaq/test-vectors/header/**/*.json'
         ':(glob)vipaq/test-vectors/interop/cs/**/*.json'
         ':(glob)vipaq/test-vectors/interop/ts/**/*.json'
+        'packages/binacle-net-ui/src/utils/sampleData.ts'
     )
 
     changed="$(git status --porcelain -- "${generated[@]}")"

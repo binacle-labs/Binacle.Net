@@ -3,7 +3,7 @@ namespace Binacle.TestsKernel.Algorithms.Helpers;
 
 public static class ScenarioResultHelper
 {
-	public static Models.ScenarioResult ParseFromCompactString(string compactString)
+	private static Models.AlgorithmResult ParseFromCompactString(string compactString)
 	{
 		var parts = compactString.Split(' ');
 		if (parts.Length != 2)
@@ -14,13 +14,41 @@ public static class ScenarioResultHelper
 
 		var (packingStatus, packingEarlyExitReason) = ParseOperationResultStatus(parts[0]);
 		var (fittingStatus, fittingEarlyExitReason) = ParseOperationResultStatus(parts[1]);
-		return new Models.ScenarioResult
+		return new Models.AlgorithmResult(
+			packingStatus,
+			packingEarlyExitReason,
+			fittingStatus,
+			fittingEarlyExitReason
+		);
+	}
+
+	public static Models.ScenarioResult ParseFromMap(IReadOnlyDictionary<string, string> byAlgorithm)
+	{
+		var parsed = new Dictionary<Algorithm, Models.AlgorithmResult>();
+		foreach (var (name, compactString) in byAlgorithm)
 		{
-			PackingStatus = packingStatus,
-			PackingEarlyExitReason = packingEarlyExitReason,
-			FittingStatus = fittingStatus, 
-			FittingEarlyExitReason = fittingEarlyExitReason
-		};
+			// Enum.TryParse also takes a number and any value the enum does not define, so the round trip is
+			// what rejects "0" and "ffd".
+			if (!Enum.TryParse(name, out Algorithm algorithm) || algorithm.ToString() != name)
+			{
+				throw new ArgumentException(
+					$"Invalid algorithm. Value {name} should be one of {string.Join(", ", Enum.GetNames<Algorithm>())}.");
+			}
+
+			if (!parsed.TryAdd(algorithm, ParseFromCompactString(compactString)))
+			{
+				throw new ArgumentException($"Invalid format. Algorithm {algorithm} is named more than once.");
+			}
+		}
+
+		var missing = Enum.GetValues<Algorithm>().Where(x => !parsed.ContainsKey(x)).ToArray();
+		if (missing.Length > 0)
+		{
+			throw new ArgumentException(
+				$"Invalid format. A result must name every algorithm. Missing {string.Join(", ", missing)}.");
+		}
+
+		return new Models.ScenarioResult(parsed);
 	}
 
 	private static (OperationResultStatus resultStatus, EarlyExitReason earlyExitReason) ParseOperationResultStatus(

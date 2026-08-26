@@ -28,7 +28,8 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy everything needed to run the app from the "build" stage.
+# There is no build stage - `just build publish` writes this folder before docker runs. The path is hardcoded
+# here and is the one allowlisted entry in .dockerignore, so publishing anywhere else builds an empty image.
 COPY ["artifacts/binacle-net", "."]
 
 # Logs, pack-logs, and the SQLite database are written here. It has to exist in the image and be owned by the

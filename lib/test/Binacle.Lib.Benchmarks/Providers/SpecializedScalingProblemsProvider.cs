@@ -14,7 +14,12 @@ public static class SpecializedScalingProblemsProvider
 			bin: "60x40x10",
 			items: ["2x5x10 [3]", "12x15x10 [4]", "8x8x8 [6]"],
 			metrics: "10572 24000 13 44.05",
-			result: "FullyPacked FullyPacked"
+			results: new Dictionary<string, string>
+			{
+				["FFD"] = "FullyPacked FullyPacked",
+				["WFD"] = "FullyPacked FullyPacked",
+				["BFD"] = "FullyPacked FullyPacked"
+			}
 		);
 	}
 	

@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
 			{
 				Filename = $"VipaqProtobufSizeComparison.{codecName}",
 				Title = $"ViPaq vs Protobuf — stored size ({codecName})",
-				Description = blurb + " Real placed data (offline FFD), each set shown per layout."
+				Description = blurb + " Real placed data (offline FFD, WFD and BFD), each set shown per layout."
 			};
 
 			foreach (var (setLabel, scenarios) in ScenarioSets)

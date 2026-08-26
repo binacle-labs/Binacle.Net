@@ -54,6 +54,6 @@ public sealed class CommonTestingFixture : IDisposable
 	public void AssertResult(Scenario scenario, OperationResult result)
 	{
 		scenario.Metrics.EvaluateResult(result);
-		scenario.Result.EvaluateResult(result);
+		scenario.Result.For(result.AlgorithmInfo.Algorithm).EvaluateResult(result);
 	}
 }

@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "DemoSample_06_LongItems_50x30x20",
+    "Bin": "50x30x20",
+    "Metrics": "19000 30000 5 63.33",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "50x10x10 [3]",
+      "20x10x10 [2]"
+    ]
+  },
+  {
+    "Name": "DemoSample_06_LongItems_30x30x30",
+    "Bin": "30x30x30",
+    "Metrics": "19000 27000 5 70.37",
+    "Result": {
+      "FFD": "PartiallyPacked EarlyExit-ContainerDimensionExceeded",
+      "WFD": "PartiallyPacked EarlyExit-ContainerDimensionExceeded",
+      "BFD": "PartiallyPacked EarlyExit-ContainerDimensionExceeded"
+    },
+    "Items": [
+      "50x10x10 [3]",
+      "20x10x10 [2]"
+    ]
+  }
+]

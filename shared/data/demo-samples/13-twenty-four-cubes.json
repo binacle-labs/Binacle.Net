@@ -1,0 +1,41 @@
+[
+  {
+    "Name": "DemoSample_13_TwentyFourCubes_50x40x30",
+    "Bin": "50x40x30",
+    "Metrics": "24000 60000 24 40.0",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "10x10x10 [24]"
+    ]
+  },
+  {
+    "Name": "DemoSample_13_TwentyFourCubes_40x30x25",
+    "Bin": "40x30x25",
+    "Metrics": "24000 30000 24 80.0",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "10x10x10 [24]"
+    ]
+  },
+  {
+    "Name": "DemoSample_13_TwentyFourCubes_30x25x20",
+    "Bin": "30x25x20",
+    "Metrics": "24000 15000 24 160.0",
+    "Result": {
+      "FFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "WFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "BFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded"
+    },
+    "Items": [
+      "10x10x10 [24]"
+    ]
+  }
+]

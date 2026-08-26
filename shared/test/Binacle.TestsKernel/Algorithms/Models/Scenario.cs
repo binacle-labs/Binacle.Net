@@ -21,14 +21,14 @@ public class Scenario
 
 
 	public static Scenario Create(
-		string name, 
+		string name,
 		string bin,
 		string[] items,
 		string metrics,
-		string result)
+		IReadOnlyDictionary<string, string> results)
 	{
 		var parsedMetrics = ScenarioMetricsHelper.ParseFromCompactString(metrics);
-		var parsedResult = ScenarioResultHelper.ParseFromCompactString(result);
+		var parsedResult = ScenarioResultHelper.ParseFromMap(results);
 		return new Scenario
 		{
 			Name = name,

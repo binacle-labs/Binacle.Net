@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "DemoSample_08_CubeBin_60x40x40",
+    "Bin": "60x40x40",
+    "Metrics": "56192 96000 6 58.53",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "WFD": "FullyPacked FullyPacked",
+      "BFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "30x20x20 [4]",
+      "16x16x16 [2]"
+    ]
+  },
+  {
+    "Name": "DemoSample_08_CubeBin_34x34x34",
+    "Bin": "34x34x34",
+    "Metrics": "56192 39304 6 142.97",
+    "Result": {
+      "FFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "WFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded",
+      "BFD": "PartiallyPacked EarlyExit-ContainerVolumeExceeded"
+    },
+    "Items": [
+      "30x20x20 [4]",
+      "16x16x16 [2]"
+    ]
+  }
+]

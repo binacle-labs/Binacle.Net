@@ -82,7 +82,7 @@ public class FitByCustomScenario
 		result.FittedBinVolumePercentage!.Value
 			.ShouldBeLessThanOrEqualTo(scenario.Metrics.Percentage, new PercentageComparer());
 		
-		scenario.Result.EvaluateResult(result);
+		scenario.Result.EvaluateResult(result, request.Parameters);
 	}
 }
 

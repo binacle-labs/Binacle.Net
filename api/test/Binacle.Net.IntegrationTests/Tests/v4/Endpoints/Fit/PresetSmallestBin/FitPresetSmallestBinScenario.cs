@@ -63,7 +63,7 @@ public class FitPresetSmallestBinScenario
 		result!.Bin.ShouldNotBeNull();
 		CustomProblemsScenarioProvider.GetDistinctBinIds().ShouldContain(result.Bin.ID);
 
-		if (scenario.Result.FittingStatus == OperationResultStatus.FullyPacked)
+		if (scenario.Result.For(request.Parameters.GetAlgorithm()!.Value).FittingStatus == OperationResultStatus.FullyPacked)
 		{
 			result.Status.ShouldBe(BinFitResultStatus.Fits);
 			result.Bin.CalculateVolume().ShouldBeLessThanOrEqualTo(scenario.Metrics.BinVolume);

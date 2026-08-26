@@ -67,7 +67,7 @@ public class PackPresetSmallestBinScenario
 		                 + (result.UnpackedItems?.Sum(x => x.Quantity) ?? 0);
 		itemsCount.ShouldBe(scenario.Metrics.ItemsCount);
 
-		if (scenario.Result.PackingStatus == OperationResultStatus.FullyPacked)
+		if (scenario.Result.For(request.Parameters.GetAlgorithm()!.Value).PackingStatus == OperationResultStatus.FullyPacked)
 		{
 			result.Status.ShouldBe(BinPackResultStatus.FullyPacked);
 			result.Bin.CalculateVolume().ShouldBeLessThanOrEqualTo(scenario.Metrics.BinVolume);

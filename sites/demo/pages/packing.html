@@ -36,7 +36,7 @@ excerpt: |
                 <div class="field label small padless" :class="bin.isFieldValid('Length') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="bin.length"
+                         x-model.number="bin.length"
                          :id="$fieldId('length', index)"
                          :name="$fieldName('length', index)"/>
                   <label :for="$fieldId('length', index)">Length</label>
@@ -46,7 +46,7 @@ excerpt: |
                 <div class="field label small padless" :class="bin.isFieldValid('Width') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="bin.width"
+                         x-model.number="bin.width"
                          :id="$fieldId('width', index)"
                          :name="$fieldName('width', index)"/>
                   <label :for="$fieldId('width', index)">Width</label>
@@ -56,7 +56,7 @@ excerpt: |
                 <div class="field label small padless" :class="bin.isFieldValid('Height') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="bin.height"
+                         x-model.number="bin.height"
                          :id="$fieldId('height', index)"
                          :name="$fieldName('height', index)"/>
                   <label :for="$fieldId('height', index)">Height</label>
@@ -96,7 +96,7 @@ excerpt: |
                 <div class="field label small padless" :class="item.isFieldValid('Length') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="item.length"
+                         x-model.number="item.length"
                          :id="$fieldId('length', index)"
                          :name="$fieldName('length', index)"/>
                   <label :for="$fieldId('length', index)">Length</label>
@@ -106,7 +106,7 @@ excerpt: |
                 <div class="field label small padless" :class="item.isFieldValid('Width') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="item.width"
+                         x-model.number="item.width"
                          :id="$fieldId('width', index)"
                          :name="$fieldName('width', index)"/>
                   <label :for="$fieldId('width', index)">Width</label>
@@ -116,7 +116,7 @@ excerpt: |
                 <div class="field label small padless" :class="item.isFieldValid('Height') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="item.height"
+                         x-model.number="item.height"
                          :id="$fieldId('height', index)"
                          :name="$fieldName('height', index)"/>
                   <label :for="$fieldId('height', index)">Height</label>
@@ -126,7 +126,7 @@ excerpt: |
                 <div class="field label small padless" :class="item.isFieldValid('Quantity') ? '' : 'invalid'">
                   <input type="number"
                          class="small padless"
-                         x-model="item.quantity"
+                         x-model.number="item.quantity"
                          :id="$fieldId('quantity', index)"
                          :name="$fieldName('quantity', index)"/>
                   <label :for="$fieldId('quantity', index)">Quantity</label>
@@ -179,6 +179,11 @@ excerpt: |
             <span>Get results</span>
           </button>
         </div>
+        <div class="s12" aria-live="polite">
+          <template x-for="(error, index) in formErrors" :key="index">
+            <div class="error-text" x-text="error"></div>
+          </template>
+        </div>
       </div>
     </fieldset>
   </form>
@@ -198,8 +203,10 @@ excerpt: |
             <span>No Results</span>
           </template>
           <template x-for="(result, index) in results" :key="index">
-            <a class="row wave padding"
+            <a href="#"
+               class="row wave padding"
                :class="isSelected(result) ? 'surface-container border' : ''"
+               :aria-current="isSelected(result) ? 'true' : null"
                @click.prevent.stop="selectResult(result)">
               <i class="large"
                  :class="colorClass(result) + '-text'">package_2</i>
@@ -213,7 +220,7 @@ excerpt: |
                           :class="colorClass(result) + '-text'">
                 </progress>
 
-                <div class="s4" x-text="result.result">
+                <div class="s4" x-text="resultStatusText(result)">
                 </div>
                 <template x-if="!resultIsFullyPacked(result)">
                   <div class="s8 right-align" x-text="resultItemPercentageText(result)">

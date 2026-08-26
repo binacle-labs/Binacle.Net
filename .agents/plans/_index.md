@@ -173,6 +173,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting"
   paths: ["shared/**"]
+- file: shared/fixture-fill-per-algorithm.md
+  description: "The scenario fixtures record which algorithms succeed, not how well - so a sample that exists because one algorithm packs better cannot say so"
+  state: idea
+  waits-on: "nobody waiting"
+  paths: ["shared/data/**", "shared/test/Binacle.TestsKernel/**"]
 - file: shared/testskernel-data-extraction.md
   description: "TestsKernel - grow the shared fixture cases"
   state: ready
@@ -211,6 +216,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: tooling/typescript-linting.md
   description: "No linter exists for any TypeScript or JavaScript in the repository - decide whether one lands, and what it gates"
   state: idea
-  waits-on: "a yes or a no, and it is not urgent - nothing is broken by the gap"
+  waits-on: "a yes or a no"
   paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**"]
 ```

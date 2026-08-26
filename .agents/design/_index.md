@@ -83,5 +83,5 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   description: "ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions."
   paths: ["vipaq/**"]
 - file: vipaq/history.md
-  description: "ViPaq design history — superseded throwaway-prototype measurements (2026-07-05) that informed the locked decisions. Reference only, not current truth."
+  description: "ViPaq design history — superseded throwaway-prototype measurements (2026-07-05), the earlier framings of decisions that were later amended or reversed, and where the test files the v2 rebuild deleted ended up. Reference only, not current truth."
 ```

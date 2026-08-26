@@ -19,6 +19,11 @@ these were invisible for as long as they were.
 
 **The items are separable.** Anything here can be pulled into its own file the moment someone starts it.
 
+**Neither host is fixed - checked 26 Aug 2026.** An earlier note said the demo site had already been
+corrected and only the image was left. It had not. `sites/demo/pages/packing.html` and
+`api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` each carry the same seven bare `x-model` lines, and
+`core/packingDemo.ts` still sends the raw values. **Do not skip either host on the strength of that note.**
+
 ## The one that costs visitors
 
 **A visitor who types their own box dimensions gets a .NET converter exception in a dialog.**
@@ -45,6 +50,11 @@ well is cheap insurance.
   `core/packingDemo.ts:42` uses `.every()`, which is `true` for an empty array, so zero bins reaches the
   server. No confirm and no undo either.
 
+**Found 26 Aug 2026, and gone the same day.** Randomize used to roll its bins and items independently and
+could produce two identical ones, which the API rejects as a duplicate id. **The hand-picked sample set
+removed it** - Randomize now moves between checked samples and a test asserts no sample carries a duplicate
+id. Recorded because the same trap is one careless roll away if anything ever generates a set again.
+
 ## The four the visitor cannot see past
 
 - **A failed call leaves the previous packing drawn.** `onSubmit` returns `null` to the visualizer when the
@@ -57,7 +67,9 @@ well is cheap insurance.
   `EarlyFail_ContainerDimensionExceeded` - a C# identifier on a public page. It needs mapping to plain
   English.
 - **`unpackedItems` is on the response and rendered nowhere**, so a partial result reports a percentage and
-  will not say which items were left out.
+  will not say which items were left out. **This stopped being optional on 26 Aug 2026.** The demo now ships a
+  hand-picked sample set, and one of those samples exists precisely to show a partial pack - three items where
+  the volume fits and the geometry does not. It is the one sample the page cannot currently explain.
 
 ## The three about operating it
 
@@ -72,32 +84,53 @@ well is cheap insurance.
 
 ## What is not a bug, so nobody chases it
 
+**The module does not ship an old palette. Checked 26 Aug 2026 and the claim does not hold.** A review said
+the module was still on a pre-contrast-pass dark palette while the sites had moved on. It is not.
+`api/src/Binacle.Net.UIModule/_sass/_theme.scss` is byte identical to `sites/demo/_sass/_theme.scss` once
+whitespace is stripped; `#3c5d8b` is also the dark `--primary` in `sites/www/_sass/_tokens.scss`; and the
+module's `_components.scss` carries the same four contrast overrides the demo site's does. **There is no
+palette work here.** If a contrast number is ever in doubt, measure it - do not compare hex strings across
+files that were always meant to match.
+
 **The pink and teal faces in the 3D view are not item colours.** `utils/_itemMaterial.ts` is a single shared
 `MeshNormalMaterial`, which colours each face by the direction its normal points. There is one kind of item
 and no categories anywhere in the API. Any change to how items are coloured is design work and belongs with
 the rebrand, not here.
 
+## What is left
+
+**Four of the ten fixes shipped on 2026-08-26 and are ticked below.** Four more are fixed in code and
+unit-tested but **have never been looked at in a browser** - they are the four `By eye` clauses, and they are
+the same four the release set is holding its browser pass for.
+
+**Two are untouched:** the submit button giving no sign it was pressed, and `unpackedItems` being rendered
+nowhere. **The second stopped being optional** - see the note beside it above.
+
 ## Done when
 
-- [ ] No dimension reaches the API as a string from any host.
-      `grep -n "length: x.length" packages/binacle-net-ui/src/core/packingDemo.ts` shows a cast, or the
-      templates on both hosts use `x-model.number`.
+- [x] **No dimension reaches the API as a string from any host - 2026-08-26.** `onSubmit` casts, and both
+      templates carry seven `x-model.number` lines.
 - [ ] Adding a bin and submitting returns a result rather than a 422.
-      **By eye.** Load the packing page, press Add bin, press Get results.
+      **By eye, and still unseen.** Fixed in code and unit-tested on 2026-08-26; nobody has loaded the page.
+      Load the packing page, press Add bin, press Get results.
 - [ ] Clearing all bins is caught before the request goes out.
-      **By eye.** Press Clear all, then Get results - the error is inline, not a 422 dialog.
+      **By eye, and still unseen.** `formErrors` renders in both templates; nobody has watched it fire.
+      Press Clear all, then Get results - the error is inline, not a 422 dialog.
 - [ ] A failed request clears the scene.
-      **By eye.** Point the demo at a dead host, submit, and confirm the 3D view is empty rather than stale.
+      **By eye, and still unseen.** `clearScene()` exists and is called on a null result.
+      Point the demo at a dead host, submit, and confirm the 3D view is empty rather than stale.
 - [ ] Pressing the submit button visibly changes something within one frame.
       **By eye.** The button state, the results panel, or both.
-- [ ] No C# identifier appears in the results panel.
-      `grep -rn "result.result" sites/demo/pages api/src/Binacle.Net.UIModule/Pages` returns nothing that
-      prints the value unmapped.
+- [x] **No C# identifier appears in the results panel - 2026-08-26.** Both templates call
+      `resultStatusText`, and the map covers all six statuses read from the v3 contract.
 - [ ] A partial result names the items it could not fit.
       `grep -rn "unpackedItems" sites/demo/pages api/src/Binacle.Net.UIModule/Pages` returns at least one hit.
 - [ ] Every result row can be reached and activated from the keyboard.
-      **By eye.** Tab to a row and press Enter; the 3D view redraws.
-- [ ] The error dialog traps focus and closes on Escape.
-      `grep -rn "showModal" packages/binacle-net-ui/src sites/demo/_includes` returns a call.
-- [ ] The camera aspect comes from the renderer's container, not the window.
-      `grep -n "innerWidth" packages/binacle-net-ui/src/core/packingVisualizer.ts` returns nothing.
+      **By eye, and still unseen.** Both templates now give the row an `href` and `aria-current`.
+      Tab to a row and press Enter; the 3D view redraws.
+- [x] **The error dialog traps focus and closes on Escape - 2026-08-26.** `core/errorsDialog.ts` calls
+      `showModal()` and listens for the element's own `close` event. **Watch where it sits on screen the first
+      time** - `showModal()` moves it into the browser's top layer and beercss positions `.modal.active`
+      itself.
+- [x] **The camera aspect comes from the renderer's container - 2026-08-26.** `utils/containerAspectRatio.ts`
+      reads the container's box, driven by a `ResizeObserver`. No `innerWidth` left in the visualizer.

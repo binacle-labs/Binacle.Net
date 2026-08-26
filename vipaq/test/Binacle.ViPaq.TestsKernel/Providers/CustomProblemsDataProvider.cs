@@ -3,7 +3,7 @@ using Binacle.ViPaq.TestsKernel.Models;
 namespace Binacle.ViPaq.TestsKernel.Providers;
 
 // Real placed results for the custom, hand-authored problems: the bin plus the placed items the packer
-// produced. Generated offline by Binacle.ViPaq.PackedDataGenerator (FFD, pinned), committed under
+// produced. Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under
 // vipaq/data/packed/custom-problems/ and read here as embedded resources. No token is stored - it is derivable,
 // so the benchmark computes it. Do not hand-edit.
 public static class CustomProblemsDataProvider
@@ -16,8 +16,7 @@ public static class CustomProblemsDataProvider
 	{
 		foreach (var scenario in PackedDataReader.Read(Family))
 		{
-			// See BischoffDataProvider: keyed by Name alone, so a second algorithm's `.bfd.json` in this folder
-			// would collide on Add. Deferred until such data exists.
+			// See BischoffDataProvider: the name's algorithm suffix is what keeps the three algorithms apart.
 			scenarios.Add(scenario.Name, scenario);
 		}
 	}

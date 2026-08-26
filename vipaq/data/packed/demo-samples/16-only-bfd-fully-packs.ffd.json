@@ -1,0 +1,34 @@
+[
+	{
+		"Name": "DemoSample_16_OnlyBfdFullyPacks_60x55x50",
+		"WidthBits": 8,
+		"Bin": "60x55x50",
+		"Items": [
+			"25x25x25 (0,0,0)",
+			"25x25x25 (25,0,0)",
+			"25x25x25 (0,25,0)",
+			"25x25x25 (0,0,25)",
+			"20x20x15 (25,25,0)",
+			"20x20x15 (25,0,25)",
+			"20x20x15 (0,25,25)",
+			"20x20x15 (25,25,15)",
+			"12x12x12 (25,25,30)"
+		]
+	},
+	{
+		"Name": "DemoSample_16_OnlyBfdFullyPacks_35x30x30",
+		"WidthBits": 8,
+		"Bin": "35x30x30",
+		"Items": [
+			"25x25x25 (0,0,0)"
+		]
+	},
+	{
+		"Name": "DemoSample_16_OnlyBfdFullyPacks_30x25x25",
+		"WidthBits": 8,
+		"Bin": "30x25x25",
+		"Items": [
+			"25x25x25 (0,0,0)"
+		]
+	}
+]

@@ -1,5 +1,6 @@
 import {Bin, Item} from "../viewModels";
 import {getRandomInt} from "./getRandomInt";
+import {sampleData} from "./sampleData";
 
 export interface Sample {
 	bins: Bin[];
@@ -17,15 +18,6 @@ export function randomBin() {
 		getRandomInt(minBinSide, maxBinSide),
 		getRandomInt(minBinSide, maxBinSide)
 	);
-}
-
-function randomBins() {
-	const count = getRandomInt(2, 5);
-	const bins = [] as Bin[];
-	for (let i = 0; i < count; i++) {
-		bins.push(randomBin());
-	}
-	return bins;
 }
 
 // The bin everything is sized against: the largest by volume, so the set always fits at least one candidate
@@ -46,32 +38,18 @@ export function randomItemFor(bin: Bin, quantity: number) {
 	return new Item(randomSide(bin.length), randomSide(bin.width), randomSide(bin.height), quantity);
 }
 
-// Quantities are shared out of a volume budget of 45-75% of the bin and never rounded up, so the set cannot
-// exceed the bin either. Measured over 200,000 rolls: 0% impossible, median fill 55%, 2-4 item types.
-function itemsFor(bin: Bin) {
-	const binVolume = bin.length * bin.width * bin.height;
-	const types = getRandomInt(2, 4);
-	const items = [] as Item[];
-	let budget = binVolume * (getRandomInt(45, 75) / 100);
+export const sampleCount = sampleData.length;
 
-	for (let i = 0; i < types; i++) {
-		const item = randomItemFor(bin, 1);
-		const itemVolume = item.length * item.width * item.height;
-		const quantity = Math.min(10, Math.floor(budget / (types - i) / itemVolume));
-		if (quantity < 1) {
-			continue;
-		}
-		item.quantity = quantity;
-		items.push(item);
-		budget -= itemVolume * quantity;
-	}
-
-	return items;
+// A fresh Bin and Item every call. The demo edits what it is handed, and the set has to survive that.
+export function sampleAt(index: number): Sample {
+	const data = sampleData[index];
+	return {
+		bins: data.bins.map(([length, width, height]) => new Bin(length, width, height)),
+		items: data.items.map(([length, width, height, quantity]) => new Item(length, width, height, quantity))
+	};
 }
 
-// The bins first, then the items sized to them. One call, because two independent rolls are exactly the
-// impossible-pair bug this replaced.
-export function randomSample(): Sample {
-	const bins = randomBins();
-	return {bins, items: itemsFor(largestBin(bins))};
+// A step of at least one, so it can never hand back the sample already on screen.
+export function nextSampleIndex(current: number): number {
+	return (current + getRandomInt(1, sampleCount - 1)) % sampleCount;
 }

@@ -6,9 +6,11 @@
 
 	<ItemGroup>
 		<!-- The shared notation formats Bin/Items; Metrics is arithmetic; Result is a fixed baseline (see
-		     BischoffSuiteConverter). No algorithm dependency — the tool never runs the packer. TestReporting has the
-		     shared RepositoryRoot (Bind().Find) used to locate the output dir — no bespoke per-tool locator. -->
+		     BischoffSuiteConverter). Binacle.Packing is there for the Algorithm enum only — it holds the models, not
+		     the packer, which this tool never runs. TestReporting has the shared RepositoryRoot (Bind().Find) used to
+		     locate the output dir — no bespoke per-tool locator. -->
 		<ProjectReference Include="..\..\src\Binacle.CompactNotation\Binacle.CompactNotation.csproj" />
+		<ProjectReference Include="..\..\src\Binacle.Packing\Binacle.Packing.csproj" />
 		<ProjectReference Include="..\..\test\Binacle.TestReporting\Binacle.TestReporting.csproj" />
 	</ItemGroup>
 

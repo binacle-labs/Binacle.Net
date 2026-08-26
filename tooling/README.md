@@ -95,7 +95,7 @@ The documents come out of the build, not out of a running server, so nothing has
 ---
 
 ## 🔄 Regenerating committed data
-`regen.just`, loaded as the `regen` module. Four tools write data that is **committed to the repo**, and this
+`regen.just`, loaded as the `regen` module. Five tools write data that is **committed to the repo**, and this
 is the only place that says how to run them.
 
 ```bash
@@ -103,6 +103,7 @@ just regen all                     # every generator, in dependency order
 just regen or-lib-scenarios        # OR-Library text -> shared/data/bischoff-suite
 just regen vipaq-packed-data       # those + custom-problems, packed -> vipaq/data/packed
 just regen vipaq-interop-vectors   # the interop pair + header bytes -> vipaq/test-vectors
+just regen demo-samples            # shared/data/demo-samples -> the demo's sample set
 just regen check                   # regenerate, then fail if any of it changed
 ```
 
@@ -114,10 +115,15 @@ ordering is the part that is easy to get wrong by hand. `vipaq-interop-vectors` 
 because its C# and TS halves write `interop/cs` and `interop/ts` from the same `input.json`; regenerating one
 alone is the drift the interop integrity tests exist to catch.
 
+`demo-samples` is the odd one out: its source is committed data rather than a raw input, and it writes a
+TypeScript file into the demo's package instead of `.json`. The data folder is the source of truth, and the
+demo reads whatever is in it.
+
 Every run is deterministic, so `check` is just "run everything, then see whether the tree moved". It diffs only
-the `.json` the generators write - these folders also hold their own README, and `vipaq/test-vectors` as a
-whole holds hand-authored vectors no generator touches. **Nothing in CI calls it**, and that is deliberate: it
-is for the maintainer who edited a tool or a source problem and wants to know what fell out of step.
+what the generators write - these folders also hold their own README, `vipaq/test-vectors` as a whole holds
+hand-authored vectors no generator touches, and the demo's package is otherwise hand-written. **Nothing in CI
+calls it**, and that is deliberate: it is for the maintainer who edited a tool or a source problem and wants
+to know what fell out of step.
 
 ---
 

@@ -3,13 +3,24 @@ import {
 	defineComponent,
 	getResponseStatusText,
 	largestBin,
+	nextSampleIndex,
 	randomBin,
 	randomItemFor,
-	randomSample
+	sampleAt
 } from "../utils";
 import {Bin, Item, Error} from "../viewModels";
 import {PackingRequest, PackingResponse} from "../apiModels";
 import {PackedData} from "../apiModels/packingResponse";
+
+// The API's BinPackResultStatus, in the words a visitor reads.
+const resultStatusTexts: Record<string, string> = {
+	Unknown: 'Unknown',
+	NotPacked: 'Not packed',
+	PartiallyPacked: 'Partially packed',
+	FullyPacked: 'Fully packed',
+	EarlyFail_ContainerVolumeExceeded: 'Items exceed bin volume',
+	EarlyFail_ContainerDimensionExceeded: 'Item longer than bin',
+};
 
 export function packingDemoAppPlugin(Alpine: AlpineType) {
 	Alpine.data('packing_demo_app', packingDemoApp);
@@ -33,16 +44,34 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	],
 	results: [] as PackedData[],
 	selectedResult: null as PackedData | null,
+	formErrors: [] as string[],
+	sampleIndex: 0,
 	init() {
-		const sample = randomSample();
+		// Sample zero, never a roll: the page opens on the same readable set every time.
+		this.showSample(0);
+		this.model.algorithm = this.algorithms[0].value;
+	},
+	showSample(index: number) {
+		const sample = sampleAt(index);
+		this.sampleIndex = index;
 		this.model.bins = sample.bins;
 		this.model.items = sample.items;
-		this.model.algorithm = this.algorithms[0].value;
+	},
+	// `every` below is true on an empty list, so without this an emptied form posts no bins and no items.
+	listErrors() {
+		const errors = [] as string[];
+		if (this.model.bins.length < 1) {
+			errors.push('Add at least one bin.');
+		}
+		if (this.model.items.length < 1) {
+			errors.push('Add at least one item.');
+		}
+		return errors;
 	},
 	isValid() {
 		const binsValid = this.model.bins.every(bin => !bin.hasErrors());
 		const itemsValid = this.model.items.every(item => !item.hasErrors());
-		return binsValid && itemsValid;
+		return this.listErrors().length < 1 && binsValid && itemsValid;
 	},
 	removeBin(index: number) {
 		this.model.bins.splice(index, 1);
@@ -56,7 +85,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		['@click']() {
 			// A copy, not a roll: a fourth candidate is only worth comparing if it keeps the same footprint.
 			const last = this.model.bins[this.model.bins.length - 1];
-			this.model.bins.push(last ? new Bin(last.length, last.width, last.height) : randomBin());
+			this.model.bins.push(last ? Bin.copyOf(this.model.bins, last) : randomBin());
 		}
 	},
 	clearAllBins: {
@@ -77,12 +106,10 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			this.model.items = [];
 		}
 	},
-	// One button, because two independent rolls are the impossible-pair bug this replaced.
+	// A different sample from the hand-picked set, never the one on screen.
 	randomize: {
 		['@click']() {
-			const sample = randomSample();
-			this.model.bins = sample.bins;
-			this.model.items = sample.items;
+			this.showSample(nextSampleIndex(this.sampleIndex));
 		}
 	},
 	async handleErrorResponse(response: Response) {
@@ -139,6 +166,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		}
 	},
 	onSubmit() {
+		this.formErrors = this.listErrors();
 		if (!this.isValid()) {
 			this.$logger.error("[Binacle] Model is not valid");
 			return;
@@ -148,18 +176,19 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			parameters: {
 				algorithm: this.model.algorithm,
 			},
+			// x-model hands back the input's string, and the API declares these as int.
 			bins: this.model.bins.map(x => ({
 				id: x.id,
-				length: x.length,
-				width: x.width,
-				height: x.height
+				length: Number(x.length),
+				width: Number(x.width),
+				height: Number(x.height)
 			})),
 			items: this.model.items.map(x => ({
 				id: x.id,
-				length: x.length,
-				width: x.width,
-				height: x.height,
-				quantity: x.quantity
+				length: Number(x.length),
+				width: Number(x.width),
+				height: Number(x.height),
+				quantity: Number(x.quantity)
 			}))
 		} as PackingRequest;
 
@@ -202,6 +231,9 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			return 'orange';
 		}
 		return 'red';
+	},
+	resultStatusText(result: PackedData) {
+		return resultStatusTexts[result.result] ?? 'Unknown';
 	},
 	resultTitle(result: PackedData) {
 		return `Bin: ${result.bin.id}`;

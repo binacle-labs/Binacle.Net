@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "DemoSample_02_PacksNowhere_30x30x30",
+    "Bin": "30x30x30",
+    "Metrics": "24000 27000 3 88.89",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "20x20x20 [3]"
+    ]
+  }
+]

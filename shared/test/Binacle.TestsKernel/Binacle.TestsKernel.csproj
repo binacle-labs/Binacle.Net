@@ -11,7 +11,8 @@
         slice: the api integration suite and the lib tests read them through this kernel, and the ViPaq packed-data
         generator reads the same files by path at run time. LogicalName reproduces the manifest name the reader
         expects. Link keeps these out-of-project files under a virtual folder in the IDE instead of scattering them
-        at the project root. Bischoff suite is the OR-Library converter's output; custom-problems are hand-authored.
+        at the project root. Bischoff suite is the OR-Library converter's output; custom-problems are hand-authored;
+        demo-samples are the packer's own output, kept as a regression baseline.
         One flat entry per folder (no ** wildcard): a recursive wildcard with %(RecursiveDir) would inject a
         backslash into LogicalName and corrupt the manifest name.
     -->
@@ -23,6 +24,10 @@
         <EmbeddedResource Include="..\..\data\custom-problems\*.json">
             <Link>Algorithms\Data\CustomProblems\%(Filename)%(Extension)</Link>
             <LogicalName>Binacle.TestsKernel.Algorithms.Data.CustomProblems.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="..\..\data\demo-samples\*.json">
+            <Link>Algorithms\Data\DemoSamples\%(Filename)%(Extension)</Link>
+            <LogicalName>Binacle.TestsKernel.Algorithms.Data.DemoSamples.%(Filename)%(Extension)</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 
