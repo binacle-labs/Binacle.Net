@@ -1,78 +1,109 @@
 ---
-description: Two framework defaults nobody overrode - code samples on the docs site render in the body sans-serif, and wide tables are clipped rather than scrolled
+description: Two framework defaults on the docs site - code samples had no named mono face (fixed), and wide tables are still clipped rather than scrolled
 state: proposed
-waits-on: "a yes or a no from the maintainer"
+waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
 paths:
   - "sites/docs/**"
 ---
 
-# Two beercss defaults are breaking the docs site
+# A beercss default is still clipping wide tables on the docs site
 
-**Found on 22 Aug 2026.** **They are not `www` work** - `www` drops the framework and inherits neither. These
+**Found on 22 Aug 2026.** **Not `www` work** - `www` drops the framework and inherits neither fault. These
 bite `sites/docs`, which keeps it.
 
-## What it is
+The mono stack is in and stays. The table half was tried, made things worse, and is out again. What follows
+is what that ruled out and what is left.
 
-Two rules in `sites/docs/_sass/`, one line each.
+## The mono stack - done
 
-1. **Give `pre` and `code` a mono stack.**
-2. **Wrap wide tables in a container that scrolls**, rather than letting `overflow-x: hidden` cut them off.
+`sites/docs/_sass/_typography.scss` gives `main pre` and `main code` a mono stack.
 
-## Why
+**It did not fix a visible bug, because there was no visible bug.** `beer.min.css` sets
+`pre{...;font-family:inherit}`, but Rouge puts every block's text inside `<code>` and the browser's own
+stylesheet renders `code` monospace. Measured in the built site: `pre` computes to the body sans stack, the
+`code` inside it computes to `monospace`, and before-and-after screenshots of a fenced block are identical.
+**No reader ever saw a sans-serif code block.** What the rule buys is a pinned face instead of each browser's
+fixed-width default, and a match with the stack `sites/www` already uses.
 
-**Code blocks are not monospace on any site.** `beer.min.css` sets
+`sites/demo` and the UI module have no `<pre>` content, so this only ever concerned the docs site.
 
-```css
-pre{...;font-family:inherit}
-```
+## Wide tables - still clipped
 
-and **no `font-family` declaration exists anywhere in the sass** - not in `sites/docs/_sass/`, not in
-`sites/demo/_sass/`, not in `api/src/Binacle.Net.UIModule/_sass/`. So `pre` inherits the body sans-serif and
-every fenced block renders in it. **78 files under `sites/docs/collections/` carry fenced code blocks.** It is
-the documentation site for an HTTP API; the JSON is most of what a reader is there for.
-
-`sites/demo` and the UI module have no `<pre>` content, so the fault shows on the docs site only.
-
-**Wide tables are clipped, not scrolled.** `beer.min.css` sets `overflow-x: hidden` on **both** `body` and
-`main`:
+`beer.min.css` sets `overflow-x: hidden` on **both** `body` and `main`:
 
 ```css
 body{color:var(--on-surface);background-color:var(--surface);overflow-x:hidden}
 main{flex:1;padding:.5rem;overflow-x:hidden}
 ```
 
-Nothing overrides either. The four-column table at
-`sites/docs/collections/_common_pages/configuration-basics.md:134` loses its right-hand columns on a phone -
-**the column holding the connection-string example, which is the reason the table exists** - and there is no
-scrollbar to tell the reader anything is missing.
+Nothing overrides either. A table wider than the content column loses its right-hand columns, with no
+scrollbar to say anything is missing. The four-column table at
+`sites/docs/collections/_common_pages/configuration-basics.md:134` loses the column holding the
+connection-string example - **the reason the table exists** - on a phone, and at 1280px too.
 
-## What it touches
+Only **8 files** under `sites/docs/collections/` have a table at all. At 390px four of them clip.
 
-- `sites/docs/_sass/_typography.scss` or a new partial, for the mono stack
-- the docs table markup or a wrapper, for the scroll container
-- **`sites/docs/` is published**, so this is a site session, not a coding session
+## The cheap fix does not work
+
+`table { display: block; overflow-x: auto; }` scrolls the table, and shrinks it. `display: block` puts the
+rows in an anonymous table box that sizes to its content instead of filling the column. Measured on the eight
+pages that carry tables:
+
+- `forwarded-headers`: 928px, down to 308px.
+- `vipaq-protocol`, one table: down to 247px.
+- `quick-start` and `health-checks`: down to 574px.
+
+**Three CSS-only alternatives were tried and none works:**
+
+- `min-inline-size: 100%` on the row groups does nothing - width does not apply to a table-row-group.
+- `display: table; inline-size: 100%` on `thead`/`tbody` restores the width, but makes head and body two
+  separate tables and misaligns every column.
+- Nothing else reaches the anonymous table box.
+
+**There is no CSS-only, no-wrapper answer.** It is shrink, or keep the clipping.
+
+## What is left: a wrapper
+
+The plan first floated a wrapper and dismissed it as too big. It is the only route left. A block-level
+element around each table takes the `overflow-x: auto`; the table inside stays a table and keeps its width.
+
+**What it costs, honestly:** these are kramdown-generated tables in **8 markdown files across 4 version
+folders**, so it needs either markup written into each file or a Jekyll hook that wraps every `<table>` at
+build time. Both are more than a line of sass, and the markup route repeats the wrapper 8+ times across
+version folders that are otherwise frozen copies.
 
 ## What will bite
 
-**Check the Pygments theme first.** `sites/docs/_sass/pygments/` styles the highlighted spans and may already
-assume a face. Setting the stack on `pre` and `code` without reading it can change the colour rules' metrics.
+**Any scroll answer needs a visible resting scrollbar.** Beercss styles scrollbars nearly invisible -
+`sites/docs/lib/beercss/beer.css:183` sets `background: none` on the track, thumb and buttons at 0.4rem, and
+paints the thumb only on `:hover`/`:focus`. A table that scrolls but shows no scrollbar at rest still reads
+as clipped.
 
-**`overflow-x: hidden` on `body` is doing something.** It is a framework default and something on the docs
-site may be relying on it to hide a horizontal overflow elsewhere. **Wrap the table; do not remove the
-framework's rule.**
+**Do not remove the framework's `overflow-x: hidden`.** It is a default on `body` and something else on the
+site may rely on it.
+
+**Check the Pygments theme before touching faces.** `sites/docs/_sass/pygments/` styles the highlighted spans
+and may assume metrics.
+
+## A separate fault, not this one
+
+**Four pages overflow the document horizontally at 390px for a different reason**, unchanged by anything
+here: the breadcrumb `nav.tiny-space` refuses to wrap, and the fixed page-top FAB spills 2px. **Do not fix it
+here** - it needs its own plan.
 
 ## The case against
 
-**Nobody has complained.** Both faults have been live for the whole life of the site and neither has been
-reported.
-
-**And the second one is one table.** Fixing the general case means a wrapper on every table in 78 files or a
-Jekyll hook, which is more work than the one table justifies.
+**Nobody has complained.** The clipping has been live for the whole life of the site and has never been
+reported. The fix now costs a wrapper in 8 files or a build hook, against a fault that bites 4 pages at phone
+width and one page at 1280px.
 
 ## Done when
 
-- [ ] `pre` and `code` render monospace on the built docs site.
-      `grep -rn 'font-family' sites/docs/_sass/` returns a mono stack, and **by eye** on a built page with a
-      fenced block.
-- [ ] The configuration-basics table is reachable at phone width.
-      **By eye.** Build the site, open that page at 390px, and scroll the table to its last column.
+- [x] `pre` and `code` render monospace on the built docs site.
+      `grep -rn 'font-family' sites/docs/_sass/` returns the stack, and the built `css/main.css` carries
+      `main pre,main code{font-family:ui-monospace,...}`. **By eye** on a built page with a fenced block:
+      monospace, and unchanged from before - see **The mono stack** above.
+- [ ] The configuration-basics table is reachable at phone width, and still fills the column when it fits.
+      **By eye.** Built and opened at 390px: the table scrolls to the connection-string column, with a
+      scrollbar visible at rest. On a page whose table is narrower than the column - `forwarded-headers` -
+      the table still spans the full column width, not 308px.

@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, and how the agent reference layer is kept honest against the code.
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
 verified: 2026-08-23
-check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL
+check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
 paths:
   - "NOTICE"
   - "README.md"
@@ -11,6 +11,7 @@ paths:
   - "Dockerfile"
   - "CONTENT-TERMS.md"
   - "sites/docs/**"
+  - "shared/src/Binacle.Packing/**"
 ---
 
 # General — decisions ledger
@@ -216,6 +217,28 @@ reason this is a decision rather than a closed task:
 **Measured evidence a doc quotes is not renumbered when the world moves.** Both findings records quote dataset
 sizes that were correct when measured and have since grown; they now say so and name the live count, rather
 than restating splits that would need a re-run to be true. Re-dating a measurement is falsifying it.
+
+### D8 — identity is not geometry, and most model duplication is kept on purpose
+
+The `Binacle.Geometry` extraction is finished: one leaf holds the `IWith*` geometry family and the generic
+concrete `Dimensions<T>` / `Coordinates<T>` / `Item<T>`.
+
+**Identity is not geometry.** `IWithID` / `IWithReadOnlyID` and the read-only composites `IIdentifiableBin` /
+`IIdentifiableItem` sit in `shared/src/Binacle.Packing/Abstractions/`, a layer above the leaf, and never went
+into `Binacle.Geometry`. That layer is what made a leaf rename unnecessary — `Geometry` → `Primitives` or
+`Core` was the alternative and was not needed. Which interface sits in which project is `$lib/models`.
+
+**What was deliberately *not* reduced to a shared model**, and this list is the point of the record: lib
+internal result models (internal ctors, immutable) · algorithm working types (they carry behaviour) · v3 DTOs
+(frozen) · UIModule ViewModels (DataAnnotations + computed ID) · lib **internal** readonly-struct `Dimensions` /
+`Coordinates` (value-type performance — they must stay structs).
+
+**That list is settled, not an open question.** A later "reduce the duplication" pass that does not read it
+will re-derive the same five answers from scratch, or take one of them the other way.
+
+**TypeScript duplicates the model shapes on purpose.** TS is structurally typed, so the duplicates already
+interoperate and nothing is broken; there is simply no single source. Worth revisiting only if the shapes
+start to drift.
 
 ## Open
 

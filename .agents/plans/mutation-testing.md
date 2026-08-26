@@ -1,7 +1,7 @@
 ---
 description: mutation testing with Stryker.NET
 state: idea
-waits-on: "nobody waiting"
+waits-on: "nobody waiting - a future idea"
 ---
 
 # Idea: mutation testing with Stryker.NET

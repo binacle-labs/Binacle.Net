@@ -1,7 +1,7 @@
 ---
 description: v4 - flip from experimental to stable
-state: blocked
-waits-on: "an endpoint added to v4 that reshapes no existing contract - none has been chosen"
+state: deferred
+waits-on: "v3.0.0, and an endpoint added to v4 that reshapes no existing contract - none has been chosen"
 paths:
   - "api/**"
 ---

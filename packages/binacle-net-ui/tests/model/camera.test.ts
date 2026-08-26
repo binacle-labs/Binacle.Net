@@ -12,7 +12,6 @@ describe("cameraFar", () => {
 		expect(far).toBe(1000);
 	});
 
-	// Twice the corner-to-corner distance plus twice the height, rounded up.
 	test("is twice the diagonal plus twice the height, rounded up", () => {
 		const bin = {length: 10, width: 20, height: 30};
 
@@ -83,7 +82,6 @@ describe("containerAspectRatio", () => {
 		expect(aspectRatio).toBe(0.5);
 	});
 
-	// A container that has not been laid out yet measures 0, and that would make the projection NaN.
 	test.each([
 		["no width", 0, 400],
 		["no height", 800, 0],

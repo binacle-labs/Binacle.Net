@@ -161,11 +161,14 @@
           </button>
         </div>
         <div class="s7 m4 row">
-          <button class="max" type="submit">
-            <span>Get results</span>
+          <button class="max" type="submit"
+                  :disabled="submitting"
+                  :aria-busy="submitting ? 'true' : null">
+            <span x-text="submitButtonText()">Get results</span>
           </button>
         </div>
         <div class="s12" aria-live="polite">
+          <div x-text="submitStatus"></div>
           <template x-for="(error, index) in formErrors" :key="index">
             <div class="error-text" x-text="error"></div>
           </template>

@@ -1,7 +1,7 @@
 ---
 description: The instance page reads its presets over HTTP from the browser - move it to server-side state
-state: ready
-waits-on: "nothing"
+state: idea
+waits-on: "v3, and the maintainer expanding the idea"
 paths:
   - "api/src/Binacle.Net.UIModule/**"
   - "api/src/Binacle.Net.Kernel/**"
@@ -9,7 +9,8 @@ paths:
 
 # The instance page's presets, without a call
 
-**Status: ready, with one design question to settle first.** One coding session. Repository code only.
+**Status: an idea.** The maintainer will expand it before anyone starts. One coding session as written,
+repository code only, with one design question still to settle.
 
 ## The item
 

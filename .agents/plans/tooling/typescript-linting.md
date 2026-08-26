@@ -1,7 +1,7 @@
 ---
-description: No linter exists for any TypeScript or JavaScript in the repository - decide whether one lands, and what it gates
-state: idea
-waits-on: "a yes or a no"
+description: Answered no - linting is one decision for the whole repository, not a TypeScript one. Every language gets the same treatment or none does.
+state: deferred
+waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
 paths:
   - "packages/**"
   - "sites/**"
@@ -9,20 +9,35 @@ paths:
   - "vipaq/packages/**"
 ---
 
-# No linter for the TypeScript
+# Linting is a whole-repository decision
 
-**There is no eslint, no prettier and no biome anywhere.** Style in the TypeScript is whatever the last
-person typed, and the only thing holding it is `.editorconfig` and `strict` in six copies of
-`tsconfig.json`.
+**Answered no on 2026-08-27, and the reason is the shape, not the tool.** The maintainer's words: *"then no
+we don't do. There is no linter for C#, there is for Ruby, but no - not yet, all need same treatment."*
 
-**Ruby is not in the same position.** `ruby/.rubocop.yml` covers every gem and the style it enforces is
-written down. What has never happened there is a run - rubocop is not in `ruby/Gemfile` and no recipe calls
-it, so it lands red before it lands green. A different gap from this one.
+**Do not reopen this as a TypeScript question.** Adopting a linter for one of three languages leaves the
+repository with three different answers to the same question. **What revives this file is a decision to lint
+every language here to the same standard.** Then the material below is the TypeScript half of it.
 
-**Nothing is broken.** This is worth doing because the next person to touch a package cannot tell what the
-house style is without reading four files and guessing, not because anything is wrong today.
+## Where each language actually stands - checked 2026-08-27
 
-## What the answer has to settle
+- **TypeScript and JavaScript: nothing.** No eslint, no prettier, no biome anywhere. Style is whatever the
+  last person typed, held only by `.editorconfig` and `strict` in six copies of `tsconfig.json`.
+- **Ruby: a config, never run.** `ruby/.rubocop.yml` covers every gem and writes down the style it enforces.
+  rubocop is in no `Gemfile` and no `.gemspec`, and no `just` recipe calls it - the only mentions outside that
+  config are in `.agents/`. It lands red before it lands green.
+- **C#: no in-build linter, but not nothing.** There are no analyzer packages, no `EnforceCodeStyleInBuild`,
+  no `AnalysisMode` and no `TreatWarningsAsErrors`. The single root `.editorconfig` carries formatting rules
+  and exactly one `dotnet_diagnostic` line, and it is a suppression (`IDE0130`, scoped to the ViPaq unit
+  tests). **What C# does have is SonarCloud**, run by `.github/workflows/sonar-analysis.yml` on merge, with
+  its rule set tuned in `Directory.Build.props` via `SonarQubeTestProject`. CodeQL runs beside it, security
+  only. **So the C# gap is a local, in-build style linter - not quality analysis, which already runs.**
+
+**Nothing is broken.** The cost is that the next person to touch a package cannot tell what the house style is
+without reading four files and guessing.
+
+## What the TypeScript half would have to settle
+
+**Kept because it is measured work, not because the question is open.**
 
 - **Which tool.** `prettier` plus `typescript-eslint` is what most of the world runs. `biome` is one binary
   for both and much faster. Either is defensible; running both is not.
@@ -40,12 +55,15 @@ house style is without reading four files and guessing, not because anything is 
 
 ## Done when
 
-- [ ] One tool is chosen and the reason is written down, or the answer is a recorded no.
-      **By eye.** Either a config file exists at the root, or this plan is deleted and the no is a row
-      in the general decisions ledger.
+**None of these open while the file is deferred.** They describe what landing a linter across the repository
+would look like, so that reviving it does not start from a blank page.
+
+- [ ] Every language here has an answer, and it is the same answer.
+      **By eye.** TypeScript, Ruby and C# each either run a linter or are written down as deliberately not
+      linted. One language settled and two not is the state this file exists to refuse.
 - [ ] The indentation conflict is settled in `.editorconfig`, not left for an editor to lose.
-      `grep -n 'indent_style' .editorconfig` agrees with the tool's config.
-- [ ] A `just` recipe runs it, and `just check` lists that recipe.
-      `just check` shows it, and it exits non-zero on a seeded violation.
-- [ ] Whether it gates a pull request is answered in the workflow, not only here.
+      `grep -n 'indent_style' .editorconfig` agrees with whatever tool config lands beside it.
+- [ ] A `just` recipe runs each linter, and `just check` lists them.
+      `just check` shows them, and each exits non-zero on a seeded violation.
+- [ ] Whether they gate a pull request is answered in the workflow, not only here.
       `grep -rn 'lint' .github/workflows/` - either a step names it, or nothing does on purpose.

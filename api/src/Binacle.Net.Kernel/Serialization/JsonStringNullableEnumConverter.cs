@@ -30,7 +30,9 @@ public class JsonStringNullableEnumConverter<T> : JsonConverter<T>
 		if (!Enum.TryParse(this.underlyingType, value, ignoreCase: false, out object result) &&
 		    !Enum.TryParse(this.underlyingType, value, ignoreCase: true, out result))
 		{
-			return default!;
+			// Null would read as "absent" and a validator that only requires one field of several would
+			// pass, dropping what the client actually sent.
+			throw new JsonException($"Could not convert \"{value}\" to {this.underlyingType.Name}");
 		}
 		return (T)result;
 	}
@@ -88,7 +90,12 @@ internal sealed class NullableEnumConverter<T> : JsonConverter<T>
 
 	public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		return this.TryParseEnumFromString(ref reader, out T result) ? result : default!;
+		if (!this.TryParseEnumFromString(ref reader, out T result))
+		{
+			throw new JsonException($"Could not convert value to {this.underlyingType.Name}");
+		}
+
+		return result;
 	}
 
 	public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
@@ -127,6 +134,6 @@ internal sealed class NullableEnumConverter<T> : JsonConverter<T>
 		}
 
 		result = default!;
-		return true;
+		return false;
 	}
 }

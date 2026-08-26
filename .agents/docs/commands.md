@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-25
+verified: 2026-08-26
 check: Test leaves match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -252,11 +252,12 @@ just regen all                         # every generator, in dependency order
 just regen or-lib-scenarios            # OR-Library text -> shared/data/bischoff-suite
 just regen vipaq-packed-data           # those + custom-problems, packed -> vipaq/data/packed
 just regen vipaq-interop-vectors       # the interop pair + header bytes -> vipaq/test-vectors
+just regen demo-samples                # shared/data/demo-samples -> the demo's sample set
 just regen check                       # regenerate, then fail if any of it changed
 ```
 
-Four tools whose output is committed. None takes an argument: each runs every generator in its list, so it
-cannot half-run and leave the data inconsistent.
+Their output is committed. None takes an argument: each runs every generator in its list, so it cannot
+half-run and leave the data inconsistent.
 
 `or-lib-scenarios` writes what `vipaq-packed-data` reads, which is why `all` exists — the ordering is the part
 that is easy to get wrong by hand. `vipaq-interop-vectors` is one recipe because the C# and TS halves write

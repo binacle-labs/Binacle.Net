@@ -1,7 +1,7 @@
 ---
 description: The scenario fixtures record which algorithms succeed, not how well - so a sample that exists because one algorithm packs better cannot say so
 state: idea
-waits-on: "nobody waiting"
+waits-on: "nobody waiting - wanted sometime, not in the near future"
 paths:
   - "shared/data/**"
   - "shared/test/Binacle.TestsKernel/**"
@@ -14,6 +14,9 @@ of the bin an algorithm actually filled.
 
 **That is enough for most scenarios and not enough for some.** Where every algorithm packs the same set into
 the same bin, the fill is the only thing separating them, and the fixture cannot see it.
+
+**The maintainer wants this done sometime.** It is an idea rather than a proposal only because nothing is
+forcing it yet.
 
 ## What it costs today
 

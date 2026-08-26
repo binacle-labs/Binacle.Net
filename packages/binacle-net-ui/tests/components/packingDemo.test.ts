@@ -3,10 +3,10 @@ import type {Alpine as AlpineType} from "alpinejs";
 import {PackedData, PackingResponse} from "../../src/apiModels/packingResponse";
 import {Logger} from "../../src/core/logger";
 import {packingDemoApp, packingDemoAppPlugin, PackingDemoOptions} from "../../src/core/packingDemo";
-import {largestBin} from "../../src/utils/samples";
+import {sampleData} from "../../src/utils/sampleData";
+import {largestBin, sampleAt} from "../../src/utils/samples";
 import {Bin, Item} from "../../src/viewModels";
 
-// The only place the endpoint path is written. Moving the demo to v4 is this one line.
 const packEndpoint = "/api/v3/pack/by-custom";
 
 interface Dispatched {
@@ -19,7 +19,36 @@ type SceneThunk = () => Promise<{bin: unknown; items: unknown} | null>;
 type PackingDemo = ReturnType<typeof packingDemoApp> & {
 	$dispatch: (event: string, detail?: any) => void;
 	$logger: Logger;
+	$watch: (key: string, callback: () => void) => void;
 };
+
+// Alpine hands the component a reactive proxy, so $watch sees writes anywhere under the watched value. The
+// harness has plain objects, so it wraps the watched one to get the same reach.
+// One proxy per target, or an identity check on a re-read would fail.
+function deepWatched<T extends object>(target: T, onChange: () => void, seen: WeakMap<object, any>): T {
+	const cached = seen.get(target);
+	if (cached) {
+		return cached;
+	}
+	const proxy = new Proxy(target, {
+		get(obj, key) {
+			const value = Reflect.get(obj, key);
+			return value && typeof value === "object" ? deepWatched(value, onChange, seen) : value;
+		},
+		set(obj, key, value) {
+			const written = Reflect.set(obj, key, value);
+			onChange();
+			return written;
+		},
+		deleteProperty(obj, key) {
+			const deleted = Reflect.deleteProperty(obj, key);
+			onChange();
+			return deleted;
+		},
+	});
+	seen.set(target, proxy);
+	return proxy;
+}
 
 function createApp(options: PackingDemoOptions = {}) {
 	const dispatched: Dispatched[] = [];
@@ -27,6 +56,10 @@ function createApp(options: PackingDemoOptions = {}) {
 	const app = packingDemoApp(options) as PackingDemo;
 	app.$dispatch = (name: string, detail?: any) => {dispatched.push({name, detail});};
 	app.$logger = logger as unknown as Logger;
+	app.$watch = (key: string, callback: () => void) => {
+		const seen = new WeakMap<object, any>();
+		(app as any)[key] = deepWatched((app as any)[key], callback, seen);
+	};
 
 	return {app, dispatched, logger};
 }
@@ -72,7 +105,7 @@ function packingResponse(data: PackedData[] | null): PackingResponse {
 	return {result: "Success", data: data as PackedData[]};
 }
 
-// The one scene thunk onSubmit hands over, so a test can run the request the way the visualizer would.
+// Runs the request the way the visualizer would.
 function sceneThunk(dispatched: Dispatched[]): SceneThunk {
 	return dispatched.find(x => x.name === "update-scene")!.detail as SceneThunk;
 }
@@ -132,7 +165,6 @@ describe("init", () => {
 		expect(second.model.items.map(item => item.id)).toEqual(first.model.items.map(item => item.id));
 	});
 
-	// Two visitors edit their own copies. A shared instance would put one visitor's edit in the next arrival's form.
 	test("editing the seeded model leaves the set alone", () => {
 		const first = createApp().app;
 		const second = createApp().app;
@@ -196,8 +228,7 @@ describe("isValid", () => {
 		expect(valid).toBe(false);
 	});
 
-	// Both lists are checked with `every`, which is true on an empty list, so the emptied form used to pass
-	// the guard and post a request with no bins and no items.
+	// Both lists are checked with `every`, which is true on an empty list.
 	test("an emptied model is not valid", () => {
 		const {app} = createApp();
 		app.model.bins = [];
@@ -306,6 +337,130 @@ describe("the submit guard", () => {
 	});
 });
 
+describe("pressing the submit button", () => {
+	test("nothing is in flight before it is pressed", () => {
+		const {app} = createApp();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("the button reads Get results when nothing is in flight", () => {
+		const {app} = createApp();
+
+		expect(app.submitButtonText()).toBe("Get results");
+	});
+
+	test("a valid submit marks the request as in flight straight away", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitting).toBe(true);
+	});
+
+	test("the button reads Working while the request is in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitButtonText()).toBe("Working...");
+	});
+
+	test("the status line says so while the request is in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitStatus).toBe("Packing...");
+	});
+
+	test("an invalid submit is not in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("an invalid submit leaves the status line empty", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("results end the flight", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, "OK", packingResponse([packedData()])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("results clear the status line, because the panel itself is the answer", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, "OK", packingResponse([packedData()])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("an empty body says so on the status line", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, "OK", packingResponse(null)));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitStatus).toBe("No results.");
+	});
+
+	test("a failed request ends the flight", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFailingFetch(new Error("offline"));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("the button is pressable again after a failed request", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFailingFetch(new Error("offline"));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitButtonText()).toBe("Get results");
+	});
+});
+
 describe("adding a bin", () => {
 	test("copies the last bin rather than rolling a new one", () => {
 		const {app} = createApp();
@@ -317,7 +472,7 @@ describe("adding a bin", () => {
 		expect([added.length, added.width, added.height]).toEqual([31, 32, 33]);
 	});
 
-	// The id is the footprint, and the API rejects two bins with the same id.
+	// The API rejects two bins with the same id.
 	test("the copy does not take the id of the bin it copied", () => {
 		const {app} = createApp();
 		app.model.bins = [new Bin(31, 32, 33)];
@@ -469,16 +624,28 @@ describe("randomize", () => {
 		expect(app.model.items).not.toBe(before);
 	});
 
-	// The bug this replaced was two independent rolls, which could leave items no bin could hold.
-	test("the new items fit the new largest bin", () => {
+	test("the new bins and items are the ones the picked sample carries", () => {
 		const {app} = createApp();
 		app.init();
 
 		app.randomize["@click"].call(app);
 
-		const bin = largestBin(app.model.bins);
-		expect(app.model.items.every(i => i.length <= bin.length && i.width <= bin.width && i.height <= bin.height))
-			.toBe(true);
+		const picked = sampleAt(app.sampleIndex);
+		expect(app.model.bins.map(bin => bin.id)).toEqual(picked.bins.map(bin => bin.id));
+		expect(app.model.items.map(item => item.id)).toEqual(picked.items.map(item => item.id));
+	});
+
+	test("the new bins and items are fresh objects", () => {
+		const {app} = createApp();
+		app.init();
+
+		app.randomize["@click"].call(app);
+		const picked = sampleAt(app.sampleIndex);
+		app.model.bins[0].length = 999;
+		app.model.items[0].quantity = 999;
+
+		expect(picked.bins[0].length).not.toBe(999);
+		expect(picked.items[0].quantity).not.toBe(999);
 	});
 
 	test("never lands on the sample already on screen", () => {
@@ -511,6 +678,73 @@ describe("randomize", () => {
 		app.randomize["@click"].call(app);
 
 		expect(app.isValid()).toBe(true);
+	});
+
+	test("clears the status line, so it cannot outlive the result it described", () => {
+		const {app} = createApp();
+		app.init();
+		app.submitStatus = "No results.";
+
+		app.randomize["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+});
+
+describe("the status line goes stale", () => {
+	function submittedApp() {
+		const {app} = createApp();
+		app.init();
+		app.submitStatus = "No results.";
+		return app;
+	}
+
+	test("loading a sample clears it", () => {
+		const app = submittedApp();
+
+		app.showSample(1);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("editing a bin clears it", () => {
+		const app = submittedApp();
+
+		app.model.bins[0].length = 12;
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("adding a bin clears it", () => {
+		const app = submittedApp();
+
+		app.addBin["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("clearing the bins clears it", () => {
+		const app = submittedApp();
+
+		app.clearAllBins["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("adding an item clears it", () => {
+		const app = submittedApp();
+
+		app.addItem["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("clearing the items clears it", () => {
+		const app = submittedApp();
+
+		app.clearAllItems["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
 	});
 });
 
@@ -1043,6 +1277,85 @@ describe("result labels", () => {
 		const fullyPacked = app.resultIsFullyPacked(result);
 
 		expect(fullyPacked).toBe(false);
+	});
+});
+
+describe("the items a result could not fit", () => {
+	test("a fully packed result has none", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: null});
+
+		expect(app.hasUnpackedItems(result)).toBe(false);
+	});
+
+	test("an empty list counts as none", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: []});
+
+		expect(app.hasUnpackedItems(result)).toBe(false);
+	});
+
+	test("a partial result has some", () => {
+		const {app} = createApp();
+		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+
+		expect(app.hasUnpackedItems(result)).toBe(true);
+	});
+
+	test("a missing list reads as an empty one", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: null});
+
+		expect(app.unpackedItemsOf(result)).toEqual([]);
+	});
+
+	test("the heading counts the quantities, not the lines", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: [{id: "a", quantity: 2}, {id: "b", quantity: 3}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 5 items");
+	});
+
+	test("one left out reads as one item", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: [{id: "a", quantity: 1}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 1 item");
+	});
+
+	test("a line names how many and which item", () => {
+		const {app} = createApp();
+
+		expect(app.unpackedItemText({id: "20x20x20-3", quantity: 2})).toBe("2 x 20x20x20-3");
+	});
+
+	// A visitor reads these, so they stay plain ASCII and carry no field name from the contract.
+	test("the heading and the lines are plain ASCII with no contract name in them", () => {
+		const {app} = createApp();
+		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+
+		const text = [app.unpackedItemsTitle(result), ...app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))]
+			.join(" ");
+
+		expect(text).toMatch(/^[\x20-\x7e]+$/);
+		expect(text).not.toMatch(/unpacked/i);
+	});
+
+	// 02-packs-nowhere is the sample that exists to show a partial pack - the volume fits, the geometry does not.
+	test("the partial-pack sample names what was left out", () => {
+		const {app} = createApp();
+		const sample = sampleData.find(x => x.name === "02-packs-nowhere")!;
+		const item = new Item(...sample.items[0]);
+		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 2 items");
+		expect(app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))).toEqual(["2 x 20x20x20-3"]);
+	});
+
+	test("the partial-pack sample is still in the set", () => {
+		const sample = sampleData.find(x => x.name === "02-packs-nowhere");
+
+		expect(sample).toEqual({name: "02-packs-nowhere", bins: [[30, 30, 30]], items: [[20, 20, 20, 3]]});
 	});
 });
 

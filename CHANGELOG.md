@@ -106,12 +106,12 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - The separate fitting algorithm family was retired.  
 
 ### 🏗️ Internal Work
+
+Work on the repository, the build and the dependencies. The dependency patches, the Binacle.Geometry extraction and the packing log rework are inside the image; nothing else here reaches it.
+
 - Patched two **high-severity advisories** in transitive dependencies — `Microsoft.OpenApi` and the bundled **SQLite** native library.  
 - Extracted **Binacle.Geometry** into its own library.  
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.  
-
-Everything below is work on the repository. None of it reaches the image.
-
 - Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  
 - Added cross-language ViPaq interop tests between C# and TypeScript.  
@@ -120,6 +120,9 @@ Everything below is work on the repository. None of it reaches the image.
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.  
 
 ### 📚 Versioned Docs
+
+Work on the documentation site. Nothing here changes the image you pull.
+
 - Documentation is now versioned per minor line — `v1.3.x`, `v2.0.x`, `v2.1.x`, `v3.0.x` — so any image can be matched to its docs.  
 - Backfilled the `v2.0.x` and `v2.1.x` documentation, which was previously missing.  
 - The `latest` documentation now redirects to the current version, so existing links keep working.  

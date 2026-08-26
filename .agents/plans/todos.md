@@ -17,50 +17,66 @@ a decision or a set of sub-steps gets its own plan file instead.
 the `--fail-severity=warn` flag it needs. It had been written in both files and the two copies had already
 started to differ.
 
-## Tests
+## Agent docs
 
-- **One flaky test, about 1 run in 19.** `packages/binacle-net-ui/tests/components/packingDemo.test.ts`,
-  *"the new items fit the new largest bin"*. It randomizes once, then asserts every item fits the
-  largest-by-volume bin side for side with no rotation. **That was a property of the old random roll**, where
-  items were sized against the largest bin. The demo now carries hand-picked samples and does not have it:
-  `07-tall-items` has bins 20x20x60 and 40x40x30 and an item 8x8x55, so the largest by volume is 40x40x30 and
-  55 beats every side of it. **The sample is right and the assertion is wrong.** It will fail in CI one day on
-  an unrelated commit. Found 2026-08-26.
-
-## Ruby gems
-
-- **No workflow runs the gem leaves.** The six `ruby-*-unit` leaves joined `just test all` on 24 Aug 2026, so
-  a local run covers them, but the PR gate names its steps and none of them is ruby. **Whether they go on the
-  gate is a separate call.**
-
-- **Rubocop has never been run.** `ruby/.rubocop.yml` exists, rubocop is not in `ruby/Gemfile` and no recipe
-  calls it. It lands red before it lands green, which is why it is not wired to anything yet.
+- **`.agents/docs/sites/demo.md` has not been read against the tree since 2026-08-24.** Run its own `check:`
+  line: collections, JS bundles and plugin list against `sites/demo/_config.yml` and `sites/demo/js/`; no
+  `seo.html` in `_includes/` and `pages/index.html` still printing `item.summary`; the demo/prefetch script
+  split against `_data/includes.yml`; the `sitemaps:` block writing one file and `/sitemap.xml` listing three
+  pages; `artifacts/demo/lib/` after `just build demo` holding exactly the vendor folders listed, with
+  `gulpfile.js`'s IGNORE map explaining what is missing. Fix what has moved, then date it.
 
 ## Sites
 
-- **Three curly apostrophes and two lines of old-register prose on the docs site.** Found 2026-08-25 while
-  the v3.0.x pages were being corrected, and left alone because they were outside that job.
-  `configuration/ui-module/index.md:13-14` reads "provides a user-friendly interface" and "the system's
-  capabilities" and carries a curly apostrophe; `configuration/index.md` still calls the UI module "packing
-  demos and protocol decoding"; the docs landing has a curly apostrophe in "Binacle.Net's packing solutions".
-  **The apostrophes break the plain-ASCII rule for user-facing text.** A site session.
+- **Old-register prose left on the docs site.** Found 2026-08-25, checked again 2026-08-27.
+  `sites/docs/collections/_versions/v3.0.x/configuration/ui-module/index.md:20-28` still reads "allows users
+  to interact", "Users can navigate" and "enables users to decode"; `sites/docs/pages/index.md:29` still says
+  "the algorithms and real-time strategies that power Binacle.Net's packing solutions". **A site session.**
 
-- **The demo site's packing page still carries the pre-rewrite copy.** Found 2026-08-26. The image's version
-  renders `AppletsService.cs`'s rewritten description; `sites/demo/pages/packing.html` hardcodes the old
-  register in two places - the body `<p>` and the front-matter `excerpt:` - both reading "An interactive tool
-  that lets you test different packing algorithms". **Two surfaces describe the same tool differently, and the
-  site has the older one.** The front-matter `description:` is a meta description and is meant to differ; the
-  body copy is not. A site session.
+## The shared UI package
 
-- **The three sites still default to dark.** `default_theme: "dark"` in `sites/www/_config.yml`,
-  `sites/docs/_config.yml` and `sites/demo/_config.yml`. **Decided 2026-08-25: every surface follows the
-  machine**, and the UI module already does. Three lines to `"system"`. **A site session, not a coding
-  session.**
+- **The submit button can stick.** `packages/binacle-net-ui/src/core/packingDemo.ts:183` sets
+  `submitting = true` in `onSubmit` and only the `finally` at `:225` clears it - and that `finally` is inside
+  the thunk handed to `$dispatch('update-scene', ...)`, which nothing runs unless a visualizer is listening.
+  On a page without one the button stays disabled and the status stays "Packing..." with no way back.
+  **Latent, not live** - both packing pages include the visualizer today. Found independently by two reviews.
+  **The fix is a behaviour decision, not a typo**: what the button should wait on. Deliberately not changed
+  before the v3.0.0 tag.
+
+- **An import that reads wrong.** `packages/binacle-net-ui/src/core/packingDemo.ts:170` tests
+  `error instanceof Error` while `:11` imports `Error` from `../viewModels`. `viewModels/error.ts` declares an
+  interface, so the import is erased and the branch tests the global `Error` - correct today. **If that
+  interface ever becomes a class it breaks silently.**
+
+## Kernel
+
+- **The nullable-enum converter never rejects a bad value.** Found 2026-08-27.
+  `api/src/Binacle.Net.Kernel/Serialization/JsonStringNullableEnumConverter.cs:104` -
+  `TryParseEnumFromString` has five returns and every one of them is `return true`, including the
+  fall-through at `:129` where nothing matched. An unknown enum string is read as `default!` rather than
+  refused, so validation is what has to catch it. Two consequences:
+  - The `throw new JsonException(...)` at `:78` in `ReadAsPropertyName` is unreachable. Nothing can make
+    `TryParseEnumFromString` return `false`.
+  - **Not a live defect where the value is required.** `default!` on a nullable enum is null, and the
+    validators reject null - `v3/Contracts/Algorithm.cs:26` and the v4 one both `NotNull()`, so a bogus
+    algorithm is a 422 either way.
+  - **It does change behaviour on a patch.** `ServiceModule/v0/Contracts/Admin/SubscriptionPatchRequest.cs`
+    only requires that one of `Type` and `Status` has a value, so a request naming a bogus `Type` and a good
+    `Status` passes and the bad field is silently dropped instead of refused.
+
+  **The lenient parse is worth a deliberate decision rather than an accident**, and the dead throw says the
+  opposite of what the code does.
 
 ## ServiceModule
 
-- `api/src/Binacle.Net.ServiceModule/Services/ApiUsageRateLimitingPolicy.cs:34`
-  Review JSON config for default rate limit policies (anonymous, subscription tiers).
+**Both are `// TODO` comments in the code, and both ride with the ServiceModule decision.** The maintainer
+said on 2026-08-27 that ServiceModule work is taken as one piece, not row by row - so neither of these is
+picked up on its own.
 
-- `api/src/Binacle.Net.ServiceModule/v0/Endpoints/AccountBindingResult.cs:57`
-  The "no request body" path returns a raw `ProblemDetails`. Should be a proper typed response.
+- `api/src/Binacle.Net.ServiceModule/Services/ApiUsageRateLimitingPolicy.cs:32` - the comment reads
+  **"Review json config for default policies"**. It sits at the top of `GetPartition`, which reads
+  `ApiUsageAnonymous` and the tier configurations out of `RateLimiterConfiguration`.
+
+- `api/src/Binacle.Net.ServiceModule/v0/Endpoints/AccountBindingResult.cs:57` - the comment reads
+  **"Make Response"**. It is on the `this.request is null` path, which returns a bare `ProblemDetails`
+  ("Malformed Request", 400) where every other path in the file returns a typed result.

@@ -1,10 +1,14 @@
 ---
 description: Sonar - what is left after the 2026-08-09 sweep
-state: ready
-waits-on: "nothing"
+state: blocked
+waits-on: "a re-read - the file is stale, and the maintainer wants it revisited before the v3.0.0 tag"
 ---
 
 # Sonar - what is left after the 2026-08-09 sweep
+
+**Stale as of 27 Aug 2026.** The counts and the issue lists below predate the current analysis and nobody has
+checked them since. **Re-read the file against SonarCloud before acting on any line in it** - do not treat a
+number here as current.
 
 > **The project was recreated on 2026-08-17** under the new `binacle-labs` Sonar organization, key
 > `binacle-labs_Binacle.Net`. A new org was chosen over a rebind, so **the old project and everything held in

@@ -1,13 +1,20 @@
 ---
-description: Ten of the twenty-six test leaves run on no pipeline. Give every leaf a step, group the leaves for a laptop, and add a check so the two lists cannot drift again.
-state: ready
-waits-on: "nothing"
+description: Ten of the twenty-six test leaves run on no pipeline, and rubocop has never been run at all. Give every leaf a step, group the leaves for a laptop, get rubocop running once, and add a check so the two lists cannot drift again.
+state: blocked
+waits-on: "the maintainer's instructions on how - he said on 2026-08-27 that he wants this done and to wait for them"
 paths:
   - ".github/workflows/**"
   - "tooling/**"
 ---
 
 # Every test leaf reaches every pipeline
+
+**The maintainer wants this done - 2026-08-27.** His words: *"I want it. Wait for instructions."* **Do not
+start it.** The what is settled; how it is wired is his call and he will say.
+
+**Both Ruby rows from `todos.md` moved here on 2026-08-27**, on the maintainer's word that they are part of
+this work. One was the gem leaves reaching a workflow, already covered below. The other is rubocop, which was
+not, and now has its own section.
 
 **Measured 24 Aug 2026.** `just test all` runs 26 leaves. `shared-test-suite.yml` has 18 steps. The
 difference is the **ten Ruby gem leaves**, which run on a laptop and on nothing else.
@@ -48,6 +55,19 @@ exists; it takes the directory holding the `Gemfile`, which for the gems is `rub
 lines and fail on a difference **in either direction**. Put it on the pull request gate's workflow-lint job,
 beside the two checks already there.
 
+## Rubocop, which is a different job from running the gems
+
+**Rubocop has never been run.** `ruby/.rubocop.yml` exists, rubocop is not in `ruby/Gemfile`, and no recipe
+calls it. **This is not the same thing as the ten leaves above** - those are tests that exist and run on a
+laptop; this is a linter that has never produced output at all.
+
+**It lands red before it lands green.** A first run on code nobody has linted reports a backlog, so wiring it
+straight onto the gate turns the gate red on work that has nothing to do with the change in front of it. The
+order is: add the gem, run it, see the size of the backlog, then decide what it is attached to.
+
+**A leaf that fails on arrival is not a leaf.** Whatever this becomes, it does not join `all` or the CI suite
+until it passes on a clean tree - the same bar every other leaf clears.
+
 ## What will bite
 
 **Both directions matter, and the second one bites at the worst moment.** A leaf with no step is the hole
@@ -72,7 +92,7 @@ A check that has only ever passed is a check nobody has tested.
 - **The decision** - separate steps rather than group steps, and why - goes in the CI/CD decisions ledger.
 - **The recipes** - the groups, and the new check - go in the commands doc and the tooling doc.
 - **The gem leaves reaching CI** goes in the Ruby doc, which currently says they are leaves and stops there.
-- **The line in `todos.md` saying no workflow runs the gem leaves** is deleted.
+- **Both `todos.md` Ruby lines are already gone** - they moved into this file on 2026-08-27.
 
 ## Done when
 
@@ -88,5 +108,8 @@ A check that has only ever passed is a check nobody has tested.
       Run the leaf with a backend that does not exist. It must be rejected, not defaulted.
 - [ ] The leaf list exists in one place.
       **By eye.** Find the second copy. If the workflow is the only other list, that is the one the check covers.
-- [ ] The decision and the docs are written, and the `todos.md` line is gone.
-      **By eye.** The four files named above.
+- [ ] Rubocop runs from a recipe and its first run has been seen.
+      `grep -c rubocop ruby/Gemfile` is 1, and a recipe calls it. **By eye:** run it once and read the count
+      before deciding what it attaches to.
+- [ ] The decision and the docs are written.
+      **By eye.** The three files named above.

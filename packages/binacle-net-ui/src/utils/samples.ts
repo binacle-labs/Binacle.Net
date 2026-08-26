@@ -7,7 +7,7 @@ export interface Sample {
 	items: Item[];
 }
 
-// 30 is the floor because an item side is half a bin side and still has to clear 8.
+// 30 is the floor: an item side is half a bin side and still has to clear 8.
 const minBinSide = 30;
 const maxBinSide = 60;
 const minItemSide = 8;
@@ -20,16 +20,14 @@ export function randomBin() {
 	);
 }
 
-// The bin everything is sized against: the largest by volume, so the set always fits at least one candidate
-// and the smaller ones are the interesting result. That comparison is what the page is for.
+// Items are sized against this bin, so the set always fits at least one candidate.
 export function largestBin(bins: Bin[]) {
 	return bins.reduce((largest, bin) =>
 		bin.length * bin.width * bin.height > largest.length * largest.width * largest.height ? bin : largest
 	);
 }
 
-// Half the matching bin side, floored at 8. Eight of them fit before any packing thought, so nothing rolled
-// here can be an item the bin will not hold.
+// Eight of these fit the bin before any packing thought, so nothing rolled here is an item it will not hold.
 function randomSide(binSide: number) {
 	return getRandomInt(minItemSide, Math.max(minItemSide, Math.floor(binSide / 2)));
 }
@@ -40,7 +38,7 @@ export function randomItemFor(bin: Bin, quantity: number) {
 
 export const sampleCount = sampleData.length;
 
-// A fresh Bin and Item every call. The demo edits what it is handed, and the set has to survive that.
+// A fresh Bin and Item every call - the demo edits what it is handed.
 export function sampleAt(index: number): Sample {
 	const data = sampleData[index];
 	return {

@@ -1,7 +1,7 @@
 ---
 description: Harden and slim the base image
-state: ready
-waits-on: "nothing"
+state: idea
+waits-on: "nobody waiting - not in the near future"
 ---
 
 # Harden and slim the base image

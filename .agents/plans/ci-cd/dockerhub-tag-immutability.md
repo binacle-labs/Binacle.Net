@@ -1,14 +1,15 @@
 ---
 description: Turn on Docker Hub tag immutability, for release tags only
-state: blocked
-waits-on: "a shipped release behind the rule"
+state: proposed
+waits-on: "the maintainer - he is rethinking it as of 27 Aug 2026"
 paths:
   - ".github/workflows/**"
 ---
 
 # Turn on Docker Hub tag immutability, for release tags only
 
-**Status:** not started. **One option in it is actively unsafe today** - see section 3.
+**Status:** not started. **The maintainer is rethinking this as of 27 Aug 2026.** **One option in it is
+actively unsafe today** - see section 3.
 
 **Terminology first, because this repo already uses the word.** Elsewhere "immutable tag" means the exact-version
 tag (`3.0.0`, `3.0.0-beta.2`) that the pipeline never moves, as opposed to `3.0` and `latest`, which it does.

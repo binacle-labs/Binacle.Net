@@ -129,21 +129,28 @@ both tags.
       publishes; the second one does not.**
 - [ ] **Rewrite the same reason in prose in `samples/README.md` and `samples/docker/README.md`.** Both name
       `3.0.0-beta.4` and explain why; both become `3.0` with the explanation cut.
+- [ ] **Delete the test-build line from `README.md`.** The pin warning carries a second line - *"Until
+      `3.0.0` is published, the only name that resolves is `binacle/binacle-net:3.0.0-beta.4`."* The `3.0`
+      sentence above it is true on its own from this release onward, so the line becomes wrong the moment the
+      publish job goes green. `grep -n '3\.0\.0-beta' README.md` returns nothing.
 
 **Someone who copies an example keeps that version forever**, which is why this is worth doing on the day
 rather than at leisure.
 
-### 2. Publish the documentation site
+### 2. Finish the documentation site's v3.0.x pages
 
-**The whole of `plans/sites/docs-v3-deploy.md`.** It holds the `v3.0.x` corrections, the swagger copies, the
-release-notes carry-over and the deploy itself, with its own checks.
+**`plans/sites/docs-v3-deploy.md`**, which is now down to two page edits and the live-site reads. The
+corrections, the swagger copies and the release-notes carry-over are done.
 
-**It has to be after the tag** - the notes need the date and the `releases/tag/v3.0.0` link, and the worked
-example in `verifying-a-release.md` quotes real output from the released image. It currently verifies
-`3.0.0-beta.2`, which is deleted from Docker Hub; re-cut it from `just image verify 3.0.0`.
+**The deploy itself is done** - the site runs on a temporary domain and the maintainer switches DNS to it when
+v3 lands. **Do not re-run it.**
 
-**This is the single most losable item in the release.** Nothing fails if the deploy is skipped. `main`
-already says `current: v3.0.x`, so the site just quietly keeps serving v2.1.x as current and nothing says so.
+**Both page edits have to be after the tag** - the notes need the date and the `releases/tag/v3.0.0` link, and
+the worked example in `verifying-a-release.md` quotes real output from the released image. It currently
+verifies `3.0.0-beta.2`, which is deleted from Docker Hub; re-cut it from `just image verify 3.0.0`.
+
+**This is the single most losable item in the release.** Nothing fails if the pages are left as they are - the
+verify page just keeps asking readers to run a command against a tag that no longer exists.
 
 ### 3. Decide whether image names can be locked
 
@@ -176,9 +183,9 @@ them.
 
 | Plan | What the release freed |
 |---|---|
-| `plans/api/packing-demo-bugs.md` | whatever the release did not take. **The demo site has its own copy of the same bugs** - `sites/demo/pages/packing.html` carries the same seven lines - plus the submit button giving no sign it was pressed, and nothing showing which items did not fit. A site session for the first, a coding session for the rest |
-| `plans/ci-cd/dockerhub-overview.md` | section 2 only - the logo and the categories. Section 1 was taken by the release. **Delete the file when both are done** |
-| `plans/todos.md` | the three sites' `default_theme: "dark"`, the `Dockerfile` comment naming a build stage that does not exist, and the docs site's curly apostrophes. All site or one-line work |
+| `plans/api/packing-demo-bugs.md` | nine of the ten. **The submit button went in after all - checked 2026-08-27**, and both hosts render it. What is left is the browser pass on four, which rides on A1, plus the unfitted items: the inline block was rejected on layout the day it shipped, so the markup comes out of both templates and the answer becomes a tooltip. The strings stay in the package |
+| `plans/ci-cd/dockerhub-overview.md` | section 2, the logo and the categories - **done 2026-08-27**. Section 1, the quick start's response, was taken by the release as B3 and is still open. **Delete the file when section 1 is done** |
+| `plans/todos.md` | the docs site's old-register prose, and two one-liners in the shared UI package - a submit button that can stick where no visualizer listens, and an `Error` import that only reads wrong. **The theme defaults and the demo page's copy are done - checked 2026-08-27** |
 | `plans/ci-cd/test-leaves-reach-ci.md` | the ten Ruby leaves reaching the PR gate. Held off the release gate because Ruby does not build the image |
 | `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
 | `plans/sites/docs-client-generation.md` | nothing was blocking it; it sits here because the docs deploy is the natural next docs session |

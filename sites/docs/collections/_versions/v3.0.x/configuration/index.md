@@ -89,6 +89,6 @@ Please refer to the [Service Module]({% vlink /configuration/service-module/inde
 
 ### 🖥️ UI Module
 
-Provides a web-based UI for packing demos and protocol decoding.
+Adds two browser pages: a packing demo and a ViPaq decoder.
 
 - [🔍 UI Module Overview]({% vlink /configuration/ui-module/index.md %})

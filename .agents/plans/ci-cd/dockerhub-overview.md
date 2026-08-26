@@ -1,5 +1,5 @@
 ---
-description: The Docker Hub repository page
+description: The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted
 state: ready
 waits-on: "nothing"
 paths:
@@ -16,7 +16,7 @@ The short description on the repository was already correct.
 **The credential is answered.** `DOCKERHUB_TOKEN` writes the description - HTTP 200 on the existing registry
 push credential, proved 2026-08-19. No second secret, no password fallback. The CI/CD doc records it.
 
-Two things left, then this file goes.
+One thing left, then this file goes.
 
 ## 1. The `curl` example was run against a tag that no longer exists
 
@@ -27,21 +27,11 @@ paste the real response back.** A broken first command is the whole first impres
 **Read the rendered page before publishing it:** `just image dockerhub-overview <version>` prints exactly what
 the pipeline writes. The recipe refuses a version with a suffix, so it takes a released version only.
 
-## 2. The logo and the categories
+## 2. The logo and the categories - done 2026-08-27
 
-Both are web-form settings on the repository, both are one sitting, and neither touches anything above.
+**The maintainer set both.** His words: *"did logo and categories."* Nothing here is open.
 
-**Logo.** A sponsored-org perk and the slot is empty. `assets/media/logo/binacle-logo-512x512.png` is the
-right source - Docker Hub wants a square image and 512x512 clears its minimum with room. Check the transparent
-variant (`-512x512a.png`) against both themes first; the page is white in light mode and dark in dark mode, so
-a logo that assumes one will look broken in the other.
-
-**Categories.** The repo has one, "Integration & delivery", and three are allowed. That category is about
-CI/CD tooling, which this is not - it is the leftover of a single hurried pick. **"Developer Tools" is the
-closer fit and should lead**, with "Integration & delivery" kept only if a third genuinely better one cannot
-be found in the list Docker offers.
-
-Then delete this file.
+**Delete this file once section 1 is done.** Section 1 is all that keeps it alive.
 
 ## Do not
 

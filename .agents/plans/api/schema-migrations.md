@@ -1,7 +1,7 @@
 ---
 description: a schema-migration path for the ServiceModule store
-state: idea
-waits-on: the maintainer - how far the ServiceModule is taken
+state: deferred
+waits-on: "v3.0.0, then all the ServiceModule work taken together - these three move as one"
 paths:
   - "api/**"
 ---

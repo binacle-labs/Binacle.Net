@@ -1,12 +1,14 @@
 ---
 description: CI - make the PR gate mean something
-state: deferred
-waits-on: "gate 2 the all-modules integration tests, gate 3 the UI test harness - neither has anything to gate yet"
+state: idea
+waits-on: "nothing - the maintainer called gates 2 and 3 a future idea on 2026-08-27, and neither has anything to gate yet"
 paths:
   - ".github/workflows/**"
 ---
 
 # CI - make the PR gate mean something
+
+**Gates 2 and 3 are a future idea - 2026-08-27.** That is the maintainer's word for them. Nobody is waiting.
 
 **Status:** **Gate 1 landed on 2026-08-18, with the workflow shape and the `gate` job.**
 `pull-request.yml` runs `changes` -> (`test-suite`, `image`) -> `gate`, `shared-test-suite.yml` lost its

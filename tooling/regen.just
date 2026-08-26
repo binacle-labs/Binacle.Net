@@ -7,8 +7,8 @@
 #   just regen demo-samples            shared/data/demo-samples -> the demo's sample set
 #   just regen check                   regenerate, then fail if any of that changed
 #
-# Every tool here rewrites files that are committed. All five take no arguments by design - a run does every
-# generator in its list, so it cannot half-run and leave the data inconsistent.
+# Every tool here rewrites files that are committed. No recipe takes an argument - a run does every generator
+# in its list, so it cannot half-run and leave the data inconsistent.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

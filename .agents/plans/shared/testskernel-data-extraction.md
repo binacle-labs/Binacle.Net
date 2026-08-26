@@ -1,12 +1,15 @@
 ---
 description: TestsKernel - grow the shared fixture cases
-state: ready
-waits-on: "nothing"
+state: deferred
+waits-on: "the maintainer - he said \"not yet\" on 2026-08-27; it revives when he says the fixture cases are worth growing"
 paths:
   - "shared/**"
 ---
 
 # TestsKernel — grow the shared fixture cases
+
+**Not yet - 2026-08-27.** The maintainer's answer on growing the cases was *"not yet"*. Nothing below is
+wrong; it is deliberately not being done. **What revives it is him saying so.**
 
 **Status (2026-08-13):** The data move is **done**, and the fixtures have since been split by consumer. Bischoff
 suite and custom-problems stay in `shared/data/` because more than one slice reads them; result-selection moved to

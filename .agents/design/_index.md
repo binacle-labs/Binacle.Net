@@ -11,8 +11,8 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: decisions.md
-  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, and how the agent reference layer is kept honest against the code."
-  paths: ["NOTICE", "README.md", "SECURITY.md", "CHANGELOG.md", "Dockerfile", "CONTENT-TERMS.md", "sites/docs/**"]
+  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model."
+  paths: ["NOTICE", "README.md", "SECURITY.md", "CHANGELOG.md", "Dockerfile", "CONTENT-TERMS.md", "sites/docs/**", "shared/src/Binacle.Packing/**"]
 ```
 
 ## API
@@ -65,6 +65,9 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: sites/docs-and-demo.md
   description: "Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget."
   paths: ["sites/demo/**", "sites/docs/**"]
+- file: sites/packing-demo-set.md
+  description: "Why the packing demo sizes its items against the largest bin, and how sizingBin and addBin relate - the reasoning behind the numbers a visitor arrives to"
+  paths: ["packages/binacle-net-ui/**"]
 - file: sites/webmanifest.md
   description: "Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither."
   paths: ["sites/**", "gulpfile.js"]

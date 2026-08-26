@@ -24,7 +24,7 @@ logo:
 # The link-preview image every page falls back to. A page overrides it with og_image.
 og_image                : /media/logo/binacle-logo-512x512.png
 
-default_theme: "dark"
+default_theme: "system"
 theme_storage: "cookie"
 ################################################################
 # Where things are

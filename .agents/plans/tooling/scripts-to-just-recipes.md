@@ -1,32 +1,53 @@
 ---
-description: Convert the last `tooling/*.sh` scripts to `just` recipes
-state: ready
-waits-on: "nothing"
+description: Where benchmark and performance results live and what shape they take - and only then, converting the last four `tooling/*.sh` scripts to `just` recipes
+state: blocked
+waits-on: "an unanswered question - where benchmark and performance results live and what shape they take. The maintainer keeps them in results/ and does not like them there"
 paths:
   - "tooling/**"
+  - "results/**"
 ---
 
-# Convert the last `tooling/*.sh` scripts to `just` recipes
+# Where benchmark and performance results go, and only then the four scripts
 
-**Status:** Not started. Split out of `ci-shared-scripts` on 2026-08-07, and deliberately not named `ci-`
-anything: **CI runs none of these.** They gate nothing and no workflow calls them. This is about
-discoverability, and nothing else.
+**The blocker is not the conversion. It is the output.** Every one of the four remaining scripts is a
+benchmark or performance harness, and **nobody has decided where their results are persisted or in what
+shape.** They land in `results/` today and the maintainer does not want them there. Until that is answered,
+converting the scripts moves the writing of results into a recipe and freezes the current answer by accident.
 
-Every script CI cares about has already moved. Tests, coverage, the OpenAPI documents, the agent indexes,
-running things from source, the build and the image stacks are `just` modules under `tooling/`; setup is
-`just install` / `just assets` in the root justfile.
+**So this is one question with a mechanical tail, not four mechanical conversions.** Answer the question
+first. The conversion is the easy half and is written up below so it can be done in one sitting once the
+question is closed.
 
-Five are left:
+## The question, stated
+
+- **Where do benchmark and performance results live?** `results/` is a hand-curated vault: a keeper is copied
+  in by hand, harnesses write to gitignored scratch. That works and the maintainer still dislikes the result
+  sitting there.
+- **What shape is a result?** One file per run, one ledger per suite, something dated, something diffable —
+  undecided. The shape decides what a recipe can do on its own and what still needs a human.
+- **What follows from the answer:** whether a recipe may write into the chosen place at all, or whether it
+  keeps writing to scratch and a person promotes a keeper.
+
+The same question blocks the plan to refresh the curated lib benchmark ledger. They are one decision.
+
+## The four scripts
 
 - `tooling/benchmarks.lib.sh`
 - `tooling/benchmarks.vipaq.sh`
 - `tooling/performance.lib.sh`
 - `tooling/performance.vipaq.sh`
 
-## Why bother, given they work
+Split out of `ci-shared-scripts` on 2026-08-07, and deliberately not named `ci-` anything: **CI runs none of
+these.** They gate nothing and no workflow calls them.
+
+Every script CI cares about has already moved. Tests, coverage, the OpenAPI documents, the agent indexes,
+running things from source, the build and the image stacks are `just` modules under `tooling/`; setup is
+`just install` / `just assets` in the root justfile.
+
+## Why convert them at all, given they work
 
 `just --list` answers "what can I run here", and recipe names complete on tab. Nothing in `tooling/` completes
-anything, so these five are findable only by knowing they exist. That is the whole benefit - it is real, but it
+anything, so these four are findable only by knowing they exist. That is the whole benefit - it is real, but it
 is small, and this plan should not be allowed to grow past it.
 
 ## How, from the moves that already landed
@@ -49,10 +70,11 @@ These are the lessons from converting everything else. They are worth following 
 
 ## Watch out
 
-The benchmark and performance harnesses write results, and `results/` is a hand-curated vault - harnesses write
-to gitignored scratch, never straight into it. Do not let a recipe change where output lands.
+**A recipe must not quietly change where output lands.** That is the whole reason this is blocked: today the
+harnesses write to gitignored scratch and a keeper is copied into `results/` by hand. Whatever the answer
+turns out to be, it is taken deliberately and not as a side effect of a conversion.
 
-## Six stale references clear themselves when this lands
+## Six stale references clear themselves when the conversion lands
 
 `lib/README.md` (2), `results/lib/README.md` (2), `results/lib/benchmarks/README.md` and
 `results/lib/efficiency/README.md` all give `./tooling/performance.lib.sh` or `./tooling/benchmarks.lib.sh` as
@@ -69,5 +91,11 @@ on their own terms instead.
 
 ## Done when
 
-Every `tooling/*.sh` a maintainer types is a `just` recipe, or says in one line at the top why it stayed a
-script.
+- [ ] Where benchmark and performance results live, and what shape they take, is written down where the
+      results themselves are explained.
+      **By eye.** Read `results/README.md`. If the answer is only in this plan, the box is open.
+- [ ] Every `tooling/*.sh` a maintainer types is a `just` recipe, or says in one line at the top why it stayed
+      a script.
+      `ls tooling/*.sh` lists nothing, or every file listed carries that line.
+- [ ] The six stale references name a recipe, not a path into `tooling/`.
+      `grep -rn "tooling/performance\.\|tooling/benchmarks\." lib/README.md results/` returns nothing.

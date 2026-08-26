@@ -11,6 +11,7 @@ import {
 import {Bin, Item, Error} from "../viewModels";
 import {PackingRequest, PackingResponse} from "../apiModels";
 import {PackedData} from "../apiModels/packingResponse";
+import {UnpackedItem} from "../apiModels/unpackedItem";
 
 // The API's BinPackResultStatus, in the words a visitor reads.
 const resultStatusTexts: Record<string, string> = {
@@ -46,10 +47,17 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	selectedResult: null as PackedData | null,
 	formErrors: [] as string[],
 	sampleIndex: 0,
+	submitting: false,
+	submitStatus: '',
 	init() {
 		// Sample zero, never a roll: the page opens on the same readable set every time.
 		this.showSample(0);
 		this.model.algorithm = this.algorithms[0].value;
+		// $watch is deep, so this is the one place that catches every edit - randomize, a sample, a keystroke,
+		// a bin added or cleared.
+		this.$watch('model', () => {
+			this.submitStatus = '';
+		});
 	},
 	showSample(index: number) {
 		const sample = sampleAt(index);
@@ -76,8 +84,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	removeBin(index: number) {
 		this.model.bins.splice(index, 1);
 	},
-	// The bin the items are sized against, and the one a new bin is copied from. A fresh roll when there are
-	// none, so nothing here has to handle an empty list.
+	// A fresh roll when there are none, so nothing here has to handle an empty list.
 	sizingBin() {
 		return this.model.bins.length > 0 ? largestBin(this.model.bins) : randomBin();
 	},
@@ -106,7 +113,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			this.model.items = [];
 		}
 	},
-	// A different sample from the hand-picked set, never the one on screen.
+	// A different sample from the hand-picked set, not a roll of new dimensions.
 	randomize: {
 		['@click']() {
 			this.showSample(nextSampleIndex(this.sampleIndex));
@@ -168,9 +175,13 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	onSubmit() {
 		this.formErrors = this.listErrors();
 		if (!this.isValid()) {
+			this.submitStatus = '';
 			this.$logger.error("[Binacle] Model is not valid");
 			return;
 		}
+		// Set before the dispatch, so the button and the status line change in the click's own frame.
+		this.submitting = true;
+		this.submitStatus = 'Packing...';
 
 		const request = {
 			parameters: {
@@ -193,21 +204,27 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		} as PackingRequest;
 
 		this.$dispatch('update-scene', async () => {
-			this.$logger.log('[Binacle] Packing request sent', request);
-			const response = await this.getResults(request);
-			this.$logger.log('[Binacle] Packing results received', response);
-			if(!response || !response.data){
-				this.results = [];
-				this.selectedResult = null;
-				return null;
+			try {
+				this.$logger.log('[Binacle] Packing request sent', request);
+				const response = await this.getResults(request);
+				this.$logger.log('[Binacle] Packing results received', response);
+				if(!response || !response.data){
+					this.results = [];
+					this.selectedResult = null;
+					this.submitStatus = 'No results.';
+					return null;
+				}
+				const firstSuccessfulResult = response.data.find(x => !!x.bin);
+				this.results = response.data;
+				this.selectedResult = firstSuccessfulResult || null;
+				this.submitStatus = this.results.length > 0 ? '' : 'No results.';
+				return {
+					bin: firstSuccessfulResult?.bin,
+					items: firstSuccessfulResult?.packedItems || []
+				};
+			} finally {
+				this.submitting = false;
 			}
-			const firstSuccessfulResult = response.data.find(x => !!x.bin);
-			this.results = response.data;
-			this.selectedResult = firstSuccessfulResult || null;
-			return {
-				bin: firstSuccessfulResult?.bin,
-				items: firstSuccessfulResult?.packedItems || []
-			};
 		});
 
 	},
@@ -246,5 +263,21 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	},
 	resultIsFullyPacked(result: PackedData) {
 		return result.result === 'FullyPacked';
+	},
+	submitButtonText() {
+		return this.submitting ? 'Working...' : 'Get results';
+	},
+	unpackedItemsOf(result: PackedData): UnpackedItem[] {
+		return result.unpackedItems ?? [];
+	},
+	hasUnpackedItems(result: PackedData) {
+		return this.unpackedItemsOf(result).length > 0;
+	},
+	unpackedItemsTitle(result: PackedData) {
+		const count = this.unpackedItemsOf(result).reduce((total, item) => total + item.quantity, 0);
+		return count === 1 ? 'Could not fit 1 item' : `Could not fit ${count} items`;
+	},
+	unpackedItemText(item: UnpackedItem) {
+		return `${item.quantity} x ${item.id}`;
 	}
 }));

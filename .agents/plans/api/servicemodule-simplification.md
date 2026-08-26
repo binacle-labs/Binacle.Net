@@ -1,14 +1,14 @@
 ---
 description: simplify ServiceModule - collapse the ceremony, keep the provider seam
-state: idea
-waits-on: the maintainer - how far the ServiceModule is taken. The other two api/ plans wait on the same answer
+state: deferred
+waits-on: "v3.0.0, then all the ServiceModule work taken together - these three move as one"
 paths:
   - "api/**"
 ---
 
 # Idea: simplify ServiceModule — collapse the ceremony, keep the provider seam
 
-**Status:** Unvetted idea. Post-v4, not mid-release.
+**Status:** Unvetted idea.
 
 ## What
 

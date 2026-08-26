@@ -1,7 +1,7 @@
 ---
 description: pack/first-bin endpoint
-state: idea
-waits-on: nobody waiting - but v4-stable is waiting on this one, or on another candidate
+state: deferred
+waits-on: "v3.0.0. The v4 stable flip waits on this endpoint or on another candidate"
 paths:
   - "api/**"
 ---

@@ -1,7 +1,7 @@
 ---
 description: Derive the repo's dependency graph into a generated file, draw it, and lint it with a small ruleset.
-state: ready
-waits-on: "nothing - state chosen by an agent, strike it if wrong"
+state: idea
+waits-on: "v3.0.0 at the earliest, and a maybe even then"
 ---
 
 # Architecture checks - derive the facts, lint the rules

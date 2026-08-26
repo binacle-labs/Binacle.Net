@@ -1,7 +1,7 @@
 ---
 description: A check that nothing outside the agent guidance directory points a reader into it.
-state: ready
-waits-on: "nothing - state chosen by an agent, strike it if wrong"
+state: idea
+waits-on: "v3 at the earliest, and a maybe even then"
 ---
 
 # Comment lint - stop code pointing at agent guidance

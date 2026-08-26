@@ -1,7 +1,7 @@
 ---
 description: "Integration tests: cover what the harness cannot see today"
 state: ready
-waits-on: "nothing"
+waits-on: "nothing - phase 1 is agreed and can start"
 paths:
   - "api/**"
 ---
@@ -11,12 +11,16 @@ paths:
 **Status:** Designed, nothing built. Split out on 2026-07-29 from the smoke-testing work, because the two are
 different jobs: this one is **behaviour, in process**; the other is **packaging, in a container**.
 
+**Phase 1 is agreed - 2026-08-27.** The maintainer's word was *"agreed"* on the split below: phase 1 is a
+read-only session that answers the three questions at the bottom of this file and writes no test. It can
+start.
+
 ## This is two sessions, and phase 1 stops before it writes anything
 
 Added 2026-08-07. The file used to say "one session each" and it was wrong about this one - it is two, and
 running them as one is how it produces the mistake it warns about below.
 
-**Phase 1 - investigate, read-only.** Answer the four questions at the bottom of this file. Write the answers
+**Phase 1 - investigate, read-only.** Answer the three questions at the bottom of this file. Write the answers
 back into this plan, replacing the guesses with what you found. **Then stop.** Do not write a test, do not
 touch a harness, do not delete a TODO. The maintainer decides the shape from your answers.
 

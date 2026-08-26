@@ -1,7 +1,7 @@
 ---
 description: CI - what is left after the workflow restructure landed, and the gap the next workflows session inherits
 state: blocked
-waits-on: "branch protection pointing at Pull Request / Gate - state chosen by an agent, strike it if wrong"
+waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
 paths:
   - ".github/**"
 ---
@@ -16,6 +16,9 @@ earns one.
 This file is down to what is *not* done, so it restates neither.
 
 ## The one thing needing hands, not code
+
+**Agreed 27 Aug 2026 — this is being done.** What is missing is not the decision but how: the maintainer
+wants guidance on making the change before anyone touches the protection settings.
 
 **Point branch protection at `Pull Request / Gate`, and nothing else.** Until then every pull request waits on
 a required check that no longer reports: the test suite lost its `pull_request` trigger when the gate started

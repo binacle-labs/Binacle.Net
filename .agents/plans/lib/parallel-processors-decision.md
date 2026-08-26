@@ -1,7 +1,7 @@
 ---
 description: Decide what happens to the three `Parallel*` processors
-state: ready
-waits-on: "nothing"
+state: idea
+waits-on: "v3, and more time - it is an idea"
 paths:
   - "lib/**"
 ---

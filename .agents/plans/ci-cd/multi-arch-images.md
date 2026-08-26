@@ -1,7 +1,7 @@
 ---
 description: CI - publish the image for arm64 as well as amd64
-state: blocked
-waits-on: "an answer to whether anyone runs this on ARM"
+state: idea
+waits-on: "nobody waiting - not in the near future"
 paths:
   - ".github/workflows/**"
 ---

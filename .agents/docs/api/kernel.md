@@ -1,8 +1,8 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-08-23
-check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
+verified: 2026-08-27
+check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/JsonStringNullableEnumConverter.cs still holds the factory, the internal NullableEnumConverter<T> and the public generic, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on both public converter types; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
 paths:
@@ -265,3 +265,59 @@ The concrete packing feature (the request/entry types and their registration) li
 `BinacleService` is the live producer: it injects `IOptionalDependency<Channel<AlgorithmOperationLogChannelRequest>>`
 and writes via `WriteToChannelAsync(...)`, which **no-ops when the channel isn't registered** (i.e. when the
 DiagnosticsModule packing-log feature is off).
+
+## HealthChecks
+
+`Kernel/HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs` holds two `AddHealthCheck`
+extensions on `IServiceCollection`. Its namespace is **`Binacle.Net`** (not `Binacle.Net.Kernel.*`) — that is the
+`using` you need.
+
+```csharp
+services.AddHealthCheck<SqliteHealthCheck>("Database", HealthStatus.Unhealthy, ServiceTags);
+services.AddHealthCheck("Database", sp => new SqliteHealthCheck(...), HealthStatus.Unhealthy, ServiceTags);
+```
+
+Both append a `HealthCheckRegistration` to `HealthCheckServiceOptions` through `services.Configure(...)`. The
+generic overload builds the check with `ActivatorUtilities.CreateInstance<T>(sp)`, so **the check class itself
+does not have to be registered** — only its constructor arguments have to resolve from the container. The
+overload taking a `Func<IServiceProvider, IHealthCheck>` is for a check the container cannot build that way.
+`failureStatus` and `tags` have no defaults, so every caller states them; only `timeout` is optional.
+
+**Adding a check does not switch health checks on.** Nothing here registers `HealthCheckService`:
+`AddHealthChecks()` is called once, by DiagnosticsModule's `ModuleDefinition`, which also maps the endpoint. A
+registration added without that module sits in options with nothing to run it.
+
+The `name` is the handle everything downstream uses — the endpoint's allow-list filters on it, not on the class
+name. DiagnosticsModule registers `SystemHealthCheck`; each ServiceModule infrastructure provider (Azure Tables,
+Sqlite, Npgsql) registers its own. The registered names, tags and the endpoint are in
+`$api/modules/diagnostics`; the providers are in `$api/modules/service`.
+
+## Serialization
+
+`Kernel/Serialization/JsonStringNullableEnumConverter.cs` is the whole folder — converters for a **nullable
+enum** written as a string. Namespace `Binacle.Net.Kernel.Serialization`. Nothing here is registered in DI or
+added to `JsonSerializerOptions`; each one is placed per property with `[JsonConverter]`.
+
+```csharp
+[JsonConverter(typeof(JsonStringNullableEnumConverter))]
+public required Algorithm? Algorithm { get; set; }
+```
+
+The file holds three types, and the names do not say which is which:
+
+| Type | What it is |
+|---|---|
+| `JsonStringNullableEnumConverter` | A `JsonConverterFactory`. `CanConvert` accepts only `Nullable<TEnum>`. This is the one contracts use. |
+| `NullableEnumConverter<T>` | `internal`, and **what the factory actually creates**. Also handles the enum as a property name. |
+| `JsonStringNullableEnumConverter<T>` | A `public` converter carrying the factory's name with a type parameter. Nothing places it; only the OpenAPI transformer names it. |
+
+Reading is the same in both converters: `Enum.TryParse` case-sensitive first, then case-insensitive. **A string
+that matches no member is not an error** — the read returns `default`, i.e. null, as an empty string and a JSON
+null do. The converter never rejects a value; validation is what turns an unknown algorithm into a 422.
+
+`EnumStringsSchemaTransformer` (`Kernel/OpenApi/Transformers`) matches on the converter type placed on the
+property and, for either public type, sets the schema to `string` and lists the member names — so a nullable
+enum carrying some other converter is typed but loses its list of values. See `$api/openapi`.
+
+Placed on v3 `PackRequestParameters` and `FitRequestParameters`, v4 `OperationParameters`, and the ServiceModule
+admin account and subscription contracts.

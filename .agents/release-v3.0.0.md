@@ -64,12 +64,12 @@ tag and belongs to `post-release-v3.0.0.md`. The demo and www deploys are not re
 
 | # | Item | Where the work is | State |
 |---|---|---|---|
-| A1 | Check the light and dark switch works, in a real browser | here | **reopened 2026-08-26 - A4 changed the page** |
+| A1 | Check the light and dark switch works, in a real browser | here | done - 2026-08-27. **All seven checks read in a browser, A4's four and A6's three** |
 | A2 | Check the demo starts in the same mode as the visitor's computer | here | done - 2026-08-25 |
 | A3 | Check version 4 of the API is still marked experimental | here | done - 2026-08-26 |
-| A4 | Fix the packing demo bugs that go inside the image | `plans/api/packing-demo-bugs.md` - the part below | code done - 2026-08-26. **Four by-eye checks ride on A1** |
+| A4 | Fix the packing demo bugs that go inside the image | `plans/api/packing-demo-bugs.md` - the part below | done - 2026-08-27. **Its four by-eye checks passed on A1 the same day** |
 | A5 | Check the changelog names every image change since the last test release | here | done - 2026-08-26 |
-| A6 | Swap the demo's random roll for a hand-picked sample set | here | done - 2026-08-26 |
+| A6 | Swap the demo's random roll for a hand-picked sample set | here | done - 2026-08-26. **Its three by-eye checks passed on A1 on 2026-08-27** |
 | A7 | Cut the test release - tag `v3.0.0-beta.5` | here | open |
 
 ### A1. Check the light and dark switch works, in a real browser
@@ -79,12 +79,16 @@ tag and belongs to `post-release-v3.0.0.md`. The demo and www deploys are not re
       in each header.
 - [x] **Re-read after the default changed to `"system"` - 2026-08-25.** No wrong-theme flash on the module's
       first paint with the `theme` cookie cleared.
-- [ ] **Stale - A4 landed on 2026-08-26 and changed the packing page.** The read above was valid against
-      commit `596b6130`. **It has to be done again**, and it now carries five checks A4 could not make without
-      a browser: add a bin and submit, clear all and submit, a failed request emptying the 3D view, and
-      reaching a result row with Tab and pressing Enter.
-      **Watch the error box in particular** - `showModal()` moves it into the browser's top layer and beercss
-      does its own positioning for `.modal.active`, so it may sit differently on screen than it used to.
+- [x] **Re-read after A4 - 2026-08-27.** The read above was valid against commit `596b6130` and A4 changed
+      the packing page. The page was loaded again and **all four checks A4 could not make without a browser
+      pass**: add a bin and submit returns a result, clear all and submit is caught inline, a failed request
+      empties the 3D view, and a result row is reached with Tab and activated with Enter.
+- [x] **The page opens on the same sample every time - 2026-08-27.**
+      **By eye:** reload a few times - it is always sample `01-opening-set`, three bins and two item types.
+- [x] **Randomize moves to a different sample - 2026-08-27.**
+      **By eye:** press it several times - it never lands on the sample already on screen.
+- [x] **There is one Randomize button where there used to be two - 2026-08-27.**
+      **By eye:** count them on the page.
 
 ### A2. Check the demo starts in the same mode as the visitor's computer
 
@@ -92,8 +96,8 @@ tag and belongs to `post-release-v3.0.0.md`. The demo and www deploys are not re
       both say `"system"`, which is what the switcher package already defaults to and what `_Layout.cshtml` was
       written for - under `system` it emits no `data-theme` attribute and the stylesheet follows the machine.
 
-**The three Jekyll sites still say `default_theme: "dark"` and that is not release work.** `sites/` is off
-limits to a coding session. It is a row in `plans/todos.md`.
+**The three Jekyll sites now say `default_theme: "system"` too - checked 2026-08-27.** `sites/www`,
+`sites/docs` and `sites/demo` all follow the machine, so every surface agrees.
 
 ### A3. Check version 4 of the API is still marked experimental
 
@@ -121,15 +125,31 @@ says so - one edit covers both the image and the demo site.
 | The error box is not opened as a real dialog - the keyboard walks the page behind it and Escape does nothing | `packages/binacle-net-ui/` |
 | Result rows cannot be reached or pressed from a keyboard | both page templates |
 | The 3D picture is stretched - it is sized from the window rather than from the box it sits in, and it is worst on a phone | `packages/binacle-net-ui/src/core/packingVisualizer.ts:45` and `:226` |
+| Pressing the one button gives no sign it was pressed - nothing changes until the results arrive | `packages/binacle-net-ui/src/core/packingDemo.ts` `onSubmit`, plus the button bindings and the live region in both page templates |
+| A partial result gives a percentage and never names the items that did not fit | **Not in the image. Helpers only.** The four strings are in `packages/binacle-net-ui/src/core/packingDemo.ts`; nothing renders them on either host - see below |
 
-**Left out, and each is still a live row in the plan.** The submit button giving no sign it was pressed, and
-nothing on the page showing which items did not fit. The first is polish, the second is a new feature.
-**Neither produces a wrong answer.**
+**The submit button was cut from this gate and is now in - 2026-08-27.** It was called polish; it was built
+and it is **inside the image**, which is why it is on the table above rather than in a note under it. **Its
+status line was trimmed the same day and that is in the image too**: "Results ready." is gone, and
+`submitStatus` now clears on any change to the form, so a message cannot outlive the result it described.
+"Packing..." and "No results." are the only two left.
 
-**The demo site has its own copy of the same bugs, and fixing it is not release work.**
-`sites/demo/pages/packing.html` carries the same seven lines - **checked 2026-08-26, it is not fixed,
-whatever an earlier note said** - but `sites/` is off limits to a coding session and the demo site is not in
-the image. It is a post-release row.
+**The unfitted items are the one row on this table with no visible feature behind it. Helpers only.**
+`hasUnpackedItems`, `unpackedItemsOf`, `unpackedItemsTitle` and `unpackedItemText` are in
+`packages/binacle-net-ui/src/core/packingDemo.ts` and therefore in the image, with unit tests. **Nothing calls
+them.** An inline block shipped on both hosts on 2026-08-27 and was pulled the same day because it changes the
+height of the result row; the markup is out of both templates and the answer will be a tooltip, which is a new
+interaction and is not in this release. **So the image carries four unused strings and a visitor sees
+nothing**, which is what it did before 27 Aug.
+`grep -c hasUnpackedItems sites/demo/pages/packing.html api/src/Binacle.Net.UIModule/Pages/Packing.cshtml`
+returns 0 for each - that is the row's state, not a failure.
+**Nine of the plan's ten are in the image; this one is not.**
+
+**Both hosts match otherwise - checked 2026-08-27.** `sites/demo/pages/packing.html` and
+`api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` each carry the seven `x-model.number` lines, the error
+block, the keyboard-reachable result rows, the readable status text, and the submit-button bindings with the
+live region. The demo site's body copy matches `AppletsService.cs` as well. **The unfitted-items removal was
+the last site edit this gate needed, and it landed on both hosts on 2026-08-27. No site work is left here.**
 
 **One claim from the 2026-08-25 review does not hold, so nobody chases it.** "The module ships the pre-pass
 dark palette" is wrong. `api/src/Binacle.Net.UIModule/_sass/_theme.scss` is byte identical to
@@ -164,27 +184,22 @@ lands, so the audit covers the final tree.
       cycle and never reached a released image, so "no longer fails" would describe a failure no released
       version ever had. **A fix only earns a line when the broken behaviour shipped.**
 
-**One scope decision, and it is yours.** You asked for the changelog to cover the image and nothing else. Two
-sections would go: **📚 Versioned Docs** entirely, and most of **🏗️ Internal Work** - the restructure, the
-benchmark suites, the interop tests, the folder renames, the pinned actions, the rebuilt pipeline.
-
-**My recommendation is to keep them, and I will say why rather than just do it.** The GitHub release body is
-the release of the repository, not of the image. Two of those bullets are the most useful non-image lines in
-the file: *versioned docs* is what tells someone running v2.1.1 that their image now has matching docs, and
-*the rebuilt pipeline* is the reason the `cosign verify` block above it means anything. Deleting them makes
-the release body shorter and the reader worse off.
-
-**What your ask does correctly identify** is that Internal Work mixes image and non-image with no marker, and
-that the size claim is an image claim nobody has re-measured. Both are on the list above.
-
-**Decide it when you work this row.** If the answer is still "cut them", cut them - it is your release body.
+**The scope decision was taken on 2026-08-27: both non-image sections stay.** **📚 Versioned Docs** and
+**🏗️ Internal Work** are not cut. Each now opens with one line saying what the section is and what it does
+to the image. Versioned Docs says nothing in it reaches the image. **Internal Work names the items that do** -
+the dependency patches, the Binacle.Geometry extraction and the packing log rework, all compiled into the
+image - and says nothing else there reaches it. A blanket "none of this reaches the image" would have told a
+self-hoster a security patch had not shipped, and **the three are named rather than counted** because A5 is
+still open and a bullet added at the top would break "the first three". That one line replaces the mid-list
+sentence the section used to carry.
 
 ### A6. Swap the demo's random roll for a hand-picked sample set
 
 **Decided 2026-08-26. It goes inside the image, so it is on this list.**
 
-The packing demo rolls its opening numbers at random. Instead it carries **10 to 20 hand-picked samples**
-inside `packages/binacle-net-ui/`, and both the demo in the image and the demo site roll from that one set.
+The packing demo used to roll its opening numbers at random. It now carries **20 hand-picked samples**, one
+JSON per sample in `shared/data/demo-samples/`, generated into `packages/binacle-net-ui/src/utils/sampleData.ts`
+by `just regen demo-samples`. Both the demo in the image and the demo site roll from that one set.
 **The first sample is pinned and always loads.** Randomize picks a different sample from the set rather than
 rolling numbers.
 
@@ -193,15 +208,15 @@ once and then always behaves; a rolled one is re-rolled in front of every visito
 way the page can produce an error a visitor did not cause - Randomize can currently roll two identical bins
 or two identical items, and the API rejects the duplicate id.
 
-- [x] **17 samples, every one run against all three algorithms - 2026-08-26.** 51 requests, all 200, no
+- [x] **20 samples, every one run against all three algorithms - 2026-08-26.** 60 requests, all 200, no
       duplicate-id rejections. Bin counts run one to five. The pinned sample is three bins and two item types.
 - [x] **No scenario names and no unit labels.** Numbers only. What to call a sample is a wording decision and
       it is not settled here.
 - [x] **The demo site's page template needs nothing for this** - checked 2026-08-26. It binds `randomize` and
       reads `model.bins` / `model.items`, all unchanged, so the site picks the set up on its next build. **Its
-      A4 markup fixes are still outstanding** and are a separate site session.
+      A4 markup fixes landed in the same commit** - see A4.
 - [x] **The changelog line is corrected - 2026-08-26.** It used to say the demo starts from a random sample
-      rather than a fixed one. It now names the 17 examples, the pinned one, and what Randomize does.
+      rather than a fixed one. It now names the 20 examples, the pinned one, and what Randomize does.
 
 ### A7. Cut the test release
 
@@ -285,11 +300,11 @@ beta.4 still resolves - so leaving them is correct and cheaper than moving them 
 post-release work and the tree at `v3.0.0` carries a beta pin for the length of one run. **They moved early
 once before, on 2026-08-07, and sat on `main` naming an image nobody could pull.**
 
-**`README.md` already names `binacle/binacle-net:3.0`.** Moved on 2026-08-17 when the beta names came off the
-public surfaces, so **the most read file in the repo currently names an image nobody can pull**, and beta.5
-does not change that - a test release creates no `3.0` name. Either revert it until the real tag or accept it;
-the same trade was taken deliberately for `tooling/README.md` and `tooling/smoke.just`. **Open, and it is a
-judgement call.**
+**`README.md` named `binacle/binacle-net:3.0` alone, and that was reverted on 2026-08-27.** The name was moved
+on 2026-08-17 when the beta names came off the public surfaces, so the most read file in the repo pointed at
+an image nobody can pull, and beta.5 does not change that - a test release creates no `3.0` name. The pin
+warning now carries a second line naming `3.0.0-beta.4` until the real tag, and `post-release-v3.0.0.md`
+carries its removal. `tooling/README.md` and `tooling/smoke.just` still take the opposite trade deliberately.
 
 **Any label the release workflow also emits is a label the `Dockerfile` does not own.** `metadata-action`
 auto-fills `description` from the GitHub repo blurb and silently overrode the `Dockerfile`'s, and `publish`
@@ -324,8 +339,9 @@ Three mechanics:
 changes, nothing is published to NuGet, and no contract moves - the OpenAPI diff proves the last one. The four
 breaking changes stay four.
 
-**This section is also what the docs site copies**, by hand. `plans/sites/docs-v3-deploy.md` carries what the
-page is missing.
+**This section is also what the docs site copies**, by hand. **The copy is done as of 2026-08-27** - the only
+thing the page still lacks is the release date and the release link, which need the tag.
+`plans/sites/docs-v3-deploy.md` carries that.
 
 ---
 
@@ -333,7 +349,8 @@ page is missing.
 
 1. **A4** - fix the packing demo bugs that go inside the image. **Done 2026-08-26.**
 2. **A6** - the hand-picked sample set. The last code work.
-3. **A1** - the browser read, which A4 and A6 both invalidated. It carries A4's four by-eye checks.
+3. **A1** - the browser read, which A4 and A6 both invalidated. **Done 2026-08-27** - A4's four by-eye
+   checks and A6's three sample checks all passed.
 4. **A5** - check the changelog, after A4 and A6 so it covers the finished tree.
 5. **Cut the test release, `v3.0.0-beta.5`.** Watch the run.
 6. **B1 and B2** - check the test image, then open it in a browser.
@@ -357,10 +374,9 @@ they went - strike either one and it comes back.**
 | **Every test leaf on the CI suite** | Ten of the twenty-six leaves are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A leaf nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses `shared-test-suite.yml` as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | `plans/ci-cd/test-leaves-reach-ci.md` |
 | **Docker Hub tag immutability - the rule** | The switch is off, so the rule's value changes nothing about this release either way. Correcting it is what makes the post-release decision a flip rather than a project. **The stored value on 2026-08-13 was `".*"`**, which would freeze `latest` and `3.0`. | `plans/ci-cd/dockerhub-tag-immutability.md` |
 
-**Also not here, and not new:** the Ruby coverage decision (`plans/ruby-gem-coverage.md`), the pull request
-gate's missing Node steps and the description caption's comment (both `plans/todos.md`), the Docker Hub logo
-and categories (the rest of `plans/ci-cd/dockerhub-overview.md`), and rubocop, which lands red before it lands
-green.
+**Also not here, and not new:** the Ruby coverage decision (`plans/ruby-gem-coverage.md`) and rubocop, which
+lands red before it lands green. **The Docker Hub logo and categories - the rest of
+`plans/ci-cd/dockerhub-overview.md` - were done outside the release on 2026-08-27.**
 
 **Held back on 2026-08-14, with reasons that still hold:**
 

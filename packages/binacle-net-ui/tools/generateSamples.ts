@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import {parseDimensions, parseQuantity} from "binacle-compact-notation";
 
-// Turns shared/data/demo-samples into the demo's sample set, as a TypeScript file both webpack hosts import.
 // One source file is one sample: its entries are that sample's bins, and every entry repeats the same items.
 
 interface ScenarioEntry {
@@ -43,7 +42,7 @@ function readSample(file: string): Sample {
 		throw new Error(`${file} holds no entries.`);
 	}
 
-	// A file whose entries disagree is a corrupt source. Taking the first list would hide it.
+	// Taking the first entry's list without this check would hide a source whose entries disagree.
 	const items = entries[0].Items;
 	for (const entry of entries) {
 		if (entry.Items.join(" ") !== items.join(" ")) {
@@ -92,7 +91,7 @@ function main(): void {
 	if (files.length < 1) {
 		throw new Error(`${sourceDir} holds no scenario files.`);
 	}
-or
+
 	const samples = files.map(readSample);
 	fs.writeFileSync(outputPath, render(samples));
 	console.log(`Wrote ${samples.length} samples to ${outputPath}, opening on ${samples[0].name}.`);

@@ -1,7 +1,7 @@
 ---
 description: Migrate the shipped UI clients off the v3 API
-state: blocked
-waits-on: "the site half waits on api.binacle.net serving a v3.0.x image; the module half can start today"
+state: deferred
+waits-on: "v3. The site half additionally needs api.binacle.net serving a v3.0.x image; the module half is only waiting on v3"
 paths:
   - "api/**"
   - "packages/binacle-net-ui/**"

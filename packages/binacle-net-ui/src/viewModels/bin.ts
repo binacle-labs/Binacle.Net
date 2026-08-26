@@ -12,8 +12,8 @@ export default class Bin extends Box {
 		return this.copy > 0 ? `${super.id} (${this.copy})` : super.id;
 	}
 
-	// The id is the footprint, and the API rejects duplicate ids. Highest plus one, not the count, so
-	// removing a bin cannot hand out a number that is still in use.
+	// The API rejects duplicate ids. Highest plus one, not the count, so removing a bin cannot hand out
+	// a number that is still in use.
 	static copyOf(bins: Bin[], bin: Bin): Bin {
 		const highestCopy = bins
 			.filter(x => x.length === bin.length && x.width === bin.width && x.height === bin.height)

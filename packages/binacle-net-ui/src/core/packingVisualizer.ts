@@ -90,7 +90,6 @@ export const packingVisualizer = defineComponent(() => ({
 	} as SceneData,
 	updateScene(resultPromise: () => Promise<{bin: Dimensions, items: (Dimensions & Coordinates)[]} | null>) {
 		this.stopRepeating();
-		// loading
 		if(window.binacle?.visualizerContainer){
 			startLoading(window.binacle.visualizerContainer);
 		}
@@ -253,7 +252,6 @@ export const packingVisualizer = defineComponent(() => ({
 
 		const themeColors = getThemeColors(window.document.body, "tertiary-container");
 
-		// WebGLRenderer CanvasRenderer
 		const renderer = new WebGLRenderer({antialias: true});
 		renderer.setClearColor(themeColors.color);
 		renderer.setPixelRatio(window.devicePixelRatio);

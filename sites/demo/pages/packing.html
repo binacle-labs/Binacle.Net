@@ -14,13 +14,13 @@ scripts:
   - type: "text/javascript"
     src: "/js/packing_demo.js"
 excerpt: |
-  An interactive tool that lets you test different packing algorithms with your own bins and items,
-  and see how each one arranges them inside the bin.
+  Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them in 3D.
+  Each algorithm searches differently, so the same items can land in different places.
 ---
 
 <p>
-  An interactive tool that lets you test different packing algorithms with your own bins and items,
-  and see how each one arranges them inside the bin.
+  Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them in 3D.
+  Each algorithm searches differently, so the same items can land in different places.
 </p>
 
 <div x-data="packing_demo_app({ baseUrl: '{{ site.api_url }}' })">
@@ -175,11 +175,14 @@ excerpt: |
           </button>
         </div>
         <div class="s7 m4 row">
-          <button class="max" type="submit">
-            <span>Get results</span>
+          <button class="max" type="submit"
+                  :disabled="submitting"
+                  :aria-busy="submitting ? 'true' : null">
+            <span x-text="submitButtonText()">Get results</span>
           </button>
         </div>
         <div class="s12" aria-live="polite">
+          <div x-text="submitStatus"></div>
           <template x-for="(error, index) in formErrors" :key="index">
             <div class="error-text" x-text="error"></div>
           </template>

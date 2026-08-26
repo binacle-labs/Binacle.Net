@@ -10,8 +10,8 @@ nav:
   icon: 🖥️
 ---
 
-The UI Module provides a user-friendly interface for interacting with Binacle.Net, allowing users to explore its features visually. 
-This makes it easier to demonstrate and understand the system’s capabilities without making direct API calls.
+The UI Module adds two pages to the API: a packing demo and a ViPaq decoder. Both run in your browser, so you
+can try Binacle.Net without writing a request.
 
 > This module is disabled by default.
 {: .block-note}

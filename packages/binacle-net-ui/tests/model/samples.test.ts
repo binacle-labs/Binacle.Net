@@ -76,8 +76,8 @@ describe("randomItemFor", () => {
 	});
 });
 
-// The guard on the set as a whole. It is generated from shared/data/demo-samples, so a bad file there is a
-// 422 on the demo page and nothing else here would catch it.
+// The set is generated from shared/data/demo-samples, so a bad file there is a 422 on the demo page and
+// nothing else here would catch it.
 describe("the sample set", () => {
 	test("holds one sample per source file", () => {
 		expect(sampleCount).toBe(sampleData.length);
@@ -158,7 +158,6 @@ describe("sampleAt", () => {
 		expect(second.items.map(item => item.id)).toEqual(first.items.map(item => item.id));
 	});
 
-	// The demo binds its inputs straight to these objects, so a shared instance would let one edit change the set.
 	test("hands back a new Bin and Item every call", () => {
 		const first = sampleAt(0);
 		const second = sampleAt(0);
