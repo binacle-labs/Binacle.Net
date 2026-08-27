@@ -12,6 +12,9 @@
 format = ENV.fetch('COVERAGE_FORMAT', '')
 
 unless format.empty?
+  # CI installs the bundle into ruby/vendor/bundle, so nothing below is on the load path until bundler puts
+  # it there. On a laptop the gems are usually installed globally and this looks unnecessary.
+  require 'bundler/setup'
   require 'simplecov'
 
   case format
