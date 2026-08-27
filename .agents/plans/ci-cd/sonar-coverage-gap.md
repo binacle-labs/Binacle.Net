@@ -12,14 +12,14 @@ paths:
 
 # Where the uncovered lines are
 
-**Measured on the 2026-08-27 run: 67.8% overall, 67.1% line, 77.8% branch. 2226 uncovered of 6767.** The gate
-wants 80% on new code and reads 63.0%. It cannot be lowered - custom quality gates start at the Team plan and
-the project is on Free - so this closes by testing, not by configuring.
+**Measured on the `ad2e96b8` run of 2026-08-27: 71.1% overall, 70.6% line. 1892 uncovered of 6429.** The gate
+wants 80% on new code and reads **77.0%**. It cannot be lowered - custom quality gates start at the Team plan
+and the project is on Free - so this closes by testing, not by configuring.
 
-**334 of the 2226 were never coverable** and are now out of the denominator through
-`sonar.coverage.exclusions`: the python index generator, the three sites' bundles and webpack configs, and
-the typescript fixture-provider and generator folders. That is 67.1% to 70.6% with no test written. Everything
-below is the real remainder.
+**334 lines were never coverable** and came out of the denominator through `sonar.coverage.exclusions`: the
+python index generator, the three sites' bundles and webpack configs, and the typescript fixture-provider and
+generator folders. That alone was 67.1% to 70.6%, with no test written. Everything below is the real
+remainder, and the file-level numbers are from the run before the exclusions landed.
 
 ## 212 lines already have tests and are not being run
 

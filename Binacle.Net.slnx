@@ -115,6 +115,7 @@
   <Project Path="tooling/tooling.proj" Type="Shared">
     <Platform Project="AnyCPU" />
   </Project>
+  <Project Path="ruby/ruby.csproj" />
   <Folder Name="/sites/">
     <Project Path="sites/docs/docs.proj" Type="Shared">
       <Platform Project="AnyCPU" />

@@ -5,8 +5,10 @@ export class OrbitControls {
 	}
 
 	update() {
+		// Empty on purpose.
 	}
 
 	dispose() {
+		// Empty on purpose.
 	}
 }

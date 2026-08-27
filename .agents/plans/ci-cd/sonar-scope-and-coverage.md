@@ -1,7 +1,7 @@
 ---
-description: No .rb file has ever been indexed, and it is not because ruby/ is in no MSBuild project - files from the same folders are indexed. Two hypotheses left and one run that tells them apart.
+description: Confirmed on the 2026-08-27 run - no Ruby analyser loads, so the ten gems can never report coverage. ruby/ruby.csproj is the one cheap experiment left, and it is in the tree waiting for a run.
 state: proposed
-waits-on: "nothing. One Sonar run with the check below settles which of the two fixes is the right one"
+waits-on: "one Sonar run. The experiment is built; the log says whether it worked"
 paths:
   - "tooling/ci/sonar-analysis.xml"
   - ".github/workflows/sonar-analysis.yml"
@@ -9,77 +9,60 @@ paths:
   - "Binacle.Net.slnx"
 ---
 
-# Why Sonar sees no Ruby
+# Sonar sees no Ruby, and now we know why
 
-**Measured on the 2026-08-27 run, through the SonarCloud API.** The project holds 1000 files. Not one of them
-is a `.rb`. Neither our 102 gem sources nor the thousands under `ruby/vendor` that CI installs. The language
-breakdown has no `ruby` entry at all, and the project has never had a Ruby quality profile applied to it -
-even though the profile exists and carries 67 rules.
+**Settled by the `ad2e96b8` run of 2026-08-27.** The scanner log is the evidence, not the dashboard.
 
-Coverage for a file Sonar does not know about is dropped in silence, which is why the ten gems read zero.
+```
+INFO: 10 languages detected in 1322 preprocessed files
+INFO: Loading plugins for detected languages
+```
 
-## The earlier diagnosis is wrong
+**Ruby is not one of the ten**, and no `Sensor Ruby` line appears anywhere in the run. The plugin list is
+loaded *after* detection, from the languages found - so the `.rb` files were walked, claimed by nothing, and
+dropped. The language breakdown that reached SonarCloud is `cs, css, docker, js, py, shell, ts, web, yaml`.
 
-**It said: `ruby/` is in no MSBuild project, the scanner takes its file list from the build, so the `.rb`
-files are never indexed. The fix was a `ruby/ruby.proj`.**
+An earlier version of this plan blamed MSBuild project membership. That was wrong and is disproved twice
+over: before `ruby/vendor/**` was excluded, 240 files from that same folder were indexed - `.html`, `.erb`,
+`.yml`, `.sh` - none of them in any project either.
 
-That cannot be the mechanism. From inside `ruby/vendor/bundle/`, which is in no project either, the run
-indexed 240 files - kramdown's `.html` fixtures, jekyll's `.erb` templates, `safe_yaml`'s `.sh`, and four
-gems' own `.yml` workflows. `.github/` is in no project and its 20 yaml files are indexed.
+**The coverage half was never the problem and is finished.** All ten gems produce a SimpleCov JSON report
+with absolute repository paths, which is exactly what `sonar.ruby.coverage.reportPaths` wants. Verified by
+running one by hand, and by the ten `JSON Coverage report generated for RSpec` lines in the same run.
+There is nothing to build. There is nothing for the reports to attach to.
 
-**Same folder, `.html` in and `.rb` out.** No path-based cause survives that. Whatever decides this is the
-language, not the project.
+## The experiment is built: `ruby/ruby.csproj`
 
-## Two hypotheses, and the run that separates them
+`Microsoft.Build.NoTargets`, `IsPackable=false`, `Content Include="**\*.rb"` excluding `vendor/**` - 102
+files, none of them vendored. In `Binacle.Net.slnx`. If listing the files in a built project is what makes the
+scanner offer them to the language detector, this is the whole fix.
 
-**A - the Ruby sensor does not run under the Scanner for .NET.** The walk that picks up loose files covers
-web, yaml and shell but never invokes the Ruby analyser. If this is it, a `ruby.proj` changes nothing and the
-fix is a second standalone `sonar-scanner` pass over `ruby/`, or dropping the ruby coverage line as a thing
-that cannot work here.
+**It is `.csproj` and not `.proj`, and that is the finding underneath it.** The solution file cannot infer a
+project type from `.proj`, so every content project here is declared `Type="Shared"` - and a Shared project is
+**never built by `dotnet build Binacle.Net.slnx`**. `tooling/obj` and `assets/obj` are stale from 6 Aug 2026
+and CI has never recreated them. So none of those projects has ever reached the scanner, and a `ruby.proj`
+copied from `tooling.proj` would have been a guaranteed no-op.
 
-**B - the walk only claims files a project does not, for a subset of languages, and membership fixes it.**
-Sonar's own documentation says loose files are analysed "unless explicitly excluded" for SDK-style projects,
-and that other file types are enabled by listing them in the project file. If this is it, `ruby/ruby.proj`
-works - `Microsoft.Build.NoTargets`, `IsPackable=false`, `Content Include="**\*.rb"`, the same shape as
-`tooling/tooling.proj`, added to `Binacle.Net.slnx`.
+That also settles where `tooling/`'s `.sh` and `.py` come from: not from `tooling.proj`, which never builds,
+but from the scanner's own walk of the repository root. The same walk reaches `ruby/` - it is what indexed 240
+files under `ruby/vendor` before that folder was excluded. **It sees the `.rb` files and does not claim
+them.**
 
-**It must exclude `vendor/**` either way**, or a bare glob sweeps thousands of other people's gems into the
-build.
+**A second Sonar project is the fallback, and it is a real decision.** A standalone `sonar-scanner` pass over
+`ruby/` cannot write into `binacle-labs_Binacle.Net` - one project takes one analysis - so it means a second
+project key, a second dashboard, and a second gate. Ten gems at 96-100% coverage would look good on it. It
+also doubles the thing anyone has to look at.
 
-The evidence does not favour one. `tooling/`'s `.sh` and `.py` are in a project *and* would be caught by the
-walk, so they prove nothing.
-
-## The check that decides it, and it is one run
-
-`dotnet-sonarscanner begin` writes `.sonarqube/out/`, and every project in the build gets a folder holding a
-`ProjectInfo.xml` and a `FilesToAnalyze.txt`. **That list is the truth.** Grep it for a `.rb` path.
-
-- A `.rb` path is there and SonarCloud still shows no Ruby - **hypothesis A**, the sensor never ran.
-- No `.rb` path is there - **hypothesis B**, and adding the project is what puts it there.
-
-`end` also reports how many files each analyser picked up. A language with zero files is a scope problem,
-never a coverage problem. If the files appear and the coverage still reads zero, one run with
-`sonar.verbose=true` names every report it parsed and every path in one it could not match - it is the only
-thing that separates "the report was not read" from "the report was read and matched nothing". Turn it off
-again; it is loud.
-
-**Read them in that order.** Working backwards from the dashboard is how three weeks concluded the coverage
-import was broken, when the files were never there to cover.
-
-## What this does not settle
-
-**Whether SonarCloud imports the simplecov json** stays unproven until the files are indexed. The report paths
-are right - checked 2026-08-28, the json records absolute paths under the repository root, which is what the
-importer wants.
-
-**102 files arriving at once will raise new findings on a rule set that has never seen them.** That is triage,
-not a defect, and `plans/sonar-issue-triage.md` owns it.
+**Doing neither is defensible.** The gems have their own suites, all ten pass in CI, and their coverage is
+printed by `just coverage table`. What is lost is a number on a dashboard. What is not lost is the testing.
+**If that is the answer, say so and delete the `sonar.ruby.coverage.reportPaths` line**, because a setting
+that cannot work is worse than no setting - it is what made three weeks of this look like an import bug.
 
 ## Done when
 
-- [ ] A `.rb` path either is or is not in a `FilesToAnalyze.txt` under `.sonarqube/out/`, and which one is
-      written into the CI/CD decisions ledger along with the fix it picks.
-      **By eye**, after a local `begin` + `build`. No token needed for the grep.
-- [ ] The gems are not at zero in SonarCloud.
-      **By eye**, on the Code page, after a run.
-- [ ] If they are still at zero, one run with `sonar.verbose=true` says why, and the answer joins the ledger.
+- [ ] One run says whether the Ruby plugin loads now that `ruby/ruby.csproj` is in the build.
+      Grep the `end` log for `Quality profile for ruby`. The run of 2026-08-27 listed ten and ruby was not
+      among them; eleven with ruby means it worked.
+- [ ] If it cannot work here, the choice between a second project and dropping it is written into the CI/CD
+      decisions ledger, and the coverage property matches that choice.
+      **By eye.** A `sonar.ruby.coverage.reportPaths` line with no Ruby analyser behind it is the failure.

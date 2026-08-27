@@ -25,7 +25,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting - not in the near future"
 - file: sonar-issue-triage.md
-  description: "Sonar re-read against the current project on 2026-08-28 - what the scope fix and the high-severity pass cleared, the 299 findings left, and the answer on whether test and tooling code stays in scope"
+  description: "Confirmed by the 2026-08-27 run - security is A and zero findings, high-severity is down to two, and 295 findings remain. What is left, and the answer on whether test and tooling code stays in scope"
   state: ready
   waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
   paths: ["tooling/ci/sonar-analysis.xml", "api/src/Binacle.Net.UIModule/**", "packages/**"]
@@ -137,9 +137,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing"
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
 - file: ci-cd/sonar-scope-and-coverage.md
-  description: "No .rb file has ever been indexed, and it is not because ruby/ is in no MSBuild project - files from the same folders are indexed. Two hypotheses left and one run that tells them apart."
+  description: "Confirmed on the 2026-08-27 run - no Ruby analyser loads, so the ten gems can never report coverage. ruby/ruby.csproj is the one cheap experiment left, and it is in the tree waiting for a run."
   state: proposed
-  waits-on: "nothing. One Sonar run with the check below settles which of the two fixes is the right one"
+  waits-on: "one Sonar run. The experiment is built; the log says whether it worked"
   paths: ["tooling/ci/sonar-analysis.xml", ".github/workflows/sonar-analysis.yml", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
   description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."

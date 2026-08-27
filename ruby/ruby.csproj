@@ -1,0 +1,14 @@
+<!-- Exists only so the Sonar scanner is offered the gem sources; NoTargets compiles nothing.
+
+     .csproj and not .proj like tooling.proj: the solution file cannot infer a type for .proj, so those are
+     declared Type="Shared" - and a Shared project is never built, so the scanner never sees it. -->
+<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- vendor/ is the bundle CI installs, so without the exclude the build swallows every gem we depend on. -->
+        <Content Include="**\*.rb" Exclude="vendor\**" />
+    </ItemGroup>
+</Project>

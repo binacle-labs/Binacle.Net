@@ -1,5 +1,5 @@
 ---
-description: Sonar re-read against the current project on 2026-08-28 - what the scope fix and the high-severity pass cleared, the 299 findings left, and the answer on whether test and tooling code stays in scope
+description: Confirmed by the 2026-08-27 run - security is A and zero findings, high-severity is down to two, and 295 findings remain. What is left, and the answer on whether test and tooling code stays in scope
 state: ready
 waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
 paths:
@@ -25,18 +25,19 @@ the gate's `new_security_rating` failure, were both entirely vendored gems - unp
 
 | | Open | Security | Reliability | Maintainability | High or worse |
 |---|---|---|---|---|---|
-| As measured | 384 | 8 | 81 | 311 | 34 |
-| Less `ruby/vendor/**` | 319 | 0 | 27 | 295 | 22 |
-| Less the high-severity pass | 299 | 0 | 12 | 290 | 2 |
+| Before, `22:20` run | 384 | 8 | 81 | 311 | 34 |
+| After, `ad2e96b8` run | **295** | **0** | **9** | **286** | **2** |
+
+Ratings moved with it: **security C to A, reliability D to C, maintainability stayed A.** Coverage 67.8% to
+**71.1%**. Analysed lines dropped from 30048 to 26275, which is the vendored gems leaving.
 
 The two remaining high findings are `typescript:S1186` on `packages/binacle-net-ui/tests/stubs/orbitControls.ts` -
-empty `update()` and `dispose()` on a stub whose whole point is to do nothing. **Mark both Accepted in the
-SonarCloud UI with "deliberate no-op stub".** The file comment already says why; repeating it inside the
-braces to satisfy the rule would be the comment rule broken to please an analyser.
+empty `update()` and `dispose()` on a stub whose whole point is to do nothing. Answered in code with a
+three-word comment in each body, which is what the rule wants for a body that is empty on purpose.
 
 ## Test and tooling code stays in scope
 
-**114 of the remaining 299 sit in test or tooling code, and they should stay visible.** Three reasons, and
+**Roughly a third of what remains sits in test or tooling code, and it should stay visible.** Three reasons, and
 they are not the same reason:
 
 - **The costly half is already handled.** `SonarQubeTestProject` in `Directory.Build.props` takes the .NET
@@ -83,17 +84,22 @@ ceremony. **Accept the ten with "test fixture, no finalizer"** rather than addin
 
 ## The gate
 
-`new_coverage` is the only condition that this pass does not move: **63.0% against 80%**. The other two
-failures - `new_security_rating` and `new_reliability_rating` - were the vendored gems and the shell scripts,
-and both are cleared.
+**Two conditions still fail, down from three.** `new_security_rating` is now A.
+
+- `new_coverage` **77.0% against 80%** - it was 63.0%. Three points.
+- `new_reliability_rating` **C against A** - one of the nine findings above sits in new code. Fixing or
+  accepting all nine clears it.
 
 **The 80% cannot be lowered.** Custom quality gates need the Team plan and the project is on Free. The gate
 goes green when the untested code gets tested. `plans/ci-cd/sonar-coverage-gap.md` says where that code is.
 
 ## Done when
 
-- [ ] The two `orbitControls.ts` stub findings are Accepted with a reason in SonarCloud.
-      **By eye**, on the issue list filtered to Accepted.
+- [ ] The nine reliability findings are each fixed or Accepted. Four are analyser mistakes and need the
+      Accept: `<Applet>` in `_Navbar.cshtml` is the Razor `@model` type read as the deprecated html element,
+      the empty `<h5>` in `_ErrorsDialog.cshtml` is filled by Alpine at runtime, and the two `charCodeAt`
+      findings are on a byte decoder where code points are the wrong unit.
+      Re-read the project filtered to reliability; the list is empty or every entry is Accepted.
 - [ ] The six accessibility findings on the UIModule pages are fixed or answered.
       Re-read the project filtered to `Web:` rules on `api/src/Binacle.Net.UIModule/**`; the list is empty or
       every entry is Accepted.
