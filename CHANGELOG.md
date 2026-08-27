@@ -36,6 +36,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - Presets can be **listed** with `presets` or **fetched one at a time** with `presets/{preset}`.  
 - V4 is **experimental and can change at any time**. V3 remains stable and is the recommended version.  
 - V3 endpoints are unchanged and remain stable, apart from the ViPaq payload.  
+- **A non-string `algorithm` value now answers 422 rather than 400.** `"algorithm": 1`, `true` or a list used to come back as `Invalid JSON Format` with no field named. It now comes back as a validation error naming the field — the same answer a misspelled name such as `"FFDD"` has always given. Both statuses were already declared on these endpoints, so the contract has not moved; what changed is which one you get.  
 - **ViPaq is no longer experimental.** The format is settled as of this release, where it carried an experimental warning through v2.1.1. A future format change takes a new `Version` code rather than altering the current one, so an older decoder rejects a newer string outright instead of misreading it.  
 - Added **forwarded headers** support, configured in `Config_Files/ForwardedHeaders.json`. **Disabled by default.**  
 - When enabled, the caller's address and scheme are resolved from `X-Forwarded-For` and `X-Forwarded-Proto` before anything reads them, so rate limiting and health check IP restrictions see the real caller rather than the proxy.  
@@ -115,7 +116,7 @@ Work on the repository, the build and the dependencies. The dependency patches, 
 - Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  
 - Added cross-language ViPaq interop tests between C# and TypeScript.  
-- **Rebuilt the release pipeline.** A tag now builds the image once, smoke tests it in a staging registry, then copies the tested digest to Docker Hub — so what is published is bit for bit what passed, and a failure anywhere leaves Docker Hub untouched. The release body is this changelog, extracted by the workflow.  
+- **Rebuilt the release pipeline.** A release is dispatched with a version. It builds the image once, smoke tests it in a staging registry, copies the tested digest to Docker Hub, and creates the git tag and the GitHub release last — so what is published is bit for bit what passed, a failure anywhere leaves Docker Hub untouched, and no tag exists for a release that did not finish. The release body is this changelog, extracted by the workflow.  
 - Renamed two top-level folders — `config/` is now `tooling/`, and build output goes to `artifacts/` instead of `build/`.  
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.  
 

@@ -1,6 +1,6 @@
 # Seven jobs, cheapest check first:
 #
-#   dispatch 3.0.0 -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> tag+release -> page
+#   dispatch 3.0.0 -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> release -> page
 
 name: Build and Release Docker Image
 
@@ -252,7 +252,7 @@ jobs:
         run: cosign sign --yes "$TARGET"
 
   release:
-    name: Tag the commit and create the release
+    name: Create the release
     needs: [ gate, test, build, smoke, publish ]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -270,16 +270,15 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # The run's own commit, not whatever main points at by now, so the tag and the image agree.
-      - name: Push the release tag
-        run: just ci push-tag "$TAG" "$COMMIT"
-
+      # One call makes the tag and the release, so the image can never be out with no tag naming it. On the
+      # run's own commit, not whatever main points at by now, so the tag and the image agree.
+      #
       # A release may already exist: tagging from GitHub's web UI creates the tag and the release together.
       - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SECTION: ${{ needs.gate.outputs.section }}
-        run: just ci github-release "$TAG" "$SECTION"
+        run: just ci github-release "$TAG" "$SECTION" "$COMMIT"
 
       # In this job rather than `publish` because the release URL only exists once the step above has run.
       - name: Summarise what was published

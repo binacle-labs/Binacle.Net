@@ -34,8 +34,4 @@ internal class InstanceModel : AppletPageModel
 	// way to link it correctly.
 	public string? PathFor(FeatureSwitch featureSwitch)
 		=> this.featureOptions.Value.PathFor(featureSwitch.Feature);
-
-	public void OnGet()
-	{
-	}
 }

@@ -12,8 +12,4 @@ internal class PackingModel : AppletPageModel
 	}
 
 	public string ApiBaseUrl { get; }
-
-	public void OnGet()
-	{
-	}
 }

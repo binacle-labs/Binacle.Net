@@ -1,7 +1,7 @@
 ---
 description: The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on.
 state: blocked
-waits-on: "a pull request run and a Sonar run - neither has happened since this landed"
+waits-on: "a pull request run, and one look at the gems in SonarCloud"
 paths:
   - ".github/workflows/**"
   - "tooling/**"
@@ -31,12 +31,14 @@ filter itself has still only been read, never watched skipping a job.
 Two runs settle it, and both are cheap: a branch touching one page under `sites/`, and a branch touching one
 file under `ruby/`.
 
-## Sonar has not run since the gems landed
+## Sonar ran, found a bug in the gem coverage, and it is fixed
 
-`sonar-analysis.yml` has `Setup - Ruby` now, so the ten tests can start, and
-`sonar.ruby.coverage.reportPaths` is set. **Nothing has proved SonarCloud reads it.** The gems are in scope
-either way - nothing in the analysis settings excludes `ruby/` - so the run either moves them off zero or
-shows the import does nothing.
+The run of 2026-08-27 died on the first gem: CI installs the bundle into `ruby/vendor/bundle`, so simplecov
+was not on the load path. Fixed on 2026-08-28 and all ten gems re-run green here.
+
+**The gems are still at zero in SonarCloud, and the import is not the reason.** No `.rb` file has ever been
+indexed, so there is nothing for the coverage to attach to.
+`plans/ci-cd/sonar-scope-and-coverage.md` owns that; this file only needs to know the gems executed.
 
 ## Rubocop
 
@@ -54,8 +56,10 @@ and reading what it changed is the actual work.
       **By eye.** Open a pull request touching one page and read the gate's table.
 - [ ] A change under `ruby/` runs the site tests and starts no Postgres.
       **By eye.** Open a pull request touching one gem file and read the gate's table.
-- [ ] The Sonar run executes the gem tests and they are not at zero.
-      **By eye.** Run the workflow, then read the gems in SonarCloud.
+- [x] The Sonar run executes the gem tests. First tried 2026-08-27, failed on the load path, fixed
+      2026-08-28.
+- [ ] The gems are not at zero in SonarCloud.
+      **By eye.** Read them after a run. `plans/ci-cd/sonar-scope-and-coverage.md` is where that answer lands.
 - [ ] Rubocop comes back clean, and whether it attaches to anything is decided.
       `cd ruby && bundle exec rubocop` exits 0, and a line in the Ruby doc or the CI/CD ledger says where it
       runs, or that it does not.

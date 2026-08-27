@@ -91,3 +91,6 @@ sites/www/media
 sites/www/lib
 sites/www/*.ico
 sites/www/*.png
+
+## Ruby gems - `bundler-cache: true` and a local `bundle install` both put the bundle here.
+ruby/vendor

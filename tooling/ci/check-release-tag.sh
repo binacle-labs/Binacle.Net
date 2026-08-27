@@ -12,8 +12,8 @@ local_sha="$(git rev-parse -q --verify "refs/tags/${tag}^{commit}" || true)"
 remote_sha="$(git ls-remote origin "refs/tags/${tag}" "refs/tags/${tag}^{}" | awk '{ sha = $1 } END { print sha }')"
 
 for sha in "$local_sha" "$remote_sha"; do
-    [ -n "$sha" ] || continue
-    if [ "$sha" != "$commit" ]; then
+    [[ -n "$sha" ]] || continue
+    if [[ "$sha" != "$commit" ]]; then
         echo "Tag ${tag} already exists, on ${sha}, and this run is on ${commit}." >&2
         echo "Release the next version instead. Do not delete and re-push a tag anyone has pulled." >&2
         exit 1
@@ -21,7 +21,7 @@ for sha in "$local_sha" "$remote_sha"; do
 done
 
 # Not an error: it is what lets a run that published and then failed be dispatched again.
-if [ -n "${local_sha}${remote_sha}" ]; then
+if [[ -n "${local_sha}${remote_sha}" ]]; then
     echo "Tag ${tag} is already on ${commit} - this run is a retry."
 else
     echo "Tag ${tag} is free."

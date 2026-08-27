@@ -14,8 +14,9 @@ paths:
 **Nobody needs to re-run the deploy** - what is left is page content and the checks below.
 
 **Most of this file has landed.** The UI module corrections, the two swagger copies and the release-notes
-carry-over are all done and verified against the tree on 2026-08-27. Two page edits remain, and both need the
-tag to exist.
+carry-over are all done and verified against the tree on 2026-08-27, and the release-notes page was diffed
+bullet for bullet against `CHANGELOG.md` again on 2026-08-28. Two page edits remain, and both need the tag to
+exist.
 
 ---
 
@@ -40,6 +41,24 @@ version folder.
 **Everything else on that page is done.** The `/app/data` bullet, the `libgssapi-krb5-2` line, the Service
 Module, Diagnostics and UI Module sections, migration steps 7 and 8, the signing block and the organisation
 move are all on the page - checked 2026-08-27 against `CHANGELOG.md`.
+
+### Three fixes made on 2026-08-28 by a coding session, on the maintainer's explicit override
+
+**`never-edit-published-sites` was overridden by name for this one change.** Recorded here because that rule
+says a coding session writes down what the page must say and stops. It did that first; the override came
+after. **The carve-outs in the rule did not cover this and still do not.**
+
+What a full bullet-for-bullet diff against `CHANGELOG.md` found, and what was changed on the page:
+
+| Was | Now |
+|---|---|
+| The `algorithm` 422 line was missing - the changelog gained it on 2026-08-28, after the carry-over | Added under the V3 stability bullet, no `vlink`, because `v3.0.x` has no errors or responses page |
+| *"The Packing Demo carries **17** worked examples"* | **20**, which is what `shared/data/demo-samples/` holds and what the changelog says. The page was written when there were 17 |
+| *"**A tag** now builds the image once"* | The release is dispatched with a version and the tag is made last. **The same sentence was wrong in `CHANGELOG.md` and was fixed there too** |
+
+**Two changelog bullets have no counterpart on the page and that is deliberate** - the Service Module
+exemption, which the page states as a callout at the top instead, and the forwarded-headers line, which the
+page turns into a link rather than bold. Do not "fix" either.
 
 ## 3. Read the live site - these four checks exist nowhere else
 
@@ -82,6 +101,9 @@ says *"the visual packing demo"*. If that page should use the canonical tool nam
 - [ ] The verifying-a-release example quotes the released image.
       `grep -n 'beta' sites/docs/collections/_versions/v3.0.x/verifying-a-release.md` returns nothing, and the
       command in it runs green from a clean shell.
+- [x] **The three drift fixes are on the page - 2026-08-28.** `grep -c 'answers 422 rather than 400'` and
+      `grep -c '20 worked examples'` each return 1, and `grep -c 'A tag now builds'` returns 0, all against
+      `sites/docs/collections/_versions/v3.0.x/release-notes.md`.
 - [ ] The release notes page names the release date and links the GitHub release.
       `grep -n 'Not released yet' sites/docs/collections/_versions/v3.0.x/release-notes.md` returns nothing,
       and the line below `## v3.0.0` names a date and a `releases/tag/v3.0.0` link.

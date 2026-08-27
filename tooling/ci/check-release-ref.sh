@@ -5,7 +5,7 @@ set -euo pipefail
 
 ref="$1"
 
-if [ "$ref" != "refs/heads/main" ]; then
+if [[ "$ref" != "refs/heads/main" ]]; then
     echo "Releases run from main only. This was dispatched on ${ref}." >&2
     exit 1
 fi

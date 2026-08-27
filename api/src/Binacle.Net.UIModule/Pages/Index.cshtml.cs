@@ -31,8 +31,4 @@ internal class IndexModel : PageModel
 
 	public string? SummaryFor(Applet applet)
 		=> applet.Page == "/Instance" ? this.InstanceSummary : null;
-
-	public void OnGet()
-	{
-	}
 }

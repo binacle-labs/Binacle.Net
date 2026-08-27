@@ -8,8 +8,4 @@ internal class VipaqModel : AppletPageModel
 		: base(appletsService, "/Vipaq")
 	{
 	}
-
-	public void OnGet()
-	{
-	}
 }

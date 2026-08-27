@@ -12,7 +12,7 @@ summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
 {
     echo "## Smoked \`${image}\`"
     echo
-    if [ -n "$digest" ]; then
+    if [[ -n "$digest" ]]; then
         echo "**Digest** \`${digest}\` - what the tag pointed at when this ran."
     else
         echo '**The pull failed.** Nothing was smoked.'
@@ -21,7 +21,7 @@ summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
     echo '| Check | Result |'
     echo '|---|---|'
     while read -r pair; do
-        [ -n "$pair" ] || continue
+        [[ -n "$pair" ]] || continue
 
         case "${pair##*:}" in
             success) mark='✅' ;;

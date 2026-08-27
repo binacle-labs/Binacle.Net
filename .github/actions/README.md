@@ -20,8 +20,12 @@ steps in an `action.yml`, no packaging and no publishing. A workflow uses one by
 
 ## 📥 Installing a pinned binary
 
-Four one-step actions that download a release, check it against a **pinned SHA-256**, and put it on `PATH`.
-A changed checksum fails the step rather than running an unknown binary.
+Four one-step actions. Each calls `tooling/ci/install-<tool>.sh`, which downloads a release, checks it against
+a **pinned SHA-256** and puts it on `PATH`. A changed checksum fails the step rather than running an unknown
+binary.
+
+**The version, the checksum and the download live in the script**, not in the action. One home each, and
+shellcheck reads them - `just check scripts`.
 
 | Action | Tool | Used by |
 |---|---|---|
@@ -30,8 +34,9 @@ A changed checksum fails the step rather than running an unknown binary.
 | `install-lychee` | `lychee` | The link check before a site deploy |
 | `install-actionlint` | `actionlint` | The workflow lint on every pull request |
 
-**Their versions are duplicated in [`DEVELOPMENT.md`](../../DEVELOPMENT.md)**, which is how a maintainer
-installs the same ones. Change one, change the other, or CI and a laptop stop testing the same bytes.
+**The same scripts install these on a laptop** - run `tooling/ci/install-lychee.sh` and you get the bytes CI
+gets. [`DEVELOPMENT.md`](../../DEVELOPMENT.md) tells a maintainer to run exactly these, so there is one home
+for each version and nothing to keep in step.
 
 ## 🏗️ Building
 

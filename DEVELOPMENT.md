@@ -3,7 +3,9 @@
 What you need installed to build, test and run Binacle.Net from source, and how to get it.
 
 This file is the one place tool versions and install steps live. Everything else in the repo points here rather
-than repeating it.
+than repeating it. The four pinned binaries below are the exception, and a deliberate one: their version, their
+checksum and their download are in `tooling/ci/install-<tool>.sh`, which is the same script CI runs. You run it
+too, so a laptop and a runner install the same bytes by construction rather than by both being edited.
 
 ## What you need
 
@@ -83,28 +85,22 @@ docker run --rm hello-world
 ### The smoke tools
 
 Only needed for `just smoke`. Both are single static binaries and go to `~/.local/bin`, which is already on
-`PATH` - no sudo, and nothing to uninstall but a file. Pin the versions rather than taking `latest`, so a local
-run and a CI run install the same bytes.
+`PATH` - no sudo, and nothing to uninstall but a file.
 
 ```bash
-# container-structure-test 1.22.1 - asserts what is inside the image
-curl -fsSL -o /tmp/cst \
-  https://github.com/GoogleContainerTools/container-structure-test/releases/download/v1.22.1/container-structure-test-linux-amd64
-install -m0755 /tmp/cst ~/.local/bin/container-structure-test
+# container-structure-test - asserts what is inside the image
+tooling/ci/install-container-structure-test.sh
 
-# hurl 8.0.1 - runs the .hurl files against a running stack
-curl -fsSL -o /tmp/hurl.tar.gz \
-  https://github.com/Orange-OpenSource/hurl/releases/download/8.0.1/hurl-8.0.1-x86_64-unknown-linux-gnu.tar.gz
-tar xzf /tmp/hurl.tar.gz -C /tmp
-install -m0755 /tmp/hurl-8.0.1-x86_64-unknown-linux-gnu/bin/hurl ~/.local/bin/hurl
-
-container-structure-test version
-hurl --version
+# hurl - runs the .hurl files against a running stack
+tooling/ci/install-hurl.sh
 ```
+
+Each one downloads, checks the file against its pinned SHA-256, installs it and prints the version. A bad
+checksum stops it there rather than running an unknown binary.
 
 #### hurl on Ubuntu 26.04
 
-The command above leaves a hurl that will not start on Ubuntu 26.04. The binary links against `libxml2.so.2`;
+The script above leaves a hurl that will not start on Ubuntu 26.04. The binary links against `libxml2.so.2`;
 26.04 ships only `libxml2.so.16` (package `libxml2-16`) and carries no compat package, so it dies with a
 missing-library error that looks nothing like a hurl problem. The `.deb` fails the same way - it depends on
 `libxml2`, which is no longer a package name there, and on `libcurl4`, now `libcurl4t64`.
@@ -129,8 +125,8 @@ done
 cp -P /tmp/hurl-libs/usr/lib/x86_64-linux-gnu/libxml2.so.2* ~/.local/lib/hurl/
 cp -P /tmp/hurl-libs/usr/lib/x86_64-linux-gnu/libicu*.so.74* ~/.local/lib/hurl/
 
-# Move the real binary next to them and put a wrapper on PATH in its place.
-install -m0755 /tmp/hurl-8.0.1-x86_64-unknown-linux-gnu/bin/hurl ~/.local/lib/hurl/hurl.bin
+# Move the binary the script installed next to them, and put a wrapper on PATH in its place.
+mv ~/.local/bin/hurl ~/.local/lib/hurl/hurl.bin
 cat > ~/.local/bin/hurl <<'EOF'
 #!/bin/sh
 # hurl needs libxml2.so.2, which this system does not have. The private copy beside the binary is the only
@@ -143,7 +139,8 @@ chmod 755 ~/.local/bin/hurl
 hurl --version
 ```
 
-About 42MB, almost all of it ICU data. `rm -rf ~/.local/lib/hurl ~/.local/bin/hurl` undoes it completely.
+About 42MB, almost all of it ICU data. `rm -rf ~/.local/lib/hurl ~/.local/bin/hurl` undoes it completely -
+then re-run the install script for a plain binary again.
 Nothing outside hurl ever sees those libraries, which is the point - an old libxml2 on the system library path
 would be a real problem. Every other distro takes the plain binary and needs none of this, CI runners included
 as long as they stay on noble.
@@ -155,45 +152,34 @@ static binary in `~/.local/bin`, pinned rather than `latest`. The musl build is 
 from the system, which is the whole class of problem the hurl section above describes.
 
 ```bash
-# lychee 0.24.2 - checks the links in artifacts/docs and artifacts/demo
-curl -fsSL -o /tmp/lychee.tar.gz \
-  https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-musl.tar.gz
-tar xzf /tmp/lychee.tar.gz -C /tmp
-install -m0755 /tmp/lychee-x86_64-unknown-linux-musl/lychee ~/.local/bin/lychee
-
-lychee --version
+tooling/ci/install-lychee.sh
 ```
 
-Upstream publishes a `.sha256` beside every asset, so the download can be checked before it is installed:
-
-```bash
-curl -fsSL https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-musl.tar.gz.sha256
-```
+Upstream publishes a `.sha256` beside every asset, and the script checks the download against it before
+installing. If that step ever fails, the release asset changed - do not work around it.
 
 ### actionlint and shellcheck
 
-Only needed for `just check workflows`. **Both, not just the first** - actionlint runs shellcheck over every
-`run:` block when it can find it, and the GitHub runners ship shellcheck already. Installing only actionlint
-here means a laptop checks less than CI does and finds out on the pull request.
+Needed for `just check workflows` and, for shellcheck alone, `just check scripts`. **Both, not just the
+first** - actionlint runs shellcheck over every `run:` block when it can find it, and the GitHub runners ship
+shellcheck already. Installing only actionlint here means a laptop checks less than CI does and finds out on
+the pull request.
 
 ```bash
-# actionlint 1.7.12 - the workflow and action files
-curl -fsSL -o /tmp/actionlint.tar.gz \
-  https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
-tar xzf /tmp/actionlint.tar.gz -C /tmp actionlint
-install -m0755 /tmp/actionlint ~/.local/bin/actionlint
+# actionlint - the workflow and action files
+tooling/ci/install-actionlint.sh
 
-# shellcheck 0.11.0 - what actionlint hands the run: blocks to
+# shellcheck 0.11.0 - what actionlint hands the run: blocks to, and what `just check scripts` runs
 curl -fsSL -o /tmp/sc.tar.xz \
   https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz
 tar xJf /tmp/sc.tar.xz -C /tmp
 install -m0755 /tmp/shellcheck-v0.11.0/shellcheck ~/.local/bin/shellcheck
 
-actionlint --version
 shellcheck --version
 ```
 
-Upstream publishes `actionlint_1.7.12_checksums.txt` beside the release, so the download can be checked first.
+**shellcheck has no install script, because CI never installs it** - the GitHub runners ship it. This is the
+one tool where a laptop does the work a runner does not.
 
 ### cosign
 
@@ -208,6 +194,9 @@ install -m0755 /tmp/cosign ~/.local/bin/cosign
 
 cosign version
 ```
+
+**cosign has no install script either**, for the opposite reason to shellcheck: CI installs it through
+sigstore's own action, so there is no shared shell to run here.
 
 `just image verify <version>` runs without it and says so - the other three checks still work, and only the
 signature one stops. Nothing needs a `docker login`, cosign included: these are the commands a user runs, and

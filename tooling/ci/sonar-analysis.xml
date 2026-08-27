@@ -24,8 +24,14 @@
        - Vendored: assets/lib/ and its build-time copies under sites/*/lib - alpine, beercss,
          material-dynamic-colors, swagger-ui. 8157 ncloc and 274 issues in the 2026-08-08 run, none ours to fix,
          and 2329 uncovered lines that were most of the missing coverage.
+       - Vendored: ruby/vendor/, which CI creates - `bundler-cache: true` installs the bundle into
+         vendor/bundle before the scan. 3524 ncloc and 65 issues in the 2026-08-27 run, including every one of
+         the 8 open security findings and 12 of the 34 HIGH. They are other people's gems: the gate was failing
+         on kramdown's html fixtures and on unpinned actions in http_parser.rb's own workflows.
        - Not code: shared/data/ and vipaq/test-vectors/, the two fixture corpora. shared/data was the whole
          json=14010 slice of that run, 28% of the project measured as data files.
+       - Not code: ruby/*/spec/fixtures/, the gems' own fixture sites. Broken on purpose - a rspec case named
+         nasty.html exists to feed the parser a stray </script>, and Sonar reported it as a defect.
        - Jekyll templates: sites/**/*.html open with YAML front matter and carry Liquid tags inside their
          attributes, so they are not HTML documents. Sonar's HTML analyser would report the template syntax,
          not the page.
@@ -35,13 +41,15 @@
        attack surface in the repo - 5e5f8c02 was an XSS fix in one of them. Back in scope: 6 hand-written js,
        15 scss, and the site yml and json. Fixing them is still not a coding session's job (CLAUDE.md);
        findings go in a plan for the session that owns those files. -->
-  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,assets/lib/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
+  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
 
   <!-- One flat file per suite in artifacts/coverage/sonar, split by extension: .xml from the C# collector,
        .info from jest, .json from simplecov. tooling/tests.just is what writes them and the only place that
        knows the suite list.
 
-       Nothing here excludes ruby/, so without the third line every gem line counts as uncovered. -->
+       The ruby line is set up but imports nothing yet: no .rb file has ever been indexed - 0 of the 102
+       gem sources, and 0 of the thousands under ruby/vendor that the walk did reach. Coverage for a file
+       Sonar does not know about is dropped in silence. -->
   <Property Name="sonar.cs.vscoveragexml.reportsPaths">artifacts/coverage/sonar/*.xml</Property>
   <Property Name="sonar.javascript.lcov.reportPaths">artifacts/coverage/sonar/*.info</Property>
   <Property Name="sonar.ruby.coverage.reportPaths">artifacts/coverage/sonar/*.json</Property>
@@ -68,8 +76,14 @@
 
   <!-- Build tooling, not shipped code. The .NET support projects (benchmarks, performance suites, tools and
        the two test kernels) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
-       that takes them out of the coverage denominator and off the product rule set in one move. -->
-  <Property Name="sonar.coverage.exclusions">gulpfile.js,jest.config.js</Property>
+       that takes them out of the coverage denominator and off the product rule set in one move.
+
+       SonarQubeTestProject only reaches MSBuild projects, so the four globs below do the same job for
+       everything else: the python index generator, the site bundles, and the ts fixture and generator
+       folders. 334 lines, every one of them uncovered and uncoverable - 5% of the denominator.
+
+       These stay in scope for rules. This is a coverage exclusion only. -->
+  <Property Name="sonar.coverage.exclusions">gulpfile.js,jest.config.js,tooling/**,sites/**,**/tests/**,**/tools/**</Property>
 
   <!-- No sonar.issue.ignore rules here, on purpose. Where a rule was wrong about our code the code now says
        so in a way the analyser can read - [AssertionMethod] on the helpers that assert, arrange/act/assert

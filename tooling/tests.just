@@ -271,7 +271,8 @@ _rspec_test gem:
     # Both absolute, because rspec runs from inside the gem folder.
     #
     # RUBYOPT and not a require in each spec_helper, because a gem must not reach above its own folder.
-    # Bundler goes first, so the load path is up before this file asks for simplecov.
+    # The file requires bundler/setup itself - CI vendors the bundle, so nothing is on the load path until
+    # bundler puts it there.
     export COVERAGE_DIR="$coverage/{{ gem }}"
     export RUBYOPT="-r$(pwd)/tooling/tests.ruby-coverage.rb ${RUBYOPT:-}"
 

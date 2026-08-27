@@ -23,7 +23,7 @@ if (container) {
 			return;
 		}
 
-		for (const name of names.sort()) {
+		for (const name of names.sort((a, b) => a.localeCompare(b))) {
 			const bins = presets[name] || [];
 			const row = document.createElement('tr');
 

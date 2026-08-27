@@ -17,13 +17,13 @@ echo '|---|---|' >>"$summary"
 while read -r name result; do
     echo "| $name | $result |" >>"$summary"
 
-    if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+    if [[ "$result" != "success" ]] && [[ "$result" != "skipped" ]]; then
         echo "$name failed." >&2
         failed=1
     fi
 done <<<"$jobs"
 
-if [ "$failed" = 1 ]; then
+if [[ "$failed" = 1 ]]; then
     echo "" >>"$summary"
     echo "The gate failed. A job above did not pass." >>"$summary"
     exit 1

@@ -22,9 +22,8 @@ does not outlive the work. This is where that reasoning lives now.
 ### D1 — a release is dispatched with a version, and the tag and the release are its last job
 
 `on: workflow_dispatch` with a required `version` input carrying no leading `v` — `3.0.0`, which is both the
-`CHANGELOG.md` section name and the Docker tag. The workflow forms `v3.0.0`, creates that tag on the run's own
-commit once the image is built, smoked and published, and creates the GitHub release in the same job, tag
-first.
+`CHANGELOG.md` section name and the Docker tag. The workflow forms `v3.0.0` and, once the image is built,
+smoked and published, `gh release create --target <commit>` makes the tag and the release in one call.
 
 **Why the release is not the trigger.** With `release: published` the release is already public when the
 workflow starts, so a failure leaves an announced release whose image never arrived. Creating it last inverts
@@ -53,10 +52,17 @@ dispatched again, and the only way out would be deleting a tag.
 `latest=auto` marks any non-prerelease semver as latest — so `latest` moved backwards. Now the gate stops it
 in seconds. **The standing rule survives anyway: do not delete and re-push a released tag.**
 
-**The residual risk that replaces it is the mirror image, and smaller.** Fail between `publish` and the tag and
-there is an image on Docker Hub with `latest` moved, no tag and no release. Recovery is a re-dispatch, which
-rebuilds and re-copies the same digest under the same tags. The tag push and `gh release create` are kept in
-one job with the tag first, so the window is one step wide.
+**The residual risk that replaces it is the mirror image, and smaller.** Fail between `publish` and the
+release and there is an image on Docker Hub with `latest` moved, no tag and no release. Recovery is a
+re-dispatch, which rebuilds and re-copies the same digest under the same tags. There is no window inside the
+release job itself: one API call makes both, so the image cannot be public with the tag missing because the
+tag step failed.
+
+**Amended 2026-08-28 — the tag is made by the release, not pushed before it.** `gh release create` creates a
+missing tag itself and `--target` says on which commit, so the separate `just ci push-tag` step is gone from
+this workflow. `push-tag.sh` stays for the three deploy marker tags. `--target` is ignored when the tag already
+exists, so the load-bearing exception above — a re-dispatch on a run whose tag is already there — still works
+exactly as written.
 
 **The GitHub web release route stops working, and that is accepted.** *Draft a new release → create tag on
 publish* now builds nothing, silently. The release job's create-or-edit branch is left in place: it costs
@@ -212,10 +218,19 @@ It also makes a red step reproducible: the `run:` line is what you paste into a 
 gate, three per deploy workflow, the Sonar gate poll, three in the release, two in the smoke, one in CodeQL.
 Those moved to `tooling/ci/`, one file per operation, behind a new `ci` module.
 
-**One file per operation, not a bigger `.just` module.** Neither a `.just` recipe body nor a `run:` block can
-be handed to shellcheck, and neither can be run on its own. A `.sh` file is both — a real filename in a stack
-trace, a thing you can execute while you debug it, and a file CodeQL's `actions` pack and shellcheck both read.
-`ci.just` stays a door: a one-line description and the call, two lines per recipe.
+**One file per operation, not a bigger `.just` module.** A `.just` recipe body can be neither shellchecked nor
+run on its own. A `.sh` file is both — a real filename in a stack trace, a thing you can execute while you
+debug it, and a file CodeQL's `actions` pack and shellcheck both read. `ci.just` stays a door: a one-line
+description and the call, two lines per recipe.
+
+**Corrected 2026-08-28.** This entry used to say a `run:` block cannot be handed to shellcheck either. That is
+false — actionlint shellchecks every inline `run:` block when shellcheck is present, and both are installed in
+the lint job. The decision stands on its other leg, which was always the stronger one: a `.sh` file can be run
+on its own.
+
+**And the shellcheck half is now true of the scripts themselves.** Until 2026-08-28 nothing ran shellcheck over
+`tooling/ci/*.sh` — the reason those files exist was a habit, not a fact. `just check scripts` runs it, and the
+lint job calls that recipe. shellcheck ships on the runners, so it installs nothing.
 
 **Arguments in, no context read.** A script never reads `github.*` or the runner's own environment for an
 input; the workflow puts the value in `env:` and the step passes it on the command line. That is what makes
@@ -229,6 +244,27 @@ already readable, and wrapping them buys a file and loses nothing.
 copy, so `gate` in `pull-request.yml` and `summary` in `codeql-analysis.yml` now check out. Both had a
 narrower permission set before. The trade is deliberate: the alternative is a hand-kept list of job names in
 `gate` that a new job can be left out of, which is a failure nothing reports.
+
+**The composite actions followed on 2026-08-28, and they call the script by path, not through `just`.** The
+four `install-*` actions held 36 lines of download-and-checksum shell, the last shell in CI that nothing
+checked. Each is now a door onto `tooling/ci/install-<tool>.sh`. No `just` in between: an action that installs
+a tool must not need another tool installed first, and there is no recipe to call because nothing else calls
+these. It works because a local action is read out of the working copy — `./.github/actions/install-lychee`
+only resolves after `actions/checkout`, so the repository is always present.
+
+**The version and the checksum moved into the script with the shell, against the earlier plan.** That plan said
+to leave them in the action's `env:` "where a reader and Dependabot look". Dependabot never looked: it rewrites
+`uses:` pins, and these four are hand-pinned binaries it has never touched. Leaving them behind would have made
+two homes for one fact and left the script unrunnable without typing a checksum. One home, in the script, and
+`tooling/ci/install-lychee.sh` is now the whole install on a laptop as well as in CI - `DEVELOPMENT.md` runs
+these four rather than spelling out four `curl` blocks that repeated every version.
+
+**All four checksums are upstream's.** hurl and lychee publish `<asset>.sha256`; actionlint and
+container-structure-test publish a `checksums.txt`. Both of the ones this was not previously recorded for were
+fetched and compared on 2026-08-28 and match byte for byte.
+
+**`build-jekyll-site` keeps its two inline lines.** `npm ci --ignore-scripts` and `just build "$SITE"` are not
+shell worth checking, and a file for each would be a file that says nothing.
 
 **The release `publish` job is the exception and keeps its inline block.** It holds the Docker Hub credential
 and deliberately never checks out, which is also why it gets no composite action. Moving its `imagetools`

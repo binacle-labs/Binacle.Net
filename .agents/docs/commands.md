@@ -345,10 +345,11 @@ just check links docs                  # one of them
 just check links-external docs         # every link, other people's servers included
 just check workflows                   # actionlint over .github/workflows
 just check actions                     # the .github/actions manifests
+just check scripts                     # shellcheck over tooling/ci/*.sh
 ```
 
-Both print the files they were handed and end with a count, because actionlint and grep are silent when they
-pass and silence alone does not say the run happened. **`workflows`** catches what a workflow file cannot be
+All three print the files they were handed and end with a count, because actionlint, grep and shellcheck are
+silent when they pass and silence alone does not say the run happened. **`workflows`** catches what a workflow file cannot be
 tested for without running it: a bad expression, an undefined `needs`, an invalid runner label, an unquoted
 shell variable. **It needs shellcheck as well as
 actionlint** — actionlint hands every `run:` block to it when it can find one, and the runners already have it,
@@ -358,6 +359,10 @@ so a laptop without it checks less than CI does.
 reports `"jobs" section is missing`. What it checks by hand is the one failure that has already happened: a
 `vars` or `secrets` expression anywhere in a manifest, `description:` fields included, fails the action *load*
 on the runner rather than resolving to empty.
+
+**`scripts` is the one that makes `tooling/ci/` worth having.** Those files exist so the shell a workflow runs
+can be run and checked on its own; without this recipe nothing checked them. shellcheck ships on the runners, so
+the pull request installs nothing for it.
 
 Needs `lychee` (pinned, installed from `DEVELOPMENT.md` like the smoke tools) and needs the site built first —
 the recipe stops with `No artifacts/docs` rather than checking nothing and passing. It reads the built output

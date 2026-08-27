@@ -9,3 +9,8 @@ runs:
       uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
       with:
         just-version: '^1.45'
+
+    # Last line, like the install-* actions: a red step then names the tool.
+    - name: just version
+      shell: bash
+      run: just --version

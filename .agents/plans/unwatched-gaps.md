@@ -1,10 +1,9 @@
 ---
-description: Four repository gaps nothing watches - a pull request that runs no job, a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200
+description: Three repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200
 state: proposed
 waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
 paths:
   - "sites/**"
-  - ".github/workflows/**"
   - "tooling/**"
   - "api/src/Binacle.Net.UIModule/**"
 ---
@@ -13,13 +12,6 @@ paths:
 
 **Each of these is a gap in coverage, not a defect, and each needs a yes or a no.** Re-checked against the
 tree on 2026-08-27. The five that had a known answer and no decision in them moved to the TODO list.
-
-## No pull request builds a site, and `sites/` is outside the gate
-
-`pull-request.yml:42` classes everything under `sites/` as not-code, and `test-suite`, `image` and
-`workflows` are all gated on `code == 'true'`. **A pull request touching only `sites/www` runs zero jobs and
-passes green.** There is no Jekyll build job in the workflow at all - the first time a site's build runs in
-CI is the deploy.
 
 ## The frozen OpenAPI copies on the docs site drift with nothing watching
 
@@ -42,9 +34,6 @@ requests (`ModuleDefinition.cs:48`) keep their real status; a direct hit does no
 
 ## Done when
 
-- [ ] A pull request touching only `sites/` runs at least one job.
-      **By eye.** `pull-request.yml:42` no longer sends `sites/` to `code=false`, or a site build job exists
-      that is not gated on `code`.
 - [ ] The docs site's swagger copies fail a check when they drift from the generator.
       `grep swagger tooling/regen.just` matches, or another recipe compares the two.
 - [ ] The v4 dependency in the shipped image is deliberate.

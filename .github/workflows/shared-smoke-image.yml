@@ -54,9 +54,6 @@ jobs:
       - name: Install - hurl
         uses: ./.github/actions/install-hurl
 
-      - name: just version
-        run: just --version
-
       # Only for a GHCR image, so a Docker Hub dispatch needs no credential at all.
       - name: Login to GHCR
         if: ${{ startsWith(inputs.image, 'ghcr.io/') }}

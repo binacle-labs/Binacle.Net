@@ -19,7 +19,7 @@ summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
     echo '| Tag |'
     echo '|---|'
     while IFS= read -r public_tag; do
-        [ -n "$public_tag" ] || continue
+        [[ -n "$public_tag" ]] || continue
         echo "| \`${public_tag}\` |"
     done <<<"$5"
     echo

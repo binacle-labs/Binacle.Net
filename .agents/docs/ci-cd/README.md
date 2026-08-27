@@ -248,11 +248,14 @@ short**, or the required check name becomes unreadable at exactly the moment som
 - **`just` is pinned to `^1.45`, in one place**: `.github/actions/setup-just`. Modules and
   `set working-directory` need a recent just, and Ubuntu's apt ships one too old to parse the module files.
 - **A binary is installed by `curl` from its own release, one action per tool, pinned by version and by
-  SHA-256.** `container-structure-test`, `hurl` and `lychee` are all like this, and **all three live in
-  `.github/actions/install-*`**, which is where their versions and checksums are written. Each ends by printing
-  the version it installed, so the log names the tool that failed rather than "smoke tools". The checksums make
-  a swapped release asset fail the build instead of run; hurl and lychee publish their own, and the
-  `container-structure-test` one was taken from the binary in use because upstream publishes none.
+  SHA-256.** `container-structure-test`, `hurl`, `lychee` and `actionlint` are all like this. The action
+  `.github/actions/install-<tool>` is a door; **the version, the checksum and the download live in
+  `tooling/ci/install-<tool>.sh`**, one home for each, shellchecked with the rest. Each ends by printing the
+  version it installed, so the log names the tool that failed rather than "smoke tools". The checksums make a
+  swapped release asset fail the build instead of run, and all four are the ones upstream publishes - hurl and
+  lychee beside the asset as `<asset>.sha256`, actionlint and container-structure-test in a `checksums.txt`.
+  Each script is also what `DEVELOPMENT.md` tells a maintainer to run, so a version has one home rather than
+  two that have to be kept in step.
 
   **Every one of those `curl` calls carries `--proto '=https' --proto-redir '=https'`.** `-L` follows a
   redirect wherever it points, and without those two the hop can land on plain HTTP. Dropping them is what
@@ -297,8 +300,8 @@ is the only option when the shared thing needs its own runner or service contain
 | `setup-dotnet` | `shared-image-tests`, `sonar-analysis`, `pull-request`, the release `build` job | SDK plus the NuGet package cache. Takes the SDK version as an input |
 | `setup-node` | `shared-image-tests`, `shared-site-tests`, `sonar-analysis`, `pull-request`, `release-docker-image`, `build-jekyll-site` | Node and the npm cache. It does not install packages |
 | `setup-ruby` | `build-jekyll-site`, `shared-site-tests`, `sonar-analysis` | Ruby and the gems. Takes the Gemfile directory as an input — `ruby/` for the gem specs, the site's own directory for a build |
-| `install-container-structure-test` | `shared-smoke-image` | The binary, curled and pinned by version and SHA-256 |
-| `install-hurl` | `shared-smoke-image` | The same, and it carries the `libxml2` note that explains its caller's runner pin |
+| `install-container-structure-test` | `shared-smoke-image` | Calls `tooling/ci/install-container-structure-test.sh` - the binary, curled and pinned by version and SHA-256 |
+| `install-hurl` | `shared-smoke-image` | The same. Its script carries the `libxml2` note that explains the caller's runner pin |
 | `install-lychee` | all three deploy workflows, and `pull-request`'s `site-build` job | The same. The musl build, so it links nothing from the runner |
 | `install-actionlint` | `pull-request` | The same, for the workflow linter |
 | `build-jekyll-site` | all three deploy workflows, and `pull-request`'s `site-build` job | The toolchain and `just build <site>`. Takes the site's name and its directory, which are two inputs because they are two things. It does not deploy |
@@ -324,10 +327,14 @@ reports `"jobs" section is missing` — it treats every input as a workflow. Wha
 caller's side is their **inputs**: a missing required one or a misspelled name is reported against the `uses:`
 line, naming the action and listing what it accepts.
 
-**What is left unchecked is their shell — 36 lines**, against what is left in the workflows after the move to
-`tooling/ci/`, which shellcheck reads directly. Measured 2026-08-28. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts. The
-gap is small and it is real; closing it means extracting `runs.steps[].run` and piping it to shellcheck, which
-is a tool to build rather than one to install.
+**Their shell used to be the one shell in CI that nothing checked — 36 lines.** Closed on 2026-08-28, and not
+by building an extractor. The four `install-*` blocks moved to `tooling/ci/install-<tool>.sh` and the actions
+call them, so `just check scripts` covers them like everything else. **This works because a local action is
+read out of the working copy**: `./.github/actions/install-lychee` only resolves after `actions/checkout`, so
+the repository is always there by the time the action runs.
+
+The fifth block was `build-jekyll-site`'s two lines, `npm ci --ignore-scripts` and `just build "$SITE"`. Those
+stay inline: neither is shell worth checking, and a file for each would be a file that says nothing.
 
 **`setup-` wraps an upstream action; `install-` curls a pinned binary.** The prefix is the distinction, and it
 is the one that matters when something breaks: a `setup-` failure is somebody else's action, an `install-`

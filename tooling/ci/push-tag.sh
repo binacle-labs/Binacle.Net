@@ -6,8 +6,8 @@ set -euo pipefail
 tag="$1"
 commit="$2"
 
-git config user.name "github-actions[bot]"
-git config user.email "github-actions[bot]@users.noreply.github.com"
+# No user.name or user.email needed: with no -a or -m this is a lightweight tag, which is a ref and not an
+# object, so git never asks who you are.
 git tag "$tag" "$commit"
 
 git push origin "$tag"

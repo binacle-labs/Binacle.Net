@@ -183,6 +183,12 @@ lands, so the audit covers the final tree.
       file documents v2.1.1 to v3.0.0. Every bug A4 fixed was introduced by the demo rebuild inside this same
       cycle and never reached a released image, so "no longer fails" would describe a failure no released
       version ever had. **A fix only earns a line when the broken behaviour shipped.**
+- [x] **Re-audited 2026-08-28 after `d0ba7823` changed image source, and one line was added.** The commit
+      landed after this row was first ticked. Applying the same rule: the bad-enum answer moved twice, and
+      only one move shipped. `"algorithm": "FFDD"` was read as null at v2.1.1 and caught by validation as
+      absent, which is a 422 - unchanged, so no line. **`"algorithm": 1`, `true` or a list answered 400
+      `Invalid JSON Format` at v2.1.1 and answers 422 now** - that shipped, so it earns one, in Core Changes
+      under the V3 stability bullet. Checked by running v2.1.1's converter, not by reading it.
 
 **The scope decision was taken on 2026-08-27: both non-image sections stay.** **📚 Versioned Docs** and
 **🏗️ Internal Work** are not cut. Each now opens with one line saying what the section is and what it does
@@ -339,9 +345,10 @@ Three mechanics:
 changes, nothing is published to NuGet, and no contract moves - the OpenAPI diff proves the last one. The four
 breaking changes stay four.
 
-**This section is also what the docs site copies**, by hand. **The copy is done as of 2026-08-27** - the only
-thing the page still lacks is the release date and the release link, which need the tag.
-`plans/sites/docs-v3-deploy.md` carries that.
+**This section is also what the docs site copies**, by hand. **The two were diffed bullet for bullet on
+2026-08-28 and are in step** - three drifts were fixed on the page and one of them, the release pipeline
+sentence, was wrong here too and was fixed here. **The page still lacks the release date and the release
+link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that and records what was changed.
 
 ---
 
@@ -374,7 +381,7 @@ they went - strike either one and it comes back.**
 | **Every test on the CI suite** | Ten of the twenty-six tests are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A test nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses its shared test suite as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | `plans/ci-cd/tests-reach-ci.md` |
 | **Docker Hub tag immutability - the rule** | The switch is off, so the rule's value changes nothing about this release either way. Correcting it is what makes the post-release decision a flip rather than a project. **The stored value on 2026-08-13 was `".*"`**, which would freeze `latest` and `3.0`. | `plans/ci-cd/dockerhub-tag-immutability.md` |
 
-**Also not here, and not new:** the Ruby coverage decision (`plans/ruby-gem-coverage.md`) and rubocop, which
+**Also not here, and not new:** the Ruby coverage decision (`plans/ci-cd/sonar-scope-and-coverage.md`) and rubocop, which
 lands red before it lands green. **The Docker Hub logo and categories - the rest of
 `plans/ci-cd/dockerhub-overview.md` - were done outside the release on 2026-08-27.**
 

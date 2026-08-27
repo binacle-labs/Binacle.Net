@@ -59,9 +59,9 @@ check-release-tag tag commit:
 changelog-section version:
     @tooling/ci/changelog-section.sh {{ quote(version) }}
 
-# Create the release for a tag, or replace the body of one that exists
-github-release tag section:
-    @tooling/ci/github-release.sh {{ quote(tag) }} {{ quote(section) }}
+# Create the release for a tag, making the tag on the commit, or replace the body of one that exists
+github-release tag section commit:
+    @tooling/ci/github-release.sh {{ quote(tag) }} {{ quote(section) }} {{ quote(commit) }}
 
 # Write the release's run summary: version, digest, public tags
 release-summary version digest tag url tags:

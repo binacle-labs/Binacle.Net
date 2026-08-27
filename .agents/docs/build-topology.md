@@ -1,7 +1,7 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-08-27
+verified: 2026-08-28
 check: Every solution folder and project count matches Binacle.Net.slnx (46 projects); the cross-slice edges against both Gemfiles, both webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands

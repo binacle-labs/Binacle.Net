@@ -25,12 +25,14 @@ for _ in $(seq 1 60); do
 
     case "$status" in
         SUCCESS|FAILED|CANCELED) break ;;
+        # PENDING and IN_PROGRESS land here - keep polling.
+        *) ;;
     esac
 
     sleep 5
 done
 
-if [ "$status" != "SUCCESS" ]; then
+if [[ "$status" != "SUCCESS" ]]; then
     {
         echo '## Sonar'
         echo

@@ -5,12 +5,13 @@
 #   just check links-external <site>   the same site, other people's servers included
 #   just check workflows               actionlint over .github/workflows
 #   just check actions                 the .github/actions files, which actionlint cannot read
+#   just check scripts                 shellcheck over the scripts in tooling/ci
 #
 # `links` reads the built site and never the source, because a href in the source is Liquid and not a URL
 # yet. Build first.
 #
-# `workflows` and `actions` print the files they were handed and count them at the end. Both say nothing at
-# all when they pass, so the count is what tells a clean run from one that never started.
+# `workflows`, `actions` and `scripts` print the files they were handed and count them at the end. All three
+# say nothing at all when they pass, so the count is what tells a clean run from one that never started.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
@@ -78,6 +79,21 @@ actions:
     fi
 
     echo "${#files[@]} actions, no errors"
+
+# The shell a workflow runs - the scripts in tooling/ci
+scripts:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    files=(tooling/ci/*.sh)
+
+    echo "checking ${#files[@]} scripts in tooling/ci"
+    printf '  %s\n' "${files[@]##*/}"
+
+    # shellcheck prints its own errors and exits non-zero, so the line below is only reached on a clean run.
+    shellcheck "${files[@]}"
+
+    echo "${#files[@]} scripts, no errors"
 
 [private]
 _lychee site *flags:

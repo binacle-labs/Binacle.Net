@@ -24,16 +24,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Harden and slim the base image"
   state: idea
   waits-on: "nobody waiting - not in the near future"
-- file: ruby-gem-coverage.md
-  description: "The ten gems now report coverage locally. What is left is confirming SonarCloud imports the simplecov json at all, which no run has yet shown."
-  state: blocked
-  waits-on: "a Sonar run - none has happened since the gems landed"
-  paths: ["ruby/**", "tooling/**"]
 - file: sonar-issue-triage.md
-  description: "Sonar - re-read the open findings against the current project, then the one-line exclusion fix and the two rewrites behind it"
-  state: blocked
-  waits-on: "a re-read against SonarCloud - every count in this file predates the current project and the maintainer wants it revisited before the v3.0.0 tag"
-  paths: ["tooling/ci/sonar-analysis.xml"]
+  description: "Sonar re-read against the current project on 2026-08-28 - what the scope fix and the high-severity pass cleared, the 299 findings left, and the answer on whether test and tooling code stays in scope"
+  state: ready
+  waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
+  paths: ["tooling/ci/sonar-analysis.xml", "api/src/Binacle.Net.UIModule/**", "packages/**"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - what each buys, and the four yes-or-no answers"
   state: idea
@@ -47,10 +42,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "a Sonar run - state and blocker chosen by an agent, strike them if wrong"
 - file: unwatched-gaps.md
-  description: "Four repository gaps nothing watches - a pull request that runs no job, a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200"
+  description: "Three repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200"
   state: proposed
   waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
-  paths: ["sites/**", ".github/workflows/**", "tooling/**", "api/src/Binacle.Net.UIModule/**"]
+  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**"]
 ```
 
 ## API
@@ -61,11 +56,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing - phase 1 is agreed and can start"
   paths: ["api/**"]
-- file: api/nullable-enum-converter.md
-  description: "The Kernel's nullable-enum converter accepts any string and returns default rather than refusing it - a leniency nobody chose, with one dead throw sitting on top of it"
-  state: proposed
-  waits-on: "a yes or a no on whether an unknown enum string is refused at deserialization or left to validation"
-  paths: ["api/src/Binacle.Net.Kernel/Serialization/**"]
 - file: api/pack-first-bin-endpoint.md
   description: "pack/first-bin endpoint"
   state: deferred
@@ -116,6 +106,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nothing to gate yet. The maintainer called both a future idea on 2026-08-27"
   paths: [".github/workflows/**"]
+- file: ci-cd/ci-step-review.md
+  description: "A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck"
+  state: in-progress
+  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no"
+  paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/dockerhub-overview.md
   description: "The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted"
   state: ready
@@ -136,13 +131,23 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "a real run of the release workflow. Everything else this plan asked for is built"
   paths: [".github/workflows/release-docker-image.yml"]
+- file: ci-cd/sonar-coverage-gap.md
+  description: "Coverage is 67.8% against a gate of 80% on new code - where the 2226 uncovered lines actually are, and the 212 of them that already have tests and only need the services started"
+  state: ready
+  waits-on: "nothing"
+  paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
+- file: ci-cd/sonar-scope-and-coverage.md
+  description: "No .rb file has ever been indexed, and it is not because ruby/ is in no MSBuild project - files from the same folders are indexed. Two hypotheses left and one run that tells them apart."
+  state: proposed
+  waits-on: "nothing. One Sonar run with the check below settles which of the two fixes is the right one"
+  paths: ["tooling/ci/sonar-analysis.xml", ".github/workflows/sonar-analysis.yml", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
   description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."
   state: blocked
-  waits-on: "a pull request run and a Sonar run - neither has happened since this landed"
+  waits-on: "a pull request run, and one look at the gems in SonarCloud"
   paths: [".github/workflows/**", "tooling/**", "ruby/**"]
 - file: ci-cd/workflow-restructure.md
-  description: "CI - the branch protection change waiting on the maintainer, and the composite actions' shell, the one shell in CI that nothing lints"
+  description: "CI - one thing left, and it is a settings page: point branch protection at `Pull Request / Gate`. The composite actions' shell was the other half and it is done"
   state: blocked
   waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
   paths: [".github/**"]

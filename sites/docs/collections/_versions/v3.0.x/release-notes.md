@@ -63,6 +63,10 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - V4 is **experimental and can change at any time**. V3 remains stable and is the recommended version. See
   [Version 4]({% vlink /api/v4.md %}).
 - V3 endpoints are unchanged and remain stable, apart from the ViPaq payload.
+- **A non-string `algorithm` value now answers 422 rather than 400.** `"algorithm": 1`, `true` or a list used
+  to come back as `Invalid JSON Format` with no field named. It now comes back as a validation error naming
+  the field - the same answer a misspelled name such as `"FFDD"` has always given. Both statuses were already
+  declared on these endpoints, so the contract has not moved; what changed is which one you get.
 - **ViPaq is no longer experimental.** The format is settled as of this release, where it carried an
   experimental warning through v2.1.1. A future format change takes a new `Version` code rather than altering
   the current one, so an older decoder rejects a newer string outright instead of misreading it. See
@@ -184,7 +188,7 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **Nothing on a page is fetched from the internet.** The footer's `img.shields.io` badges are gone, and the
   stylesheet, the icon font, the logos and the 3D library are all served from the image. An air-gapped install
   renders the same as any other.
-- **The Packing Demo carries 17 worked examples instead of one**, and its two randomize buttons are now one. The
+- **The Packing Demo carries 20 worked examples instead of one**, and its two randomize buttons are now one. The
   same example always loads, so a link to the page shows everyone the same thing; Randomize moves to a different
   one. Each was checked against all three algorithms, and each is a set where the bins genuinely disagree -
   which is the comparison the page exists to show.
@@ -223,9 +227,11 @@ Everything below is work on the repository. None of it reaches the image.
   route, contract or configuration moved with it, which is why it is listed here rather than as a change above.
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.
 - Added cross-language ViPaq interop tests between C# and TypeScript.
-- **Rebuilt the release pipeline.** A tag now builds the image once, smoke tests it in a staging registry, then
-  copies the tested digest to Docker Hub - so what is published is bit for bit what passed, and a failure
-  anywhere leaves Docker Hub untouched. The release body is the changelog, extracted by the workflow.
+- **Rebuilt the release pipeline.** A release is dispatched with a version. It builds the image once, smoke
+  tests it in a staging registry, copies the tested digest to Docker Hub, and creates the git tag and the
+  GitHub release last - so what is published is bit for bit what passed, a failure anywhere leaves Docker Hub
+  untouched, and no tag exists for a release that did not finish. The release body is the changelog, extracted
+  by the workflow.
 - Renamed two top-level folders - `config/` is now `tooling/`, and build output goes to `artifacts/` instead of
   `build/`.
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.

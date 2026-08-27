@@ -1,4 +1,4 @@
-#   changes -> image tests, image build, site tests, site build, workflow lint -> gate
+#   changes -> image tests, image build, site tests, site build, lint -> gate
 #
 # `gate` is the only name branch protection holds. Never move the image build into the test suite - the
 # release calls that file whole and would build a throwaway image every time.
@@ -122,7 +122,7 @@ jobs:
         run: just check links "$SITE"
 
   workflows:
-    name: Workflow lint
+    name: Lint
     needs: changes
     if: ${{ needs.changes.outputs.code == 'yes' }}
     runs-on: ubuntu-latest
@@ -146,6 +146,11 @@ jobs:
       - name: Check - actions
         if: ${{ !cancelled() }}
         run: just check actions
+
+      # shellcheck ships on the runner, so nothing is installed for this one.
+      - name: Check - scripts
+        if: ${{ !cancelled() }}
+        run: just check scripts
 
   gate:
     name: Gate

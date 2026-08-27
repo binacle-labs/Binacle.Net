@@ -23,7 +23,7 @@ count() { printf '%s\n' "$alerts" | awk -v k="$1" '$2 == k { n = $1 } END { prin
     echo '## CodeQL'
     echo
     # A failed matrix leg means these counts are missing that language, not that it has no findings.
-    if [ "$analysis" != "success" ]; then
+    if [[ "$analysis" != "success" ]]; then
         echo "**The analysis reported \`${analysis}\`.** The counts below are incomplete."
         echo
     fi

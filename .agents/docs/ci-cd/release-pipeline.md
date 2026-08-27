@@ -104,25 +104,26 @@ the manifest **by digest** from GHCR under all three public tags at once, and co
 checks out, so it holds no `contents` permission. Job output: `tags`, the public tag set, read by `release` for
 the run summary.
 
-**`release`** — checkout, `just`, then the tag, then the release body from `just changelog extract <section>`.
-It `needs:` the `gate` job because it reads that job's `section` output, and the prerelease flag is set
-explicitly either way from whether the tag contains a hyphen.
+**`release`** — checkout, `just`, then one call that makes the tag and the release together, with the body from
+`just changelog extract <section>`. It `needs:` the `gate` job because it reads that job's `section` output, and
+the prerelease flag is set explicitly either way from whether the tag contains a hyphen.
 
-**It creates the tag, and that is the first thing it does.** `just ci push-tag v<version> <commit>`, on
-`github.sha` — the commit the button was pressed against, which is also what every other job checked out — so
-the tag and the image cannot describe different code. `main` may have moved on by now and the tag ignores that.
-The tag and `gh release create` are in one job, tag first, so the window in which the image is public and the
-tag is not is a single step wide.
+**The tag is made by the release, not pushed separately.** `gh release create` creates a missing tag itself, and
+`--target <commit>` says which commit to put it on. The job passes `github.sha` — the commit the button was
+pressed against, which is also what every other job checked out — so the tag and the image cannot describe
+different code. `main` may have moved on by now and the tag ignores that. Because it is one API call there is no
+window at all in which the image is public and the tag is missing.
 
 **It also writes the run summary** — version, digest, every public tag, the release link and the verify
 command. This job rather than `publish` because the release URL does not exist until the release step has run.
 
-**It creates the release, or edits one that already exists.** The dispatch route never finds one there, because
-the tag was made a step earlier. The branch is kept for a tag made by hand: GitHub's web UI cannot create a
-bare tag — the only way to tag from the site is to publish a release, which makes both at once. A plain
-`gh release create` would then fail after every other job had succeeded, leaving the image published and one
-red job. Editing instead means the body comes from `CHANGELOG.md` whichever way the tag was made, and a release
-marked prerelease by hand is corrected for a real version.
+**It creates the release, or edits one that already exists.** The dispatch route normally finds nothing there.
+The edit branch is kept for a tag made by hand: GitHub's web UI cannot create a bare tag — the only way to tag
+from the site is to publish a release, which makes both at once. A plain `gh release create` would then fail
+after every other job had succeeded, leaving the image published and one red job. Editing instead means the body
+comes from `CHANGELOG.md` whichever way the tag was made, and a release marked prerelease by hand is corrected
+for a real version. `--target` is ignored when the tag already exists, so a re-dispatch after a half-finished
+run still works.
 
 **`page`** — `uses: ./.github/workflows/shared-dockerhub-overview.yml` with the `build` job's `version`, and the
 two Docker Hub secrets passed by name. That workflow renders `.github/dockerhub-overview.md` through
