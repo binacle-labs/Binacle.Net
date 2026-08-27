@@ -1,0 +1,101 @@
+# Every test that ends up in a site - the ten gems the three sites load by path, and the javascript they
+# bundle. One step per test, so a red check names the suite.
+#
+# No .NET, no service containers, no OpenAPI lint. None of that reaches a site.
+#
+# `shared-` because the pull request gate and all three deploys call it. The dispatch trigger stays, so it
+# can still be run by hand.
+
+name: Shared / Site Tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  suite:
+    name: Site tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup - just
+        uses: ./.github/actions/setup-just
+
+      - name: Setup - Node
+        uses: ./.github/actions/setup-node
+
+      - name: Install npm packages
+        run: npm ci --ignore-scripts
+
+      # ruby/, not a site: the gems share one Gemfile there and the sites have their own.
+      - name: Setup - Ruby
+        uses: ./.github/actions/setup-ruby
+        with:
+          working-directory: ruby
+
+      # !cancelled() so every test still runs after one fails - you see all the red, not just the first.
+      - name: Test - binacle-compact-notation
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-compact-notation_unit
+
+      - name: Test - binacle-vipaq
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-vipaq_unit
+
+      - name: Test - binacle-net-ui
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-net-ui_unit
+
+      - name: Test - cookies
+        if: ${{ !cancelled() }}
+        run: just test ts_cookies_unit
+
+      - name: Test - theme-switcher
+        if: ${{ !cancelled() }}
+        run: just test ts_theme-switcher_unit
+
+      - name: Test - binacle-docs-versions
+        if: ${{ !cancelled() }}
+        run: just test rb_binacle-docs-versions_unit
+
+      - name: Test - binacle-robots
+        if: ${{ !cancelled() }}
+        run: just test rb_binacle-robots_unit
+
+      - name: Test - jekyll-breadcrumb-trail
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-breadcrumb-trail_unit
+
+      - name: Test - jekyll-filters
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-filters_unit
+
+      - name: Test - jekyll-gtm
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-gtm_unit
+
+      - name: Test - jekyll-multi-sitemap
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-multi-sitemap_unit
+
+      - name: Test - jekyll-page-meta
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-page-meta_unit
+
+      - name: Test - jekyll-resource-tags
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-resource-tags_unit
+
+      - name: Test - jekyll-structured-data
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-structured-data_unit
+
+      - name: Test - jekyll-webmanifest
+        if: ${{ !cancelled() }}
+        run: just test rb_jekyll-webmanifest_unit

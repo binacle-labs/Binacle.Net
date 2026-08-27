@@ -32,13 +32,6 @@ internal class EnumStringsSchemaTransformer : IOpenApiSchemaTransformer
 		}
 
 
-		if (converterType is { IsGenericType: true } && converterType.GetGenericTypeDefinition() == typeof(JsonStringNullableEnumConverter<>))
-		{
-			schema.Type = JsonSchemaType.String;
-			schema.Enum = GetEnumOptions(underlyingPropertyType);
-			return Task.CompletedTask;
-		}
-		
 		if (converterType == typeof(JsonStringNullableEnumConverter))
 		{
 			schema.Type = JsonSchemaType.String;

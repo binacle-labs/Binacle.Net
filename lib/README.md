@@ -42,6 +42,6 @@ then picks the best outcome across algorithms or across bins.
 | Project | Run with | Covers |
 |---|---|---|
 | `test/Binacle.Lib.TestsKernel` | — | Fixture kernel for result selection. Embeds `data/result-selection`. |
-| `test/Binacle.Lib.UnitTests` | `just test lib-unit` | All algorithm versions × scenarios; result selection |
+| `test/Binacle.Lib.UnitTests` | `just test cs_binacle-lib_unit` | All algorithm versions × scenarios; result selection |
 | `test/Binacle.Lib.PerformanceTests` | `./tooling/performance.lib.sh` | Algorithm performance (console runner) |
 | `test/Binacle.Lib.Benchmarks` | `./tooling/benchmarks.lib.sh` | BenchmarkDotNet microbenchmarks |

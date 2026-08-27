@@ -1,14 +1,14 @@
 ---
 name: no-sonar-issue-ignores
-description: Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/sonar-analysis.xml
+description: Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/ci/sonar-analysis.xml
 type: decision
 when: answering a Sonar finding
 paths:
-  - "tooling/sonar-analysis.xml"
+  - "tooling/ci/sonar-analysis.xml"
   - "Directory.Build.props"
 ---
 
-`tooling/sonar-analysis.xml` carries no `sonar.issue.ignore.multicriteria` entries, and none should be added.
+`tooling/ci/sonar-analysis.xml` carries no `sonar.issue.ignore.multicriteria` entries, and none should be added.
 A suppression there hides a finding from everyone reading the code, in a file nobody opens.
 
 **Two honest answers to a rule you disagree with:**
@@ -45,5 +45,5 @@ the *shape* of a stored hash, and the rule fires on the property name, so any li
 **Why:** a finding answered in code stays reviewable and keeps the rule armed for the next occurrence; a
 finding answered in config is invisible and switches the rule off for everything matching the path.
 
-**How to apply:** never add an ignore rule to `tooling/sonar-analysis.xml`. Fix the code, mark the assertion
+**How to apply:** never add an ignore rule to `tooling/ci/sonar-analysis.xml`. Fix the code, mark the assertion
 helper, or mark the individual finding in the SonarCloud UI with a reason.

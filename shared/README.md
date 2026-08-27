@@ -62,9 +62,9 @@ generators. The reports it writes are the ones committed under [`results/`](../r
 
 ### 🔤 `Binacle.CompactNotation.UnitTests`
 
-Parse, format and round-trip tests for `src/Binacle.CompactNotation`. Runs with `just test shared-cs-unit`.
+Parse, format and round-trip tests for `src/Binacle.CompactNotation`. Runs with `just test cs_binacle-compact-notation_unit`.
 The TypeScript twin of that parser lives in
-[`packages/binacle-compact-notation`](../packages/binacle-compact-notation) and runs with `just test shared-ts-unit`.
+[`packages/binacle-compact-notation`](../packages/binacle-compact-notation) and runs with `just test ts_binacle-compact-notation_unit`.
 
 ## 🛠️ Tools
 

@@ -21,7 +21,7 @@ reason is not re-derived.
   have to be the real ones.
 - **Runtime is the shared budget.** The integration suite is already the long pole, and all-modules plus
   coverage each make it longer. Know the total before adding the second gate.
-- **Neither goes in `shared-test-suite.yml`.** The release calls that file whole and takes no inputs, so every
+- **Neither goes in `shared-image-tests.yml`.** The release calls that file whole and takes no inputs, so every
   step added there is a step the release pays for. They belong in `pull-request.yml`, beside the image build.
 
 ## Gate 2 - the integration suites with all modules on
@@ -30,7 +30,7 @@ The harnesses run **core modules only**, so every module combination the image s
 
 **Writing those tests is not this.** The integration-test plan owns the decisions - one run with everything
 on or a matrix, where the rate-limit tests live, and what breaks when the modules go on. What belongs here is
-only that once those leaves exist they run on every pull request like the rest. If the answer is a matrix,
+only that once those tests exist they run on every pull request like the rest. If the answer is a matrix,
 the runtime budget above is what decides how wide.
 
 ## Gate 3 - a Sonar verdict without a button press
@@ -47,13 +47,13 @@ suites landed, so nobody has seen the new numbers arrive there. A floor nobody a
 time it blocks something.
 
 **Coverage sees one storage backend.** `sonar-analysis.yml` pins the service suite to SQLite, so its coverage
-never reaches the Postgres or Azure provider code. Covering those means running that leaf per backend, which
+never reaches the Postgres or Azure provider code. Covering those means running that test per backend, which
 the coverage recipes do not do.
 
 ## Done when
 
 - [ ] The integration suites run against the module set the image ships, and the three harness TODOs are gone.
-      `grep -rn "Run the tests with all modules enabled" api/test` returns nothing, and those leaves have a
+      `grep -rn "Run the tests with all modules enabled" api/test` returns nothing, and those tests have a
       step in `pull-request.yml`.
 - [ ] A pull request gets a coverage number and a Sonar verdict without anyone pressing a button.
       **By eye.** `sonar-analysis.yml` carries a `pull_request` trigger, or `pull-request.yml` calls it.

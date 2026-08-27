@@ -34,9 +34,11 @@ recipe names complete on tab; these four are findable only by knowing they exist
 
 Lessons from the conversions that already landed, worth following rather than rediscovering:
 
-- **Absorbed, not wrapped.** The recipe runs the tool and the script is deleted. A recipe that only calls a
-  script keeps the drift it was meant to remove. A script that is a program moves into a shebang recipe body
-  whole - that is how the 103-line `agents-index.sh` moved.
+- **Absorbed, not wrapped - for a script that wraps a tool.** The recipe runs the tool and the script is
+  deleted. These four are that shape: each is `dotnet run -c Release` with a path.
+  **This does not extend to a program.** Since 2026-08-28 a program lives in its own file with a two-line
+  recipe as its door - `tooling/ci/*.sh` and `tooling/agents/generate-index.py` - because shellcheck cannot
+  read a `.just` body and a recipe body cannot be run on its own.
 - **An alias list becomes a parameter whose `case` rejects an unknown value.** Without the reject a typo
   falls through to the default and reports a green run for something nobody asked for.
 - **One module per job, not per script.** Where two modules need the same few lines, copy them.

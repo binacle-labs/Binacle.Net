@@ -110,7 +110,7 @@ randomizer's contract, *never produces a box the items cannot fit*, is asserted 
 `packages/binacle-net-ui/tests/model/samples.test.ts`. **A change to the instance page now has something to
 break**, which was not true when this work was first written down.
 
-Run `just test api-ui-unit` and `just test api-ui-integration` after touching the page model.
+Run `just test cs_binacle-net-ui-module_unit` and `just test cs_binacle-net-ui-module_integration` after touching the page model.
 
 ## Done when
 

@@ -46,7 +46,7 @@ passes an empty one, which means fetch relative from whatever host served the pa
 ## 🧪 Tests
 
 ```bash
-just test packages-net-ui-unit
+just test ts_binacle-net-ui_unit
 ```
 
 jsdom, because the components read `document` and `window` even where the logic under test does not.

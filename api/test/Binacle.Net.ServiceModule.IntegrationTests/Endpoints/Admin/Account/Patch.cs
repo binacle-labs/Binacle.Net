@@ -1,5 +1,6 @@
 using Binacle.Net.ServiceModule.IntegrationTests.Models;
 using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using Binacle.Net.ServiceModule.Domain.Accounts.Models;
 using Binacle.Net.ServiceModule.IntegrationTests.ExtensionMethods;
 using Binacle.Net.ServiceModule.v0.Contracts.Admin;
@@ -314,6 +315,67 @@ public class Patch : AdminEndpointsTestsBase
 			request,
 			this.Sut.JsonSerializerOptions, 
 			TestContext.Current.CancellationToken
+		);
+		response.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PATCH {routePath}. With Unknown Status Returns 422 UnprocessableContent")]
+	public async Task Patch_WithUnknownStatus_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+		var request = new AccountPatchRequest
+		{
+			Status = AccountStatus.Active
+		};
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Patch,
+			url,
+			request,
+			nameof(AccountPatchRequest.Status),
+			JsonValue.Create("invalid")
+		);
+		response.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PATCH {routePath}. With Unknown Role And Valid Status Returns 422 UnprocessableContent")]
+	public async Task Patch_WithUnknownRoleAndValidStatus_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+		var request = new AccountPatchRequest
+		{
+			Status = AccountStatus.Active,
+			Role = AccountRole.User
+		};
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Patch,
+			url,
+			request,
+			nameof(AccountPatchRequest.Role),
+			JsonValue.Create("invalid")
+		);
+		response.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PATCH {routePath}. With Numeric Status Returns 422 UnprocessableContent")]
+	public async Task Patch_WithNumericStatus_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+		var request = new AccountPatchRequest
+		{
+			Status = AccountStatus.Active
+		};
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Patch,
+			url,
+			request,
+			nameof(AccountPatchRequest.Status),
+			JsonValue.Create(1)
 		);
 		response.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableContent);
 	}

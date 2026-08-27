@@ -1,10 +1,9 @@
-using System.Text.Json;
+using Binacle.Net.Kernel.Endpoints;
 using Binacle.Net.ServiceModule.Domain.Accounts.Entities;
 using Binacle.Net.ServiceModule.Domain.Accounts.Services;
 using Binacle.Net.ServiceModule.v0.Contracts.Common;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Binacle.Net.ServiceModule.v0.Endpoints;
@@ -48,21 +47,12 @@ internal class AccountBindingResult<T>
 		
 		if (this.exception is not null)
 		{
-			var problemDetails = GetProblemDetails(this.exception);
-			return Results.Problem(problemDetails);
+			return BindingProblem.For(this.exception, typeof(T));
 		}
 
 		if (this.request is null)
 		{
-			// TODO: Make Response
-			var problemDetails = new ProblemDetails
-			{
-				Status = StatusCodes.Status400BadRequest,
-				Title = "Malformed Request",
-				Detail = "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again.",
-			};
-
-			return Results.Problem(problemDetails);
+			return BindingProblem.MalformedRequest();
 		}
 
 		var validator = this.serviceProvider.GetRequiredService<IValidator<T>>();
@@ -89,36 +79,6 @@ internal class AccountBindingResult<T>
 		return await result;
 	}
 
-
-	private static ProblemDetails GetProblemDetails(Exception ex)
-	{
-		if (ex is JsonException jsonEx)
-		{
-			return new ProblemDetails
-			{
-				Status = StatusCodes.Status400BadRequest,
-				Title = "Invalid JSON Format",
-				Detail = jsonEx.Message,
-			};
-		}
-
-		// Generic fallback error
-		var problemDetails = new ProblemDetails
-		{
-			Status = StatusCodes.Status500InternalServerError,
-			Title = "Unexpected Server Error",
-			Detail = "An unexpected error occurred while processing your request. Please try again later or contact support.",
-		};
-		
-		if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-		{
-			problemDetails.Extensions.TryAdd("exception", ex.GetType().Name);
-			problemDetails.Extensions.TryAdd("message", ex.Message);
-			problemDetails.Extensions.TryAdd("stackTrace", ex.StackTrace);
-		}
-
-		return problemDetails;
-	}
 
 	public static async ValueTask<AccountBindingResult<T>> BindAsync(HttpContext httpContext)
 	{

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Binacle.Net.IntegrationTests.v4.Abstractions;
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Pack;
@@ -41,6 +42,30 @@ public class PackCustomBestBinBehavior : BehaviourTestsBase
 	{
 		this.sampleRequest.Parameters!.Algorithm = null;
 		await base.Request_Returns_422UnprocessableContent(routePath, this.sampleRequest);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Unknown Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithUnknownAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create("invalid"),
+			nameof(PackCustomBestBinRequest.Parameters),
+			nameof(OperationParameters.Algorithm)
+		);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Numeric Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithNumericAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create(1),
+			nameof(PackCustomBestBinRequest.Parameters),
+			nameof(OperationParameters.Algorithm)
+		);
 	}
 
 	[Fact(DisplayName = $"POST {routePath}. Without Bins, Returns 422 UnprocessableContent")]

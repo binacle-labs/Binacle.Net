@@ -1,9 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using Binacle.Net.ServiceModule.Domain.Subscriptions.Models;
 using Binacle.Net.ServiceModule.IntegrationTests.ExtensionMethods;
 using Binacle.Net.ServiceModule.IntegrationTests.Models;
 using Binacle.Net.ServiceModule.v0.Contracts.Admin;
+using Microsoft.AspNetCore.Http;
 
 namespace Binacle.Net.ServiceModule.IntegrationTests.Endpoints.Admin.Subscription;
 
@@ -249,17 +251,48 @@ public class Create : AdminEndpointsTestsBase
 	public async Task Post_WithInvalidSubscriptionType_Returns_422UnprocessableContent()
 	{
 		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
-		var request = new 
+		var request = new SubscriptionCreateRequest
 		{
-			Type = "invalid"
+			Type = SubscriptionType.Normal
 		};
 		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
 
-		var response = await this.Client.PostAsJsonAsync(
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Post,
 			url,
 			request,
-			this.Sut.JsonSerializerOptions, 
+			nameof(SubscriptionCreateRequest.Type),
+			JsonValue.Create("invalid")
+		);
+		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
+
+		// The key an absent type produces. A client that gets a second key for the same field cannot tell the
+		// two apart, and only one of them is documented.
+		var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>(
+			this.Sut.JsonSerializerOptions,
 			TestContext.Current.CancellationToken
+		);
+
+		problem.ShouldNotBeNull();
+		problem.Errors.ShouldContainKey(nameof(SubscriptionCreateRequest.Type));
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Numeric Subscription Type Returns 422 Unprocessable Content")]
+	public async Task Post_WithNumericSubscriptionType_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var request = new SubscriptionCreateRequest
+		{
+			Type = SubscriptionType.Normal
+		};
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Post,
+			url,
+			request,
+			nameof(SubscriptionCreateRequest.Type),
+			JsonValue.Create(1)
 		);
 		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
 	}

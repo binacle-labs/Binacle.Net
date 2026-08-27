@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using Binacle.Net.ServiceModule.Domain.Subscriptions.Models;
 using Binacle.Net.ServiceModule.IntegrationTests.ExtensionMethods;
 using Binacle.Net.ServiceModule.IntegrationTests.Models;
@@ -197,7 +198,6 @@ public class Update : AdminEndpointsTestsBase
 		response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 	}
 
-
 	[Fact(DisplayName = $"PUT {routePath}. For Account Without Subscription Returns 404 Not Found")]
 	public async Task Put_ForAccountWithoutSubscription_Returns_404NotFound()
 	{
@@ -279,6 +279,69 @@ public class Update : AdminEndpointsTestsBase
 			request,
 			this.Sut.JsonSerializerOptions, 
 			TestContext.Current.CancellationToken
+		);
+		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PUT {routePath}. With Unknown Subscription Type Returns 422 Unprocessable Content")]
+	public async Task Put_WithUnknownSubscriptionType_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var request = new SubscriptionUpdateRequest
+		{
+			Type = SubscriptionType.Normal,
+			Status = SubscriptionStatus.Active
+		};
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Put,
+			url,
+			request,
+			nameof(SubscriptionUpdateRequest.Type),
+			JsonValue.Create("invalid")
+		);
+		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PUT {routePath}. With Unknown Subscription Status Returns 422 Unprocessable Content")]
+	public async Task Put_WithUnknownSubscriptionStatus_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var request = new SubscriptionUpdateRequest
+		{
+			Type = SubscriptionType.Normal,
+			Status = SubscriptionStatus.Active
+		};
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Put,
+			url,
+			request,
+			nameof(SubscriptionUpdateRequest.Status),
+			JsonValue.Create("invalid")
+		);
+		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
+	}
+
+	[Fact(DisplayName = $"PUT {routePath}. With Numeric Subscription Type Returns 422 Unprocessable Content")]
+	public async Task Put_WithNumericSubscriptionType_Returns_422UnprocessableContent()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+		var request = new SubscriptionUpdateRequest
+		{
+			Type = SubscriptionType.Normal,
+			Status = SubscriptionStatus.Active
+		};
+		var url = routePath.Replace("{id}", this.accountCredentialsUnderTest.Id.ToString());
+
+		var response = await this.SendWithFieldValueAsync(
+			HttpMethod.Put,
+			url,
+			request,
+			nameof(SubscriptionUpdateRequest.Type),
+			JsonValue.Create(1)
 		);
 		response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableContent);
 	}

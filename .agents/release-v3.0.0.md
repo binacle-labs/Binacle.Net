@@ -70,7 +70,7 @@ tag and belongs to `post-release-v3.0.0.md`. The demo and www deploys are not re
 | A4 | Fix the packing demo bugs that go inside the image | `plans/api/packing-demo-bugs.md` - the part below | done - 2026-08-27. **Its four by-eye checks passed on A1 the same day** |
 | A5 | Check the changelog names every image change since the last test release | here | done - 2026-08-26 |
 | A6 | Swap the demo's random roll for a hand-picked sample set | here | done - 2026-08-26. **Its three by-eye checks passed on A1 on 2026-08-27** |
-| A7 | Cut the test release - tag `v3.0.0-beta.5` | here | open |
+| A7 | Cut the test release - dispatch the release workflow with version `3.0.0-beta.5` | here | open |
 
 ### A1. Check the light and dark switch works, in a real browser
 
@@ -237,8 +237,8 @@ list.
 | B1 | Check the test image is signed and complete | here | open |
 | B2 | Open the test image in a browser and use it like a visitor | here | open |
 | B3 | Run the first command on the Docker Hub page and paste in the real answer | `plans/ci-cd/dockerhub-overview.md` - section 1 | open |
-| B4 | Rename the changelog heading to `3.0.0` | here | open - **the last edit before the tag** |
-| B5 | Cut the real release - tag `v3.0.0` | here | open |
+| B4 | Rename the changelog heading to `3.0.0` | here | open - **the last edit before the release** |
+| B5 | Cut the real release - dispatch the release workflow with version `3.0.0` | here | open |
 
 ### B1. Check the test image is signed and complete
 
@@ -371,7 +371,7 @@ they went - strike either one and it comes back.**
 
 | Item | Why not | Where it went |
 |---|---|---|
-| **Every test leaf on the CI suite** | Ten of the twenty-six leaves are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A leaf nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses `shared-test-suite.yml` as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | `plans/ci-cd/test-leaves-reach-ci.md` |
+| **Every test on the CI suite** | Ten of the twenty-six tests are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A test nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses its shared test suite as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | `plans/ci-cd/tests-reach-ci.md` |
 | **Docker Hub tag immutability - the rule** | The switch is off, so the rule's value changes nothing about this release either way. Correcting it is what makes the post-release decision a flip rather than a project. **The stored value on 2026-08-13 was `".*"`**, which would freeze `latest` and `3.0`. | `plans/ci-cd/dockerhub-tag-immutability.md` |
 
 **Also not here, and not new:** the Ruby coverage decision (`plans/ruby-gem-coverage.md`) and rubocop, which

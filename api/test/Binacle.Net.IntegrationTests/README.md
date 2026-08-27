@@ -4,7 +4,7 @@ HTTP tests for the v3 and v4 endpoints. They start the API in-process with `WebA
 real requests through it - no mocks, no running server, and no ports.
 
 ```bash
-just test api-core-integration   # from the repo root
+just test cs_binacle-net_integration   # from the repo root
 ```
 
 ## 📂 One folder per endpoint
@@ -28,6 +28,11 @@ xUnit `[MemberData]`, so the API and the lib are graded against the same problem
 
 The shared behaviour assertions - `Request_Returns_200Ok`, `Request_Returns_422UnprocessableContent` and the
 rest - live in `Tests/<version>/Abstractions/BehaviourTestsBase.cs`, one per version.
+
+`NegativeRequest.cs` sits beside them at the project root, shared by both versions. It sends a valid typed
+request with one field replaced by raw JSON, which is how a value the C# type cannot hold - an unknown enum,
+an ordinal - reaches the endpoint. The field is named with `nameof`, so a renamed property is a build error
+rather than a test that quietly passes on nothing.
 
 ## 🧩 Two fixtures
 

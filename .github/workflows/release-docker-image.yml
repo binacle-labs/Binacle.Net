@@ -1,49 +1,41 @@
 # Seven jobs, cheapest check first:
 #
-#   push tag v3.0.0 -> notes gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> release -> page
-#
-# Three things to know before you change anything here:
-#
-#   - Never rebuild the image between `build` and `publish`. The copy is by digest, which is what makes the
-#     published image bit for bit the one `smoke` passed. A rebuild ships something nothing tested.
-#   - cosign runs twice on purpose. A signature is a referrer, not part of the index, so it does not survive
-#     the copy and has to be made again where the image lands.
-#   - Do NOT add `release: published` as a second trigger. The release created in the last job would re-enter
-#     this workflow and build everything twice.
+#   dispatch 3.0.0 -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> tag+release -> page
 
 name: Build and Release Docker Image
 
 on:
-  push:
-    tags:
-      # `v` then a DIGIT, not the looser `v*`: the two deploy workflows push `docs-<n>` and
-      # `web-release-<run>`, and a release build must never fire on one. Any new tag-pushing workflow has to
-      # stay out of the `v<digit>` namespace.
-      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, with no leading v (e.g. 3.0.0)'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 env:
-  # GHCR rejects an uppercase path. Written out rather than derived from github.repository_owner, so a
-  # mixed-case owner can never reach the registry path.
+  # GHCR rejects an uppercase path, so this is written out rather than derived from the owner name.
   STAGING_IMAGE: ghcr.io/binacle-labs/binacle-net
 
-# Never cancelled: a stop between `build` and `publish` strands a staged image or half-moves the Docker Hub tags.
+# Never cancelled: a stop between `build` and `publish` strands a staged image or half-moves the Docker Hub
+# tags.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
-  # FIRST, and everything waits on it. The release body has to exist before anything is built, because the
-  # alternative is discovering it at the end - with the image already on Docker Hub and `latest` moved, and
-  # no release to describe it. A grep costs seconds; that costs a bad release.
-  notes:
-    name: Changelog notes gate
+  gate:
+    name: Release gate
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
+
+    env:
+      VERSION: ${{ inputs.version }}
+      TAG: v${{ inputs.version }}
 
     outputs:
       section: ${{ steps.section.outputs.name }}
@@ -55,47 +47,43 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # A beta publishes the in-progress section; a real release publishes its own. The heading is renamed
-      # from [Unreleased] to the version as the last edit before the real tag.
-      # Interpolated values go through env rather than into the script body, so nothing is pasted into a
-      # shell it could change the meaning of. Same pattern in every run: block in this file.
-      - name: Which section this tag publishes
-        id: section
+      - name: Check the dispatch is on main
         env:
-          TAG: ${{ github.ref_name }}
-        run: |
-          case "$TAG" in
-            *-*) echo "name=Unreleased" >> "$GITHUB_OUTPUT" ;;
-            *)   echo "name=${TAG#v}"   >> "$GITHUB_OUTPUT" ;;
-          esac
+          REF: ${{ github.ref }}
+        run: just ci check-release-ref "$REF"
+
+      - name: Check the version is semver
+        run: just ci check-version "$VERSION"
+
+      - name: Check the tag is free
+        env:
+          COMMIT: ${{ github.sha }}
+        run: just ci check-release-tag "$TAG" "$COMMIT"
+
+      - name: Which section this version publishes
+        id: section
+        run: just ci changelog-section "$VERSION" | tee -a "$GITHUB_OUTPUT"
 
       - name: Check the section exists
         env:
           SECTION: ${{ steps.section.outputs.name }}
         run: just changelog check "$SECTION"
 
-  # Nothing guarantees the tag sits on a commit that passed CI - you can tag anything. This is that guarantee,
-  # and it reuses the PR workflow rather than restating the leaves.
-  #
-  # After the gate, not beside it: the gate is seconds and this is minutes, so a missing changelog section
-  # should not cost a full suite run before it is reported.
   test:
-    name: Test suite
-    needs: notes
-    uses: ./.github/workflows/shared-test-suite.yml
+    name: Image tests
+    needs: gate
+    uses: ./.github/workflows/shared-image-tests.yml
     permissions:
       contents: read
 
   build:
     name: Build and push to GHCR
-    needs: [ notes, test ]
+    needs: [ gate, test ]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
       packages: write
-      # Keyless signing. cosign exchanges this OIDC token for a short-lived certificate, so there is no key
-      # to store and none to rotate.
       id-token: write
 
     outputs:
@@ -115,31 +103,26 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # `just build publish` bundles the UI module's javascript before dotnet collects static web assets, so
-      # this job needs node. Without it the image ships demo pages that render and do nothing, and no step
-      # fails.
+      # `just build publish` bundles the UI module's javascript before dotnet collects the static web
+      # assets. Without node the image ships demo pages that render and do nothing, and no step fails.
       - name: Setup - Node
         uses: ./.github/actions/setup-node
 
       - name: Install npm packages
         run: npm ci --ignore-scripts
 
-      # Do not inline restore/publish here again - the recipe owns those flags.
       - name: Publish
         run: just build publish
 
-      # One metadata step now, not two: only the immutable tag is pushed here. The moving tags are computed in
-      # `publish`, which is the only job that creates them.
+      # Only the immutable tag. The moving tags are computed in `publish`, the job that creates them.
+      # `value=` is what type=semver reads here: a dispatch has no tag ref to take a version from.
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ env.STAGING_IMAGE }}
           tags: |
-            type=semver,pattern={{version}}
-          # Three labels metadata-action gets wrong: licenses auto-detects to NOASSERTION on a dual-licensed
-          # repo, url auto-fills the repo instead of the landing site, and description auto-fills the GitHub
-          # repo blurb, silently beating the Dockerfile's caption.
+            type=semver,pattern={{version}},value=${{ inputs.version }}
           labels: |
             org.opencontainers.image.licenses=GPL-3.0-only AND CC-BY-SA-4.0
             org.opencontainers.image.url=https://www.binacle.net
@@ -151,7 +134,6 @@ jobs:
           VERSION: ${{ steps.meta.outputs.version }}
         run: echo "staging=${STAGING_IMAGE}:${VERSION}" >> "$GITHUB_OUTPUT"
 
-      # GITHUB_TOKEN is minted for this run and expires with it, so staging needs no stored credential.
       - name: Login to GHCR
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
@@ -162,8 +144,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
-      # file: is the literal Dockerfile at the repo root - there is exactly one, so a repo variable could only
-      # drift from it.
       - name: Build and push to staging
         id: push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
@@ -173,32 +153,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Stated explicitly, not left to buildx's defaults, so it stays a choice. mode=max records the full
-          # build definition; the only build arg is VERSION, so nothing secret is captured - revisit this
-          # before adding a secret-bearing one. Both make the artifact an OCI index, which the copy carries
-          # whole.
+          # Stated rather than left to buildx's defaults, so it stays a choice.
           provenance: mode=max
           sbom: true
-          # metadata-action's version, never github.ref_name: the latter would put "v3.0.0" in BINACLE_VERSION
-          # while the image tag said "3.0.0".
+
+          # metadata-action's version, so BINACLE_VERSION and the image tag cannot disagree.
           build-args: |
             VERSION=${{ steps.meta.outputs.version }}
 
       - name: Setup cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
-      # Signs the DIGEST, not a tag, so the signature covers the artifact rather than a name that can move.
-      #
-      # Attached as an OCI 1.1 referrer - fallback tag `sha256-<digest>`, NO `.sig` suffix; older cosign made
-      # those, this one does not. A referrer is not inside the index, so it does not survive the copy, which is
-      # why `publish` signs again.
       - name: Sign the staging image
         env:
           TARGET: ${{ steps.ref.outputs.staging }}@${{ steps.push.outputs.digest }}
         run: cosign sign --yes "$TARGET"
 
-  # The gate. Calls shared-smoke-image.yml rather than copying its steps, so the release path runs exactly what a
-  # maintainer runs by hand. Red here means nothing reaches Docker Hub and no release is created.
   smoke:
     name: Smoke the staged image
     needs: build
@@ -209,12 +179,6 @@ jobs:
     with:
       image: ${{ needs.build.outputs.staging }}
 
-  # The only job that touches Docker Hub, and the only place the stored credential is used.
-  #
-  # Runs for EVERY tag. A prerelease is narrowed by the metadata step below, not by a condition here.
-  # Do not add a job-level skip - it only makes betas unpullable from Docker Hub.
-  #
-  # No `contents` permission: this job never checks out.
   publish:
     name: Copy to Docker Hub
     needs: [ build, smoke ]
@@ -222,24 +186,20 @@ jobs:
     timeout-minutes: 15
     permissions:
       packages: read
-      # Keyless signing again - see the build job. The signature does not survive the copy, so the Docker Hub
-      # artifact has to be signed where it lands.
       id-token: write
 
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
 
     steps:
-      # Computes the Docker Hub tag set. This job only runs for a real release, so all three apply - but
-      # metadata-action still owns the semver parsing rather than this file hand-rolling it.
       - name: Docker metadata - public tags
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ vars.DOCKERHUB_ORGNAME }}/${{ vars.DOCKERHUB_REPO }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
           flavor: |
             latest=auto
 
@@ -259,9 +219,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
-      # `imagetools create` transfers a manifest rather than rebuilding, so the digest is preserved and Docker
-      # Hub serves exactly what `smoke` passed. Reading SOURCE by DIGEST keeps that true even if something
-      # re-tagged staging. All tags go in one command - they alias one manifest, so the blobs move once.
+      # A copy by digest, never a rebuild. Rebuilding here would publish an image the smoke never saw.
       - name: Copy the smoked digest to Docker Hub
         env:
           SOURCE: ${{ needs.build.outputs.staging }}@${{ needs.build.outputs.digest }}
@@ -277,8 +235,8 @@ jobs:
           done <<< "$TAGS"
           echo "Copying ${SOURCE} to: ${tags[*]}"
           docker buildx imagetools create "${args[@]}" "$SOURCE"
-          # Read back where each tag landed. All three must equal the digest the smoke job passed; this is the
-          # only evidence in the log that the copy preserved it.
+
+          # Every tag must read back as the digest above. This is the only place the log shows that.
           for tag in "${tags[@]}"; do
             echo -n "${tag} -> "
             docker buildx imagetools inspect "$tag" --format '{{ .Manifest.Digest }}'
@@ -287,25 +245,23 @@ jobs:
       - name: Setup cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
-      # Against the digest, so one signature covers every public tag aliasing it. Not a duplicate of the build
-      # job's - a GHCR signature does not come across with the copy, and this is the one users verify.
+      # Not a duplicate of the build job's: a signature does not come across with the copy.
       - name: Sign the published image
         env:
           TARGET: ${{ vars.DOCKERHUB_ORGNAME }}/${{ vars.DOCKERHUB_REPO }}@${{ needs.build.outputs.digest }}
         run: cosign sign --yes "$TARGET"
 
-  # Last, so the release never describes an image that failed to build, smoke or publish. `needs` includes
-  # `notes` because this reads that job's output.
-  #
-  # If any job above ever becomes conditional, this needs `if: !failure() && !cancelled()` - a skipped
-  # dependency skips everything downstream, and a beta would silently get no release.
   release:
-    name: Create the GitHub release
-    needs: [ notes, test, build, smoke, publish ]
+    name: Tag the commit and create the release
+    needs: [ gate, test, build, smoke, publish ]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
+
+    env:
+      TAG: v${{ inputs.version }}
+      COMMIT: ${{ github.sha }}
 
     steps:
       - name: Checkout
@@ -314,78 +270,31 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # `extract` promotes the section's headings back to h2 - in the file they sit at h3 under the version
-      # heading, and a release body has no such parent.
-      #
-      # Create OR edit: the release may already exist, because publishing one from GitHub's web UI is the only
-      # way to tag from the site and creates both at once. A plain `gh release create` would fail on that.
-      #
-      # The prerelease flag is set in both directions, so a release marked prerelease by hand is corrected for
-      # a real version tag.
+      # The run's own commit, not whatever main points at by now, so the tag and the image agree.
+      - name: Push the release tag
+        run: just ci push-tag "$TAG" "$COMMIT"
+
+      # A release may already exist: tagging from GitHub's web UI creates the tag and the release together.
       - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
-          SECTION: ${{ needs.notes.outputs.section }}
-        run: |
-          set -euo pipefail
-          case "$TAG" in
-            *-*) pre=true  ;;
-            *)   pre=false ;;
-          esac
-          just changelog extract "$SECTION" > "$RUNNER_TEMP/notes.md"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release ${TAG} already exists - replacing its body with the ${SECTION} section."
-            gh release edit "$TAG" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --prerelease="$pre"
-          else
-            echo "Creating release ${TAG} from the ${SECTION} section."
-            if [ "$pre" = true ]; then
-              gh release create "$TAG" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --prerelease
-            else
-              gh release create "$TAG" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
-            fi
-          fi
+          SECTION: ${{ needs.gate.outputs.section }}
+        run: just ci github-release "$TAG" "$SECTION"
 
-      # The run page's answer to "what shipped" - otherwise it is a `docker buildx` line inside a log. It sits
-      # in this job rather than `publish` because the release URL only exists once the step above has run.
-      #
-      # This is a signed-in view. Anything a user needs to verify the image has to reach them through the
-      # release body and SECURITY.md as well.
+      # In this job rather than `publish` because the release URL only exists once the step above has run.
       - name: Summarise what was published
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
           VERSION: ${{ needs.build.outputs.version }}
           TAGS: ${{ needs.publish.outputs.tags }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-          {
-            echo "## Published \`${VERSION}\`"
-            echo
-            echo "**Digest** \`${DIGEST}\` - the one \`smoke\` passed, copied rather than rebuilt."
-            echo
-            echo '| Tag |'
-            echo '|---|'
-            while IFS= read -r tag; do
-              [ -n "$tag" ] || continue
-              echo "| \`${tag}\` |"
-            done <<< "$TAGS"
-            echo
-            echo "[Release ${TAG}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${TAG})"
-            echo
-            echo '```'
-            echo "just image verify ${VERSION}"
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
+        run: just ci release-summary "$VERSION" "$DIGEST" "$TAG" "$RELEASE_URL" "$TAGS"
 
-  # Cosmetic, and the only job nothing depends on - it runs last, after everything irreversible.
-  #
-  # Skipped for a prerelease: a beta must not rewrite a page describing the stable line. It is a job condition
-  # here because this job is the only one that ignores metadata-action.
+  # The one job with its own prerelease condition: a beta must not rewrite a page describing the stable line.
   page:
     name: Docker Hub page
     needs: [ build, publish, release ]
-    if: ${{ !contains(github.ref_name, '-') }}
+    if: ${{ !contains(inputs.version, '-') }}
     uses: ./.github/workflows/shared-dockerhub-overview.yml
     permissions:
       contents: read

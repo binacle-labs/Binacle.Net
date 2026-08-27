@@ -73,9 +73,9 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
 | `vipaq/test/Binacle.ViPaq.PerformanceTests` | the `IPreReportCheck` gates — all 2,316 real packs × every codec × both layouts × natural/forced-16-bit widths, header + decode-to-input, run before the size reports |
 | `vipaq/test/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings over the curated picks and the synthetic sets |
-| `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test vipaq-ts-unit` (jest) |
+| `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
-The C# unit suite runs with `just test vipaq-cs-unit`. Only the two unit suites are on `just test all`; the
+The C# unit suite runs with `just test cs_binacle-vipaq_unit`. Only the two unit suites are on `just test all`; the
 performance and benchmark projects are run on demand.
 
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract

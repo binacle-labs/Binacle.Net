@@ -1,0 +1,51 @@
+# What generate-index.py writes. One table per manifest, in the order `just agents all` rewrites them.
+#
+# A directory under .agents/ joins the set by getting a table here. Without one it is not indexed.
+
+[indexes.rules]
+heading = "Agent Rules Index"
+blurb = """
+Every standing rule, one file per rule. `load: always` must be known before you start; the rest
+are fetched when their `when:` fires. See [README.md](README.md) for the trigger table."""
+
+[indexes.docs]
+heading = "Agent Docs Index"
+blurb = """
+Every doc in `.agents/docs/`, grouped by area. Scan for your topic, then read that file — do not work
+from this summary. Task-based entry points ("I want to add a v4 endpoint") are in the "Common Tasks"
+table of [README.md](README.md)."""
+
+[indexes.design]
+heading = "Agent Design Index"
+blurb = """
+Every design record in `.agents/design/`, grouped by area. The settled design behind the docs — the
+decisions (why) and the findings (measured evidence). Permanent and citable; read the one you need."""
+
+[indexes.plans]
+heading = "Agent Plans Index"
+blurb = """
+Every plan in `.agents/plans/` (recursive), grouped by area. Plans are work not yet done — read the one
+you need, and trim or delete it once the work lands. `state:` and `waits-on:` say where each one stands;
+[README.md](README.md) defines the five states."""
+
+[indexes.memory]
+heading = "Agent Memory Index"
+blurb = """
+Every memory in `.agents/memory/`, grouped by area. Durable facts with no home in a doc or plan —
+conventions, decisions, gotchas. See [README.md](README.md) for when and how to add one."""
+
+# Only the groups whose capitalisation cannot be guessed. Any other group gets its first letter uppercased,
+# which is right for shared, samples, tooling and every slice added since.
+[group_headings]
+api = "API"
+lib = "Lib"
+vipaq = "ViPaq"
+"ci-cd" = "CI/CD"
+
+# Front matter keys copied into every entry, in this order.
+[fields]
+always = ["when", "load"]
+# Where the work stands. Every other index would carry two empty keys.
+plans_only = ["state", "waits-on"]
+# Yaml lists, flattened to one line.
+lists = ["paths"]

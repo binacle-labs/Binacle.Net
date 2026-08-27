@@ -3,7 +3,7 @@ description: Sonar - re-read the open findings against the current project, then
 state: blocked
 waits-on: "a re-read against SonarCloud - every count in this file predates the current project and the maintainer wants it revisited before the v3.0.0 tag"
 paths:
-  - "tooling/sonar-analysis.xml"
+  - "tooling/ci/sonar-analysis.xml"
 ---
 
 # Sonar - what is left
@@ -89,7 +89,7 @@ goes green when the UI gets tested, not by configuration.
 - [ ] The counts in this file came from a run someone opened.
       **By eye.** Step 1's numbers name a revision analysed under `binacle-labs_Binacle.Net`.
 - [ ] `lib/data/**` is excluded, and the two prose copies of the list match the line.
-      `grep -c 'lib/data' tooling/sonar-analysis.xml` returns at least 1, and the comment above it and the
+      `grep -c 'lib/data' tooling/ci/sonar-analysis.xml` returns at least 1, and the comment above it and the
       no-sonar-issue-ignores memory name the same folders.
 - [ ] The answered findings are marked Accepted again in the current project.
       **By eye.** Open the project's issue list filtered to Accepted and compare it to the design register.

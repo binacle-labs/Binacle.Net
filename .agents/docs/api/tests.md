@@ -16,14 +16,14 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 
 | Project | Covers | Run |
 |---|---|---|
-| `Binacle.Net.IntegrationTests` | v3 + v4 HTTP endpoints (fit, pack, presets) | `just test api-core-integration` |
-| `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test api-service-integration` |
-| `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test api-ui-integration` |
-| `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test api-core-unit` |
-| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Network/`, `Paths/`) | `just test api-kernel-unit` |
-| `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, middleware, config validators | `just test api-diagnostics-unit` |
-| `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test api-ui-unit` |
-| `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies | `just test api-service-unit` |
+| `Binacle.Net.IntegrationTests` | v3 + v4 HTTP endpoints (fit, pack, presets) | `just test cs_binacle-net_integration` |
+| `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test cs_binacle-net-service-module_integration` |
+| `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
+| `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
+| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Network/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
+| `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, middleware, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
+| `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test cs_binacle-net-ui-module_unit` |
+| `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies | `just test cs_binacle-net-service-module_unit` |
 
 The unit suites need no host and nothing brought up. `Binacle.Net.Kernel.UnitTests` is split by Kernel feature,
 each folder holding its own `Tests/` and `Providers/`.
@@ -78,17 +78,17 @@ backend leg.
 > `Binacle.Net.ServiceModule.IntegrationTests` picks its database backend from **`BINACLE_TEST_INFRA`** —
 > `AzureStorage`, `Postgres`, or `Sqlite`. Unset, it **falls back to SQLite**, so a bare `dotnet test` runs with
 > no external service. Only the first two need something up (Azurite on `127.0.0.1:10002`, Postgres on `5432`);
-> pick one with `just test api-service-integration [Sqlite|Postgres|AzureStorage]`, which rejects a
+> pick one with `just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorage]`, which rejects a
 > misspelled backend instead of silently falling back.
 >
 > Each backend has a localhost default connection string, overridden by the production env name
 > `AZURESTORAGE_` / `POSTGRES_` / `SQLITE_CONNECTION_STRING` — the same keys the app reads, no test-only
 > mechanism. The backend and whether it came from an override are printed to the console on every run, so a
 > green run never hides which one it used. **CI runs the suite three times, one step per backend**
-> (`.github/workflows/shared-test-suite.yml`), against a Postgres and an Azurite service container that stay up for the
+> (`.github/workflows/shared-image-tests.yml`), against a Postgres and an Azurite service container that stay up for the
 > whole job; Sonar coverage runs SQLite only. The defaults match the CI service containers, so CI sets no
-> connection string. Locally, `just test all` runs the SQLite leaf only — it is the set that needs nothing
-> brought up; the other two are a deliberate `just test api-service-integration <backend>` after
+> connection string. Locally, `just test all` runs the SQLite test only — it is the set that needs nothing
+> brought up; the other two are a deliberate `just test cs_binacle-net-service-module_integration <backend>` after
 > `just serve services-up -d`.
 
 ## Layout — one folder per endpoint
@@ -188,6 +188,48 @@ emptiness split.
 
 v4 adds `FitCompareRequest_Validate` / `PackCompareRequest_Validate` for the compare endpoints: 200, `Results`
 not empty, then the same per-entry asserts across every result.
+
+## Negative tests start from the typed request
+
+A negative test written as an anonymous object - `new { Algorithm = "invalid" }` - keeps compiling after the
+contract is renamed, still gets its 422, and passes for the wrong reason from then on. A test that sends the
+typed request has the opposite problem: the C# type cannot express a wire value the enum forbids, so that path
+goes untested.
+
+Both base classes take the middle. Serialize the typed request, override the one field as raw JSON, post that:
+
+```csharp
+var payload = JsonSerializer.SerializeToNode(request, this.Sut.JsonSerializerOptions)!.AsObject();
+payload["parameters"]!["algorithm"] = algorithm;
+```
+
+Neither suite writes a wire name down. Both take the field as `nameof`, convert it through the serializer's
+naming policy, and assert the key is on the payload before replacing it:
+
+| Suite | Helper | Shape |
+|---|---|---|
+| core, `NegativeRequest.cs` at the project root | `Post_WithFieldValue_Returns_422UnprocessableContent` | `params string[]` of `nameof` segments, so any depth works - `nameof(FitPresetBinRequest.Parameters), nameof(OperationParameters.Algorithm)` |
+| ServiceModule, `Endpoints/Admin/AdminEndpointsTestsBase.cs` | `SendWithFieldValueAsync` | one `nameof` and the HTTP verb; the contracts there are flat |
+
+Each version's `BehaviourTestsBase` forwards to `NegativeRequest` rather than holding its own copy, because v3
+and v4 differ in the request shape and not in how a field is broken.
+
+Both helpers were verified by breaking a contract on purpose. Adding `[JsonPropertyName]` to
+`OperationParameters.Algorithm` - which production compiles straight through - turns 28 v4 tests red with
+`'algorithm' is not on the serialized request`. Renaming a property fails the build, though in the core suite
+the endpoint handlers fail first, so there the `nameof` is the second line rather than the first.
+
+**`params` takes an empty array happily**, and a call with no segments would post an untouched valid request
+and assert nothing. `NegativeRequest` refuses one. That is not hypothetical: the bulk edit that introduced
+these call sites missed five files, and this is what caught them.
+
+**Assert the body, not only the status.** Every negative test here has more than one route to its status code,
+so the helpers check the error key too - the 422 was right for a while when the key was not (`$api/decisions#D4`).
+
+**The set of enum fields is not written down anywhere.** `RequestEnumConverterTests`, one copy in
+`Binacle.Net.UnitTests` and one in `Binacle.Net.ServiceModule.UnitTests`, finds every nullable enum on every
+contract by reflection and fails if one does not carry `JsonStringNullableEnumConverter`. A new field is
+covered the day it is added; nobody has to remember.
 
 ## Test host config
 

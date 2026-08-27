@@ -38,9 +38,13 @@
   <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,assets/lib/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
 
   <!-- One flat file per suite in artifacts/coverage/sonar, split by extension: .xml from the C# collector,
-       .info from jest. tooling/tests.just is what writes them and the only place that knows the suite list. -->
+       .info from jest, .json from simplecov. tooling/tests.just is what writes them and the only place that
+       knows the suite list.
+
+       Nothing here excludes ruby/, so without the third line every gem line counts as uncovered. -->
   <Property Name="sonar.cs.vscoveragexml.reportsPaths">artifacts/coverage/sonar/*.xml</Property>
   <Property Name="sonar.javascript.lcov.reportPaths">artifacts/coverage/sonar/*.info</Property>
+  <Property Name="sonar.ruby.coverage.reportPaths">artifacts/coverage/sonar/*.json</Property>
 
   <!-- Two places where near-identical code is the design, not debt. This is a duplication exclusion, not an
        issue ignore: every rule still runs on these files, only the copy-paste detector skips them.

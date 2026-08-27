@@ -2,13 +2,13 @@
 name: sonar-scope-exclusions
 description: sonar.exclusions and friends are scope exclusions, not issue ignores - they are allowed and already in use
 type: convention
-when: reading or editing the exclusion lists in tooling/sonar-analysis.xml
+when: reading or editing the exclusion lists in tooling/ci/sonar-analysis.xml
 paths:
-  - "tooling/sonar-analysis.xml"
+  - "tooling/ci/sonar-analysis.xml"
   - "Directory.Build.props"
 ---
 
-`tooling/sonar-analysis.xml` **does** carry `sonar.exclusions`, `sonar.cpd.exclusions` and
+`tooling/ci/sonar-analysis.xml` **does** carry `sonar.exclusions`, `sonar.cpd.exclusions` and
 `sonar.coverage.exclusions`. Do not read the ban on issue ignores as forbidding them - they are a different
 thing. An issue ignore says "run this rule here, then hide what it finds". A scope exclusion says
 "this is not our code, or not this metric's business".

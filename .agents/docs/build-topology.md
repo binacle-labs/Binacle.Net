@@ -96,7 +96,7 @@ Root `global.json` holds one key and no SDK pin:
 
 That is the .NET 10 opt-in to the Microsoft.Testing.Platform (MTP) `dotnet test`. It is not optional here: the
 test projects run on **MTP v2**, and the .NET 10 SDK dropped the VSTest bridge those used to fall back to, so
-without this file every C# leaf fails with "Testing with VSTest target is no longer supported". The opt-in is
+without this file every C# test fails with "Testing with VSTest target is no longer supported". The opt-in is
 repo-wide - once set, every test project must be an MTP one.
 
 Two consequences for anything that shells out to `dotnet test`:
@@ -200,7 +200,7 @@ independent shell re-derivation, and npm's own resolver. Re-checked 2026-08-27.
   files cross back. `binacle-compact-notation` sitting in `dependencies` rather than `devDependencies` in
   `vipaq/packages/binacle-vipaq/package.json` is the single line that makes npm's graph look cyclic.
 - **`.github` is a slice and sits above `tooling`.** It hashes `.config/dotnet-tools.json` and names
-  `tooling/sonar-analysis.xml`.
+  `tooling/ci/sonar-analysis.xml`.
 
 **Nineteen global `Using` declarations across thirteen projects have no matching `ProjectReference`** — one in
 every slice that has C#. Every one resolves transitively, so they all compile today, and **every one breaks

@@ -15,10 +15,10 @@ from the repo root with `npm install`.
 All four have tests. From the repo root:
 
 ```
-just test shared-ts-unit                # binacle-compact-notation
-just test packages-net-ui-unit          # binacle-net-ui
-just test packages-cookies-unit         # cookies
-just test packages-theme-switcher-unit  # theme-switcher
+just test ts_binacle-compact-notation_unit                # binacle-compact-notation
+just test ts_binacle-net-ui_unit          # binacle-net-ui
+just test ts_cookies_unit         # cookies
+just test ts_theme-switcher_unit  # theme-switcher
 ```
 
 `binacle-compact-notation` has to agree with

@@ -1,7 +1,5 @@
-using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Binacle.Net.Kernel.Endpoints;
@@ -30,20 +28,12 @@ public class BindingResult<T>
 	{
 		if (this.exception is not null)
 		{
-			var problemDetails = GetProblemDetails(this.exception);
-			return Results.Problem(problemDetails);
+			return BindingProblem.For(this.exception, typeof(T));
 		}
 
 		if (this.request is null)
 		{
-			var problemDetails = new ProblemDetails
-			{
-				Status = StatusCodes.Status400BadRequest,
-				Title = "Malformed Request",
-				Detail = "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again.",
-			};
-
-			return Results.Problem(problemDetails);
+			return BindingProblem.MalformedRequest();
 		}
 
 		var validator = this.serviceProvider.GetRequiredService<IValidator<T>>();
@@ -58,37 +48,6 @@ public class BindingResult<T>
 		}
 
 		return await handleValidRequest(this.request);
-	}
-
-
-	private static ProblemDetails GetProblemDetails(Exception ex)
-	{
-		if (ex is JsonException jsonEx)
-		{
-			return new ProblemDetails
-			{
-				Status = StatusCodes.Status400BadRequest,
-				Title = "Invalid JSON Format",
-				Detail = jsonEx.Message,
-			};
-		}
-
-		// Generic fallback error
-		var problemDetails = new ProblemDetails
-		{
-			Status = StatusCodes.Status500InternalServerError,
-			Title = "Unexpected Server Error",
-			Detail = "An unexpected error occurred while processing your request. Please try again later or contact support.",
-		};
-		
-		if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-		{
-			problemDetails.Extensions.TryAdd("exception", ex.GetType().Name);
-			problemDetails.Extensions.TryAdd("message", ex.Message);
-			problemDetails.Extensions.TryAdd("stackTrace", ex.StackTrace);
-		}
-
-		return problemDetails;
 	}
 
 	public static async ValueTask<BindingResult<T>> BindAsync(HttpContext httpContext)

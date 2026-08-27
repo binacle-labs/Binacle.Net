@@ -1,4 +1,4 @@
-# CHANGELOG.md sections, loaded by the root justfile as the `changelog` module.
+# Reads one version's section out of CHANGELOG.md.
 #
 #   just changelog extract 3.0.0      print that version's section
 #   just changelog extract Unreleased print the in-progress section
@@ -6,7 +6,11 @@
 #
 # The release workflow calls both: `check` as its first gate, `extract` to build the release body.
 
+# Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
+
+# awk prints why it failed, so just's own "Recipe failed" line adds nothing. The exit code still gets
+# through, so CI still fails.
 set no-exit-message := true
 
 changelog := "CHANGELOG.md"
@@ -19,17 +23,18 @@ default:
 extract version:
     #!/usr/bin/env bash
     set -euo pipefail
-    # Two jobs: find the section, then undo the nesting the file imposes on it.
+
+    # The awk below does two things.
     #
-    # FINDING IT. A section ends at the next VERSION heading, not at the next `## ` - a promoted body carries
-    # its own `## `. So a terminator is a `## ` whose first token parses as `Unreleased` or as semver.
-    # Accepts `## 3.0.0`, `## [3.0.0]`, and either with a trailing ` - <date>`.
+    # It finds the section. A section ends at the next VERSION heading, not at the next `## ` - a promoted
+    # body carries its own `## `. So a terminator is a `## ` whose first word reads as `Unreleased` or as a
+    # version number. `## 3.0.0`, `## [3.0.0]` and either with a trailing ` - <date>` all count.
     #
-    # PROMOTING IT. In the file a release is `##` under the single `# Changelog`; a release body has no such
-    # parent and starts at `##`. Every heading shifts by whatever brings the SHALLOWEST one back to `##`,
-    # which keeps the relative depth inside the body.
+    # Then it promotes the headings. In the file a release sits at `##` under the one `# Changelog`; on its
+    # own a release body starts at `##`. Every heading shifts by whatever brings the shallowest one back to
+    # `##`, which keeps the relative depth inside the body.
     #
-    # Headings inside a fenced code block are left alone - they are content, not structure.
+    # A heading inside a fenced code block is left alone - it is content, not structure.
     awk -v want='{{ version }}' '
       function version_token(line,   h, a) {
         h = line; sub(/^## +/, "", h); gsub(/[][]/, "", h)
@@ -69,11 +74,14 @@ extract version:
 check version:
     #!/usr/bin/env bash
     set -euo pipefail
+
     notes="$(just changelog::extract '{{ version }}')"
+
     if [ -z "${notes//[[:space:]]/}" ]; then
         echo "No '## {{ version }}' section in {{ changelog }}." >&2
         echo "Rename [Unreleased] to {{ version }} before tagging." >&2
         exit 1
     fi
+
     lines=$(printf '%s\n' "$notes" | grep -c '' || true)
     echo "'## {{ version }}' found - ${lines} lines."

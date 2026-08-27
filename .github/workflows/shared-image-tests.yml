@@ -1,0 +1,160 @@
+# Every test that ends up in the Docker image, plus the OpenAPI lint. One job, so setup and the build happen
+# once; one step per test, so a red check names the suite.
+#
+# `shared-` because the pull request gate and the release both call it. The dispatch trigger stays, so it can
+# still be run by hand.
+#
+# DOTNET_TEST_ARGS is job-wide: CI builds the solution once and every test runs --no-build. Unset on a laptop.
+
+name: Shared / Image Tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  suite:
+    name: Image tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    env:
+      DOTNET_TEST_ARGS: --configuration Release --no-build
+
+    # Up for the whole job so the ServiceModule backend steps can reach them. Idle during the others, which
+    # is cheaper than starting them inline.
+    services:
+      # Table storage on 10002 is the only endpoint the tests use. The other two are mapped because the
+      # emulator's "UseDevelopmentStorage=true" shorthand names all three, and a missing one reads as a
+      # connection failure rather than as an unused port.
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite:3.36.0
+        ports:
+          - 10000:10000
+          - 10001:10001
+          - 10002:10002
+        # nc, not curl: the image is alpine-based and ships busybox, not curl. A plain port check is enough -
+        # the emulator serves as soon as it listens.
+        options: >-
+          --health-cmd "nc -z 127.0.0.1 10002"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_USER: appuser
+          POSTGRES_DB: binacle_net
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U appuser -d binacle_net"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup - just
+        uses: ./.github/actions/setup-just
+
+      - name: Setup - .NET
+        uses: ./.github/actions/setup-dotnet
+        with:
+          dotnet-version: ${{ vars.DONET_VERSION }}
+
+      - name: Setup - Node
+        uses: ./.github/actions/setup-node
+
+      - name: Install npm packages
+        run: npm ci --ignore-scripts
+
+      - name: Build
+        run: dotnet build Binacle.Net.slnx --configuration Release
+
+      # Not a test, and it does its own build - the recipe generates the documents before linting them.
+      - name: Lint - OpenAPI documents
+        if: ${{ !cancelled() }}
+        run: just openapi lint
+
+      # !cancelled() so every test still runs after one fails - you see all the red, not just the first.
+      # The quick unit tests go first, so an obvious break shows up before the integration hosts start.
+      - name: Test - Binacle.Lib.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-lib_unit
+
+      - name: Test - Binacle.CompactNotation.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-compact-notation_unit
+
+      - name: Test - binacle-compact-notation
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-compact-notation_unit
+
+      - name: Test - Binacle.ViPaq.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-vipaq_unit
+
+      - name: Test - binacle-vipaq
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-vipaq_unit
+
+      - name: Test - binacle-net-ui
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-net-ui_unit
+
+      - name: Test - cookies
+        if: ${{ !cancelled() }}
+        run: just test ts_cookies_unit
+
+      - name: Test - theme-switcher
+        if: ${{ !cancelled() }}
+        run: just test ts_theme-switcher_unit
+
+      - name: Test - Binacle.Net.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net_unit
+
+      - name: Test - Binacle.Net.Kernel.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-kernel_unit
+
+      - name: Test - Binacle.Net.DiagnosticsModule.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-diagnostics-module_unit
+
+      - name: Test - Binacle.Net.UIModule.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-ui-module_unit
+
+      - name: Test - Binacle.Net.ServiceModule.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-service-module_unit
+
+      - name: Test - Binacle.Net.UIModule.IntegrationTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-ui-module_integration
+
+      - name: Test - Binacle.Net.IntegrationTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net_integration
+
+      # A step per backend, not a matrix. The backend is the recipe's argument, so a typo is rejected
+      # instead of reporting green for a backend nobody exercised.
+      - name: Test - Binacle.Net.ServiceModule.IntegrationTests [Sqlite]
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-service-module_integration Sqlite
+
+      - name: Test - Binacle.Net.ServiceModule.IntegrationTests [Postgres]
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-service-module_integration Postgres
+
+      - name: Test - Binacle.Net.ServiceModule.IntegrationTests [AzureStorage]
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-service-module_integration AzureStorage

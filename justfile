@@ -1,16 +1,18 @@
-# Binacle.Net task runner.
-# Setup, the dev loops and the test, coverage, openapi, agents and build modules live here. Benchmarks and
-# performance are still shell scripts.
-# `just` with no args lists every task. Install: sudo apt install just
+# Binacle.Net task runner. `just` with no arguments lists everything.
+#
+# Install: sudo apt install just
+#
+# Each module below is one file in tooling/. The benchmark and performance runs are still shell scripts in
+# there, not recipes.
 
 # List all tasks
 default:
     @just --list
 
-# Test leaves: `just test <leaf>`, everything with `just test all`, listed by `just --list test`.
+# Tests: `just test all`, one with `just test <name>`, every name with a bare `just test`.
 mod test 'tooling/tests.just'
 
-# Coverage on top of those leaves: `just coverage all [cobertura|sonar]`, `just coverage report` for the HTML.
+# Coverage for those tests: `just coverage all [cobertura|sonar]`, `just coverage report` for the HTML.
 mod coverage 'tooling/coverage.just'
 
 # OpenAPI documents: `just openapi generate [dir]`, `just openapi lint [dir]` to Spectral them too.
@@ -40,8 +42,11 @@ mod smoke 'tooling/smoke.just'
 # Check what was built: `just check links` for every site, `just check links <site>` for one.
 mod check 'tooling/check.just'
 
-# Two recipes rather than an `install` module: you want all of it on a fresh clone, and the only part worth
-# running on its own is the asset copy. It becomes a module when there is a third thing to install separately.
+# The shell a workflow runs: `just ci gate <json>`, `just ci changed-paths <base> <head>`, one file each.
+mod ci 'tooling/ci.just'
+
+# Two recipes rather than an `install` module: a fresh clone wants all of it, and the asset copy is the only
+# part worth running on its own.
 
 # Everything a fresh clone needs before `just serve` works
 [group('dev')]

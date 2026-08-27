@@ -1,7 +1,7 @@
-#   changes -> test suite, image build, workflow lint -> gate
+#   changes -> image tests, image build, site tests, site build, workflow lint -> gate
 #
-# `gate` is the only name branch protection holds. Never move the image build into the test suite - the release
-# calls that file whole and would build a throwaway image every time.
+# `gate` is the only name branch protection holds. Never move the image build into the test suite - the
+# release calls that file whole and would build a throwaway image every time.
 
 name: Pull Request
 
@@ -22,41 +22,45 @@ jobs:
       contents: read
     outputs:
       code: ${{ steps.paths.outputs.code }}
+      site: ${{ steps.paths.outputs.site }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The three-dot diff below needs the merge base, which a shallow clone does not have.
+          # The recipe diffs base...head, which needs the merge base a shallow clone does not have.
           fetch-depth: 0
 
-      # Three dots, not two: with two, a commit landing on main reads as a change in every open pull request.
-      - name: List the changed paths
+      - name: Setup - just
+        uses: ./.github/actions/setup-just
+
+      - name: Work out what changed
         id: paths
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          git diff --name-only "$BASE...$HEAD" | tee /tmp/changed.txt
-          if grep -qvE '^(\.agents/|sites/)|\.md$' /tmp/changed.txt; then
-            echo 'code=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'code=false' >> "$GITHUB_OUTPUT"
-          fi
+        run: just ci changed-paths "$BASE" "$HEAD" | tee -a "$GITHUB_OUTPUT"
 
   test-suite:
-    name: Tests
+    name: Image tests
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
-    uses: ./.github/workflows/shared-test-suite.yml
+    if: ${{ needs.changes.outputs.code == 'yes' }}
+    uses: ./.github/workflows/shared-image-tests.yml
+    permissions:
+      contents: read
+
+  site-tests:
+    name: Site tests
+    needs: changes
+    if: ${{ needs.changes.outputs.site == 'yes' }}
+    uses: ./.github/workflows/shared-site-tests.yml
     permissions:
       contents: read
 
   image:
     name: Image build
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
+    if: ${{ needs.changes.outputs.code == 'yes' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -75,21 +79,52 @@ jobs:
           dotnet-version: ${{ vars.DONET_VERSION }}
 
       # `just build image` reaches `publish`, which bundles the UI module's javascript. Without node the
-      # bundlers resolve out of a `node_modules` nothing installed and this job fails.
+      # bundlers resolve out of a node_modules nothing installed, and this job fails.
       - name: Setup - Node
         uses: ./.github/actions/setup-node
 
       - name: Install npm packages
         run: npm ci --ignore-scripts
 
-      # The recipe the release builds through, so this proves that path. No login, no push, no credentials.
       - name: Build - image
         run: just build image
+
+  site-build:
+    name: Site build (${{ matrix.site }})
+    needs: changes
+    if: ${{ needs.changes.outputs.site == 'yes' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [ docs, demo, www ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build - site
+        uses: ./.github/actions/build-jekyll-site
+        with:
+          site: ${{ matrix.site }}
+          directory: sites/${{ matrix.site }}
+
+      - name: Install - lychee
+        uses: ./.github/actions/install-lychee
+
+      - name: Check - links
+        env:
+          SITE: ${{ matrix.site }}
+        run: just check links "$SITE"
 
   workflows:
     name: Workflow lint
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
+    if: ${{ needs.changes.outputs.code == 'yes' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -114,41 +149,21 @@ jobs:
 
   gate:
     name: Gate
-    needs: [ changes, test-suite, image, workflows ]
+    needs: [ changes, test-suite, site-tests, image, site-build, workflows ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions: {}
+    permissions:
+      contents: read
 
     steps:
-      # Read every result: a bare always() passes while its dependencies are red.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup - just
+        uses: ./.github/actions/setup-just
+
       - name: Check every job above
         env:
-          # Name and result in pairs, so the summary below can say which job did what.
-          RESULTS: >-
-            changes:${{ needs.changes.result }}
-            tests:${{ needs.test-suite.result }}
-            image:${{ needs.image.result }}
-            workflows:${{ needs.workflows.result }}
-        run: |
-          set -euo pipefail
-          failed=0
-          {
-            echo '| Job | Result |'
-            echo '|---|---|'
-          } >> "$GITHUB_STEP_SUMMARY"
-          for pair in $RESULTS; do
-            job="${pair%%:*}"
-            result="${pair##*:}"
-            echo "| \`$job\` | $result |" >> "$GITHUB_STEP_SUMMARY"
-            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
-              echo "$job reported '$result'."
-              failed=1
-            fi
-          done
-          if [ "$failed" -eq 1 ]; then
-            echo '' >> "$GITHUB_STEP_SUMMARY"
-            echo '**The gate failed.** A job above did not succeed.' >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "Every job succeeded or was skipped."
+          RESULTS: ${{ toJSON(needs) }}
+        run: just ci gate "$RESULTS"

@@ -7,7 +7,7 @@ runs:
     - name: Install hurl
       shell: bash
       env:
-        # Keep in step with DEVELOPMENT.md, so CI and a laptop get the same bytes.
+        # Keep in step with DEVELOPMENT.md.
         VERSION: 8.0.1
         SHA256: cac7c4670d69444db120edb21fe06c97ba8c80dcc52279957c8dd18f05fb0c06
       # ~/.local/bin is on PATH for an interactive shell but not for later steps, hence GITHUB_PATH.

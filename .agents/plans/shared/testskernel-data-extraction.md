@@ -17,8 +17,7 @@ suite and custom-problems stay in `shared/data/` because more than one slice rea
 is `ResultSelection.`. Only the "review and grow the cases" work below remains. Delete this file when nothing
 pending is left.
 
-**It collides with the heavy architecture tools** - ArchUnitNET and its xunit v3 adapter. Both touch the test
-leaves, so whichever runs second reads the other's result, and the `xunit.v3.mtp-v2` pin in
+**It collides with the heavy architecture tools** - ArchUnitNET and its xunit v3 adapter. Both touch the tests, so whichever runs second reads the other's result, and the `xunit.v3.mtp-v2` pin in
 `Directory.Packages.props` bites both.
 
 A new JSON file dropped into the right data folder is picked up automatically (each `.csproj` embeds its set with a

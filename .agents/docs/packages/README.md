@@ -122,11 +122,11 @@ the server and the browser cannot disagree.
 
 | Project | What it covers | Run |
 |---|---|---|
-| `packages/binacle-compact-notation` | the notation parser/formatter, `tests/compactNotation.test.ts` | `just test shared-ts-unit` |
-| `packages/binacle-net-ui` | the randomizer, the view models and every Alpine component bar the visualizer | `just test packages-net-ui-unit` |
-| `packages/cookies` | the converter round trip, get/set/remove, attribute stringifying | `just test packages-cookies-unit` |
-| `packages/theme-switcher` | connect, click, the control and its labels, `system`, the swap, the host settings, the pre-paint read, and the cookie over plain http | `just test packages-theme-switcher-unit` |
-| `vipaq/packages/binacle-vipaq` | the ViPaq TS mirror, including the shared cross-language vectors | `just test vipaq-ts-unit` |
+| `packages/binacle-compact-notation` | the notation parser/formatter, `tests/compactNotation.test.ts` | `just test ts_binacle-compact-notation_unit` |
+| `packages/binacle-net-ui` | the randomizer, the view models and every Alpine component bar the visualizer | `just test ts_binacle-net-ui_unit` |
+| `packages/cookies` | the converter round trip, get/set/remove, attribute stringifying | `just test ts_cookies_unit` |
+| `packages/theme-switcher` | connect, click, the control and its labels, `system`, the swap, the host settings, the pre-paint read, and the cookie over plain http | `just test ts_theme-switcher_unit` |
+| `vipaq/packages/binacle-vipaq` | the ViPaq TS mirror, including the shared cross-language vectors | `just test ts_binacle-vipaq_unit` |
 
 The compact-notation alias is filed under **shared**, not packages, because that package mirrors a
 `shared/src` C# project; the other three are named after the folder they live in.
@@ -139,7 +139,7 @@ include `secure` and jsdom hides a secure cookie from a document on an insecure 
 proves the theme survives a reload on an image served over plain http.
 
 **Coverage settings live only in the root `jest.config.js`.** In multi-project mode jest ignores a project's
-own `collectCoverageFrom`, and every leaf runs through the root config with `--selectProjects`. Five package
+own `collectCoverageFrom`, and every test runs through the root config with `--selectProjects`. Five package
 configs carried a copy until 2026-08-22; all five were dead and one disagreed with the root.
 
 ## Dependencies

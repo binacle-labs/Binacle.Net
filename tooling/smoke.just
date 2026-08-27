@@ -1,45 +1,45 @@
-# Smoke test a built image: its static content and its HTTP surface. Loaded as the `smoke` module.
+# Smoke tests a built image: the files it ships and the HTTP surface it serves.
 #
 #   just smoke all                     build binacle-net:local, check its structure, then every profile
-#   just smoke test-structure [image]  the image's static content - no container, no stack
+#   just smoke test-structure [image]  the files the image ships - no container, no stack
 #   just smoke test <profile> [image]  one profile end to end: up -> hurl -> down
 #   just smoke up <profile> [image]    bring one up and leave it   [minimal|quickstart|prod|service|full]
-#   just smoke down <profile>          stop it (add -v to drop the volume)
+#   just smoke down <profile>          stop it, add -v to drop the volume
 #
-# Every recipe takes the image last and defaults to binacle-net:local, so the same suite runs against a local
-# build or a published tag - `just smoke test service binacle/binacle-net:3.0.0` smokes what is actually on
-# Docker Hub. The stacks read it as $BINACLE_IMAGE with the same default, so a bare `docker compose` still works.
+# The image goes last on every recipe and defaults to binacle-net:local, so the same suite runs against a
+# local build or a published tag - `just smoke test service binacle/binacle-net:3.0.0` smokes what is on
+# Docker Hub.
 #
-# Static content is one container-structure-test file (tooling/smoke/structure.yaml) read straight from the
-# image; the HTTP surface is one .hurl per profile run against a running stack. The structure check reads the
-# image, not a container, so it runs once per `all` rather than once per profile.
+# The files are checked by one container-structure-test file, tooling/smoke/structure.yaml, read straight
+# from the image. That is why it runs once per `all` and not once per profile. The HTTP surface is one .hurl
+# per profile, run against a stack that is up.
 #
-# The stacks are separate files from samples/: they raise the anonymous rate limit and throw their storage
-# away, which the samples must never do.
+# The stacks here are not the ones under samples/. These raise the anonymous rate limit and throw their
+# storage away, which a sample must never do.
 
-# Module recipes run where the module file lives (tooling/), which would break every path below.
+# Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
 
-# docker, container-structure-test and hurl all print why they failed; just's own line adds nothing.
+# docker, container-structure-test and hurl all print why they failed, so just's own line adds nothing.
 set no-exit-message := true
 
-# The tool binaries. Install them per DEVELOPMENT.md - they are not part of `just install`.
+# Install these per DEVELOPMENT.md. `just install` does not.
 cst := "container-structure-test"
 hurl := "hurl"
 
 # What `just build image` tags, and so what every recipe here smokes unless told otherwise.
 local_image := "binacle-net:local"
 
-# The profiles, declared once. just has no list type, so this is a space-separated string - which is what both
-# `all`'s loop and `_check`'s match want anyway. Adding a profile is this line plus the two files under
-# tooling/smoke/ named after it.
+# just has no list type, so this is a space-separated string - which is what the loop in `all` and the match
+# in `_check` both want. Adding a profile is this line plus the two files named after it under tooling/smoke.
 profiles := "minimal quickstart prod service full"
 
+# List the recipes
 # List the recipes
 default:
     @just --list smoke
 
-# The image's static content: the shipped files, their permissions, the metadata and the OCI labels
+# The files the image ships, their permissions, the metadata and the OCI labels
 test-structure image=local_image:
     {{ cst }} test --image {{ image }} --config tooling/smoke/structure.yaml
 
@@ -47,17 +47,19 @@ test-structure image=local_image:
 test profile image=local_image:
     #!/usr/bin/env bash
     set -euo pipefail
+
     just smoke::_check "{{ profile }}"
-    # Tears the stack down even when the hurl run fails under set -e. The teardown is not silenced: a failed
-    # `down` is how a container leaks, which is the one thing this trap exists to prevent.
+
+    # Tears the stack down even when the hurl run fails. The teardown is not silenced: a failed `down` is how
+    # a container leaks, which is the one thing this trap exists to prevent.
     trap 'just smoke::_compose "{{ profile }}" "{{ image }}" down -v || true' EXIT
+
     just smoke::_compose "{{ profile }}" "{{ image }}" up -d
     just smoke::_test_profile "{{ profile }}"
 
-# The HTTP surface against an already-up stack. Takes no image - it talks to whatever is listening, and which
-# image that came from was decided by `up`. Private because `test` owns the lifecycle, but still reachable as
-# `just smoke::_test_profile <profile>`, which is how you re-run a .hurl you are editing without paying for an
-# up and a down each time.
+# Takes no image: it talks to whatever is listening, and `up` already decided which image that is. Private
+# because `test` owns the lifecycle, but `just smoke::_test_profile <profile>` still works - which is how you
+# re-run a .hurl you are editing without paying for an up and a down each time.
 [private]
 _test_profile profile:
     {{ hurl }} --test --retry 30 --retry-interval 1000 tooling/smoke/{{ profile }}.hurl
@@ -70,44 +72,52 @@ up profile image=local_image:
 down profile *args:
     @just smoke::_compose "{{ profile }}" "{{ local_image }}" down {{ args }}
 
-# Build the image, check its structure once, then every profile end to end
+# Build the image, check its files once, then every profile end to end
 all image=local_image:
     #!/usr/bin/env bash
     set -euo pipefail
-    # Only build when smoking the local tag. Given a published one there is nothing to build, and building
-    # would tag binacle-net:local while the stacks went on pulling the image that was asked for - a green run
-    # that says nothing about either.
+
+    # Only build when smoking the local tag. Building for a published one would tag binacle-net:local while
+    # the stacks went on pulling the image that was asked for - a green run that says nothing about either.
     if [ "{{ image }}" = "{{ local_image }}" ]; then
         just build image
     else
         echo "smoking {{ image }} - not building"
         docker pull "{{ image }}"
     fi
+
     echo "===== smoke: image structure ====="
     just smoke test-structure "{{ image }}"
+
     for profile in {{ profiles }}; do
         echo "===== smoke: $profile ====="
         just smoke test "$profile" "{{ image }}"
     done
+
     echo "all profiles green: {{ image }}"
 
-# Reject an unknown profile in one place. $want is quoted inside the pattern so it stays a literal - unquoted it
-# would be read as a glob, and a profile named `*` would match anything.
+# Rejects an unknown profile, in one place
 [private]
 _check profile:
     #!/usr/bin/env bash
+
+    # $want is quoted inside the pattern so it stays a literal. Unquoted it is a glob, and a profile named
+    # `*` would match anything.
     want="{{ profile }}"
     case " {{ profiles }} " in
         *" $want "*) ;;
         *) echo "Unknown profile '$want'. Use one of: {{ profiles }}" >&2; exit 1 ;;
     esac
 
-# The profile name maps to a compose file here and nowhere else, so up and down cannot disagree about which
-# file a name means. The image reaches the stack as $BINACLE_IMAGE, which every smoke compose file reads with
-# the same binacle-net:local default - so a bare `docker compose -f tooling/smoke/<profile>.yml` still works.
+# A profile name maps to a compose file here and nowhere else, so `up` and `down` cannot disagree about which
+# file a name means.
 [private]
 _compose profile image *args:
     #!/usr/bin/env bash
     set -euo pipefail
+
     just smoke::_check "{{ profile }}"
+
+    # The stack reads $BINACLE_IMAGE with the same binacle-net:local default, so a bare
+    # `docker compose -f tooling/smoke/<profile>.yml` still works.
     BINACLE_IMAGE="{{ image }}" docker compose -f "tooling/smoke/{{ profile }}.yml" {{ args }}

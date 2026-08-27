@@ -35,7 +35,7 @@ just serve services-down [-v]    # only needed after -d; Ctrl-C is enough otherw
 ```
 
 `services-up` is here rather than with the image stacks because it runs no binacle-net at all: it is what
-`just serve api` talks to, and what the Postgres and AzureStorage test leaves need. Running the **built
+`just serve api` talks to, and what the Postgres and AzureStorage tests need. Running the **built
 image** is the other job, and that is the `image` module below.
 
 Its file, `serve.services.yml`, is the only place those three services are declared. The `full` image stack
@@ -45,27 +45,35 @@ one `-v` in either place that empties it.
 ---
 
 ## 🧪 Tests
-`tests.just`, loaded as the `test` module. One recipe per suite, so tab completion finds them and CI calls the
-same recipes a maintainer does.
+`tests.just`, loaded as the `test` module. One recipe per suite, and CI calls the same recipes a maintainer
+does.
+
+A test name is derived, never chosen - `<lang>_<project>_<kind>`, where the project segment is the assembly,
+package or gem name lowercased with dots turned to dashes. The single tests are private, so completion offers
+the three groups; `just test` with no argument prints every name.
 
 ```bash
-just --list test                 # every leaf
+just test                        # the three groups, then every name
 just test all                    # everything that needs nothing brought up
-just test lib-unit               # one leaf
-just test api-service-integration Postgres
+just test image                  # the ones the Docker image ships
+just test sites                  # the ones a Jekyll site ships
+just test cs_binacle-lib_unit    # one test
+just test cs_binacle-net-service-module_integration Postgres
 ```
 
 Postgres and AzureStorage need their service up first (`just serve services-up -d`); with no argument the harness
 falls back to SQLite.
 
-The `ruby` group is the six Jekyll plugin gems, one leaf each - `just test ruby-gtm-unit`. They are in
-`just test all` because they need nothing brought up, and they carry no coverage: Ruby's collector is
-simplecov and it is not in the bundle, so a coverage run executes them and writes nothing for them.
+The ten `rb_` tests are the Jekyll plugin gems. They need nothing brought up, they report coverage through
+simplecov, and they run on the site path only: a gem ships in the three sites and never in the Docker image.
+
+`image` and `sites` are for a laptop. CI names every test as its own step, so a red check names the suite.
+The lists are written out by hand and nothing checks one against another.
 
 ---
 
 ## 📊 Coverage
-`coverage.just`, loaded as the `coverage` module. It runs the same leaves with the collector attached - coverage
+`coverage.just`, loaded as the `coverage` module. It runs the same tests with the collector attached - coverage
 is the same run with extra output, not a second one.
 
 ```bash
@@ -82,7 +90,9 @@ xml for C# plus lcov for TS. Output is one flat file per suite under `artifacts/
 ---
 
 ## 📑 OpenAPI and the agent indexes
-Two small modules, `openapi.just` and `agents.just`.
+Two small modules, `openapi.just` and `agents.just`. The agent one is a door onto
+`agents/generate-index.py`, which reads `agents/indexes.toml` - **[`agents/README.md`](agents/README.md) has
+the detail**.
 
 ```bash
 just openapi generate [dir]      # write artifacts/openapi/Binacle.Net_v3.json and _v4.json
@@ -262,14 +272,31 @@ docker run --rm -v binacle-net-data:/data -v "$PWD/out:/out" alpine cp -a /data/
 
 ---
 
+## 🚦 CI scripts
+`ci.just`, loaded as the `ci` module, and one file per operation in [`ci/`](ci/README.md). This is the shell a
+GitHub Actions workflow runs, kept out of the YAML so shellcheck can read it and so you can run it yourself.
+
+```bash
+just --list ci                     # every operation, with its arguments
+just ci changed-paths HEAD~1 HEAD  # which halves of the repo a diff touched
+just ci gate '<json of every job and its result>'
+```
+
+Each script takes its inputs as arguments and reads no GitHub context of its own, so all of them run here as
+well as on a runner. The ones that print `key=value` are teed into `$GITHUB_OUTPUT` by the workflow step; the
+ones that write a run summary fall back to the screen. **[`ci/README.md`](ci/README.md) lists them all.**
+
+---
+
 ## ☁️ Cloudflare
 
-`cloudflare/` holds one wrangler config per site - `docs.wrangler.jsonc` and `demo.wrangler.jsonc`. They are
-**not** run from here: the `Deploy Docs Site` and `Deploy Demo Site` workflows call `wrangler deploy --config`
-against them, both manual (`workflow_dispatch`) and both tagging the commit they published.
+`cloudflare/` holds one wrangler config per site - `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and
+`www.wrangler.jsonc`. They are **not** run from here: the three `Deploy ... Site` workflows call
+`wrangler deploy --config` against them, all manual (`workflow_dispatch`) and all tagging the commit they
+published.
 
-Each config points at the folder the build already wrote - `artifacts/docs` and `artifacts/demo` - so a deploy
-uploads whatever `just build docs` last produced. That path is relative to the config file and has to match
+Each config points at the folder the build already wrote - `artifacts/docs`, `artifacts/demo`,
+`artifacts/www` - so a deploy uploads whatever `just build docs` last produced. That path is relative to the config file and has to match
 the `destination` in the site's `_config.yml`; the two are wrong together or right together.
 
 Preview URLs are off on purpose, and observability is on - request metadata and 404s are the only way to see

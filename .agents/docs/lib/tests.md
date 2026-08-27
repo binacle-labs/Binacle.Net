@@ -23,7 +23,7 @@ because nothing outside this slice reads it (`$lib/dependencies`).
 | Project | Kind | Run |
 |---|---|---|
 | `Binacle.Lib.TestsKernel` | fixture library (no suite) | — |
-| `Binacle.Lib.UnitTests` | xUnit | `just test lib-unit` |
+| `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PerformanceTests` | console host (writes markdown reports) | `./tooling/performance.lib.sh` |
 | `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
 

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Binacle.Net.Configuration;
 using Binacle.Net.v3.Contracts;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +73,32 @@ public class PackByPresetBehavior:  Abstractions.BehaviourTestsBase
 		this.sampleRequest.Parameters!.Algorithm = null;
 		var urlPath = routePath.Replace("{preset}", PresetKeys.CustomProblems);
 		await base.Request_Returns_422UnprocessableContent(urlPath, this.sampleRequest);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Unknown Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithUnknownAlgorithm_Returns_422UnprocessableContent()
+	{
+		var urlPath = routePath.Replace("{preset}", PresetKeys.CustomProblems);
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			urlPath,
+			this.sampleRequest,
+			JsonValue.Create("invalid"),
+			nameof(PackByPresetRequest.Parameters),
+			nameof(PackRequestParameters.Algorithm)
+		);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Numeric Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithNumericAlgorithm_Returns_422UnprocessableContent()
+	{
+		var urlPath = routePath.Replace("{preset}", PresetKeys.CustomProblems);
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			urlPath,
+			this.sampleRequest,
+			JsonValue.Create(1),
+			nameof(PackByPresetRequest.Parameters),
+			nameof(PackRequestParameters.Algorithm)
+		);
 	}
 
 	[Fact(DisplayName = $"POST {routePath}. Without Items, Returns 422 UnprocessableContent")]

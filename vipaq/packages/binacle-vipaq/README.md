@@ -26,7 +26,7 @@ the vectors are written in.
 ## 🧪 Tests
 
 ```bash
-just test vipaq-ts-unit          # from the repo root
+just test ts_binacle-vipaq_unit          # from the repo root
 ```
 
 Two of the suites are the cross-language ones and matter more than the rest:

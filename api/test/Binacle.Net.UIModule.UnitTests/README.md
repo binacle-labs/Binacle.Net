@@ -11,7 +11,7 @@ Razor generates internal page classes, so every type under test is `internal` an
 `InternalsVisibleTo`. That is the same arrangement the other modules use.
 
 ```bash
-just test api-ui-unit
+just test cs_binacle-net-ui-module_unit
 ```
 
 **What is not here.** Routing, the error-page middleware and whether a reserved path answers with JSON instead

@@ -7,10 +7,10 @@ runs:
     - name: Install container-structure-test
       shell: bash
       env:
-        # Keep in step with DEVELOPMENT.md, so CI and a laptop get the same bytes.
+        # Keep in step with DEVELOPMENT.md.
         VERSION: v1.22.1
-        # Upstream publishes none - taken from the binary in use. It proves later downloads match that one,
-        # not that it was genuine.
+        # Upstream publishes none. Taken from the binary in use, so it proves later downloads match that
+        # one, not that it was genuine.
         SHA256: fa35e89512a8978585f76cf41397956d2e3a30c62c2ad3fb857b1597074d14ca
       # ~/.local/bin is on PATH for an interactive shell but not for later steps, hence GITHUB_PATH.
       run: |

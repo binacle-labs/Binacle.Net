@@ -127,7 +127,7 @@ pick the same one, is in the packing-demo design record (`$sites/packing-demo-se
 
 ## Tests
 
-`just test packages-net-ui-unit`. jsdom, because the components read `document` and `window` even where the
+`just test ts_binacle-net-ui_unit`. jsdom, because the components read `document` and `window` even where the
 logic under test does not. **20 suites, 349 tests, 70.53% of lines** — measured 2026-08-27.
 
 `tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is

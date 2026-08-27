@@ -6,7 +6,9 @@
     <ItemGroup>
         <Content Include="*.json" />
         <Content Include="smoke\*.json" />
-        <Content Include="*.sh" />
+        <Content Include="cloudflare\*.jsonc" />
+        <Content Include="**\*.sh" />
+        <Content Include="**\*.py" />
         <Content Include="*.just"/>
         <Content Include="**\*.md"/>
         <Content Include="**\*.yml"/>
@@ -14,5 +16,6 @@
         <Content Include="**\*.hurl"/>
         <Content Include="**\*.xml"/>
         <Content Include="**\*.toml"/>
+        <Content Include="**\*.rb"/>
     </ItemGroup>
 </Project>

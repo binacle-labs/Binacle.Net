@@ -161,6 +161,6 @@ See `$api/v4/add-endpoint` for the template — ServiceModule endpoints use `IGr
 
 ## Related Tests
 
-`api/test/Binacle.Net.ServiceModule.IntegrationTests` (run with `just test api-service-integration
+`api/test/Binacle.Net.ServiceModule.IntegrationTests` (run with `just test cs_binacle-net-service-module_integration
 [Sqlite|Postgres|AzureStorage]`) — covers the auth token endpoint and the Admin account and subscription
 endpoints, including the two list endpoints and the subscription Get.

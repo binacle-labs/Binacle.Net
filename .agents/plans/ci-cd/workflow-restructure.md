@@ -1,5 +1,5 @@
 ---
-description: CI - what is left after the workflow restructure landed, and the gap the next workflows session inherits
+description: CI - the branch protection change waiting on the maintainer, and the composite actions' shell, the one shell in CI that nothing lints
 state: blocked
 waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
 paths:
@@ -32,16 +32,44 @@ renamed freely afterwards.
 from the caller's side - a missing required input or a misspelled name is reported against the `uses:` line,
 naming the action and listing what it accepts.
 
-**What is unchecked is their shell: 36 lines**, against 256 in the workflows that get actionlint and
-shellcheck. Measured 2026-08-27. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts.
+**Their shell is the only shell in CI that nothing lints: 36 lines.** Measured 2026-08-28, after the
+workflows moved their logic into `tooling/ci/*.sh`. Four of the five blocks are the near-identical `install-*`
+download-and-checksum scripts.
+
+The rest is covered. 285 lines of script under `tooling/ci/` go through shellcheck directly, and actionlint
+hands the 23 lines still inline in three workflows to shellcheck itself. So this is now the whole gap, not a
+share of it.
+
+**It costs nothing today.** All five blocks were extracted by hand on 2026-08-28 and shellcheck reported
+nothing. The gap is that no one would know when that stops being true.
 
 **One check already sits in `just check actions` by hand**: a grep for a `vars` or `secrets` expression in a
 manifest. That is not hypothetical - it failed the first CI run on 2026-08-18, from an expression written
 inside an input `description`, because the runner evaluates the whole manifest before any step runs.
 
-**Closing the rest means extracting `runs.steps[].run` and piping it to shellcheck** - a tool to build rather
-than one to install, which is why it did not land with the rest. It belongs in `just check actions`, beside
-that grep.
+## How to close it - decided 2026-08-28, not built
+
+**No tool needed. The action calls a script in the repo.**
+
+    run: tooling/ci/install-lychee.sh
+
+**This works because a local action is read out of the working copy.** `./.github/actions/install-lychee` only
+resolves after `actions/checkout`, so the repository is always there by the time the action runs - checked on
+2026-08-28 across all 38 uses of a local action, every one of them after a checkout. Nothing has to be
+installed first, and it does not go through `just`.
+
+**The version and the checksum stay in the action's `env:`**, which is where a reader and Dependabot look for
+them. Only the shell moves.
+
+Then the gap closes itself: the shell is a `.sh` file that `shellcheck tooling/ci/*.sh` already covers, and
+there is nothing left inside an action to extract. **The extractor this plan used to call for is not needed.**
+
+**A second thing falls out.** `DEVELOPMENT.md` tells the maintainer to install lychee, hurl, actionlint and
+container-structure-test by hand. Those four scripts are the same install CI does.
+
+**Do the investigation first.** A separate pass is asking, for each of these, whether an official action or a
+package manager already does the job, and whether any of the shell is doing more than it needs to. A script
+written before that answer is a script deleted after it.
 
 ## Done when
 
@@ -49,5 +77,7 @@ that grep.
       **By eye.** Open the branch protection settings for `main` and read the required-checks list.
 - [ ] No pull request is waiting on a required check that cannot report.
       **By eye.** Open any open pull request; nothing sits pending forever.
-- [ ] The composite actions' shell is linted, or a line here says it was dropped.
-      `just check actions` runs shellcheck over `runs.steps[].run`, or this plan says why not.
+- [ ] Every composite action's shell is a script under `tooling/ci/`, or a line here says why one is not.
+      `grep -c 'run: |' .github/actions/*/action.yml` returns 0, and `shellcheck tooling/ci/*.sh` is clean.
+- [ ] Each install is still the right way to install that tool.
+      The investigation pass has reported, and anything it found a supported route for is using it.

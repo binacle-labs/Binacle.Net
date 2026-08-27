@@ -1,49 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-
 namespace Binacle.Net.Kernel.Serialization;
-
-public class JsonStringNullableEnumConverter<T> : JsonConverter<T>
-{
-	private readonly Type underlyingType;
-
-	public JsonStringNullableEnumConverter()
-	{
-		this.underlyingType = Nullable.GetUnderlyingType(typeof(T))!;
-	}
-
-	public override bool CanConvert(Type typeToConvert)
-	{
-		return typeof(T).IsAssignableFrom(typeToConvert);
-	}
-
-	public override T Read(ref Utf8JsonReader reader,
-		Type typeToConvert,
-		JsonSerializerOptions options)
-	{
-		string value = reader.GetString()!;
-		if (String.IsNullOrEmpty(value)) return default!;
-
-		// for performance, parse with ignoreCase:false first.
-		if (!Enum.TryParse(this.underlyingType, value, ignoreCase: false, out object result) &&
-		    !Enum.TryParse(this.underlyingType, value, ignoreCase: true, out result))
-		{
-			// Null would read as "absent" and a validator that only requires one field of several would
-			// pass, dropping what the client actually sent.
-			throw new JsonException($"Could not convert \"{value}\" to {this.underlyingType.Name}");
-		}
-		return (T)result;
-	}
-
-	public override void Write(Utf8JsonWriter writer,
-		T value,
-		JsonSerializerOptions options)
-	{
-		writer.WriteStringValue(value?.ToString());
-	}
-}
 
 public class JsonStringNullableEnumConverter : JsonConverterFactory
 {
@@ -75,27 +33,27 @@ internal sealed class NullableEnumConverter<T> : JsonConverter<T>
 
 	public override T ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		if (!this.TryParseEnumFromString(ref reader, out T result))
+		if (!EnumValueReader.TryRead(ref reader, this.underlyingType, out object? result, out var value))
 		{
-			throw new JsonException($"Could not read property for {typeof(T).Name}");
+			throw new JsonEnumValueException(this.underlyingType, value);
 		}
 
-		return result;
+		return (T)result!;
 	}
 
 	public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
 	{
-		writer.WriteStringValue(WriteValue(value));
+		writer.WritePropertyName(WriteValue(value));
 	}
 
 	public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		if (!this.TryParseEnumFromString(ref reader, out T result))
+		if (!EnumValueReader.TryRead(ref reader, this.underlyingType, out object? result, out var value))
 		{
-			throw new JsonException($"Could not convert value to {this.underlyingType.Name}");
+			throw new JsonEnumValueException(this.underlyingType, value);
 		}
 
-		return result;
+		return (T)result!;
 	}
 
 	public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
@@ -107,33 +65,38 @@ internal sealed class NullableEnumConverter<T> : JsonConverter<T>
 	{
 		return value?.ToString();
 	}
+}
 
-	private bool TryParseEnumFromString(ref Utf8JsonReader reader, out T result)
+internal static class EnumValueReader
+{
+	public static bool TryRead(
+		ref Utf8JsonReader reader,
+		Type enumType,
+		out object? result,
+		out string? value
+	)
 	{
+		result = null;
+		value = null;
+
 		if (reader.TokenType == JsonTokenType.Null)
 		{
-			result = default!;
-			return true;
-		}
-		string value = reader.GetString()!;
-
-		if (String.IsNullOrEmpty(value))
-		{
-			result = default!;
-			return true;
-		}
-		if (Enum.TryParse(this.underlyingType, value, ignoreCase: false, out object parsedResult))
-		{
-			result = (T)parsedResult;
-			return true;
-		}
-		if (Enum.TryParse(this.underlyingType, value, ignoreCase: true, out object parsedResult2))
-		{
-			result = (T)parsedResult2;
 			return true;
 		}
 
-		result = default!;
-		return false;
+		if (reader.TokenType != JsonTokenType.String && reader.TokenType != JsonTokenType.PropertyName)
+		{
+			return false;
+		}
+
+		value = reader.GetString();
+		if (string.IsNullOrEmpty(value))
+		{
+			return true;
+		}
+
+		// for performance, parse with ignoreCase:false first.
+		return Enum.TryParse(enumType, value, ignoreCase: false, out result)
+		       || Enum.TryParse(enumType, value, ignoreCase: true, out result);
 	}
 }

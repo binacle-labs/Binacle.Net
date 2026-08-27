@@ -9,7 +9,7 @@ under a reserved prefix must not.
 | `Tests/` | one file per question: error routing, page content, and the module switched off |
 
 ```bash
-just test api-ui-integration
+just test cs_binacle-net-ui-module_integration
 ```
 
 **What will bite you.** `Feature.Manager` is process-global static state, set while a host builds, so two

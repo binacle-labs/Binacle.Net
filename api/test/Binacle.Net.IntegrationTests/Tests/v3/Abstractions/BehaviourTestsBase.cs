@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using Binacle.Net.v3.Contracts;
 
 namespace Binacle.Net.IntegrationTests.v3.Abstractions;
@@ -132,5 +133,20 @@ public abstract partial class BehaviourTestsBase
 		{
 			additionalValidation.Invoke(result);
 		}
+	}
+	protected Task RequestWithFieldValue_Returns_422UnprocessableContent<TRequest>(
+		string url,
+		TRequest request,
+		JsonNode? value,
+		params string[] propertyPath
+	)
+	{
+		return NegativeRequest.Post_WithFieldValue_Returns_422UnprocessableContent(
+			this.Sut,
+			url,
+			request,
+			value,
+			propertyPath
+		);
 	}
 }

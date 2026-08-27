@@ -1,17 +1,12 @@
-# Sends coverage to SonarCloud. Keep Automatic Analysis OFF in the UI: it only reads source, so it can never
-# report coverage, and the two fight if both are on.
+# Sends coverage to SonarCloud. The build and the coverage run stay between `Sonar begin` and `Sonar end`.
 #
-# Build and coverage MUST stay between begin and end - the scanner only sees projects compiled in that pair.
-# A failing suite skips "Sonar end", so a broken run publishes nothing. That is deliberate.
-#
-# Only the key, org, token and host stay below; everything else the scanner needs is passed by `/s:`.
+# Only the key, org, token and host are set below. Everything else the scanner needs is in the file `/s:`
+# names.
 
 name: Sonar Analysis
 
 on:
-  # By hand only. Not a schedule - a nightly run re-analyses a commit nothing changed and reports the same
-  # numbers, which teaches everyone the run means nothing. Not pull_request either, yet: the coverage
-  # condition is red before anyone writes a line, and a gate like that gets waived within a week.
+  # By hand only - no schedule, and no pull request trigger yet.
   workflow_dispatch:
 
 # Cancellable: SonarCloud shows the branch's latest state, so superseded numbers get overwritten anyway.
@@ -23,7 +18,7 @@ jobs:
   analyze:
     name: Analyse and publish
     runs-on: ubuntu-latest
-    # Full build plus every suite under coverage, then the upload. The slowest workflow here.
+    # Full build plus every suite under coverage. The slowest workflow here.
     timeout-minutes: 45
     permissions:
       contents: read
@@ -32,10 +27,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Sonar needs full history to tell new code from old. A shallow clone makes everything look new.
           fetch-depth: 0
 
-      # The scanner is a Java program, whatever language it analyses.
       - name: Setup Java
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
@@ -53,11 +46,16 @@ jobs:
       - name: Setup - Node
         uses: ./.github/actions/setup-node
 
+      # `just coverage all` runs the gem tests too, and without this they cannot start.
+      - name: Setup - Ruby
+        uses: ./.github/actions/setup-ruby
+        with:
+          working-directory: ruby
+
       - name: Install npm packages
         run: npm ci --ignore-scripts
 
-      # Only the analyzer cache is here - the NuGet one comes with the .NET setup above. Analyzers are stable
-      # between runs, so caching skips the re-download.
+      # The analyzer cache only - the NuGet one comes with the .NET setup above.
       - name: Cache Sonar analyzers
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -68,8 +66,6 @@ jobs:
       - name: Restore tools
         run: dotnet tool restore
 
-      # Every interpolated value goes through env rather than into the command line, so nothing is pasted into
-      # a shell it could change the meaning of.
       - name: Sonar begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -81,7 +77,7 @@ jobs:
             /o:"$SONAR_ORGANIZATION" \
             /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /s:"$GITHUB_WORKSPACE/tooling/sonar-analysis.xml"
+            /s:"$GITHUB_WORKSPACE/tooling/ci/sonar-analysis.xml"
 
       # Build once here so the coverage run below can --no-build.
       - name: Build
@@ -92,67 +88,16 @@ jobs:
           DOTNET_TEST_ARGS: --configuration Release --no-build
         run: just coverage all sonar
 
-      # Publishes the run. Skipped on any failure above, so coverage from a broken run is never recorded.
       - name: Sonar end
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # `end` returns as soon as the report is uploaded - SonarCloud processes it after. Reading the gate
-      # without waiting for `ceTask` returns the PREVIOUS analysis, which is worse than printing nothing.
-      # `report-task.txt` is written by `end` and is the only place the task and dashboard URLs appear.
+      # The recipe waits for SonarCloud to finish processing. `end` returns when the upload does, so reading
+      # the gate straight away returns the previous run's numbers.
       - name: Summarise the quality gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          set -euo pipefail
-          report=.sonarqube/out/.sonar/report-task.txt
-          ce_task_url=$(grep -m1 '^ceTaskUrl=' "$report" | cut -d= -f2-)
-          dashboard_url=$(grep -m1 '^dashboardUrl=' "$report" | cut -d= -f2-)
-
-          # 5 minutes. A queued task that has not started in that time is a SonarCloud outage, not a slow build.
-          for _ in $(seq 1 60); do
-            task=$(curl -sS -u "${SONAR_TOKEN}:" "$ce_task_url")
-            status=$(printf '%s' "$task" | jq -r '.task.status')
-            case "$status" in
-              SUCCESS|FAILED|CANCELED) break ;;
-            esac
-            sleep 5
-          done
-
-          if [ "$status" != "SUCCESS" ]; then
-            {
-              echo '## Sonar'
-              echo
-              echo "The analysis task reported \`${status}\`. No gate to read."
-              echo
-              echo "[Dashboard](${dashboard_url})"
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          analysis_id=$(printf '%s' "$task" | jq -r '.task.analysisId')
-          gate=$(curl -sS -u "${SONAR_TOKEN}:" \
-            "https://sonarcloud.io/api/qualitygates/project_status?analysisId=${analysis_id}")
-
-          case "$(printf '%s' "$gate" | jq -r '.projectStatus.status')" in
-            OK)   verdict='✅ Passed' ;;
-            ERROR) verdict='❌ Failed' ;;
-            *)    verdict="$(printf '%s' "$gate" | jq -r '.projectStatus.status')" ;;
-          esac
-
-          {
-            echo '## Sonar'
-            echo
-            echo "**Quality gate:** ${verdict} - commit \`${GITHUB_SHA:0:8}\` on \`${GITHUB_REF_NAME}\`"
-            echo
-            echo '| Condition | Value | Required | |'
-            echo '|---|---|---|---|'
-            # `comparator` is the FAILING direction, so it is inverted here to read as the requirement.
-            printf '%s' "$gate" | jq -r '
-              .projectStatus.conditions[]
-              | (if .comparator == "LT" then ">=" elif .comparator == "GT" then "<=" else .comparator end) as $req
-              | "| `\(.metricKey)` | \(.actualValue) | \($req) \(.errorThreshold) | \(if .status == "OK" then "✅" else "❌" end) |"'
-            echo
-            echo "[Open the dashboard](${dashboard_url})"
-          } >> "$GITHUB_STEP_SUMMARY"
+          COMMIT: ${{ github.sha }}
+          BRANCH: ${{ github.ref_name }}
+        run: just ci sonar-summary .sonarqube/out/.sonar/report-task.txt "$COMMIT" "$BRANCH"

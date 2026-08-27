@@ -4,7 +4,7 @@ description: Sonar rules cannot be switched off on this project - custom quality
 type: gotcha
 when: someone proposes turning a Sonar rule off
 paths:
-  - "tooling/sonar-analysis.xml"
+  - "tooling/ci/sonar-analysis.xml"
 ---
 
 **No Sonar rule can be deactivated anywhere on this project.** Custom quality profiles start at the Team plan

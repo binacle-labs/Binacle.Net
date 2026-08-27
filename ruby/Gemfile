@@ -1,5 +1,15 @@
 source "https://rubygems.org"
 
+# Coverage, for every gem at once. The specs load it through spec_coverage.rb and it stays off unless
+# COVERAGE_FORMAT is set. Two formatters because the consumers want different files: cobertura for the local
+# table and the html report, json for Sonar.
+gem "simplecov", require: false
+gem "simplecov-cobertura", require: false
+gem "simplecov_json_formatter", require: false
+
+# Style, one config for every gem at ruby/.rubocop.yml. Not wired to any test or any workflow.
+gem "rubocop", require: false
+
 # One bundle for every gem here. Bundler walks up from a gem's own directory and finds this file, so
 # `bundle exec rspec` works from inside any of them.
 gemspec path: "binacle-docs-versions"

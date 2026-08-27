@@ -25,15 +25,15 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting - not in the near future"
 - file: ruby-gem-coverage.md
-  description: "The ten Ruby gems produce no coverage, so they are absent from the coverage table and from Sonar. Add simplecov per gem, without breaking the rule that a gem must be droppable into an unrelated site."
-  state: ready
-  waits-on: "nothing"
+  description: "The ten gems now report coverage locally. What is left is confirming SonarCloud imports the simplecov json at all, which no run has yet shown."
+  state: blocked
+  waits-on: "a Sonar run - none has happened since the gems landed"
   paths: ["ruby/**", "tooling/**"]
 - file: sonar-issue-triage.md
   description: "Sonar - re-read the open findings against the current project, then the one-line exclusion fix and the two rewrites behind it"
   state: blocked
   waits-on: "a re-read against SonarCloud - every count in this file predates the current project and the maintainer wants it revisited before the v3.0.0 tag"
-  paths: ["tooling/sonar-analysis.xml"]
+  paths: ["tooling/ci/sonar-analysis.xml"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - what each buys, and the four yes-or-no answers"
   state: idea
@@ -131,13 +131,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting - not in the near future"
   paths: [".github/workflows/**"]
-- file: ci-cd/test-leaves-reach-ci.md
-  description: "Ten of the twenty-six test leaves run on no pipeline, and rubocop has never been run at all. Give every leaf a step, group the leaves for a laptop, get rubocop running once, and add a check so the two lists cannot drift again."
+- file: ci-cd/release-by-dispatch.md
+  description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
   state: blocked
-  waits-on: "the maintainer's instructions on how - he said on 2026-08-27 that he wants this done and to wait for them"
-  paths: [".github/workflows/**", "tooling/**"]
+  waits-on: "a real run of the release workflow. Everything else this plan asked for is built"
+  paths: [".github/workflows/release-docker-image.yml"]
+- file: ci-cd/tests-reach-ci.md
+  description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."
+  state: blocked
+  waits-on: "a pull request run and a Sonar run - neither has happened since this landed"
+  paths: [".github/workflows/**", "tooling/**", "ruby/**"]
 - file: ci-cd/workflow-restructure.md
-  description: "CI - what is left after the workflow restructure landed, and the gap the next workflows session inherits"
+  description: "CI - the branch protection change waiting on the maintainer, and the composite actions' shell, the one shell in CI that nothing lints"
   state: blocked
   waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
   paths: [".github/**"]

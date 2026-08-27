@@ -1,8 +1,8 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-27
-check: Test leaves match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
+verified: 2026-08-28
+check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
   - "tooling/**"
@@ -52,7 +52,7 @@ just serve services-down [-v]          # only needed after -d; Ctrl-C is enough 
 ```
 
 `services-up` runs **no** binacle-net — it is what `just serve api` talks to, and what the Postgres and
-AzureStorage test leaves need. Running the *built image* is a different job; see "Run the image" below.
+AzureStorage tests need. Running the *built image* is a different job; see "Run the image" below.
 
 The API launch profiles:
 
@@ -67,53 +67,74 @@ run first.
 
 ## Run Tests
 
-Tests are `just` recipes, not scripts — one recipe per suite ("leaf"), defined in `tooling/tests.just` and
-loaded as the `test` module. `just --list test` lists them; the same recipes are what CI calls, so a red step
-is the line to paste here.
+Tests are `just` recipes, not scripts — one recipe per suite, defined in `tooling/tests.just` and
+loaded as the `test` module. The same recipes are what CI calls, so a red step is the line to paste here.
+
+**A test name is derived, never chosen:** `<lang>_<project>_<kind>`. The project segment is the assembly,
+package or gem name lowercased with dots turned to dashes, so `cs_binacle-net-kernel_unit` is
+`Binacle.Net.Kernel.UnitTests` and nothing else. `_` separates the segments, `-` belongs inside a name.
+
+**The tests are `[private]`**, so completion offers the three groups and not twenty-six tests. A private
+recipe still runs by name. `just test` with no argument prints the whole list.
 
 ```bash
-just test all                          # every leaf that needs nothing brought up
-just test lib-unit                     # lib C# unit
-just test shared-cs-unit               # compact-notation C#
-just test shared-ts-unit               # compact-notation TS
-just test vipaq-cs-unit                # vipaq C#
-just test vipaq-ts-unit                # vipaq TS
-just test packages-net-ui-unit         # binacle-net-ui TS
-just test packages-cookies-unit        # cookies TS
-just test packages-theme-switcher-unit # theme-switcher TS
-just test api-core-unit                # Binacle.Net options validators, forwarded headers
-just test api-kernel-unit              # Kernel features
-just test api-diagnostics-unit         # DiagnosticsModule
-just test api-ui-unit                  # UIModule applets, switches and page models
-just test api-service-unit             # ServiceModule config validators and policies
-just test api-core-integration         # v3 + v4 HTTP endpoints
-just test api-ui-integration           # page routes and markup, demo on and off
-just test api-service-integration [Sqlite|Postgres|AzureStorage]   # no arg falls back to SQLite
+just test all       # every test that needs nothing brought up
+just test image     # the sixteen the Docker image ships
+just test sites     # the fifteen a Jekyll site ships
+just test           # the three above, then every test name
 
-# The ten Ruby gem leaves. `just test all` runs them; no workflow does.
-just test ruby-docs-versions-unit      # binacle-docs-versions
-just test ruby-robots-unit             # binacle-robots
-just test ruby-breadcrumb-trail-unit   # jekyll-breadcrumb-trail
-just test ruby-filters-unit            # jekyll-filters
-just test ruby-gtm-unit                # jekyll-gtm
-just test ruby-multi-sitemap-unit      # jekyll-multi-sitemap
-just test ruby-page-meta-unit          # jekyll-page-meta
-just test ruby-resource-tags-unit      # jekyll-resource-tags
-just test ruby-structured-data-unit    # jekyll-structured-data
-just test ruby-webmanifest-unit        # jekyll-webmanifest
+# C#
+just test cs_binacle-lib_unit
+just test cs_binacle-compact-notation_unit
+just test cs_binacle-vipaq_unit
+just test cs_binacle-net_unit
+just test cs_binacle-net-kernel_unit
+just test cs_binacle-net-diagnostics-module_unit
+just test cs_binacle-net-ui-module_unit
+just test cs_binacle-net-service-module_unit
+just test cs_binacle-net_integration
+just test cs_binacle-net-ui-module_integration
+just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorage]  # no arg falls back to SQLite
+
+# TypeScript
+just test ts_binacle-compact-notation_unit
+just test ts_binacle-vipaq_unit
+just test ts_binacle-net-ui_unit
+just test ts_cookies_unit
+just test ts_theme-switcher_unit
+
+# Ruby - the ten gems. `just test sites` and `just test all` run them.
+just test rb_binacle-docs-versions_unit
+just test rb_binacle-robots_unit
+just test rb_jekyll-breadcrumb-trail_unit
+just test rb_jekyll-filters_unit
+just test rb_jekyll-gtm_unit
+just test rb_jekyll-multi-sitemap_unit
+just test rb_jekyll-page-meta_unit
+just test rb_jekyll-resource-tags_unit
+just test rb_jekyll-structured-data_unit
+just test rb_jekyll-webmanifest_unit
 ```
 
-**Twenty-six leaves, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
-from the gem's own folder, and `COVERAGE_FORMAT` is ignored for them — simplecov is not in the bundle, so a
-coverage run executes them and writes nothing, leaving them absent from the table rather than at zero.
+**Twenty-six tests, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
+from the gem's own folder, which is the only place a `spec_helper` is on the load path.
 
-`DOTNET_TEST_ARGS` is appended to every `dotnet test` leaf, which is how CI runs them all against one Release
+**Three group recipes, and the two lists in `tooling/tests.just` are the only copy of the set of tests.**
+`just test image` is what the Docker image ships, `just test sites` is what a Jekyll site ships, and
+`just test all` is the two of them with nothing run twice — five javascript tests are in both. Each group
+runs every test and reports all the failures, not just the first.
+
+**A group is for a laptop. CI never calls one** — a workflow names every test as its own step, so a red check
+names the suite. The step's `name:` is the assembly, package or gem in full; its `run:` is the derived recipe
+name. The lists are written out by hand and nothing checks one against another.
+
+`DOTNET_TEST_ARGS` is appended to every `dotnet test` recipe, which is how CI runs them all against one Release
 build: `DOTNET_TEST_ARGS="--configuration Release --no-build" just test all`.
 
 ## Coverage
 
-Coverage is not a second run — the collector rides along inside the test run, so these are the same leaves
-`just test all` runs, asked for extra output. Needs nothing brought up: the ServiceModule leaf uses SQLite.
+Coverage is not a second run — the collector rides along inside the test run, so these are the same tests
+`just test all` runs, asked for extra output. Needs nothing brought up: the ServiceModule test uses SQLite.
 
 ```bash
 just coverage all                      # every suite + the table (cobertura)
@@ -123,17 +144,22 @@ just coverage table                    # re-print the table without re-running
 ```
 
 The format names the consumer, not the file format — `cobertura` is what the table and the HTML report read,
-`sonar` is Visual Studio xml for C# plus lcov for TS. Output is one flat file per suite, named after the project
-or package:
+`sonar` is Visual Studio xml for C#, lcov for TS and simplecov json for Ruby. Output is one flat file per
+suite, named after the project, package or gem:
 
 | Path | Holds |
 |---|---|
-| `artifacts/tests/<suite>.ctrf.json` | test results (jest packages write `<package>.jest.json`) |
+| `artifacts/tests/<suite>.ctrf.json` | test results (jest writes `<package>.jest.json`, rspec `<gem>.rspec.json`) |
+| `artifacts/tests/expected.txt` | every suite that started, one name per line |
 | `artifacts/coverage/cobertura/<suite>.xml` | coverage for the table and the HTML report |
-| `artifacts/coverage/sonar/<suite>.xml` | C# coverage for Sonar; TS is `<package>.info` (lcov) |
+| `artifacts/coverage/sonar/<suite>.xml` | C# coverage for Sonar; TS is `<package>.info`, Ruby `<gem>.json` |
 | `artifacts/coverage/html-report/` | the merged report, written by `just coverage report` |
 
 The table prints a row per suite (`Passed`/`Failed`/`Skipped`/`Coverage`) and its exit code is the run's verdict.
+
+**A suite that started and wrote nothing gets a `no report` row and fails the run.** Every test writes its
+name into `expected.txt` before it runs, which is the only thing separating "the suite produced nothing" from
+"there is no such suite" — without it a missing report is simply absent from the table and the run publishes.
 
 ## OpenAPI documents
 
@@ -342,8 +368,29 @@ breaks. Both sites together answer in about a fifth of a second, which is why th
 pre-flight. `links-external` makes a real request per unique URL, takes ten seconds, and can fail on somebody
 else's outage; that is why it is a separate recipe rather than a flag, and why it is not a gate.
 
-`tooling/lychee.toml`, named with `--config`, holds the URLs it must never check — the `localhost` samples in
+`tooling/check.lychee.toml`, named with `--config`, holds the URLs it must never check — the `localhost` samples in
 the quickstart pages, which are correct on the page and unreachable from anywhere else.
+
+## CI scripts
+
+```bash
+just --list ci                              # every operation, with its arguments
+just ci changed-paths HEAD~1 HEAD           # code=yes|no and site=yes|no
+just ci gate '<json of every job and its result>'
+just ci deploy-summary <commit> <tag> <url>
+```
+
+The shell a GitHub Actions workflow runs. `ci.just` is a door with two lines per recipe; the code is one file
+per operation in `tooling/ci/`, because shellcheck cannot read a `.just` body or a `run:` block and neither
+can be run on its own.
+
+**Every script takes its inputs as arguments and reads no `github.*` context**, so all of them run here as
+well as on a runner. The ones that print `key=value` are teed into `$GITHUB_OUTPUT` by the step that calls
+them, and send their own chatter to stderr so it cannot land in that file; the ones that write a run summary
+append to `$GITHUB_STEP_SUMMARY` and fall back to `/dev/stdout`.
+
+Nothing here is a thing you would normally run by hand — it is here so a red step can be reproduced by pasting
+its `run:` line into a terminal. See `$ci-cd` for which workflow calls which.
 
 ## JS Packages (npm workspaces at root)
 
@@ -351,8 +398,8 @@ the quickstart pages, which are correct on the page and unreachable from anywher
 
 ## TypeScript packages
 
-Five test leaves — `shared-ts-unit`, `vipaq-ts-unit`, `packages-net-ui-unit`, `packages-cookies-unit` and
-`packages-theme-switcher-unit`. They run jest from the repo root through the root `jest.config.js`, which is
+Five tests — `ts_binacle-compact-notation_unit`, `ts_binacle-vipaq_unit`, `ts_binacle-net-ui_unit`, `ts_cookies_unit` and
+`ts_theme-switcher_unit`. They run jest from the repo root through the root `jest.config.js`, which is
 what keeps the workspace folder in coverage paths and applies its `collectCoverageFrom`. Running `npm test`
 inside a package works but drives the run from that package's own config, so its numbers are not the ones CI
 or coverage report.

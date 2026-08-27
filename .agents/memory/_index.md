@@ -30,9 +30,9 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   when: "anyone asks for a client SDK or package"
   paths: ["api/**"]
 - file: no-sonar-issue-ignores.md
-  description: "Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/sonar-analysis.xml"
+  description: "Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/ci/sonar-analysis.xml"
   when: "answering a Sonar finding"
-  paths: ["tooling/sonar-analysis.xml", "Directory.Build.props"]
+  paths: ["tooling/ci/sonar-analysis.xml", "Directory.Build.props"]
 - file: results-curated.md
   description: "results/ is a hand-curated vault — harnesses write to gitignored scratch, never straight into results/"
   when: "writing anything into results/"
@@ -44,20 +44,20 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 - file: sonar-no-quality-profile.md
   description: "Sonar rules cannot be switched off on this project - custom quality profiles start at the Team plan and this one is on Free, so \"Sonar way\" is read-only"
   when: "someone proposes turning a Sonar rule off"
-  paths: ["tooling/sonar-analysis.xml"]
+  paths: ["tooling/ci/sonar-analysis.xml"]
 - file: sonar-scope-exclusions.md
   description: "sonar.exclusions and friends are scope exclusions, not issue ignores - they are allowed and already in use"
-  when: "reading or editing the exclusion lists in tooling/sonar-analysis.xml"
-  paths: ["tooling/sonar-analysis.xml", "Directory.Build.props"]
+  when: "reading or editing the exclusion lists in tooling/ci/sonar-analysis.xml"
+  paths: ["tooling/ci/sonar-analysis.xml", "Directory.Build.props"]
 - file: sonar-touching-untested-code.md
   description: "Fixing an old Sonar smell in an untested file makes the quality gate worse - changed lines become \"new code\" and count as uncovered"
   when: "fixing a Sonar smell in a file with no test coverage"
 - file: sweep-traps-that-survive-a-build.md
   description: "Two edits that pass a full build and ten thousand tests while being wrong - prepending a line ahead of a BOM, and removing one redundant null-conditional"
   when: "doing a mechanical sweep across many C# files - inserting a using, removing a redundant operator"
-- file: test-leaf-naming.md
-  description: "How a test leaf is named - <slice>[-<component>][-<language>]-<kind>, kind spelled out, no two leaves a letter apart"
-  when: "adding or renaming a test leaf"
+- file: test-naming.md
+  description: "How a test is named - <lang>_<project>_<kind>, derived from the assembly or package, and the tests are private"
+  when: "adding or renaming a test"
   paths: ["tooling/tests.just", "**/test/**"]
 - file: tests-arrange-act-assert.md
   description: "A test body shows arrange, act and assert as separate lines — never one helper that does all three"

@@ -17,7 +17,7 @@ meaning the same thing.
 | Node.js, via [nvm](https://github.com/nvm-sh/nvm) | 22 | `.nvmrc` | `just install`, the TS packages, `assets`, all three sites' webpack |
 | Ruby, via [rbenv](https://github.com/rbenv/rbenv) | 3.4.7 | `sites/docs/.ruby-version`, `sites/demo/.ruby-version`, `sites/www/.ruby-version` | Jekyll, for **all three** sites |
 | [just](https://github.com/casey/just#installation) | any recent | none | every recipe in this repo |
-| Docker | 28+ | none | the image, the `image` and `smoke` modules, the Postgres and AzureStorage test leaves |
+| Docker | 28+ | none | the image, the `image` and `smoke` modules, the Postgres and AzureStorage tests |
 
 Only Docker is optional. Everything else is needed for a full `just install` and `just test all`.
 

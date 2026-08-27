@@ -186,7 +186,7 @@ them.
 | `plans/api/packing-demo-bugs.md` | nine of the ten. **The submit button went in after all - checked 2026-08-27**, and both hosts render it. What is left is the browser pass on four, which rides on A1, plus the unfitted items: the inline block was rejected on layout the day it shipped, so the markup comes out of both templates and the answer becomes a tooltip. The strings stay in the package |
 | `plans/ci-cd/dockerhub-overview.md` | section 2, the logo and the categories - **done 2026-08-27**. Section 1, the quick start's response, was taken by the release as B3 and is still open. **Delete the file when section 1 is done** |
 | `plans/todos.md` | the docs site's old-register prose, and two one-liners in the shared UI package - a submit button that can stick where no visualizer listens, and an `Error` import that only reads wrong. **The theme defaults and the demo page's copy are done - checked 2026-08-27** |
-| `plans/ci-cd/test-leaves-reach-ci.md` | the ten Ruby leaves reaching the PR gate. Held off the release gate because Ruby does not build the image |
+| `plans/ci-cd/tests-reach-ci.md` | the ten Ruby tests reaching the PR gate. Held off the release gate because Ruby does not build the image |
 | `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
 | `plans/sites/docs-client-generation.md` | nothing was blocking it; it sits here because the docs deploy is the natural next docs session |
 | `plans/ruby-gem-coverage.md` | a yes or a no. Ten published gems have no tests measured, and the alternative is writing down that this is deliberate |

@@ -1,8 +1,8 @@
 ---
 id: api/decisions
-description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, and why the DiagnosticsModule alone is registered unconditionally.
+description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, and why an unknown enum answers with the same error a missing one does.
 verified: 2026-08-27
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path
 paths:
   - "api/**"
 ---
@@ -122,3 +122,37 @@ taken.
 registered; the packing log processor inside it is not — `ModuleDefinition.cs` registers that only when its
 configuration turns it on. So the channel can be absent while the module is present, which is exactly what
 that abstraction covers.
+
+### D4 — an unknown enum answers with the error a missing one gives, keyed the same way
+
+**Settled 2026-08-27.** A value the enum does not have is refused during binding, and the 422 it produces
+carries the same key and the same message the validator produces when the field is absent.
+
+**Refusing it is the first half.** Reading an unknown value as null would make it indistinguishable from
+absent, and a request that only requires one field of several would then be accepted with the field the client
+sent silently dropped. A PATCH is where that bites: send a good status and a bad role and the patch applies
+with the role gone. So the converter throws `JsonEnumValueException` rather than returning null.
+
+**Answering it the same way is the second half, and it is the part that is easy to get wrong.** The two checks
+see different names for the same field. FluentValidation reports the CLR property path, `Parameters.Algorithm`.
+`JsonException.Path` reports what the client wrote on the wire, `parameters.algorithm`. Left alone that is two
+keys and two messages for one field, only one of them documented — a client cannot key off either with
+confidence. `JsonEnumValueException.GetValidationSummary` takes the request type and maps the wire path back,
+so both checks answer `Parameters.Algorithm`.
+
+**The message is deliberately identical, not merely similar.** `'Algorithm' is required and must be one of the
+following values: ...` for both. "Required" is loose for a value that was sent, and a distinct message was the
+rejected alternative: it adds a second response shape to document for a client whose next move is the same
+either way — send one of these values. One shape, one documented example, and the generated document did not
+move.
+
+**Two things hold this.** `BindingProblem` is the single place a failed bind becomes a response, so the enum
+branch cannot be fixed on one route and missed on the next — it was, for exactly as long as there were two
+copies. And `JsonEnumValueException` derives from `JsonException`, so `BindingProblem` has to match the derived
+type first; matched the other way round every unknown enum falls into the 400 branch and this decision is
+silently undone.
+
+**What guards it.** `RequestEnumConverterTests` in the two unit suites finds every nullable enum on every
+contract by reflection and fails if one does not carry the converter — a new field is covered the day it is
+added, without anyone remembering to add a test. The integration suites assert the 422 body, not just the
+status, because the status was right while the key was wrong.

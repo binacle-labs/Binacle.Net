@@ -1,14 +1,16 @@
+using System.Text.Json.Nodes;
+using Binacle.Net.v3.Contracts;
 
 namespace Binacle.Net.IntegrationTests.v3.Endpoints.Pack.ByCustom;
 
 [Trait("Behavioral Tests", "Ensures operations behave as expected")]
 public class PackByCustomBehavior : Abstractions.BehaviourTestsBase
 {
-	private readonly Binacle.Net.v3.Contracts.PackByCustomRequest sampleRequest = new()
+	private readonly PackByCustomRequest sampleRequest = new()
 	{
 		Parameters = new()
 		{
-			Algorithm = Binacle.Net.v3.Contracts.Algorithm.FFD,
+			Algorithm = Algorithm.FFD,
 			IncludeViPaqData = false
 		},
 		Bins = new()
@@ -77,6 +79,30 @@ public class PackByCustomBehavior : Abstractions.BehaviourTestsBase
 	{
 		this.sampleRequest.Parameters!.Algorithm = null;
 		await base.Request_Returns_422UnprocessableContent(routePath, this.sampleRequest);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Unknown Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithUnknownAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create("invalid"),
+			nameof(PackByCustomRequest.Parameters),
+			nameof(PackRequestParameters.Algorithm)
+		);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Numeric Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithNumericAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create(1),
+			nameof(PackByCustomRequest.Parameters),
+			nameof(PackRequestParameters.Algorithm)
+		);
 	}
 
 	[Fact(DisplayName = $"POST {routePath}. Without Items, Returns 422 UnprocessableContent")]

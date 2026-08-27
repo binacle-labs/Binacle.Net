@@ -6,21 +6,21 @@ waits-on: "a Sonar run - state and blocker chosen by an agent, strike them if wr
 
 # A test harness for the UI
 
-**The harness is built.** Four leaves run it, each with a step in `shared-test-suite.yml`:
+**The harness is built.** Four tests run it, each with a step in `shared-image-tests.yml`:
 
-| Suite | Leaf |
+| Suite | Test |
 |---|---|
-| `packages/binacle-net-ui` | `just test packages-net-ui-unit` |
-| `packages/cookies` | `just test packages-cookies-unit` |
-| `packages/theme-switcher` | `just test packages-theme-switcher-unit` |
-| `api/test/Binacle.Net.UIModule.UnitTests` | `just test api-ui-unit` |
+| `packages/binacle-net-ui` | `just test ts_binacle-net-ui_unit` |
+| `packages/cookies` | `just test ts_cookies_unit` |
+| `packages/theme-switcher` | `just test ts_theme-switcher_unit` |
+| `api/test/Binacle.Net.UIModule.UnitTests` | `just test cs_binacle-net-ui-module_unit` |
 
 `api/test/Binacle.Net.UIModule.IntegrationTests` covers what needs a booted host, and
 `api/test/Binacle.Net.Kernel.UnitTests/Paths/` covers the reserved-path matching underneath it.
 
 ## What is left
 
-**One item, and it is a verification.** The leaves write lcov through `_jest_test` and Visual Studio xml
+**One item, and it is a verification.** The tests write lcov through `_jest_test` and Visual Studio xml
 through `_dotnet_test`, the same way every other suite does - but no Sonar run has happened since they
 landed, so **nobody has seen the numbers arrive there**. Until someone dispatches `sonar-analysis.yml` and
 reads the result, "coverage reaches Sonar" is an assumption.
@@ -30,8 +30,8 @@ green when the UI gets tested - not by configuration.
 
 Two things to check when that run happens, because both would look like success:
 
-- **Four new flat files, one per leaf.** A leaf whose report never got imported shows up as the same red
-  condition as a leaf with no tests.
+- **Four new flat files, one per test.** A test whose report never got imported shows up as the same red
+  condition as a test with no tests.
 - **The UIModule assembly reads far lower than its hand-written code.** Two generated namespaces land inside
   it at 0%. That is expected; it is written down in the CI/CD design record with the rest of the numbers.
 
@@ -59,5 +59,5 @@ mode.
 
 ## Done when
 
-- A Sonar run has happened with the four leaves in it, and the coverage condition is failing for a number
+- A Sonar run has happened with the four tests in it, and the coverage condition is failing for a number
   somebody chose to look at rather than because the UI was never tested.

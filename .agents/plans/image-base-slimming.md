@@ -9,7 +9,7 @@ waits-on: "nobody waiting - not in the near future"
 **Status:** The finding this file was opened for is **fixed**. The image was carrying two .NET runtimes; the
 publish dropped `--self-contained` on 2026-08-10 and went from **150.2 MB to 103.2 MB**, promoted to CI, and
 beta 2 is the first image built that way. All suites were green - 31 structure assertions, five smoke
-profiles, eleven test leaves. The release plan tracks that part.
+profiles, eleven tests. The release plan tracks that part.
 
 **What is left is what the title now says.** With the app layer down to 18 MB, the base image *is* the image -
 so this file is no longer about a duplicated runtime, it is about the base itself. Every size below was

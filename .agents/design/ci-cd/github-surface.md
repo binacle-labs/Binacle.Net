@@ -1,7 +1,7 @@
 ---
 id: ci-cd/github-surface
 description: What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly
-verified: 2026-08-27
+verified: 2026-08-28
 check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them
 paths:
   - ".github/**"
@@ -123,8 +123,9 @@ repository.
 ## Platform settings - all unverified
 
 **The one it argues hardest for: a tag ruleset over `v[0-9]*`.** Restrict deletions, block force pushes,
-enforcement Active. Target the same pattern the release workflow triggers on, so protection and trigger cannot
-drift apart.
+enforcement Active. The release workflow pushes exactly that namespace as its last job, so the ruleset would
+protect what it creates - and it has to leave the workflow's own `GITHUB_TOKEN` able to create a tag, or every
+release fails at the last step.
 
 **Why it matters.** Everything downstream of a tag treats it as permanent: the image carries the version as a
 build argument, the release body is drawn from the changelog section that tag names, the signature covers a

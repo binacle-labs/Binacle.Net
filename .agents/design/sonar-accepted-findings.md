@@ -13,7 +13,7 @@ paths:
 
 **This register is the only durable copy.** On the Free plan a finding is answered by marking it Accepted in
 the SonarCloud UI - "Sonar way" is read-only, and `sonar.issue.ignore` rules are not allowed in
-`tooling/sonar-analysis.xml`. **Those marks live in the project's database, not in this repository.**
+`tooling/ci/sonar-analysis.xml`. **Those marks live in the project's database, not in this repository.**
 
 **They have already been lost once.** The project was recreated on 2026-08-17 under the `binacle-labs`
 organization, key `binacle-labs_Binacle.Net`, because a SonarQube Cloud org's binding to a GitHub account

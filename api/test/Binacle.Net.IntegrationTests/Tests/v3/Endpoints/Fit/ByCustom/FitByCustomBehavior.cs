@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Binacle.Net.IntegrationTests.v3.Abstractions;
 using Binacle.Net.v3.Contracts;
 using FitRequestParameters = Binacle.Net.v3.Contracts.FitRequestParameters;
@@ -80,6 +81,30 @@ public class FitByCustomBehavior : BehaviourTestsBase
 	{
 		this.sampleRequest.Parameters!.Algorithm = null;
 		await base.Request_Returns_422UnprocessableContent(routePath, this.sampleRequest);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Unknown Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithUnknownAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create("invalid"),
+			nameof(FitByCustomRequest.Parameters),
+			nameof(FitRequestParameters.Algorithm)
+		);
+	}
+
+	[Fact(DisplayName = $"POST {routePath}. With Numeric Algorithm, Returns 422 UnprocessableContent")]
+	public async Task Post_WithNumericAlgorithm_Returns_422UnprocessableContent()
+	{
+		await base.RequestWithFieldValue_Returns_422UnprocessableContent(
+			routePath,
+			this.sampleRequest,
+			JsonValue.Create(1),
+			nameof(FitByCustomRequest.Parameters),
+			nameof(FitRequestParameters.Algorithm)
+		);
 	}
 
 	[Fact(DisplayName = $"POST {routePath}. Without Items, Returns 422 UnprocessableContent")]

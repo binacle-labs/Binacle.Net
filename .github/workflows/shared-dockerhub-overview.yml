@@ -1,9 +1,8 @@
-# Writes the Docker Hub repository page. Called by the release pipeline as its last job, and runnable by hand
-# for a wording fix - a typo should not need a tag.
+# Writes the Docker Hub repository page. Called by the release pipeline as its last job, and runnable by
+# hand for a wording fix - a typo should not need a tag.
 #
-# The page is a landing page, not a changelog: it describes the stable line, so a prerelease must never reach
-# it. Two things enforce that and neither is here - the caller gates the job on a non-prerelease tag, and
-# `just image dockerhub-overview` refuses a version with a suffix.
+# It describes the stable line, so a prerelease must never reach it. Nothing here enforces that: the caller
+# gates the job on a non-prerelease tag, and `just image dockerhub-overview` refuses a version with a suffix.
 
 name: Shared / Docker Hub Page
 
@@ -43,21 +42,15 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # Empty only on a manual run. `gh release view` returns the latest NON-prerelease, which is the line this
-      # page describes - so a wording fix needs nothing typed and cannot name a version by mistake.
+      # Empty only on a manual run, where the recipe falls back to the latest non-prerelease.
       - name: Which version the page describes
         id: version
         env:
           INPUT: ${{ inputs.version }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          version="$INPUT"
-          [ -n "$version" ] || version="$(gh release view --json tagName -q .tagName)"
-          echo "Page will describe ${version#v}"
-          echo "name=${version#v}" >> "$GITHUB_OUTPUT"
+        run: just ci dockerhub-version "$INPUT" | tee -a "$GITHUB_OUTPUT"
 
-      # The recipe owns the placeholders and the two guards. Run it locally to read the page before a release.
+      # Run this locally to read the page before a release.
       - name: Render the page
         env:
           VERSION: ${{ steps.version.outputs.name }}
@@ -73,8 +66,8 @@ jobs:
           repository: ${{ vars.DOCKERHUB_ORGNAME }}/${{ vars.DOCKERHUB_REPO }}
           readme-filepath: ${{ runner.temp }}/overview.md
 
-      # Only on a manual run, where this workflow is the whole run. On the release path the `release` job's
-      # summary is the one place that says what shipped, and a second block there adds no fact.
+      # Only on a manual run, where this workflow is the whole run. On the release path the `release` job
+      # writes the one summary.
       - name: Summarise
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:

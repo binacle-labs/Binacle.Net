@@ -2,7 +2,7 @@
 id: ruby
 description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
 verified: 2026-08-27
-check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy
+check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
 ---
@@ -267,7 +267,7 @@ Settled 24 Aug 2026, when the two oldest gems were moved onto what the other fou
   `Binacle::Robots`.
 - **`# frozen_string_literal: true` at the top of every `.rb`**, gemspecs and specs included.
 - **`ruby/.rubocop.yml` covers every gem.** It disables `Metrics`, allows any hyphenated entry filename and
-  sets the line length to 120. How to run it, and what it reports, is under "Running the specs".
+  sets the line length to 120. Nothing runs it. What it reports is under "Running the specs".
 
 ## binacle-robots
 
@@ -339,22 +339,47 @@ committed, so every spec run uses the same Jekyll — 4.4.1 — rather than what
 by itself. Plain `rspec` also works and ignores the lock. `bundle exec rspec` from `ruby/` itself does not:
 each `spec/spec_helper.rb` is only on the load path when rspec runs from inside that gem.
 
-**Each gem is a test leaf**, added 24 Aug 2026 — `just test ruby-gtm-unit`, and all ten are in `just test all`
-because they need nothing brought up. The leaf runs `bundle exec rspec` from inside the gem folder, which is the
-only place a `spec_helper` is on the load path.
+**Each gem is a test** — `just test rb_jekyll-gtm_unit`. All ten are in `just test sites` and in
+`just test all`, because they need nothing brought up. The test runs `bundle exec rspec` from inside the gem
+folder, which is the only place a `spec_helper` is on the load path.
 
-**Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is not in the bundle:
-`gem install rubocop`, then run `rubocop` from `ruby/`. **It does not come back clean.** As of
-24 Aug 2026 it reports, all of it autocorrectable and none of it decided on:
+**They run on the site path, never on the image path.** `shared-site-tests.yml` names all ten as steps, and
+the pull request gate and all three site deploys call it. `shared-image-tests.yml` names none of them, because
+nothing under `ruby/` reaches the Docker image, so a gem must never be written in
+there.
 
-- **every gemspec** — `Gemspec/RequireMFA` and `Gemspec/DevelopmentDependencies`.
-- **`ruby/Gemfile`** — `Style/FrozenStringLiteralComment`, and `Style/StringLiterals` on every
-  `gemspec path:` line.
-- **`jekyll-multi-sitemap`** — `Style/SafeNavigation`, `Layout/EmptyLineAfterGuardClause`,
-  `Lint/UnusedMethodArgument`, and `Style/StringLiterals` in one spec.
-- **`jekyll-resource-tags`** — `Style/StringConcatenation` and `Style/RedundantRegexpEscape`.
+**Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is in the bundle, and **nothing runs
+it** - there is no recipe and no pipeline step. Run it by hand with `cd ruby && bundle exec rubocop`. **It
+does not come back clean.** 42 offences in 17 files, measured 27 Aug 2026, all but the ten
+`Gemspec/DevelopmentDependencies` autocorrectable and none of it decided on:
 
-**They carry no coverage.** Ruby's collector is simplecov and it is not in the bundle, so a `just coverage` run
-executes them and writes no file for them — they are absent from the table rather than sitting at zero.
+| Count | Cop |
+|---|---|
+| 16 | `Style/StringLiterals` |
+| 10 | `Gemspec/DevelopmentDependencies` |
+| 10 | `Gemspec/RequireMFA` |
+| 1 each | `Layout/EmptyLineAfterGuardClause`, `Lint/UnusedMethodArgument`, `Style/FrozenStringLiteralComment`, `Style/RedundantRegexpEscape`, `Style/SafeNavigation`, `Style/StringConcatenation` |
 
-**No workflow runs them.** The only workflow that reads `ruby/` is CodeQL, which analyses rather than tests.
+**It is on no pipeline and in no test group.** A test that fails on arrival is not a test. `just check
+ruby` ran it until 2026-08-27, when it was deleted - no linting is set up in this repository, so the recipe
+was the only thing pretending otherwise.
+
+## Coverage
+
+**Every gem reports coverage**, through simplecov, and **no gem file was touched to get it.** The setup lives
+in `tooling/tests.ruby-coverage.rb` and the rspec recipe loads it through `RUBYOPT`, so it runs before the gem is
+required — which is the whole requirement, since SimpleCov measures nothing that was already loaded.
+
+**RUBYOPT rather than a require in each `spec_helper`, and that is the point.** A gem installed from a package
+index has no parent directory to require, so a shared helper above the gem folders would break the rule that
+every gem drops into an unrelated site. No gemspec gained a development dependency either — the three gems are
+in `ruby/Gemfile`, because coverage is the build's concern and not the gem's.
+
+**It is off unless `COVERAGE_FORMAT` is set**, so a plain `bundle exec rspec` still writes no files. The
+recipe sets it: `cobertura` for the local table and the HTML report, `sonar` for the JSON SonarCloud reads.
+One flat file per gem lands in `artifacts/coverage/<format>/`, named after the gem, the same shape the C# and
+jest tests produce.
+
+**`sonar.ruby.coverage.reportPaths` is what makes Sonar read it.** Nothing in the analysis settings excludes
+`ruby/`, so without that line every gem line counts as uncovered. **Whether SonarCloud actually imports it has
+not been seen yet** — no Sonar run has happened since the gems landed.

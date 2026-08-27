@@ -88,8 +88,8 @@ Four things to settle before adopting ArchUnitNET, and the first decides whether
 
 - **Check `.xUnitV3`'s transitive xunit dependency.** This repo pins `xunit.v3.mtp-v2` precisely because
   mixing the MTP v1 and v2 adapters throws `TypeLoadException` before a test runs. If `.xUnitV3` pulls plain
-  `xunit.v3`, the new test leaf reproduces it.
-- **It collides with work that grows the shared TestsKernel fixtures.** Both touch the test leaves, so
+  `xunit.v3`, the new test reproduces it.
+- **It collides with work that grows the shared TestsKernel fixtures.** Both touch the tests, so
   whichever runs second reads the other's result.
 - **Decide which graph is authoritative.** ArchUnitNET measures *type* dependencies from loaded assemblies; a
   derived graph comes from project references. They disagree - `api/src/Binacle.Net/Binacle.Net.csproj`

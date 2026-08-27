@@ -121,14 +121,14 @@ Then run a gem's specs from its own folder. Bundler walks up and finds the share
 cd ruby/jekyll-multi-sitemap && bundle exec rspec
 ```
 
-From the repo root each gem is a test leaf, so `just test ruby-gtm-unit` runs one and `just test all` runs
-them with everything else. They carry no coverage - simplecov is not in the bundle.
+From the repo root each gem is a test, so `just test rb_jekyll-gtm_unit` runs one and `just test all` runs
+them with everything else. Coverage comes with them, through simplecov.
 
-For style there is `.rubocop.yml`, covering all ten gems. Rubocop is not in the bundle either, so install it
-once with `gem install rubocop` and run it from here:
+For style there is `.rubocop.yml`, covering all ten gems. Nothing runs it - no recipe, no pipeline step. Run
+it by hand from here:
 
 ```bash
-cd ruby && rubocop
+cd ruby && bundle exec rubocop
 ```
 
-Adding a gem means one `gemspec path:` line in `ruby/Gemfile` and one leaf in the test module.
+Adding a gem means one `gemspec path:` line in `ruby/Gemfile` and one recipe in the test module.

@@ -27,6 +27,8 @@ files hold the carve-outs.
 | write **any doc, comment or explanation** | [plain-language](plain-language.md) |
 | write a **heading in a public markdown file** - README, samples, the Docker Hub page, the docs site | [icon-headings-in-public-docs](icon-headings-in-public-docs.md) |
 | add a **folder**, or write or edit a **`README.md`** outside `.agents/` | [every-folder-has-a-readme](every-folder-has-a-readme.md) |
+| pass **settings to a tool**, or write a table or list inside a script or recipe | [config-goes-in-the-tools-own-file](config-goes-in-the-tools-own-file.md) - use the tool's config file; do not invent one |
+| add a **file under `tooling/`**, or a file a recipe reads | [just-recipes-at-the-tooling-root](just-recipes-at-the-tooling-root.md) - the root is `.just` files; supporting files go in a folder named after the module |
 | write or edit a **plan** | [plans-do-not-schedule-themselves](plans-do-not-schedule-themselves.md) |
 | write anything a human reads **outside `.agents/`** | [ref-codes-stay-in-the-agent-docs](ref-codes-stay-in-the-agent-docs.md) |
 | add a **fact** to any file under `.agents/` | [one-fact-one-place](one-fact-one-place.md) |

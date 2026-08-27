@@ -15,7 +15,7 @@ steps in an `action.yml`, no packaging and no publishing. A workflow uses one by
 |---|---|
 | `setup-dotnet` | Installs the .NET SDK and restores the NuGet cache. The version is an **input** - pass the repo variable, because an empty value quietly installs a default SDK |
 | `setup-node` | Installs Node (default `22`) and restores the npm cache. It does **not** install packages; the caller runs `npm ci` |
-| `setup-ruby` | Installs Ruby (default `3.4.7`) and, unlike the others, **does** install the gems. Takes the site directory holding the `Gemfile` |
+| `setup-ruby` | Installs Ruby (default `3.4.7`) and, unlike the others, **does** install the gems. Takes the directory holding the `Gemfile` - a site for a build, `ruby/` for the gem specs |
 | `setup-just` | Installs the `just` version this repo's module files need |
 
 ## 📥 Installing a pinned binary

@@ -139,5 +139,5 @@ A sample the suite never runs is untested advice, which is the same argument tha
 out.
 
 Backend is the exception, and deliberately so. Smoke is SQLite-only because the backend axis already belongs to
-the integration suite - `just test api-service-integration Postgres` proves that side. Matching the module set
+the integration suite - `just test cs_binacle-net-service-module_integration Postgres` proves that side. Matching the module set
 is what these names promise; matching the database is not.

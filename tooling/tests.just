@@ -1,205 +1,210 @@
-# Test leaves, loaded by the root justfile as the `test` module. Run one with `just test <leaf>`, all of
-# them with `just test all`, and list them with `just --list test`.
+# Runs the tests. One recipe per test project, so one failure names one project.
 #
-# A leaf is one project and one run, so it is also one CI step. One recipe per leaf, because shell
-# completion only completes recipe names.
+#   just test                            the list
+#   just test all                        every project
+#   just test image                      the ones the Docker image ships
+#   just test sites                      the ones a site ships
+#   just test cs_binacle-lib_unit        one project
+#
+# A name is <language>_<project>_<kind>, taken from the assembly, package or gem it runs.
+#
+# The single projects are [private], so the list shows the three groups instead of forty names. A private
+# recipe still runs when you name it.
 
-# Module recipes run where the module file lives (tooling/), which would break every path below.
+# Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
 
-# The test runner already printed why it failed, so just's own "Recipe failed" line adds nothing. The exit
-# code still propagates, so CI still fails.
+# The test runner already said what broke, so just's own "Recipe failed" line adds nothing. The exit code
+# still gets through, so CI still fails.
 set no-exit-message := true
 
-# CI builds the solution once and runs every leaf against that build; on a laptop a plain `dotnet test` is
-# what you want. An env var, not a just variable: a module variable cannot be set from the command line, so
-# `just dotnet_test_args=... test lib-unit` would be ignored in silence.
+# Extra flags for `dotnet test`. CI builds the solution once and passes --no-build; on a laptop you want
+# none. An environment variable and not a just variable, because just cannot set a module variable from the
+# command line and would ignore it without saying so.
+#
 #   DOTNET_TEST_ARGS="--configuration Release --no-build" just test all
 dotnet_test_args := env('DOTNET_TEST_ARGS', '')
 
-# List the leaves
+# List the recipes
 default:
     @just --list test
 
-# Listed by hand, not read out of this file: this is the infra-free set, and whether a leaf needs nothing
-# brought up is a judgement per leaf. Cheap leaves first. A failing leaf does not stop the rest.
+# The three lists below are written out by hand, and nothing checks one against another. That is on purpose.
+#
+# A list stops at the first failure, so the quick ones go first.
 
-# Every leaf that needs nothing brought up first
+# Every test the Docker image ships
+image:
+    just test cs_binacle-lib_unit
+    just test cs_binacle-compact-notation_unit
+    just test ts_binacle-compact-notation_unit
+    just test cs_binacle-vipaq_unit
+    just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-ui_unit
+    just test ts_cookies_unit
+    just test ts_theme-switcher_unit
+    just test cs_binacle-net_unit
+    just test cs_binacle-net-kernel_unit
+    just test cs_binacle-net-diagnostics-module_unit
+    just test cs_binacle-net-ui-module_unit
+    just test cs_binacle-net-service-module_unit
+    just test cs_binacle-net-ui-module_integration
+    just test cs_binacle-net_integration
+    just test cs_binacle-net-service-module_integration Sqlite
+
+# Every test a site ships - the gems, and the javascript a site bundles
+sites:
+    just test ts_binacle-compact-notation_unit
+    just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-ui_unit
+    just test ts_cookies_unit
+    just test ts_theme-switcher_unit
+    just test rb_binacle-docs-versions_unit
+    just test rb_binacle-robots_unit
+    just test rb_jekyll-breadcrumb-trail_unit
+    just test rb_jekyll-filters_unit
+    just test rb_jekyll-gtm_unit
+    just test rb_jekyll-multi-sitemap_unit
+    just test rb_jekyll-page-meta_unit
+    just test rb_jekyll-resource-tags_unit
+    just test rb_jekyll-structured-data_unit
+    just test rb_jekyll-webmanifest_unit
+
+# Every test that needs nothing started first
 all:
-    #!/usr/bin/env bash
-    set -uo pipefail
+    just test cs_binacle-lib_unit
+    just test cs_binacle-compact-notation_unit
+    just test ts_binacle-compact-notation_unit
+    just test cs_binacle-vipaq_unit
+    just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-ui_unit
+    just test ts_cookies_unit
+    just test ts_theme-switcher_unit
+    just test cs_binacle-net_unit
+    just test cs_binacle-net-kernel_unit
+    just test cs_binacle-net-diagnostics-module_unit
+    just test cs_binacle-net-ui-module_unit
+    just test cs_binacle-net-service-module_unit
+    just test cs_binacle-net-ui-module_integration
+    just test cs_binacle-net_integration
+    just test cs_binacle-net-service-module_integration Sqlite
+    just test rb_binacle-docs-versions_unit
+    just test rb_binacle-robots_unit
+    just test rb_jekyll-breadcrumb-trail_unit
+    just test rb_jekyll-filters_unit
+    just test rb_jekyll-gtm_unit
+    just test rb_jekyll-multi-sitemap_unit
+    just test rb_jekyll-page-meta_unit
+    just test rb_jekyll-resource-tags_unit
+    just test rb_jekyll-structured-data_unit
+    just test rb_jekyll-webmanifest_unit
 
-    # Takes the leaf's arguments too, so a line can name a backend: `leaf api-service-integration Postgres`.
-    failed=""
-    test_leaf() {
-        echo "=== just test $* ==="
-        just test::"$@" || failed="$failed $1"
-    }
+# The C# tests. The argument is the test project's folder.
 
-    test_leaf lib-unit
-    test_leaf shared-cs-unit
-    test_leaf shared-ts-unit
-    test_leaf vipaq-cs-unit
-    test_leaf vipaq-ts-unit
-    test_leaf packages-net-ui-unit
-    test_leaf packages-cookies-unit
-    test_leaf packages-theme-switcher-unit
-    test_leaf ruby-docs-versions-unit
-    test_leaf ruby-robots-unit
-    test_leaf ruby-breadcrumb-trail-unit
-    test_leaf ruby-filters-unit
-    test_leaf ruby-gtm-unit
-    test_leaf ruby-multi-sitemap-unit
-    test_leaf ruby-page-meta-unit
-    test_leaf ruby-resource-tags-unit
-    test_leaf ruby-structured-data-unit
-    test_leaf ruby-webmanifest-unit
-    test_leaf api-core-unit
-    test_leaf api-kernel-unit
-    test_leaf api-diagnostics-unit
-    test_leaf api-ui-unit
-    test_leaf api-service-unit
-    test_leaf api-ui-integration
-    test_leaf api-core-integration
-    test_leaf api-service-integration Sqlite
+[private]
+cs_binacle-lib_unit: (_dotnet_test 'lib/test/Binacle.Lib.UnitTests')
 
-    if [ -n "$failed" ]; then
-        echo "FAILED:$failed" >&2
-        exit 1
-    fi
-    echo "All leaves passed."
+[private]
+cs_binacle-compact-notation_unit: (_dotnet_test 'shared/test/Binacle.CompactNotation.UnitTests')
 
-# Binacle.Lib unit
-[group('lib')]
-lib-unit: (_dotnet_test 'lib/test/Binacle.Lib.UnitTests')
+[private]
+cs_binacle-vipaq_unit: (_dotnet_test 'vipaq/test/Binacle.ViPaq.UnitTests')
 
-# CompactNotation unit (C#)
-[group('shared')]
-shared-cs-unit: (_dotnet_test 'shared/test/Binacle.CompactNotation.UnitTests')
+[private]
+cs_binacle-net_unit: (_dotnet_test 'api/test/Binacle.Net.UnitTests')
 
-# binacle-compact-notation unit (TS)
-[group('shared')]
-shared-ts-unit: (_jest_test 'binacle-compact-notation')
+[private]
+cs_binacle-net-kernel_unit: (_dotnet_test 'api/test/Binacle.Net.Kernel.UnitTests')
 
-# ViPaq unit (C#)
-[group('vipaq')]
-vipaq-cs-unit: (_dotnet_test 'vipaq/test/Binacle.ViPaq.UnitTests')
+[private]
+cs_binacle-net-diagnostics-module_unit: (_dotnet_test 'api/test/Binacle.Net.DiagnosticsModule.UnitTests')
 
-# binacle-vipaq unit (TS)
-[group('vipaq')]
-vipaq-ts-unit: (_jest_test 'binacle-vipaq')
+[private]
+cs_binacle-net-ui-module_unit: (_dotnet_test 'api/test/Binacle.Net.UIModule.UnitTests')
 
-# binacle-net-ui unit (TS)
-[group('packages')]
-packages-net-ui-unit: (_jest_test 'binacle-net-ui')
+[private]
+cs_binacle-net-service-module_unit: (_dotnet_test 'api/test/Binacle.Net.ServiceModule.UnitTests')
 
-# cookies unit (TS)
-[group('packages')]
-packages-cookies-unit: (_jest_test 'cookies')
+[private]
+cs_binacle-net_integration: (_dotnet_test 'api/test/Binacle.Net.IntegrationTests')
 
-# theme-switcher unit (TS)
-[group('packages')]
-packages-theme-switcher-unit: (_jest_test 'theme-switcher')
+[private]
+cs_binacle-net-ui-module_integration: (_dotnet_test 'api/test/Binacle.Net.UIModule.IntegrationTests')
 
-# binacle-docs-versions unit
-[group('ruby')]
-ruby-docs-versions-unit: (_rspec_test 'binacle-docs-versions')
+# The backend is an argument and not a variable, because just cannot set a module variable from the command
+# line and would ignore it without saying so.
+#
+# No backend means SQLite. Postgres and AzureStorage need `just serve services-up -d` running first.
 
-# binacle-robots unit
-[group('ruby')]
-ruby-robots-unit: (_rspec_test 'binacle-robots')
-
-# jekyll-breadcrumb-trail unit
-[group('ruby')]
-ruby-breadcrumb-trail-unit: (_rspec_test 'jekyll-breadcrumb-trail')
-
-# jekyll-filters unit
-[group('ruby')]
-ruby-filters-unit: (_rspec_test 'jekyll-filters')
-
-# jekyll-gtm unit
-[group('ruby')]
-ruby-gtm-unit: (_rspec_test 'jekyll-gtm')
-
-# jekyll-multi-sitemap unit
-[group('ruby')]
-ruby-multi-sitemap-unit: (_rspec_test 'jekyll-multi-sitemap')
-
-# jekyll-page-meta unit
-[group('ruby')]
-ruby-page-meta-unit: (_rspec_test 'jekyll-page-meta')
-
-# jekyll-resource-tags unit
-[group('ruby')]
-ruby-resource-tags-unit: (_rspec_test 'jekyll-resource-tags')
-
-# jekyll-structured-data unit
-[group('ruby')]
-ruby-structured-data-unit: (_rspec_test 'jekyll-structured-data')
-
-# jekyll-webmanifest unit
-[group('ruby')]
-ruby-webmanifest-unit: (_rspec_test 'jekyll-webmanifest')
-
-# The api leaves run units first, then integrations, so a bare `just test all` reports the cheap failures
-# before it spends minutes in a test host.
-
-# Binacle.Net unit
-[group('api')]
-api-core-unit: (_dotnet_test 'api/test/Binacle.Net.UnitTests')
-
-# Kernel unit
-[group('api')]
-api-kernel-unit: (_dotnet_test 'api/test/Binacle.Net.Kernel.UnitTests')
-
-# DiagnosticsModule unit
-[group('api')]
-api-diagnostics-unit: (_dotnet_test 'api/test/Binacle.Net.DiagnosticsModule.UnitTests')
-
-# UIModule unit
-[group('api')]
-api-ui-unit: (_dotnet_test 'api/test/Binacle.Net.UIModule.UnitTests')
-
-# ServiceModule unit
-[group('api')]
-api-service-unit: (_dotnet_test 'api/test/Binacle.Net.ServiceModule.UnitTests')
-
-# Binacle.Net integration
-[group('api')]
-api-core-integration: (_dotnet_test 'api/test/Binacle.Net.IntegrationTests')
-
-# UIModule integration
-[group('api')]
-api-ui-integration: (_dotnet_test 'api/test/Binacle.Net.UIModule.IntegrationTests')
-
-# The backend is a positional argument: a module variable cannot be set from the command line and would be
-# ignored in silence. Empty lets the harness pick SQLite, so a bare run needs nothing brought up. Postgres
-# and AzureStorage need theirs up:
-#   just serve services-up -d
-
-# ServiceModule integration [Sqlite|Postgres|AzureStorage]
-[group('api')]
-api-service-integration backend="":
+[private]
+cs_binacle-net-service-module_integration backend="":
     #!/usr/bin/env bash
     set -euo pipefail
-    # A misspelled backend would otherwise fall through to the harness default and pass, reporting
-    # a green run for a backend nobody exercised.
+
+    # A typo would otherwise fall through to the default and report a green run for a backend nobody tested.
     case "{{ backend }}" in
         "" | Sqlite | Postgres | AzureStorage) ;;
         *) echo "Unknown backend '{{ backend }}'. Use Sqlite, Postgres or AzureStorage." >&2; exit 1 ;;
     esac
+
     export BINACLE_TEST_INFRA="{{ backend }}"
+
     just test::_dotnet_test api/test/Binacle.Net.ServiceModule.IntegrationTests
 
-# Runs one test project. Every C# leaf goes through here, so the flags live in one place.
+# The TypeScript tests. The argument is the package's jest displayName.
+
+[private]
+ts_binacle-compact-notation_unit: (_jest_test 'binacle-compact-notation')
+
+[private]
+ts_binacle-vipaq_unit: (_jest_test 'binacle-vipaq')
+
+[private]
+ts_binacle-net-ui_unit: (_jest_test 'binacle-net-ui')
+
+[private]
+ts_cookies_unit: (_jest_test 'cookies')
+
+[private]
+ts_theme-switcher_unit: (_jest_test 'theme-switcher')
+
+# The Ruby tests. The argument is the gem's folder under ruby/.
+
+[private]
+rb_binacle-docs-versions_unit: (_rspec_test 'binacle-docs-versions')
+
+[private]
+rb_binacle-robots_unit: (_rspec_test 'binacle-robots')
+
+[private]
+rb_jekyll-breadcrumb-trail_unit: (_rspec_test 'jekyll-breadcrumb-trail')
+
+[private]
+rb_jekyll-filters_unit: (_rspec_test 'jekyll-filters')
+
+[private]
+rb_jekyll-gtm_unit: (_rspec_test 'jekyll-gtm')
+
+[private]
+rb_jekyll-multi-sitemap_unit: (_rspec_test 'jekyll-multi-sitemap')
+
+[private]
+rb_jekyll-page-meta_unit: (_rspec_test 'jekyll-page-meta')
+
+[private]
+rb_jekyll-resource-tags_unit: (_rspec_test 'jekyll-resource-tags')
+
+[private]
+rb_jekyll-structured-data_unit: (_rspec_test 'jekyll-structured-data')
+
+[private]
+rb_jekyll-webmanifest_unit: (_rspec_test 'jekyll-webmanifest')
+
+# Runs one C# test project. Every C# test goes through here, so the flags sit in one place.
 #
-# Files are named after the project alone; the extension already tells C# from TS.
-#
-# Coverage is not a second run - the collector rides along. Set COVERAGE_FORMAT and the same leaf also writes
-# results and coverage into artifacts/. `just coverage all` sets it.
-#
-# The output path must be absolute: a relative --coverage-output lands inside the project's own
-# bin/.../TestResults.
+# With COVERAGE_FORMAT unset this is a plain `dotnet test`. With it set, the same run also writes a test
+# report and a coverage file under artifacts/. `just coverage all` is what sets it.
+
 [private]
 _dotnet_test project:
     #!/usr/bin/env bash
@@ -210,10 +215,10 @@ _dotnet_test project:
         exit 0
     fi
 
-    # COVERAGE_FORMAT names the consumer, not the file format, so the folder can be named after it too.
+    # The format name says who reads the file, not what the file is.
     case "$COVERAGE_FORMAT" in
         cobertura) output_format=cobertura ;;
-        sonar)     output_format=xml ;;  # Visual Studio coverage, the only C# format Sonar imports
+        sonar)     output_format=xml ;;  # Visual Studio coverage, the only C# format Sonar reads
         *) echo "Unknown COVERAGE_FORMAT '$COVERAGE_FORMAT'. Use cobertura or sonar." >&2; exit 1 ;;
     esac
 
@@ -222,31 +227,74 @@ _dotnet_test project:
     coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
     mkdir -p "$results" "$coverage"
 
-    # No `--` before the runner options: the Microsoft.Testing.Platform `dotnet test` hands unrecognized
-    # options to the test app itself, and a `--` makes it read the project path as a stray argument.
+    # Written before the run, so `just coverage table` can tell "wrote no report" from "never ran".
+    echo "$name" >> "$results/expected.txt"
+
+    # Both paths are absolute. A relative coverage path lands inside the project's own bin folder.
+    #
+    # No `--` in front of these options. `dotnet test` hands anything it does not recognise to the test app
+    # itself, and a `--` makes it read the project path as junk.
     dotnet test --project {{ project }} {{ dotnet_test_args }} \
         --results-directory "$results" \
         --report-ctrf --report-ctrf-filename "$name.ctrf.json" \
         --coverage --coverage-output-format "$output_format" \
         --coverage-output "$coverage/$name.xml"
 
-# Runs one gem's specs. Bundler walks up from the gem folder and finds ruby/Gemfile, so every leaf uses the
-# same Jekyll the sites are locked to rather than whatever is installed. Running from ruby/ itself does not
-# work: a spec_helper is only on the load path when rspec starts inside its own gem.
+# Runs one gem's tests. Bundler walks up from the gem folder and finds ruby/Gemfile, so every gem runs
+# against the same Jekyll the sites are locked to.
 #
-# COVERAGE_FORMAT is ignored here. Ruby's collector is simplecov and it is not in the bundle, so a coverage
-# run executes these leaves and writes nothing for them - they are absent from the table rather than at zero.
+# Starting from ruby/ itself does not work. rspec has to start inside the gem for its spec_helper to be
+# found.
+
 [private]
 _rspec_test gem:
-    cd ruby/{{ gem }} && bundle exec rspec
+    #!/usr/bin/env bash
+    # No -e. The exit code is kept below, so the coverage file still gets moved out of a failed run.
+    set -uo pipefail
 
-# Runs one TS package - the jest half of _dotnet_test, same two modes.
+    if [ -z "${COVERAGE_FORMAT:-}" ]; then
+        cd ruby/{{ gem }} && exec bundle exec rspec
+    fi
+
+    # SimpleCov names its file after the formatter, so the extension is what tells them apart.
+    case "$COVERAGE_FORMAT" in
+        cobertura) produced=coverage.xml ;;
+        sonar)     produced=coverage.json ;;  # what Sonar reads for Ruby
+        *) echo "Unknown COVERAGE_FORMAT '$COVERAGE_FORMAT'. Use cobertura or sonar." >&2; exit 1 ;;
+    esac
+
+    results="$(pwd)/artifacts/tests"
+    coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
+    mkdir -p "$results" "$coverage"
+    echo '{{ gem }}' >> "$results/expected.txt"
+
+    # Both absolute, because rspec runs from inside the gem folder.
+    #
+    # RUBYOPT and not a require in each spec_helper, because a gem must not reach above its own folder.
+    # Bundler goes first, so the load path is up before this file asks for simplecov.
+    export COVERAGE_DIR="$coverage/{{ gem }}"
+    export RUBYOPT="-r$(pwd)/tooling/tests.ruby-coverage.rb ${RUBYOPT:-}"
+
+    cd ruby/{{ gem }}
+    bundle exec rspec --format progress --format json --out "$results/{{ gem }}.rspec.json"
+    rc=$?
+
+    # SimpleCov buries the file in a folder. Lift it out, named after the gem, so the folder holds one flat
+    # file per project. Not fatal on its own - a failed run reports through rc.
+    if [ -f "$COVERAGE_DIR/$produced" ]; then
+        mv "$COVERAGE_DIR/$produced" "$coverage/{{ gem }}.${produced##*.}"
+    fi
+    rm -rf "$COVERAGE_DIR"
+
+    exit $rc
+
+# Runs one TypeScript package. The jest half of _dotnet_test, with the same two modes.
 #
-# `--selectProjects`, not `--projects <path>`: the root jest.config.js keeps the workspace folder in recorded
-# paths, and its `collectCoverageFrom` is ignored when a package's own config drives the run. The name is the
-# package's `displayName`.
+# --selectProjects and not --projects <path>, because the root jest.config.js keeps the workspace folder in
+# the recorded paths, and its collectCoverageFrom is ignored when a package's own config drives the run.
 #
-# Paths are absolute - jest resolves a relative one against the package, not against artifacts/.
+# Paths are absolute. jest resolves a relative one against the package, not against artifacts/.
+
 [private]
 _jest_test package:
     #!/usr/bin/env bash
@@ -257,8 +305,8 @@ _jest_test package:
         exit 0
     fi
 
-    # Same consumer names as _dotnet_test, mapped to what jest calls them: Sonar reads JS coverage as lcov,
-    # not the Visual Studio xml it wants for C#.
+    # The same two format names as _dotnet_test, in what jest calls them. Sonar reads javascript coverage as
+    # lcov, not the Visual Studio xml it wants for C#.
     case "$COVERAGE_FORMAT" in
         cobertura) reporter=cobertura ;;
         sonar)     reporter=lcovonly ;;
@@ -268,13 +316,14 @@ _jest_test package:
     results="$(pwd)/artifacts/tests"
     coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
     mkdir -p "$results" "$coverage"
+    echo '{{ package }}' >> "$results/expected.txt"
 
     npx jest --selectProjects {{ package }} \
         --coverage --coverageReporters="$reporter" --coverageDirectory="$coverage/{{ package }}" \
         --json --outputFile="$results/{{ package }}.jest.json"
 
-    # jest names the file after its reporter and buries it in a folder. Lift it out, named after the package
-    # and keeping its extension, so the folder holds one flat file per suite like the C# ones.
+    # jest names the file after its reporter and buries it in a folder. Lift it out, named after the package,
+    # so the folder holds one flat file per project.
     for produced in "$coverage/{{ package }}"/*; do
         [ -f "$produced" ] || continue
         mv "$produced" "$coverage/{{ package }}.${produced##*.}"

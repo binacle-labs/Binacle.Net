@@ -1,10 +1,12 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why the release pipeline is tag-triggered, stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-08-27
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation.
+verified: 2026-08-28
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, and D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login
 paths:
   - ".github/workflows/**"
+  - "tooling/ci/**"
+  - "tooling/image.just"
 ---
 
 # CI/CD — decisions ledger
@@ -17,29 +19,61 @@ does not outlive the work. This is where that reasoning lives now.
 
 ## Locked
 
-### D1 — the release pipeline triggers on the tag, not on `release: published`
+### D1 — a release is dispatched with a version, and the tag and the release are its last job
 
-`on: push: tags: 'v[0-9]*'`, and creating the GitHub release is the pipeline's **last** job rather than its
-trigger.
+`on: workflow_dispatch` with a required `version` input carrying no leading `v` — `3.0.0`, which is both the
+`CHANGELOG.md` section name and the Docker tag. The workflow forms `v3.0.0`, creates that tag on the run's own
+commit once the image is built, smoked and published, and creates the GitHub release in the same job, tag
+first.
 
-**Why:** with `release: published`, the release is already public when the workflow starts, so a failure leaves
-an announced release whose image never arrived. Building from the tag and creating the release at the end
-inverts that — a failure leaves a tag you delete, and nothing a user ever saw.
+**Why the release is not the trigger.** With `release: published` the release is already public when the
+workflow starts, so a failure leaves an announced release whose image never arrived. Creating it last inverts
+that: a failure leaves nothing a user ever saw.
 
-**This is a replacement, not an addition.** Leaving both triggers on would make the release created in the last
-job re-trigger the whole workflow and build everything a second time.
+**Why nothing but the last job may create the tag.** A tag that is the trigger exists before a single test has
+run, so a red suite leaves a tag — and often a GitHub release — to delete by hand before the version can be
+tried again. Made last, a failed run leaves nothing at all: fix the cause and press the button again.
 
-**The pattern is `v[0-9]*` rather than `v*` because this repo has three tag-pushing workflows.** The two site
-deploys create `docs-<run>` and `demo-<run>`, and a release build must never fire on one. Neither
-matches either pattern, so this is not a fix for a live bug — it is refusing to depend on a coincidence of
-naming, and on the second coincidence underneath it: those workflows push with `GITHUB_TOKEN`, which GitHub
-does not let trigger further workflows. That protection disappears the day either switches to a PAT.
+**One trigger, never two.** `workflow_dispatch` replaces the tag trigger rather than joining it. With both on,
+the tag the last job pushes re-enters the workflow and builds everything a second time. A `GITHUB_TOKEN` push
+does not trigger workflows today, which would hide it — that is exactly the coincidence this decision refuses
+to depend on.
 
-**The residual risk this does not close: re-pushing an old version tag.** `v1.0.0` matches, and now that
-`CHANGELOG.md` carries a `## [1.0.0]` section the notes gate would pass rather than stop it. `latest=auto`
-marks any non-prerelease semver as latest, so a re-pushed old tag would move `latest` backwards onto it.
-Deliberate action is needed to get there, so it is recorded rather than guarded — but do not delete and
-re-push a released tag.
+**The version is checked before anything is built.** The gate job proves the dispatch is on `main`, that the
+version is semver shaped with no leading `v`, and that `v<version>` does not already exist on some other
+commit. The semver check is also what keeps the input out of a shell whose meaning it could change; every
+interpolation still goes through `env:` on top of that.
+
+**The tag-exists check has an exception, and it is load-bearing.** A tag that already points at *this run's*
+commit passes. Without that, a run that publishes the image and then fails at the release step could never be
+dispatched again, and the only way out would be deleting a tag.
+
+**What the tag check closes.** The old shape's recorded residual risk was re-pushing an old version tag:
+`v1.0.0` matched the trigger, `CHANGELOG.md` carries a `## [1.0.0]` section so the notes gate passed it, and
+`latest=auto` marks any non-prerelease semver as latest — so `latest` moved backwards. Now the gate stops it
+in seconds. **The standing rule survives anyway: do not delete and re-push a released tag.**
+
+**The residual risk that replaces it is the mirror image, and smaller.** Fail between `publish` and the tag and
+there is an image on Docker Hub with `latest` moved, no tag and no release. Recovery is a re-dispatch, which
+rebuilds and re-copies the same digest under the same tags. The tag push and `gh release create` are kept in
+one job with the tag first, so the window is one step wide.
+
+**The GitHub web release route stops working, and that is accepted.** *Draft a new release → create tag on
+publish* now builds nothing, silently. The release job's create-or-edit branch is left in place: it costs
+nothing and still covers a tag made by hand.
+
+**No `dry_run` input.** The other repository that releases this way has one, because its release commits to
+`main` and there is no cheaper rehearsal. Here a prerelease already runs every job including `publish`, so a
+dry run would duplicate it — and making `publish` conditional would reintroduce the trap in D3, where `release`
+then needs `if: ${{ !failure() && !cancelled() }}` or a beta silently gets no GitHub release.
+
+**Superseded 2026-08-28 — what changed and what did not.** This ran on `on: push: tags: 'v[0-9]*'` from the
+rebuild until then. Everything above about `release: published` and about creating the release last is the
+original reasoning and is untouched; only the entry point moved. Two things went with it. The pattern was
+`v[0-9]*` rather than `v*` because the three site deploys push `docs-<run>`, `demo-<run>` and `www-<run>` and
+a release build must never fire on one — the release fires on no tag at all now, so that constraint on their
+tag names is gone. And the certificate identity inside every signature changed with the ref; that is recorded
+under D15, where the verify commands are listed.
 
 ### D2 — build once, smoke the registry copy, then copy by digest
 
@@ -173,6 +207,34 @@ Calling the recipe makes CI and a laptop build the same thing by construction.
 
 It also makes a red step reproducible: the `run:` line is what you paste into a terminal.
 
+**Made true on 2026-08-28, where it was not.** The rule held for the *commands* — `just build image`,
+`just smoke test` — but roughly 240 lines of shell still sat in `run: |` blocks: the changed-paths filter, the
+gate, three per deploy workflow, the Sonar gate poll, three in the release, two in the smoke, one in CodeQL.
+Those moved to `tooling/ci/`, one file per operation, behind a new `ci` module.
+
+**One file per operation, not a bigger `.just` module.** Neither a `.just` recipe body nor a `run:` block can
+be handed to shellcheck, and neither can be run on its own. A `.sh` file is both — a real filename in a stack
+trace, a thing you can execute while you debug it, and a file CodeQL's `actions` pack and shellcheck both read.
+`ci.just` stays a door: a one-line description and the call, two lines per recipe.
+
+**Arguments in, no context read.** A script never reads `github.*` or the runner's own environment for an
+input; the workflow puts the value in `env:` and the step passes it on the command line. That is what makes
+every one of them runnable here, and it keeps the existing "an interpolated value goes through `env:`" rule
+true by construction rather than by habit.
+
+**A single command stays inline.** `dotnet dotnet-sonarscanner begin` and the one-line Docker Hub summary are
+already readable, and wrapping them buys a file and loses nothing.
+
+**Two jobs gained `contents: read` for this, and that is the price.** A script is read out of the working
+copy, so `gate` in `pull-request.yml` and `summary` in `codeql-analysis.yml` now check out. Both had a
+narrower permission set before. The trade is deliberate: the alternative is a hand-kept list of job names in
+`gate` that a new job can be left out of, which is a failure nothing reports.
+
+**The release `publish` job is the exception and keeps its inline block.** It holds the Docker Hub credential
+and deliberately never checks out, which is also why it gets no composite action. Moving its `imagetools`
+copy into a script would mean checking out repository code beside that credential to save fifteen lines. Not
+worth it; if it ever does check out for another reason, move the block then.
+
 The corollary is that recipes must stay callable from CI as they stand — nothing interactive, no `sudo`, no
 local-only paths. Directory preparation that needs `sudo` is a precondition of *running* a compose stack, not
 of building anything, and is deliberately kept out of the build recipes.
@@ -250,7 +312,12 @@ Two mechanical consequences: the checkout needs `fetch-depth: 0`, because a shal
 new to the new-code comparison; and the scanner is a Java program whatever language it analyses, so the job sets
 up a JDK.
 
-**Scope and coverage paths live in `tooling/sonar-analysis.xml`, not in the workflow.** The Scanner for .NET
+**The trigger is `workflow_dispatch` and nothing else — recorded 2026-08-28.** No schedule: a nightly run
+re-analyses a commit nothing changed and reports the same numbers, which teaches everyone that the run means
+nothing. No `pull_request` either, for the reason in O2 — the coverage condition is red before anyone writes a
+line.
+
+**Scope and coverage paths live in `tooling/ci/sonar-analysis.xml`, not in the workflow.** The Scanner for .NET
 ignores `sonar-project.properties`, so that XML is the file form it reads, and `/s:` needs an absolute path.
 Only the key, org, token and host stay in the YAML.
 
@@ -294,7 +361,7 @@ SonarCloud UI, and they are what the gate actually hangs on.
   the 2026-08-07 run index zero files **and still report success**. Scope is exclusions only, and they live in
   the xml.
 
-### D9 — the Postgres service in `shared-test-suite.yml` carries no password
+### D9 — the Postgres service in `shared-image-tests.yml` carries no password
 
 `POSTGRES_HOST_AUTH_METHOD: trust`, and no `POSTGRES_PASSWORD`.
 
@@ -351,12 +418,15 @@ on the line. The image was self-contained until 2026-08-10 while basing on `aspn
 copies of .NET — the bundled one the app ran on, and the base image's, which nothing loaded.
 
 **Measured before the change was kept:** image 150.2 MB to 103.2 MB, publish output 123 MB to 18 MB,
-`System.*.dll` count 172 to 4. All structure assertions, all five smoke profiles and every test leaf green on
+`System.*.dll` count 172 to 4. All structure assertions, all five smoke profiles and every test green on
 the rebuilt image. The entrypoint did not change — `dotnet Binacle.Net.dll` was always the framework-dependent
 idiom, which is what made the old pairing wrong in the first place.
 
 The second reason is durability: framework-dependent means a .NET security fix reaches users by rebasing on a
 newer `aspnet` tag rather than by republishing the app, which matters for a project that ships months apart.
+
+**Written twice, on purpose.** The flags are in `tooling/build.just` and again in the publish step of
+`release-docker-image.yml`. Nothing checks that the two agree, so changing one means changing the other.
 
 ### D13 — per-build OCI labels are applied at build time, never as `LABEL` fed by `ARG`
 
@@ -367,9 +437,11 @@ stay as `LABEL` lines in the `Dockerfile`.
 cache from that point down, for metadata nothing executes. `--label` writes image-config metadata with no layer
 and no cache cost.
 
-metadata-action overrides two of the Dockerfile's constant labels on purpose — `licenses`, because
-auto-detection returns `NOASSERTION` for a dual-licensed repo, and `url`, which should be the landing site
-rather than the repo.
+metadata-action overrides three of the Dockerfile's constant labels on purpose — `licenses`, because
+auto-detection returns `NOASSERTION` for a dual-licensed repo; `url`, which should be the landing site
+rather than the repo; and `description`, which auto-fills from the GitHub repository blurb and silently beats
+the `Dockerfile`'s caption. **The third was moved here on 2026-08-28** from a comment in the workflow, which
+was the only place it was written down.
 
 ### D15 — the image carries an SBOM and provenance, and is signed keyless
 
@@ -427,6 +499,17 @@ the part that breaks; the issuer flag never moves. `SECURITY.md` is the wording 
 and it played out as written: every copy of the regexp changed together, the issuer flag did not move, and
 `SECURITY.md` led. It is worth reading as evidence rather than as prediction - the cost of the move was five
 edits and one beta to prove them, because the copies were listed here before anyone needed the list.
+
+**A third thing moved the identity on 2026-08-28, and it changed no command: the ref.** The identity ends
+`release-docker-image.yml@<ref>`, and `<ref>` is whatever the run was dispatched on. Under the tag trigger that
+was `refs/tags/v3.0.0`; the release is a `workflow_dispatch` from `main` now, so it is `refs/heads/main` — see
+D1. **All four copies keep working unchanged**, because every one of them anchors at the `@` and constrains
+nothing after it.
+
+**The weakening is real, it is accepted, and the regexp must not be tightened.** A signature can now come from
+a branch ref rather than only from a tag, and `main` is the only branch the gate lets release. Appending
+`refs/tags/` to the regexp to close that would stop every image signed from 2026-08-28 onward from verifying —
+on four surfaces at once, for every user, with a failure that reads as tampering.
 
 **Signing starts at `3.0.0-beta.2`**, along with the SBOM and the GHCR staging copy. Everything earlier
 answers `no signatures found`, and that is history rather than a broken check. **Which images verify under
@@ -489,13 +572,118 @@ last.
 
 **This closes the question the workflow restructure left open.** It was not CI's to answer.
 
+### D18 — two test suites, split by what ships
+
+**Decided by the maintainer, 2026-08-27.** `shared-image-tests.yml` runs the sixteen tests that end up in the
+Docker image. `shared-site-tests.yml` runs the fifteen that end up in a Jekyll site. The release pipeline calls
+the first; the three site deploys call the second; the pull request gate calls both.
+
+**Why:** a release should run the tests for what it releases. The ten Jekyll plugins under `ruby/` cannot reach
+the image, so a release paying for them buys nothing, and every step added to the suite the release calls is a
+step every release pays for. The mirror was worse: the gems ran on no pipeline at all, so a broken plugin was
+first seen half way through a deploy.
+
+**The cut is one rule, not a judgement per test: the image gets the .NET tests plus the javascript tests, and
+a site gets everything that is not .NET.** Checked against the manifests on 2026-08-27 — every site pulls all
+five javascript packages, `demo` through `binacle-net-ui` to `binacle-vipaq` to `binacle-compact-notation`, all
+three through `theme-switcher` to `cookies`.
+
+**Five tests are in both files, and that is not duplication to remove.** They ship in the image and they ship
+in the sites, so both sides prove them. 16 plus 15 less the 5 shared is 26, the whole list.
+
+**The pull request gate's path filter overlaps for the same reason — recorded 2026-08-28.** `just ci
+changed-paths` prints `code=` and `site=`, and `packages/`, `shared/` and `vipaq/` set both. That is right:
+those directories ship in the image and in the sites, so a change to one has to prove both.
+
+**A site deploy runs the site suite as its own first job**, for the same reason the release runs the image
+suite: a deploy is dispatched from any branch, so nothing guarantees the commit passed the gate.
+
+**Steps, never a group recipe, in either file.** `just test image` and `just test sites` exist so one command
+runs a slice on a laptop; a red check has to name the suite, which a group recipe cannot do.
+The lists and the steps are written out by hand and nothing checks one against the other. That is the
+trade: a list you can read, against a test that runs on a laptop and never in CI if somebody forgets the
+step. `just check test-steps` did the checking until 2026-08-27, when it was deleted — a check about the
+contents of another file in this repository is not a check on anything real.
+
+**A step's `name:` is the assembly, package or gem in full; its `run:` is the test derived from that name.**
+Renamed on 2026-08-27. Before, a step said `Test - API Kernel (Unit)` and ran `just test api-kernel-unit`,
+which was a third name for `Binacle.Net.Kernel.UnitTests` — three names for one suite, none of them derivable
+from another. The test is now `cs_binacle-net-kernel_unit`, and the rule for building it is in the
+`test-naming` memory. The tests are `[private]`, so a laptop's completion offers the three groups; a
+private recipe still runs by name, which is all a step needs.
+
+**What this does not fix.** The five javascript tests run twice on a pull request that touches
+`packages/`. That is two jest runs of a few seconds each, against a suite in each file that is honest about
+what it covers.
+
+### D19 — the merged coverage report drops the test-support assemblies
+
+`just coverage report` passes `-assemblyfilters:'-*.TestsKernel;-Binacle.TestReporting;-*.UnitTests;-*.IntegrationTests'`
+to reportgenerator.
+
+**Why:** a test helper scoring itself says nothing about shipped code. `*.TestsKernel` is a pattern rather
+than three names, so adding a kernel needs no edit.
+
+**Why `Binacle.TestReporting` and the ViPaq kernel are named even though neither is in the report today.**
+They only reach it if a suite that runs under coverage starts referencing them. Naming them now means that
+day is silent, instead of moving the denominator with nobody noticing.
+
+### D20 — CodeQL runs buildless, on merge only, and reports nothing on a check
+
+**Recorded 2026-08-28**, from the comments in `codeql-analysis.yml` that were the only copy of it. One job per
+language: `actions`, `csharp`, `javascript-typescript`, `ruby`. Findings land in the repository's Security
+tab.
+
+**Every language runs `build-mode: none`**, so no job installs a toolchain. If C# extraction is ever found to
+miss code, that one matrix entry becomes `manual` with a `dotnet build` step — **never `autobuild`**, which
+guesses at a solution this repository builds through `just`.
+
+**On `push` to `main`, not on `pull_request`.** The gate is the only required check and code scanning is
+advisory. A second pull request check that never blocks trains people to ignore it.
+
+**The schedule earns its place here, unlike Sonar's.** The query packs change, so the same commit reports new
+findings weeks later. That is a reason a Sonar schedule does not have — see D8.
+
+**`security-extended`, and quality queries stay off.** Sonar already reports quality, and two tools
+disagreeing on the same line is how a finding stops being read.
+
+**`category: /language:<name>` is load-bearing.** Without it, each upload replaces the last, so the job that
+finishes last clears the other three languages' findings.
+
+**The permissions are the smallest set that works.** `security-events: write` for the upload. GitHub's
+template also lists `actions: read` and `packages: read`; both are for private repositories and private query
+packs, and this one is public and uses neither.
+
+**The `summary` job exists because no page in the run says how many alerts are open** once the matrix has
+finished. It does not repeat the per-language results — the job list already shows those.
+
+### D21 — `just image verify` is what a user runs, and it must stay that way
+
+**Recorded 2026-08-28**, from the comments in `tooling/image.just` that were the only copy of it. Four checks
+against a published image: tags, signature, attestations, metadata.
+
+**No `docker login`, ever.** These are the commands a user runs against a public artifact, and a check that
+only passes with a credential is not checking a public artifact. Nothing in this recipe may grow one.
+
+**The version argument has no default.** A default rots into a tag nobody meant to check, and green against
+last release is worse than no output.
+
+**The order is deliberate: each check answers something the next one assumes.** Which tags are this image,
+then whether it is signed, then what is attached to it, then what it says about itself.
+
+**Every check prints what it found before it says pass or fail**, and no check aborts the others — the recipe
+runs without `set -e` and OR-s the exit codes, so the first failure cannot hide the answers that explain it.
+A check whose only output is "ok" cannot be read over someone's shoulder.
+
+**Only `3.0.0` and later can pass**, per D15 — signing and the SBOM start there.
+
 ## Open
 
 ### O1 — a prerelease cannot test the publish step, and this got worse
 
 **Mostly closed by the D3 reversal on 2026-08-11.** For part of that day `publish` was skipped entirely for a
 prerelease, which meant the Docker Hub login, the copy and the release-side signature were all first exercised
-by a real release. That is no longer true: `publish` now runs for every tag, so a beta proves the job's
+by a real release. That is no longer true: `publish` runs for every release, so a beta proves the job's
 credentials, its wiring, the cross-registry copy and the signature.
 
 **What is still untested is narrower: the moving tags.** A prerelease produces only its immutable tag, so
@@ -503,16 +691,21 @@ credentials, its wiring, the cross-registry copy and the signature.
 references instead of one — are first proven on the release itself. That is one extra argument to a command
 that will have run several times by then.
 
-Whether that residual deserves a throwaway-tag run is a judgement call rather than an obvious yes. If it is
-done, note the two traps: a tag containing a hyphen is treated as a prerelease and proves nothing, and a clean
-`v0.0.1` against the real repo **would move `latest`**, because metadata-action never queries the registry and
-`latest=auto` marks any non-prerelease semver as latest. Point `DOCKERHUB_REPO` at a scratch repo instead.
+**D1 fed this on 2026-08-28.** Both metadata steps take the version from `value=${{ inputs.version }}` now,
+because a dispatch has no tag ref for `type=semver` to read, and that is the input to exactly the two tag rules
+nothing has proven yet.
+
+Whether that residual deserves a throwaway run is a judgement call rather than an obvious yes. If it is
+done, note the two traps: a version containing a hyphen is treated as a prerelease and proves nothing, and a
+clean `0.0.1` against the real repo **would move `latest`**, because metadata-action never queries the registry
+and `latest=auto` marks any non-prerelease semver as latest. Point `DOCKERHUB_REPO` at a scratch repo instead.
 
 ### O2 — how much the pull-request gate should prove
 
-Today a PR runs the test leaves and nothing else: the image is never built, the integration suites cover core
-modules only, and Sonar runs when somebody presses a button. Each is a known gap rather than an oversight, and
-the shape of the fix is not settled — one folded job or three workflows, and what the runtime budget allows.
+A PR now runs both test suites, an image build, the three site builds with their link checks, and the
+`.github/` lints. What is still missing: the integration suites cover core modules only, and Sonar runs when
+somebody presses a button. Both are known gaps rather than oversights, and the shape of the fix is not settled
+— one folded job or three workflows, and what the runtime budget allows.
 
 One part **is** settled: **coverage must not be made blocking yet.** The project runs the read-only "Sonar way"
 gate, which asks 80% on new code, and custom gates need a paid plan. A condition that is red before anyone

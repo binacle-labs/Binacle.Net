@@ -7,7 +7,7 @@ runs:
     - name: Install actionlint
       shell: bash
       env:
-        # Keep in step with DEVELOPMENT.md, so CI and a laptop get the same bytes.
+        # Keep in step with DEVELOPMENT.md.
         VERSION: 1.7.12
         # Published by upstream in actionlint_<version>_checksums.txt.
         SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8

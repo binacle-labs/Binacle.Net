@@ -1,29 +1,27 @@
-# Checks that inspect what the repo produced, loaded by the root justfile as the `check` module.
+# Checks. Each one reads a real file and says what is wrong with it.
 #
-#   just check links                   internal links in every built site
-#   just check links <site>            one of them
-#   just check links-external <site>   every link, other people's servers included
+#   just check links                   the internal links in all three built sites
+#   just check links <site>            one site
+#   just check links-external <site>   the same site, other people's servers included
 #   just check workflows               actionlint over .github/workflows
-#   just check actions                 the .github/actions manifests, which actionlint cannot read
+#   just check actions                 the .github/actions files, which actionlint cannot read
 #
-# Both name the files they were handed and count them at the end. actionlint and grep say nothing when they
-# pass, so that count is the only thing separating a clean run from one that never started.
+# `links` reads the built site and never the source, because a href in the source is Liquid and not a URL
+# yet. Build first.
 #
-# It reads the built site, never the source: a source href is Liquid, not a URL yet. Build first.
-#
-# `links` passes --offline and drops every external link. The external run is a separate recipe, not a flag.
+# `workflows` and `actions` print the files they were handed and count them at the end. Both say nothing at
+# all when they pass, so the count is what tells a clean run from one that never started.
 
-# Module recipes run where the module file lives (tooling/), which would break every path below.
+# Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
 
 # lychee prints every broken link with its file and line, so just's own "Recipe failed" line adds nothing.
-# The exit code still propagates, so CI still fails.
+# The exit code still gets through, so CI still fails.
 set no-exit-message := true
 
-# Named because the config no longer sits in the working directory, where lychee finds one by itself.
-# Absolute for the same reason as the openapi paths: the recipe runs from the repo root, and this file does
-# not move with it.
-lychee_config := justfile_directory() / "tooling" / "lychee.toml"
+# lychee only finds a config by itself when it sits in the working directory, and this one does not, so it
+# is named. Absolute, because the recipes run from the repo root and this file does not move with them.
+lychee_config := justfile_directory() / "tooling" / "check.lychee.toml"
 
 # List the recipes
 default:
@@ -33,52 +31,65 @@ default:
 links site="":
     #!/usr/bin/env bash
     set -euo pipefail
+
     sites="{{ site }}"
     [ -n "$sites" ] || sites="docs demo www"
+
     for s in $sites; do
         just check _lychee "$s" --offline
     done
 
-# Every link in one site, external ones included - slower, and it can fail on somebody else's outage
+# Every link in one site, other people's servers included - slower, and it can fail on somebody else's outage
 links-external site: (_lychee site)
 
 # The workflow files: expressions, shell quoting, runner labels, action inputs
 workflows:
     #!/usr/bin/env bash
     set -euo pipefail
+
     files=(.github/workflows/*.yml)
+
     echo "checking ${#files[@]} workflows in .github/workflows"
     printf '  %s\n' "${files[@]##*/}"
-    # actionlint prints its own errors and exits non-zero, so set -e stops us before the all-clear below.
+
+    # actionlint prints its own errors and exits non-zero, so the line below is only reached on a clean run.
     actionlint -color "${files[@]}"
+
     echo "${#files[@]} workflows, no errors"
 
-# The composite action manifests, which actionlint cannot read
+# The .github/actions files, which actionlint cannot read
 actions:
     #!/usr/bin/env bash
     set -euo pipefail
+
     files=(.github/actions/*/action.yml)
     names=("${files[@]%/action.yml}")
+
     echo "checking ${#files[@]} actions in .github/actions"
     printf '  %s\n' "${names[@]##*/}"
-    # By hand because actionlint treats every file as a workflow. A vars or secrets expression anywhere in a
-    # manifest, descriptions included, fails the action load on the runner.
-    # grep prints the offending file, line and text itself; the line below says what to do about it.
+
+    # By hand, because actionlint reads every file as a workflow. A vars or secrets expression anywhere in
+    # one of these files, descriptions included, makes the action fail to load on the runner.
+    #
+    # grep prints the file, the line and the text. The line below says what to do about it.
     if grep -nE --color=auto '\$\{\{[^}]*\b(vars|secrets)\.' "${files[@]}"; then
         echo "take it as an input instead - neither context exists inside an action" >&2
         exit 1
     fi
+
     echo "${#files[@]} actions, no errors"
 
 [private]
 _lychee site *flags:
     #!/usr/bin/env bash
     set -euo pipefail
+
     dir="artifacts/{{ site }}"
     if [ ! -d "$dir" ]; then
         echo "No $dir. Run 'just build {{ site }}' first - this reads the built site." >&2
         exit 1
     fi
-    # --root-dir is what resolves a root-relative href like /core-concepts/ against the site root instead of
-    # the filesystem root. It has to be absolute; the recipe runs from the repo root, so $PWD is that.
+
+    # --root-dir must be absolute, or a href like /core-concepts/ resolves against the filesystem root
+    # instead of the site.
     lychee --config '{{ lychee_config }}' {{ flags }} --root-dir "$PWD/$dir" --no-progress "$dir/**/*.html"
