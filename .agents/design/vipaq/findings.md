@@ -1,7 +1,7 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-08-19
+verified: 2026-08-27
 check: Numbers match the latest results/vipaq/compression/ size reports and results/vipaq/benchmarks/ output; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/ and .TestsKernel/Providers/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
@@ -44,11 +44,12 @@ Source: `Binacle.ViPaq.PerformanceTests` (size + crossover) and
 `Binacle.ViPaq.PackedDataGenerator` from the Bischoff suite (thpack1–7) + custom problems. Round-trip green on
 every scenario, both in the generator and the harness.
 
-**The dataset has grown since these runs, and the counts below are not renumbered.** `vipaq/data/packed/`
-carried 716 scenarios / 58,834 items when this was measured; on 2026-07-16 it went to **721 / 59,106** — five
-custom scenarios and 272 items. So every "of 716" split here describes the earlier set. Nothing suggests the
-*shape* moved (the five are small customs, the same family as the fifteen already on the uncompressed side),
-but the exact splits would have to be re-run to be restated. The live count is in `$vipaq/dependencies`.
+**The dataset has grown twice since these runs, and the counts below are not renumbered.**
+`vipaq/data/packed/` carried 716 scenarios when this was measured; on 2026-07-16 it went to 721 — five small
+custom scenarios and 272 items. It then went to **2,316** when every problem started being packed under all
+three algorithms and the demo-samples family was added. So every "of 716" split here describes the first set.
+Nothing suggests the *shape* moved, but the exact splits would have to be re-run to be restated. The live
+count is in `$vipaq/dependencies`.
 
 ## The headline: random data lies about compression
 

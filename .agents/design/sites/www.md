@@ -1,7 +1,7 @@
 ---
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
-verified: 2026-08-24
+verified: 2026-08-27
 check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
 paths:
   - "sites/www/**"

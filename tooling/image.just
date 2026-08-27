@@ -8,18 +8,12 @@
 #   just image verify <version>  check a published image: tags, signature, attestations, metadata
 #   just image dockerhub-overview <version>   print the Docker Hub page as it would be published
 #
-# These follow `just build image`, and they answer a different question from the `serve` module: not "does the
-# code work" but "does the thing we ship work". The stacks all run binacle-net:local, which is why each checks
-# for it first and `serve` has no such check. **`verify` and `dockerhub-overview` are the exceptions** - one
-# reads a published image off Docker Hub and the other renders the page that describes it; neither builds
-# anything and neither logs in.
+# The stacks run binacle-net:local, so each checks for it first. `verify` and `dockerhub-overview` do not -
+# one reads a published image off Docker Hub, the other renders the page describing it.
 #
 # Two files, three stacks: `volume` and `bind` share tooling/image.local.yml and differ only in where
-# /app/data goes. `full` includes that file and serve's services, so it is the same postgres on the same
-# volume and the same port - it and `just serve services-up` cannot run at once.
-#
-# The folder setup below is copied from `serve`, not shared with it. A module that reaches into another one
-# puts back the coupling that splitting them removed, and this is a few lines of mkdir and chmod.
+# /app/data goes. `full` also includes serve's services - same postgres, same volume, same port - so it and
+# `just serve services-up` cannot run at once.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

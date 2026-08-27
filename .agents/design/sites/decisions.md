@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
 description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate.
-verified: 2026-08-23
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against the collections block in sites/demo/_config.yml, which must contain sitemaps and nothing else
+verified: 2026-08-27
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -48,7 +48,7 @@ header bar and the index `h1` use `display_title`; the `<title>` suffix and `og:
 otherwise wear the same name and the nav's exit link off the demo is meaningless. A `<title>` suffix needs the
 brand — `Packing Demo - Binacle.Net Demo` stutters, and the page half already says Demo where it matters.
 
-### S4 — the demo site has one collection, and it is the sitemap
+### S4 — the demo site has no collections at all
 
 The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser, both
 navs and the JSON-LD block all select on that flag.
@@ -56,8 +56,14 @@ navs and the JSON-LD block all select on that flag.
 **They were an `apps` collection while the URLs were `/apps/:name/`.** Once the host became the index and the
 tools moved to `/packing/` and `/vipaq/`, a collection expressed nothing a front-matter flag does not.
 
-**`sitemaps` stays a collection** for the opposite reason: a sitemap under `pages/` inherits the `pages/**`
-defaults — a layout and a sitemap entry — and would need two overrides to undo them, and would list itself.
+**A `sitemaps` collection went the same way**, and later than the first. A sitemap page under `pages/`
+inherited the `pages/**` defaults — a layout and a sitemap entry — and needed two overrides to undo them,
+which was the argument for keeping it a collection. `jekyll-multi-sitemap` removed the page entirely: the
+`sitemaps:` block in `_config.yml` names the files and what each includes, and the gem generates them, so
+there is nothing on disk to inherit a default. `sites/demo/_config.yml` declares no `collections:` key.
+
+**`sites/docs` is the only site with collections** — `versions` and `common_pages` — and neither is a
+sitemap.
 
 ### S5 — legacy swagger pages keep `nofollow`; every other legacy page gets `follow`
 

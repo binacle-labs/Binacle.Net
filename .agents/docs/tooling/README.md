@@ -1,7 +1,7 @@
 ---
-id: "tooling"
+id: tooling
 description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image and smoke modules for just, the benchmark/performance scripts, the wrangler configs, the local compose stacks, and emulator state"
-verified: 2026-08-26
+verified: 2026-08-27
 check: "Script list, tests.just leaves, coverage.just recipes, openapi.just, agents.just, regen.just, changelog.just, serve.just, build.just (the API publish/image pair and the three site builds), check.just and its lychee.toml, image.just (stacks and the four verify checks, whose certificate identity must match SECURITY.md) and smoke.just recipes, and the compose stack/file/service table match tooling/"
 also_update:
   - commands

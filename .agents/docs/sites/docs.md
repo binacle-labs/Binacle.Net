@@ -1,8 +1,8 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-08-24
-check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL; sites/docs/_plugins/ is still empty and every plugin the site loads is a gem under ruby/; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
+verified: 2026-08-27
+check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
 paths:
   - "sites/docs/**"
 ---
@@ -152,20 +152,27 @@ A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.
 
 ## Plugins
 
+Eleven, in `_config.yml` order. **This is the site that loads every gem** — the other two are flat, so
+neither takes `jekyll-breadcrumb-trail`, and only this one is versioned, so only it takes
+`binacle-docs-versions`.
+
 | Plugin | Source |
 |---|---|
+| `jekyll-tidy` | gem |
 | `jekyll-gtm` | `ruby/jekyll-gtm` |
 | `jekyll-filters` | `ruby/jekyll-filters` |
+| `binacle-robots` | `ruby/binacle-robots` |
 | `jekyll-multi-sitemap` | `ruby/jekyll-multi-sitemap` |
 | `jekyll-resource-tags` | `ruby/jekyll-resource-tags` |
 | `jekyll-page-meta` | `ruby/jekyll-page-meta` |
 | `jekyll-structured-data` | `ruby/jekyll-structured-data` |
+| `jekyll-webmanifest` | `ruby/jekyll-webmanifest` |
 | `jekyll-breadcrumb-trail` | `ruby/jekyll-breadcrumb-trail` |
 | `binacle-docs-versions` | `ruby/binacle-docs-versions` |
-| `jekyll-tidy` | gem |
 
-**`sites/docs/_plugins/` is empty.** VLink lived there and moved into `binacle-docs-versions` with the
-version stamps, which is where it gets a spec suite; nothing under `sites/` has one.
+**There is no `sites/docs/_plugins/` directory.** `_config.yml` still declares `plugins_dir: _plugins` and
+Jekyll tolerates it being absent. VLink lived there and moved into `binacle-docs-versions` with the version
+stamps, which is where it gets a spec suite; nothing under `sites/` has one.
 
 **breadcrumbs** (`{% breadcrumbs %}`) — one call in `_includes/header.html` renders the trail for every
 page, versioned or not. The two thirty-line includes and the branch that chose between them went on

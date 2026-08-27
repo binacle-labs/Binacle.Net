@@ -1,8 +1,8 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-08-23
-check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing
+verified: 2026-08-27
+check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing
 also_update:
   - packages
   - api/configuration
@@ -91,12 +91,20 @@ person clicks. **An air-gapped install is a normal way to run this**, so a new r
 
 ## Configuration
 
-**None.** The module reads no config file. `UIModuleOptions.ApiBaseUrl` is the seam for pointing the demo at
-another API host; `AddUIModule` sets it to empty and nothing else writes it. Empty means the demo fetches
-relative, from the API it ships in.
+**None.** The module reads no config file. `UIModuleOptions` is `internal`, has two properties, and
+`AddUIModule` sets both to their shipped values — nothing else writes either.
 
-`Pages/Packing.cshtml.cs` renders it into the demo's `x-data` attribute. The demo site does the same thing
-from a build-time value — same mechanism, different producer.
+| Property | Shipped value | What it does |
+|---|---|---|
+| `ApiBaseUrl` | `""` | The seam for pointing the demo at another API host. Empty means the demo fetches relative, from the API it ships in. `Pages/Packing.cshtml.cs` renders it into the demo's `x-data` attribute; the demo site does the same thing from a build-time value — same mechanism, different producer. |
+| `DefaultTheme` | `"system"` | `"light"`, `"dark"` or `"system"`. **One value, or the server paints one theme and the switcher changes to another.** |
+
+**The theme is resolved server-side, so the image needs no head script to avoid the wrong-theme flash.**
+`_Layout.cshtml` reads the `theme` cookie, falls back to `DefaultTheme`, and writes `data-theme`,
+`data-default-theme` and `data-theme-storage="cookie"` onto `<html>`. Under `"system"` the `data-theme`
+value is null and **Razor drops the whole attribute** — no attribute is how the stylesheet is told to follow
+the machine. The three Jekyll sites reach the same end through `default_theme: "system"` in their
+`_config.yml`.
 
 ## It makes no server-side HTTP calls
 

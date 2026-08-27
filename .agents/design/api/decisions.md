@@ -1,8 +1,8 @@
 ---
 id: api/decisions
-description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, and why the API sends no HSTS header.
-verified: 2026-08-22
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing
+description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, and why the DiagnosticsModule alone is registered unconditionally.
+verified: 2026-08-27
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do
 paths:
   - "api/**"
 ---
@@ -107,3 +107,18 @@ behind any other reverse proxy besides IIS. The reverse proxy terminates TLS, an
 the correct request scheme." (<https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer>.)
 `ForwardedHeaders` ships **off** in this image, so anyone who configures an HTTPS port behind a proxy walks
 into exactly that. Deleting the HSTS half removes one leg of it.
+
+### D3 — DiagnosticsModule is always on, and the asymmetry is deliberate
+
+**Settled 2026-08-17.** `builder.AddDiagnosticsModule()` and `app.UseDiagnosticsModule()` are unconditional in
+`Program.cs`, while ServiceModule and UIModule sit behind `Feature.IsEnabled`.
+
+**That is by design and is not evidence of anything.** An earlier draft of the architecture-check work read it
+as a sign a boundary was being crossed, and that argument is withdrawn. **So "every module is registered
+behind a feature check" is not a rule anyone should write** — it would be red on a decision that has been
+taken.
+
+**`IOptionalDependency<T>` is still doing real work**, which is a separate thing. The module is always
+registered; the packing log processor inside it is not — `ModuleDefinition.cs` registers that only when its
+configuration turns it on. So the channel can be absent while the module is present, which is exactly what
+that abstraction covers.

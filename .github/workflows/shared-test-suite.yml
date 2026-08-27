@@ -1,15 +1,12 @@
 # Every test leaf plus the OpenAPI lint. One job so setup and build happen once; one step per leaf so a red
-# check names the suite. ServiceModule is duplicated steps per backend rather than a matrix - cheaper at this
-# count, and all three backends run here, so none of them ships on a hand-run.
+# check names the suite. ServiceModule is duplicated steps per backend rather than a matrix.
 #
-# `shared-` because two workflows call this file - the pull request gate and the release. That does not make
-# it private: the dispatch trigger stays, so the whole suite can be run by hand against a branch.
+# `shared-` because the pull request gate and the release both call it. The dispatch trigger stays, so it can
+# still be run by hand.
 #
-# It takes no inputs, so both callers get the same run. Every step added here is a step the release pays for,
-# which is why the pull request's image build lives in its own workflow rather than in this one.
+# It takes no inputs, so both callers get the same run. Every step added here is a step the release pays for.
 #
-# DOTNET_TEST_ARGS is job-wide: CI builds the solution once and every leaf runs --no-build against it. Unset
-# on a laptop, where the same recipes do a plain `dotnet test`.
+# DOTNET_TEST_ARGS is job-wide: CI builds the solution once and every leaf runs --no-build. Unset on a laptop.
 
 name: Shared / Test Suite
 
@@ -55,13 +52,11 @@ jobs:
         env:
           POSTGRES_USER: appuser
           POSTGRES_DB: binacle_net
-          # No POSTGRES_PASSWORD: this container lives for one job, is reachable only from it, and is thrown
-          # away after, so there is nothing for a password to protect. Under trust it accepts any password, so
-          # the tests connect unchanged with the shared local-dev connection string.
+          # No POSTGRES_PASSWORD: this container lives for one job and is thrown away. Under trust it accepts
+          # any password, so the tests connect unchanged with the shared local-dev connection string.
           #
-          # That local-dev password is still load-bearing in the local compose stacks, BinacleApi.cs and
-          # ConnectionStrings.Development.json. It is the same value everywhere on purpose - change it in all
-          # of them or none.
+          # That local-dev password is the same value in the local compose stacks, BinacleApi.cs and
+          # ConnectionStrings.Development.json. Change it in all of them or none.
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432

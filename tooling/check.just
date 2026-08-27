@@ -9,13 +9,9 @@
 # Both name the files they were handed and count them at the end. actionlint and grep say nothing when they
 # pass, so that count is the only thing separating a clean run from one that never started.
 #
-# It reads the built site, never the source. A source href is Liquid - `{{ site.baseurl }}/api` is not a link
-# yet - so checking `sites/docs/` would check strings that are not the URLs anyone visits. Build first.
+# It reads the built site, never the source: a source href is Liquid, not a URL yet. Build first.
 #
-# `links` passes --offline, which drops every external link. That is not timidity about the network: an
-# external check fails on somebody else's rate limit or outage, and one that goes red for reasons the author
-# did not cause stops being read. Internal links are the ones a rename breaks, and they answer the same way
-# every time. That is why the external run is a separate recipe rather than a flag, and why CI calls `links`.
+# `links` passes --offline and drops every external link. The external run is a separate recipe, not a flag.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

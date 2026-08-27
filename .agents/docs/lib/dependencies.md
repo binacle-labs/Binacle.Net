@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection tests kernel, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-08-13
+verified: 2026-08-27
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"

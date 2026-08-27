@@ -1,7 +1,7 @@
 ---
 id: sites/demo
 description: The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/.
-verified: 2026-08-24
+verified: 2026-08-27
 check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; sites/demo/_includes/ still has no seo.html and pages/index.html still prints item.summary on the cards; the demo/prefetch script split still matches sites/demo/_data/includes.yml; the sitemaps: block in _config.yml still writes one file and /sitemap.xml still lists the three pages; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
 also_update:
   - packages
@@ -72,9 +72,10 @@ hand-written include dropped.
 
 ## Plugins
 
-Same as the docs site: `jekyll-gtm`, `jekyll-filters`, `jekyll-multi-sitemap`, `jekyll-resource-tags`,
-`jekyll-page-meta`, `jekyll-structured-data`, `jekyll-tidy` — everything but `binacle-docs-versions`, which
-is the docs site's own.
+Nine, in `_config.yml` order: `jekyll-tidy`, `jekyll-gtm`, `jekyll-filters`, `binacle-robots`,
+`jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
+`jekyll-webmanifest`. The two the docs site loads and this one does not are `binacle-docs-versions` and
+`jekyll-breadcrumb-trail` — a flat site has no version picker and no trail to draw.
 
 **The head is `{% page_meta %}` then `{% structured_data %}`, and there is no seo include.** The two demo
 pages name their node with `structured_data: type: WebApplication` in front matter; the `offers`,

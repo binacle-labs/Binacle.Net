@@ -2,7 +2,7 @@
 id: sites/packing-demo-set
 description: Why the packing demo sizes its items against the largest bin, and how sizingBin and addBin relate - the reasoning behind the numbers a visitor arrives to
 verified: 2026-08-27
-check: largestBin and randomItemFor in packages/binacle-net-ui/src/utils/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/core/packingDemo.ts - the bin each one picks is the claim that moves
+check: largestBin and randomItemFor in packages/binacle-net-ui/src/utils/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/core/packingDemo.ts - the bin each one picks is the claim that moves; the module's _sass/_theme.scss still matches sites/demo/_sass/_theme.scss once whitespace is stripped; utils/_itemMaterial.ts is still one shared MeshNormalMaterial
 paths:
   - "packages/binacle-net-ui/**"
 ---
@@ -35,3 +35,21 @@ so what items are sized against does not move under the visitor mid-edit.
 smallest one. Any statement that the sizing bin is also the one a new bin is copied from is wrong, and one
 was written in a comment and later removed. **Whether `addBin` should copy the largest instead is a behaviour
 question nobody has answered** - not a bug.
+
+## The module does not ship an old palette
+
+**Checked 26 Aug 2026.** A review said `Binacle.Net.UIModule` was still on a pre-contrast-pass dark palette
+while the sites had moved on. It is not. `api/src/Binacle.Net.UIModule/_sass/_theme.scss` is byte identical
+to `sites/demo/_sass/_theme.scss` once whitespace is stripped, `#3c5d8b` is also the dark `--primary` in
+`sites/www/_sass/_tokens.scss`, and the module's `_components.scss` carries the same four contrast overrides
+the demo site's does.
+
+**If a contrast number is ever in doubt, measure it.** Do not compare hex strings across files that were
+always meant to match - that is what produced the false finding.
+
+## The pink and teal faces are not item colours
+
+`utils/_itemMaterial.ts` is a single shared `MeshNormalMaterial`, which colours each face by the direction
+its normal points. There is one kind of item and no categories anywhere in the API.
+
+**Any change to how items are coloured is design work.** It is not a bug and there is nothing to fix.

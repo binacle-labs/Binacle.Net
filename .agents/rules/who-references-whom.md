@@ -1,5 +1,5 @@
 ---
-description: The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions.
+description: The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever.
 load: always
 when: adding any link, $ reference or pointer, anywhere in the repo
 ---
@@ -10,7 +10,7 @@ The whole rule, in one table. Nothing else states any part of it.
 
 | File type | May reference | Never references |
 |---|---|---|
-| **docs** (permanent) | code, paths, READMEs, **other docs** | design, plans, memory |
+| **docs** (permanent) | code, paths, READMEs, **other docs, design** | plans, memory |
 | **design** (permanent) | code, paths, READMEs, **docs, other design** | plans, memory |
 | **plans** (ephemeral) | code, paths, READMEs - **nothing under `.agents/`** | every layer, including each other |
 | **memory** (ephemeral) | ideally nothing; a doc or design only if it truly must | plans, other memory |
@@ -20,17 +20,21 @@ The whole rule, in one table. Nothing else states any part of it.
 
 ## Why each line
 
-- **Docs never point at design.** Docs are "what is true now"; design is the "why" and can change under them.
-  Design points at docs; docs never point back.
+- **Docs and design point at each other freely.** Both are permanent and both carry `verified:`, so neither
+  link can dangle. A doc says what is true now; the record beside it says why, and a reader of one wants the
+  other. **This was banned until 2026-08-27** and the ban kept losing: five pointers were written back in by
+  four different sessions doing the obvious thing.
 - **Nothing permanent points at anything ephemeral.** A plan is deleted when built or dropped, and a
   memory can stop being true, so the link dangles. If a permanent file needs the content, it was not
   ephemeral - move it into a doc or design record first.
 - **Plans cite no `$` reference at all** - not a doc, not a design record, not each other. Name the
   area in plain words ("the ServiceModule doc") and inline the fact. A plan is a scratchpad that gets deleted;
   a `$` reference out of one is a maintenance debt for a file that will not outlive the work.
-- **Nothing outside `.agents/` may point into it.** Three shapes, all banned: a filename (`see decisions.md`),
-  a `$` reference (`Formula per $lib/result-building`), and a bare ref code (`(D16)`, which names no file at
-  all and is the worst of the three to read). 27 of these accumulated silently before anyone counted.
+- **Nothing outside `.agents/` may point into it. This line never moves.** Every other row here has been
+  argued and one has been relaxed; this one is not up for discussion. Three shapes, all banned: a filename
+  (`see decisions.md`), a `$` reference (`Formula per $lib/result-building`), and a bare ref code (`(D16)`,
+  which names no file at all and is the worst of the three to read). 27 of these accumulated silently before
+  anyone counted.
 
   **A path a tool operates on is not a reference.** `tooling/agents.just` reads and writes
   `.agents/**/_index.md` and the root `justfile` registers it. Those are operands. What is banned is the

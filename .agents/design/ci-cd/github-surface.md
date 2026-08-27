@@ -1,8 +1,8 @@
 ---
 id: ci-cd/github-surface
 description: What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly
-verified: 2026-08-17
-check: every platform row is unverified - it was read from the working copy, not from the GitHub settings pages. Re-read the settings before trusting any of them
+verified: 2026-08-27
+check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them
 paths:
   - ".github/**"
 ---
@@ -74,11 +74,15 @@ week, see whether the bump arrives.
 
 ## What this repository uses today
 
-`.github/` holds `dependabot.yml` (actions only, weekly, grouped minor and patch) and six workflows. The root
-holds `README.md`, `SECURITY.md`, `CHANGELOG.md`, `DEVELOPMENT.md`, the two licence files and `NOTICE`.
+`.github/` holds `dependabot.yml` (actions only, weekly, grouped minor and patch, with one entry per action
+folder that pins an outside SHA), **ten workflows**, **nine composite actions** under `actions/`, and
+`dockerhub-overview.md` — the source the release pipeline renders onto the Docker Hub page. The root holds
+`README.md`, `SECURITY.md`, `CHANGELOG.md`, `DEVELOPMENT.md`, `CLAUDE.md`, `LICENSE.GPL-3.0`,
+`CONTENT-TERMS.md` and `NOTICE`.
 
-**Missing:** issue templates and a PR template, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS` and
-`CITATION.cff`.
+**Missing:** issue templates and a PR template, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS`,
+`SUPPORT.md`, `FUNDING.yml` and `CITATION.cff` — checked 2026-08-27, and the last three are absent on purpose
+per the table below.
 
 **Two worth a decision and nothing more:**
 
@@ -111,7 +115,7 @@ repository.
   conduct, contributing, and issue and PR templates. **Worth loading once for the checklist**, then ignoring
   the parts that are not wanted.
 - **Merge settings** - squash-only, auto-delete head branches, allow auto-merge. Unverified.
-- **Environments** - both site deploys declare one, which is what carries the deployment URL. Required
+- **Environments** - all three site deploys declare one, which is what carries the deployment URL. Required
   reviewers and wait timers are available and unused.
 
 ---

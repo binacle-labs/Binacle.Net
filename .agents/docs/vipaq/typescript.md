@@ -1,7 +1,7 @@
 ---
 id: vipaq/typescript
 description: Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library
-verified: 2026-08-19
+verified: 2026-08-27
 check: TS API signatures, the package root index.ts re-exports and every row of the divergence table match vipaq/packages/binacle-vipaq/; the suite and test counts match a `just test vipaq-ts-unit` run
 also_update:
   - vipaq

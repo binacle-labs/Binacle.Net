@@ -12,10 +12,6 @@ paths:
 **The maintainer wants this done - 2026-08-27.** His words: *"I want it. Wait for instructions."* **Do not
 start it.** The what is settled; how it is wired is his call and he will say.
 
-**Both Ruby rows from `todos.md` moved here on 2026-08-27**, on the maintainer's word that they are part of
-this work. One was the gem leaves reaching a workflow, already covered below. The other is rubocop, which was
-not, and now has its own section.
-
 **Measured 24 Aug 2026.** `just test all` runs 26 leaves. `shared-test-suite.yml` has 18 steps. The
 difference is the **ten Ruby gem leaves**, which run on a laptop and on nothing else.
 
@@ -92,7 +88,6 @@ A check that has only ever passed is a check nobody has tested.
 - **The decision** - separate steps rather than group steps, and why - goes in the CI/CD decisions ledger.
 - **The recipes** - the groups, and the new check - go in the commands doc and the tooling doc.
 - **The gem leaves reaching CI** goes in the Ruby doc, which currently says they are leaves and stops there.
-- **Both `todos.md` Ruby lines are already gone** - they moved into this file on 2026-08-27.
 
 ## Done when
 

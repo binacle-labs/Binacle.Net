@@ -71,7 +71,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   load: on-trigger
   paths: [".agents/release-v*.md", ".agents/post-release-v*.md"]
 - file: who-references-whom.md
-  description: "The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions."
+  description: "The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever."
   when: "adding any link, $ reference or pointer, anywhere in the repo"
   load: always
 ```

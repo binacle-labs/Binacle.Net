@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-08-13
+verified: 2026-08-27
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below
 paths:
   - "shared/**"
@@ -27,7 +27,9 @@ Binacle.Geometry                 leaf — BCL only, no Binacle deps
    │
    └── Binacle.Packing ──────────┘   the packing vocabulary: results, identity, status enums
           [IVT → Binacle.Lib, Binacle.Lib.TestsKernel]
-          consumers: Binacle.Lib, api Binacle.Net + IntegrationTests, both tests kernels, ViPaq generator
+          consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.TestsKernel,
+                     Binacle.Lib.TestsKernel, OrLibrary.Converter, ViPaq.PackedDataGenerator
+                     (Binacle.Net reaches it transitively and imports it globally - $api/dependencies)
 
 Binacle.TestsKernel              algorithm fixture hub — Bischoff + custom-problems scenarios
    refs: Binacle.Packing, Binacle.CompactNotation
@@ -37,7 +39,7 @@ Binacle.TestReporting            leaf — markdown report writer, no Binacle dep
    consumers: Binacle.Lib.PerformanceTests, ViPaq.PerformanceTests, both ViPaq generators, OrLibrary.Converter
 
 shared/tools/Binacle.OrLibrary.Converter   exe tool
-   refs: Binacle.CompactNotation, Binacle.TestReporting
+   refs: Binacle.CompactNotation, Binacle.Packing, Binacle.TestReporting
 ```
 
 ## Projects at a glance
@@ -50,7 +52,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.TestsKernel` | packing result models, identity, status enums |
 | `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
 | `Binacle.TestsKernel` | library | Packing, CompactNotation | — | algorithm fixtures + providers (see note 3) |
-| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, TestReporting | — | converts OR-Library benchmark data |
+| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
 
 ## Notes
 

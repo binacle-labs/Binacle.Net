@@ -1,8 +1,8 @@
 ---
 id: lib/decisions
 description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two tests kernels, and the open parallelization question.
-verified: 2026-08-13
-check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/
+verified: 2026-08-27
+check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by Binacle.TestsKernel.csproj match the key sets in Algorithms/CollectionKeys.cs
 also_update:
   - lib/findings
 paths:
@@ -81,6 +81,12 @@ which **nothing outside the lib slice reads**, so its fixtures live in `lib/data
 slice otherwise. Bischoff and custom-problems qualify twice over — two slices read them through the kernel, and
 the ViPaq packed-data generator reads the same files by path at run time — so they stay put. ViPaq had already
 settled this shape with its own `vipaq/data/packed`.
+
+**`shared/data/demo-samples/` was added under the same rule and is the awkward case.** Three consumers, and
+none of them is a C# test through this kernel: the demo component generates its sample set from it, the ViPaq
+packed-data generator packs it, and the shared kernel embeds it but names no collection key for it, so
+`AllScenariosProvider` does not include it. **The embed is currently reachable and unread** — the files land
+in `ScenarioCollectionsProvider.Collections` under `demosamples/<name>` and nothing asks for them.
 
 **The friend grant is preferred to a shared bin model.** `OperationResultHelper` bridges through Packing's
 internal `Dimensions` rather than taking a bin type from the shared algorithm kernel. Reaching for that kernel

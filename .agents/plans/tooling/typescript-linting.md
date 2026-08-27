@@ -23,8 +23,8 @@ every language here to the same standard.** Then the material below is the TypeS
 - **TypeScript and JavaScript: nothing.** No eslint, no prettier, no biome anywhere. Style is whatever the
   last person typed, held only by `.editorconfig` and `strict` in six copies of `tsconfig.json`.
 - **Ruby: a config, never run.** `ruby/.rubocop.yml` covers every gem and writes down the style it enforces.
-  rubocop is in no `Gemfile` and no `.gemspec`, and no `just` recipe calls it - the only mentions outside that
-  config are in `.agents/`. It lands red before it lands green.
+  rubocop is in no `Gemfile` and no `.gemspec`, and no `just` recipe calls it - nothing in the codebase
+  mentions it outside that config. It lands red before it lands green.
 - **C#: no in-build linter, but not nothing.** There are no analyzer packages, no `EnforceCodeStyleInBuild`,
   no `AnalysisMode` and no `TreatWarningsAsErrors`. The single root `.editorconfig` carries formatting rules
   and exactly one `dotnet_diagnostic` line, and it is a suppression (`IDE0130`, scoped to the ViPaq unit

@@ -12,9 +12,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: architecture-checks.md
-  description: "Derive the repo's dependency graph into a generated file, draw it, and lint it with a small ruleset."
+  description: "Generate the repo's dependency graph, draw it, and lint it with a small ruleset - plus three greps over api/src, and the one boundary violation to fix before building the check that watches it"
   state: idea
   waits-on: "v3.0.0 at the earliest, and a maybe even then"
+  paths: ["**/*.csproj", "tooling/**"]
 - file: comment-lint.md
   description: "A check that nothing outside the agent guidance directory points a reader into it."
   state: idea
@@ -23,25 +24,22 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Harden and slim the base image"
   state: idea
   waits-on: "nobody waiting - not in the near future"
-- file: mutation-testing.md
-  description: "mutation testing with Stryker.NET"
-  state: idea
-  waits-on: "nobody waiting - a future idea"
 - file: ruby-gem-coverage.md
   description: "The ten Ruby gems produce no coverage, so they are absent from the coverage table and from Sonar. Add simplecov per gem, without breaking the rule that a gem must be droppable into an unrelated site."
   state: ready
   waits-on: "nothing"
   paths: ["ruby/**", "tooling/**"]
 - file: sonar-issue-triage.md
-  description: "Sonar - what is left after the 2026-08-09 sweep"
+  description: "Sonar - re-read the open findings against the current project, then the one-line exclusion fix and the two rewrites behind it"
   state: blocked
-  waits-on: "a re-read - the file is stale, and the maintainer wants it revisited before the v3.0.0 tag"
+  waits-on: "a re-read against SonarCloud - every count in this file predates the current project and the maintainer wants it revisited before the v3.0.0 tag"
+  paths: ["tooling/sonar-analysis.xml"]
 - file: testing-techniques.md
-  description: "testing techniques not in use"
+  description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - what each buys, and the four yes-or-no answers"
   state: idea
   waits-on: "nobody waiting - future"
 - file: todos.md
-  description: "TODOs"
+  description: "One-liners with a known answer - eight of them, across the image, the sites and the shared UI package"
   state: ready
   waits-on: "nothing"
 - file: ui-test-harness.md
@@ -49,7 +47,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "a Sonar run - state and blocker chosen by an agent, strike them if wrong"
 - file: unwatched-gaps.md
-  description: "Repository gaps nothing watches - a shipped file on no assertion, a generated copy on no drift check, a pull request that runs no job. Each is a gap, not a break."
+  description: "Four repository gaps nothing watches - a pull request that runs no job, a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200"
   state: proposed
   waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
   paths: ["sites/**", ".github/workflows/**", "tooling/**", "api/src/Binacle.Net.UIModule/**"]
@@ -63,36 +61,31 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing - phase 1 is agreed and can start"
   paths: ["api/**"]
+- file: api/nullable-enum-converter.md
+  description: "The Kernel's nullable-enum converter accepts any string and returns default rather than refusing it - a leniency nobody chose, with one dead throw sitting on top of it"
+  state: proposed
+  waits-on: "a yes or a no on whether an unknown enum string is refused at deserialization or left to validation"
+  paths: ["api/src/Binacle.Net.Kernel/Serialization/**"]
 - file: api/pack-first-bin-endpoint.md
   description: "pack/first-bin endpoint"
   state: deferred
   waits-on: "v3.0.0. The v4 stable flip waits on this endpoint or on another candidate"
   paths: ["api/**"]
 - file: api/packing-demo-bugs.md
-  description: "Ten correctness and accessibility bugs in the shared packing demo component - most of them ship inside the image as well as on the demo site"
+  description: "Two open bugs in the shared packing demo - a partial result names no unfitted items, and the submit button can stick disabled on a page with no visualizer"
   state: deferred
-  waits-on: "the v3.0.0 tag - the maintainer deferred the unfitted-items tooltip, the one item left, on 2026-08-27"
+  waits-on: "the v3.0.0 tag - the maintainer deferred it on 2026-08-27"
   paths: ["packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "a packing-only image variant, without the ServiceModule assemblies"
   state: idea
   waits-on: "nobody waiting - far future"
   paths: ["api/**"]
-- file: api/refresh-token-endpoint.md
-  description: "add refresh-token support to ServiceModule"
+- file: api/servicemodule.md
+  description: "How far ServiceModule is taken - one decision, and the three pieces of work behind it - collapsing the layering, a schema-migration path, and refresh tokens"
   state: deferred
-  waits-on: "v3.0.0, then all the ServiceModule work taken together - these three move as one"
-  paths: ["api/**"]
-- file: api/schema-migrations.md
-  description: "a schema-migration path for the ServiceModule store"
-  state: deferred
-  waits-on: "v3.0.0, then all the ServiceModule work taken together - these three move as one"
-  paths: ["api/**"]
-- file: api/servicemodule-simplification.md
-  description: "simplify ServiceModule - collapse the ceremony, keep the provider seam"
-  state: deferred
-  waits-on: "v3.0.0, then all the ServiceModule work taken together - these three move as one"
-  paths: ["api/**"]
+  waits-on: "the maintainer. He said on 2026-08-27 that ServiceModule work is taken as one piece, not row by row"
+  paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
 - file: api/show-me-the-request.md
   description: "The packing demo shows the HTTP call it just made, against this host, ready to copy"
   state: deferred
@@ -119,9 +112,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: ci-cd/ci-gates.md
-  description: "CI - make the PR gate mean something"
+  description: "Two gates the pull request still does not have - the integration suites against the module set the image ships, and a Sonar verdict without anyone pressing a button"
   state: idea
-  waits-on: "nothing - the maintainer called gates 2 and 3 a future idea on 2026-08-27, and neither has anything to gate yet"
+  waits-on: "nothing to gate yet. The maintainer called both a future idea on 2026-08-27"
   paths: [".github/workflows/**"]
 - file: ci-cd/dockerhub-overview.md
   description: "The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted"
@@ -153,11 +146,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Lib
 
 ```yaml
-- file: lib/benchmark-ledger.md
-  description: "Refresh the curated lib benchmark ledger"
-  state: blocked
-  waits-on: "an unanswered question - where benchmark and performance results live and what shape they take. The maintainer keeps them in results/ and does not like them there"
-  paths: ["lib/**", "results/lib/**"]
 - file: lib/parallel-processors-decision.md
   description: "Decide what happens to the three `Parallel*` processors"
   state: idea
@@ -208,14 +196,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Tooling
 
 ```yaml
-- file: tooling/scripts-to-just-recipes.md
-  description: "Where benchmark and performance results live and what shape they take - and only then, converting the last four `tooling/*.sh` scripts to `just` recipes"
-  state: blocked
-  waits-on: "an unanswered question - where benchmark and performance results live and what shape they take. The maintainer keeps them in results/ and does not like them there"
-  paths: ["tooling/**", "results/**"]
 - file: tooling/typescript-linting.md
   description: "Answered no - linting is one decision for the whole repository, not a TypeScript one. Every language gets the same treatment or none does."
   state: deferred
   waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
   paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**"]
+- file: tooling/where-benchmark-results-live.md
+  description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"
+  state: blocked
+  waits-on: "the maintainer answering where benchmark and performance results live and what shape they take. They sit in results/ today and he does not want them there"
+  paths: ["tooling/**", "results/**", "lib/**"]
 ```

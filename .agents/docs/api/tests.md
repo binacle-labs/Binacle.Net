@@ -1,8 +1,8 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-08-22
-check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
+verified: 2026-08-27
+check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
 paths:
@@ -104,8 +104,9 @@ api/test/…/Tests/v4/Endpoints/Fit/CustomBin/FitCustomBinBehavior.cs
 
 Each endpoint has up to two files. **Behavior** covers status codes, validation, and the endpoint's own rules.
 **Scenario** replays the shared fixture cases (`$shared`) through the route and asserts the algorithm's answer.
-The two `Presets` endpoints have a behavior file only — they run no algorithm, so there is nothing for a
-scenario to assert.
+**The three `Presets` endpoints have a behavior file only** — `v3 Presets/List`, `v4 Presets/List` and
+`v4 Presets/Get`. They run no algorithm, so there is nothing for a scenario to assert, and they are the only
+three folders in the tree with one file.
 
 **Namespaces track the folders**, with `Tests/` elided:
 `Tests/v4/Endpoints/Fit/CustomBin/` → `Binacle.Net.IntegrationTests.v4.Endpoints.Fit.CustomBin`. `Abstractions/`
@@ -116,7 +117,11 @@ Two consequences worth knowing:
 - `BinacleApi` and `PresetKeys` live in the root namespace, which is an ancestor of every test namespace, so
   they still resolve with no `using`.
 - `ScenarioResultExtensions` does **not** — it sits in `v{3,4}.ExtensionMethods`, a sibling. Every scenario
-  test needs `using Binacle.Net.IntegrationTests.v{3,4}.ExtensionMethods;` for `EvaluateResult`.
+  test needs `using Binacle.Net.IntegrationTests.v{3,4}.ExtensionMethods;` for `EvaluateResult`. **It is a
+  different extension from the shared kernel's**: this one takes the request parameters as well, because the
+  scenario's expected result is a map keyed by algorithm and the parameters say which algorithm ran
+  (`$shared`). A test that needs the entry itself reaches it as
+  `scenario.Result.For(request.Parameters.GetAlgorithm()!.Value)`.
 
 Scenario tests for the multi-bin endpoints send the scenario's single bin as a one-element list, so selection
 cannot change the answer and the result must match the single-bin endpoint's. The exceptions are the preset

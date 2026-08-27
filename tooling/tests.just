@@ -1,9 +1,8 @@
 # Test leaves, loaded by the root justfile as the `test` module. Run one with `just test <leaf>`, all of
 # them with `just test all`, and list them with `just --list test`.
 #
-# A leaf is one project and one run, so it is also one CI step. One recipe per leaf because shell
-# completion only completes recipe names - a leaf passed as an argument cannot complete without a
-# hand-written list that drifts.
+# A leaf is one project and one run, so it is also one CI step. One recipe per leaf, because shell
+# completion only completes recipe names.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'
@@ -22,13 +21,8 @@ dotnet_test_args := env('DOTNET_TEST_ARGS', '')
 default:
     @just --list test
 
-# The leaves are listed by hand rather than read out of this file, so `all` states what it runs. It is the
-# infra-free set: every leaf here passes on a machine with nothing brought up, the ServiceModule one on its
-# SQLite fallback. That is a judgement per leaf, not something a recipe list can tell you - a new leaf joins
-# `all` only once someone decides it needs nothing. Cheap leaves first, so failures show up early.
-#
-# A failing leaf does not stop the rest, the same as CI's `if: !cancelled()` - one command should report
-# everything that is broken, not just the first thing.
+# Listed by hand, not read out of this file: this is the infra-free set, and whether a leaf needs nothing
+# brought up is a judgement per leaf. Cheap leaves first. A failing leaf does not stop the rest.
 
 # Every leaf that needs nothing brought up first
 all:
@@ -178,10 +172,9 @@ api-core-integration: (_dotnet_test 'api/test/Binacle.Net.IntegrationTests')
 [group('api')]
 api-ui-integration: (_dotnet_test 'api/test/Binacle.Net.UIModule.IntegrationTests')
 
-# The backend is a positional argument, not a variable: a module variable cannot be set from the command
-# line, and `just infra=Postgres test api-service-integration` would be ignored in silence - a green run for
-# a backend nobody exercised. Empty lets the harness pick (SQLite), so a bare run needs nothing brought up.
-# Postgres and AzureStorage need theirs up:
+# The backend is a positional argument: a module variable cannot be set from the command line and would be
+# ignored in silence. Empty lets the harness pick SQLite, so a bare run needs nothing brought up. Postgres
+# and AzureStorage need theirs up:
 #   just serve services-up -d
 
 # ServiceModule integration [Sqlite|Postgres|AzureStorage]
@@ -200,16 +193,13 @@ api-service-integration backend="":
 
 # Runs one test project. Every C# leaf goes through here, so the flags live in one place.
 #
-# Files are named after the project alone. Nothing needs to tell C# from TS today - in artifacts/coverage/sonar the
-# extension already does it (.xml here, .info from jest), and in artifacts/coverage/cobertura both are .xml and
-# every consumer wants them merged anyway. If that changes, put the language in the name (`<name>.cs.xml` /
-# `<name>.ts.info`) rather than in a folder, so the Sonar globs stay one line each.
+# Files are named after the project alone; the extension already tells C# from TS.
 #
-# Coverage is not a second run - the collector rides along inside this one. Set COVERAGE_FORMAT and the same
-# leaf also writes its results and coverage into artifacts/, named after the project. `just coverage all` sets it.
+# Coverage is not a second run - the collector rides along. Set COVERAGE_FORMAT and the same leaf also writes
+# results and coverage into artifacts/. `just coverage all` sets it.
 #
 # The output path must be absolute: a relative --coverage-output lands inside the project's own
-# bin/.../TestResults instead of where you asked.
+# bin/.../TestResults.
 [private]
 _dotnet_test project:
     #!/usr/bin/env bash
@@ -252,13 +242,11 @@ _rspec_test gem:
 
 # Runs one TS package - the jest half of _dotnet_test, same two modes.
 #
-# `--selectProjects` runs the package through the *root* jest.config.js, which is the point: the root config's
-# `projects` list keeps the workspace folder in recorded paths, and its `collectCoverageFrom` is ignored when a
-# package's own config drives the run (`--projects <path>`), quietly pulling test helpers into the numbers. The
-# name is the package's `displayName`, which matches its npm name.
+# `--selectProjects`, not `--projects <path>`: the root jest.config.js keeps the workspace folder in recorded
+# paths, and its `collectCoverageFrom` is ignored when a package's own config drives the run. The name is the
+# package's `displayName`.
 #
-# Paths are absolute because jest resolves them against the package, so a relative one would land inside the
-# package instead of artifacts/.
+# Paths are absolute - jest resolves a relative one against the package, not against artifacts/.
 [private]
 _jest_test package:
     #!/usr/bin/env bash

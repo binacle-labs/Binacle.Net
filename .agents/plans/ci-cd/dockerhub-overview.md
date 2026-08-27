@@ -57,3 +57,13 @@ Each of these was decided and is easy to undo by accident.
 - **Do not dispatch the workflow with an empty version input to check a wording change.** Empty takes the
   latest non-prerelease release, which is not always the version you just edited the page for. Render it
   locally instead, or type the version.
+
+## Done when
+
+- [ ] The quick start example quotes a response from a tag that exists on Docker Hub.
+      **By eye.** Run the `curl` in `.github/dockerhub-overview.md` against a published tag and compare it to
+      the pasted response.
+- [ ] The rendered page was read before it was published.
+      `just image dockerhub-overview <version>` prints what the pipeline writes; read that, not the source.
+- [ ] This file is deleted. Section 1 is all that keeps it alive.
+      **By eye.** With section 1 done there is nothing left in it.

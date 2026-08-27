@@ -1,7 +1,7 @@
 ---
 id: api
 description: Index for API slice docs — endpoints, contracts, service, kernel, presets, and module docs (Diagnostics, ServiceModule, UIModule)
-verified: 2026-08-21
+verified: 2026-08-27
 check: The startup order matches Program.cs top to bottom, builder half then pipeline half; the dependency map matches every ProjectReference in api/**/*.csproj and the projects those reach; every type named in the v4 request flow still resolves
 also_update:
   - api/modules
@@ -41,8 +41,10 @@ if SCALAR_UI      → register Scalar OpenAPI docs
 ---
 UseForwardedHeaders()                    // FIRST — rewrites RemoteIpAddress and Scheme before anything reads them
 UseHttpsRedirection() / UseExceptionHandler() / UseCors()
-if SWAGGER_UI or SCALAR_UI → MapOpenApi()          // maps /openapi/{documentName}.json
-    if SWAGGER_UI → UseSwaggerUI()                 // these run BEFORE the module Use* calls
+MapApiDocumentUi(swaggerEnabled, scalarEnabled)     // runs BEFORE the module Use* calls
+    returns at once unless one of the two is on
+    MapOpenApi("/openapi/{documentName}.json")
+    if SWAGGER_UI → UseSwaggerUI()
     if SCALAR_UI  → MapScalarApiReference()
 UseDiagnosticsModule()
 if SERVICE_MODULE → UseServiceModule()   // auth, authz, rate limiter, v0 endpoints
@@ -51,9 +53,11 @@ RegisterEndpointsFromAssemblyContaining<IApiMarker>()   // v3, v4 endpoints
 RunStartupTasksAsync()
 ```
 
-Note: Scalar is wired with `app.MapScalarApiReference(...)` (not a `Use*` method), and the
-Swagger/Scalar UI block is registered **before** `UseDiagnosticsModule()` and the optional-module
-`Use*` calls — not after them.
+Note: the three document-UI calls sit behind one extension,
+`MapApiDocumentUi` (`api/src/Binacle.Net/ExtensionMethods/OpenApiUiExtensions.cs`), which returns immediately
+when both flags are off — so `/openapi/{documentName}.json` is not served unless a UI is on. Scalar is wired
+with `app.MapScalarApiReference(...)` (not a `Use*` method), and the whole block is registered **before**
+`UseDiagnosticsModule()` and the optional-module `Use*` calls — not after them.
 
 `UseForwardedHeaders()` must stay first. It rewrites `Connection.RemoteIpAddress` and `Request.Scheme`, and
 everything downstream — HTTPS redirection, the health check IP allow-list, rate limiting — reads those. See
@@ -139,8 +143,8 @@ See `$lib/result-building` for how `OperationResultBuilder` computes status and 
 
 ## Related Tests
 
-Six projects under `api/test/` — two integration suites and four unit suites. API Tests (`$api/tests`) names
-each one, what it covers and the `just` alias that runs it; `just test all` runs every suite in the repo.
+Eight projects under `api/test/` — three integration suites and five unit suites. API Tests (`$api/tests`)
+names each one, what it covers and the `just` alias that runs it; `just test all` runs every suite in the repo.
 
 See Shared (`$shared`) for the scenario data format, and Commands (`$commands`) for how to run the API locally.
 

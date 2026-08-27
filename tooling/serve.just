@@ -7,16 +7,13 @@
 #   just serve services-up [-d]  what the API talks to: aspire dashboard, azurite, postgres
 #   just serve services-down     stop them (only needed after -d; Ctrl-C is enough otherwise)
 #
-# One module because it is all the same job: work on the code on this machine. `services-up` is here rather
-# than with the image stacks for that reason - it runs no binacle-net at all, it brings up what
-# `just serve api` talks to, and the Postgres and AzureStorage test leaves want the same thing.
+# `services-up` runs no binacle-net - it brings up what `just serve api` talks to, and what the Postgres and
+# AzureStorage test leaves need.
 #
 # The `full` image stack includes tooling/serve.services.yml, so `services-down -v` wipes a database that
 # stack shares.
 #
-# Running the *built image* is the other job and lives in the `image` module. The two do not call each other:
-# the few lines of folder setup below are copied there rather than shared, because a module that reaches into
-# another one puts the coupling back that splitting them removed. Nothing here is called by CI.
+# Running the built image is the `image` module. Nothing here is called by CI.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

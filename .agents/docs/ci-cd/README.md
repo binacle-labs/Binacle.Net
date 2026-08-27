@@ -1,7 +1,7 @@
 ---
 id: ci-cd
 description: CI/CD — the ten GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-08-23
+verified: 2026-08-27
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -240,7 +240,7 @@ short**, or the required check name becomes unreadable at exactly the moment som
   wedged smoke profile would otherwise burn.
 - **`npm ci --ignore-scripts`**, so an install-time lifecycle hook cannot run arbitrary code. Nothing in the
   workspaces declares `prepare`/`postinstall`. It is a step in the job that needs packages, next to the
-  `setup-node` that precedes it — three places today, and the flag belongs in all three.
+  `setup-node` that precedes it — five places today (four workflows and `build-jekyll-site`), and the flag belongs in all five.
 - **An interpolated value goes through `env:`, never into a `run:` body.** `${{ }}` pasted into a script is
   substituted before the shell sees it, so the value becomes part of the command rather than an argument to
   it. Every one of them in this repo is a tag name, a repo variable or a step output — none of them
@@ -258,15 +258,15 @@ is the only option when the shared thing needs its own runner or service contain
 
 | Action | Used by | What it does |
 |---|---|---|
-| `setup-just` | six jobs | The `just` install and the `^1.45` range, once |
-| `setup-dotnet` | `shared-test-suite`, `sonar-analysis`, the release `build` job | SDK plus the NuGet package cache. Takes the SDK version as an input |
-| `setup-node` | `shared-test-suite`, `sonar-analysis`, `build-jekyll-site` | Node and the npm cache. It does not install packages |
+| `setup-just` | nine jobs, plus the three deploy jobs through `build-jekyll-site` | The `just` install and the `^1.45` range, once |
+| `setup-dotnet` | `shared-test-suite`, `sonar-analysis`, `pull-request`, the release `build` job | SDK plus the NuGet package cache. Takes the SDK version as an input |
+| `setup-node` | `shared-test-suite`, `sonar-analysis`, `pull-request`, `release-docker-image`, `build-jekyll-site` | Node and the npm cache. It does not install packages |
 | `setup-ruby` | `build-jekyll-site` | Ruby and the site's gems. Takes the Gemfile directory as an input |
 | `install-container-structure-test` | `shared-smoke-image` | The binary, curled and pinned by version and SHA-256 |
 | `install-hurl` | `shared-smoke-image` | The same, and it carries the `libxml2` note that explains its caller's runner pin |
-| `install-lychee` | both deploy workflows | The same. The musl build, so it links nothing from the runner |
+| `install-lychee` | all three deploy workflows | The same. The musl build, so it links nothing from the runner |
 | `install-actionlint` | `pull-request` | The same, for the workflow linter |
-| `build-jekyll-site` | both deploy workflows | The toolchain and `just build <site>`. Takes the site's name and its directory, which are two inputs because they are two things. It does not deploy |
+| `build-jekyll-site` | all three deploy workflows | The toolchain and `just build <site>`. Takes the site's name and its directory, which are two inputs because they are two things. It does not deploy |
 
 **A `setup-` action installs a toolchain and stops there.** Neither `setup-dotnet` nor `setup-node` installs
 packages — the SDK and the cache, then the caller runs `npm ci` or lets `dotnet build` restore. An action named
@@ -289,8 +289,8 @@ reports `"jobs" section is missing` — it treats every input as a workflow. Wha
 caller's side is their **inputs**: a missing required one or a misspelled name is reported against the `uses:`
 line, naming the action and listing what it accepts.
 
-**What is left unchecked is their shell — 38 lines**, against 132 lines in the workflows that get actionlint
-and shellcheck. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts. The
+**What is left unchecked is their shell — 36 lines**, against 256 in the workflows that get actionlint
+and shellcheck. Measured 2026-08-27. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts. The
 gap is small and it is real; closing it means extracting `runs.steps[].run` and piping it to shellcheck, which
 is a tool to build rather than one to install.
 
@@ -332,7 +332,7 @@ Set in GitHub repo settings, read as `${{ vars.* }}`.
 
 | Variable | Used by | What it is |
 |---|---|---|
-| `DONET_VERSION` | `shared-test-suite`, `sonar-analysis`, `release-docker-image` | The .NET SDK version, passed into the `setup-dotnet` action. **The name is misspelled** ("DONET"). It matches the repo setting, so do not correct it in one file only. **Read in the workflow and passed as an input**, never read inside the action — the `vars` context is not dependably available there, and an empty value installs a default SDK and looks like it worked |
+| `DONET_VERSION` | `shared-test-suite`, `sonar-analysis`, `pull-request`, `release-docker-image` | The .NET SDK version, passed into the `setup-dotnet` action. **The name is misspelled** ("DONET"). It matches the repo setting, so do not correct it in one file only. **Read in the workflow and passed as an input**, never read inside the action — the `vars` context is not dependably available there, and an empty value installs a default SDK and looks like it worked |
 | `DOCKERHUB_ORGNAME` | `release-docker-image`, `shared-dockerhub-overview` | Docker Hub org, the first half of the image name |
 | `DOCKERHUB_REPO` | `release-docker-image`, `shared-dockerhub-overview` | Docker Hub repo, the second half. Also the lever for testing the `publish` job without touching the real repo: point it at a scratch repo, tag a non-prerelease version, then point it back |
 | `SONAR_PROJECT_KEY` | `sonar-analysis` | SonarCloud project key |
@@ -349,7 +349,7 @@ the pre-move `src/` path after the layout change and broke the publish.
 |---|---|
 | `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | `release-docker-image` — the `publish` job, and `shared-dockerhub-overview` which the `page` job calls. One token does both: the same registry push credential also writes the repository description, confirmed 2026-08-19. **Passed to the called workflow by name, never `secrets: inherit`**, which would hand the runner every secret the repo has |
 | `SONAR_TOKEN` | `sonar-analysis` |
-| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | both deploy workflows |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | all three deploy workflows |
 | `GITHUB_TOKEN` | `release-docker-image` — GHCR login in `build` and `publish`, and creating the release |
 
 **Signing needs no secret either.** cosign runs keyless — it exchanges the job's OIDC token for a short-lived

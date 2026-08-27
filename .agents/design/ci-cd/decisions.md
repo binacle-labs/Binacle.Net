@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why the release pipeline is tag-triggered, stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-08-25
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only
+verified: 2026-08-27
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only
 paths:
   - ".github/workflows/**"
 ---
@@ -254,6 +254,46 @@ up a JDK.
 ignores `sonar-project.properties`, so that XML is the file form it reads, and `/s:` needs an absolute path.
 Only the key, org, token and host stay in the YAML.
 
+#### The published sites are in scope, and that was a reversal {#sites-in-scope}
+
+**Changed 2026-08-09.** `sonar.exclusions` used to drop both site directories whole, and the reason given was
+that they are a separate deliverable written in their own session - **a workflow reason, not a scope reason.**
+The test in the analysis xml is whether the code is ours to author, review and change. It is.
+
+**The cost landed exactly where it hurt.** Those Jekyll sites are the only public attack surface in the
+repository, `5e5f8c02` was an XSS fix in one of them, and the exclusion kept Sonar from looking for the next
+one.
+
+What is in scope is small - six hand-written js, fifteen scss, and the site yml and json. The generated and
+vendored parts (`sites/*/js`, `sites/*/lib`, the two `media` folders) are named individually and stay out;
+they are gitignored, so a CI checkout would not see them anyway. `sites/**/*.html` stays out too, because a
+Jekyll template with `---` front matter and Liquid in its attributes is not an HTML document and Sonar's HTML
+analyser can only misread it.
+
+**Measuring and fixing are separate jobs, and only fixing was ever restricted.** A finding under `sites/` is
+not fixed in a coding session; it becomes a row for the session that owns those files.
+
+#### Four settings that cannot live in the repo {#sonar-ui-settings}
+
+Scope, coverage paths and the test/product split are all in the repository. These four are only in the
+SonarCloud UI, and they are what the gate actually hangs on.
+
+- **New code period.** It was `previous_version`, and because the scanner is never passed `/v:` the project
+  version never changed, so the period stayed pinned to the **first analysis, 2025-04-15**. Sixteen months of
+  work counted as new code: 882 of 1059 code smells, and a gate asking 80% coverage on new code was really
+  asking it of everything ever written. Set to **"Number of days = 30"** on 2026-08-09, and the new-code smell
+  count fell from 882 to 8. **The textbook answer once Sonar runs on pull requests is "reference branch =
+  main" - do not assume it applies here.** The Free plan analyses only `main` plus pull requests targeting it,
+  and a pull request is already graded on its own diff whatever this says, so the setting may be unavailable
+  or a no-op and "days = 30" may be permanent.
+- **Two findings marked in the UI**, neither with an honest code fix: `S2245` on `getRandomInt.ts`, which
+  picks demo data rather than secrets, and `S2068` on the `AccountGetResponse` OpenAPI example, where
+  `PasswordHash` is the literal `"type::hash::salt"`.
+- **Automatic Analysis stays off**, per this decision.
+- **No source glob in the UI.** A leftover `sonar.inclusions` of `src/**/*` from a flat layout is what made
+  the 2026-08-07 run index zero files **and still report success**. Scope is exclusions only, and they live in
+  the xml.
+
 ### D9 — the Postgres service in `shared-test-suite.yml` carries no password
 
 `POSTGRES_HOST_AUTH_METHOD: trust`, and no `POSTGRES_PASSWORD`.
@@ -431,19 +471,21 @@ an `og:url` pointing at where it *will* live. Run externally before the deploy, 
 deploy is about to create — 35 of 36 failures on the first real run, all of them self-references. A gate red
 for that reason before anyone writes a line is a gate people learn to ignore.
 
-### D17 — the two site deploys are published by hand, and never on a push
+### D17 — the site deploys are published by hand, and never on a push
 
-**Decided by the maintainer, 2026-08-19.** `deploy-docs-site.yml` and `deploy-demo-site.yml` are
-`workflow_dispatch` and stay that way. No `push` trigger on `sites/**`, and no scheduled run.
+**Decided by the maintainer, 2026-08-19, and it covers `deploy-www-site.yml` too, added after.**
+`deploy-docs-site.yml`, `deploy-demo-site.yml` and `deploy-www-site.yml` are `workflow_dispatch` and stay that
+way. No `push` trigger on `sites/**`, and no scheduled run.
 
-**Why:** publishing to the internet is a deliberate act, not a side effect of a commit. Those two folders are
+**Why:** publishing to the internet is a deliberate act, not a side effect of a commit. Those folders are
 written in their own session, and pressing the button is part of how that session ends — a merge that happens
 to touch a page is not a decision to put it live.
 
 **Two mechanical consequences that make the same point.** The marker tag is numbered by `github.run_number`, so
 a push trigger would produce a tag per commit and the tag would stop meaning "this is live". And the
-concurrency group is never cancelled — `cancel-in-progress: false`, because a stopped deploy leaves App
-Platform mid-rollout — so a busy branch would queue rollouts behind each other rather than skip to the last.
+concurrency group is never cancelled — `cancel-in-progress: false`, because a stopped run leaves the site
+deployed with no marker tag — so a busy branch would queue rollouts behind each other rather than skip to the
+last.
 
 **This closes the question the workflow restructure left open.** It was not CI's to answer.
 

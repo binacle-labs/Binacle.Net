@@ -1,7 +1,7 @@
 ---
 id: lib/models
 description: Lib model types and IWith* interfaces — Bin, Item, packed/unpacked results, and the constraints used in generic type parameters
-verified: 2026-08-13
+verified: 2026-08-27
 check: Type and interface names match shared/src/Binacle.Packing/ and lib/src/Binacle.Lib/Abstractions/; generic geometry interfaces match shared/src/Binacle.Geometry/; every file path in the tables resolves
 also_update:
   - api/v4/contracts
@@ -93,13 +93,13 @@ identity and the identifiable markers below are Packing's.
 
 `IWithID` is identity, not geometry, so it sits in `shared/src/Binacle.Packing/Abstractions/` rather than in
 `Binacle.Geometry`. The volume interfaces stayed in `Binacle.Geometry`, still generic over
-`System.Numerics.INumber<T>` — so this table spans both projects, and the file column says which.
+`System.Numerics.IBinaryInteger<T>` — so this table spans both projects, and the file column says which.
 
 | Interface | File | What it requires |
 |---|---|---|
 | `IWithID` | `Binacle.Packing/Abstractions/IWithID.cs` | `string ID { get; set; }` |
 | `IWithReadOnlyID` | `Binacle.Packing/Abstractions/IWithReadOnlyID.cs` | `string ID { get; }` |
-| `IWithVolume` | `Binacle.Geometry/Abstractions/IWithVolume.cs` | `int Volume { get; set; }` (non-generic over `IWithVolume<T> : INumber<T>`) |
+| `IWithVolume` | `Binacle.Geometry/Abstractions/IWithVolume.cs` | `int Volume { get; set; }` (non-generic over `IWithVolume<T>`, constrained `struct, IBinaryInteger<T>`) |
 | `IWithReadOnlyVolume` | `Binacle.Geometry/Abstractions/IWithReadOnlyVolume.cs` | `int Volume { get; }` |
 
 ### Identifiable markers — read-only composites

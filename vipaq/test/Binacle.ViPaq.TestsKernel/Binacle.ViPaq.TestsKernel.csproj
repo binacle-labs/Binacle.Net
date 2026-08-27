@@ -17,12 +17,10 @@
 
   <ItemGroup>
     <!--
-      Frozen placed-result data, generated offline by Binacle.ViPaq.PackedDataGenerator. Embedded so the data
-      providers read the exact committed files with no lib dependency at run time. The "*.*.json" glob takes
-      every algorithm — the inner dot is the ".ffd" / ".wfd" / ".bfd" suffix. Flat, no RecursiveDir, so the
-      LogicalName stays "PackedData.<family>.<name>.<algo>.json", the four-part shape EmbeddedResourceFile
-      splits on. Link keeps the out-of-project files under a virtual Data/ folder in the IDE. Rebuild after
-      regenerating the data.
+      Frozen placed-result data, generated offline by Binacle.ViPaq.PackedDataGenerator. The "*.*.json" glob
+      takes every algorithm - the inner dot is the ".ffd" / ".wfd" / ".bfd" suffix. Flat, no RecursiveDir, so
+      the LogicalName stays "PackedData.<family>.<name>.<algo>.json", the four-part shape EmbeddedResourceFile
+      splits on. Rebuild after regenerating the data.
     -->
     <EmbeddedResource Include="..\..\data\packed\bischoff-suite\*.*.json">
       <Link>Data\bischoff-suite\%(Filename)%(Extension)</Link>

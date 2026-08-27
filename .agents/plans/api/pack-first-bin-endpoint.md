@@ -6,9 +6,10 @@ paths:
   - "api/**"
 ---
 
-**`api/v4-stable` is blocked on this file.** v4 cannot go stable until one endpoint is added that reshapes no
-existing contract, and this is the only candidate anyone has worked through. **Promote it, pick another, or
-accept that v4 stays experimental** - all three are answers; having none is not.
+**The v4 stable flip is blocked on an endpoint like this one.** v4 cannot go stable until one endpoint is
+added that reshapes no existing contract, and this is the only candidate anyone has worked through.
+**Promote it, pick another, or accept that v4 stays experimental** - all three are answers; having none is
+not.
 
 
 # Idea: pack/first-bin endpoint

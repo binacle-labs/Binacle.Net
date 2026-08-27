@@ -1,8 +1,8 @@
 ---
 id: sites/demo-and-image-boundary
 description: The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is
-verified: 2026-08-23
-check: the shared/not-shared table against packages/binacle-net-ui, sites/demo and api/src/Binacle.Net.UIModule - the eight duplicated file pairs are the row that moves
+verified: 2026-08-27
+check: the shared/not-shared table against packages/binacle-net-ui, sites/demo and api/src/Binacle.Net.UIModule - the eight duplicated file pairs are the row that moves; diff -w each pair to keep the identical-vs-drifted split honest
 paths:
   - "sites/demo/**"
   - "packages/binacle-net-ui/**"
@@ -77,9 +77,13 @@ form on one side and they stop being the same page - and the cheapest way out st
 ## The half that is not shared and should be
 
 **The markup exists twice.** `sites/demo/` and `api/src/Binacle.Net.UIModule/` carry the same packing page,
-ViPaq page, three scss files and two partials - eight file pairs, about 590 lines. The TypeScript underneath
-is shared and the markup is not, **which is the shape that breaks silently**: the package is green, one host
-renders, the other does not.
+ViPaq page, **four** scss files and two partials - eight file pairs, 576 lines on the demo side, measured
+2026-08-27. The TypeScript underneath is shared and the markup is not, **which is the shape that breaks
+silently**: the package is green, one host renders, the other does not.
+
+**Two of the eight are byte-identical and four are not.** `_theme.scss` (121 lines) and `_theme-modes.scss`
+(20) match; `_components.scss`, `_forms.scss` and both pages have each drifted by a handful of lines. **That
+is the duplication working exactly as it fails** - nothing tells you which differences are deliberate.
 
 **It ends in a decision, not a build.**
 

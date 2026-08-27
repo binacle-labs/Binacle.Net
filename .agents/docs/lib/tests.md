@@ -1,8 +1,8 @@
 ---
 id: lib/tests
 description: lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-08-13
-check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture, and aliases match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
+verified: 2026-08-27
+check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
 also_update:
   - shared
   - lib/algorithm-factory
@@ -46,9 +46,17 @@ void AssertResult(Scenario scenario, OperationResult result)
 ```
 
 `GetScenarioByName` resolves from the kernel's `Algorithms` `AllScenariosProvider`. `Run` builds the algorithm
-and calls `Execute(parameters)`, checking nothing. `AssertResult` does both checks —
-`scenario.Metrics.EvaluateResult` and `scenario.Result.EvaluateResult` — and is marked `[AssertionMethod]`
-so the analyser knows where the assertion lives. A test reads:
+and calls `Execute(parameters)`, checking nothing. `AssertResult` does both checks — `Metrics` pins how the
+algorithm got there, `Result` pins where it landed — and is marked `[AssertionMethod]` so the analyser knows
+where the assertion lives:
+
+```csharp
+scenario.Metrics.EvaluateResult(result);
+scenario.Result.For(result.AlgorithmInfo.Algorithm).EvaluateResult(result);
+```
+
+**`scenario.Result` is a map keyed by algorithm**, so the assert picks the entry for whichever algorithm ran
+(`$shared`). A test reads:
 
 ```csharp
 var testScenario = this.Fixture.GetScenarioByName(scenario);

@@ -1,7 +1,7 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-08-19
+verified: 2026-08-27
 check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; the report files under results/vipaq/compression/ resolve
 paths:
   - "vipaq/**"
@@ -89,14 +89,12 @@ whole new surface. They do not know what a dimension or a coordinate is, and the
 items, because the order of those three *is* the layout. `ProtocolEncoder` does it for the bin, because the bin
 is written the same way in both layouts (§3).
 
-The new path does not range-check on the way in: an 8- or 16-bit field cannot hold an out-of-range value, which
-is what §5 means by "a decoder has nothing to range-check". The old `EnsureWithinRange` guard exists only for the
-64-bit tier that §4 deleted.
+Nothing range-checks on the way in: an 8- or 16-bit field cannot hold an out-of-range value, which is what §5
+means by "a decoder has nothing to range-check".
 
-**The old-format methods are gone.** `Write32Bits`, `Write64Bits`, `Read32Bits`, `Read64Bits`, the `BitSize`
-extension methods, `ExtensionMethods/`, and `ViPaqLimits.MaxInteger` / `.SixteenBitsMax` / `.ThirtyTwoBitsMax` /
-`.CompressionThresholdBytes` were all deleted with the shim. The class is now `Limits`, and it keeps only
-`EightBitsMax`, `MaxValue` and `MaxItemCount`.
+`Limits` carries `EightBitsMax`, `MaxValue` and `MaxItemCount`, and nothing else. What the v2 rebuild deleted
+from the public surface, so nobody goes looking for a method that has not existed since the shim, is in
+`$vipaq/history`.
 
 **The layout codecs are a sanctioned abstraction.** Two implementations, one factory, and **two interfaces**:
 `ILayoutEncoder` and `ILayoutDecoder`. Both are implemented by the same class, because the thing that knows how
@@ -137,8 +135,7 @@ must not churn when the internals move.
 `Deserialize` call it. A compressed blob reads back fine; there is no unsupported path.
 
 **There are no typed wrappers.** `Serialize<TBin, TItem, T>` and `Deserialize<TBin, TItem, T>` are the whole public
-surface. The old `SerializeInt32` / `DeserializeInt32` / `SerializeUInt16` / `DeserializeUInt16` are gone and did
-not come back — every call site names its types on the generic method instead (`v3/Contracts/PackResponse.cs`,
+surface — every call site names its types on the generic method (`v3/Contracts/PackResponse.cs`,
 `v4/Contracts/BinResponseBase.cs`, both `ViPaqExampleExtensions`, and the UIModule decoder).
 
 ## Public surface, and what tests can reach

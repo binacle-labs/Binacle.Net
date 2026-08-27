@@ -209,13 +209,10 @@ jobs:
     with:
       image: ${{ needs.build.outputs.staging }}
 
-  # The only job that touches Docker Hub, and the only place the stored credential is used. `imagetools create`
-  # ships with the runner, so no third-party tool moves the artifact users pull.
+  # The only job that touches Docker Hub, and the only place the stored credential is used.
   #
-  # Runs for EVERY tag. A prerelease is narrowed by the metadata step below, not by a condition here: it emits
-  # only the immutable tag, because metadata-action withholds {{major}}.{{minor}} and latest=auto withholds
-  # latest. Do not add a job-level skip - `smoke` already guarantees nothing unsmoked gets here, and a skip
-  # only makes betas unpullable from Docker Hub.
+  # Runs for EVERY tag. A prerelease is narrowed by the metadata step below, not by a condition here.
+  # Do not add a job-level skip - it only makes betas unpullable from Docker Hub.
   #
   # No `contents` permission: this job never checks out.
   publish:
@@ -317,18 +314,14 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # The section was already proven to exist by the `notes` job, so this only formats and publishes it.
-      # `extract` promotes the section's headings back to h2 - in the file they sit at h3, nested under the
-      # version heading, and a release body has no such parent.
+      # `extract` promotes the section's headings back to h2 - in the file they sit at h3 under the version
+      # heading, and a release body has no such parent.
       #
-      # Create OR edit, because the release may already exist. GitHub's web UI cannot create a bare tag: the
-      # only way to tag from the site is to publish a release, which creates both at once. That is a normal way
-      # to start this pipeline, and a plain `gh release create` would fail on it after everything else had
-      # already succeeded - image pushed, tags moved, signed - leaving one red job and a hand-typed body.
-      # Editing instead means the body always comes from CHANGELOG.md however the tag was made.
+      # Create OR edit: the release may already exist, because publishing one from GitHub's web UI is the only
+      # way to tag from the site and creates both at once. A plain `gh release create` would fail on that.
       #
-      # The prerelease flag is set explicitly in both directions rather than only when true, so a release
-      # marked prerelease by hand in the UI is corrected for a real version tag.
+      # The prerelease flag is set in both directions, so a release marked prerelease by hand is corrected for
+      # a real version tag.
       - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -385,13 +378,10 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # Cosmetic, and the only job nothing depends on. It runs after everything irreversible has already
-  # succeeded, so a Docker Hub page that failed to update is a red job on a release that shipped correctly -
-  # never a release held up by a paragraph.
+  # Cosmetic, and the only job nothing depends on - it runs last, after everything irreversible.
   #
-  # Skipped for a prerelease. A beta gets its immutable tag and nothing else, and must not rewrite a page
-  # describing the stable line - the same rule the moving tags already follow, made a job condition here
-  # because this job is the only one that ignores metadata-action.
+  # Skipped for a prerelease: a beta must not rewrite a page describing the stable line. It is a job condition
+  # here because this job is the only one that ignores metadata-action.
   page:
     name: Docker Hub page
     needs: [ build, publish, release ]

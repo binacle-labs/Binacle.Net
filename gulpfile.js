@@ -19,17 +19,12 @@ const ASSETS = {
 };
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.
 //
-// swagger-ui is 4.8 MB and only sites/docs/_layouts/versions/swagger.html reads it. The API serves its own
-// Swagger UI from Swashbuckle, so it is dead weight on the demo site and in the image.
-//
-// material-dynamic-colors stays everywhere at 72 KB: sites/demo/_data/includes.yml keeps a commented-out
-// script tag for it, so dropping it breaks that line the moment anyone uncomments it.
-//
-// www runs no framework at all - no BeerCSS, no material-dynamic-colors - so it takes the media and the
-// favicons and none of assets/lib/.
-//
-// The two android icons go to the three sites, which name them in a web app manifest. The UI module has no
-// manifest and links only favicon.ico, so they were 60 KB of nothing in the image.
+// swagger-ui, 4.8 MB: only sites/docs/_layouts/versions/swagger.html reads it. The API serves its own from
+// Swashbuckle.
+// material-dynamic-colors, 72 KB: stays everywhere, because sites/demo/_data/includes.yml keeps a
+// commented-out script tag for it.
+// www runs no framework, so it takes the media and the favicons and none of assets/lib/.
+// The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const IGNORE = {
 	docs: [],
 	demo: ['assets/lib/swagger-ui/**'],

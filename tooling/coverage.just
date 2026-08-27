@@ -9,11 +9,8 @@
 # artifacts/coverage/<format>/, named after the project or package.
 #
 # Nothing here knows which test project or package exists, and nothing here runs a test. Each recipe sets
-# COVERAGE_FORMAT and calls `just test all`; every leaf writes its own files into artifacts/, because coverage is
-# the same run with extra output, not a second run. What is left here is only what happens afterwards: merge
-# and report.
-#
-# The steps are public on purpose - `just --list coverage` shows them and each one can be run alone.
+# COVERAGE_FORMAT and calls `just test all`; every leaf writes its own files. What is left here is merge and
+# report.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

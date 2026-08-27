@@ -1,5 +1,5 @@
 ---
-description: testing techniques not in use
+description: The testing techniques this repo does not use - property-based, fuzzing, load, mutation - what each buys, and the four yes-or-no answers
 state: idea
 waits-on: "nobody waiting - future"
 ---
@@ -101,6 +101,32 @@ The pitch says "real time"; that claim is untested under concurrency. A 400-bin 
 
 **Open:** is there a stated target to test against? Without one this measures without deciding anything.
 
+### 4. Mutation testing on `ResultSelection/`
+
+Coverage answers "did this line run?". Mutation testing answers "if this line were **wrong**, would any test
+fail?" It flips `>` to `>=`, `&&` to `||`, deletes a statement, reruns the suite, and reports each mutant as
+**killed** (a test failed, good) or **survived** (covered but never actually checked). Tool:
+`dotnet-stryker`.
+
+`lib/src/Binacle.Lib/ResultSelection/` is the natural first target, and the only one worth trying:
+
+- It reports ~88% line and ~88% branch. Mutation testing says whether that is real.
+- `BestBin_v2.cs:24` adds a magic `1000` to rank fully-packed bins first. That constant **is** a business
+  rule. Coverage proves the line runs; it cannot prove a test would notice if the rule inverted.
+- Its failures are **silent**. A wrong bin choice returns 200 and looks fine.
+
+The manual version already works: deleting the cancellation guard in `LoopBinProcessor` failed exactly two
+tests, which is what proved the guard was tested rather than merely covered.
+
+**Open:** the lib suite is ~8,679 tests and Stryker reruns them per mutant, so whole-repo is likely hours -
+start at `ResultSelection/` (five small files) and see what one run costs. If it scores well the idea closes
+as "checked, not needed", which is a fine outcome. `.config/dotnet-tools.json` already pins ReportGenerator
+and the Sonar scanner, so a local pin would match - only worth it if it is run more than once. Not in CI.
+
+**Do not chase the score.** Equivalent mutants cap it, and it games the same way coverage does. Do not point
+it at `UIModule` or `DiagnosticsModule` - loud failures, low value, the same reasoning that leaves their
+coverage alone.
+
 ## Probably not worth it
 
 - **E2E (Playwright).** Aimed at the demo UI. Brittle, slow, breaks on markup changes — the same
@@ -109,3 +135,18 @@ The pitch says "real time"; that claim is untested under concurrency. A 400-bin 
   cycle. Both clients are in this repo; the integration tests already cover the contract.
 - **Snapshot testing (Verify).** The same idea as golden vectors, aimed at objects. The vectors already do
   this where it matters, and better.
+
+## Done when
+
+Each candidate ends in a yes or a no. Nothing here is started until one gets a yes.
+
+- [ ] Property-based testing has an answer.
+      **By eye.** Either an invariant suite exists under `lib/test/`, or this section says it was tried and
+      what it cost.
+- [ ] Fuzzing the ViPaq decoder has an answer, and the security question under it is settled first.
+      **By eye.** Whether a decoder token reaches a public endpoint is written down, then a yes or a no.
+- [ ] Load testing has an answer, or a stated target to test against.
+      **By eye.** Without a target there is nothing to pass or fail, so the target is the first half.
+- [ ] Mutation testing has an answer.
+      **By eye.** Either one Stryker run over `lib/src/Binacle.Lib/ResultSelection/` has been costed, or this
+      section says why it was dropped.

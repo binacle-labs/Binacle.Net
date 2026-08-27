@@ -6,8 +6,8 @@ paths:
   - "api/**"
 ---
 
-**The endpoint it is waiting on.** `api/pack-first-bin-endpoint.md` is the only candidate written up. Nothing
-else has been costed.
+**The endpoint it is waiting on.** The only candidate anyone has written up is `pack/first-bin`. Nothing else
+has been costed.
 
 
 # v4 — flip from experimental to stable

@@ -1,8 +1,8 @@
 ---
-id: "ci-cd/release-pipeline"
+id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a pushed tag to a published GitHub release, GHCR as the staging registry, the copy-to-Docker-Hub step every tag reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-08-19
-check: "The seven jobs, their needs: edges and job outputs match release-docker-image.yml; the concurrency block still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, and the release job's !failure() note is still accurate; shared-test-suite.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; `just changelog check` and `extract` still take a bare version or Unreleased"
+verified: 2026-08-27
+check: "The seven jobs, their needs: edges and job outputs match release-docker-image.yml; the concurrency block still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-test-suite.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
   - tooling

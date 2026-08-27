@@ -1,8 +1,8 @@
 ---
 id: shared
 description: Shared slice — Binacle.TestsKernel (algorithm scenario data, compact-string formats, providers, fixtures) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-08-13
-check: Collection keys, compact-string parsers, and provider class names and methods match shared/test/Binacle.TestsKernel; OR-Library files match shared/data
+verified: 2026-08-27
+check: Collection keys, compact-string parsers (Result is a per-algorithm map, not a bare string), and provider class names and methods match shared/test/Binacle.TestsKernel; the embedded-resource folders in Binacle.TestsKernel.csproj match the folders under shared/data and the key sets in Algorithms/CollectionKeys.cs; OR-Library files match shared/data
 also_update:
   - lib/tests
   - api/tests
@@ -15,7 +15,8 @@ paths:
 `shared/` holds code used across more than one slice. Two parts:
 
 - `shared/test/Binacle.TestsKernel` — algorithm test scenario infrastructure (data, parsers, providers, models)
-- `shared/data` — the scenario JSON that more than one slice reads, plus the raw OR-Library benchmark data
+- `shared/data` — the scenario JSON that more than one slice reads (`bischoff-suite/`, `custom-problems/`,
+  `demo-samples/`), plus the raw OR-Library benchmark data
 
 ## Who uses Binacle.TestsKernel
 
@@ -52,6 +53,13 @@ Algorithms (`Algorithms/CollectionKeys.cs`):
 Data is embedded JSON under `Algorithms/Data/<suite>/`, loaded by resource prefix. The collection key is
 `{folder}/{name}` lowercased.
 
+**A third folder is embedded and has no key set.** `shared/data/demo-samples/` comes in under
+`Algorithms/Data/DemoSamples/`, so `ScenarioCollectionsProvider.Collections` holds it under keys like
+`demosamples/01-opening-set` — but `CollectionKeys.cs` names no set for it and `AllScenariosProvider` does not
+include it, so no C# test reads it through this kernel today. Its consumers are the demo component in
+`packages/binacle-net-ui/` and ViPaq, which reads the *packed* form from `vipaq/data/packed/demo-samples/`
+through its own kernel.
+
 **That `Data/` folder is not on disk.** Every scenario JSON lives under `shared/data/` and is pulled in as an
 `EmbeddedResource` with a `<Link>`, so it only *looks* like `…/Data/…` in the IDE. To edit a scenario, open
 `shared/data/bischoff-suite/` or `shared/data/custom-problems/`. The csproj sets `LogicalName` so the manifest
@@ -70,12 +78,18 @@ Scenario JSON keeps values terse. Each field has its own parser. Verify against 
 |---|---|---|---|
 | Dimensions | `TestBin.FromCompactString` / `TestItem.FromCompactString` (in `Models/`) via the shared `Binacle.CompactNotation` parser | `"LxWxH"` or `"LxWxH [Q]"` — the factory splits off the optional `[Q]` (quantity, default 1), then `CompactNotationParser.ParseDimensions<int>` → 3 ints L,W,H | `"108x76x30 [40]"`, `"60x40x10"` |
 | Metrics (4) | `Algorithms/Helpers/ScenarioMetricsHelper.cs` | exactly 4 space-separated: `ItemsVolume BinVolume ItemsCount Percentage` (first 3 int, last decimal, trailing `%` trimmed) | `"29736390 30089620 112 98.83"` |
-| Result (2) | `Algorithms/Helpers/ScenarioResultHelper.cs` | exactly 2 space-separated: **`parts[0]` = packing, `parts[1]` = fitting** | `"PartiallyPacked PartiallyPacked"` |
+| Result (a map) | `Algorithms/Helpers/ScenarioResultHelper.cs` | a JSON object keyed by algorithm name, and **it must name every one** — `FFD`, `WFD`, `BFD`. Each value is 2 space-separated statuses: **`parts[0]` = packing, `parts[1]` = fitting** | `{"FFD": "PartiallyPacked PartiallyPacked", "WFD": …, "BFD": …}` |
 
 The result-selection formats (the 5-part `OperationResult` and the `"Name_vN"` `AlgorithmInfo`) moved with their
 parsers to `lib/test/Binacle.Lib.TestsKernel/ResultSelection/Helpers/`.
 
-Both halves of the **result** string parse as the lib enum `OperationResultStatus`
+**Keyed by algorithm, never by version.** Every version of an algorithm must produce the same result, so
+there is deliberately no way to name `FFD_v1` and `FFD_v2` apart. `ParseFromMap` rejects an unknown name, a
+name given twice, and a map missing any algorithm — the round trip through `Enum.TryParse` is what rejects
+`"0"` and `"ffd"`. **A bare string is rejected**: a scenario whose algorithms all agree repeats the same pair
+under each key rather than collapsing.
+
+Both halves of each **result** string parse as the lib enum `OperationResultStatus`
 (`Unknown=-1, FullyPacked, PartiallyPacked, NotPacked, EarlyExit`) — not the API fit/pack enums, so there is no
 `AllItemsFit`/`NotAllItemsFit` here. A half may carry an early-exit reason as `Status-EarlyExitReason`
 (`EarlyExitReason`: `None`, `ContainerVolumeExceeded`, `ContainerDimensionExceeded`); in real data only the
@@ -113,14 +127,22 @@ the missing pair to Bischoff when a caller needs it, not to even the two up.
 Models: `TestBin` (`IWithID, IWithDimensions`), `TestItem` (`IWithID, IWithDimensions, IWithQuantity`),
 `TestOperationParameters`. `TestBin`/`TestItem` each expose a `FromCompactString` factory (and a
 `Binacle.Geometry.IWithDimensions<int>` ctor) that parse via the shared notation. Algorithms `Scenario`
-carries bin + items + `ScenarioMetrics` + `ScenarioResult`.
+carries `Name` + bin + items + `ScenarioMetrics` + `ScenarioResult`, and `Scenario.Create` is what parses all
+three from their compact forms.
+
+**`ScenarioResult` is a map, and `AlgorithmResult` is one entry in it.** `scenario.Result.For(algorithm)`
+returns the `AlgorithmResult` for that algorithm and throws if the scenario does not name it.
+`AlgorithmResult` carries `PackingStatus`, `PackingEarlyExitReason`, `FittingStatus` and
+`FittingEarlyExitReason`.
 
 The kernel defines **no xUnit fixtures** — those live in the test projects (see lib tests (`$lib/tests`)).
 It provides:
 
 - `TestAlgorithmFactory<TAlgorithm>` — `delegate TAlgorithm (TestBin bin, List<TestItem> items)`
-- `EvaluateResult` extensions on `ScenarioMetrics` and `ScenarioResult` (the latter picks the packing vs fitting
-  expected status by `result.AlgorithmOperation`, then throws on mismatch)
+- `EvaluateResult` extensions on `ScenarioMetrics` and on `AlgorithmResult` — **not on `ScenarioResult`**, which
+  is the map. The `AlgorithmResult` one picks the packing or the fitting expected status by
+  `result.AlgorithmOperation`, then throws on mismatch. A caller reaches it as
+  `scenario.Result.For(result.AlgorithmInfo.Algorithm).EvaluateResult(result)`.
 - `OperationResultExtensions` (volume/count totals) and `PercentageComparer` (0.1% tolerance)
 
 ## shared/data — OR-Library

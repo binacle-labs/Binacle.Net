@@ -1,5 +1,5 @@
 ---
-description: TODOs
+description: One-liners with a known answer - eight of them, across the image, the sites and the shared UI package
 state: ready
 waits-on: "nothing"
 ---
@@ -11,20 +11,26 @@ a decision or a set of sub-steps gets its own plan file instead.
 
 ---
 
-## CI
+## The image and the sites
 
-**The OpenAPI lint moved out on 2026-08-17** and into the v3.0.0 release plan, which owns it whole along with
-the `--fail-severity=warn` flag it needs. It had been written in both files and the two copies had already
-started to differ.
-
-## Agent docs
-
-- **`.agents/docs/sites/demo.md` has not been read against the tree since 2026-08-24.** Run its own `check:`
-  line: collections, JS bundles and plugin list against `sites/demo/_config.yml` and `sites/demo/js/`; no
-  `seo.html` in `_includes/` and `pages/index.html` still printing `item.summary`; the demo/prefetch script
-  split against `_data/includes.yml`; the `sitemaps:` block writing one file and `/sitemap.xml` listing three
-  pages; `artifacts/demo/lib/` after `just build demo` holding exactly the vendor folders listed, with
-  `gulpfile.js`'s IGNORE map explaining what is missing. Fix what has moved, then date it.
+- **Three shipped bundles and the framework stylesheet are on no smoke assertion.** `vendors.js`,
+  `binacle-net-ui.js` and `binacle-vipaq.js` are requested by every applet page, and `lib/beercss/beer.min.css`
+  is the whole framework - `build.just:45` says skipping the asset copy "ships pages with no styling". None is
+  in `tooling/smoke/structure.yaml`, whose opening comment calls itself "a complete declaration ... it asserts
+  every shipped file". Add the four assertions.
+- **A locally built image carries a source map the release image does not.**
+  `api/src/Binacle.Net.UIModule/wwwroot/css/main.css.map` is left behind by `npm run watch:css`
+  (`package.json:12`, which unlike `build:css` at `:9` passes no `--no-source-map`), and nothing cleans it -
+  webpack's `clean` applies to `output.path`, which is `wwwroot/js` only. CI checks out fresh and has none.
+- **`api_url` is declared on three sites and read by one.** All three set it in `_config.yml` and
+  `_config.prod.yml`; the only reader is `sites/demo/pages/packing.html:26`. Drop it from the two that do not
+  read it.
+- **The demo pages carry two live flags and only one is documented.** `sites/demo/pages/packing.html` and
+  `vipaq.html` set both `applet: true` and `demo: true`. Both are read - `applet` by
+  `_includes/navbar/menu.html:1`, `demo` by `_layouts/page.html:11`. `_data/includes.yml:42` documents only
+  `demo`. The `_apps` removal, half-done.
+- **The instance page prints its runtime as a literal.** `Pages/Instance.cshtml:26` prints `<code>.NET 10</code>`
+  as text, on the page whose job is reporting what the container runs. Every other row comes from `@Model`.
 
 ## Sites
 
@@ -35,48 +41,7 @@ started to differ.
 
 ## The shared UI package
 
-- **The submit button can stick.** `packages/binacle-net-ui/src/core/packingDemo.ts:183` sets
-  `submitting = true` in `onSubmit` and only the `finally` at `:225` clears it - and that `finally` is inside
-  the thunk handed to `$dispatch('update-scene', ...)`, which nothing runs unless a visualizer is listening.
-  On a page without one the button stays disabled and the status stays "Packing..." with no way back.
-  **Latent, not live** - both packing pages include the visualizer today. Found independently by two reviews.
-  **The fix is a behaviour decision, not a typo**: what the button should wait on. Deliberately not changed
-  before the v3.0.0 tag.
-
 - **An import that reads wrong.** `packages/binacle-net-ui/src/core/packingDemo.ts:170` tests
   `error instanceof Error` while `:11` imports `Error` from `../viewModels`. `viewModels/error.ts` declares an
   interface, so the import is erased and the branch tests the global `Error` - correct today. **If that
   interface ever becomes a class it breaks silently.**
-
-## Kernel
-
-- **The nullable-enum converter never rejects a bad value.** Found 2026-08-27.
-  `api/src/Binacle.Net.Kernel/Serialization/JsonStringNullableEnumConverter.cs:104` -
-  `TryParseEnumFromString` has five returns and every one of them is `return true`, including the
-  fall-through at `:129` where nothing matched. An unknown enum string is read as `default!` rather than
-  refused, so validation is what has to catch it. Two consequences:
-  - The `throw new JsonException(...)` at `:78` in `ReadAsPropertyName` is unreachable. Nothing can make
-    `TryParseEnumFromString` return `false`.
-  - **Not a live defect where the value is required.** `default!` on a nullable enum is null, and the
-    validators reject null - `v3/Contracts/Algorithm.cs:26` and the v4 one both `NotNull()`, so a bogus
-    algorithm is a 422 either way.
-  - **It does change behaviour on a patch.** `ServiceModule/v0/Contracts/Admin/SubscriptionPatchRequest.cs`
-    only requires that one of `Type` and `Status` has a value, so a request naming a bogus `Type` and a good
-    `Status` passes and the bad field is silently dropped instead of refused.
-
-  **The lenient parse is worth a deliberate decision rather than an accident**, and the dead throw says the
-  opposite of what the code does.
-
-## ServiceModule
-
-**Both are `// TODO` comments in the code, and both ride with the ServiceModule decision.** The maintainer
-said on 2026-08-27 that ServiceModule work is taken as one piece, not row by row - so neither of these is
-picked up on its own.
-
-- `api/src/Binacle.Net.ServiceModule/Services/ApiUsageRateLimitingPolicy.cs:32` - the comment reads
-  **"Review json config for default policies"**. It sits at the top of `GetPartition`, which reads
-  `ApiUsageAnonymous` and the tier configurations out of `RateLimiterConfiguration`.
-
-- `api/src/Binacle.Net.ServiceModule/v0/Endpoints/AccountBindingResult.cs:57` - the comment reads
-  **"Make Response"**. It is on the `this.request is null` path, which returns a bare `ProblemDetails`
-  ("Malformed Request", 400) where every other path in the file returns a typed result.

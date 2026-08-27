@@ -4,11 +4,9 @@
 #   just openapi generate <dir>    write them somewhere else
 #   just openapi lint [<dir>]      generate, then lint them against tooling/openapi.spectral.yaml
 #
-# The documents come out of the build, not out of a running server: Microsoft.Extensions.ApiDescription.Server
-# starts the app host itself and dumps every registered document. So nothing has to be brought up first, and the
-# host it starts has no launch profile - ServiceModule is off, which is the shape the committed specs assume
-# (no /api/auth/token path). Generation is off by default; the two knobs and why they look like that are in
-# api/src/Binacle.Net/Binacle.Net.csproj.
+# The documents come out of the build, not a running server, so nothing has to be brought up. The host it
+# starts has no launch profile, so ServiceModule is off - which is the shape the committed specs assume, with
+# no /api/auth/token path. The two generation knobs are in api/src/Binacle.Net/Binacle.Net.csproj.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

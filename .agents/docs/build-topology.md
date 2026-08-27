@@ -1,8 +1,8 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-08-25
-check: Every solution folder and project count matches Binacle.Net.slnx (46 projects); Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
+verified: 2026-08-27
+check: Every solution folder and project count matches Binacle.Net.slnx (46 projects); the cross-slice edges against both Gemfiles, both webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
   - samples
@@ -179,6 +179,33 @@ The Docker samples use `Microsoft.Docker.Sdk` `.dcproj` files instead. None of t
 
 **`results/` is deliberately not in the solution.** The curated benchmark vault is read and hand-edited, never
 built, so it carries no `.proj` and has no solution folder — open the markdown directly.
+
+## Cross-slice edges, and the ones no project file declares
+
+Derived 2026-08-17 from every `*.csproj`, `package.json`, `Binacle.Net.slnx`, both Gemfiles, both webpack
+configs, the `Dockerfile`, the gulpfile and the `just` modules, then verified three ways — XML parse, an
+independent shell re-derivation, and npm's own resolver. Re-checked 2026-08-27.
+
+- **`lib` and `vipaq` are not standalone.** Both sit on `shared/src/Binacle.Geometry` in `src`, not only in
+  tests.
+- **There is no upward edge.** Nothing under `shared/` references `lib/` or `api/`.
+- **`vipaq/tools` reaches into both `lib` and `shared`.**
+- **The sites are not graph leaves.** Their Gemfiles load `../../ruby/jekyll-*` by path, and
+  `sites/demo/webpack.config.js` names `packages/binacle-net-ui` and `vipaq/packages/binacle-vipaq`. "Agents
+  must not edit it" and "it is a leaf in the graph" are different claims.
+- **`api/src/Binacle.Net.UIModule` is a JavaScript consumer too.** It has its own `package.json`,
+  `tsconfig.json` and `webpack.config.js`, and that config names the same two packages `sites/demo` does. A
+  slice that was C#-only sits on both graphs.
+- **There is no cycle between `packages` and `vipaq`.** Shipped code flows one way; only test support and tool
+  files cross back. `binacle-compact-notation` sitting in `dependencies` rather than `devDependencies` in
+  `vipaq/packages/binacle-vipaq/package.json` is the single line that makes npm's graph look cyclic.
+- **`.github` is a slice and sits above `tooling`.** It hashes `.config/dotnet-tools.json` and names
+  `tooling/sonar-analysis.xml`.
+
+**Nineteen global `Using` declarations across thirteen projects have no matching `ProjectReference`** — one in
+every slice that has C#. Every one resolves transitively, so they all compile today, and **every one breaks
+the day the project it borrows from stops referencing what it borrows.** Whether the fix is nineteen added
+references or a decision that transitive resolution is fine here has never been settled.
 
 ## `tooling/` vs `samples/`
 

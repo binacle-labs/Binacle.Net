@@ -1,7 +1,7 @@
 ---
 id: packages
 description: TypeScript packages under packages/ (npm workspaces) — UI components, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-08-24
+verified: 2026-08-27
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
@@ -21,7 +21,7 @@ three keep an `index.ts` barrel at the package root.
 | Package | Description |
 |---|---|
 | `binacle-net-ui` | Alpine.js + Three.js frontend for the packing demo and ViPaq decoder — see `$packages/binacle-net-ui` |
-| `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) |
+| `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) and `binacle-net-ui` (its sample generator) |
 | `cookies` | Cookie read/write utility (based on js-cookie v3.0.5, MIT) |
 | `theme-switcher` | Light/dark theme switching — the custom element and the pre-paint read |
 
@@ -37,8 +37,10 @@ components, plugins, model layers, the `window.binacle` global, and how to add a
 ## binacle-compact-notation
 
 TypeScript mirror of the C# `Binacle.CompactNotation` — the shared compact text notation for Binacle geometry
-(`"10x10x10 (0,0,0)"` style). A leaf with no dependencies. Used by `binacle-vipaq` in its `tools/` and `tests/`
-(not runtime `src/`) to parse geometry when generating interop artifacts and reading shared vectors.
+(`"10x10x10 (0,0,0)"` style). A leaf with no dependencies. **Two packages reach it and neither at runtime**:
+`binacle-vipaq` in its `tools/` and `tests/` (not runtime `src/`), to parse geometry when generating interop
+artifacts and reading shared vectors; and `binacle-net-ui` as a devDependency, in one file —
+`tools/generateSamples.ts`.
 
 ## cookies
 

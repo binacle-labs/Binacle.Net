@@ -128,3 +128,12 @@ tests; a gate that runs them is a separate change and should not hold this up.
 **The Azure Storage provider is a hole in every layer of coverage.** Since `service-azure` was folded into
 `service` it has no dedicated sample, no CI coverage and no smoke profile, and nobody has written down whether
 it stays or goes.
+
+## Done when
+
+- [ ] Phase 1 has answered the three questions above, in this file, replacing the guesses.
+      **By eye.** Read the questions section - it names findings, not assumptions.
+- [ ] The maintainer has picked the shape: one run with everything on, or a matrix.
+      **By eye.** The answer is written here, not in someone's head.
+- [ ] Phase 2's boxes under *What to build* are all ticked and the three harness TODOs are gone.
+      `grep -rn "Run the tests with all modules enabled" api/test` returns nothing.

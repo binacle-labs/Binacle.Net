@@ -32,8 +32,8 @@ renamed freely afterwards.
 from the caller's side - a missing required input or a misspelled name is reported against the `uses:` line,
 naming the action and listing what it accepts.
 
-**What is unchecked is their shell: 38 lines**, against 258 in the workflows that get actionlint and
-shellcheck. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts.
+**What is unchecked is their shell: 36 lines**, against 256 in the workflows that get actionlint and
+shellcheck. Measured 2026-08-27. Four of the five blocks are the near-identical `install-*` download-and-checksum scripts.
 
 **One check already sits in `just check actions` by hand**: a grep for a `vars` or `secrets` expression in a
 manifest. That is not hypothetical - it failed the first CI run on 2026-08-18, from an expression written
@@ -42,3 +42,12 @@ inside an input `description`, because the runner evaluates the whole manifest b
 **Closing the rest means extracting `runs.steps[].run` and piping it to shellcheck** - a tool to build rather
 than one to install, which is why it did not land with the rest. It belongs in `just check actions`, beside
 that grep.
+
+## Done when
+
+- [ ] Branch protection requires `Pull Request / Gate` and nothing else.
+      **By eye.** Open the branch protection settings for `main` and read the required-checks list.
+- [ ] No pull request is waiting on a required check that cannot report.
+      **By eye.** Open any open pull request; nothing sits pending forever.
+- [ ] The composite actions' shell is linted, or a line here says it was dropped.
+      `just check actions` runs shellcheck over `runs.steps[].run`, or this plan says why not.

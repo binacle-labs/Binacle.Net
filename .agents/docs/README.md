@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-08-25
+verified: 2026-08-27
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -54,7 +54,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `samples/` | Docker and Kubernetes deployment samples (user-facing starting points) |
 | `tooling/` | Every task the repo can run, called by CI and by hand alike — eleven `just` modules (agents, build, changelog, check, coverage, image, openapi, regen, serve, smoke, tests), the benchmark/performance scripts, local compose, env, emulator state |
 | `.github/workflows/` | The ten GitHub Actions workflows — the PR gate, the shared test suite, Sonar, CodeQL, the release pipeline, image smoke, the Docker Hub overview push, and the three site deploys (`$ci-cd`) |
-| `shared/data/` | OR-library packing benchmark data |
+| `shared/data/` | Fixture data more than one slice reads — `or-library/` (raw), `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
 | `assets/` | Shared images, js, css and fonts, copied into both Jekyll sites and the UI module by `gulpfile.js` |
 | `results/` | The hand-curated measurement vault — benchmark and size reports, never auto-written (`$build-topology`) |
 | `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `www/`, `openapi/`, `tests/`, `coverage/`. Never edit |

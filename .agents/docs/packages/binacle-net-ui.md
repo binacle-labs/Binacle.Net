@@ -1,8 +1,8 @@
 ---
 id: packages/binacle-net-ui
 description: packages/binacle-net-ui — Alpine.js components + Three.js visualizer for the packing demo. Components, plugins, model layers, and the window.binacle global.
-verified: 2026-08-22
-check: Every Alpine.data name in src/core/ appears in the component table and vice versa; the two plugins register exactly what is listed; the model-layer folders and the utils split match src/; the hardcoded endpoint in core/packingDemo.ts is still the one named here; the coverage figure below still matches a `just coverage` run
+verified: 2026-08-27
+check: Every Alpine.data name in src/core/ appears in the component table and vice versa; the two plugins register exactly what is listed; the model-layer folders and the utils split match src/; utils/sampleData.ts still carries its generated-do-not-edit line and randomize still steps a sampleIndex rather than rolling; the hardcoded endpoint in core/packingDemo.ts is still the one named here; the suite/test/coverage figures still match `npx jest --selectProjects binacle-net-ui --coverage`
 also_update:
   - packages
 paths:
@@ -49,7 +49,7 @@ A host page imports a plugin, calls `Alpine.plugin(...)`, then `Alpine.start()`,
 
 | `x-data` name | Factory | Params | What it does |
 |---|---|---|---|
-| `packing_demo_app` | `packingDemoApp` | `({ baseUrl })` | Form model (bins/items/algorithm), validation, randomizers. On submit POSTs to **`${baseUrl}/api/v3/pack/by-custom`**; dispatches `update-scene` / `error-occurred`. Algorithms: FFD/BFD/WFD |
+| `packing_demo_app` | `packingDemoApp` | `({ baseUrl })` | Form model (bins/items/algorithm), validation, and the sample set. On submit POSTs to **`${baseUrl}/api/v3/pack/by-custom`**; dispatches `update-scene` / `error-occurred`. Algorithms: FFD/BFD/WFD |
 | `protocol_decoder_app` | `protocolDecoderApp` | none | Decodes base64 ViPaq via `binacle-vipaq`'s `ViPaqSerializer.deserialize`; saves to `localStorage` key `ProtocolDecoderSavedResults` |
 | `packing_visualizer` | `packingVisualizer` | none | The Three.js scene. Listens for `update-scene`; sets up the scene in `init()` and stores it on `window.binacle`. Playback controls drive items in/out |
 | `errors_dialog` | `errorsDialog` | `(default_title)` | Error dialog; `onErrorOccurred(detail)` handles a `string[]` or an `Error` view-model |
@@ -69,9 +69,7 @@ visualizerState }` — exactly the three members of the `Binacle` interface in `
 nullable, declared onto `Window` in `src/types/global.d.ts`. It is **event-driven** — there are no public
 `initialize`/`redrawScene` methods.
 
-**There is only one now.** The UIModule used to define a second, imperative `window.binacle` in a hand-written
-`wwwroot/js/PackingVisualizer.js`, driven from Blazor JS interop. That file and the stack around it are gone;
-both hosts run the event-driven one above.
+**Both hosts run this one.** There is no second, imperative `window.binacle` anywhere.
 
 ## Model layers (`src/`)
 
@@ -97,8 +95,20 @@ at load.
 delete `<host>/node_modules/.cache/webpack` - a warm cache reports success on source that fails cold.
 
 `onSubmit` maps `viewModels` (classes) into `apiModels` (plain objects) before POST. Three.js scene helpers live
-in `src/utils/` (`redrawScene`, `createBin`/`createItem`, `addItemToScene`/`removeItemFromScene`, camera helpers,
-`getThemeColors`, …) alongside non-scene utils (`defineComponent`, `getRandom*`, `findClosestElement`).
+in `src/utils/` (`redrawScene`, `createBin`/`createItem`, `addItemToScene`/`removeItemFromScene`, the camera
+helpers, `containerAspectRatio`, `getThemeColors`, `_itemMaterial`, …) alongside non-scene utils
+(`defineComponent`, `getRandomInt`, `findClosestElement`).
+
+## The sample set
+
+**Randomize moves between hand-picked samples; it does not roll new dimensions.** `utils/sampleData.ts` is
+**generated** from `shared/data/demo-samples/` by `just regen demo-samples` and carries a `Do not edit` line.
+`utils/samples.ts` turns an entry into `Bin` and `Item` view models, and `packingDemo.ts` holds a
+`sampleIndex` and steps through them.
+
+`samples.ts` also keeps the rolling helpers `randomBin` and `randomItemFor`, used where a fresh bin is needed
+rather than a whole set. Why items are sized against the largest bin, and why `sizingBin` and `addBin` do not
+pick the same one, is in the packing-demo design record (`$sites/packing-demo-set`).
 
 ## Conventions for adding / modifying a component
 
@@ -118,9 +128,9 @@ in `src/utils/` (`redrawScene`, `createBin`/`createItem`, `addItemToScene`/`remo
 ## Tests
 
 `just test packages-net-ui-unit`. jsdom, because the components read `document` and `window` even where the
-logic under test does not. **20 suites, 273 tests, 69.73% of lines** as of 2026-08-22.
+logic under test does not. **20 suites, 349 tests, 70.53% of lines** — measured 2026-08-27.
 
-`tests/model/` is the pure half — the randomizer, the view models, `ControlsManager`. `tests/components/` is
+`tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is
 the Alpine half: each component factory is a plain object, so a test calls it directly with a stub `$dispatch`
 and `$logger` rather than starting Alpine.
 

@@ -126,7 +126,8 @@ Run `just test api-ui-unit` and `just test api-ui-integration` after touching th
 - [ ] `Kernel` has gained one plain options type and no new project reference.
       One new file under `api/src/Binacle.Net.Kernel/`, and `git diff` on its `.csproj` is empty.
 - [ ] The UI module doc describes what is there, including why the fetch went away.
-      `.agents/docs/api/modules/ui.md` says it, and its `verified:` date is not older than the code change.
+      **By eye.** The module's own reference doc says it, and its `verified:` date is not older than the
+      code change.
 - [ ] The image builds and `just smoke all` is green.
       Run it.
 

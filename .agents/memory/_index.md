@@ -52,6 +52,9 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 - file: sonar-touching-untested-code.md
   description: "Fixing an old Sonar smell in an untested file makes the quality gate worse - changed lines become \"new code\" and count as uncovered"
   when: "fixing a Sonar smell in a file with no test coverage"
+- file: sweep-traps-that-survive-a-build.md
+  description: "Two edits that pass a full build and ten thousand tests while being wrong - prepending a line ahead of a BOM, and removing one redundant null-conditional"
+  when: "doing a mechanical sweep across many C# files - inserting a using, removing a redundant operator"
 - file: test-leaf-naming.md
   description: "How a test leaf is named - <slice>[-<component>][-<language>]-<kind>, kind spelled out, no two leaves a letter apart"
   when: "adding or renaming a test leaf"

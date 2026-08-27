@@ -4,9 +4,7 @@
 #   just changelog extract Unreleased print the in-progress section
 #   just changelog check 3.0.0        exit 1 if the section is missing or empty
 #
-# The release workflow calls both: `check` as its first gate, `extract` to build the release body. Keeping the
-# parsing here means CI and a laptop read the file the same way, and you can preview the exact body you are
-# about to publish before you push the tag.
+# The release workflow calls both: `check` as its first gate, `extract` to build the release body.
 
 set working-directory := '..'
 set no-exit-message := true
@@ -23,17 +21,13 @@ extract version:
     set -euo pipefail
     # Two jobs: find the section, then undo the nesting the file imposes on it.
     #
-    # FINDING IT. A section ends at the next VERSION heading, not at the next `## ` - a body may well carry
-    # its own `## ` once it has been promoted, and stopping at those would truncate it at its first
-    # subheading. So a terminator is a `## ` whose first token parses as `Unreleased` or as semver. Accepts
-    # `## 3.0.0`, `## [3.0.0]`, and either with a trailing ` - <date>`, so the file can follow Keep a
-    # Changelog exactly without the matcher caring which shape you used.
+    # FINDING IT. A section ends at the next VERSION heading, not at the next `## ` - a promoted body carries
+    # its own `## `. So a terminator is a `## ` whose first token parses as `Unreleased` or as semver.
+    # Accepts `## 3.0.0`, `## [3.0.0]`, and either with a trailing ` - <date>`.
     #
-    # PROMOTING IT. In the file a release is `##` and its own sections are `###`, so the tree nests properly
-    # under the single `# Changelog`. A GitHub release body has no such parent - it starts at `##`. So every
-    # heading is shifted by whatever it takes to bring the SHALLOWEST one back to `##`, which keeps the
-    # relative depth inside the body intact and needs nothing recorded anywhere. Round-trips exactly: what
-    # this prints is what was published.
+    # PROMOTING IT. In the file a release is `##` under the single `# Changelog`; a release body has no such
+    # parent and starts at `##`. Every heading shifts by whatever brings the SHALLOWEST one back to `##`,
+    # which keeps the relative depth inside the body.
     #
     # Headings inside a fenced code block are left alone - they are content, not structure.
     awk -v want='{{ version }}' '

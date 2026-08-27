@@ -1,7 +1,7 @@
 ---
 id: packages/dependencies
 description: TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which.
-verified: 2026-08-21
+verified: 2026-08-27
 check: the workspaces globs in the root package.json still cover every package; each package.json dependencies block matches the graph; a grep for non-relative `from "..."` across packages/*/src and vipaq/packages/binacle-vipaq/src turns up nothing the graph does not name
 paths:
   - "packages/**"
@@ -9,8 +9,8 @@ paths:
 
 # Packages — TypeScript dependencies
 
-The npm workspaces. Root `package.json` covers `packages/*`, `vipaq/packages/binacle-vipaq`, and the three
-consumers — `api/src/Binacle.Net.UIModule`, `sites/docs` and `sites/demo`. Every package resolves the others
+The npm workspaces. Root `package.json` covers `packages/*`, `vipaq/packages/binacle-vipaq`, and the four
+consumers — `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo` and `sites/www`. Every package resolves the others
 from the workspace. Every workspace import is also declared in its importer's `package.json` (all as `"*"`),
 so the graph is honest on its own, not only by hoisting.
 
@@ -20,7 +20,9 @@ Arrows point at what a package imports (each is declared in the importer's `pack
 
 ```
 binacle-compact-notation      leaf (no deps)
-   ▲
+   ▲   ▲
+   │   └── binacle-net-ui       — dev only, and only in tools/generateSamples.ts
+   │
 binacle-vipaq  ───────────────┘  — imported only in tools/ + tests/, not runtime src
    ▲                              mirror of the C# ViPaq
    │
@@ -40,7 +42,7 @@ theme-switcher ───────────────┘
 | `cookies` | `packages/` | — | — |
 | `theme-switcher` | `packages/` | `cookies` | — |
 | `binacle-vipaq` | `vipaq/packages/` | `binacle-compact-notation` | — |
-| `binacle-net-ui` | `packages/` | `binacle-vipaq` | `alpinejs`, `three` (incl. the `three/examples/jsm/controls/OrbitControls` subpath) |
+| `binacle-net-ui` | `packages/` | `binacle-vipaq`; `binacle-compact-notation` (dev) | `alpinejs`, `three` (incl. the `three/examples/jsm/controls/OrbitControls` subpath) |
 
 ## Notes
 
@@ -48,9 +50,14 @@ theme-switcher ───────────────┘
    `binacle-vipaq`, `theme-switcher` → `cookies`, `binacle-vipaq` → `binacle-compact-notation`), so resolution
    never relies on workspace hoisting.
 
-2. **`binacle-vipaq` touches `binacle-compact-notation` only in `tools/` and `tests/`**, not in runtime `src/`.
-   The vipaq mirror parses the shared compact-geometry notation when generating interop artifacts and reading
-   vectors; the format itself pulls in nothing. See `$vipaq/typescript`.
+2. **Two packages reach `binacle-compact-notation`, and neither does it at runtime.** `binacle-vipaq` touches
+   it only in `tools/` and `tests/`, not in runtime `src/` — it parses the shared compact-geometry notation
+   when generating interop artifacts and reading vectors, and the format itself pulls in nothing
+   (`$vipaq/typescript`). `binacle-net-ui` declares it as a **devDependency** and imports it in exactly one
+   file, `tools/generateSamples.ts`.
+
+   **`binacle-vipaq` declares it as a runtime `dependency`, which is what makes npm's graph look cyclic.**
+   Moving it to `devDependencies` is a known one-line change nobody has made.
 
 3. **`binacle-compact-notation` and `cookies` are leaves** — no workspace or runtime deps.
 

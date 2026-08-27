@@ -1,7 +1,7 @@
 ---
 id: sites/webmanifest
 description: Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither.
-verified: 2026-08-24
+verified: 2026-08-27
 check: the theme_color in each site's webmanifest block against the dark --primary and --bg in that site's own sass; the android-chrome ignore line in gulpfile.js for the uimodule target; no site holding a pages/site.webmanifest of its own
 paths:
   - "sites/**"

@@ -9,11 +9,9 @@
 # The three site recipes mirror `just serve docs` / `demo` / `www`: same site, built once instead of served
 # and watched. They are the build half of the pair, which is why they are here rather than in `serve`.
 #
-# All of them are written to be callable from CI as they stand - nothing interactive, no sudo, no local-only
-# paths - so the image a maintainer builds and the image the release workflow ships come from one recipe.
-# Creating and opening up the bind-mounted tooling/data and tooling/azurite is not here: those are a
-# precondition of running the compose stack, not of building anything, and one of them needs sudo, which CI
-# must not run.
+# Nothing here is interactive, uses sudo, or names a local-only path, so CI calls these as they stand.
+# Preparing the bind-mounted tooling/data and tooling/azurite is not here - that is a precondition of running
+# a compose stack, not of building.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'
@@ -75,19 +73,15 @@ image version="local": publish
       --label "org.opencontainers.image.created=${created}" \
       -t "binacle-net:{{ version }}" .
 
-# The three Jekyll sites. Three steps in a fixed order, and skipping any of them produces a site that looks
-# built: the asset copy fills the site's gitignored lib/ and media/, webpack compiles _js/ into its gitignored
-# js/, and only then does jekyll have everything to assemble. `jekyll build` alone succeeds and ships a site
-# with no scripts and no logo - which is exactly the failure worth catching before a deploy rather than after.
+# The three Jekyll sites. Three steps in a fixed order: the asset copy fills the site's gitignored lib/ and
+# media/, webpack compiles _js/ into its gitignored js/, then jekyll assembles. `jekyll build` alone succeeds
+# and ships a site with no scripts and no logo.
 #
 # --config takes both files: _config.yml holds everything, _config.prod.yml overrides the three values that
-# differ off localhost (the site url, the api url, the analytics container). Jekyll merges later files over
-# earlier ones, so the order matters.
+# differ off localhost - site url, api url, analytics container. Jekyll merges later files over earlier ones.
 #
-# Output goes to artifacts/<site>, set as `destination` in each _config.yml rather than passed here.
-#
-# The deploy workflows run these and hand artifacts/<site> straight to the host, so what is built here is what
-# gets served. A green run is the deploy, not a rehearsal for one.
+# Output goes to artifacts/<site>, set as `destination` in each _config.yml rather than passed here. The
+# deploy workflows hand that directory straight to the host.
 
 # The documentation site into artifacts/docs
 docs: (_build-site 'docs' 'sites/docs')

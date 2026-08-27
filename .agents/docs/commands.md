@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-26
+verified: 2026-08-27
 check: Test leaves match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -89,7 +89,23 @@ just test api-service-unit             # ServiceModule config validators and pol
 just test api-core-integration         # v3 + v4 HTTP endpoints
 just test api-ui-integration           # page routes and markup, demo on and off
 just test api-service-integration [Sqlite|Postgres|AzureStorage]   # no arg falls back to SQLite
+
+# The ten Ruby gem leaves. `just test all` runs them; no workflow does.
+just test ruby-docs-versions-unit      # binacle-docs-versions
+just test ruby-robots-unit             # binacle-robots
+just test ruby-breadcrumb-trail-unit   # jekyll-breadcrumb-trail
+just test ruby-filters-unit            # jekyll-filters
+just test ruby-gtm-unit                # jekyll-gtm
+just test ruby-multi-sitemap-unit      # jekyll-multi-sitemap
+just test ruby-page-meta-unit          # jekyll-page-meta
+just test ruby-resource-tags-unit      # jekyll-resource-tags
+just test ruby-structured-data-unit    # jekyll-structured-data
+just test ruby-webmanifest-unit        # jekyll-webmanifest
 ```
+
+**Twenty-six leaves, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
+from the gem's own folder, and `COVERAGE_FORMAT` is ignored for them — simplecov is not in the bundle, so a
+coverage run executes them and writes nothing, leaving them absent from the table rather than at zero.
 
 `DOTNET_TEST_ARGS` is appended to every `dotnet test` leaf, which is how CI runs them all against one Release
 build: `DOTNET_TEST_ARGS="--configuration Release --no-build" just test all`.

@@ -1,7 +1,7 @@
 ---
 id: sites/docs-and-demo-design
 description: Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget.
-verified: 2026-08-24
+verified: 2026-08-27
 check: D6 against sites/docs/_sass/_breadcrumbs.scss, which must stay one rule; D1 against the progress elements in sites/demo/pages/packing.html and vipaq.html, which must both still carry value="0"; D2 against the four overrides in sites/demo/_sass/_components.scss; D4 against the prefetch list in sites/demo/_data/includes.yml
 paths:
   - "sites/demo/**"

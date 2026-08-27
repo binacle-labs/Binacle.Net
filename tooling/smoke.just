@@ -12,12 +12,10 @@
 #
 # Static content is one container-structure-test file (tooling/smoke/structure.yaml) read straight from the
 # image; the HTTP surface is one .hurl per profile run against a running stack. The structure check reads the
-# image rather than a container, so it runs once per `all` and not once per profile - the same 31 assertions
-# repeated behind five different stacks answer the same question five times.
+# image, not a container, so it runs once per `all` rather than once per profile.
 #
-# The stacks are separate files from samples/ on purpose: they raise the anonymous rate limit and throw their
-# storage away, which the samples must never do. The Smoke section of tooling/README.md has the two rules that
-# decide what belongs in this suite - read them before adding a check.
+# The stacks are separate files from samples/: they raise the anonymous rate limit and throw their storage
+# away, which the samples must never do.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

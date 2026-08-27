@@ -29,7 +29,7 @@ table of [README.md](README.md).
   description: "Config file layout, env-var conventions, override precedence, and feature flag list"
   paths: ["api/src/Binacle.Net/Config_Files/**", "api/src/Binacle.Net/Configuration/**"]
 - file: api/dependencies.md
-  description: "API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, and who sees internals."
+  description: "API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals."
   paths: ["api/**"]
 - file: api/endpoints.md
   description: "Endpoint pattern, registration, request validation flow, and route groups for v3 and v4"

@@ -73,6 +73,21 @@ permanent ruler — the worry being that bolting an experiment onto the ruler st
 Reversed because the race is not only about the codec: it also settles row-major vs columnar (a permanent concern)
 and fixes the compressed-vs-raw-protobuf comparison bug. So the codecs became permanent harness fixtures.
 
+## What the v2 rebuild deleted from the public surface
+
+Kept so a session does not go looking for a method that has not existed since the shim came out, and does not
+reintroduce one.
+
+- **Bit-width methods.** `Write32Bits`, `Write64Bits`, `Read32Bits`, `Read64Bits`, the `BitSize` extension
+  methods and the whole `ExtensionMethods/` folder. `WriteValue(value, width)` / `ReadValue(width)` replaced
+  them.
+- **The range guard.** `EnsureWithinRange` existed only for the 64-bit tier. With 8- and 16-bit fields a value
+  cannot be out of range, so there is nothing left to guard.
+- **`ViPaqLimits`.** Renamed to `Limits`, and `MaxInteger` (2⁵³−1), `SixteenBitsMax`, `ThirtyTwoBitsMax` and
+  `CompressionThresholdBytes` went with the rename.
+- **The typed wrappers.** `SerializeInt32`, `DeserializeInt32`, `SerializeUInt16`, `DeserializeUInt16`. Call
+  sites name their types on the generic method instead.
+
 ## Where the deleted test files went
 
 Recovered 2026-08-13 from comments during the comment-thinning pass. The v2 rebuild (D11) deleted several test

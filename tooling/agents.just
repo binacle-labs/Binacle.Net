@@ -3,12 +3,11 @@
 #   just agents all                      rewrite all five _index.md
 #   just agents generate-index plans     rewrite one
 #
-# Run it after adding, renaming, moving or re-describing any file under those directories - the index is the
-# only thing that makes a file findable without opening every one of them.
+# Run it after adding, renaming, moving or re-describing any file under those directories.
 #
-# Each index lists every .md under its directory (recursively), grouped by area - the first path segment, with
-# root-level files under "General" - and one line per file. The description comes from `description:` in the
-# front matter, falling back to the first `# ` heading, then the filename.
+# Each index lists every .md under its directory, recursively, grouped by area - the first path segment, with
+# root-level files under "General". The description comes from `description:` in the front matter, falling
+# back to the first `# ` heading, then the filename.
 
 # Module recipes run where the module file lives (tooling/), which would break every path below.
 set working-directory := '..'

@@ -1,7 +1,7 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions.
-verified: 2026-08-19
+verified: 2026-08-27
 check: AlgorithmRacing_Packing_v2, its base class and the five scenario keys in BischoffCuratedProblemsProvider still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
 also_update:
   - lib/decisions

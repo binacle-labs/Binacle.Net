@@ -1,7 +1,7 @@
 ---
 id: api/dependencies
-description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, and who sees internals.
-verified: 2026-08-21
+description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals.
+verified: 2026-08-27
 check: ProjectReference and InternalsVisibleTo entries in api/**/*.csproj match the graph, the table and the walls below, including every test project and the entry point's Using Include items
 paths:
   - "api/**"
@@ -31,6 +31,7 @@ Binacle.Net  (Web SDK, entry / composition root)
       │        └── ServiceModule.Domain         → (nothing)                       [IVT → SM.IntegrationTests]
       │
       └── UIModule  (Razor SDK)    → Kernel
+             [IVT → UIModule.UnitTests]
 
 Kernel  → Binacle.CompactNotation                                shared API floor (every module refs it)
 
@@ -41,6 +42,8 @@ Tests  (all xUnit v3, all OutputType Exe)
    DiagnosticsModule.UnitTests     → DiagnosticsModule
    ServiceModule.UnitTests         → ServiceModule
    ServiceModule.IntegrationTests  → ServiceModule, Binacle.Net
+   UIModule.UnitTests              → UIModule
+   UIModule.IntegrationTests       → Binacle.Net
 ```
 
 ## Projects at a glance
@@ -60,6 +63,8 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.DiagnosticsModule.UnitTests` | xUnit exe | DiagnosticsModule | DiagnosticsModule | log/telemetry units |
 | `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule | auth/accounts units |
 | `Binacle.Net.ServiceModule.IntegrationTests` | xUnit exe | ServiceModule, Binacle.Net | Binacle.Net, ServiceModule, Domain, Infrastructure | auth + rate-limit tests |
+| `Binacle.Net.UIModule.UnitTests` | xUnit exe | UIModule | UIModule | page models, applet list, error page |
+| `Binacle.Net.UIModule.IntegrationTests` | xUnit exe | Binacle.Net | Binacle.Net | which routes answer with a page, demo on and off |
 
 ## The walls
 
@@ -82,6 +87,8 @@ Tests  (all xUnit v3, all OutputType Exe)
 
 5. **`UIModule` references nothing but `Kernel`.** Both its demos are TypeScript running in the browser, so it
    talks to the API over HTTP like any other client and needs no packing, ViPaq or compact-notation reference.
+   **It is a node on the JavaScript graph too** — its own `package.json` names `binacle-net-ui`,
+   `binacle-vipaq`, `cookies`, `theme-switcher`, `alpinejs` and `three` (`$build-topology`).
 
 6. **`Binacle.Net` reaches `Binacle.Packing` and `Binacle.Geometry` transitively, and imports both globally.**
    Its csproj carries `<Using Include="Binacle.Packing" />` and `<Using Include="Binacle.Geometry" />`, so

@@ -1,7 +1,7 @@
 ---
 id: sites
 description: Every published site lives under sites/, one directory each. What the three share, and what is per-site.
-verified: 2026-08-23
+verified: 2026-08-27
 check: The directory list matches sites/; all three sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
 also_update:
   - commands
@@ -26,6 +26,9 @@ Every site this repo publishes, one directory each.
 **All of it is off limits from a coding session.** Each site is written in its own session; see
 `.agents/README.md` for the rule and its one carve-out.
 
+**A `sites/web/` may appear and is not a site.** It holds `bin/` and `obj/` left behind by the rename to
+`sites/demo/`, is untracked, and is not in `.gitignore`. Nothing builds or reads it.
+
 ## What every site here has in common
 
 Read this once, then the per-site doc for what differs.
@@ -44,9 +47,13 @@ Read this once, then the per-site doc for what differs.
 - **`just build <site>` and `just serve <site>`** are the pair: built once, or served with a webpack watch
   beside it. Three steps in a fixed order — asset copy, webpack, jekyll — and skipping one builds a site that
   looks finished. See `$commands`.
-- **Assets and gems come from outside.** `assets/` is copied in by gulp; `ruby/jekyll-gtm` and
-  `ruby/jekyll-filters` are loaded from each `Gemfile` by path. Both are relative paths that count levels, so
-  they are what a move breaks first.
+- **Assets and gems come from outside.** `assets/` is copied in by gulp, and **every site loads the same eight
+  path gems** in its `Gemfile`'s `:jekyll_plugins` group — `jekyll-gtm`, `jekyll-filters`, `binacle-robots`,
+  `jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
+  `jekyll-webmanifest` — plus `jekyll-tidy` from rubygems. **`sites/docs` adds two more**,
+  `jekyll-breadcrumb-trail` and `binacle-docs-versions`, because it is the only one with a trail to draw and
+  the only one that is versioned. Every path gem is `path: "../../ruby/<name>"`, a relative path that counts
+  levels, so it is what a move breaks first.
 - **Deployed by hand, one workflow each.** `workflow_dispatch` only, and the workflow builds the site, link
   checks what it built, and hands that same directory to the host — see `$ci-cd`.
 
