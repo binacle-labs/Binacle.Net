@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation.
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation.
 verified: 2026-08-28
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, and D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.proj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; and D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -712,6 +712,62 @@ runs without `set -e` and OR-s the exit codes, so the first failure cannot hide 
 A check whose only output is "ok" cannot be read over someone's shoulder.
 
 **Only `3.0.0` and later can pass**, per D15 — signing and the SBOM start there.
+
+### D22 — the gems reach Sonar through a built project, and the project type is what decides that
+
+`ruby/ruby.proj` exists for one reason: to list the 102 gem sources as `Content` so the scanner is offered
+them. `Microsoft.Build.NoTargets`, so it compiles nothing. It excludes `vendor/**`, the bundle CI installs.
+
+**Without it Sonar saw no Ruby at all.** The run of 2026-08-27 23:08 reported `10 languages detected` and no
+`Sensor Ruby` line anywhere; the run after it, with the project, reported `11` and analysed 99 `.rb` files.
+The scanner's own walk of the repository root reaches `ruby/` — it indexed 240 files under `ruby/vendor`
+before that folder was excluded — so it sees the `.rb` files and does not claim them. Being listed in a built
+project is what makes the difference.
+
+**The extension is declared in `Binacle.Net.slnx`, so the project entry carries no `Type`:**
+
+```xml
+<ProjectType Name="Ruby" Extension="rbproj" BasedOn="C#" />
+```
+
+A `.slnx` rejects any project whose type it cannot infer — `ProjectType '' not found` makes the whole solution
+unloadable — and it infers nothing from `.proj`. Declaring the extension answers that once. The mapping is
+scoped to `rbproj`, so the five `Type="Shared"` content projects are untouched.
+
+**It is based on `C#` and not on `Shared`, and `IsBuildable` does not bridge the two.** Measured on
+2026-08-28, each from a deleted `ruby/obj` and a full `dotnet build Binacle.Net.slnx`:
+
+| Declaration | Built by the solution |
+|---|---|
+| `.csproj`, no type | yes |
+| `.proj`, `Type="C#"` | yes |
+| `.rbproj`, `BasedOn="C#"` | yes |
+| `.rbproj`, `BasedOn="Shared" IsBuildable="true"` | **no** |
+
+`IsBuildable="true"` on a type based on `Shared` does not make it build. An unbuilt project never reaches the
+scanner, which is this one's whole job — which is also why `tooling/obj` and `assets/obj` are stale from
+6 Aug 2026 and none of those projects has ever been analysed.
+
+**The consequence for the others is worth knowing.** `tooling.proj`, `assets.proj` and the three site
+projects are all `Type="Shared"`, so none of them has ever been built or appeared as a Sonar module. Their
+files are analysed anyway, through the scanner's root walk — which is why the `.sh` and `.py` findings exist
+while the projects that list them do not.
+
+**The type names are not documented, so they were tested.** Accepted: `C#`, `VB`, `F#`, `Website`, `Shared`,
+`WiX`, `Docker`, `Folder`, `JavaScript`, and a raw GUID. Rejected: `Classic C#`, `MSBuild`, `Web`,
+`Solution Folder`, `Python`, `Node`, `TypeScript`, `Custom`, `None`.
+
+**The scanner does not care what the file is called.** Its targets pick files by MSBuild item type -
+`SQAnalysisFileItemTypes` names `Content` among others - and the only projects it skips are Microsoft Fakes
+projects, `_wpftmp`/`WorkerExtensions` temp projects, and anything setting `SonarQubeExclude`. Nothing keys
+off the extension, and `ProjectLanguage` comes from `$(Language)`, which is empty for a NoTargets project
+whatever it is named. So the extension is a readability choice, not a functional one.
+
+**One knock-on: the ruby coverage path is the odd one out.** A report path is resolved against the base
+directory of the module the sensor runs in. The C# and javascript sensors run in the root module; the
+SimpleCov sensor runs in `ruby/`, this project's folder, and said so —
+`SimpleCov report not found: 'artifacts/coverage/sonar/*.json'`. So that one property opens with `../` while
+the other two do not. Every report is still written to `artifacts/coverage/sonar`.
 
 ## Open
 

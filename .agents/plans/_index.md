@@ -137,10 +137,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing"
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
 - file: ci-cd/sonar-scope-and-coverage.md
-  description: "Confirmed on the 2026-08-27 run - no Ruby analyser loads, so the ten gems can never report coverage. ruby/ruby.csproj is the one cheap experiment left, and it is in the tree waiting for a run."
-  state: proposed
-  waits-on: "one Sonar run. The experiment is built; the log says whether it worked"
-  paths: ["tooling/ci/sonar-analysis.xml", ".github/workflows/sonar-analysis.yml", "ruby/**", "Binacle.Net.slnx"]
+  description: "The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with."
+  state: ready
+  waits-on: "one Sonar run to confirm the two property changes now in the tree"
+  paths: ["tooling/ci/sonar-analysis.xml", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
   description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."
   state: blocked

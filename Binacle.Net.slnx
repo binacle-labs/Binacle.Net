@@ -2,6 +2,7 @@
   <Configurations>
     <Platform Name="Any CPU" />
     <Platform Name="x86" />
+    <ProjectType Name="Ruby" Extension="rbproj" BasedOn="C#" />
   </Configurations>
   <Folder Name="/artifacts/">
     <File Path="artifacts/README.md" />
@@ -115,7 +116,7 @@
   <Project Path="tooling/tooling.proj" Type="Shared">
     <Platform Project="AnyCPU" />
   </Project>
-  <Project Path="ruby/ruby.csproj" />
+  <Project Path="ruby/ruby.rbproj" />
   <Folder Name="/sites/">
     <Project Path="sites/docs/docs.proj" Type="Shared">
       <Platform Project="AnyCPU" />

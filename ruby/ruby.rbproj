@@ -1,7 +1,8 @@
 <!-- Exists only so the Sonar scanner is offered the gem sources; NoTargets compiles nothing.
 
-     .csproj and not .proj like tooling.proj: the solution file cannot infer a type for .proj, so those are
-     declared Type="Shared" - and a Shared project is never built, so the scanner never sees it. -->
+     Binacle.Net.slnx declares the rbproj extension, so this needs no Type attribute. It is based on C# and
+     not on Shared: a Shared project is never built, IsBuildable="true" does not override that, and a project
+     that is not built never reaches the scanner - which is this one's whole job. -->
 <Project Sdk="Microsoft.Build.NoTargets/3.7.56">
     <PropertyGroup>
         <IsPackable>false</IsPackable>

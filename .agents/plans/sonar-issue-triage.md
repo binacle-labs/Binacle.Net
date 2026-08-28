@@ -26,7 +26,11 @@ the gate's `new_security_rating` failure, were both entirely vendored gems - unp
 | | Open | Security | Reliability | Maintainability | High or worse |
 |---|---|---|---|---|---|
 | Before, `22:20` run | 384 | 8 | 81 | 311 | 34 |
-| After, `ad2e96b8` run | **295** | **0** | **9** | **286** | **2** |
+| After the scope fix | 295 | **0** | **9** | 286 | **2** |
+| After the gems were indexed | 327 | 0 | 9 | 318 | 27 |
+
+**The 27 are all `ruby:S1192`, all in gem spec files** - a duplicated string literal, which Sonar rates high
+for Ruby and low for C#. They arrived with the gems, not with a regression.
 
 Ratings moved with it: **security C to A, reliability D to C, maintainability stayed A.** Coverage 67.8% to
 **71.1%**. Analysed lines dropped from 30048 to 26275, which is the vendored gems leaving.

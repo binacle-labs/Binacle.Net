@@ -47,12 +47,16 @@
        .info from jest, .json from simplecov. tooling/tests.just is what writes them and the only place that
        knows the suite list.
 
-       The ruby line is set up but imports nothing yet: no .rb file has ever been indexed - 0 of the 102
-       gem sources, and 0 of the thousands under ruby/vendor that the walk did reach. Coverage for a file
-       Sonar does not know about is dropped in silence. -->
+       The ruby one opens with ../ and the other two do not. Sonar documents these paths as relative to the
+       project root; what the 2026-08-27 run actually did was resolve them against the base directory of the
+       module the sensor ran in. The C# and javascript sensors run in the root module, so root-relative is
+       right for them. The ruby sensor runs in the only module holding .rb files - ruby/, its own project -
+       and said so: "SimpleCov report not found: 'artifacts/coverage/sonar/*.json'".
+
+       All three reports are in artifacts/coverage/sonar. Only the path written to reach them differs. -->
   <Property Name="sonar.cs.vscoveragexml.reportsPaths">artifacts/coverage/sonar/*.xml</Property>
   <Property Name="sonar.javascript.lcov.reportPaths">artifacts/coverage/sonar/*.info</Property>
-  <Property Name="sonar.ruby.coverage.reportPaths">artifacts/coverage/sonar/*.json</Property>
+  <Property Name="sonar.ruby.coverage.reportPaths">../artifacts/coverage/sonar/*.json</Property>
 
   <!-- Two places where near-identical code is the design, not debt. This is a duplication exclusion, not an
        issue ignore: every rule still runs on these files, only the copy-paste detector skips them.
@@ -78,12 +82,15 @@
        the two test kernels) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
        that takes them out of the coverage denominator and off the product rule set in one move.
 
-       SonarQubeTestProject only reaches MSBuild projects, so the four globs below do the same job for
-       everything else: the python index generator, the site bundles, and the ts fixture and generator
-       folders. 334 lines, every one of them uncovered and uncoverable - 5% of the denominator.
+       SonarQubeTestProject only reaches MSBuild projects, so the five globs below do the same job for
+       everything else: the python index generator, the site bundles, the ts fixture and generator folders,
+       and the gem specs. The first four were 334 lines, every one uncovered and uncoverable.
+
+       **/spec/** is the gems' own rspec suites - about half of ruby/. SimpleCov is configured to
+       `skip '/spec/'`, so it reports nothing for them and they would sit at 0% forever.
 
        These stay in scope for rules. This is a coverage exclusion only. -->
-  <Property Name="sonar.coverage.exclusions">gulpfile.js,jest.config.js,tooling/**,sites/**,**/tests/**,**/tools/**</Property>
+  <Property Name="sonar.coverage.exclusions">gulpfile.js,jest.config.js,tooling/**,sites/**,**/tests/**,**/tools/**,**/spec/**</Property>
 
   <!-- No sonar.issue.ignore rules here, on purpose. Where a rule was wrong about our code the code now says
        so in a way the analyser can read - [AssertionMethod] on the helpers that assert, arrange/act/assert

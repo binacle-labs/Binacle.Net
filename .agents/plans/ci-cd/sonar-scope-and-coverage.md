@@ -1,68 +1,66 @@
 ---
-description: Confirmed on the 2026-08-27 run - no Ruby analyser loads, so the ten gems can never report coverage. ruby/ruby.csproj is the one cheap experiment left, and it is in the tree waiting for a run.
-state: proposed
-waits-on: "one Sonar run. The experiment is built; the log says whether it worked"
+description: The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with.
+state: ready
+waits-on: "one Sonar run to confirm the two property changes now in the tree"
 paths:
   - "tooling/ci/sonar-analysis.xml"
-  - ".github/workflows/sonar-analysis.yml"
   - "ruby/**"
   - "Binacle.Net.slnx"
 ---
 
-# Sonar sees no Ruby, and now we know why
+# Getting the gems into Sonar
 
-**Settled by the `ad2e96b8` run of 2026-08-27.** The scanner log is the evidence, not the dashboard.
+**`ruby/ruby.csproj` worked.** The run of 2026-08-27 23:33 detected **eleven** languages where the one before
+it detected ten, `Sensor Ruby Sensor [ruby]` analysed 99 source files, and `ruby=2967` is in the language
+breakdown. Listing the `.rb` files in a project that actually builds is what the scanner needed.
+
+**Why the solution declares an `rbproj` type based on `C#`, and why `Shared` cannot work, is `$ci-cd/decisions` D22.**
+
+## The coverage import failed, and the run named the reason
 
 ```
-INFO: 10 languages detected in 1322 preprocessed files
-INFO: Loading plugins for detected languages
+Sensor SimpleCov Sensor for Ruby coverage [ruby] (done) | time=1ms
+ERROR: SimpleCov report not found: 'artifacts/coverage/sonar/*.json'
 ```
 
-**Ruby is not one of the ten**, and no `Sensor Ruby` line appears anywhere in the run. The plugin list is
-loaded *after* detection, from the languages found - so the `.rb` files were walked, claimed by nothing, and
-dropped. The language breakdown that reached SonarCloud is `cs, css, docker, js, py, shell, ts, web, yaml`.
+**A report path is resolved against the base directory of the module the sensor runs in**, and the only
+module holding `.rb` files is `ruby/` - its own project, base dir `<repo>/ruby`. So it looked for
+`ruby/artifacts/coverage/sonar/`. The C# and javascript imports work because their sensors run in the root
+module, where the same shape of path means the repository root.
 
-An earlier version of this plan blamed MSBuild project membership. That was wrong and is disproved twice
-over: before `ruby/vendor/**` was excluded, 240 files from that same folder were indexed - `.html`, `.erb`,
-`.yml`, `.sh` - none of them in any project either.
+**Fixed by writing that one path as `../artifacts/coverage/sonar/*.json`.** The reports have not moved -
+all three are in `artifacts/coverage/sonar`. Only the route to them differs, and the settings file says why.
 
-**The coverage half was never the problem and is finished.** All ten gems produce a SimpleCov JSON report
-with absolute repository paths, which is exactly what `sonar.ruby.coverage.reportPaths` wants. Verified by
-running one by hand, and by the ten `JSON Coverage report generated for RSpec` lines in the same run.
-There is nothing to build. There is nothing for the reports to attach to.
+Sonar documents these paths as relative to the project root. The run showed otherwise, and the run wins.
 
-## The experiment is built: `ruby/ruby.csproj`
+## The specs were counting as uncovered product code
 
-`Microsoft.Build.NoTargets`, `IsPackable=false`, `Content Include="**\*.rb"` excluding `vendor/**` - 102
-files, none of them vendored. In `Binacle.Net.slnx`. If listing the files in a built project is what makes the
-scanner offer them to the language detector, this is the whole fix.
+Indexing the gems added 1506 lines to the coverage denominator and 1506 uncovered lines, dropping the project
+from 71.1% to **58.4%** and new-code coverage from 77.0% to 26.3%.
 
-**It is `.csproj` and not `.proj`, and that is the finding underneath it.** The solution file cannot infer a
-project type from `.proj`, so every content project here is declared `Type="Shared"` - and a Shared project is
-**never built by `dotnet build Binacle.Net.slnx`**. `tooling/obj` and `assets/obj` are stale from 6 Aug 2026
-and CI has never recreated them. So none of those projects has ever reached the scanner, and a `ruby.proj`
-copied from `tooling.proj` would have been a guaranteed no-op.
+Roughly half of `ruby/` is rspec - 2016 lines of spec against 1974 of lib. **SimpleCov is configured to
+`skip '/spec/'`**, so it reports nothing for them and they would sit at 0% forever. `**/spec/**` is now in
+`sonar.coverage.exclusions`, beside the `**/tests/**` that does the same job for the typescript suites.
+`spec/` exists nowhere outside `ruby/`, so the glob needs no qualifying.
 
-That also settles where `tooling/`'s `.sh` and `.py` come from: not from `tooling.proj`, which never builds,
-but from the scanner's own walk of the repository root. The same walk reaches `ruby/` - it is what indexed 240
-files under `ruby/vendor` before that folder was excluded. **It sees the `.rb` files and does not claim
-them.**
+With both changes the ten gems should land at the 96-100% their own runs report.
 
-**A second Sonar project is the fallback, and it is a real decision.** A standalone `sonar-scanner` pass over
-`ruby/` cannot write into `binacle-labs_Binacle.Net` - one project takes one analysis - so it means a second
-project key, a second dashboard, and a second gate. Ten gems at 96-100% coverage would look good on it. It
-also doubles the thing anyone has to look at.
+## What the gems arrived with
 
-**Doing neither is defensible.** The gems have their own suites, all ten pass in CI, and their coverage is
-printed by `just coverage table`. What is lost is a number on a dashboard. What is not lost is the testing.
-**If that is the answer, say so and delete the `sonar.ruby.coverage.reportPaths` line**, because a setting
-that cannot work is worse than no setting - it is what made three weeks of this look like an import bug.
+**27 new high-severity findings, every one `ruby:S1192`** - a duplicated string literal in a spec file, like
+`"site.webmanifest"` five times in `jekyll-webmanifest/spec/generator_spec.rb`. Sonar rates S1192 high for
+Ruby where it rates it low for C#, which is why 27 test-code findings outrank everything else on the list.
+They are the same class as the .NET test findings and the same answer applies: they stay visible.
+`plans/sonar-issue-triage.md` owns the triage.
+
+**`sonar.tests` is not set**, and the Ruby sensor said so: it fell back to a path heuristic to tell spec from
+lib. Setting it globally is not open to us - the .NET half of the project gets its test/source split from
+`SonarQubeTestProject`, and a global `sonar.tests` would fight it.
 
 ## Done when
 
-- [ ] One run says whether the Ruby plugin loads now that `ruby/ruby.csproj` is in the build.
-      Grep the `end` log for `Quality profile for ruby`. The run of 2026-08-27 listed ten and ruby was not
-      among them; eleven with ruby means it worked.
-- [ ] If it cannot work here, the choice between a second project and dropping it is written into the CI/CD
-      decisions ledger, and the coverage property matches that choice.
-      **By eye.** A `sonar.ruby.coverage.reportPaths` line with no Ruby analyser behind it is the failure.
+- [ ] The ten gems report their real coverage.
+      **By eye**, on the Code page under `ruby/`. Zero means the import still is not landing; grep the run for
+      `SimpleCov report not found`.
+- [ ] Overall coverage is back above where it was before the gems were indexed.
+      71.1% is the number to beat. Below it means the specs are still in the denominator.
