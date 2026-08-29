@@ -25,6 +25,7 @@ all under the MIT License. Copy them into your own project and nothing follows t
 and both implementations of ViPaq and the compact notation are under the Apache License 2.0. Their data
 outlives the request that produced it, so a reader can be written in any language from them freely.
 
-**The logo and the brand assets.** `assets/logo/`, the favicons and the media under `assets/media/` are
-excluded from this license and remain all rights reserved. They identify the project; they are not content
-to reuse.
+**The logo and the brand assets.** `assets/logo/`, `assets/media/logo/` and the favicons are excluded from
+this license. The name and the logo identify the project, and this license grants no trademark rights in
+them. `assets/media/github/` and `assets/media/docker/` are GitHub's and Docker's marks, used under their
+owners' brand guidelines, and are not ours to license at all.

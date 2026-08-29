@@ -115,7 +115,7 @@ Work on the repository, the build and the dependencies. The dependency patches, 
 - Extracted **Binacle.Geometry** into its own library.  
 - **Took `FluxResults` in-tree** as `shared/src/Binacle.FluxResults`, dropping the NuGet package reference. Only the parts the API uses came over, the namespace changed, and no behaviour did. It has its own unit suite, which the package never had.  
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.  
-- **Every part of the repository now names its own licence.** Nineteen `LICENSE` files landed beside the code they cover, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship.  
+- **Every part of the repository now names its own licence.** A `LICENSE` file now sits beside every part that has its own, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship, and the image now carries `NOTICE` and the licence text itself rather than only a label.  
 - Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  
 - Added cross-language ViPaq interop tests between C# and TypeScript.  

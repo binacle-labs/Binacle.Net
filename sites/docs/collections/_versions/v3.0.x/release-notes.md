@@ -226,9 +226,10 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **Took `FluxResults` in-tree.** The result and union types the API returns are now part of the repository
   rather than a NuGet package. No behaviour changed.
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.
-- **Every part of the repository now names its own licence.** Nineteen `LICENSE` files landed beside the code
-  they cover, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all
-  four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship.
+- **Every part of the repository now names its own licence.** A `LICENSE` file now sits beside every part
+  that has its own, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all
+  four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship, and the image now
+  carries `NOTICE` and the licence text itself rather than only a label.
 
 Everything below is work on the repository. None of it reaches the image.
 

@@ -32,6 +32,11 @@ RUN apt-get update \
 # here and is the one allowlisted entry in .dockerignore, so publishing anywhere else builds an empty image.
 COPY ["artifacts/binacle-net", "."]
 
+# The licence text has to be in the image, not only in the OCI label. GPL-3.0 sections 4 and 5 require a copy
+# to travel with the conveyed binaries. The vendored front-end libraries carry their own LICENSE next to them
+# under wwwroot/lib, copied there by the gulp asset task.
+COPY ["NOTICE", "LICENSE.GPL-3.0", "./"]
+
 # Logs, pack-logs, and the SQLite database are written here. It has to exist in the image and be owned by the
 # app user: docker creates a mount point that the image does not have as root, and the app does not run as
 # root, so a volume mounted over a missing /app/data is unwritable. A fresh named volume inherits this

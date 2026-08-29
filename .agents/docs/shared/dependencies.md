@@ -2,7 +2,7 @@
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
 verified: 2026-08-30
-check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults and Binacle.CompactNotation each carry their own LICENSE, MIT and Apache-2.0 respectively, and NOTICE names both
+check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"
 ---
@@ -52,7 +52,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
-| `Binacle.Geometry` | library | — (BCL only) | — | the geometry leaf: `IWith[ReadOnly]*` + `Dimensions<T>`/`Coordinates<T>`/`Item<T>` |
+| `Binacle.Geometry` | library | — (BCL only) | — | the geometry leaf: `IWith[ReadOnly]*` + `Dimensions<T>`/`Coordinates<T>`/`Item<T>` (Apache-2.0, see note 8) |
 | `Binacle.CompactNotation` | library | Geometry | grants IVT to its UnitTests | parses/formats the `LxWxH (X,Y,Z)` compact string |
 | `Binacle.CompactNotation.UnitTests` | xUnit exe | CompactNotation | yes | notation tests |
 | `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.TestsKernel` | packing result models, identity, status enums |
@@ -95,7 +95,14 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    three- and four-arm unions were dropped. The namespace was renamed to `Binacle.FluxResults`; the type names
    were not. `shared/src/Binacle.FluxResults/README.md` records the provenance.
 
-8. **The obvious name for it, `Binacle.Results`, does not compile.** Inside `Binacle.Net.ServiceModule` the
+8. **`Binacle.Geometry` is Apache-2.0, and that is a dependency fact rather than a preference.**
+   `Binacle.CompactNotation` and `Binacle.ViPaq` are Apache-2.0 so a third party can read the two data formats
+   without taking on the code licence, and both `ProjectReference` this project. An Apache grant over a library
+   that cannot be built without a copyleft dependency is not usable, so the leaf moved with them.
+   **`Binacle.Packing` referencing it is unaffected** - Apache-2.0 into GPL-3.0 is the permitted direction, and
+   the combined binary is still conveyed under the code licence.
+
+9. **The obvious name for it, `Binacle.Results`, does not compile.** Inside `Binacle.Net.ServiceModule` the
    identifier `Results` would then bind to that namespace and shadow ASP.NET's
    `Microsoft.AspNetCore.Http.Results`, breaking every `Results.Ok(...)` in the endpoints. `Binacle.TypedResults`
    collides the same way with `Microsoft.AspNetCore.Http.TypedResults`. Keep `Flux` in the name.
