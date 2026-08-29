@@ -122,7 +122,6 @@ Azure.Monitor.OpenTelemetry.AspNetCore
                                   https://github.com/Azure/azure-sdk-for-net
 Microsoft.Extensions.*            https://github.com/dotnet/runtime
 Microsoft.AspNetCore.*            https://github.com/dotnet/aspnetcore
-FluxResults                       https://github.com/ChrisMavrommatis/FluxResults
 OpenApiExamples                   https://github.com/ChrisMavrommatis/OpenApiExamples
 
 Shipped in the browser UI and the websites:

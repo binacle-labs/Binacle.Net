@@ -97,6 +97,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-compact-notation_unit
 
+      - name: Test - Binacle.FluxResults.UnitTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-flux-results_unit
+
       - name: Test - Binacle.ViPaq.UnitTests
         if: ${{ !cancelled() }}
         run: just test cs_binacle-vipaq_unit

@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-28
+verified: 2026-08-29
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -79,13 +79,14 @@ recipe still runs by name. `just test` with no argument prints the whole list.
 
 ```bash
 just test all       # every test that needs nothing brought up
-just test image     # the sixteen the Docker image ships
+just test image     # the seventeen the Docker image ships
 just test sites     # the fifteen a Jekyll site ships
 just test           # the three above, then every test name
 
 # C#
 just test cs_binacle-lib_unit
 just test cs_binacle-compact-notation_unit
+just test cs_binacle-flux-results_unit
 just test cs_binacle-vipaq_unit
 just test cs_binacle-net_unit
 just test cs_binacle-net-kernel_unit

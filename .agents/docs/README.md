@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-08-27
+verified: 2026-08-29
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -42,8 +42,10 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror of ViPaq |
 | `shared/src/Binacle.Geometry` | Shared geometry leaf — generic `IWith*` interfaces + concrete `Dimensions<T>`/`Coordinates<T>` (BCL-only, referenced by lib, ViPaq, CompactNotation) |
 | `shared/src/Binacle.CompactNotation` | Shared compact-string parser/formatter (`LxWxH (X,Y,Z) [Q]`) |
+| `shared/src/Binacle.FluxResults` | Result and union types the service module returns instead of throwing |
 | `shared/test/Binacle.TestsKernel` | Shared test fixtures and scenario data |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
+| `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
 | `packages/` | TypeScript packages (npm workspaces) |
 | `ruby/` | Ruby gems (Jekyll plugins) |
 | `sites/` | Every published site, one directory each (`$sites`) |

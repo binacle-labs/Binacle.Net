@@ -6,8 +6,8 @@ using Binacle.Net.ServiceModule.Domain.Subscriptions.Entities;
 using Binacle.Net.ServiceModule.Domain.Subscriptions.Models;
 using Binacle.Net.ServiceModule.Domain.Subscriptions.Services;
 using Microsoft.AspNetCore.Http;
-using Conflict = FluxResults.Conflict;
-using NotFound = FluxResults.NotFound;
+using Conflict = Binacle.FluxResults.Conflict;
+using NotFound = Binacle.FluxResults.NotFound;
 
 namespace Binacle.Net.ServiceModule.Infrastructure.Subscriptions.Services;
 

@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
-description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-08-27
+description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
+verified: 2026-08-29
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below
 paths:
   - "shared/**"
@@ -31,6 +31,12 @@ Binacle.Geometry                 leaf — BCL only, no Binacle deps
                      Binacle.Lib.TestsKernel, OrLibrary.Converter, ViPaq.PackedDataGenerator
                      (Binacle.Net reaches it transitively and imports it globally - $api/dependencies)
 
+Binacle.FluxResults              leaf — BCL only, no Binacle deps
+   ▲                             result/union types: FluxUnion<T0, T1>, the TypedResult structs
+   │                             consumers: api ServiceModule.Domain — Infrastructure, ServiceModule and
+   │                             SM.IntegrationTests reach it transitively and import it globally
+   └── Binacle.FluxResults.UnitTests   xUnit
+
 Binacle.TestsKernel              algorithm fixture hub — Bischoff + custom-problems scenarios
    refs: Binacle.Packing, Binacle.CompactNotation
    consumers: api IntegrationTests, Binacle.Lib.UnitTests/Benchmarks/PerformanceTests
@@ -50,6 +56,8 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.CompactNotation` | library | Geometry | grants IVT to its UnitTests | parses/formats the `LxWxH (X,Y,Z)` compact string |
 | `Binacle.CompactNotation.UnitTests` | xUnit exe | CompactNotation | yes | notation tests |
 | `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.TestsKernel` | packing result models, identity, status enums |
+| `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
+| `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
 | `Binacle.TestsKernel` | library | Packing, CompactNotation | — | algorithm fixtures + providers (see note 3) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
@@ -80,3 +88,14 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 
 6. **`Binacle.TestReporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
    `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.
+
+7. **`Binacle.FluxResults` came in from the retired FluxResults NuGet package**, v1.0.0. Same copyright
+   holder, so it is first-party code under the repo's own licence — it is not a third-party component and
+   `NOTICE` does not list it. Only what the API uses came over: the `FluxResult<T>` wrapper and the three- and
+   four-arm unions were dropped. The namespace was renamed to `Binacle.FluxResults`; the type names were not.
+   `shared/src/Binacle.FluxResults/README.md` records it.
+
+8. **The obvious name for it, `Binacle.Results`, does not compile.** Inside `Binacle.Net.ServiceModule` the
+   identifier `Results` would then bind to that namespace and shadow ASP.NET's
+   `Microsoft.AspNetCore.Http.Results`, breaking every `Results.Ok(...)` in the endpoints. `Binacle.TypedResults`
+   collides the same way with `Microsoft.AspNetCore.Http.TypedResults`. Keep `Flux` in the name.

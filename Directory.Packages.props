@@ -72,7 +72,6 @@
   <ItemGroup>
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-    <PackageVersion Include="FluxResults" Version="1.0.0" />
   </ItemGroup>
   <!-- Testing. The runner half is a matched set, with the SDK pin in global.json. xunit.v3.mtp-v2 is the
 	     Microsoft.Testing.Platform v2 adapter; plain xunit.v3 is the v1 one, and CodeCoverage has been

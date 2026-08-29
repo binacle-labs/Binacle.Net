@@ -38,6 +38,7 @@ image:
     just test cs_binacle-lib_unit
     just test cs_binacle-compact-notation_unit
     just test ts_binacle-compact-notation_unit
+    just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
     just test ts_binacle-net-ui_unit
@@ -75,6 +76,7 @@ all:
     just test cs_binacle-lib_unit
     just test cs_binacle-compact-notation_unit
     just test ts_binacle-compact-notation_unit
+    just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
     just test ts_binacle-net-ui_unit
@@ -106,6 +108,9 @@ cs_binacle-lib_unit: (_dotnet_test 'lib/test/Binacle.Lib.UnitTests')
 
 [private]
 cs_binacle-compact-notation_unit: (_dotnet_test 'shared/test/Binacle.CompactNotation.UnitTests')
+
+[private]
+cs_binacle-flux-results_unit: (_dotnet_test 'shared/test/Binacle.FluxResults.UnitTests')
 
 [private]
 cs_binacle-vipaq_unit: (_dotnet_test 'vipaq/test/Binacle.ViPaq.UnitTests')

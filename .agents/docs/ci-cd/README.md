@@ -1,7 +1,7 @@
 ---
 id: ci-cd
 description: CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-08-28
+verified: 2026-08-29
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -38,7 +38,7 @@ described in `$tooling`. Nothing about a recipe's behaviour is repeated here.
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `pull-request.yml` | `pull_request` | The gate. Works out separately whether image code and site code changed, then runs the matching test suite, the image build, the three site builds and the `.github/` lints. `gate` reports either way — see below |
-| `shared-image-tests.yml` | `workflow_dispatch`, `workflow_call` | The sixteen tests that end up in the Docker image, plus `just openapi lint`. One job so setup and build happen once; one step per test so a red check names the suite. Postgres and Azurite run as job services, one ServiceModule step per storage backend. Called by the release pipeline as its "this commit passed CI" gate, so the release gets the lint too |
+| `shared-image-tests.yml` | `workflow_dispatch`, `workflow_call` | The seventeen tests that end up in the Docker image, plus `just openapi lint`. One job so setup and build happen once; one step per test so a red check names the suite. Postgres and Azurite run as job services, one ServiceModule step per storage backend. Called by the release pipeline as its "this commit passed CI" gate, so the release gets the lint too |
 | `shared-site-tests.yml` | `workflow_dispatch`, `workflow_call` | The fifteen tests that end up in a Jekyll site — the ten gems and the five javascript packages a site bundles. No .NET, no service containers, no OpenAPI lint. Called by the pull request gate and by all three deploys |
 | `sonar-analysis.yml` | `workflow_dispatch` | Build plus `just coverage all sonar` between `Sonar begin`/`Sonar end`, published to SonarCloud. **By hand, and never on a schedule** — a nightly run re-analyses a commit nothing changed and reports the same numbers |
 | `codeql-analysis.yml` | `push` on `main`, weekly `schedule`, `workflow_dispatch` | CodeQL over four languages — `actions`, `csharp`, `javascript-typescript`, `ruby` — one matrix job each, all buildless. Findings land in the Security tab, not on a check. **On a schedule as well as on merge** — the query packs change, so an untouched commit reports new findings later. That is the one analysis a schedule earns |

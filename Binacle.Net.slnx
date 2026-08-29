@@ -87,11 +87,13 @@
   </Folder>
   <Folder Name="/shared/src/">
     <Project Path="shared/src/Binacle.CompactNotation/Binacle.CompactNotation.csproj" />
+    <Project Path="shared/src/Binacle.FluxResults/Binacle.FluxResults.csproj" />
     <Project Path="shared/src/Binacle.Geometry/Binacle.Geometry.csproj" />
     <Project Path="shared/src/Binacle.Packing/Binacle.Packing.csproj" />
   </Folder>
   <Folder Name="/shared/test/">
     <Project Path="shared/test/Binacle.CompactNotation.UnitTests/Binacle.CompactNotation.UnitTests.csproj" />
+    <Project Path="shared/test/Binacle.FluxResults.UnitTests/Binacle.FluxResults.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.TestReporting/Binacle.TestReporting.csproj" />
     <Project Path="shared/test/Binacle.TestsKernel/Binacle.TestsKernel.csproj" />
   </Folder>

@@ -219,6 +219,8 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - Patched two **high-severity advisories** in transitive dependencies - `Microsoft.OpenApi` and the bundled
   **SQLite** native library.
 - Extracted **Binacle.Geometry** into its own library.
+- **Took `FluxResults` in-tree.** The result and union types the API returns are now part of the repository
+  rather than a NuGet package. No behaviour changed.
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.
 
 Everything below is work on the repository. None of it reaches the image.
