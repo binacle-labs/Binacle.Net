@@ -16,7 +16,9 @@ paths:
 **Most of this file has landed.** The UI module corrections, the two swagger copies and the release-notes
 carry-over are all done and verified against the tree on 2026-08-27, and the release-notes page was diffed
 bullet for bullet against `CHANGELOG.md` again on 2026-08-28, and the FluxResults bullet it gained on
-2026-08-29 is on the page too. Two page edits remain, and both need the tag to exist.
+2026-08-29 is on the page too. **The licensing edits of 2026-08-30 landed the same way** - two more bullets,
+the footer, the three site manifests and a samples section on all four versions. Two page edits remain, and
+both need the tag to exist.
 
 ---
 
@@ -56,6 +58,29 @@ matching the order in `CHANGELOG.md`.
 **`NOTICE` also dropped its `FluxResults` entry**, because a first-party library in the tree is not a
 third-party component. No page on the site lists the third-party dependencies, so nothing else moved - checked
 2026-08-29.
+
+### The licensing edits, made on 2026-08-30 by a coding session, on the maintainer's explicit override
+
+**`never-edit-published-sites` was overridden for these, and the override came first this time** - the
+maintainer granted it before the session touched anything, naming both the site files and the release notes.
+
+**Two bullets, mirrored word for word against `CHANGELOG.md`.** *"Licensing is now stated per part"* went last
+in Overview, after the `binacle-labs` move. *"Every part of the repository now names its own licence"* went in
+the **first** Internal Work group, above *"Everything below is work on the repository"*, because the image's
+`org.opencontainers.image.licenses` label changed with it. The intro sentence naming what is inside the image
+gained the licence label alongside the packing log rework.
+
+**Three other page edits went with them.** `_data/footer.yml` moved from CC BY-SA 4.0 to CC BY 4.0 and dropped
+the ShareAlike icon; the three `sites/*/package.json` licence fields were corrected the same way, with
+`sites/docs` also naming MIT because the versioned sample folders live inside it; and
+`v3.0.x/samples/index.md` gained a **📄 Copying these files** section, because those files are MIT and nothing
+on the site said so.
+
+**Every version got the licence section, not only `v3.0.x`.** The maintainer extended the override to the
+older lines when asked, so `v1.3.x`, `v2.0.x` and `v2.1.x` carry it too - **byte-identical in all four**, and
+deliberately version-neutral: an earlier draft named a compose file, a manifest and a `Presets.json`, and
+`v1.3.x` has no Kubernetes manifests. A licence grant is not version-specific, so one wording is correct
+everywhere and four wordings would drift.
 
 ### Three fixes made on 2026-08-28 by a coding session, on the maintainer's explicit override
 

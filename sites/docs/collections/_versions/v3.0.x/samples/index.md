@@ -39,3 +39,9 @@ image on every release.
 Every sample pins `binacle/binacle-net:{{ page.version_tag }}` - the minor tag, which picks up fixes within the
 {{ page.version_tag }} line and never a breaking change. A copied sample should not jump to a new major on the
 next pull, which is what `latest` would do.
+
+## 📄 Copying these files
+Every file on these pages is under the **MIT License**, not the licence covering the API code. Copy one into
+your own project and nothing follows it. The
+[NOTICE](https://github.com/binacle-labs/Binacle.Net/blob/main/NOTICE) file in the repository is the full map
+of which licence covers which part.

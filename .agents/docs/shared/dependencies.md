@@ -1,8 +1,8 @@
 ---
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-08-29
-check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below
+verified: 2026-08-30
+check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults and Binacle.CompactNotation each carry their own LICENSE, MIT and Apache-2.0 respectively, and NOTICE names both
 paths:
   - "shared/**"
 ---
@@ -90,10 +90,10 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.
 
 7. **`Binacle.FluxResults` came in from the retired FluxResults NuGet package**, v1.0.0. Same copyright
-   holder, so it is first-party code under the repo's own licence — it is not a third-party component and
-   `NOTICE` does not list it. Only what the API uses came over: the `FluxResult<T>` wrapper and the three- and
-   four-arm unions were dropped. The namespace was renamed to `Binacle.FluxResults`; the type names were not.
-   `shared/src/Binacle.FluxResults/README.md` records it.
+   holder, and **it keeps that package's MIT licence rather than the repository's** — it carries its own
+   `LICENSE` and `NOTICE` names it. Only what the API uses came over: the `FluxResult<T>` wrapper and the
+   three- and four-arm unions were dropped. The namespace was renamed to `Binacle.FluxResults`; the type names
+   were not. `shared/src/Binacle.FluxResults/README.md` records the provenance.
 
 8. **The obvious name for it, `Binacle.Results`, does not compile.** Inside `Binacle.Net.ServiceModule` the
    identifier `Results` would then bind to that namespace and shadow ASP.NET's

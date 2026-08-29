@@ -65,26 +65,31 @@ just build image                 # publish, then tag binacle-net:local
 
 ## 📄 License
 
-This work is dual-licensed under the GNU General Public License v3.0 and the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+This project carries more than one license. Which one applies depends on which part you are using.
 
-`SPDX-License-Identifier: GPL-3.0-only AND CC-BY-SA-4.0`
+| What | License |
+|---|---|
+| The code - API, packing engine, browser UI | [GPL-3.0-only](LICENSE.GPL-3.0) |
+| Documentation, images and other content | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| The data formats - ViPaq, compact notation, [PROTOCOL.md](vipaq/PROTOCOL.md) and its test vectors | [Apache-2.0](vipaq/src/Binacle.ViPaq/LICENSE) |
+| The Ruby gems under [`ruby/`](ruby) | MIT |
+| Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
+| [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
-### Code
-The code in this project is licensed under the GNU General Public License v3.0. <br/>
+`SPDX-License-Identifier: GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`
 
-See the [LICENSE.GPL-3.0](LICENSE.GPL-3.0) file for details.
+**Every part with its own license carries its own `LICENSE` file next to it.** The data formats and the
+samples are permissive on purpose: reading a ViPaq string or a packing log, or copying a compose file into
+your own project, should not put your work under this one.
 
-### Documentation and Content
-All documentation, images, and other content files in this project are licensed under the
-[Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
+The logo and the brand assets are not covered by the content license. [CONTENT-TERMS.md](CONTENT-TERMS.md)
+is the plain-English summary and names what is excluded.
 
-[CONTENT-TERMS.md](CONTENT-TERMS.md) is a plain-English summary of what that allows. The full
-license text is at [creativecommons.org](https://creativecommons.org/licenses/by-sa/4.0/legalcode).
-
-### Third-Party Libraries
+### 📦 Third-Party Libraries
 Binacle.Net uses third-party libraries and dependencies. 
 
-See the [NOTICE](NOTICE) file for complete attribution details.
+See the [NOTICE](NOTICE) file for the complete map - every license above, and every dependency with the
+license it ships under.
 
 ## Security
 See [SECURITY.md](SECURITY.md) for my security policy and how to report vulnerabilities.

@@ -14,7 +14,7 @@ LABEL org.opencontainers.image.title="Binacle.Net" \
       org.opencontainers.image.url="https://www.binacle.net" \
       org.opencontainers.image.documentation="https://docs.binacle.net" \
       org.opencontainers.image.vendor="Binacle Labs" \
-      org.opencontainers.image.licenses="GPL-3.0-only AND CC-BY-SA-4.0" \
+      org.opencontainers.image.licenses="GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT" \
       org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:10.0"
 
 ARG VERSION

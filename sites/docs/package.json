@@ -12,7 +12,7 @@
     "url": "git+https://github.com/binacle-labs/Binacle.Net.git"
   },
   "author": "Chris Mavrommatis",
-  "license": "GPL-3.0-only AND CC-BY-SA-4.0",
+  "license": "GPL-3.0-only AND CC-BY-4.0 AND MIT",
   "devDependencies": {
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",

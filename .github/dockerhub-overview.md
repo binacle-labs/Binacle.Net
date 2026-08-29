@@ -145,4 +145,4 @@ Questions and "it worked" are equally welcome:
 - **Security policy:** <https://github.com/binacle-labs/Binacle.Net/blob/main/SECURITY.md>
 - **Architectures:** `linux/amd64`
 - **Base image:** `mcr.microsoft.com/dotnet/aspnet:10.0`. Runs as a non-root user, listens on 8080
-- **License:** GPL-3.0-only for the code, CC-BY-SA-4.0 for the content
+- **License:** GPL-3.0-only for the code, CC-BY-4.0 for the content. The wire formats are Apache-2.0 and the samples are MIT - see [NOTICE](https://github.com/binacle-labs/Binacle.Net/blob/main/NOTICE)

@@ -22,3 +22,8 @@ These samples demonstrate how to run Binacle.Net using Docker Compose.
 - [Full Deployment]({% vlink samples/docker/full-deployment/index.md %}): A complete setup with all features enabled.
 - [UI Module Only]({% vlink samples/docker/ui-module-only/index.md %}): A sample with just the UI Module enabled.
 
+## 📄 Copying these files
+Every file on these pages is under the **MIT License**, not the licence covering the API code. Copy one into
+your own project and nothing follows it. The
+[NOTICE](https://github.com/binacle-labs/Binacle.Net/blob/main/NOTICE) file in the repository is the full map
+of which licence covers which part.

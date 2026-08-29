@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors = ['Chris Mavrommatis']
   spec.licenses = ['MIT']
   spec.summary = 'Liquid tags that render link, script and prefetch elements from a data list'
-  spec.files = Dir['lib/**/*.rb']
+  spec.files = Dir['lib/**/*.rb'] + ['LICENSE']
   spec.require_paths = ['lib']
   spec.required_ruby_version = Gem::Requirement.new('>= 3.1')
   spec.add_dependency 'jekyll', '>= 4.2'

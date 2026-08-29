@@ -474,7 +474,7 @@ cache from that point down, for metadata nothing executes. `--label` writes imag
 and no cache cost.
 
 metadata-action overrides three of the Dockerfile's constant labels on purpose — `licenses`, because
-auto-detection returns `NOASSERTION` for a dual-licensed repo; `url`, which should be the landing site
+auto-detection returns `NOASSERTION` for a repo that declares more than one licence; `url`, which should be the landing site
 rather than the repo; and `description`, which auto-fills from the GitHub repository blurb and silently beats
 the `Dockerfile`'s caption. **The third was moved here on 2026-08-28** from a comment in the workflow, which
 was the only place it was written down.
