@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
-verified: 2026-08-27
-check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
+verified: 2026-08-30
+check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0 with LICENSE.GPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp in SECURITY.md, CHANGELOG.md and tooling/image.just, which must all name binacle-labs; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
 paths:
   - "NOTICE"
   - "README.md"
@@ -73,7 +73,21 @@ serves the same URL from a stale build. **A path a shipped artifact points at is
 
 **The root `package.json` declares no licence at all.** It is `private: true` and never published, so the
 field was decorative; the honest options were a single ID narrower than the truth or no field, and no field
-makes no false claim. `NOTICE` and `README.md` carry the real dual-licence statement.
+makes no false claim. `NOTICE` and `README.md` carry the real licence map.
+
+**The root holds exactly one licence file, and every other licence lives in a subdirectory.** Measured again
+on 30 Aug 2026 with the same gem: **two root files report `NOASSERTION` whatever they are named**, and a
+second file cut down to a short pointer does not escape it — filename scoring runs on the name alone, so a
+root file that matches the pattern is a candidate even when its content matches nothing, and "matches
+nothing" resolves to `other`, which counts as a second licence. That is the same mechanism `CONTENT-LICENSE.md`
+tripped above, with different files.
+
+**Subdirectories are invisible to licensee**, which is why the nineteen `LICENSE` files under `ruby/`,
+`samples/`, `tooling/`, the two wire-format libraries and their npm twins cost the badge nothing. Confirmed
+against the repository after they landed: `GPL-3.0`, 100%, exact matcher.
+
+**One trap in that: never create a `LICENSES/` folder.** licensee scans that name specifically, per the REUSE
+spec, and two files inside it would be two licences again. Any other folder name is fine.
 
 ### D2 — a version's published page must match what that version's image serves
 

@@ -14,7 +14,7 @@ LABEL org.opencontainers.image.title="Binacle.Net" \
       org.opencontainers.image.url="https://www.binacle.net" \
       org.opencontainers.image.documentation="https://docs.binacle.net" \
       org.opencontainers.image.vendor="Binacle Labs" \
-      org.opencontainers.image.licenses="GPL-3.0-only AND CC-BY-SA-4.0" \
+      org.opencontainers.image.licenses="GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT" \
       org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:10.0"
 
 ARG VERSION
@@ -31,6 +31,11 @@ RUN apt-get update \
 # There is no build stage - `just build publish` writes this folder before docker runs. The path is hardcoded
 # here and is the one allowlisted entry in .dockerignore, so publishing anywhere else builds an empty image.
 COPY ["artifacts/binacle-net", "."]
+
+# The licence text has to be in the image, not only in the OCI label. GPL-3.0 sections 4 and 5 require a copy
+# to travel with the conveyed binaries. The vendored front-end libraries carry their own LICENSE next to them
+# under wwwroot/lib, copied there by the gulp asset task.
+COPY ["NOTICE", "LICENSE.GPL-3.0", "./"]
 
 # Logs, pack-logs, and the SQLite database are written here. It has to exist in the image and be owned by the
 # app user: docker creates a mount point that the image does not have as root, and the app does not run as

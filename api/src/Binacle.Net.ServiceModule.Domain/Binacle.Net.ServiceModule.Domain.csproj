@@ -5,10 +5,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluxResults" />
+        <ProjectReference Include="..\..\..\shared\src\Binacle.FluxResults\Binacle.FluxResults.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="FluxResults"/>
+        <Using Include="Binacle.FluxResults" />
     </ItemGroup>
 </Project>

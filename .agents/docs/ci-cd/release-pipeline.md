@@ -241,7 +241,7 @@ Three sources, and they do not collide.
   change every build, so as Dockerfile layers they would bust the cache from that point down. `--label` sets
   image-config metadata with no layer.
 - **The `build` job's metadata step overrides two** that metadata-action gets wrong on its own: `licenses`,
-  because auto-detection returns `NOASSERTION` for a dual-licensed repo, and `url`, which should be the landing
+  because auto-detection returns `NOASSERTION` for a repo that declares more than one licence, and `url`, which should be the landing
   site rather than the repo.
 
 `tooling/build.just` does the same three per-build labels for a local `just build image`, so a locally built

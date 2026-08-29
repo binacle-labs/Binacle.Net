@@ -7,7 +7,7 @@ it, it belongs in that slice instead.
 
 | Folder | What it is |
 |---|---|
-| `src/` | Three small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation |
+| `src/` | Four small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation, result types |
 | `test/` | Test infrastructure shared by several suites - the scenario kernel, the report writer |
 | `tools/` | The OR-Library converter, which writes `data/bischoff-suite` |
 | `data/` | The fixture corpus more than one slice reads - see [`data/README.md`](data/README.md) |
@@ -22,8 +22,10 @@ rather than each defining their own.
 | `src/Binacle.Geometry` | Dimensions, coordinates, volume and quantity - the `IWith*` interfaces plus concrete `Dimensions`, `Coordinates`, `Item` | `Binacle.Packing`, `Binacle.CompactNotation`, ViPaq |
 | `src/Binacle.Packing` | The packing vocabulary - `Algorithm`, `AlgorithmInfo`, `PackedBin`, `PackedItem`, `UnpackedItem`, `OperationResultStatus` | `Binacle.Lib`, the API, the test kernels |
 | `src/Binacle.CompactNotation` | Parses and formats the terse strings used in fixtures and API payloads - `"60x40x30"`, `"108x76x30 [40]"` | The API, both test kernels, every generator |
+| `src/Binacle.FluxResults` | Result and union types a repository or handler returns instead of throwing - `FluxUnion<T0, T1>`, `Success`, `NotFound`, `Conflict` | The service module - see [its README](src/Binacle.FluxResults/README.md) |
 
 `Binacle.Packing` and `Binacle.CompactNotation` both build on `Binacle.Geometry`; nothing points the other way.
+`Binacle.FluxResults` sits apart from all three and references nothing.
 
 ## 🧪 Test infrastructure
 
@@ -52,6 +54,11 @@ Its scenario JSON is **not** on disk here - it is linked in from `data/`, so edi
 
 Result-selection fixtures are **not** here. They have one consumer, so they live in
 [`lib/data/result-selection`](../lib/data/result-selection) with their own kernel.
+
+### 🎯 `Binacle.FluxResults.UnitTests`
+
+Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Runs with
+`just test cs_binacle-flux-results_unit`.
 
 ### 📄 `Binacle.TestReporting`
 

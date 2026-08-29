@@ -24,3 +24,8 @@ These samples will demonstrate how to run Binacle.Net on an existing Kubernetes 
 
 - [Minimal Setup]({% vlink samples/kubernetes/minimal-setup/index.md %}): A minimal Kubernetes setup for Binacle.Net.
 
+## 📄 Copying these files
+Every file on these pages is under the **MIT License**, not the licence covering the API code. Copy one into
+your own project and nothing follows it. The
+[NOTICE](https://github.com/binacle-labs/Binacle.Net/blob/main/NOTICE) file in the repository is the full map
+of which licence covers which part.

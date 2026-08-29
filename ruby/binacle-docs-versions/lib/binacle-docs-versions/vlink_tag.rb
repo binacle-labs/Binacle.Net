@@ -3,6 +3,7 @@
 module Binacle
   module DocsVersions
     # A link to a file in the version the current page belongs to, whatever version that is.
+    # Adapted from Jekyll's own link tag, so the not-found message reads the same on purpose.
     class VLinkTag < Liquid::Tag
       include Jekyll::Filters::URLFilters
 

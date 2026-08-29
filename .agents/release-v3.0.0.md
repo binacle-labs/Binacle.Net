@@ -346,8 +346,9 @@ changes, nothing is published to NuGet, and no contract moves - the OpenAPI diff
 breaking changes stay four.
 
 **This section is also what the docs site copies**, by hand. **The two were diffed bullet for bullet on
-2026-08-28 and are in step** - three drifts were fixed on the page and one of them, the release pipeline
-sentence, was wrong here too and was fixed here. **The page still lacks the release date and the release
+2026-08-28** - three drifts were fixed on the page and one of them, the release pipeline
+sentence, was wrong here too and was fixed here. **The FluxResults bullet, added here on 2026-08-29, went on
+the page the same day** - `plans/sites/docs-v3-deploy.md` section 2 records it and the override it needed. **The page still lacks the release date and the release
 link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that and records what was changed.
 
 ---

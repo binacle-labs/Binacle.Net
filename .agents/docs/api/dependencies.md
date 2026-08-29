@@ -1,7 +1,7 @@
 ---
 id: api/dependencies
 description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals.
-verified: 2026-08-27
+verified: 2026-08-29
 check: ProjectReference and InternalsVisibleTo entries in api/**/*.csproj match the graph, the table and the walls below, including every test project and the entry point's Using Include items
 paths:
   - "api/**"
@@ -28,7 +28,7 @@ Binacle.Net  (Web SDK, entry / composition root)
       ├── ServiceModule            → Kernel, ServiceModule.Domain, ServiceModule.Infrastructure
       │      [IVT → ServiceModule.UnitTests, ServiceModule.IntegrationTests]
       │        ├── ServiceModule.Infrastructure → Kernel, ServiceModule.Domain   [IVT → SM.IntegrationTests]
-      │        └── ServiceModule.Domain         → (nothing)                       [IVT → SM.IntegrationTests]
+      │        └── ServiceModule.Domain         → Binacle.FluxResults            [IVT → SM.IntegrationTests]
       │
       └── UIModule  (Razor SDK)    → Kernel
              [IVT → UIModule.UnitTests]
@@ -54,7 +54,7 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.Kernel` | library | CompactNotation | — | shared API tooling: endpoint registration, OpenAPI, flags, validation |
 | `Binacle.Net.DiagnosticsModule` | library | Kernel, Packing, CompactNotation | — | always-on logging / telemetry / health |
 | `Binacle.Net.ServiceModule` | library | Kernel, Domain, Infrastructure | — | JWT auth, rate limiting, accounts (composes its own layers) |
-| `Binacle.Net.ServiceModule.Domain` | library | — | — | entities + repository interfaces (pure) |
+| `Binacle.Net.ServiceModule.Domain` | library | FluxResults | — | entities + repository interfaces (pure) |
 | `Binacle.Net.ServiceModule.Infrastructure` | library | Kernel, Domain | — | DB providers |
 | `Binacle.Net.UIModule` | Razor library | Kernel | — | Razor Pages demo host |
 | `Binacle.Net.UnitTests` | xUnit exe | Binacle.Net | Binacle.Net | entry-point units |
@@ -81,9 +81,17 @@ Tests  (all xUnit v3, all OutputType Exe)
    ServiceModule.Infrastructure, UIModule). `Binacle.Net` picks it up transitively through the modules rather than
    referencing it directly.
 
-4. **ServiceModule is clean-architecture three projects.** `Domain` references nothing (pure entities +
-   repository interfaces); `Infrastructure` implements them over `Kernel` + `Domain`; `ServiceModule` composes the
-   two plus `Kernel`. Keep `Domain` dependency-free — that is what the layering buys.
+4. **ServiceModule is clean-architecture three projects.** `Domain` holds pure entities + repository
+   interfaces; `Infrastructure` implements them over `Kernel` + `Domain`; `ServiceModule` composes the two plus
+   `Kernel`. **`Domain`'s one reference is `Binacle.FluxResults`** — a BCL-only leaf in `shared/src` with no
+   framework and no I/O, which is the return type of every repository interface here. Nothing else may be added:
+   the point of the layer is that it drags nothing along, and `Kernel` in particular would bring the ASP.NET
+   framework reference in with it.
+
+   All four projects that name these types import them globally with `<Using Include="Binacle.FluxResults" />` —
+   `Domain`, `Infrastructure`, `ServiceModule` and `ServiceModule.IntegrationTests` — so `FluxUnion<Account,
+   NotFound>` and `TypedResult.Success` resolve with no `using` line. `$shared/dependencies` notes why the
+   namespace cannot be called `Binacle.Results`.
 
 5. **`UIModule` references nothing but `Kernel`.** Both its demos are TypeScript running in the browser, so it
    talks to the API over HTTP like any other client and needs no packing, ViPaq or compact-notation reference.

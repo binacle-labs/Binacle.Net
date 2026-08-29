@@ -26,6 +26,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.  
 - **Versioned documentation** now covers every minor line, so older images keep their docs.  
 - **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.  
+- **Licensing is now stated per part.** The samples, the build tooling, the Ruby gems and the ViPaq and compact notation libraries are permissive, so they can be copied without taking on the code licence. The code stays GPL-3.0. The documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on quoting it.  
 
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.  
@@ -108,11 +109,13 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 
 ### 🏗️ Internal Work
 
-Work on the repository, the build and the dependencies. The dependency patches, the Binacle.Geometry extraction and the packing log rework are inside the image; nothing else here reaches it.
+Work on the repository, the build and the dependencies. The dependency patches, the Binacle.Geometry extraction, the FluxResults move, the packing log rework and the licence label are inside the image; nothing else here reaches it.
 
 - Patched two **high-severity advisories** in transitive dependencies — `Microsoft.OpenApi` and the bundled **SQLite** native library.  
 - Extracted **Binacle.Geometry** into its own library.  
+- **Took `FluxResults` in-tree** as `shared/src/Binacle.FluxResults`, dropping the NuGet package reference. Only the parts the API uses came over, the namespace changed, and no behaviour did. It has its own unit suite, which the package never had.  
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.  
+- **Every part of the repository now names its own licence.** A `LICENSE` file now sits beside every part that has its own, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship, and the image now carries `NOTICE` and the licence text itself rather than only a label.  
 - Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  
 - Added cross-language ViPaq interop tests between C# and TypeScript.  

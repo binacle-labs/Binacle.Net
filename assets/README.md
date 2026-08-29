@@ -17,14 +17,20 @@ logos. Edit the originals here; the copies in the sites are overwritten on every
 Downloaded, not installed - nothing in `package.json` pulls them, and nothing rebuilds them. Each folder is
 the vendor's own output, dropped in as-is.
 
-| Folder | What the sites use it for | Version |
-|---|---|---|
-| `lib/beercss/` | The Material-style CSS framework, plus the Material Symbols fonts | `version` file, `3.11.11` |
-| `lib/swagger-ui/` | The Swagger UI bundle the docs site embeds | `version` file, `5.11.0` |
-| `lib/material-dynamic-colors/` | Theme colour generation for beercss | not recorded |
+| Folder | What the sites use it for | Version | Licence |
+|---|---|---|---|
+| `lib/beercss/` | The Material-style CSS framework, plus the Material Symbols fonts | `version` file, `3.11.11` | MIT |
+| `lib/swagger-ui/` | The Swagger UI bundle the docs site embeds | `5.11.0`, recorded here only | Apache-2.0 |
+| `lib/material-dynamic-colors/` | Theme colour generation for beercss | not recorded | Apache-2.0 |
 
-**To upgrade one, replace the files and update its `version` file.** Two of them do not have one - if you
-upgrade those, add it, because nothing else in the repo records what shipped.
+**Every folder carries the upstream `LICENSE`**, and `swagger-ui` its `NOTICE` too. The vendor output arrived
+with no copyright header in it - beercss ships none and the swagger-ui bundle has none either - so the file
+beside it is the only notice there is. **Do not delete it when upgrading.** `gulpfile.js` has a `licenses`
+glob so it travels with the copy into every site and into the UI module's `wwwroot/`, which is how it reaches
+the published image.
+
+**To upgrade one, replace the files and update its `version` file.** Only beercss has one - if you upgrade
+either of the others, add it, because the table above is then the only record of what shipped.
 
 ## 🚀 Copying them into the sites
 
@@ -33,7 +39,7 @@ just assets                      # after changing anything here
 ```
 
 That runs the three gulp tasks in the root `gulpfile.js`, which copy every `.js`, `.css`, `.woff2`, image and
-icon into [`sites/docs/`](../sites/docs), [`sites/demo/`](../sites/demo) and the UI module's `wwwroot/`. It is
+icon - and each vendored `LICENSE` - into [`sites/docs/`](../sites/docs), [`sites/demo/`](../sites/demo) and the UI module's `wwwroot/`. It is
 also part of `just install`, so a fresh clone gets them without asking.
 
 **Every target gets the same layout - `lib/`, `media/` and the icons at the root.** What differs is only what

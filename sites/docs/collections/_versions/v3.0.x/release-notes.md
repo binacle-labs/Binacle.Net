@@ -48,6 +48,10 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.
 - **Versioned documentation** now covers every minor line, so older images keep their docs.
 - **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.
+- **Licensing is now stated per part.** The samples, the build tooling, the Ruby gems and the ViPaq and compact
+  notation libraries are permissive, so they can be copied without taking on the code licence. The code stays
+  GPL-3.0. The documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on
+  quoting it.
 
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.
@@ -219,7 +223,13 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - Patched two **high-severity advisories** in transitive dependencies - `Microsoft.OpenApi` and the bundled
   **SQLite** native library.
 - Extracted **Binacle.Geometry** into its own library.
+- **Took `FluxResults` in-tree.** The result and union types the API returns are now part of the repository
+  rather than a NuGet package. No behaviour changed.
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.
+- **Every part of the repository now names its own licence.** A `LICENSE` file now sits beside every part
+  that has its own, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all
+  four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship, and the image now
+  carries `NOTICE` and the licence text itself rather than only a label.
 
 Everything below is work on the repository. None of it reaches the image.
 

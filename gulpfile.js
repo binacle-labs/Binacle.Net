@@ -15,6 +15,11 @@ const ASSETS = {
 	fonts: {
 		src: `assets/**/*.woff2`,
 		options: {encoding: false}
+	},
+	// The vendored libraries are Apache and MIT, and both require their notice to travel with the copy. These
+	// have no extension, so none of the globs above would pick them up.
+	licenses: {
+		src: `assets/**/{LICENSE,NOTICE}`
 	}
 };
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.

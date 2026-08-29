@@ -25,7 +25,7 @@
 	<ItemGroup>
 		<Using Include="Xunit" />
 		<Using Include="Shouldly" />
-		<Using Include="FluxResults" />
+		<Using Include="Binacle.FluxResults" />
 	</ItemGroup>
 
 	<ItemGroup>
