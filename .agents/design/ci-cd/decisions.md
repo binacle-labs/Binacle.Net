@@ -1,7 +1,7 @@
 ---
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-08-28
+verified: 2026-08-31
 check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.proj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; and D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login
 paths:
   - ".github/workflows/**"
@@ -63,6 +63,13 @@ missing tag itself and `--target` says on which commit, so the separate `just ci
 this workflow. `push-tag.sh` stays for the three deploy marker tags. `--target` is ignored when the tag already
 exists, so the load-bearing exception above — a re-dispatch on a run whose tag is already there — still works
 exactly as written.
+
+**Amended 2026-08-31 — `run-name` carries the version, because the run's ref cannot.** A dispatch is listed
+against `main`, since the tag does not exist until the last job, so the Actions list showed the commit message
+and nothing said which release a run was. `run-name: Release v${{ inputs.version }}` puts it in the list. The
+branch chip still reads `main` and that is not fixable without dispatching on a tag, which D3 explains is the
+weaker ref. **Nothing verifies against the run name** — the version that matters is the `version` input, which
+the gate checks and every later job reads.
 
 **The GitHub web release route stops working, and that is accepted.** *Draft a new release → create tag on
 publish* now builds nothing, silently. The release job's create-or-edit branch is left in place: it costs
@@ -239,6 +246,33 @@ true by construction rather than by habit.
 
 **A single command stays inline.** `dotnet dotnet-sonarscanner begin` and the one-line Docker Hub summary are
 already readable, and wrapping them buys a file and loses nothing.
+
+**One block was missed by the 2026-08-28 sweep, and it was found on 2026-08-31 by adding to it.** The release's
+`publish` job still copied the image with 20 lines of `run: |`. A change that made it two copies with a sign
+between them grew it rather than moving it, which is how the miss surfaced: **a rule you can add to without
+noticing is a rule nothing enforces.** It is now `tooling/ci/moving-tags.sh` and `tooling/ci/copy-tags.sh`, and
+`release-docker-image.yml` has no inline `run: |` block left at all - `grep -c 'run: |'` returns 0.
+
+**Why there is a filter at all, since the simpler shape has none.** Copying the version tag, signing, then
+copying the *whole* list including it again needs no filter, no guard and no step output. It is idempotent and
+it works today. **It stops working the day Docker Hub immutable tags go on** - freeze the version tags with a
+pattern, leave `latest` free, and the second write of the version tag is rejected and the release goes red at
+its last step. The filter is what makes that a setting rather than a pipeline change.
+
+**The guard is not a signing check, and the script used to say it was.** The signature is on the digest and
+every tag points at that digest, so nothing goes out unsigned whatever the split does. What it catches is
+`build`'s version and metadata-action's disagreeing, which would publish two version tags. **Corrected
+2026-08-31** after the question "is this not just a filter" made the stated reason not survive being said out
+loud.
+
+**Splitting it in two rather than one bigger script** follows the one-file-per-operation half of this entry.
+"Which public tags move" and "copy a digest to these tags" are separate questions, and both are now runnable
+here: `just ci moving-tags` was checked against a real release, a prerelease and a deliberate mismatch before
+the workflow ever saw it. That is the whole point of the decision and it is the first time it has paid out.
+
+**Not every recipe a workflow calls is a `ci` one.** `publish` also runs `just image verify`, which belongs to
+the `image` module because a person runs it too. **Do not move it into `tooling/ci/`** - the rule is that a
+step calls a recipe, not that every recipe a step calls lives in one folder.
 
 **Two jobs gained `contents: read` for this, and that is the price.** A script is read out of the working
 copy, so `gate` in `pull-request.yml` and `summary` in `codeql-analysis.yml` now check out. Both had a
@@ -539,13 +573,49 @@ edits and one beta to prove them, because the copies were listed here before any
 **A third thing moved the identity on 2026-08-28, and it changed no command: the ref.** The identity ends
 `release-docker-image.yml@<ref>`, and `<ref>` is whatever the run was dispatched on. Under the tag trigger that
 was `refs/tags/v3.0.0`; the release is a `workflow_dispatch` from `main` now, so it is `refs/heads/main` — see
-D1. **All four copies keep working unchanged**, because every one of them anchors at the `@` and constrains
+D1. **Every copy kept working unchanged**, because every one of them anchored at the `@` and constrained
 nothing after it.
 
-**The weakening is real, it is accepted, and the regexp must not be tightened.** A signature can now come from
-a branch ref rather than only from a tag, and `main` is the only branch the gate lets release. Appending
-`refs/tags/` to the regexp to close that would stop every image signed from 2026-08-28 onward from verifying —
-on four surfaces at once, for every user, with a failure that reads as tampering.
+**That slack was closed on 2026-08-31, and the instruction it replaces was right about the wrong fix.** The
+note here used to read *"the regexp must not be tightened"*, and its argument was that appending `refs/tags/`
+would stop every image signed from 2026-08-28 onward from verifying. **That argument holds and is not what was
+done.** The regexp now ends `@refs/heads/main$`. Anchoring on the branch keeps every image the surfaces
+actually promise and drops the three that nobody was promised:
+
+| | Under the anchored identity |
+|---|---|
+| `3.0.0` and later | passes - every release signs from `main`, because the release is a dispatch |
+| `3.0.0-beta.5` | passes - the first release from `main`. Checked, not assumed |
+| `3.0.0-beta.3`, `-beta.4` | would fail, and it does not matter: **both were deleted from Docker Hub on 2026-08-31**, so nothing resolves to check |
+| `2.1.1` and earlier | unsigned, unchanged, still `no signatures found` |
+
+**Nothing published breaks.** Every surface says signing starts at `3.0.0`, and the only prerelease still on
+Docker Hub is `3.0.0-beta.5`, which signs from `main` and passes. `SECURITY.md` briefly carried a paragraph
+explaining how to check a tag-signed prerelease; it was removed the same day, because after the deletions
+there is no such image to check.
+
+**What the anchor buys.** A prefix accepts a signature from any ref in this repository, and a run on any ref
+executes the workflow file **as it exists at that ref**. So anyone able to push a branch and start the workflow
+could publish an image that passes the command we hand to users. **It needs write access, so it is not a way
+in** - it is a way to make the documented check pass on something that is not a release. Dispatch alone does
+not close it, because the dispatcher chooses the ref; the `$` is what closes it.
+
+**The gate's *"Check the dispatch is on main"* step is not what closes it either, and it is worth saying so
+before someone reads that step and removes the anchor.** The gate is a job inside the workflow file, so a run
+on another ref executes that ref's copy of the file, gate included. It stops an accidental dispatch on a
+branch. It cannot stop an edited one. **A check written in the thing being checked is not a control**; the
+anchor sits in the verifier, which is the only place outside the attacker's reach.
+
+**`just image verify` takes the ref and the repository as arguments**, defaulting to `refs/heads/main` and
+`binacle/binacle-net`. **The ref is part of the identity, so it is an argument rather than a constant** - that
+is what let the same recipe check images from either side of this change. Its first reason was that the old
+betas stayed checkable, and that reason expired within a day when they were deleted; the shape is kept because
+a constant would have to be edited to check anything else, and a recipe you edit to run is not a check.
+**The repository argument is what the release workflow uses** to verify what it has just pushed, a scratch
+repository included.
+
+**The docs site's two copies are not done.** A coding session cannot write them. `plans/sites/docs-v3-deploy.md`
+section 7 carries what they must say.
 
 **Signing starts at `3.0.0-beta.2`**, along with the SBOM and the GHCR staging copy. Everything earlier
 answers `no signatures found`, and that is history rather than a broken check. **Which images verify under
@@ -560,6 +630,38 @@ place.
 **Verified on 2026-08-11, not assumed.** A throwaway image built with both flags produced a single attestation
 manifest carrying two in-toto layers — `https://spdx.dev/Document` and `https://slsa.dev/provenance/v1` — and a
 cross-registry `imagetools create` of that index came out on the digest it went in with, attestations intact.
+
+**Amended 2026-08-31 — a second provenance statement, and this one is signed.** `actions/attest-build-provenance`
+runs in `build` against the pushed digest with `push-to-registry: true`. **Why, when buildkit already produces
+provenance:** buildkit's is inlined in the index and is signed by nothing of its own. The cosign signature
+covers it only because it covers the whole index, so a SLSA verifier has no signed provenance statement to
+read and the build sits at SLSA build level 1. GitHub's statement is signed, which is level 2, and GitHub
+says so outright. **It binds to the digest**, so the Docker Hub copy of that digest is covered without
+attesting twice — unlike the cosign signature, which does not come across the copy. The action is a thin
+wrapper over `actions/attest` and its own README points there for new work; the wrapper is used because its
+name says what it produces and the generic one takes a predicate.
+
+**Amended 2026-08-31 — `3.0` and `latest` do not move until the digest is signed and the signature checked.**
+`publish` used to write all three tags in one `imagetools create` and sign afterwards. A failed sign left the
+run red, no git tag and no GitHub release, all of which is correct — and `latest` already pointing at an
+unsigned image on Docker Hub, with nothing published saying so. The copy is now two calls with the sign and
+the verify between them. **Signing does fail often enough to plan for: Cilium wraps its `cosign sign` in a
+retry with backoff**, which nobody writes otherwise. A guard fails the job if the version tag is missing from
+metadata-action's list, because a silent mismatch there is what would send the moving tags out unsigned.
+
+**Amended 2026-08-31 — the workflow runs the command the docs publish.** `just image verify <version>
+signature refs/heads/main <repo>` runs in `publish` straight after the sign. **The recipe holds the only copy
+of that invocation**, so `SECURITY.md` and the registry cannot drift apart without the release going red. The
+repository is an argument so the check follows a scratch `DOCKERHUB_REPO` rather than checking the real one by
+accident. Kyverno, Cilium and Flux all publish a verify command and none of them run it in their own release,
+so this is ahead of the norm rather than catching up.
+
+**The standing maintenance cost of keyless, recorded 2026-08-31.** The published command runs on other
+people's machines, with their cosign. Sigstore's transparency log is moving to Rekor v2, generally available
+2025-10-10, and only cosign 2.6.0+ or 3.0.1+ can verify entries in it. Rekor v1 runs in parallel and freezes
+with a year's notice. **Sigstore's own advice is to update verification before signing**, which for this repo
+means the version floor now in `SECURITY.md` matters before anything in the workflow does. Nothing to change
+in the pipeline; `sigstore/cosign-installer` is pinned by SHA and Dependabot moves it.
 
 **What this obliges.** Users have no way to verify what they are not told about. Publishing signed images
 without a documented `cosign verify` invocation, including the certificate identity and OIDC issuer to match

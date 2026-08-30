@@ -17,19 +17,28 @@ paths:
 carry-over are all done and verified against the tree on 2026-08-27, and the release-notes page was diffed
 bullet for bullet against `CHANGELOG.md` again on 2026-08-28, and the FluxResults bullet it gained on
 2026-08-29 is on the page too. **The licensing edits of 2026-08-30 landed the same way** - two more bullets,
-the footer, the three site manifests and a samples section on all four versions. Two page edits remain, and
-both need the tag to exist.
+the footer, the three site manifests and a samples section on all four versions. Two page edits remain that
+need the tag to exist, and **section 7 is a third that does not - it should go on the next docs session
+whether or not the tag is cut.**
 
 ---
 
-## 1. `v3.0.x/verifying-a-release.md` quotes a tag that is gone
+## 1. `v3.0.x/verifying-a-release.md` quoted a tag that is gone - half done 2026-08-31
 
-**It is broken, not merely stale.** Line 59 reads *"Against `3.0.0-beta.2`"* - a tag deleted from Docker Hub,
-and signed under the old owner anyway. **The page is live.** It asks a reader to run a command that cannot
-succeed, and a published verify command that fails reads as our bug.
+**It was broken, not merely stale.** It read *"Against `3.0.0-beta.2`"* - a tag deleted from Docker Hub, and
+signed under the old owner anyway. Anchoring the command in section 7 would have made it wrong twice over, so
+the same session rewrote it under the same override.
 
-Run `just image verify 3.0.0` and replace three things with what it prints: the Docker Hub digest, the package
-count, and the provenance run URL. **It quotes real output, so it cannot be written before the tag exists.**
+**What it says now.** The heading is *What a checked release looks like*, and the body is a **record of
+`3.0.0-beta.5`** rather than something to run: index digest `sha256:17b721c7...`, 167 packages, run
+`33127006852`. Every figure was read off the registry on 2026-08-31, not copied.
+
+**Why a record and not an example.** Betas 1 to 4 have all been deleted from Docker Hub, two of them on
+2026-08-31. A sample tag on this page goes stale on its own; a record of what was signed stays true even after
+the tag is gone. That is this file's own rule, applied to the page that broke it.
+
+**Still open: re-point it at `3.0.0` once the tag exists.** Run `just image verify 3.0.0` and replace the three
+figures with what it prints. **It quotes real output, so it cannot be written before the tag exists.**
 
 **The rule this came from, worth keeping: name a version where the version is the fact, never as a floor or an
 example.** A floor or a sample tag goes stale on its own; a record of what was signed does not.
@@ -140,6 +149,67 @@ The `v3.0.x` ViPaq page links the wire spec at a `blob/v3.0.0` path, which 404s 
 says *"the visual packing demo"*. If that page should use the canonical tool names, both become
 *"the Packing Demo and the ViPaq Decoder"*. One decision, two lines.
 
+## 7. The verify command on two pages accepted more than it should - done 2026-08-31
+
+**Done by a coding session on the maintainer's explicit override, granted after the session had written this
+section and stopped.** Same sequence as the three under section 2. Both pages are edited.
+
+**What landed:**
+
+| Page | Change |
+|---|---|
+| `verifying-a-release.md` | the command anchored; a cosign version floor under *Install cosign*; a paragraph on the anchor under *Why both cosign flags matter*; the worked example rewritten, see section 1 |
+| `release-notes.md` | the command anchored, nothing else - it follows `CHANGELOG.md` |
+
+`grep -rn "yml@'" sites/docs/` returns nothing. The flag name is unchanged, so
+`verifying-a-release.md:40` and `release-notes.md:313`, which name `--certificate-identity-regexp` in prose,
+are still correct and were not touched.
+
+**The original note, kept because it is what a reader of this file needs:** The repo-side edits are in the working tree: `SECURITY.md`, `CHANGELOG.md`,
+`.github/dockerhub-overview.md` and `tooling/image.just`. `design/ci-cd/decisions.md` D3 records why, and it
+supersedes an instruction there that used to say the regexp must not be tightened.
+
+**The change.** The identity regexp ended at the `@` with no `$`, so it was a prefix match and accepted a
+signature made from any ref in this repository. It now ends:
+
+```
+release-docker-image.yml@refs/heads/main$
+```
+
+**Two pages carry the old string:**
+
+| Page | Line |
+|---|---|
+| `v3.0.x/verifying-a-release.md` | 20 |
+| `v3.0.x/release-notes.md` | 117 |
+
+**Replace `\.yml@'` with `\.yml@refs/heads/main$'` in the code block on each.** Nothing else in either block
+moves - the issuer flag does not change, and the flag name stays `--certificate-identity-regexp` on purpose so
+the prose around it stays true. That prose includes `verifying-a-release.md:40`, *"Drop
+`--certificate-identity-regexp` and you are only asking whether anyone signed the image"*, and
+`release-notes.md:313`, the migration step naming the same flag. **Both stay correct with no edit.**
+
+**`release-notes.md` is the copy of `CHANGELOG.md`, so it follows the changelog**, which is already changed.
+
+**One more sentence to carry, also from `SECURITY.md`:** *"Use cosign 2.6.0 or later, or 3.0.1 or later.
+Sigstore is moving the public transparency log its signatures are recorded in, and older cosign builds cannot
+read entries in the new one. An out-of-date binary fails the check the same way a tampered image would."*
+It belongs on `verifying-a-release.md`, which is the page that teaches the command.
+
+**One paragraph to carry across, from `SECURITY.md`**, which is the wording the others follow. It is new there:
+
+> The identity ends `@refs/heads/main`, the branch the release workflow is dispatched on, and the `$` anchors
+> it there. Without the anchor the check accepts a signature made from any branch in this repository, and
+> pushing a branch is not a release.
+
+**Do not carry across a prerelease note.** `SECURITY.md` briefly had one and it was removed the same day:
+`3.0.0-beta.3` and `3.0.0-beta.4` were deleted from Docker Hub on 2026-08-31, so `3.0.0-beta.5` is the only
+prerelease left and it verifies with the command above. **Section 1's worked example must not name a deleted
+tag either** - that is the same trap it already exists to fix.
+
+**Checked, not assumed.** The new command passes on `3.0.0-beta.5` and fails on `3.0.0-beta.4` and
+`3.0.0-beta.3`; the documented prerelease swap passes on `3.0.0-beta.4`.
+
 ## Done when
 
 - [ ] The verifying-a-release example quotes the released image.
@@ -160,6 +230,10 @@ says *"the visual packing demo"*. If that page should use the canonical tool nam
 - [ ] The two swagger copies still match a fresh generate.
       `diff <(jq -S . artifacts/openapi/Binacle.Net_v3.json) <(jq -S . sites/docs/collections/_versions/v3.0.x/swagger/v3.json)`
       and the same for v4 - both empty.
+- [ ] Both docs-site copies of the verify command end `@refs/heads/main$`.
+      `grep -c 'yml@refs/heads/main\$' sites/docs/collections/_versions/v3.0.x/verifying-a-release.md
+      sites/docs/collections/_versions/v3.0.x/release-notes.md` returns 1 for each, and
+      `grep -rn "yml@'" sites/docs/` returns nothing.
 - [ ] The quickstart tool names are settled either way.
       `grep -n 'packing demo' sites/docs/collections/_versions/v3.0.x/samples/docker/quickstart/index.md` -
       the page is consistent with itself and with whatever was decided.

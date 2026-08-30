@@ -1,8 +1,8 @@
 ---
 id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-08-28
-check: "The trigger is workflow_dispatch alone with a required version input; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the tag is pushed in the release job before gh release create; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
+verified: 2026-08-31
+check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; no job in the file has an inline run: | block; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the tag is pushed in the release job before gh release create; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
   - tooling
@@ -86,7 +86,10 @@ step added to the image suite is a step every release pays for — see `$ci-cd/d
 login with `GITHUB_TOKEN`, buildx, and one `docker/build-push-action` that pushes the immutable tag to GHCR
 with `provenance: mode=max` and `sbom: true`. `VERSION` is passed as a build arg from the metadata step's
 `version` output rather than from the input, so `BINACLE_VERSION` inside the container and the image tag cannot
-disagree. It ends by signing the pushed digest with cosign.
+disagree. It ends by attesting the pushed digest with `actions/attest-build-provenance`, then signing it with
+cosign. **The attestation is a second provenance statement and the reason there are two** is that buildkit's
+inline one is signed by nothing of its own; see `$ci-cd/decisions#D15`. It needs `attestations: write`, and it
+binds to the digest, so the Docker Hub copy is covered without attesting again.
 
 **Both metadata steps — this one and `publish`'s — carry `value=${{ inputs.version }}` on every `type=semver`
 line.** That rule takes its version from the tag ref, and a dispatch has no tag ref, so without `value=` both
@@ -99,10 +102,24 @@ a maintainer runs by hand, rather than copying its steps, so the release path an
 thing. See `$ci-cd` for that workflow's runner pin.
 
 **`publish`** — the only job that touches Docker Hub and the only place the stored Docker Hub credential is
-used. A `metadata-action` step computes the public tag set, then one `docker buildx imagetools create` moves
-the manifest **by digest** from GHCR under all three public tags at once, and cosign signs the result. It never
-checks out, so it holds no `contents` permission. Job output: `tags`, the public tag set, read by `release` for
-the run summary.
+used. A `metadata-action` step computes the public tag set, and then **the copy happens in two halves with the
+signature in between**:
+
+| Step | What it does |
+|---|---|
+| `Which tags move` | `just ci moving-tags` splits the version tag off the list and prints the rest |
+| `Copy the smoked digest to Docker Hub` | `just ci copy-tags` moves the manifest **by digest** under the version tag alone |
+| `Sign the published image` | cosign, against the digest |
+| `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes |
+| `Move the tags that move` | `just ci copy-tags` again, for `3.0` and `latest`. Skipped on a prerelease, which has none |
+
+**Why in halves.** All three tags used to be written before anything was signed, so a failed `cosign sign` left
+`latest` on an unsigned image with the run red and nothing saying so. **Why the split and not simply copying
+the whole list twice**, which is simpler and idempotent: a frozen version tag would reject the second write.
+Both in `$ci-cd/decisions#D15` and `#D4`.
+
+**It checks out now**, for `contents: read`, because it runs recipes out of the working copy. Job output:
+`tags`, the public tag set, read by `release` for the run summary.
 
 **`release`** — checkout, `just`, then one call that makes the tag and the release together, with the body from
 `just changelog extract <section>`. It `needs:` the `gate` job because it reads that job's `section` output, and
@@ -185,8 +202,11 @@ Signing is keyless — cosign exchanges the job's OIDC token for a short-lived c
 jobs declare `id-token: write` and why no signing key exists to store. The signature is made against the
 **digest**, so one signature covers `x.y.z`, `x.y` and `latest` alike.
 
-What that certificate's identity names, and why tightening the regexp users verify with would break every
-published command at once, is `$ci-cd/decisions#D15`.
+**The identity ends at the ref the run was on, and it is anchored.** A dispatch runs on `main`, so it reads
+`release-docker-image.yml@refs/heads/main`, and the published command closes it with a `$`. Unanchored it was a
+prefix match that took a signature from any ref in the repository. This entry used to say tightening it would
+break every published command at once; that was true of appending `refs/tags/`, and not of anchoring on the
+branch. `$ci-cd/decisions#D3` has the reversal and what it costs.
 
 ## How a prerelease differs
 
@@ -198,6 +218,7 @@ A hyphen in the version is the prerelease marker. Every job runs either way; wha
 | Pushed to GHCR | `3.0.0` | `3.0.0-beta.3` |
 | `publish` job | runs | runs |
 | Docker Hub tags | `3.0.0`, `3.0`, `latest` | `3.0.0-beta.3` only |
+| `Move the tags that move` | runs | **skipped** - nothing moves |
 | Git tag created | `v3.0.0` | `v3.0.0-beta.3` |
 | GitHub release | normal | marked `--prerelease` |
 | `page` job | runs | **skipped** |
@@ -209,10 +230,11 @@ its skip is a job condition. That is safe only because nothing needs it; a condi
 skip everything downstream of it.
 
 **The consequence for testing:** a prerelease now exercises every job, `publish` included. What it still does
-not cover is the *moving-tag* half — creating `3.0` and `latest` — since a beta produces neither. That is one
-extra argument to the same `imagetools create` call, so the residual gap is much smaller than it was, but it
-is not nothing: `latest=auto` firing correctly is first proven on a real release, and it is fed by the
-`value=` on the semver rules. `DOCKERHUB_REPO` pointed at a scratch repo is how that is rehearsed without
+not cover is the *moving-tag* half — creating `3.0` and `latest` — since a beta produces neither, so
+`Move the tags that move` skips itself on the empty list. That is now a whole step rather than one extra
+argument, so the residual gap is slightly wider than it was: `latest=auto` firing correctly and that step
+running at all are both first proven on a real release, and both are fed by the `value=` on the semver
+rules. `DOCKERHUB_REPO` pointed at a scratch repo is how that is rehearsed without
 moving a tag anyone follows.
 
 ## Where the release body comes from

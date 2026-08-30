@@ -20,8 +20,9 @@ meaning the same thing.
 | Ruby, via [rbenv](https://github.com/rbenv/rbenv) | 3.4.7 | `sites/docs/.ruby-version`, `sites/demo/.ruby-version`, `sites/www/.ruby-version` | Jekyll, for **all three** sites |
 | [just](https://github.com/casey/just#installation) | any recent | none | every recipe in this repo |
 | Docker | 28+ | none | the image, the `image` and `smoke` modules, the Postgres and AzureStorage tests |
+| jq | any recent | none | `just image verify` - every one of its four checks reads JSON |
 
-Only Docker is optional. Everything else is needed for a full `just install` and `just test all`.
+Only Docker and jq are optional. Everything else is needed for a full `just install` and `just test all`.
 
 Two maintenance gems are deliberately not in either Gemfile - they are one-off tools, not site dependencies.
 Install them globally if you need them:

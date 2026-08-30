@@ -6,6 +6,7 @@
 #   just image up bind           the image alone, SQLite, data in tooling/data, a folder you can open
 #   just image down [name]       stop it; add -v to drop the named volumes too
 #   just image verify <version>  check a published image: tags, signature, attestations, metadata
+#                                a tag-signed release needs its ref: `verify 3.0.0-beta.4 all refs/tags/v3.0.0-beta.4`
 #   just image dockerhub-overview <version>   print the Docker Hub page as it would be published
 #
 # The stacks run binacle-net:local and check for it first. `verify` reads a published image off Docker Hub
@@ -22,7 +23,7 @@ set working-directory := '..'
 # through.
 set no-exit-message := true
 
-# Where a release lands.
+# Where a release lands. `verify` takes it as a parameter so CI can check what it just pushed.
 hub_repo := 'binacle/binacle-net'
 
 # The Docker Hub page. It carries placeholders and never a version - `dockerhub-overview` fills them in.
@@ -48,7 +49,7 @@ down name="full" *args:
     @just image::_compose "{{ name }}" down {{ args }}
 
 # Verify a published image [all|tags|signature|attestations|metadata]
-verify version check="all":
+verify version check="all" signed_from="refs/heads/main" repo=hub_repo:
     #!/usr/bin/env bash
     # No `set -e`: every check runs and the codes are OR-ed at the end, so the first failure cannot hide the
     # answers that explain it.
@@ -72,7 +73,10 @@ verify version check="all":
     rc=0
     failed=""
     for c in $checks; do
-        just image::_verify-$c "{{ version }}" || { rc=1; failed="$failed $c"; }
+        case "$c" in
+            signature) just image::_verify-signature "{{ version }}" "{{ repo }}" "{{ signed_from }}" ;;
+            *)         just image::_verify-$c "{{ version }}" "{{ repo }}" ;;
+        esac || { rc=1; failed="$failed $c"; }
         echo
     done
     if [ "$rc" -eq 0 ]; then
@@ -183,13 +187,13 @@ _prepare name:
 
 # Which docker hub tags are this same image
 [private]
-_verify-tags version:
+_verify-tags version repo:
     #!/usr/bin/env bash
     set -uo pipefail
 
     echo "== docker hub tags =="
     json=$(curl --proto '=https' --proto-redir '=https' -fsSL \
-        'https://hub.docker.com/v2/repositories/{{ hub_repo }}/tags?page_size=100') || {
+        "https://hub.docker.com/v2/repositories/{{ repo }}/tags?page_size=100") || {
         echo "  could not read the tag list" >&2
         exit 1
     }
@@ -208,7 +212,7 @@ _verify-tags version:
 
 # Signed by this repo's release workflow
 [private]
-_verify-signature version:
+_verify-signature version repo signed_from:
     #!/usr/bin/env bash
     set -uo pipefail
 
@@ -217,13 +221,17 @@ _verify-signature version:
         echo "  cosign is not installed - DEVELOPMENT.md has the pinned install" >&2
         exit 1
     fi
-    ref="{{ hub_repo }}:{{ version }}"
+    ref="{{ repo }}:{{ version }}"
+
+    # Anchored on purpose: without the $ this takes a signature from any branch, and pushing a branch is
+    # not a release.
+    from=$(printf '%s' '{{ signed_from }}' | sed 's/[].[^$*\\]/\\&/g')
 
     # Never drop either flag. Without the identity this only asks whether anyone signed it, and anyone can.
     if out=$(cosign verify "$ref" \
-        --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+        --certificate-identity-regexp "^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@${from}\$" \
         --certificate-oidc-issuer https://token.actions.githubusercontent.com 2>&1); then
-        printf '  %-52s signed by the release workflow\n' "$ref"
+        printf '  %-52s signed by the release workflow, on %s\n' "$ref" '{{ signed_from }}'
     else
         printf '  %-52s NOT VERIFIED\n' "$ref" >&2
         echo "$out" | sed 's/^/      /' >&2
@@ -232,12 +240,19 @@ _verify-signature version:
 
 # What is attached: SPDX SBOM and SLSA provenance
 [private]
-_verify-attestations version:
+_verify-attestations version repo:
     #!/usr/bin/env bash
     set -uo pipefail
 
     echo "== attestations =="
-    ref="{{ hub_repo }}:{{ version }}"
+
+    # Without this the inspect below fails, both variables come back empty, and the check reports the
+    # attestations missing. A tool I have not installed is not a fault in the image.
+    if ! docker buildx version >/dev/null 2>&1; then
+        echo "  docker buildx is not installed - DEVELOPMENT.md has the Docker install" >&2
+        exit 1
+    fi
+    ref="{{ repo }}:{{ version }}"
     sbom=$(docker buildx imagetools inspect "$ref" --format '{{{{ json .SBOM }}' 2>/dev/null)
     prov=$(docker buildx imagetools inspect "$ref" --format '{{{{ json .Provenance }}' 2>/dev/null)
     rc=0
@@ -262,12 +277,12 @@ _verify-attestations version:
 
 # Labels, and what the container says about itself
 [private]
-_verify-metadata version:
+_verify-metadata version repo:
     #!/usr/bin/env bash
     set -uo pipefail
 
     echo "== metadata =="
-    ref="{{ hub_repo }}:{{ version }}"
+    ref="{{ repo }}:{{ version }}"
     docker pull -q "$ref" >/dev/null 2>&1 || {
         echo "  could not pull $ref" >&2
         exit 1

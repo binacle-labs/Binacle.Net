@@ -108,9 +108,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/dockerhub-overview.md
-  description: "The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted"
-  state: ready
-  waits-on: "nothing"
+  description: "The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run"
+  state: done
+  waits-on: "nothing. Delete this file once the v3.0.0 release has published the page"
   paths: [".github/workflows/**"]
 - file: ci-cd/dockerhub-tag-immutability.md
   description: "Turn on Docker Hub tag immutability, for release tags only"

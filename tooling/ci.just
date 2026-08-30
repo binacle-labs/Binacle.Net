@@ -59,6 +59,14 @@ check-release-tag tag commit:
 changelog-section version:
     @tooling/ci/changelog-section.sh {{ quote(version) }}
 
+# Which public tags move, given the one that never does - prints moving=<space separated>
+moving-tags immutable tags:
+    @tooling/ci/moving-tags.sh {{ quote(immutable) }} {{ quote(tags) }}
+
+# Copy one image to one or more tags by digest, then prove every tag reads back as it
+copy-tags source tags:
+    @tooling/ci/copy-tags.sh {{ quote(source) }} {{ quote(tags) }}
+
 # Create the release for a tag, making the tag on the commit, or replace the body of one that exists
 github-release tag section commit:
     @tooling/ci/github-release.sh {{ quote(tag) }} {{ quote(section) }} {{ quote(commit) }}
