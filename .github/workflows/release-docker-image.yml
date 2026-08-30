@@ -275,7 +275,15 @@ jobs:
         env:
           VERSION: ${{ needs.build.outputs.version }}
           REPO: ${{ vars.DOCKERHUB_ORGNAME }}/${{ vars.DOCKERHUB_REPO }}
-        run: just image verify "$VERSION" signature refs/heads/main "$REPO"
+        # Retried because Docker Hub's referrers index is eventually consistent and this reads it seconds
+        # after the sign. The recipe stays one shot: a reader running it wants an answer, not a wait.
+        run: |
+          for attempt in 1 2 3 4 5; do
+            just image verify "$VERSION" signature refs/heads/main "$REPO" && exit 0
+            echo "Not readable yet, attempt ${attempt}. Waiting 15s."
+            sleep 15
+          done
+          exit 1
 
       # Only now. Everything above has to be green for `3.0` and `latest` to point anywhere new.
       - name: Move the tags that move
