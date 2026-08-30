@@ -6,7 +6,7 @@
 #   just image up bind           the image alone, SQLite, data in tooling/data, a folder you can open
 #   just image down [name]       stop it; add -v to drop the named volumes too
 #   just image verify <version>  check a published image: tags, signature, attestations, metadata
-#                                a tag-signed release needs its ref: `verify 3.0.0-beta.4 all refs/tags/v3.0.0-beta.4`
+#                                a tag-signed release needs its ref passed as the third argument
 #   just image dockerhub-overview <version>   print the Docker Hub page as it would be published
 #
 # The stacks run binacle-net:local and check for it first. `verify` reads a published image off Docker Hub

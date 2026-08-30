@@ -1,7 +1,7 @@
 ---
 description: The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes
 state: blocked
-waits-on: "a real run of the release workflow. Everything else this plan asked for is built"
+waits-on: "a scratch-repo run for the moving tags. The prerelease run happened on 2026-08-30 and found a bug"
 paths:
   - ".github/workflows/release-docker-image.yml"
 ---
@@ -14,20 +14,22 @@ run.
 
 ## Done when
 
-- [ ] A prerelease dispatch produces what a beta tag produced before - immutable tag only, no `latest`, no
-      Docker Hub page. **By eye**, on the run: `publish` green, one tag in the copy step's output, `page`
-      skipped.
+- [x] **`3.0.0-beta.6`, run `33339765633`, 2026-08-30.** One tag in the copy step, `moving=` empty, `page`
+      skipped. `publish` went red **after** the copy, on the verify - see the last box.
 - [ ] `latest=auto` and the `{{major}}.{{minor}}` tag still fire, now that both metadata steps take their
       version from an explicit `value=` rather than from a tag ref. **By eye**, against a scratch
       `DOCKERHUB_REPO`, on a version with no hyphen. Three tags in the copy step, all resolving to one digest.
-- [ ] `cosign verify` passes against the published image with the command as written in `SECURITY.md`.
-      `just image verify <version>`. The certificate identity now ends `@refs/heads/main` rather than
-      `@refs/tags/v3.0.0`, and every published command anchors at the `@` and constrains nothing after it - a
-      green verify here is what proves that reading.
-- [ ] The two-stage copy behaves. **By eye**, on the run: the copy step lists the version tag on its own,
-      `Verify the published signature` is green after the sign, and `Move the tags that move` runs after that
-      with `3.0` and `latest` in it. On a prerelease the last step skips itself, because there is nothing to
-      move. **Added 2026-08-31 with the change it checks.**
+- [x] **The identity reading is proven - 2026-08-30.** The command as written in `SECURITY.md` passes against
+      the published `3.0.0-beta.6`, so `@refs/heads/main` is what a dispatch signs under.
+- [ ] **The step passes inside the run.** It did not. Docker Hub's referrers index is eventually consistent
+      and the verify read it three seconds after the sign: `no signatures found`, on an image that verifies
+      from a laptop under the same cosign build. **A five-attempt retry is now in the workflow step** and the
+      recipe is untouched, because it is what `SECURITY.md` hands readers. **Re-dispatch beta.6 to see it
+      green.**
+- [ ] The two-stage copy behaves. **The prerelease half is done** - the copy listed the version tag on its
+      own and `Move the tags that move` skipped itself with nothing to move. **What is untested is the half
+      that matters**: `3.0` and `latest` written after a green verify, which only a non-prerelease run does.
+      **Added 2026-08-31 with the change it checks.**
 
 ## The two traps in the second one
 

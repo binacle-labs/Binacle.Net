@@ -13,14 +13,15 @@ and carries an SPDX software bill of materials and SLSA build provenance. Signin
 the GitHub Actions release workflow, so there is no private key anywhere - the signature is tied to the workflow
 that built the image.
 
-Two commands cover it. Replace `<version>` with the release you pulled.
+Two commands cover it. They name `3.0`, the minor tag for this line; any tag or digest pointing at a signed
+image works the same way.
 
 ```bash
-cosign verify binacle/binacle-net:<version> \
+cosign verify binacle/binacle-net:3.0 \
   --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
-docker buildx imagetools inspect binacle/binacle-net:<version>
+docker buildx imagetools inspect binacle/binacle-net:3.0
 ```
 
 > **Releases before `3.0.0` cannot be verified.** `2.1.1` and everything earlier were
@@ -64,23 +65,17 @@ workflow, the run, and the source commit it came from.
 
 ## 🔍 What a checked release looks like
 
-This is the record for one release, `3.0.0-beta.5`, so you know the shape of a real answer before you run it
-yourself.
+So you know the shape of a real answer before you run it yourself:
 
-Its index resolves to this digest on Docker Hub:
+`cosign verify` prints the checks it performed - the claims were validated, and the entry was found in the
+transparency log - then the certificate it matched. Read that certificate: it names the release workflow and
+the branch it ran on, which is what the identity pattern above pins down.
 
-```text
-sha256:17b721c77d451f9263f7de671b5a93817be66ec5ef3eb5289ab8054e30df6813
-```
+`docker buildx imagetools inspect` prints the digest the tag resolves to, then the manifests described above.
+The image config in the same output shows the container runs as `app (1654)` rather than root, with
+`/app/data` owned `app:app 755` - the writable folder for a mounted database or key ring.
 
-Its bill of materials lists **167 packages**, and its provenance names the build that produced it:
-
-```text
-https://github.com/binacle-labs/Binacle.Net/actions/runs/33127006852/attempts/1
-```
-
-The image config in the same output shows the container runs as `app (1654)` rather than root, with `/app/data`
-owned `app:app 755` - the writable folder for a mounted database or key ring.
+If the attestation manifests are missing, you are not looking at a release image.
 
 ## 🚦 What a pass means, and what it does not
 
@@ -91,6 +86,6 @@ It is not a claim about **safety**. A signature says nothing about the vulnerabi
 genuine image with a known CVE in it verifies perfectly. For that question, read the bill of materials and scan
 it.
 
-> Contributors with a clone can run `just image verify <version>`, which runs four checks against a published
+> Contributors with a clone can run `just image verify 3.0.0`, which runs four checks against a published
 > image in one go.
 {: .block-tip}

@@ -4,11 +4,12 @@ description: Release - Binacle.Net v3.0.0. A test release first, then the real o
 
 # Release - Binacle.Net v3.0.0
 
-**Status:** Betas 1 to 5 published. **Gate A is closed and `v3.0.0-beta.5` was cut on 2026-08-28.** Gate B
-is where the work is: B1 and B3 are done, B2 needs a browser, B4 and B5 are yours.
+**Status:** Betas 1 to 6 published. **Gate A is closed.** Gate B is where the work is: B1 and B3 are done,
+B2 needs a browser, B4 and B5 are yours.
 
-**The tree has moved past beta.5, and that is the open question on this file.** See *After beta.5* below
-before deciding whether the next tag is `3.0.0` or `3.0.0-beta.6`.
+**`3.0.0-beta.6` was cut on 2026-08-30 and its run went red on a check that was doing its job.** The image is
+published and verifies; the git tag and the GitHub release are missing. *After beta.5* below has what
+happened and what is left of it.
 
 **Why there was a beta.5, kept because the same argument now applies again.** `v3.0.0-beta.4` was tagged on
 2026-08-20 and **247 files changed after it**, 176 of them under `api/`, +2378 / -13149. The UI module was
@@ -56,9 +57,14 @@ Docker Hub page job is skipped for it. The release notes are lifted out of `CHAN
 **Three deploy workflows exist and this release dispatches none of them.** The docs deploy is caused by the
 tag and belongs to `post-release-v3.0.0.md`. The demo and www deploys are not release work at all.
 
-**Which published tags are safe to name in an example.** **Betas 1 to 4 are all deleted from Docker Hub -
-3 and 4 went on 2026-08-31.** Only `3.0.0-beta.5` resolves today, and `3.0.0` once it exists. **Nothing else.**
-This moved twice in a week, so check the registry before writing a version into anything.
+**Which published tags are safe to name in an example. Read the registry, not this file.** **Every beta from
+1 to 6 resolves on Docker Hub - checked 2026-08-31.** This file said betas 1 to 4 were deleted; they are not,
+the deletion was planned and never done, and the claim had reached three other files before anyone read the
+registry. `latest` is still `2.1.1`. `3.0` does not exist.
+
+**Resolving and verifying are not the same thing.** Betas 1 to 4 were signed under a tag ref, so the published
+`cosign verify` command, anchored at `@refs/heads/main$`, **fails on them**. Only `3.0.0-beta.5` and
+`3.0.0-beta.6` pass it, which is why `README.md:20` now names beta.6 - see the gotchas.
 
 ---
 
@@ -240,29 +246,35 @@ B1 proves it did not. `run-name` now puts the version in the Actions list, since
 
 ---
 
-## After beta.5 - read this before picking the next tag
+## After beta.5 - beta.6, and the run that went red
 
-**Eight commits landed after `v3.0.0-beta.5`, and three of them change the image.** Same test that created
-beta.5 in the first place, applied again.
+**Eleven commits landed after `v3.0.0-beta.5`, six of them untested by any dispatch**, which is what beta.6
+was cut for. The image changes were FluxResults vendored in-tree, the licence text and `NOTICE` shipping
+inside the image, and the four-licence `licenses` label. The workflow changes were the anchored certificate
+identity, `3.0` and `latest` waiting until the signature is checked, and the signed provenance from
+`actions/attest-build-provenance`.
 
-| | In `3.0.0-beta.5` | In the tree now |
-|---|---|---|
-| FluxResults | `/app/FluxResults.dll`, the NuGet package | vendored, `Binacle.FluxResults` |
-| GPL sections 4 and 5 | no licence text in the image | `/app/NOTICE`, `/app/LICENSE.GPL-3.0` |
-| `licenses` label | `GPL-3.0-only AND CC-BY-SA-4.0` | `... AND CC-BY-4.0 AND Apache-2.0 AND MIT` |
+**`3.0.0-beta.6` was dispatched on 2026-08-30 from `1f6fbbe2` and the `publish` job went red.** Run
+`33339765633`. It failed on `Verify the published signature`, the step added with the two-stage copy and
+running for the first time.
 
-**`CHANGELOG.md` already describes the new state**, so a `3.0.0` cut from the tree today would ship a correct
-image with correct notes. What it would not have is a rehearsal.
+**It was a race, not a signature problem.** cosign attaches the signature as an OCI referrer and Docker Hub's
+referrers index is eventually consistent. The bundle was written at 22:46:03Z; the verify read it at
+22:46:06.8 and got `no signatures found`. The same command passes now, under cosign `v3.0.6` - the exact CI
+build - as well as `v3.1.3`. So not the format, the flags, the identity or the version.
 
-**Three more changes landed on 2026-08-31 and none has been through the pipeline either**: the anchored
-certificate identity, `3.0` and `latest` no longer moving before the signature exists, and the signed
-provenance from `actions/attest-build-provenance`. All three were checked as far as a laptop can check them -
-`actionlint`, `shellcheck`, the tag-split logic against three cases, and `just build image` proving the tree
-builds and runs. **None has been through a real dispatch.**
+**What is published, and it is complete.** `just image verify 3.0.0-beta.6 all` passes: signature under the
+anchored identity, SPDX SBOM with 166 packages, provenance pointing at the run, revision `1f6fbbe2`, base
+`aspnet:10.0`, runs as `app (1654)`. `Move the tags that move` printed `moving=` and would have skipped
+anyway, and the `page` job skipped on its prerelease guard. **Nothing is half-published.**
 
-**So the choice is a beta.6 or not**, and it is the maintainer's. The argument for: six untested changes is
-more than beta.5 was cut for, two of them are in the release workflow itself, and a test release costs six
-minutes. The argument against: every one is small and source-level, and the image was built and run locally.
+**Missing: the `v3.0.0-beta.6` git tag and the GitHub prerelease**, because the `release` job never ran.
+
+**The fix is a retry in the workflow step, not in the recipe.** Five attempts, 15 seconds apart. The recipe
+stays one shot because it is the command `SECURITY.md` hands readers, and a reader wants an answer rather
+than a wait. **Re-dispatch beta.6 to get the green run and the tag** - the tag is free, the commit is
+unchanged, and it is what proves the retry before the real tag hits the same race with `3.0.0` already on
+Docker Hub.
 
 ---
 
@@ -274,7 +286,7 @@ list.
 | # | Item | Where the work is | State |
 |---|---|---|---|
 | B1 | Check the test image is signed and complete | here | done - 2026-08-31 |
-| B2 | Open the test image in a browser and use it like a visitor | here | open - **the browser half only**, see below |
+| B2 | Open the test image in a browser and use it like a visitor | here | open - **the browser half only**, against beta.6, see below |
 | B3 | Run the first command on the Docker Hub page and paste in the real answer | `plans/ci-cd/dockerhub-overview.md` - section 1 | done - 2026-08-31, **no edit was needed** |
 | B4 | Rename the changelog heading to `3.0.0` | here | open - **the last edit before the release** |
 | B5 | Cut the real release - dispatch the release workflow with version `3.0.0` | here | open |
@@ -293,8 +305,9 @@ list.
 
 ### B2. Open the test image in a browser and use it like a visitor
 
-- [ ] **`docker run` `binacle/binacle-net:3.0.0-beta.5` with `UI_MODULE=True`** and open `/`, `/packing`,
+- [ ] **`docker run` `binacle/binacle-net:3.0.0-beta.6` with `UI_MODULE=True`** and open `/`, `/packing`,
       `/vipaq` and `/instance`. **A1 read a local build; this reads what the pipeline actually bakes.**
+      **It does not wait for the re-dispatch** - beta.6 is published and pullable now.
 
 **What was checked on 2026-08-31 without a browser, so the browser pass is shorter.** The published image was
 run and all four pages answered 200, as did `/swagger/`, `/scalar/` and `/error/404`. Every stylesheet and
@@ -315,8 +328,9 @@ public**.
 - [x] **Ran against `3.0.0-beta.5` on 2026-08-31, and the response on the page was already right.** Every
       field matches byte for byte: `NotAllItemsFit` / `locker-S` / `60.0` / `72.97`, then `AllItemsFit` /
       `locker-M` / `30.83` / `100`. **No edit was needed.** This row said the response came from a deleted tag;
-      whatever its source, it is correct. **`plans/ci-cd/dockerhub-overview.md` can be deleted** - section 2
-      was done on 2026-08-27 and section 1 is this.
+      whatever its source, it is correct. **Both sections of `plans/ci-cd/dockerhub-overview.md` are done** -
+      section 2 on 2026-08-27, section 1 here. **It is deleted once the real release has published the page**,
+      not now: nothing else records what that job is supposed to produce.
 - [ ] **Read the rendered page locally:** `just image dockerhub-overview 3.0.0`. That is exactly what the
       release publishes. The recipe refuses a version with a suffix, so it takes `3.0.0` even though the
       response was captured off beta.5.
@@ -346,16 +360,27 @@ placeholders, it does not check the tag exists. **The stale 2.x page is the less
 
 Not duplicated from any plan. **They are here because they are properties of the release, not of the work.**
 
-**The sample pins move to `3.0`, not to `3.0.0-beta.5`.** Six files sit on `3.0.0-beta.4` and stay there
-through both tags. **The rule is that a pin on `main` must name an image that exists on Docker Hub**, and
-beta.4 still resolves - so leaving them is correct and cheaper than moving them twice. The bump is
-post-release work and the tree at `v3.0.0` carries a beta pin for the length of one run. **They moved early
-once before, on 2026-08-07, and sat on `main` naming an image nobody could pull.**
+**The sample pins move to `3.0` at the tag, and they sit on `3.0.0-beta.6` until then - moved 2026-08-31.**
+Six files, plus the two sample READMEs. **Two rules hold them there**: a pin on `main` must name an image that
+exists on Docker Hub, and **no public surface may name a beta that fails the published verify command**. beta.4
+satisfied the first and not the second. The bump to `3.0` is post-release work, and the tree at `v3.0.0`
+carries a beta pin for the length of one run. **They moved early once before, on 2026-08-07, and sat on `main`
+naming an image nobody could pull** - that is what the first rule exists for.
+
+**`README.md:20` named an image the published verify command rejects, and it now names `3.0.0-beta.6` -
+moved 2026-08-31.** It pointed at `3.0.0-beta.4`, which resolves but was signed under a tag ref, so
+`cosign verify` anchored at `@refs/heads/main$` failed on it, two lines under a sentence telling the reader to
+run that command. beta.6 passes it, checked rather than assumed. **The line is still deleted at the tag** -
+`post-release-v3.0.0.md` carries that.
+
+**The six sample pins and the two sample READMEs moved with it**, same day, same reason. `tooling/image.just:9`
+named `3.0.0-beta.4` as the example of a **tag-signed** release needing its ref; **the example was cut and the
+sentence kept**, because every tag-signed image is a beta and the betas are deleted once `3.0.0` is live.
 
 **`README.md` named `binacle/binacle-net:3.0` alone, and that was reverted on 2026-08-27.** The name was moved
 on 2026-08-17 when the beta names came off the public surfaces, so the most read file in the repo pointed at
-an image nobody can pull, and beta.5 does not change that - a test release creates no `3.0` name. The pin
-warning now carries a second line naming `3.0.0-beta.4` until the real tag, and `post-release-v3.0.0.md`
+an image nobody can pull, and no test release changes that - a test release creates no `3.0` name. The pin
+warning now carries a second line naming `3.0.0-beta.6` until the real tag, and `post-release-v3.0.0.md`
 carries its removal. `tooling/README.md` and `tooling/smoke.just` still take the opposite trade deliberately.
 
 **Any label the release workflow also emits is a label the `Dockerfile` does not own.** `metadata-action`
@@ -394,8 +419,9 @@ breaking changes stay four.
 **This section is also what the docs site copies**, by hand. **The two were diffed bullet for bullet on
 2026-08-28** - three drifts were fixed on the page and one of them, the release pipeline
 sentence, was wrong here too and was fixed here. **The FluxResults bullet, added here on 2026-08-29, went on
-the page the same day** - `plans/sites/docs-v3-deploy.md` section 2 records it and the override it needed. **The page still lacks the release date and the release
-link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that and records what was changed.
+the page the same day** - `plans/sites/docs-v3-deploy.md` section 2 records it and the override it needed.
+**The error page's status line did the same on 2026-08-31.** **The page still lacks the release date and the
+release link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that and records what was changed.
 
 ---
 
@@ -409,9 +435,10 @@ link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that and rec
 5. **Cut the test release, `v3.0.0-beta.5`.** **Done 2026-08-28.**
 6. **B1** - check the test image. **Done 2026-08-31.**
 7. **B3** - the Docker Hub first command. **Done 2026-08-31, and the page needed no edit.**
-8. **Decide beta.6 or not** - *After beta.5* above has the two arguments and the six untested changes.
-9. **B2** - open whichever image that decision produces and use the packing page like a visitor. **The one
-   thing left that needs a human.**
+8. **Re-dispatch `3.0.0-beta.6`** for the green run and the missing tag. *After beta.5* above says why the
+   first run went red and what the retry fixes.
+9. **B2** - open the beta.6 image and use the packing page like a visitor. **The one thing left that needs a
+   human**, and it does not wait for step 8.
 10. **B4** - rename the changelog heading to `3.0.0`. The last edit.
 11. **Cut the real release, `v3.0.0`.** Everything after this is automatic, the Docker Hub page included.
 12. **Open `post-release-v3.0.0.md`.**

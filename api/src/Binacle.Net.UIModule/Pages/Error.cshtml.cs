@@ -20,10 +20,16 @@ internal class ErrorModel : PageModel
 
 	public void OnGet(string? errorCode)
 	{
-		if (int.TryParse(errorCode, out var statusCode))
+		// 400 to 599 is what the re-execute can send here, and the only range worth answering with. Anything
+		// else is someone typing in the address bar, and a made-up status code is not a reply.
+		if (int.TryParse(errorCode, out var statusCode) && statusCode is >= 400 and <= 599)
 		{
 			this.Title = $"Error {statusCode}";
 			this.Message = MessageFor(statusCode);
+
+			// A direct hit used to answer 200, so a monitor pointed at this address was told all was well.
+			// On the re-execute path the status is already this, and setting it again changes nothing.
+			this.Response.StatusCode = statusCode;
 		}
 
 		// Only in development: the trace id is a detail of this instance, not something a visitor needs.

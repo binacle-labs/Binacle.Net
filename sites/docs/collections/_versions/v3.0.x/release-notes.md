@@ -204,7 +204,8 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **A decoded bin with a zero side reads `0%` rather than `NaN%`** in the ViPaq Decoder. The bin comes out of a
   string a visitor pastes in, so a zero side is reachable.
 - **The error page names the problem** - a separate line for 404, 403 and 500 instead of one sentence for all of
-  them - and links back to the home page.
+  them - and links back to the home page. **It also answers with the status it names.** Opening it directly used
+  to answer `200`, so a monitor pointed at that address was told the instance was fine.
 - **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode
   whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept
   in the same `theme` cookie, so anyone who already picked one keeps it.

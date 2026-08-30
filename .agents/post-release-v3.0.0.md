@@ -97,14 +97,11 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
       nothing fails when it is. **The rest of the live-site reads are in the docs plan** - they are not
       repeated here.
 
-- [ ] **Check nothing public still names a test release.** Test releases 1 and 2 are deleted from Docker Hub,
-      so anything left pointing at one is a dead link rather than an old number.
-      `grep -rn "3\.0\.0-beta" --exclude-dir=.agents` over the repo, and read the docs site's
-      verifying-a-release page.
-
-      **One expected hit, and nobody can see it.** `sites/www/_data/exchange.yml` carries a YAML
-      comment Jekyll never renders, saying the `3.0` tag is unpublished. **That comment is stale from the tag
-      onward - delete it rather than re-reading it every release.**
+- [ ] **Check nothing public still names a test release.** **Expect no hits at all.** `grep -rn "3\.0\.0-beta"
+      --exclude-dir=.agents` over the repo. The docs site carries none since 2026-08-31, the `sites/www`
+      comment that named two was deleted the same day, and job 1 takes the README line and the seven sample
+      pins. `tooling/image.just:9` used to name one and no longer does - the example was cut on
+      2026-08-31 and the sentence kept, because only a beta could have illustrated it.
 
 ---
 
@@ -114,11 +111,10 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 
 **Do this the moment the publish job goes green.** Until then `binacle/binacle-net:3.0` does not exist, and
 **an example on `main` must name an image someone can actually pull.** The tree at tag `v3.0.0` names a test
-image for the length of one run; that is the accepted cost of the rule. **The test release did not change
-this** - a test release creates no `3.0` name, so the examples correctly stayed on `3.0.0-beta.4` through
-both tags.
+image for the length of one run; that is the accepted cost of the rule. **They sit on `3.0.0-beta.6`, moved
+there on 2026-08-31** so that no public surface names a beta the published verify command rejects.
 
-- [ ] **Six `image:` lines move from `3.0.0-beta.4` to `3.0`.**
+- [ ] **Six `image:` lines move from `3.0.0-beta.6` to `3.0`.**
       `samples/docker/{minimal,quickstart,prod,service,full}/docker-compose.yml` and
       `samples/kubernetes/minimal/binacle-deployment.yaml`.
       `grep -rn '3\.0\.0-beta' samples/` returns nothing.
@@ -128,9 +124,9 @@ both tags.
       copied sample must not jump to a new major on the next pull."* **That reason expires the moment v3.0.0
       publishes; the second one does not.**
 - [ ] **Rewrite the same reason in prose in `samples/README.md` and `samples/docker/README.md`.** Both name
-      `3.0.0-beta.4` and explain why; both become `3.0` with the explanation cut.
+      `3.0.0-beta.6` and explain why; both become `3.0` with the explanation cut.
 - [ ] **Delete the test-build line from `README.md`.** The pin warning carries a second line - *"Until
-      `3.0.0` is published, the only name that resolves is `binacle/binacle-net:3.0.0-beta.4`."* The `3.0`
+      `3.0.0` is published, the only name that resolves is `binacle/binacle-net:3.0.0-beta.6`."* The `3.0`
       sentence above it is true on its own from this release onward, so the line becomes wrong the moment the
       publish job goes green. `grep -n '3\.0\.0-beta' README.md` returns nothing.
 
@@ -147,7 +143,8 @@ v3 lands. **Do not re-run it.**
 
 **Both page edits have to be after the tag** - the notes need the date and the `releases/tag/v3.0.0` link, and
 the worked example in `verifying-a-release.md` quotes real output from the released image. It currently
-verifies `3.0.0-beta.2`, which is deleted from Docker Hub; re-cut it from `just image verify 3.0.0`.
+verifies `3.0.0-beta.2`, which resolves but fails the anchored identity; re-cut it from
+`just image verify 3.0.0`.
 
 **This is the single most losable item in the release.** Nothing fails if the pages are left as they are - the
 verify page just keeps asking readers to run a command against a tag that no longer exists.
@@ -165,11 +162,16 @@ out, and how to try it on a throwaway repository first.
       permanent. **If the answer is no, write that down as a decision and drop the plan.** Leaving it a
       permanently open question is the one outcome with no value.
 
-### 4. Decide what happens to the old test images
+### 4. Delete the old test images
 
-**A decision, not a task, and it has no plan.** `3.0.0-beta.3`, `-beta.4` and `-beta.5` can still be pulled
-from Docker Hub; 1 and 2 were deleted. **Either delete the rest now that a real image exists, or write down
-that test builds are kept.** Whichever it is, the tag-policy table in `plans/ci-cd/dockerhub-overview.md` is
+**Answered 2026-08-31: they go.** All six betas can be pulled today - the deletion several files already
+described had not happened. **Once `3.0.0` is live, delete every `3.0.0-beta.*` tag from Docker Hub.** Two
+reasons: betas 1 to 4 fail the published verify command, and a test build kept forever is a second answer to
+"which image do I pull".
+
+**This is what makes job 1 above mandatory rather than tidy-up.** After the deletions a beta pin names nothing
+at all, so the README line and the seven sample pins have to be off `3.0.0-beta.6` before the betas go.
+**Order: publish `3.0.0`, move the pins, then delete.** Whichever it is, the tag-policy table in `plans/ci-cd/dockerhub-overview.md` is
 where the answer belongs. **Putting this row here was my call - strike it if the answer is obviously "leave
 them".**
 
@@ -210,5 +212,4 @@ settles the three plans under `plans/api/`, the two ServiceModule one-liners in 
 Storage removal question at once.
 
 **Held back from v3.0.0 and waiting in `plans/`:** the heavy architecture tools (ArchUnitNET,
-dependency-cruiser, lychee), CI gates 2 and 3, the last of the UI test harness the coverage gate hangs on, and
-rubocop, which has never been run.
+dependency-cruiser, lychee), CI gates 2 and 3, and rubocop, which has never been run.

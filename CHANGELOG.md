@@ -97,7 +97,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.  
 - **Validation errors from the API are listed again.** The dialog built its message list wrong and always came up empty, so a rejected request opened a dialog with nothing in it.  
 - **A decoded bin with a zero side reads `0%` rather than `NaN%`** in the ViPaq Decoder. The bin comes out of a string a visitor pastes in, so a zero side is reachable.  
-- **The error page names the problem** — a separate line for 404, 403 and 500 instead of one sentence for all of them — and links back to the home page.  
+- **The error page names the problem** — a separate line for 404, 403 and 500 instead of one sentence for all of them — and links back to the home page. **It also answers with the status it names.** Opening it directly used to answer `200`, so a monitor pointed at that address was told the instance was fine.  
 - **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept in the same `theme` cookie, so anyone who already picked one keeps it.  
 - **The theme now sticks on an instance served over plain http.** The `theme` cookie was always written `Secure`, which a browser drops off https, so the demo reset to the default on every page load. It is marked `Secure` only where the page is served over https.  
 - **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup — see Core Changes for the variable that went.  

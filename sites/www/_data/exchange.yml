@@ -204,10 +204,6 @@ locker:
 
 # The primary conversion on three of the four pages. The tag is a variable so it is changed in one place when
 # the line moves; it must name a tag that is actually published.
-# CHECKED 23 Aug 2026: the tag below IS NOT PUBLISHED YET. Docker Hub's newest tags are 3.0.0-beta.4 and
-# 3.0.0-beta.3, and `latest` still resolves to 2.1.1 from January. The release workflow publishes `3.0` when
-# 3.0.0 ships, and go-live sits behind that - but the site must not go live before it, because this command
-# is the primary conversion and it fails with "manifest unknown" today.
 command:
   tag: "3.0"
   # ONE LINE, no backslash continuations. They were tried and they wrap into nonsense on a phone: pre-wrap

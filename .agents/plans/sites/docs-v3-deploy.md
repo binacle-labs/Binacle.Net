@@ -1,7 +1,7 @@
 ---
-description: What the v3.0.x docs pages still need - a worked example quoting a deleted tag, the release date and link - plus the live-site checks nothing else watches
+description: What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches
 state: blocked
-waits-on: "the v3.0.0 tag - the worked example quotes real output from the released image, and the release notes need its date and its release link"
+waits-on: "the v3.0.0 tag - the release notes need its date and its release link"
 paths:
   - "sites/docs/**"
 ---
@@ -17,31 +17,39 @@ paths:
 carry-over are all done and verified against the tree on 2026-08-27, and the release-notes page was diffed
 bullet for bullet against `CHANGELOG.md` again on 2026-08-28, and the FluxResults bullet it gained on
 2026-08-29 is on the page too. **The licensing edits of 2026-08-30 landed the same way** - two more bullets,
-the footer, the three site manifests and a samples section on all four versions. Two page edits remain that
-need the tag to exist, and **section 7 is a third that does not - it should go on the next docs session
-whether or not the tag is cut.**
+the footer, the three site manifests and a samples section on all four versions. **One page edit remains that
+needs the tag to exist** - section 2, the release date and link. Section 1 closed on 2026-08-31. **Section 7
+is a third that does not need the tag - it should go on the next docs session whether or not it is cut.**
 
 ---
 
-## 1. `v3.0.x/verifying-a-release.md` quoted a tag that is gone - half done 2026-08-31
+## 1. `v3.0.x/verifying-a-release.md` quoted a beta - done 2026-08-31
 
 **It was broken, not merely stale.** It read *"Against `3.0.0-beta.2`"* - a tag deleted from Docker Hub, and
 signed under the old owner anyway. Anchoring the command in section 7 would have made it wrong twice over, so
 the same session rewrote it under the same override.
 
-**What it says now.** The heading is *What a checked release looks like*, and the body is a **record of
-`3.0.0-beta.5`** rather than something to run: index digest `sha256:17b721c7...`, 167 packages, run
-`33127006852`. Every figure was read off the registry on 2026-08-31, not copied.
+**It was rewritten as a record of `3.0.0-beta.5` on 2026-08-31 and that lasted a day.** The record carried
+real figures - digest, 167 packages, the run URL. **It was replaced the same day, because the betas are
+deleted once `3.0.0` is live**, and a record of a deleted image is the exact fault the first rewrite existed
+to fix.
 
-**Why a record and not an example.** Betas 1 to 4 have all been deleted from Docker Hub, two of them on
-2026-08-31. A sample tag on this page goes stale on its own; a record of what was signed stays true even after
-the tag is gone. That is this file's own rule, applied to the page that broke it.
+**What it says now.** Both commands name `3.0`, and *What a checked release looks like* describes what each
+one prints - the checks, the certificate, the index, the SBOM, the provenance run, the `app (1654)` user -
+**with no digest, no package count and no run URL.** Nothing on the page can go stale, so nothing needs
+re-cutting after the tag. **This section is closed.**
 
-**Still open: re-point it at `3.0.0` once the tag exists.** Run `just image verify 3.0.0` and replace the three
-figures with what it prints. **It quotes real output, so it cannot be written before the tag exists.**
+**The rule, settled 2026-08-31: no page under `sites/docs` names a beta, or quotes a figure that expires.** A
+versioned page names its own version explicitly - the `v3.0.x` pages name `3.0`. Betas are deleted from Docker
+Hub once `3.0.0` is live, so a prerelease on a docs page becomes a dead reference on that day.
+
+**The rest of the repository names `3.0.0-beta.6` until the tag** - the README and the seven sample pins moved
+there on 2026-08-31, because a public surface must not name a beta the published verify command rejects.
+**They move to `3.0` on the day of the tag and that is now mandatory rather than tidy-up**: after the
+deletions a beta pin names nothing at all. `post-release-v3.0.0.md` carries it as its first job.
 
 **The rule this came from, worth keeping: name a version where the version is the fact, never as a floor or an
-example.** A floor or a sample tag goes stale on its own; a record of what was signed does not.
+example.** A floor or a sample tag goes stale on its own; the `3.0` minor tag does not.
 
 ## 2. `v3.0.x/release-notes.md` still says the release has not happened
 
@@ -202,10 +210,10 @@ It belongs on `verifying-a-release.md`, which is the page that teaches the comma
 > it there. Without the anchor the check accepts a signature made from any branch in this repository, and
 > pushing a branch is not a release.
 
-**Do not carry across a prerelease note.** `SECURITY.md` briefly had one and it was removed the same day:
-`3.0.0-beta.3` and `3.0.0-beta.4` were deleted from Docker Hub on 2026-08-31, so `3.0.0-beta.5` is the only
-prerelease left and it verifies with the command above. **Section 1's worked example must not name a deleted
-tag either** - that is the same trap it already exists to fix.
+**Do not carry across a prerelease note.** `SECURITY.md` briefly had one and it was removed the same day.
+The reason given was that betas 3 and 4 were deleted; **they were not, and the note still should not come
+back** - `3.0.0-beta.5` and `3.0.0-beta.6` verify with the command above, and a page that documents a
+workaround for two prereleases nobody is asked to pull is carrying weight for nothing.
 
 **Checked, not assumed.** The new command passes on `3.0.0-beta.5` and fails on `3.0.0-beta.4` and
 `3.0.0-beta.3`; the documented prerelease swap passes on `3.0.0-beta.4`.
@@ -221,6 +229,10 @@ tag either** - that is the same trap it already exists to fix.
 - [x] **The release notes page carries the FluxResults bullet - 2026-08-29.**
       `grep -c 'FluxResults' sites/docs/collections/_versions/v3.0.x/release-notes.md` returns 1, and the line
       sits above *"Everything below is work on the repository"*.
+- [x] **The error page status line went on the page the same day it went in the changelog - 2026-08-31.**
+      `grep -c 'answers with the status it names'` returns 1 on both `CHANGELOG.md` and the release notes page.
+      The error page used to answer `200` on a direct hit at `2.1.1` too, so the fix describes a behaviour that
+      shipped and earns a line under A5's rule.
 - [ ] The release notes page names the release date and links the GitHub release.
       `grep -n 'Not released yet' sites/docs/collections/_versions/v3.0.x/release-notes.md` returns nothing,
       and the line below `## v3.0.0` names a date and a `releases/tag/v3.0.0` link.

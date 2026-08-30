@@ -34,11 +34,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody waiting - future"
 - file: todos.md
-  description: "One-liners with a known answer - eight of them, across the image, the sites and the shared UI package"
+  description: "One-liners with a known answer - six of them, across the image, the sites and the shared UI package"
   state: ready
   waits-on: "nothing"
 - file: unwatched-gaps.md
-  description: "Three repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200"
+  description: "Two repository gaps nothing watches - a generated copy on no drift check, and a v4 caller inside the image"
   state: proposed
   waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
   paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**"]
@@ -125,7 +125,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/release-by-dispatch.md
   description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
   state: blocked
-  waits-on: "a real run of the release workflow. Everything else this plan asked for is built"
+  waits-on: "a scratch-repo run for the moving tags. The prerelease run happened on 2026-08-30 and found a bug"
   paths: [".github/workflows/release-docker-image.yml"]
 - file: ci-cd/sonar-coverage-gap.md
   description: "Coverage is 67.8% against a gate of 80% on new code - where the 2226 uncovered lines actually are, and the 212 of them that already have tests and only need the services started"
@@ -193,9 +193,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing"
   paths: ["sites/docs/**"]
 - file: sites/docs-v3-deploy.md
-  description: "What the v3.0.x docs pages still need - a worked example quoting a deleted tag, the release date and link - plus the live-site checks nothing else watches"
+  description: "What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches"
   state: blocked
-  waits-on: "the v3.0.0 tag - the worked example quotes real output from the released image, and the release notes need its date and its release link"
+  waits-on: "the v3.0.0 tag - the release notes need its date and its release link"
   paths: ["sites/docs/**"]
 ```
 

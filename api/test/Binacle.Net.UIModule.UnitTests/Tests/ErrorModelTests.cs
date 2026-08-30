@@ -31,6 +31,20 @@ public class ErrorModelTests
 		page.Message.ShouldBe(expectedMessage);
 	}
 
+	// Someone can open this address themselves, and then nothing else has set the status.
+	[Theory]
+	[InlineData("404")]
+	[InlineData("418")]
+	[InlineData("500")]
+	public void The_Page_Answers_With_The_Status_It_Names(string errorCode)
+	{
+		var page = ErrorPageIn("Production");
+
+		page.OnGet(errorCode);
+
+		page.Response.StatusCode.ShouldBe(int.Parse(errorCode));
+	}
+
 	[Theory]
 	[InlineData("418")]
 	[InlineData("502")]
@@ -45,10 +59,13 @@ public class ErrorModelTests
 	}
 
 	// The route segment is optional and the re-execute is not the only way in - someone can open /error.
+	// A number outside 400 to 599 is in the same class: the re-execute cannot produce it, so it is typed.
 	[Theory]
 	[InlineData(null)]
 	[InlineData("")]
 	[InlineData("not-a-status")]
+	[InlineData("200")]
+	[InlineData("999999")]
 	public void A_Missing_Or_Unreadable_Status_Falls_Back_Without_Naming_One(string? errorCode)
 	{
 		var page = ErrorPageIn("Production");
@@ -57,6 +74,7 @@ public class ErrorModelTests
 
 		page.Title.ShouldBe("Error");
 		page.Message.ShouldBe("Something went wrong while handling your request.");
+		page.Response.StatusCode.ShouldBe(StatusCodes.Status200OK);
 	}
 
 	// The trace id identifies this instance's request. It is a development aid and must not reach a visitor.

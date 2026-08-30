@@ -1,5 +1,5 @@
 ---
-description: One-liners with a known answer - eight of them, across the image, the sites and the shared UI package
+description: One-liners with a known answer - six of them, across the image, the sites and the shared UI package
 state: ready
 waits-on: "nothing"
 ---
@@ -13,11 +13,6 @@ a decision or a set of sub-steps gets its own plan file instead.
 
 ## The image and the sites
 
-- **Three shipped bundles and the framework stylesheet are on no smoke assertion.** `vendors.js`,
-  `binacle-net-ui.js` and `binacle-vipaq.js` are requested by every applet page, and `lib/beercss/beer.min.css`
-  is the whole framework - `build.just:45` says skipping the asset copy "ships pages with no styling". None is
-  in `tooling/smoke/structure.yaml`, whose opening comment calls itself "a complete declaration ... it asserts
-  every shipped file". Add the four assertions.
 - **A locally built image carries a source map the release image does not.**
   `api/src/Binacle.Net.UIModule/wwwroot/css/main.css.map` is left behind by `npm run watch:css`
   (`package.json:12`, which unlike `build:css` at `:9` passes no `--no-source-map`), and nothing cleans it -

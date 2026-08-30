@@ -22,10 +22,33 @@ public class ErrorPageRoutingTests : IClassFixture<UIModuleBinacleApi>
 	[InlineData("/packing")]
 	[InlineData("/vipaq")]
 	[InlineData("/instance")]
-	[InlineData("/error/404")]
 	public async Task A_Page_Route_Answers_With_Html(string path)
 	{
 		var response = await this.client.GetAsync(path, TestContext.Current.CancellationToken);
+
+		response.StatusCode.ShouldBe(HttpStatusCode.OK);
+		response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");
+	}
+
+	// A monitor can hit this address directly, so the page has to answer with the status it is naming rather
+	// than with the 200 that reaching a page normally means.
+	[Theory]
+	[InlineData("/error/404", HttpStatusCode.NotFound)]
+	[InlineData("/error/403", HttpStatusCode.Forbidden)]
+	[InlineData("/error/500", HttpStatusCode.InternalServerError)]
+	public async Task The_Error_Page_Answers_With_The_Status_It_Names(string path, HttpStatusCode expected)
+	{
+		var response = await this.client.GetAsync(path, TestContext.Current.CancellationToken);
+
+		response.StatusCode.ShouldBe(expected);
+		response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");
+	}
+
+	// No status to name, so there is none to answer with.
+	[Fact]
+	public async Task The_Error_Page_With_No_Status_Answers_Ok()
+	{
+		var response = await this.client.GetAsync("/error", TestContext.Current.CancellationToken);
 
 		response.StatusCode.ShouldBe(HttpStatusCode.OK);
 		response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");

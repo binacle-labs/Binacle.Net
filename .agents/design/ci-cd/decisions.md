@@ -586,13 +586,15 @@ actually promise and drops the three that nobody was promised:
 |---|---|
 | `3.0.0` and later | passes - every release signs from `main`, because the release is a dispatch |
 | `3.0.0-beta.5` | passes - the first release from `main`. Checked, not assumed |
-| `3.0.0-beta.3`, `-beta.4` | would fail, and it does not matter: **both were deleted from Docker Hub on 2026-08-31**, so nothing resolves to check |
+| `3.0.0-beta.3`, `-beta.4` | **fail, and both still resolve.** The deletion recorded here on 2026-08-31 never happened - read the registry, not this row |
 | `2.1.1` and earlier | unsigned, unchanged, still `no signatures found` |
 
-**Nothing published breaks.** Every surface says signing starts at `3.0.0`, and the only prerelease still on
-Docker Hub is `3.0.0-beta.5`, which signs from `main` and passes. `SECURITY.md` briefly carried a paragraph
-explaining how to check a tag-signed prerelease; it was removed the same day, because after the deletions
-there is no such image to check.
+**One published surface broke, found and fixed 2026-08-31.** The claim here was that every prerelease left
+on Docker Hub signs from `main`. Betas 1 to 4 were never deleted, and `README.md:20` sent a reader to
+`3.0.0-beta.4`, so the command in `SECURITY.md` failed on the one image the front page named. **The README now
+names `3.0.0-beta.6`, which passes.** The betas that fail are still pullable and nothing points at them. `SECURITY.md` briefly carried a paragraph explaining how to check a tag-signed prerelease and it
+was removed the same day - that removal was right for a different reason: nobody is asked to pull those
+images.
 
 **What the anchor buys.** A prefix accepts a signature from any ref in this repository, and a run on any ref
 executes the workflow file **as it exists at that ref**. So anyone able to push a branch and start the workflow

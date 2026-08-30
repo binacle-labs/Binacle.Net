@@ -36,6 +36,21 @@ fileExistenceTests:
     path: /app/Binacle.Net.dll
     shouldExist: true
 
+  # The three bundles every applet page requests, and the framework stylesheet. Nothing fails when the asset
+  # copy is skipped - the image just ships pages with no styling and demos that do nothing.
+  - name: vendors.js
+    path: /app/wwwroot/_content/Binacle.Net.UIModule/js/vendors.js
+    shouldExist: true
+  - name: binacle-net-ui.js
+    path: /app/wwwroot/_content/Binacle.Net.UIModule/js/binacle-net-ui.js
+    shouldExist: true
+  - name: binacle-vipaq.js
+    path: /app/wwwroot/_content/Binacle.Net.UIModule/js/binacle-vipaq.js
+    shouldExist: true
+  - name: beer.min.css
+    path: /app/wwwroot/_content/Binacle.Net.UIModule/lib/beercss/beer.min.css
+    shouldExist: true
+
   # The writable data dir is created by the Dockerfile and chowned to the app user (uid 1654). A dropped chown
   # here silently turns file logging into a no-op.
   - name: data dir owned by uid 1654
