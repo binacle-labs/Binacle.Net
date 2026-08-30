@@ -1,7 +1,7 @@
 ---
 description: The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with.
-state: ready
-waits-on: "one Sonar run to confirm the two property changes now in the tree"
+state: blocked
+waits-on: "one Sonar run to confirm the two property changes now in the tree. State chosen by an agent, it read `ready` while naming a blocker - strike it if wrong"
 paths:
   - "tooling/ci/sonar-analysis.xml"
   - "ruby/**"
@@ -14,7 +14,10 @@ paths:
 it detected ten, `Sensor Ruby Sensor [ruby]` analysed 99 source files, and `ruby=2967` is in the language
 breakdown. Listing the `.rb` files in a project that actually builds is what the scanner needed.
 
-**Why the solution declares an `rbproj` type based on `C#`, and why `Shared` cannot work, is `$ci-cd/decisions` D22.**
+**Why the solution declares an `rbproj` type based on `C#`, and why `Shared` cannot work, is in the CI/CD
+decisions ledger.** In short: a `.slnx` infers nothing from `.proj` and refuses a project whose type it cannot
+work out, so the extension is declared once in `Binacle.Net.slnx`; it is based on `C#` because `Shared`
+projects are not built by the solution and `IsBuildable` does not bridge the two.
 
 ## The coverage import failed, and the run named the reason
 

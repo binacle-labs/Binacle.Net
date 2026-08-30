@@ -188,7 +188,7 @@ them.
 | `plans/todos.md` | the docs site's old-register prose, and two one-liners in the shared UI package - a submit button that can stick where no visualizer listens, and an `Error` import that only reads wrong. **The theme defaults and the demo page's copy are done - checked 2026-08-27** |
 | `plans/ci-cd/tests-reach-ci.md` | the ten Ruby tests reaching the PR gate. Held off the release gate because Ruby does not build the image |
 | `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
-| `plans/sites/docs-client-generation.md` | nothing was blocking it; it sits here because the docs deploy is the natural next docs session |
+| `plans/sites/docs-client-generation.md` | nothing the release owned. **It has a blocker of its own** - every page on the site sits under a version folder and this page is not version-specific, so where it lives is unanswered. It sits here because the docs deploy is the natural next docs session |
 | `plans/ci-cd/sonar-scope-and-coverage.md` | a yes or a no. Ten published gems have no tests measured, and the alternative is writing down that this is deliberate |
 
 **`plans/_index.md` lists every plan, with its state and what it waits on.** Nothing above is a ranking.

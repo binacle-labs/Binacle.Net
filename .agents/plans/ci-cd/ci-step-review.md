@@ -1,7 +1,7 @@
 ---
 description: A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck
-state: in-progress
-waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no"
+state: blocked
+waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"

@@ -37,10 +37,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "One-liners with a known answer - eight of them, across the image, the sites and the shared UI package"
   state: ready
   waits-on: "nothing"
-- file: ui-test-harness.md
-  description: "A test harness for the UI"
-  state: blocked
-  waits-on: "a Sonar run - state and blocker chosen by an agent, strike them if wrong"
 - file: unwatched-gaps.md
   description: "Three repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and an error page that answers 200"
   state: proposed
@@ -108,8 +104,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: [".github/workflows/**"]
 - file: ci-cd/ci-step-review.md
   description: "A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck"
-  state: in-progress
-  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no"
+  state: blocked
+  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/dockerhub-overview.md
   description: "The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted"
@@ -138,8 +134,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
 - file: ci-cd/sonar-scope-and-coverage.md
   description: "The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with."
-  state: ready
-  waits-on: "one Sonar run to confirm the two property changes now in the tree"
+  state: blocked
+  waits-on: "one Sonar run to confirm the two property changes now in the tree. State chosen by an agent, it read `ready` while naming a blocker - strike it if wrong"
   paths: ["tooling/ci/sonar-analysis.xml", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
   description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."

@@ -812,6 +812,7 @@ being re-derived in four files, which is how three of them ended up disagreeing.
 |---|---|---|
 | 2026-08-08, from Sonar | 53.3%, 31.4% on new code | the Blazor UI module and three TypeScript packages — 1571 lines, 22.5% of the denominator |
 | 2026-08-22, local cobertura | 56.6% — 9511 of 16785 lines, 20 assemblies | all four now have suites; see the table below |
+| 2026-08-27, from Sonar — run `ad2e96b8` | 71.1%, 70.6% line — 1892 uncovered of 6429. New code reads **77.0%** against the 80% gate | none. All four suites reached Sonar, which is what the UI harness was waiting to see |
 
 **The 2026-08-22 detail**, hand-written code only:
 
@@ -830,8 +831,13 @@ need both UIModule suites together; the unit one alone does not reach `ModuleDef
 **The old first row counted 959 lines of Blazor that no longer exist.** What replaced it is a tenth of the
 size and nearly covered.
 
-**These are local cobertura numbers, not Sonar's.** Sonar counts coverable lines its own way and has not run
-since. Expect the shape to hold and the digits to move.
+**The middle row is local cobertura, the outer two are Sonar's**, and Sonar counts coverable lines its own
+way — the shape held and the digits moved, which is why both are kept.
+
+**334 lines came out of the denominator through `sonar.coverage.exclusions` before that run**, and none of
+them was ever coverable: the python index generator, the three sites' bundles and webpack configs, and the
+typescript fixture-provider and generator folders. That alone moved 67.1% to 70.6% with no test written.
+**It is not the same act as excluding untested code**, which stays rejected above.
 
 **`binacle-net-ui`'s uncovered third is the Three.js half** — `core/packingVisualizer.ts` and the scene
 helpers in `utils/`. They need a WebGL context, so a test there could only assert that a call happened. They
