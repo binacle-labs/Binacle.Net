@@ -24,6 +24,8 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `check-version.sh` | Passes only if the version is semver shaped, with no leading `v` |
 | `check-release-tag.sh` | Passes only if the tag is free, or already points at this commit |
 | `changelog-section.sh` | Which `CHANGELOG.md` section a version publishes. Prints `name=...` |
+| `moving-tags.sh` | Which public tags move, given the one that never does. Prints `moving=...` |
+| `copy-tags.sh` | Copies one image to one or more tags by digest, then proves each reads back as it |
 | `github-release.sh` | Creates the release, making the tag on the commit, or replaces the body of one that exists |
 | `release-summary.sh` | The release's run summary: version, digest, public tags |
 | `pull-image.sh` | Pulls a published image. Prints `digest=sha256:...` |
@@ -41,6 +43,8 @@ just ci changed-paths HEAD~1 HEAD
 just ci gate '{"changes":{"result":"success"},"image":{"result":"skipped"}}'
 just ci deploy-summary "$(git rev-parse HEAD)" docs-42 https://docs.binacle.net
 just ci check-release-tag v3.0.0 "$(git rev-parse HEAD)"
+just ci moving-tags binacle/binacle-net:3.0.0 'binacle/binacle-net:3.0.0
+binacle/binacle-net:latest'
 ```
 
 **The four `install-*.sh` are the exception: no recipe, called by path.**

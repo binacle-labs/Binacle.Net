@@ -1,7 +1,7 @@
 ---
-description: The Docker Hub repository page - the quick start example is the last thing left, and it quotes a response from a tag that was deleted
-state: ready
-waits-on: "nothing"
+description: The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run
+state: done
+waits-on: "nothing. Delete this file once the v3.0.0 release has published the page"
 paths:
   - ".github/workflows/**"
 ---
@@ -18,14 +18,18 @@ push credential, proved 2026-08-19. No second secret, no password fallback. The 
 
 One thing left, then this file goes.
 
-## 1. The `curl` example was run against a tag that no longer exists
+## 1. The `curl` example - done 2026-08-31, and it needed no edit
 
-The quick start in `.github/dockerhub-overview.md` shows a real request and a real response. The response came
-from a run against a tag that has since been deleted from Docker Hub. **Re-run it against a tag that exists and
-paste the real response back.** A broken first command is the whole first impression.
+**The response on the page was already correct.** It was run against `3.0.0-beta.5` and every field matches
+byte for byte: `NotAllItemsFit` / `locker-S` / `60.0` / `72.97`, then `AllItemsFit` / `locker-M` / `30.83` /
+`100`.
 
-**Read the rendered page before publishing it:** `just image dockerhub-overview <version>` prints exactly what
-the pipeline writes. The recipe refuses a version with a suffix, so it takes a released version only.
+**This section said the response came from a deleted tag.** Whatever its source, the numbers are right, so the
+worry was the wrong one. **The lesson worth keeping is not "re-run it" but "check before rewriting"** - a
+rewrite here would have replaced a correct response with an identical one and looked like progress.
+
+`just image dockerhub-overview 3.0.0` was run and the page renders with every placeholder filled. The recipe
+refuses a version with a suffix, so it takes `3.0.0` even though the response came off beta.5.
 
 ## 2. The logo and the categories - done 2026-08-27
 

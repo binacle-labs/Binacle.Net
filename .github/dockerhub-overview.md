@@ -110,7 +110,7 @@ provenance.
 
 ```bash
 cosign verify binacle/binacle-net:{{MINOR}} \
-  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
 docker buildx imagetools inspect binacle/binacle-net:{{MINOR}}

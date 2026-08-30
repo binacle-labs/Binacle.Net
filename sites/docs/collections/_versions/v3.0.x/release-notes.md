@@ -114,7 +114,7 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 
   ```bash
   cosign verify binacle/binacle-net:3.0.0 \
-    --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+    --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
   ```
 

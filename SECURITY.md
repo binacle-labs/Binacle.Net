@@ -26,7 +26,7 @@ build provenance. Replace `<version>` with the release you pulled.
 
 ```bash
 cosign verify binacle/binacle-net:<version> \
-  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
 docker buildx imagetools inspect binacle/binacle-net:<version>
@@ -35,6 +35,14 @@ docker buildx imagetools inspect binacle/binacle-net:<version>
 Both flags on `cosign verify` matter. Without the identity you are only asking whether *anyone* signed the
 image, and anyone can - Sigstore is open to every GitHub account. The two flags together are what say it came
 from this repository's release workflow.
+
+The identity ends `@refs/heads/main`, the branch the release workflow is dispatched on, and the `$` anchors it
+there. Without the anchor the check accepts a signature made from any branch in this repository, and pushing a
+branch is not a release.
+
+**Use cosign 2.6.0 or later, or 3.0.1 or later.** Sigstore is moving the public transparency log its
+signatures are recorded in, and older cosign builds cannot read entries in the new one. An out-of-date binary
+fails the check the same way a tampered image would.
 
 The signature covers the image digest, so it holds for the `3.0` and `latest` tags as well as the exact
 version - verifying any of them verifies the same artifact.

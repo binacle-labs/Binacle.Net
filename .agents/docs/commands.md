@@ -229,6 +229,7 @@ The backing services for an API run from source are a different thing — that i
 ```bash
 just image verify 3.0.0                 # all four checks
 just image verify 3.0.0 signature       # one: tags, signature, attestations or metadata
+just image verify 3.0.0 all refs/heads/main binacle/binacle-net   # the ref and the repo, both defaulted above
 ```
 
 Reads Docker Hub, builds nothing, **never logs in**. The version is required and never defaults — a default
@@ -384,6 +385,8 @@ just --list ci                              # every operation, with its argument
 just ci changed-paths HEAD~1 HEAD           # code=yes|no and site=yes|no
 just ci gate '<json of every job and its result>'
 just ci deploy-summary <commit> <tag> <url>
+just ci moving-tags <immutable tag> '<one tag per line>'   # prints moving=<space separated>
+just ci copy-tags <source@digest> '<tags>'                 # copy, then read every tag back
 ```
 
 The shell a GitHub Actions workflow runs. `ci.just` is a door with two lines per recipe; the code is one file

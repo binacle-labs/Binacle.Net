@@ -24,6 +24,10 @@ run.
       `just image verify <version>`. The certificate identity now ends `@refs/heads/main` rather than
       `@refs/tags/v3.0.0`, and every published command anchors at the `@` and constrains nothing after it - a
       green verify here is what proves that reading.
+- [ ] The two-stage copy behaves. **By eye**, on the run: the copy step lists the version tag on its own,
+      `Verify the published signature` is green after the sign, and `Move the tags that move` runs after that
+      with `3.0` and `latest` in it. On a prerelease the last step skips itself, because there is nothing to
+      move. **Added 2026-08-31 with the change it checks.**
 
 ## The two traps in the second one
 

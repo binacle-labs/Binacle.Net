@@ -17,7 +17,7 @@ Two commands cover it. Replace `<version>` with the release you pulled.
 
 ```bash
 cosign verify binacle/binacle-net:<version> \
-  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@' \
+  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
 docker buildx imagetools inspect binacle/binacle-net:<version>
@@ -35,12 +35,20 @@ docker buildx imagetools inspect binacle/binacle-net:<version>
 from the [cosign releases page](https://github.com/sigstore/cosign/releases). `docker buildx` already ships
 with Docker.
 
+Use **cosign 2.6.0 or later**, or 3.0.1 or later. Sigstore is moving the public transparency log that
+signatures are recorded in, and older builds cannot read entries in the new one. An out-of-date binary fails
+the check the same way a tampered image would.
+
 ## 🔐 Why both cosign flags matter
 
 Drop `--certificate-identity-regexp` and you are only asking whether *anyone* signed the image. Anyone can:
 Sigstore is open to every GitHub account, and a signature on its own says nothing about who made it. The two
 flags together are the whole check - the issuer says the identity came from GitHub Actions, and the identity
 pattern says it was this repository's release workflow.
+
+The pattern ends `@refs/heads/main$`. That last part is the branch the release workflow is dispatched on, and
+the `$` closes the pattern there. Without it the pattern matches anything after the `@`, so a signature made
+from any branch in this repository would pass the check - and pushing a branch is not a release.
 
 The signature covers the **image digest**, not the tag. So it holds for the `3.0` and `latest` tags as well as
 the exact version tag: whichever one you verify, you are verifying the same artifact.
@@ -54,19 +62,21 @@ The bill of materials is the package list - every OS package and .NET assembly i
 is what you feed to a scanner or check a CVE against. The provenance records how the image was built: the
 workflow, the run, and the source commit it came from.
 
-## 🔍 A worked example
+## 🔍 What a checked release looks like
 
-Against `3.0.0-beta.2`, the verify passes and the tag resolves to this digest on Docker Hub:
+This is the record for one release, `3.0.0-beta.5`, so you know the shape of a real answer before you run it
+yourself.
+
+Its index resolves to this digest on Docker Hub:
 
 ```text
-sha256:ccce2a441e9c7d8b301d7f3f57777d9fa25b295d1a5bd3c07b5e738fc54b3397
+sha256:17b721c77d451f9263f7de671b5a93817be66ec5ef3eb5289ab8054e30df6813
 ```
 
-The same release inspects to a bill of materials of **167 packages**, and provenance naming the build that
-produced it:
+Its bill of materials lists **167 packages**, and its provenance names the build that produced it:
 
 ```text
-https://github.com/binacle-labs/Binacle.Net/actions/runs/31738643520/attempts/1
+https://github.com/binacle-labs/Binacle.Net/actions/runs/33127006852/attempts/1
 ```
 
 The image config in the same output shows the container runs as `app (1654)` rather than root, with `/app/data`
