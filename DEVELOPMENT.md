@@ -7,7 +7,7 @@ than repeating it. The four pinned binaries below are the exception, and a delib
 checksum and their download are in `tooling/ci/install-<tool>.sh`, which is the same script CI runs. You run it
 too, so a laptop and a runner install the same bytes by construction rather than by both being edited.
 
-## What you need
+## 🧰 What you need
 
 Where a pin file exists the version manager reads it automatically, but you still have to install the manager
 first. The pins are what CI uses, so matching them locally is what keeps a green machine and a green runner
@@ -31,9 +31,9 @@ gem install bundler-audit          # adds `bundle audit`, checks the lockfile ag
 gem install bundler-audit-fix      # adds `bundle audit-fix`, bumps the flagged gems and rewrites the lockfile
 ```
 
-## Installing
+## 🛠️ Installing
 
-### .NET, Node, Ruby, just
+### 📦 .NET, Node, Ruby, just
 
 ```bash
 # .NET SDK 10 - see https://dotnet.microsoft.com/download for other distros
@@ -53,7 +53,7 @@ rbenv install 3.4.7
 `nvm use` is per shell and not sticky. If `node --version` does not match `.nvmrc`, that is why - the packages
 build against whatever is active, and CI uses 22.
 
-### Docker
+### 🐳 Docker
 
 Docker CE from Docker's own repository, rather than Ubuntu's `docker.io`, so local matches what the GitHub
 Actions runners use:
@@ -82,7 +82,7 @@ docker run --rm hello-world
 
 `$VERSION_CODENAME` resolves itself, so the same block works on any supported Ubuntu.
 
-### The smoke tools
+### 🧪 The smoke tools
 
 Only needed for `just smoke`. Both are single static binaries and go to `~/.local/bin`, which is already on
 `PATH` - no sudo, and nothing to uninstall but a file.
@@ -145,7 +145,7 @@ Nothing outside hurl ever sees those libraries, which is the point - an old libx
 would be a real problem. Every other distro takes the plain binary and needs none of this, CI runners included
 as long as they stay on noble.
 
-### lychee
+### 🔍 lychee
 
 Only needed for `just check links`, which checks the links in a built site. Same shape as the smoke tools - one
 static binary in `~/.local/bin`, pinned rather than `latest`. The musl build is deliberate: it links nothing
@@ -158,7 +158,7 @@ tooling/ci/install-lychee.sh
 Upstream publishes a `.sha256` beside every asset, and the script checks the download against it before
 installing. If that step ever fails, the release asset changed - do not work around it.
 
-### actionlint and shellcheck
+### 🚦 actionlint and shellcheck
 
 Needed for `just check workflows` and, for shellcheck alone, `just check scripts`. **Both, not just the
 first** - actionlint runs shellcheck over every `run:` block when it can find it, and the GitHub runners ship
@@ -181,7 +181,7 @@ shellcheck --version
 **shellcheck has no install script, because CI never installs it** - the GitHub runners ship it. This is the
 one tool where a laptop does the work a runner does not.
 
-### cosign
+### 🔒 cosign
 
 Only needed for `just image verify`, which checks a published image's signature. Same shape as the smoke tools
 - one static binary in `~/.local/bin`, pinned rather than `latest`, nothing to uninstall but a file.
@@ -202,7 +202,7 @@ sigstore's own action, so there is no shared shell to run here.
 signature one stops. Nothing needs a `docker login`, cosign included: these are the commands a user runs, and
 a check that only passes with a credential is not checking a public artifact.
 
-## First run
+## 🚀 First run
 
 ```bash
 just install                     # npm workspaces, all three sites' gems, then the asset copy
@@ -212,7 +212,7 @@ just build image                 # publish, then tag binacle-net:local
 
 `just` with no arguments lists every task.
 
-## Where to go next
+## 🔗 Where to go next
 
 - `tooling/README.md` - every `just` module in detail: serve, test, coverage, build, image, smoke, and the
   container data folders they use.

@@ -1,7 +1,7 @@
 ---
 id: ci-cd/github-surface
 description: What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly
-verified: 2026-08-28
+verified: 2026-08-30
 check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them
 paths:
   - ".github/**"
@@ -77,12 +77,18 @@ week, see whether the bump arrives.
 `.github/` holds `dependabot.yml` (actions only, weekly, grouped minor and patch, with one entry per action
 folder that pins an outside SHA), **ten workflows**, **nine composite actions** under `actions/`, and
 `dockerhub-overview.md` — the source the release pipeline renders onto the Docker Hub page. The root holds
-`README.md`, `SECURITY.md`, `CHANGELOG.md`, `DEVELOPMENT.md`, `CLAUDE.md`, `LICENSE.GPL-3.0`,
-`CONTENT-TERMS.md` and `NOTICE`.
+`README.md`, `SECURITY.md`, `CHANGELOG.md`, `DEVELOPMENT.md`, `CONTRIBUTING.md`, `CLAUDE.md`,
+`LICENSE.GPL-3.0`, `CONTENT-TERMS.md` and `NOTICE`.
 
-**Missing:** issue templates and a PR template, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS`,
-`SUPPORT.md`, `FUNDING.yml` and `CITATION.cff` — checked 2026-08-27, and the last three are absent on purpose
-per the table below.
+**`CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` landed on 2026-08-30**, and they say the same
+thing: **code contributions are not being taken at the moment, issues are.** The stated reason is that
+contribution terms do not exist yet and are worth writing before the first pull request rather than after. A
+pull request opened today is closed with a link to the file, and the template carries the same notice so
+somebody sees it before they spend the effort. **This is a holding position and the file says so** - it is
+reversible in a way that merging a pull request without terms is not.
+
+**Missing:** issue templates, `CODE_OF_CONDUCT.md`, `CODEOWNERS`, `SUPPORT.md`, `FUNDING.yml` and
+`CITATION.cff` — checked 2026-08-30, and the last three are absent on purpose per the table below.
 
 **Two worth a decision and nothing more:**
 

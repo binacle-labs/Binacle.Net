@@ -7,6 +7,7 @@ paths:
   - "**/README.md"
   - "SECURITY.md"
   - "DEVELOPMENT.md"
+  - "CONTRIBUTING.md"
   - ".github/dockerhub-overview.md"
   - "samples/**"
   - "sites/**"

@@ -1,6 +1,6 @@
 # Security Policy
 
-## Reporting Security Issues
+## 🛡️ Reporting Security Issues
 
 I take security bugs in Binacle.Net seriously. I appreciate your efforts to responsibly disclose your findings.
 
@@ -8,7 +8,7 @@ To report a security issue, please use GitHub's Security Advisory ["Report a Vul
 
 I will send a response indicating the next steps in handling your report. After the initial reply, I will keep you informed of the progress towards a fix and full announcement.
 
-## Supported Versions
+## 🏷️ Supported Versions
 
 I release security patches for the latest version only. Please ensure you are using the most recent release.
 
@@ -17,7 +17,9 @@ I release security patches for the latest version only. Please ensure you are us
 | latest  | :white_check_mark: |
 | < latest| :x:                |
 
-## Verifying a Release
+<a id="verifying-a-release"></a>
+
+## 🔒 Verifying a Release
 
 Images published from `3.0.0` onward are signed, and carry an SPDX software bill of materials and SLSA
 build provenance. Replace `<version>` with the release you pulled.
@@ -45,7 +47,7 @@ one of those releases.
 **A passing verify means the image came from this repository's release workflow. It does not mean the image is
 free of vulnerabilities.** For that, read the bill of materials.
 
-## Third-Party Dependencies
+## 📦 Third-Party Dependencies
 
 For security issues in third-party dependencies, please refer to:
 - [NOTICE](NOTICE) - Direct dependencies and their licenses

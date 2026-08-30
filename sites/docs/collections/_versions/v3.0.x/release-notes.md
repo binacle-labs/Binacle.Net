@@ -244,6 +244,9 @@ Everything below is work on the repository. None of it reaches the image.
   by the workflow.
 - Renamed two top-level folders - `config/` is now `tooling/`, and build output goes to `artifacts/` instead of
   `build/`.
+- **Added `CONTRIBUTING.md` and a pull request template.** Issues, bug reports and documentation corrections
+  are welcome and the file names them first. Code contributions are not being taken while the contribution
+  terms are written, and the file says that will change.
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.
 
 ### 📚 Versioned Docs

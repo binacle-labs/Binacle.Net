@@ -70,6 +70,10 @@ the **first** Internal Work group, above *"Everything below is work on the repos
 `org.opencontainers.image.licenses` label changed with it. The intro sentence naming what is inside the image
 gained the licence label alongside the packing log rework.
 
+**A third bullet landed on the same page on 30 Aug**, for `CONTRIBUTING.md` and the pull request template. It
+went below *"Everything below is work on the repository"* because neither reaches the image, and it is mirrored
+word for word against `CHANGELOG.md` like the other two.
+
 **Three other page edits went with them.** `_data/footer.yml` moved from CC BY-SA 4.0 to CC BY 4.0 and dropped
 the ShareAlike icon; the three `sites/*/package.json` licence fields were corrected the same way, with
 `sites/docs` also naming MIT because the versioned sample folders live inside it; and

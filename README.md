@@ -91,7 +91,7 @@ Binacle.Net uses third-party libraries and dependencies.
 See the [NOTICE](NOTICE) file for the complete map - every license above, and every dependency with the
 license it ships under.
 
-## Security
+## 🛡️ Security
 See [SECURITY.md](SECURITY.md) for my security policy and how to report vulnerabilities.
 
 ---

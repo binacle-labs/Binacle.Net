@@ -29,7 +29,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   description: "Public markdown uses one emoji icon on each section heading, matching README.md and the docs site."
   when: "writing or editing a heading in a public markdown file"
   load: on-trigger
-  paths: ["README.md", "**/README.md", "SECURITY.md", "DEVELOPMENT.md", ".github/dockerhub-overview.md", "samples/**", "sites/**"]
+  paths: ["README.md", "**/README.md", "SECURITY.md", "DEVELOPMENT.md", "CONTRIBUTING.md", ".github/dockerhub-overview.md", "samples/**", "sites/**"]
 - file: just-recipes-at-the-tooling-root.md
   description: "tooling/ root holds the .just modules and single files named <module>.<name>.<ext>. Three or more files for one module means a folder, and every folder there has a README."
   when: "adding a file under tooling/, or a file a just recipe reads"

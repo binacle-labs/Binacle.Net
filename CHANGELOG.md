@@ -121,6 +121,7 @@ Work on the repository, the build and the dependencies. The dependency patches, 
 - Added cross-language ViPaq interop tests between C# and TypeScript.  
 - **Rebuilt the release pipeline.** A release is dispatched with a version. It builds the image once, smoke tests it in a staging registry, copies the tested digest to Docker Hub, and creates the git tag and the GitHub release last — so what is published is bit for bit what passed, a failure anywhere leaves Docker Hub untouched, and no tag exists for a release that did not finish. The release body is this changelog, extracted by the workflow.  
 - Renamed two top-level folders — `config/` is now `tooling/`, and build output goes to `artifacts/` instead of `build/`.  
+- **Added `CONTRIBUTING.md` and a pull request template.** Issues, bug reports and documentation corrections are welcome and the file names them first. Code contributions are not being taken while the contribution terms are written, and the file says that will change.  
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.  
 
 ### 📚 Versioned Docs
