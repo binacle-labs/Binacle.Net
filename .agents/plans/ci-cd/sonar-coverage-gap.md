@@ -48,15 +48,28 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
 - **`packingVisualizer.ts` - 138 of 147 uncovered, 3.9%.** The single worst file. It is also where the
   typescript modernisation findings cluster, so each of those fixes currently costs new-code coverage. The UI
   test harness is what unblocks both.
-- **OpenApi document generation - 173 of 194, 10.8%.** `Kernel/OpenApi/Transformers/` is 140 lines at exactly
-  0%: the enum-strings, required-nullable and string-number-union transformers. These have one observable
-  output - the generated document - and asserting on it is one test per transformer, not a harness.
-- **`Kernel/Logs/` - 76 lines at 0%.** `LogsProcessor` and `LogsRetentionProcessor`, both background work.
-- **`RequestDebugMiddleware.cs` - 66 lines at 0%**, the whole of `DiagnosticsModule/Middleware` being 50%.
-- **The in-memory repositories and the two support models** - `InMemoryAccountRepository` (23),
-  `InMemorySubscriptionRepository` (23), `ConcurrentSortedDictionary` (36), `FileHashStore` (25), all at 0%.
-  `ConcurrentSortedDictionary` is the one to be careful with: a hand-written concurrent collection at 0% is
-  the shape of bug that only appears under load.
+- **OpenApi document generation - 173 of 194, 10.8%.** The `Kernel/OpenApi/Transformers/` half is done: all
+  eleven are at 100% from `Binacle.Net.Kernel.UnitTests/OpenApi/`, against hand-built transformer contexts, no
+  host. **What is left is the other ~33 lines** - `OpenApiOptionsExtensions`, `OpenApiServiceCollectionExtensions`
+  and `OpenApiValidationProblemExample` - plus the document classes in `api/src/Binacle.Net` that only a
+  generated document reaches: `ApiV3Document`, `ApiV4Document`, `ExampleData` and the example-response classes,
+  about 100 lines. **Those need a host with the document endpoint mapped**, which is gated on `SWAGGER_UI` or
+  `SCALAR_UI`, so it runs into the harness question `api/integration-test-additions.md` owns.
+- **`Kernel/Logs/` - done.** `LogsProcessor` is at 100% and `LogsRetentionProcessor` at 95%, from
+  `Binacle.Net.Kernel.UnitTests/Logs/`. **Two things are left uncovered on purpose:** the `catch` around
+  `File.Delete`, which needs a delete to fail and no way to force that is portable (Linux unlinks open files,
+  Windows does not), and the second turn of the retention loop, because `PeriodicTimer` is constructed without a
+  `TimeProvider` so the day between sweeps cannot be faked. Passing the `TimeProvider` in would make that
+  testable, and is a change to the code rather than to a test.
+- **`RequestDebugMiddleware.cs` - done, 100%** from `Binacle.Net.DiagnosticsModule.UnitTests`, driven by a
+  `DefaultHttpContext` like the other two middlewares there. All three are now 96% or better, so
+  `DiagnosticsModule/Middleware` is no longer the 50% it was.
+- **The in-memory repositories and the two support models.** `ConcurrentSortedDictionary` (36) is done - 100%
+  from `Binacle.Net.ServiceModule.UnitTests`, including two concurrency cases and a snapshot case. All three
+  were checked by deleting the locks: they fail. **Still at 0%: `InMemoryAccountRepository` (23),
+  `InMemorySubscriptionRepository` (23), `FileHashStore` (25).** The two repositories hold their
+  `ConcurrentSortedDictionary` in a static field, so state is shared across the whole process and a test that
+  writes to one has to account for every other test that did.
 
 ## The ten gems are in, and they are done
 

@@ -13,6 +13,12 @@ shopt -s nullglob
 
 format="${1:-cobertura}"
 
+# Without this an unknown list name prints an empty table and "All suites passed".
+if [[ ! -f artifacts/tests/expected.txt ]]; then
+	echo "No suite wrote anything. Check the test list name." >&2
+	exit 1
+fi
+
 total_failed=0
 seen=""
 
@@ -20,7 +26,7 @@ seen=""
 count() { grep -o "\"$2\":[0-9]*" "$1" | head -1 | cut -d: -f2; }
 
 row() {
-	printf '%-44s Passed:%-6s Failed:%-4s Skipped:%s\n' "$1" "$2" "$3" "$4"
+	printf '%-56s Passed:%-6s Failed:%-4s Skipped:%s\n' "$1" "$2" "$3" "$4"
 	total_failed=$((total_failed + $3))
 	seen="$seen $1"
 }
@@ -51,7 +57,7 @@ done
 while IFS= read -r name; do
 	[[ -n "$name" ]] || continue
 	case " $seen " in *" $name "*) continue ;; esac
-	printf '%-44s no report\n' "$name"
+	printf '%-56s no report\n' "$name"
 	total_failed=$((total_failed + 1))
 done < <(sort -u artifacts/tests/expected.txt 2>/dev/null)
 
@@ -77,7 +83,7 @@ if [[ "$format" = cobertura && -d artifacts/coverage/cobertura ]]; then
 	if [[ -f "$summary" ]]; then
 		# A project sits at column 0 and its classes are indented under it, so the leading space is what
 		# tells them apart.
-		awk '/^[^ ]/ && $0 != "Summary" { printf "%-44s %s\n", $1, $NF }' "$summary"
+		awk '/^[^ ]/ && $0 != "Summary" { printf "%-56s %s\n", $1, $NF }' "$summary"
 		echo ""
 		grep 'Line coverage:' "$summary" | sed 's/^  //'
 		echo ""
