@@ -20,13 +20,18 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 | `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test cs_binacle-net-service-module_integration` |
 | `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
 | `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
-| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Network/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
+| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, middleware, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
 | `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test cs_binacle-net-ui-module_unit` |
 | `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies | `just test cs_binacle-net-service-module_unit` |
 
 The unit suites need no host and nothing brought up. `Binacle.Net.Kernel.UnitTests` is split by Kernel feature,
 each folder holding its own `Tests/` and `Providers/`.
+
+The OpenAPI transformers are tested against a hand-built context rather than a generated document: all three
+`OpenApi*TransformerContext` types are sealed with init-only properties and a public parameterless constructor,
+so `OpenApi/TransformerContexts.cs` builds them. A failure then names one transformer. The transformers are
+`internal`, so the Kernel carries `InternalsVisibleTo`.
 
 `Binacle.Net.UIModule.UnitTests` reaches internal types, because Razor generates internal page classes and the
 whole module follows them. The module carries `InternalsVisibleTo`, the same as `Binacle.Net`, the

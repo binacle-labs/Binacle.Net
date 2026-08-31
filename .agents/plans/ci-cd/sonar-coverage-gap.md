@@ -48,9 +48,13 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
 - **`packingVisualizer.ts` - 138 of 147 uncovered, 3.9%.** The single worst file. It is also where the
   typescript modernisation findings cluster, so each of those fixes currently costs new-code coverage. The UI
   test harness is what unblocks both.
-- **OpenApi document generation - 173 of 194, 10.8%.** `Kernel/OpenApi/Transformers/` is 140 lines at exactly
-  0%: the enum-strings, required-nullable and string-number-union transformers. These have one observable
-  output - the generated document - and asserting on it is one test per transformer, not a harness.
+- **OpenApi document generation - 173 of 194, 10.8%.** The `Kernel/OpenApi/Transformers/` half is done: all
+  eleven are at 100% from `Binacle.Net.Kernel.UnitTests/OpenApi/`, against hand-built transformer contexts, no
+  host. **What is left is the other ~33 lines** - `OpenApiOptionsExtensions`, `OpenApiServiceCollectionExtensions`
+  and `OpenApiValidationProblemExample` - plus the document classes in `api/src/Binacle.Net` that only a
+  generated document reaches: `ApiV3Document`, `ApiV4Document`, `ExampleData` and the example-response classes,
+  about 100 lines. **Those need a host with the document endpoint mapped**, which is gated on `SWAGGER_UI` or
+  `SCALAR_UI`, so it runs into the harness question `api/integration-test-additions.md` owns.
 - **`Kernel/Logs/` - 76 lines at 0%.** `LogsProcessor` and `LogsRetentionProcessor`, both background work.
 - **`RequestDebugMiddleware.cs` - 66 lines at 0%**, the whole of `DiagnosticsModule/Middleware` being 50%.
 - **The in-memory repositories and the two support models** - `InMemoryAccountRepository` (23),
