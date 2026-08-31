@@ -22,7 +22,9 @@ module Jekyll
         text = markdown(site, text.gsub(LIQUID, ' '))
         text = CGI.unescapeHTML(text.gsub(BLOCK_END, ' ').gsub(TAG, ''))
         # After the unescape, so an escaped &lt;script&gt; cannot come back as a tag. One pass of gsub
-        # leaves '<script' behind on '<<script>script>', and unescaping is a second way in.
+        # leaves '<script' behind on '<scr<x>ipt>', and unescaping is a second way in.
+        # CodeQL still flags the gsub above and wants it looped until stable. Don't. I measured the
+        # loop at 0.4s on 4k characters, quadratic. This line is what closes it.
         text = text.delete('<>').gsub(/\s+/, ' ').strip
         return nil if text.empty?
 
