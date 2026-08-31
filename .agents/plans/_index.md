@@ -133,10 +133,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing"
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
 - file: ci-cd/sonar-scope-and-coverage.md
-  description: "The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with."
+  description: "The gems are indexed and Sonar analysed 99 .rb files, but the coverage import still reads 0% - the report path took a wildcard the ruby setting does not support. Fixed by merging the ten reports into one file; one run confirms it, and answers the open question about the leading ../ at the same time."
   state: blocked
-  waits-on: "one Sonar run to confirm the two property changes now in the tree. State chosen by an agent, it read `ready` while naming a blocker - strike it if wrong"
-  paths: ["tooling/ci/sonar-analysis.xml", "ruby/**", "Binacle.Net.slnx"]
+  waits-on: "one Sonar run on the merged ruby.json now in the tree"
+  paths: ["tooling/ci/sonar-analysis.xml", "tooling/coverage.run.sh", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
   description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."
   state: blocked

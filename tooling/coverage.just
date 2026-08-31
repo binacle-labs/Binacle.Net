@@ -23,21 +23,7 @@ all format='cobertura': (run format) (table format)
 
 # Run every test with the coverage collector attached [cobertura|sonar]
 run format:
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    case '{{ format }}' in
-        cobertura | sonar) ;;
-        *) echo "Unknown format '{{ format }}'. Use cobertura or sonar." >&2; exit 1 ;;
-    esac
-
-    # The whole folder, not only this format's. A leftover cobertura run would still be sitting there after a
-    # sonar run, and `report` would merge it and look normal. artifacts/coverage holds exactly one run.
-    rm -rf artifacts/tests artifacts/coverage
-
-    # `|| true` because a failing suite still wrote its report, and `table` is what says pass or fail.
-    # Without it a failed run prints no table at all - the one time you most want to see it.
-    COVERAGE_FORMAT='{{ format }}' just test all || true
+    tooling/coverage.run.sh '{{ format }}'
 
 # Merge the last cobertura run into one HTML report
 report:

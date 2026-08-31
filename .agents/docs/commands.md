@@ -153,7 +153,7 @@ suite, named after the project, package or gem:
 | `artifacts/tests/<suite>.ctrf.json` | test results (jest writes `<package>.jest.json`, rspec `<gem>.rspec.json`) |
 | `artifacts/tests/expected.txt` | every suite that started, one name per line |
 | `artifacts/coverage/cobertura/<suite>.xml` | coverage for the table and the HTML report |
-| `artifacts/coverage/sonar/<suite>.xml` | C# coverage for Sonar; TS is `<package>.info`, Ruby `<gem>.json` |
+| `artifacts/coverage/sonar/<suite>.xml` | C# coverage for Sonar; TS is `<package>.info`, Ruby one merged `ruby.json` |
 | `artifacts/coverage/html-report/` | the merged report, written by `just coverage report` |
 | `artifacts/coverage/summary/Summary.txt` | the per-project coverage the table prints |
 
@@ -171,6 +171,10 @@ drops whole trees that are in scope here. Use the rows to pick what to work on, 
 **What reportgenerator reads and what it drops is in `.netconfig` at the repo root**, its own config file,
 which it looks for in the directory it runs in. Both recipes share it. Only `targetdir` and `reporttypes`
 are on the command line, because that is all the two differ on.
+
+**A `sonar` run ends by merging the ten gem reports into one `ruby.json`**, in `tooling/coverage.run.sh`.
+`sonar.ruby.coverage.reportPaths` is the only one of Sonar's three coverage settings that takes no wildcard,
+so it has to be handed a file name. That merge is what jq is needed for.
 
 **A suite that started and wrote nothing gets a `no report` row and fails the run.** Every test writes its
 name into `expected.txt` before it runs, which is the only thing separating "the suite produced nothing" from

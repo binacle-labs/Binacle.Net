@@ -44,19 +44,25 @@
   <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
 
   <!-- One flat file per suite in artifacts/coverage/sonar, split by extension: .xml from the C# collector,
-       .info from jest, .json from simplecov. tooling/tests.just is what writes them and the only place that
-       knows the suite list.
+       .info from jest. tooling/tests.just is what writes them and the only place that knows the suite list.
 
-       The ruby one opens with ../ and the other two do not. Sonar documents these paths as relative to the
-       project root; what the 2026-08-27 run actually did was resolve them against the base directory of the
-       module the sensor ran in. The C# and javascript sensors run in the root module, so root-relative is
-       right for them. The ruby sensor runs in the only module holding .rb files - ruby/, its own project -
-       and said so: "SimpleCov report not found: 'artifacts/coverage/sonar/*.json'".
+       Ruby is one merged ruby.json for all ten gems, because sonar.ruby.coverage.reportPaths is the only one
+       of these three that takes no wildcard - the other two glob fine. tooling/coverage.run.sh does the
+       merge, so the gem list still lives in one place.
+
+       It also opens with ../ where the other two do not. Sonar documents these paths as relative to the
+       project root; the 2026-08-27 run resolved them against the base directory of the module the sensor ran
+       in. The C# and javascript sensors run in the root module, so root-relative is right for them. The ruby
+       sensor runs in the only module holding .rb files - ruby/, its own project.
+
+       That second half is still unproven. The wildcard failed first, so the ../ was never actually tested:
+       the run of 2026-08-31 carried it and ruby still read 0%. If the next run does too, drop the ../ - the
+       file name is the part that is certain.
 
        All three reports are in artifacts/coverage/sonar. Only the path written to reach them differs. -->
   <Property Name="sonar.cs.vscoveragexml.reportsPaths">artifacts/coverage/sonar/*.xml</Property>
   <Property Name="sonar.javascript.lcov.reportPaths">artifacts/coverage/sonar/*.info</Property>
-  <Property Name="sonar.ruby.coverage.reportPaths">../artifacts/coverage/sonar/*.json</Property>
+  <Property Name="sonar.ruby.coverage.reportPaths">../artifacts/coverage/sonar/ruby.json</Property>
 
   <!-- Two places where near-identical code is the design, not debt. This is a duplication exclusion, not an
        issue ignore: every rule still runs on these files, only the copy-paste detector skips them.

@@ -1,9 +1,10 @@
 ---
-description: The gems are indexed - ruby/ruby.csproj worked and Sonar analysed 99 .rb files. What is left is the coverage import, which failed on a path resolved against the wrong directory, and the 27 findings the gems arrived with.
+description: The gems are indexed and Sonar analysed 99 .rb files, but the coverage import still reads 0% - the report path took a wildcard the ruby setting does not support. Fixed by merging the ten reports into one file; one run confirms it, and answers the open question about the leading ../ at the same time.
 state: blocked
-waits-on: "one Sonar run to confirm the two property changes now in the tree. State chosen by an agent, it read `ready` while naming a blocker - strike it if wrong"
+waits-on: "one Sonar run on the merged ruby.json now in the tree"
 paths:
   - "tooling/ci/sonar-analysis.xml"
+  - "tooling/coverage.run.sh"
   - "ruby/**"
   - "Binacle.Net.slnx"
 ---
@@ -19,22 +20,42 @@ decisions ledger.** In short: a `.slnx` infers nothing from `.proj` and refuses 
 work out, so the extension is declared once in `Binacle.Net.slnx`; it is based on `C#` because `Shared`
 projects are not built by the solution and `IsBuildable` does not bridge the two.
 
-## The coverage import failed, and the run named the reason
+## The coverage import failed on the wildcard
 
 ```
 Sensor SimpleCov Sensor for Ruby coverage [ruby] (done) | time=1ms
 ERROR: SimpleCov report not found: 'artifacts/coverage/sonar/*.json'
 ```
 
-**A report path is resolved against the base directory of the module the sensor runs in**, and the only
-module holding `.rb` files is `ruby/` - its own project, base dir `<repo>/ruby`. So it looked for
-`ruby/artifacts/coverage/sonar/`. The C# and javascript imports work because their sensors run in the root
-module, where the same shape of path means the repository root.
+**`sonar.ruby.coverage.reportPaths` takes no wildcard.** It is the only one of Sonar's three coverage
+settings that does not - `sonar.cs.vscoveragexml.reportsPaths` and `sonar.javascript.lcov.reportPaths` sit
+beside it in the same file and glob fine, which is why C# and javascript import and this one never did. Sonar
+documents it as a comma-delimited list of paths, absolute or relative to the project root, and says nothing
+about globs. Open on their side since February 2023. The sensor went looking for a file literally named
+`*.json`, did not find one, and printed the pattern back.
 
-**Fixed by writing that one path as `../artifacts/coverage/sonar/*.json`.** The reports have not moved -
-all three are in `artifacts/coverage/sonar`. Only the route to them differs, and the settings file says why.
+**Fixed on 2026-08-31 by merging the ten gem reports into one `ruby.json`**, so there is nothing left to
+match. `tooling/coverage.run.sh` does it with `jq` at the end of a sonar run - every `.json` in the folder is
+a simplecov report, C# writes `.xml` there and jest writes `.info`, and a path appears in exactly one gem's
+report so the coverage maps merge as a plain union. **The gem list stays in `tooling/tests.just` and nowhere
+else.** Measured on the merged file: 67 files, 1022 of 1034 lines, 98.8% - the same total as the ten
+separately, nothing lost.
 
-Sonar documents these paths as relative to the project root. The run showed otherwise, and the run wins.
+## The leading `../` is still unproven
+
+The path is `../artifacts/coverage/sonar/ruby.json`, and the `../` is a second, separate guess.
+
+**The theory:** a report path is resolved against the base directory of the module the sensor runs in, and
+the only module holding `.rb` files is `ruby/` - its own project, base dir `<repo>/ruby`. The C# and
+javascript sensors run in the root module, where the same shape of path means the repository root.
+
+**It has never actually been tested.** The wildcard failed first, so the `../` added on 2026-08-28 could not
+have shown whether it helped. The run of 2026-08-31 on `fab50ba9` carried it and `ruby` still read
+`coverage 0.0, lines_to_cover 749, uncovered_lines 749`.
+
+**One run settles both.** If the gems report their coverage, the wildcard was the whole problem and the `../`
+was right. If it still reads 0%, drop the `../` and dispatch again - the file name is the part that is
+certain. Sonar documents these paths as relative to the project root, which is the argument for dropping it.
 
 ## The specs were counting as uncovered product code
 
@@ -63,7 +84,9 @@ lib. Setting it globally is not open to us - the .NET half of the project gets i
 ## Done when
 
 - [ ] The ten gems report their real coverage.
-      **By eye**, on the Code page under `ruby/`. Zero means the import still is not landing; grep the run for
-      `SimpleCov report not found`.
+      **By eye**, on the Code page under `ruby/` - it read 0% over 749 lines on 2026-08-31, and their own runs
+      say 98.8%. Zero again means the import still is not landing; grep the run for
+      `SimpleCov report not found`, and if it is there, drop the `../` and dispatch once more.
 - [ ] Overall coverage is back above where it was before the gems were indexed.
-      71.1% is the number to beat. Below it means the specs are still in the denominator.
+      71.1% is the number to beat, from 64.3% on 2026-08-31. Below it means the specs are still in the
+      denominator.
