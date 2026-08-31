@@ -18,8 +18,8 @@ carry-over are all done and verified against the tree on 2026-08-27, and the rel
 bullet for bullet against `CHANGELOG.md` again on 2026-08-28, and the FluxResults bullet it gained on
 2026-08-29 is on the page too. **The licensing edits of 2026-08-30 landed the same way** - two more bullets,
 the footer, the three site manifests and a samples section on all four versions. **One page edit remains that
-needs the tag to exist** - section 2, the release date and link. Section 1 closed on 2026-08-31. **Section 7
-is a third that does not need the tag - it should go on the next docs session whether or not it is cut.**
+needs the tag to exist** - section 2, the release date and link. Sections 1 and 7 both closed on 2026-08-31.
+**Section 6 is the only other open page edit, and it needs a decision rather than the tag.**
 
 ---
 
@@ -174,8 +174,8 @@ section and stopped.** Same sequence as the three under section 2. Both pages ar
 are still correct and were not touched.
 
 **The original note, kept because it is what a reader of this file needs:** The repo-side edits are in the working tree: `SECURITY.md`, `CHANGELOG.md`,
-`.github/dockerhub-overview.md` and `tooling/image.just`. `design/ci-cd/decisions.md` D3 records why, and it
-supersedes an instruction there that used to say the regexp must not be tightened.
+`.github/dockerhub-overview.md` and `tooling/image.just`. The CI/CD decisions ledger records why under D3, and
+it supersedes an instruction there that used to say the regexp must not be tightened.
 
 **The change.** The identity regexp ended at the `@` with no `$`, so it was a prefix match and accepted a
 signature made from any ref in this repository. It now ends:
@@ -220,9 +220,11 @@ workaround for two prereleases nobody is asked to pull is carrying weight for no
 
 ## Done when
 
-- [ ] The verifying-a-release example quotes the released image.
-      `grep -n 'beta' sites/docs/collections/_versions/v3.0.x/verifying-a-release.md` returns nothing, and the
-      command in it runs green from a clean shell.
+- [x] **The verifying-a-release page names no beta - 2026-08-31.**
+      `grep -n 'beta' sites/docs/collections/_versions/v3.0.x/verifying-a-release.md` returns nothing.
+- [ ] The command on that page runs green against the released image.
+      Run the block as written from a clean shell. It needs the `v3.0.0` tag and the published `3.0` image to
+      exist, so this cannot be checked before the release.
 - [x] **The three drift fixes are on the page - 2026-08-28.** `grep -c 'answers 422 rather than 400'` and
       `grep -c '20 worked examples'` each return 1, and `grep -c 'A tag now builds'` returns 0, all against
       `sites/docs/collections/_versions/v3.0.x/release-notes.md`.
@@ -239,10 +241,10 @@ workaround for two prereleases nobody is asked to pull is carrying weight for no
 - [ ] The four live-site reads in section 3 pass on the served host.
       **By eye**, plus `curl` on `/robots.txt` and `/version/latest/`, and the browser's application panel for
       the manifest icons.
-- [ ] The two swagger copies still match a fresh generate.
+- [x] **The two swagger copies still match a fresh generate - 2026-08-31.** After `just openapi generate`,
       `diff <(jq -S . artifacts/openapi/Binacle.Net_v3.json) <(jq -S . sites/docs/collections/_versions/v3.0.x/swagger/v3.json)`
       and the same for v4 - both empty.
-- [ ] Both docs-site copies of the verify command end `@refs/heads/main$`.
+- [x] **Both docs-site copies of the verify command end `@refs/heads/main$` - 2026-08-31.**
       `grep -c 'yml@refs/heads/main\$' sites/docs/collections/_versions/v3.0.x/verifying-a-release.md
       sites/docs/collections/_versions/v3.0.x/release-notes.md` returns 1 for each, and
       `grep -rn "yml@'" sites/docs/` returns nothing.

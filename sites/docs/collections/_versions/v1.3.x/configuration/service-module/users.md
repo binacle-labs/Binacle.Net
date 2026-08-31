@@ -13,7 +13,7 @@ nav:
 
 In the **Service Module**, only **admin users** have the ability to manage other users. 
 
-To ensure there’s always an admin available, a default admin account is provided. 
+To ensure there's always an admin available, a default admin account is provided. 
 
 This section will guide you through configuring the default admin and managing admin accounts effectively.
 

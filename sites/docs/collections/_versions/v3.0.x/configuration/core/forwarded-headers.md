@@ -53,14 +53,14 @@ For more information on overriding configurations, refer to the
 
 ## 🔧 Configuration Options
 
-- `Enabled` (_boolean_) – turns the feature on. **Off by default.**
-- `TrustLoopback` (_boolean_, default `true`) – trust a proxy on the same machine (`127.0.0.0/8`, `::1`).
-- `TrustPrivateNetworks` (_boolean_, default `true`) – trust a proxy on a private network:
+- `Enabled` (_boolean_): turns the feature on. **Off by default.**
+- `TrustLoopback` (_boolean_, default `true`): trust a proxy on the same machine (`127.0.0.0/8`, `::1`).
+- `TrustPrivateNetworks` (_boolean_, default `true`): trust a proxy on a private network:
   `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `fc00::/7`.
-- `TrustedProxies` (_array_, default empty) – any other address or range, named exactly. Added to what the two
+- `TrustedProxies` (_array_, default empty): any other address or range, named exactly. Added to what the two
   flags above already allow.
-- `ForwardLimit` (_integer_, default `1`) – how many proxies stand in front of the app.
-- `ForwardedForHeaderName` (_string?_, default `null`) – read a different header instead of `X-Forwarded-For`.
+- `ForwardLimit` (_integer_, default `1`): how many proxies stand in front of the app.
+- `ForwardedForHeaderName` (_string?_, default `null`): read a different header instead of `X-Forwarded-For`.
 
 ### Why it is off by default
 With nothing in front of the app, the connection address **is** the caller's and cannot be forged. Reading the

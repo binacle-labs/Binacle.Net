@@ -102,7 +102,7 @@ To upgrade to **v2.0.0**, follow these steps:
 
 5. **Service Module users**
     - All integrations with the old Service Module will no longer work.
-    - No public documentation is available — please contact directly if needed.
+    - No public documentation is available. Please contact directly if needed.
     - For self-hosted setups, you will need to rely on the source code, as documentation will not be provided.
 
 6. **Adopt new documentation**

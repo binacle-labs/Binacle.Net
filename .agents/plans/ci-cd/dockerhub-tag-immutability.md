@@ -92,11 +92,20 @@ There is no undo, so do not learn the behaviour on the live repository.
 
 ## 6. Done when
 
-- The setting is enabled on `binacle/binacle-net` with a rule that matches released versions only.
-- The value has been read back from `https://hub.docker.com/v2/repositories/binacle/binacle-net/` and matches.
-- A release has shipped since, moving `3.0` and `latest` without incident.
-- The ci-cd docs say the setting is on and what the rule matches, because the next person to hit a rejected push
-  needs to find that in one search.
+- [ ] The maintainer has said yes or no. A no deletes this file.
+      **By eye.** Read `state:`. While it says `proposed` the box is open.
+- [ ] The scratch-repo run in section 5 happened and its four results are written into this file.
+      **By eye.** Section 5 carries what each push and the delete actually did, not what it should do.
+- [ ] The setting is enabled on `binacle/binacle-net` with a rule that matches released versions only.
+      `curl -s https://hub.docker.com/v2/repositories/binacle/binacle-net/ | jq .immutable_tags_settings`
+      returns `enabled: true` and one rule, `^\d+\.\d+\.\d+$`. Read it back from the API, not from the form.
+- [ ] A release has shipped since, moving `3.0` and `latest` without incident.
+      The `Move the tags that move` step in `.github/workflows/release-docker-image.yml` went green on a
+      non-prerelease run.
+- [ ] The ci-cd docs say the setting is on and what the rule matches.
+      **By eye** in the CI/CD doc, because the next person to hit a rejected push needs it in one search.
+      The CI/CD decisions ledger currently says the opposite, that the setting is off - that line moves with
+      this.
 
 ## 7. Do not
 

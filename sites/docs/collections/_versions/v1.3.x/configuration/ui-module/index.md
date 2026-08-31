@@ -11,7 +11,7 @@ nav:
 ---
 
 The UI Module provides a user-friendly interface for interacting with Binacle.Net, allowing users to explore its features visually. 
-This makes it easier to demonstrate and understand the system’s capabilities without making direct API calls.
+This makes it easier to demonstrate and understand the system's capabilities without making direct API calls.
 
 > This module is disabled by default.
 {: .block-note}
@@ -49,7 +49,7 @@ UI_MODULE=True
 
 ## 🛠️ Configuration
 The UI Module attempts to auto-detect the **Binacle.Net API URL** by default. 
-However, in some cases—particularly when using proxies or forwarding services—automatic detection may fail, 
+However, in some cases, particularly when using proxies or forwarding services, automatic detection may fail, 
 leading to issues with the Packing Demo or API communication.
 
 If automatic detection fails, you can manually specify the API endpoint for **BinacleApi** in the 

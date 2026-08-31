@@ -1,7 +1,7 @@
 # The docs versions, and which one is current.
 #
 # This file is the single source of truth for the version list: the order below is the order rendered,
-# so keep it newest first. Do not rely on Jekyll's own ordering — it sorts by path, which would put
+# so keep it newest first. Do not rely on Jekyll's own ordering. It sorts by path, which would put
 # v3.10.x before v3.2.x.
 #
 # `current` is the one knob: it names the current folder, points the `latest` redirect, and decides which

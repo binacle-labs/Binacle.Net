@@ -33,8 +33,8 @@ If you have to pick a state to make a file legible, say so in `waits-on:` so it 
 
 - **One item per plan file.** A session should be able to open one file, do the whole thing, and delete it —
   without pulling in three unrelated topics. Something that needs a decision, research, or more than one sitting
-  gets its own file. A single mechanical act with a known answer does not: it belongs in `todos.md`, or as a
-  checkbox on the release file if it gates a release.
+  gets its own file. A single mechanical act with a known answer does not: just do it, or make it a checkbox on
+  the release file if it gates a release.
 - **One master plan per topic**, holding what is done and what is left. When a review turns up issues, put them
   in **one findings file** beside it; a finding lives there until it is fixed, then moves into the master and is
   deleted from findings. Delete findings when it's empty. Don't let a topic sprawl into four overlapping plans,

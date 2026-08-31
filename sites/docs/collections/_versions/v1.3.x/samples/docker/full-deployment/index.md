@@ -128,7 +128,7 @@ Locate the Login URL: In the logs, find a line like:
 ```text
 Login to the dashboard at http://localhost:18888/login?t=your_token_here.
 ```
-Access the Dashboard: Copy the URL and open it in your browser. You’ll be logged in automatically
+Access the Dashboard: Copy the URL and open it in your browser. You'll be logged in automatically
 
 ## 📄 Additional Resources
 - [Docker Compose Reference](https://docs.docker.com/compose/)

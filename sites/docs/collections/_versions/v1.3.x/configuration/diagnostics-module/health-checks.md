@@ -46,10 +46,10 @@ For more information on overriding configurations, refer to the
 
 
 ## 🔧 Configuration Options
-- `Enabled` (_boolean_) – Enables (`true`) or disables (`false`) health checks.
-- `Path` (_string_) – The endpoint path that health checks respond to (default: `/_health`).
-- `RestrictedIPs` (_array_) – Defines which IPs can perform health checks.
-- `RestrictedChecks` (_array_) – Excludes specific health checks from execution.
+- `Enabled` (_boolean_): Enables (`true`) or disables (`false`) health checks.
+- `Path` (_string_): The endpoint path that health checks respond to (default: `/_health`).
+- `RestrictedIPs` (_array_): Defines which IPs can perform health checks.
+- `RestrictedChecks` (_array_): Excludes specific health checks from execution.
 
 ## 🔒 Restricting Access
 By default, health checks are publicly accessible. 
@@ -70,7 +70,7 @@ This ensures that only authorized systems can query the health check endpoint.
 ## 🛠️ Built-in Checks
 Binacle.Net comes with built-in health checks, including:
 
-- ✅ **Database Check** – (Available with the [**Service Module**]({% vlink /configuration/service-module/database.md %})) Verifies the health of the database connection.
+- ✅ **Database Check**: (Available with the [**Service Module**]({% vlink /configuration/service-module/database.md %})) Verifies the health of the database connection.
 
 You can disable specific health checks by listing them in the `RestrictedChecks` array. 
 For example, to disable the **Database Check**, you can configure it like this:

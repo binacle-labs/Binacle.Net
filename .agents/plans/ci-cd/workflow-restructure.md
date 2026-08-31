@@ -80,5 +80,6 @@ clever one.
       **By eye.** Open any pull request - the next Dependabot one will do - and read the checks list. One
       entry, `Gate`, and it resolves. `gate` is `if: always()`, so this is structurally safe; the box is open
       only because nothing has proved it on a real run.
-- [ ] Each install is still the right way to install that tool.
-      The investigation pass has reported, and anything it found a supported route for is using it.
+- [x] **Each install is still the right way to install that tool - 2026-08-28.** The investigation pass
+      reported and found no supported route for any of the four. All four `.github/actions/install-*/action.yml`
+      are a single `run: tooling/ci/install-<tool>.sh`, which is the shape it settled on.

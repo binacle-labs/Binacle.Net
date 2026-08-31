@@ -116,13 +116,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/release-by-dispatch.md
   description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
   state: blocked
-  waits-on: "a scratch-repo run for the moving tags. The prerelease run happened on 2026-08-30 and found a bug"
+  waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO"
   paths: [".github/workflows/release-docker-image.yml"]
-- file: ci-cd/sonar-coverage-gap.md
-  description: "Coverage is 74.9% against a gate of 80% on new code - where the 1901 uncovered lines actually are, and the 212 of them that already have tests and only need the services started"
-  state: ready
-  waits-on: "nothing"
-  paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
 - file: ci-cd/workflow-restructure.md
   description: "CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report"
   state: ready
@@ -167,11 +162,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "A docs page with copy-paste commands that generate a client from the published OpenAPI spec"
   state: blocked
   waits-on: "where a page that is not version-specific lives on the docs site - the maintainer said yes to the page on 2026-08-27 and that placement is the one thing still open"
-  paths: ["sites/docs/**"]
-- file: sites/docs-site-plain-ascii.md
-  description: "The docs site's punctuation is inconsistent - en dashes used as list separators in four v3.0.x pages, two curly apostrophes, and a kramdown setting that rewrites straight quotes to curly at build"
-  state: ready
-  waits-on: "nothing"
   paths: ["sites/docs/**"]
 - file: sites/docs-v3-deploy.md
   description: "What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches"

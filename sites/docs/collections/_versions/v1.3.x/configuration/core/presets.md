@@ -104,7 +104,7 @@ docker run --name binacle-net ^
 ### 📝 Option 2: Docker Compose
 If you prefer to use Docker Compose, follow these steps:
 
-1. Create a Docker Compose file (compose.yaml) if you don’t already have one.
+1. Create a Docker Compose file (compose.yaml) if you don't already have one.
 2. Download the [Presets.json]({% vlink /downloads/Presets.json %}){:download="" target="_blank"} 
   file and modify it according to your needs.
 3. Place the modified Presets.json file in the same directory as your compose.yaml.

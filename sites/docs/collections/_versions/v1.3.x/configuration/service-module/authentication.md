@@ -47,6 +47,6 @@ For more information on this refer to the
 1. **Issuer**: The entity issuing the token, typically your application's base URL.
 2. **Audience**: The intended recipient of the token, usually the same as the issuer.
 3. **TokenSecret**: A secret key used to sign the JWT. Use a long and complex key for security.
-4. **ExpirationInSeconds**: The token’s validity period (in seconds). Default: 3600 seconds (1 hour).
+4. **ExpirationInSeconds**: The token's validity period (in seconds). Default: 3600 seconds (1 hour).
 
 

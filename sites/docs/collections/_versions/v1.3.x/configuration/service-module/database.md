@@ -41,7 +41,7 @@ The Service Module specifically interacts with Azure Tables and will automatical
 > If a table with this name already exists, ensure there are no conflicts, or consider using a different storage account.
 {: .block-warning}
 
-> The Service Module only interacts with Azure Tables—it does not use other storage account features such as Blobs, 
+> The Service Module only interacts with Azure Tables. It does not use other storage account features such as Blobs, 
 > Queues, or Files.
 {: .block-note}
 

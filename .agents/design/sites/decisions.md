@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
 description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate.
-verified: 2026-08-27
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages
+verified: 2026-08-31
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder and the shared pages, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -96,3 +96,30 @@ and Docker marks, because that bar is already where you leave for another proper
 four, because that is where someone who has finished looks.
 
 **The rail carries one exit, not two, for a measured reason** — the second label overflowed an 80px rail.
+
+### S8 - quotes are typed straight and the build curls them
+
+`sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`, and it stays. kramdown
+rewrites a straight `'` or `"` into its curly form when the page is built.
+
+**So type ASCII in the markdown.** `don't` in the source comes out as a curly apostrophe on the page. A curly
+character typed into the source renders identically, which is why swapping one for the other changes nothing a
+visitor sees, and why the source stops being a picture of the page as soon as anyone starts typing them.
+
+**One setting is cheaper than checking every page by hand.** Every quote and apostrophe on the site comes out
+in the same form whoever wrote the page, and a writer never has to think about it. **It applies to every
+version folder, not just the current one**, so an older page is typed the same way as a new one.
+
+### S9 - a term is separated from its meaning by a colon, on every version
+
+`` `Enabled` (_boolean_): turns the feature on `` - the colon tight against the term, one space after. It is
+the same list shape on every page of every version, so it gets one character.
+
+**The site used an en dash on some pages and an em dash on others** until 31 Aug 2026, two characters for one
+job, and a reader moving between versions saw both. Neither dash survives anywhere under `sites/docs/`: not in
+`v1.3.x`, `v2.0.x`, `v2.1.x` or `v3.0.x`, not in the shared pages that render inside every version, not in the
+outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punctuate.**
+
+**A dash doing another job was not turned into a colon.** A pair around an aside became commas, a dash joining
+two clauses became a full stop, and a dash inside a code block, a sample response or a config block is data and
+was left alone.
