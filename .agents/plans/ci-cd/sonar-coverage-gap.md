@@ -57,10 +57,12 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
   `SCALAR_UI`, so it runs into the harness question `api/integration-test-additions.md` owns.
 - **`Kernel/Logs/` - 76 lines at 0%.** `LogsProcessor` and `LogsRetentionProcessor`, both background work.
 - **`RequestDebugMiddleware.cs` - 66 lines at 0%**, the whole of `DiagnosticsModule/Middleware` being 50%.
-- **The in-memory repositories and the two support models** - `InMemoryAccountRepository` (23),
-  `InMemorySubscriptionRepository` (23), `ConcurrentSortedDictionary` (36), `FileHashStore` (25), all at 0%.
-  `ConcurrentSortedDictionary` is the one to be careful with: a hand-written concurrent collection at 0% is
-  the shape of bug that only appears under load.
+- **The in-memory repositories and the two support models.** `ConcurrentSortedDictionary` (36) is done - 100%
+  from `Binacle.Net.ServiceModule.UnitTests`, including two concurrency cases and a snapshot case. All three
+  were checked by deleting the locks: they fail. **Still at 0%: `InMemoryAccountRepository` (23),
+  `InMemorySubscriptionRepository` (23), `FileHashStore` (25).** The two repositories hold their
+  `ConcurrentSortedDictionary` in a static field, so state is shared across the whole process and a test that
+  writes to one has to account for every other test that did.
 
 ## The ten gems are in, and they are done
 

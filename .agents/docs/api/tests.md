@@ -23,7 +23,7 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 | `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, middleware, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
 | `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test cs_binacle-net-ui-module_unit` |
-| `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies | `just test cs_binacle-net-service-module_unit` |
+| `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies, the password hasher, and `ConcurrentSortedDictionary` | `just test cs_binacle-net-service-module_unit` |
 
 The unit suites need no host and nothing brought up. `Binacle.Net.Kernel.UnitTests` is split by Kernel feature,
 each folder holding its own `Tests/` and `Providers/`.
