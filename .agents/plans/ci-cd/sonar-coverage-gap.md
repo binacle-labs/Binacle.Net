@@ -61,7 +61,9 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
   Windows does not), and the second turn of the retention loop, because `PeriodicTimer` is constructed without a
   `TimeProvider` so the day between sweeps cannot be faked. Passing the `TimeProvider` in would make that
   testable, and is a change to the code rather than to a test.
-- **`RequestDebugMiddleware.cs` - 66 lines at 0%**, the whole of `DiagnosticsModule/Middleware` being 50%.
+- **`RequestDebugMiddleware.cs` - done, 100%** from `Binacle.Net.DiagnosticsModule.UnitTests`, driven by a
+  `DefaultHttpContext` like the other two middlewares there. All three are now 96% or better, so
+  `DiagnosticsModule/Middleware` is no longer the 50% it was.
 - **The in-memory repositories and the two support models.** `ConcurrentSortedDictionary` (36) is done - 100%
   from `Binacle.Net.ServiceModule.UnitTests`, including two concurrency cases and a snapshot case. All three
   were checked by deleting the locks: they fail. **Still at 0%: `InMemoryAccountRepository` (23),

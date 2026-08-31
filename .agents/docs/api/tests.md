@@ -21,7 +21,7 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 | `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
 | `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
 | `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Logs/`, `Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
-| `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, middleware, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
+| `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, the three middlewares including `/_debug`, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
 | `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test cs_binacle-net-ui-module_unit` |
 | `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies, the password hasher, and `ConcurrentSortedDictionary` | `just test cs_binacle-net-service-module_unit` |
 
