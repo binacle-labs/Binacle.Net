@@ -23,7 +23,7 @@ export function parseCoordinates(compact: string): Coordinates {
 
 export function parseQuantity(compact: string): number {
 	const body = compact.trim();
-	if (body.length < 2 || body[0] !== "[" || body[body.length - 1] !== "]")
+	if (body.length < 2 || !body.startsWith("[") || !body.endsWith("]"))
 		throw new Error(`Quantity '${compact}' must be '[Q]'.`);
 	return parseNumber(body.slice(1, -1));
 }
@@ -99,7 +99,7 @@ function parseItemGeometry(compact: string): Item {
 }
 
 function stripParens(text: string): string {
-	if (text.length < 2 || text[0] !== "(" || text[text.length - 1] !== ")")
+	if (text.length < 2 || !text.startsWith("(") || !text.endsWith(")"))
 		throw new Error(`Coordinates '${text}' must be '(X,Y,Z)'.`);
 	return text.slice(1, -1);
 }

@@ -17,7 +17,7 @@ module Jekyll
         ].join("\n")
       end
 
-      def self.index(site, urls)
+      def self.index(_site, urls)
         entries = urls.map { |url| "  <sitemap>\n    <loc>#{escape(url)}</loc>\n  </sitemap>" }
         [
           DECLARATION,

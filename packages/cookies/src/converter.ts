@@ -1,7 +1,7 @@
 // `_name` is upstream js-cookie's converter shape. This fork has no withConverter, so nothing reads it.
 const converter = {
 	read: function (value: string, _name?: string): string {
-		if (value[0] === '"') {
+		if (value.startsWith('"')) {
 			value = value.slice(1, -1)
 		}
 		return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)

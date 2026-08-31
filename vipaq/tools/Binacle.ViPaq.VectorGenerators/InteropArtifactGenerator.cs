@@ -17,6 +17,22 @@ namespace Binacle.ViPaq.VectorGenerators;
 // never byte comparison).
 public sealed class InteropArtifactGenerator : IVectorGenerator
 {
+	private static readonly JsonSerializerOptions readOptions = new()
+	{
+		// Keys and properties are both PascalCase, so no case-insensitive matching is needed.
+		PropertyNameCaseInsensitive = false,
+		ReadCommentHandling = JsonCommentHandling.Skip,
+	};
+
+	private static readonly JsonSerializerOptions writeOptions = new()
+	{
+		WriteIndented = true,
+		IndentCharacter = '\t',
+		IndentSize = 1,
+		// Keep base64 '+' and '/' literal instead of \u escapes, so the committed file stays readable.
+		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+	};
+
 	public void Generate()
 	{
 		var interopDir = RepositoryRoot.Bind().Find("vipaq", "test-vectors", "interop");
@@ -26,24 +42,8 @@ public sealed class InteropArtifactGenerator : IVectorGenerator
 		var outputDir = Path.Combine(interopDir, "cs");
 		Directory.CreateDirectory(outputDir);
 
-		var readOptions = new JsonSerializerOptions
-		{
-			// Keys and properties are both PascalCase, so no case-insensitive matching is needed.
-			PropertyNameCaseInsensitive = false,
-			ReadCommentHandling = JsonCommentHandling.Skip,
-		};
-
 		var inputs = JsonSerializer.Deserialize<InputScenario[]>(File.ReadAllText(inputPath), readOptions)
 		             ?? throw new InvalidOperationException("input.json deserialized to null.");
-
-		var writeOptions = new JsonSerializerOptions
-		{
-			WriteIndented = true,
-			IndentCharacter = '\t',
-			IndentSize = 1,
-			// Keep base64 '+' and '/' literal instead of \u escapes, so the committed file stays readable.
-			Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-		};
 
 		(string Suffix, ICompressionCodec Codec)[] modes =
 		[

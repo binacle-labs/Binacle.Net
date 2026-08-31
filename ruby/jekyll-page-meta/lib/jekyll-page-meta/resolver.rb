@@ -40,11 +40,8 @@ module Jekyll
       end
 
       def description(doc)
-        @config.from.each do |key|
-          text = Text.description(@site, source(doc, key), @config.truncate)
-          return text unless text.nil?
-        end
-        nil
+        # lazy, so a markdown conversion only runs until the first source that yields something.
+        @config.from.lazy.filter_map { |key| Text.description(@site, source(doc, key), @config.truncate) }.first
       end
 
       def source(doc, key)

@@ -2,6 +2,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Binacle.Net.ServiceModule.IntegrationTests" />
+		<InternalsVisibleTo Include="Binacle.Net.ServiceModule.UnitTests" />
 	</ItemGroup>
 
 	<ItemGroup>

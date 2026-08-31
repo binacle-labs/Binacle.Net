@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import {parseDimensions as parseBin, parseItems} from "binacle-compact-notation";
 import {ProtocolEncoder} from "../src/ProtocolEncoder";
 import {CompressionCodec, deflateCodec, gzipCodec, noOpCodec} from "../src/compression";

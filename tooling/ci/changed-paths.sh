@@ -12,8 +12,8 @@ site_input='^(sites/|ruby/|packages/|shared/|vipaq/|assets/|\.github/)'
 # Three dots: with two, a commit landing on main reads as a change in every open pull request.
 changed=$(git diff --name-only "$1...$2")
 
-touched()              { grep -qE  "$1" <<<"$changed"; }
-touched_anything_but() { grep -qvE "$1" <<<"$changed"; }
+touched()              { local pattern="$1"; grep -qE  "$pattern" <<<"$changed"; }
+touched_anything_but() { local pattern="$1"; grep -qvE "$pattern" <<<"$changed"; }
 
 if touched_anything_but "$not_code";   then echo "code=yes"; else echo "code=no"; fi
 if touched              "$site_input"; then echo "site=yes"; else echo "site=no"; fi

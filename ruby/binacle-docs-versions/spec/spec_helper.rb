@@ -27,7 +27,7 @@ module SiteBuilder
 
   def doc(site, path)
     found = (site.documents + site.pages).find { |candidate| candidate.relative_path.to_s.end_with?(path) }
-    raise "the fixture site has no #{path}" if found.nil?
+    raise ArgumentError, "the fixture site has no #{path}" if found.nil?
 
     found
   end

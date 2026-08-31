@@ -86,11 +86,11 @@ public static class SpecializedScalingProblemsProvider
     
     public static List<TestItem> GetItems(int itemCount)
 	{
-	    if (!itemsByQuantity.ContainsKey(itemCount))
+	    if (!itemsByQuantity.TryGetValue(itemCount, out var items))
 	    {
 		    throw new ArgumentException($"Invalid item count. Value {itemCount} should be between 3 and 79.");
 	    }
-	    return itemsByQuantity[itemCount].Select(TestItem.FromCompactString).ToList();
+	    return items.Select(TestItem.FromCompactString).ToList();
 	}
 
 }

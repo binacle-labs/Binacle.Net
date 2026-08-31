@@ -17,7 +17,7 @@ alerts=$(gh api --paginate \
     --jq '.[].rule.security_severity_level // "none"' | sort | uniq -c)
 
 # `uniq -c` prints nothing for a level with no alerts, and a blank cell reads as unknown, not zero.
-count() { printf '%s\n' "$alerts" | awk -v k="$1" '$2 == k { n = $1 } END { print n + 0 }'; }
+count() { local level="$1"; printf '%s\n' "$alerts" | awk -v k="$level" '$2 == k { n = $1 } END { print n + 0 }'; }
 
 {
     echo '## CodeQL'

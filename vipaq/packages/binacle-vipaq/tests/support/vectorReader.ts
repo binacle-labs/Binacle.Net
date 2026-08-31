@@ -2,8 +2,8 @@
 // embeds the same files as resources, so neither side can drift on the wire format. Edit a case in the JSON.
 // Not a *.test.ts file, so jest does not run it.
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 // Resolved against this file's location so it works regardless of the jest working directory.
 const root = path.join(__dirname, "../../../../test-vectors");

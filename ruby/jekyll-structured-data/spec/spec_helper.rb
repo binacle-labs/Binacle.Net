@@ -45,7 +45,7 @@ module SiteBuilder
 
   def output(site, name)
     page = site.pages.find { |candidate| candidate.name == name }
-    raise "the fixture site has no #{name}" if page.nil?
+    raise ArgumentError, "the fixture site has no #{name}" if page.nil?
 
     page.output.to_s
   end

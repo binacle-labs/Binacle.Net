@@ -119,7 +119,7 @@ public class ParseTests
 	[Fact]
 	public void ParseItems_flattens_many_strings()
 	{
-		var items = CompactNotationParser.ParseItems<long>(new[] { "1x1x1 (0,0,0) [2]", "2x2x2 (1,1,1)" });
+		var items = CompactNotationParser.ParseItems<long>(["1x1x1 (0,0,0) [2]", "2x2x2 (1,1,1)"]);
 
 		items.Count.ShouldBe(3);
 	}

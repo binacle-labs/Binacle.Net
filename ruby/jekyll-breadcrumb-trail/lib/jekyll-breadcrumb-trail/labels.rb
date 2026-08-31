@@ -10,11 +10,7 @@ module Jekyll
       end
 
       def self.first_of(data, keys)
-        keys.each do |key|
-          value = data[key].to_s
-          return value unless value.strip.empty?
-        end
-        nil
+        keys.map { |key| data[key].to_s }.find { |value| !value.strip.empty? }
       end
     end
   end

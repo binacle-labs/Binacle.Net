@@ -6,7 +6,7 @@ import {Sizes} from "./utils";
 export class ProtocolWriter {
 	private offset: number;
 	public buffer: Uint8Array<ArrayBuffer>;
-	private data: DataView<ArrayBuffer>;
+	private readonly data: DataView<ArrayBuffer>;
 
 	constructor(bufferSize: number) {
 		this.buffer = new Uint8Array(bufferSize);
