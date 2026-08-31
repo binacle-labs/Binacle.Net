@@ -132,15 +132,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing"
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
-- file: ci-cd/tests-reach-ci.md
-  description: "The suite is split in two and every test now has a step. The gems execute and report 98.8%. What is left is a pull request that proves each half skips, and the 41-offence rubocop backlog to be decided on."
-  state: blocked
-  waits-on: "a pull request run. The SonarCloud half was answered on 2026-08-31"
-  paths: [".github/workflows/**", "tooling/**", "ruby/**"]
 - file: ci-cd/workflow-restructure.md
-  description: "CI - one thing left, and it is a settings page: point branch protection at `Pull Request / Gate`. The composite actions' shell was the other half and it is done"
-  state: blocked
-  waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
+  description: "CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report"
+  state: ready
+  waits-on: "one pull request, to read the gate's verdict"
   paths: [".github/**"]
 ```
 
@@ -197,11 +192,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Tooling
 
 ```yaml
-- file: tooling/typescript-linting.md
-  description: "Answered no - linting is one decision for the whole repository, not a TypeScript one. Every language gets the same treatment or none does."
+- file: tooling/linting.md
+  description: "Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does."
   state: deferred
   waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
-  paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**"]
+  paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**", "ruby/**", ".editorconfig"]
 - file: tooling/where-benchmark-results-live.md
   description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"
   state: blocked

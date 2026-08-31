@@ -880,6 +880,49 @@ SimpleCov sensor runs in `ruby/`, this project's folder, and said so —
 `SimpleCov report not found: 'artifacts/coverage/sonar/*.json'`. So that one property opens with `../` while
 the other two do not. Every report is still written to `artifacts/coverage/sonar`.
 
+### D23 — one required check, and the maintainer bypasses it
+
+**Branch protection on `main` requires exactly one status check, `Gate`.** That is the job name, and the job
+name is the whole context - not `Pull Request / Gate`. `pull-request.yml` says so above the job: *"`gate` is
+the only name branch protection holds."* Every job under it can be renamed freely; this is the last
+protection edit that should ever be needed.
+
+**`gate` reports whatever happens.** It is `if: always()` with `needs:` on every other job, so a skipped half
+still produces a verdict. A required check that can silently never report is what leaves a pull request
+pending forever, and that shape is designed out rather than watched for.
+
+**The repository-admin role bypasses it, deliberately.** `pull-request.yml` triggers on `pull_request` only.
+A commit pushed straight to `main` therefore has no `Gate` check and never will - not a slow one, an absent
+one. Without the bypass the maintainer's own push is rejected with nothing to wait for. **The bypass is not a
+weakening of a check that was working; it is an admission the check was never going to run for that path.**
+
+What the check actually binds is Dependabot, which opens up to ten pull requests per ecosystem across five of
+them. External pull requests are closed (`CONTRIBUTING.md`), so there is nobody else to bind.
+
+**The alternative, rejected for now:** add `push: branches: [main]` and drop the bypass. That makes the
+requirement honest for every commit, and costs a full CI run on every push while the workflow stops being
+about pull requests. **Revisit it when a second person can commit** - at that point the bypass is protecting
+a habit rather than describing a gap.
+
+**`strict_required_status_checks_policy` is off.** A pull request can merge without being up to date with
+`main`. With one committer the alternative forces a rebase before every Dependabot merge and buys little.
+
+### D24 — release tags cannot be moved or deleted, and nobody bypasses that
+
+A tag ruleset on `refs/tags/v*` blocks **update** and **deletion**. It matches 46 tags, every release back
+through v1 and v2. **Creation stays allowed**, or the release would break - `github-release.sh` makes the tag
+itself.
+
+**The bypass list is empty on purpose, including the maintainer.** A published image and a GitHub release
+both point at a tag; moving one makes an artifact that has been public since January unverifiable, and there
+is no undo. This is the only rule here guarding something irreversible, which is why it is the only one with
+no way around it. Deleting a tag now means disabling the ruleset, deleting, and re-enabling - the friction is
+the feature.
+
+**`v*` and not everything.** The 14 deploy marker tags - `docs-6`, `web-release-5`, `www-1` - are created by
+`push-tag.sh` on every site deploy and must stay free.
+
+
 ## Open
 
 ### O1 — a prerelease cannot test the publish step, and this got worse

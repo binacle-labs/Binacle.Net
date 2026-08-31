@@ -1,7 +1,7 @@
 ---
-description: CI - one thing left, and it is a settings page: point branch protection at `Pull Request / Gate`. The composite actions' shell was the other half and it is done
-state: blocked
-waits-on: "the maintainer - how to make the branch-protection change. The change itself is agreed"
+description: CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report
+state: ready
+waits-on: "one pull request, to read the gate's verdict"
 paths:
   - ".github/**"
 ---
@@ -15,15 +15,14 @@ earns one.
 **How it all works now lives in the CI/CD doc**, and why it is shaped that way in the CI/CD decisions ledger.
 This file is down to what is *not* done, so it restates neither.
 
-## The one thing needing hands, not code
+## The protection change — done 2026-08-31
 
-**Agreed 27 Aug 2026 — this is being done.** What is missing is not the decision but how: the maintainer
-wants guidance on making the change before anyone touches the protection settings.
+**A ruleset on the default branch requires one status check, `Gate`, and blocks deletion and force-push.** The
+context is `Gate` alone, not `Pull Request / Gate` - GitHub uses the job name. **This was the last protection
+edit that should ever be needed**; every job under `gate` can be renamed freely now.
 
-**Point branch protection at `Pull Request / Gate`, and nothing else.** Until then every pull request waits on
-a required check that no longer reports: the test suite lost its `pull_request` trigger when the gate started
-calling it. **This is the last protection edit that should ever be needed** - every job under `gate` can be
-renamed freely afterwards.
+**The repository-admin role bypasses it, and a tag ruleset went in beside it.** Both are decisions with
+reasons, and the CI/CD decisions ledger holds them - not restated here.
 
 ## The gap that is now closed — done 2026-08-28
 
@@ -77,13 +76,9 @@ clever one.
 
 ## Done when
 
-- [ ] Branch protection requires `Pull Request / Gate` and nothing else.
-      **By eye.** Open the branch protection settings for `main` and read the required-checks list.
 - [ ] No pull request is waiting on a required check that cannot report.
-      **By eye.** Open any open pull request; nothing sits pending forever.
-- [x] Every composite action's shell is a script under `tooling/ci/`, or a line here says why one is not.
-      Done 2026-08-28. The four `install-*` are scripts; `build-jekyll-site`'s two lines stay inline and the
-      reason is above. All four were run against a throwaway `HOME`: downloaded, checksum verified, installed.
-      `grep -c 'run: |' .github/actions/*/action.yml` returns 0, and `shellcheck tooling/ci/*.sh` is clean.
+      **By eye.** Open any pull request - the next Dependabot one will do - and read the checks list. One
+      entry, `Gate`, and it resolves. `gate` is `if: always()`, so this is structurally safe; the box is open
+      only because nothing has proved it on a real run.
 - [ ] Each install is still the right way to install that tool.
       The investigation pass has reported, and anything it found a supported route for is using it.
