@@ -1,5 +1,4 @@
 url                     : "https://docs.binacle.net"
-api_url                 : "https://api.binacle.net"
 gtm                     : 'GTM-W5S5LWMV'
 
 # Shared across www, demo, docs and api, so a theme chosen on one is the theme on all. Absent from

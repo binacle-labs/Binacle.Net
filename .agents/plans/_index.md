@@ -24,24 +24,15 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
   waits-on: "nobody - not near future"
-- file: sonar-issue-triage.md
-  description: "Reliability A, zero bugs, zero HIGH, and the gate green as of 2026-08-31. What is left is 288 code smells nobody has to clear, triaged here by rule, and the accept marks to be read back"
-  state: ready
-  waits-on: "nothing"
-  paths: ["api/src/Binacle.Net.UIModule/Pages/**", "api/src/Binacle.Net.UIModule/_js/instance.js", "packages/binacle-net-ui/src/utils/samples.ts", "ruby/*/spec/**", "tooling/ci/sonar-analysis.xml"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
   waits-on: "nobody - future"
-- file: todos.md
-  description: "One-liners with a known answer - six of them, across the image, the sites and the shared UI package"
-  state: ready
-  waits-on: "nothing"
 - file: unwatched-gaps.md
-  description: "Repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and a drift check no workflow runs"
+  description: "Repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, a drift check no workflow runs, and a checks list that goes unreadable on the runs you would read it on"
   state: proposed
   waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
-  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**", "vipaq/test-vectors/**"]
+  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**", "vipaq/test-vectors/**", ".github/workflows/pull-request.yml"]
 ```
 
 ## API

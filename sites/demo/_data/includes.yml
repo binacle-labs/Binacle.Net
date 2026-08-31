@@ -41,6 +41,9 @@ scripts_body_end:
 
 #   What only the two app pages execute. `demo: true` in a page's front matter loads them; every other
 #   page prefetches this same list. One list, so the two can never drift.
+#
+#   Those pages carry `applet: true` as well, and it is a different switch: the navbar builds its menu from
+#   it (_includes/navbar/menu.html). A page can have one without the other.
 demo_scripts:
   - type: 'text/javascript'
     src: '/js/three.js'

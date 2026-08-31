@@ -8,7 +8,7 @@ import {
 	randomItemFor,
 	sampleAt
 } from "../utils";
-import {Bin, Item, Error} from "../viewModels";
+import {Bin, Item, Error as ErrorViewModel} from "../viewModels";
 import {PackingRequest, PackingResponse} from "../apiModels";
 import {PackedData} from "../apiModels/packingResponse";
 import {UnpackedItem} from "../apiModels/unpackedItem";
@@ -123,7 +123,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		let errorObj = {
 			title: `Error: ${response.statusText || getResponseStatusText(response.status) || response.status}`,
 			errors: []
-		} as Error;
+		} as ErrorViewModel;
 
 		try {
 			const responseJson = await response.json();
