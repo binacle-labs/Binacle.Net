@@ -1,8 +1,8 @@
 ---
 title: Service Module
 description: >-
-  The Service Module turns Binacle.Net into a hosted service with accounts and subscriptions. It has no public
-  documentation, and this page says why.
+  The Service Module turns Binacle.Net into a service with accounts, authentication and rate limiting.
+  No public documentation is provided for it.
 permalink: /version/v3.0.x/configuration/service-module/
 nav:
   parent: Configuration
@@ -11,78 +11,30 @@ nav:
 ---
 
 
-The **Service Module** of Binacle.Net has undergone a complete redesign and restructuring,  
-introducing fundamental changes that break compatibility with all existing integrations.
+The **Service Module** turns Binacle.Net into a service for callers you do not control: accounts, JWT
+authentication, per-caller rate limiting, and a database behind them. It is built for the hosted service.
 
-⚠️ **Public documentation for the Service Module is no longer available.**
+⚠️ **No public documentation is provided for the Service Module.**
 
-## 🔍 Background and Motivation
+## 📌 What that means
 
-Originally, the Service Module was developed to support Binacle.Net as a Software-as-a-Service (SaaS) platform.  
-Since the official site is publicly accessible and allows everyone to test the service,  
-there was an urgent need to manage resource consumption and prevent abuse from anonymous users.
+- There is no reference documentation for its configuration, its endpoints or its data.
+- No support is offered for it.
+- **Changes to it are listed in the release notes like anything else, but no migration steps are given.**
+- **A breaking change to it does not force a major version.** A **minor** release can break it. A **patch**
+  will not.
 
-💡 Because all hosting and API call costs are personally borne, safeguarding against unexpected expenses became a priority.  
-This led to a reimagining of how access and usage are managed.
+If you self-host with the Service Module enabled, read every minor release before upgrading.
 
-## 🔄 Transition to Accounts and Subscriptions
+## 🔓 It is still open source
 
-A key change in the redesigned Service Module is the shift from anonymous and registered users to a  
-structured **accounts and subscriptions** system:
+The module ships in the source and in the image under the same licence as the rest of Binacle.Net. You can run
+it, read it and change it.
 
-### 👤 Anonymous Access
-Anonymous users can still make requests to Binacle.Net and are subject 
-to a fixed **global throttling limit** that applies collectively to all anonymous traffic.
+## 🐳 What does exist
 
-### 🗝️ Accounts
-The Admin can issue Accounts and Subscriptions, but to access the service beyond anonymous limits,
-each account must have an active subscription associated with it.
+The [Service sample]({% vlink /samples/docker/service/index.md %}) is a working compose file that starts it:
+the secrets you have to change, the database choice, and how to get a token. It is a starting point, not
+documentation.
 
-### 📜 Subscriptions
-There are two subscription types available:
-
-#### 🆓 Demo Subscription
-Provides individual rate limits specific to each account,  
-allowing more generous usage compared to anonymous access, without sharing global limits.
-
-#### 💼 Normal Subscription
-Intended for supporters who contribute towards hosting or cloud costs.
-
-These subscriptions are **not subject to rate limits**, enabling unrestricted usage and fostering sustainable growth of the service.
-
-## 📚 Impact on Documentation and Maintenance
-
-With this change, the Service Module’s architecture and usage complexity have increased significantly.  
-Maintaining comprehensive and up-to-date public documentation for it is no longer feasible or practical.
-
-**Hence:**
-
-- 🚫 From this release forward, **no public documentation will be provided for the Service Module**.
-- 🔕 Breaking changes will **not** be documented publicly nor trigger a major version increment.
-- 🤝 Organizations interested in commercial integration or extensive Service Module use 
-  should **contact directly** for private support and collaboration agreements.
-
-## 🔓 Open Source Availability
-
-The Service Module remains an open-source component within the Binacle.Net project. This allows anyone to:
-
-- 🛠️ Clone and run their own instance of Binacle.Net.
-- ⚙️ Utilize the Service Module fully within their self-managed environment.
-
-However, since no official documentation or support is offered for the Service Module anymore, 
-**self-hosted users must rely exclusively on the source code and community resources** for implementation and troubleshooting.
-
-## 🔑 One thing worth doing if you run it
-
-Mount a volume at `/home/app/.aspnet/DataProtection-Keys`. That is where the container keeps its data
-protection key ring, and by default it lives only inside the container - so replacing the container throws the
-keys away and anything protected with them stops being readable. The container logs a warning about this on
-every boot. The samples already mount `/app/data`, so the shape is familiar.
-
----
-
-⚙️ This shift allows me to dedicate less time maintaining the Service Module and its documentation,
-freeing up valuable resources to focus on advancing the core product.
-
-By streamlining service management, Binacle.Net can continue growing sustainably while still providing access  
-to advanced features through accounts and subscriptions.
+Beyond that, the source is the reference.

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The JS bundle and stylesheet the UI module ships inside the Docker image",
   "private": true,
-  "license": "GPL-3.0-only",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "build": "npm run build:css && npm run build:js",
     "build:css": "sass --no-source-map --style=compressed _sass/main.scss wwwroot/css/main.css",

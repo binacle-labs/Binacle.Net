@@ -3,7 +3,12 @@ namespace Binacle.Net;
 public static class Metadata
 {
 	public const string Description = "Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds.";
-	public const string License = "GNU General Public License v3.0";
+	public const string License = "GNU Affero General Public License v3.0";
+	public const string LicenseId = "AGPL-3.0";
+	public const string LicenseUrl = "https://www.gnu.org/licenses/agpl-3.0.html";
+
+	// A shipped image's footer links this path, so it cannot move.
+	public const string LicenseFile = "LICENSE.AGPL-3.0";
 
 	public const string GitHub = "https://github.com/binacle-labs/Binacle.Net";
 	public const string Dockerhub = "https://hub.docker.com/r/binacle/binacle-net";

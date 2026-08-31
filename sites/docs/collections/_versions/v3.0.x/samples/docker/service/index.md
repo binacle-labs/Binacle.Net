@@ -22,7 +22,7 @@ caller's whole request back including their `Authorization` header. The docs sta
 about the caller.
 
 > The Service Module has **no public documentation** - see the
-> [Service Module]({% vlink /configuration/service-module/index.md %}) page for why. This sample is a working
+> [Service Module]({% vlink /configuration/service-module/index.md %}) page. This sample is a working
 > starting point.
 {: .block-note}
 

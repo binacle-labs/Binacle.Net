@@ -6,8 +6,8 @@
 copyright: "(c) 2023-{now} Chris Mavrommatis"
 
 license:
-  title: "GPL-3.0"
-  url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.GPL-3.0"
+  title: "AGPL-3.0"
+  url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.AGPL-3.0"
 
 links:
   - title: 'Documentation'

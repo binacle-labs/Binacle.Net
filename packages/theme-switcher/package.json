@@ -4,7 +4,7 @@
   "description": "Theme switcher custom element for the Binacle.Net websites",
   "main": "index.ts",
   "types": "index.ts",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "private": true,
   "sideEffects": false,
   "scripts": {

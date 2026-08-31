@@ -22,11 +22,10 @@ internal class ServiceModuleApiDocument : IOpenApiDocument
 			document.Info.Title = this.Title;
 			document.Info.Version = this.Version;
 			document.Info.Description = __description__;
-			// gpl 3 license
 			document.Info.License = new OpenApiLicense
 			{
-				Name = "GNU General Public License v3.0",
-				Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.html")
+				Name = Binacle.Net.Metadata.License,
+				Url = new Uri(Binacle.Net.Metadata.LicenseUrl)
 			};
 
 			document.Servers?.Clear();

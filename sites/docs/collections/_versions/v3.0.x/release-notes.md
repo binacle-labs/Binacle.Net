@@ -15,10 +15,10 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 > differently. See the [Migration Guide](#migration-guide).
 {: .block-warning}
 
-> 🛡️ **The Service Module is exempt from these notes.** From v2.0.0 it is developed for the hosted service, so a
-> breaking change to it is not documented here and does not force a major version increment. If you self-host
-> with the Service Module enabled, read every release before upgrading - a minor or patch release can break it.
-> Everything else on this page follows the usual rules. See the
+> 🛡️ **The Service Module has no public documentation.** Changes to it are listed on this page like anything
+> else, but no migration steps are given for them. A breaking change to it does not force a major version: a
+> **minor** release can break it, a **patch** will not. If you self-host with the Service Module enabled, read
+> every minor release before upgrading. See the
 > [Service Module]({% vlink configuration/service-module/index.md %}) page.
 {: .block-note}
 
@@ -48,10 +48,13 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.
 - **Versioned documentation** now covers every minor line, so older images keep their docs.
 - **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.
+- **The code licence changed from GPL-3.0 to AGPL-3.0.** Run the image as it ships and there is nothing to do.
+  Change it and run it as a service for other people, and you publish what you changed. The permissive parts
+  stay permissive. Versions up to and including `3.0.0-beta.6` remain under GPL-3.0, and that text is kept at
+  [`LICENSE.GPL-3.0/`](https://github.com/binacle-labs/Binacle.Net/tree/main/LICENSE.GPL-3.0).
 - **Licensing is now stated per part.** The samples, the build tooling, the Ruby gems and the ViPaq and compact
-  notation libraries are permissive, so they can be copied without taking on the code licence. The code stays
-  GPL-3.0. The documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on
-  quoting it.
+  notation libraries are permissive, so they can be copied without taking on the code licence. The
+  documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on quoting it.
 
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.
@@ -164,11 +167,26 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   whole `192.168.1.0/24` - that is what CIDR notation means - but the startup log now says so.
 
 ### 🛡️ Service Module
-- The Service Module is **exempt from these notes** - see the note at the top of this page. One fix is worth
-  calling out on its own.
-- **The auth token rate limit no longer partitions on a caller-supplied header.** It partitions on the
-  connection's remote address, which forwarded headers resolve to the real caller wherever a proxy is trusted.
-  Before this, varying the header reset your own login throttle.
+- **No migration steps are given for Service Module changes** - see the note at the top of this page. Changes
+  before v3.0.0 were not listed at all.
+- **Breaking. The auth token rate limit no longer reads `X-Forwarded-For`.** It partitions on the connection's
+  remote address. Before this, varying the header reset your own login throttle. Behind a proxy with
+  `ForwardedHeaders` off, which is the shipped default, every caller now shares one bucket.
+- **Breaking. An unrecognised enum value in an admin request body is rejected with 422.** It used to be dropped
+  silently, so a `PATCH` carrying a bad `Status` or `Role` returned 204 and applied the rest of the body.
+- **Breaking. SQLite date columns are written in a new format** - UTC, invariant culture. Rows written by an
+  earlier version under a non-invariant culture will not read back.
+- **Three new admin endpoints.** `GET /api/admin/accounts` and `GET /api/admin/subscriptions`, both paged, and
+  `GET /api/admin/account/{id}/subscription`.
+- **The `Location` header on subscription create now resolves.** It pointed at a route that never existed.
+- **Startup configuration errors say what a valid value looks like.** One error per setting instead of up to
+  three, naming the accepted formats and echoing what was supplied. No configuration that started before stops
+  starting.
+- **SQLite connections open with WAL journalling and a 5 second busy timeout.** WAL is persistent in the
+  database file and adds `-wal` and `-shm` files beside it.
+- **The bundled SQLite native library is pinned past GHSA-2m69-gcr7-jv3q**, a memory-corruption advisory.
+  SQLite backend only.
+- **Rate limiting attaches by convention**, so the v4 endpoints are rate limited too.
 
 ### 🎨 UI Module
 - **The demo UI was rebuilt.** It was Blazor with an interactive server render mode; it is now Razor Pages, with

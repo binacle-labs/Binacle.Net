@@ -10,9 +10,11 @@ keeps its own license and is listed under THIRD-PARTY SOFTWARE NOTICES below.
 Where a directory is named below, its license covers everything in it, including its
 documentation.
 
-- Code is licensed under the GNU General Public License v3.0 (GPL-3.0-only)
+- Code is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0-only)
   The API, the packing engine, the browser UI and everything supporting them.
-  See LICENSE.GPL-3.0 or https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.GPL-3.0
+  See LICENSE.AGPL-3.0 or https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.AGPL-3.0
+  Versions up to and including v3.0.0-beta.6 were released under GPL-3.0. That text is kept at
+  LICENSE.GPL-3.0/ and still applies to them.
 
 - Documentation and content are licensed under Creative Commons Attribution 4.0 (CC BY 4.0)
   See CONTENT-TERMS.md for a summary, or https://creativecommons.org/licenses/by/4.0/legalcode
@@ -42,6 +44,11 @@ documentation.
   samples/, the versioned sample folders under sites/docs/collections/_versions/, and
   tooling/. These exist to be copied into other projects. samples/ and tooling/ each
   carry their own LICENSE file; the versioned sample folders are covered by this entry.
+
+- packages/theme-switcher is licensed under the MIT License
+  The theme switcher custom element used by the sites and the browser UI. It is a generic
+  widget with nothing in it specific to packing, so it carries no copyleft. It carries its
+  own LICENSE file.
 
 - shared/src/Binacle.FluxResults is licensed under the MIT License
   It came from the retired FluxResults NuGet package, which was MIT under the same

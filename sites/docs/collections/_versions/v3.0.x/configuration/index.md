@@ -83,7 +83,8 @@ come enabled by default.
 Allows Binacle.Net to run as a managed service with authentication and rate limiting.
 
 This module is primarily made for the official Binacle.Net cloud service.
-It is still possible to enable it for self-hosted instances, but no documentation is provided for that use case.
+It is still possible to enable it for self-hosted instances, but **no public documentation is provided** for it.
+A minor release can break it; a patch will not.
 
 Please refer to the [Service Module]({% vlink /configuration/service-module/index.md %}) page for more details.
 

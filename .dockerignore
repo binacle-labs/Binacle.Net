@@ -6,7 +6,7 @@
 # GPL-3.0 sections 4 and 5 require a copy of the licence to travel with the binaries, and the vendored
 # Apache and MIT components require their notices. A label is metadata, it is not a copy.
 !NOTICE
-!LICENSE.GPL-3.0
+!LICENSE.AGPL-3.0
 
 # Last, so it beats the line above: the published folder carries the Config_Files/*.Development.json overrides
 # and those must never land in the image.

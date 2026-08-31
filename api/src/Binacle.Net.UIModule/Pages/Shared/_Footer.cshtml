@@ -7,7 +7,7 @@
 	<nav class="center-align wrap small-text">
 		<span>&copy; 2023-@DateTime.Now.Year Chris Mavrommatis</span>
 		<span>Binacle.Net @Metadata.Version</span>
-		<a class="underline" href="@($"{Metadata.GitHub}/blob/main/LICENSE.GPL-3.0")" target="_blank">GPL-3.0</a>
+		<a class="underline" href="@($"{Metadata.GitHub}/blob/main/{Metadata.LicenseFile}")" target="_blank">@Metadata.LicenseId</a>
 		<a class="underline" href="@Metadata.GitHub" target="_blank">GitHub</a>
 		<a class="underline" href="@Metadata.Dockerhub" target="_blank">Docker Hub</a>
 	</nav>

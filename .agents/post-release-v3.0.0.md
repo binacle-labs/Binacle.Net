@@ -60,7 +60,7 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 - [ ] **Check no image name got locked by accident.** Read `immutable_tags_settings` back from the repository
       API. The publish should have written `3.0.0`, `3.0` and `latest` with nothing in its way.
 
-- [ ] **Check GitHub reads the licence as GPL-3.0.** Read it back off the API. GitHub works the licence out on
+- [ ] **Check GitHub reads the licence as AGPL-3.0.** Read it back off the API. GitHub works the licence out on
       its own servers, so pushing is the only way to find out. **This is a read, not a fix** - if it comes
       back wrong, that is a finding for a plan.
 

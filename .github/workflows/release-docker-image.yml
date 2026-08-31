@@ -129,7 +129,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ inputs.version }}
           labels: |
-            org.opencontainers.image.licenses=GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT
+            org.opencontainers.image.licenses=AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT
             org.opencontainers.image.url=https://www.binacle.net
             org.opencontainers.image.description=Binacle.Net answers which box an order goes in, and whether it fits, in milliseconds.
 

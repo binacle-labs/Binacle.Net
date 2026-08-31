@@ -27,7 +27,7 @@ Read from `https://hub.docker.com/v2/repositories/binacle/binacle-net/` on 2026-
 
 Off, with a rule left at the default. The setting appears in the repository's own API response, so plan
 availability is probably not the blocker - **confirm it is offered in the repository's settings UI before doing
-any of this**, since the sponsored org's entitlements are what decide it.
+any of this**.
 
 ## 2. The trap in the rule
 

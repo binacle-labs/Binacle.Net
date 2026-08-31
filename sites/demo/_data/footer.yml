@@ -15,6 +15,6 @@ badges:
 copyright: "© 2023-{now} Chris Mavrommatis / Binacle.Net. All Rights Reserved"
 
 license:
-  title: "GNU General Public License v3.0"
-  url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.GPL-3.0"
+  title: "GNU Affero General Public License v3.0"
+  url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.AGPL-3.0"
   target: "_blank"

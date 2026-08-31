@@ -220,7 +220,7 @@ structured_data:
     SoftwareApplication:
       applicationCategory: DeveloperApplication
       operatingSystem: Docker
-      license: https://spdx.org/licenses/GPL-3.0-only.html
+      license: https://spdx.org/licenses/AGPL-3.0-only.html
       codeRepository: https://github.com/binacle-labs/Binacle.Net
       offers:
         "@type": Offer

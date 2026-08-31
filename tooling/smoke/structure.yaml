@@ -166,7 +166,7 @@ metadataTest:
       value: https://github.com/binacle-labs/Binacle.Net
     # The check that catches the NOASSERTION regression the live 2.1.1 image ships.
     - key: org.opencontainers.image.licenses
-      value: GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT
+      value: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT
     - key: org.opencontainers.image.version
       value: ".+"
       isRegex: true

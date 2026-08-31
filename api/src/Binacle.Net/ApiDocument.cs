@@ -15,8 +15,8 @@ internal static class ApiDocument
 			.Replace("{{deprecated}}", apiDocument.IsDeprecated ? __deprecatedMessage__: string.Empty);
 		document.Info.License = new OpenApiLicense
 		{
-			Name = "GNU General Public License v3.0",
-			Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.html")
+			Name = Metadata.License,
+			Url = new Uri(Metadata.LicenseUrl)
 		};
 		document.Info.Contact = new OpenApiContact
 		{

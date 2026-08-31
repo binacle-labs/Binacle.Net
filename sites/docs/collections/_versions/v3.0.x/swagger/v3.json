@@ -8,8 +8,8 @@
       "url": "https://github.com/binacle-labs/Binacle.Net"
     },
     "license": {
-      "name": "GNU General Public License v3.0",
-      "url": "https://www.gnu.org/licenses/gpl-3.0.html"
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://www.gnu.org/licenses/agpl-3.0.html"
     },
     "version": "3.0"
   },

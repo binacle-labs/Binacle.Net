@@ -50,9 +50,8 @@ setting.
 **Cost and risk.** Two real ones, both must be checked before this is worth doing:
 
 - **Eligibility.** Docker states OIDC connections are for Docker Team, Business, Hardened Images, or an org
-  enrolled in the Docker Sponsored Open Source Program. **I could not check which plan the `binacle` Docker
-  Hub org is on** - that is a login-only fact. If it is a free org this finding is dead until the plan
-  changes.
+  enrolled in the Docker Sponsored Open Source Program. **Check the org qualifies before doing any of this** -
+  that is a login-only fact, and if it does not, this finding is dead.
 - **It does not close the secret completely.** `shared-dockerhub-overview.yml` writes the repository
   description through the Docker Hub **web API**, not the registry, using `peter-evans/dockerhub-description`,
   which takes a username and password. An OIDC registry login does nothing for it. So the secret survives for
@@ -208,8 +207,8 @@ does. Two lines of comment; no behaviour change.
 
 ## 7. An environment with a branch policy would scope the Docker Hub credential to `main`
 
-**Now:** `DOCKERHUB_TOKEN` is a repository secret. Any workflow run on any branch in this repository can read
-it. The release is kept to `main` by `check-release-ref.sh`, which is a check inside the run.
+**Now:** `DOCKERHUB_TOKEN` is a repository secret, not scoped to an environment. The release is kept to
+`main` by `check-release-ref.sh`.
 
 **The supported way:** put the `publish` job (and the page workflow's job) in a GitHub **environment** whose
 deployment branch policy allows `main` only, and move the two Docker Hub values to environment secrets. GitHub

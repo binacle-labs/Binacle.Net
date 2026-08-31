@@ -12,27 +12,27 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: architecture-checks.md
-  description: "Generate the repo's dependency graph, draw it, and lint it with a small ruleset - plus three greps over api/src, and the one boundary violation to fix before building the check that watches it"
+  description: "Generate the repo's dependency graph, draw it, lint it - plus three greps over api/src, and the one boundary violation to fix first"
   state: idea
-  waits-on: "v3.0.0 at the earliest, and a maybe even then"
+  waits-on: "a maybe"
   paths: ["**/*.csproj", "tooling/**"]
 - file: comment-lint.md
-  description: "A check that nothing outside the agent guidance directory points a reader into it."
+  description: "A check that nothing outside the agent guidance directory points a reader into it"
   state: idea
-  waits-on: "v3 at the earliest, and a maybe even then"
+  waits-on: "a maybe - the rule has held without it since the 27 sites were fixed"
 - file: image-base-slimming.md
-  description: "Harden and slim the base image"
+  description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
-  waits-on: "nobody waiting - not in the near future"
+  waits-on: "nobody - not near future"
 - file: sonar-issue-triage.md
   description: "Confirmed by the 2026-08-27 run - security is A and zero findings, high-severity is down to two, and 295 findings remain. What is left, and the answer on whether test and tooling code stays in scope"
   state: ready
   waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
   paths: ["tooling/ci/sonar-analysis.xml", "api/src/Binacle.Net.UIModule/**", "packages/**"]
 - file: testing-techniques.md
-  description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - what each buys, and the four yes-or-no answers"
+  description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
-  waits-on: "nobody waiting - future"
+  waits-on: "nobody - future"
 - file: todos.md
   description: "One-liners with a known answer - six of them, across the image, the sites and the shared UI package"
   state: ready
@@ -63,14 +63,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "the v3.0.0 tag - the maintainer deferred it on 2026-08-27"
   paths: ["packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**", "sites/demo/**"]
 - file: api/packing-only-image.md
-  description: "a packing-only image variant, without the ServiceModule assemblies"
-  state: idea
-  waits-on: "nobody waiting - far future"
+  description: "The public image becomes packing-only and the Service Module moves to its own image"
+  state: proposed
+  waits-on: "the v3.0.0 tag - it is the first thing after"
   paths: ["api/**"]
 - file: api/servicemodule.md
-  description: "How far ServiceModule is taken - one decision, and the three pieces of work behind it - collapsing the layering, a schema-migration path, and refresh tokens"
-  state: deferred
-  waits-on: "the maintainer. He said on 2026-08-27 that ServiceModule work is taken as one piece, not row by row"
+  description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
+  state: proposed
+  waits-on: "the v3.0.0 tag - it goes with the image split"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
 - file: api/show-me-the-request.md
   description: "The packing demo shows the HTTP call it just made, against this host, ready to copy"
@@ -85,7 +85,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: api/uimodule-instance-presets.md
   description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
   state: idea
-  waits-on: "v3, and the maintainer expanding the idea"
+  waits-on: "the maintainer expanding it"
   paths: ["api/src/Binacle.Net.UIModule/**", "api/src/Binacle.Net.Kernel/**"]
 - file: api/v4-stable.md
   description: "v4 - flip from experimental to stable"
@@ -98,9 +98,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: ci-cd/ci-gates.md
-  description: "Two gates the pull request still does not have - the integration suites against the module set the image ships, and a Sonar verdict without anyone pressing a button"
+  description: "Two gates the pull request does not have - the integration suites against the shipped module set, and a Sonar verdict without a button press"
   state: idea
-  waits-on: "nothing to gate yet. The maintainer called both a future idea on 2026-08-27"
+  waits-on: "nothing to gate yet"
   paths: [".github/workflows/**"]
 - file: ci-cd/ci-step-review.md
   description: "A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck"
@@ -120,7 +120,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
-  waits-on: "nobody waiting - not in the near future"
+  waits-on: "the demand question - nobody has asked for ARM"
   paths: [".github/workflows/**"]
 - file: ci-cd/release-by-dispatch.md
   description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
@@ -153,9 +153,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: lib/parallel-processors-decision.md
-  description: "Decide what happens to the three `Parallel*` processors"
+  description: "Decide what happens to the three `Parallel*` processors - wire the threshold up, or delete them"
   state: idea
-  waits-on: "v3, and more time - it is an idea"
+  waits-on: "nobody - it is an idea"
   paths: ["lib/**"]
 ```
 
@@ -163,9 +163,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: shared/fixture-fill-per-algorithm.md
-  description: "The scenario fixtures record which algorithms succeed, not how well - so a sample that exists because one algorithm packs better cannot say so"
+  description: "The scenario fixtures record which algorithms succeed, not how full the bin got"
   state: idea
-  waits-on: "nobody waiting - wanted sometime, not in the near future"
+  waits-on: "nobody - wanted sometime"
   paths: ["shared/data/**", "shared/test/Binacle.TestsKernel/**"]
 - file: shared/testskernel-data-extraction.md
   description: "TestsKernel - grow the shared fixture cases"

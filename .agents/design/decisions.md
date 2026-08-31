@@ -89,6 +89,14 @@ against the repository after they landed: `GPL-3.0`, 100%, exact matcher.
 **One trap in that: never create a `LICENSES/` folder.** licensee scans that name specifically, per the REUSE
 spec, and two files inside it would be two licences again. Any other folder name is fine.
 
+**The move to AGPL-3.0 landed on 31 Aug 2026, and this layout is what let it.** `LICENSE.GPL-3.0` became a
+*directory* holding the old text and a `README.md`; `LICENSE.AGPL-3.0` is the one licence file at the root.
+Measured after the move with the same gem: `AGPL-3.0`, 100%, exact matcher, `LICENSE.AGPL-3.0` the only file
+matched. **GitHub redirects `/blob/<ref>/<dir>` to `/tree/<ref>/<dir>`**, so the footer link that `2.1.1`,
+`3.0.0-beta.3` and `3.0.0-beta.4` hardcode still resolves - it lands on the folder's `README.md`, which says
+which licence covers which versions. That is better than the file it replaces, which was 35KB of raw legal
+text with no context.
+
 ### D2 — a version's published page must match what that version's image serves
 
 Each folder under `sites/docs/collections/_versions/` describes the image that shipped under that minor version.

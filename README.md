@@ -69,14 +69,15 @@ This project carries more than one license. Which one applies depends on which p
 
 | What | License |
 |---|---|
-| The code - API, packing engine, browser UI | [GPL-3.0-only](LICENSE.GPL-3.0) |
+| The code - API, packing engine, browser UI | [AGPL-3.0-only](LICENSE.AGPL-3.0) |
 | Documentation, images and other content | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | The data formats - ViPaq, compact notation, [PROTOCOL.md](vipaq/PROTOCOL.md), its test vectors and the geometry primitives they use | [Apache-2.0](vipaq/src/Binacle.ViPaq/LICENSE) |
 | The Ruby gems under [`ruby/`](ruby) | MIT |
 | Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
+| [`packages/theme-switcher`](packages/theme-switcher) | MIT |
 | [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
-`SPDX-License-Identifier: GPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`
+`SPDX-License-Identifier: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`
 
 **Every part with its own license carries its own `LICENSE` file next to it.** The data formats and the
 samples are permissive on purpose: reading a ViPaq string or a packing log, or copying a compose file into

@@ -28,8 +28,6 @@ hold them to a standard good enough to generate from.
 - Keep the documents generation-quality: descriptions on every schema and property, stable `operationId`s, no
   numeric-as-string unions. Those exist so a generated client is usable, not for tidiness.
 
-**What reverses it:** real, expressed demand for one specific language, where the reach justifies the upkeep.
-The clean spec makes that a config job rather than a project, so the decision stays cheap to change — publish
-an SDK because somebody asked, never in anticipation.
-
-**This covers developers only** - anyone integrating without writing code never runs a generator.
+**What reverses it:** real, expressed demand for one specific language. The clean spec makes that a config
+job rather than a project, so the decision stays cheap to change — publish an SDK because somebody asked,
+never in anticipation.
