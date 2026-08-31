@@ -25,9 +25,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - not near future"
 - file: sonar-issue-triage.md
-  description: "Reliability is A and HIGH is zero as of 2026-08-31. What is left is 288 code smells and one red gate condition, new_coverage, which belongs to the coverage plans"
-  state: mostly done
-  waits-on: "a scan. The workflow is dispatch-only, so nothing after fab50ba9 is in the numbers"
+  description: "Reliability A, zero bugs, zero HIGH, and the gate green as of 2026-08-31. What is left is 288 code smells nobody has to clear, triaged here by rule, and the accept marks to be read back"
+  state: ready
+  waits-on: "nothing"
   paths: ["api/src/Binacle.Net.UIModule/Pages/**", "api/src/Binacle.Net.UIModule/_js/instance.js", "packages/binacle-net-ui/src/utils/samples.ts", "ruby/*/spec/**", "tooling/ci/sonar-analysis.xml"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
@@ -109,8 +109,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/dockerhub-overview.md
   description: "The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run"
-  state: done
-  waits-on: "nothing. Delete this file once the v3.0.0 release has published the page"
+  state: blocked
+  waits-on: "the v3.0.0 release publishing the page. Both sections are done - the file is kept only to be checked against the published page, then deleted"
   paths: [".github/workflows/**"]
 - file: ci-cd/dockerhub-tag-immutability.md
   description: "Turn on Docker Hub tag immutability, for release tags only"
@@ -128,19 +128,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "a scratch-repo run for the moving tags. The prerelease run happened on 2026-08-30 and found a bug"
   paths: [".github/workflows/release-docker-image.yml"]
 - file: ci-cd/sonar-coverage-gap.md
-  description: "Coverage is 67.8% against a gate of 80% on new code - where the 2226 uncovered lines actually are, and the 212 of them that already have tests and only need the services started"
+  description: "Coverage is 74.9% against a gate of 80% on new code - where the 1901 uncovered lines actually are, and the 212 of them that already have tests and only need the services started"
   state: ready
   waits-on: "nothing"
   paths: ["tooling/coverage.just", "tooling/tests.just", ".github/workflows/sonar-analysis.yml", "api/src/**", "packages/binacle-net-ui/**"]
-- file: ci-cd/sonar-scope-and-coverage.md
-  description: "The gems are indexed and Sonar analysed 99 .rb files, but the coverage import still reads 0% - the report path took a wildcard the ruby setting does not support. Fixed by merging the ten reports into one file; one run confirms it, and answers the open question about the leading ../ at the same time."
-  state: blocked
-  waits-on: "one Sonar run on the merged ruby.json now in the tree"
-  paths: ["tooling/ci/sonar-analysis.xml", "tooling/coverage.run.sh", "ruby/**", "Binacle.Net.slnx"]
 - file: ci-cd/tests-reach-ci.md
-  description: "The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on."
+  description: "The suite is split in two and every test now has a step. The gems execute and report 98.8%. What is left is a pull request that proves each half skips, and the 41-offence rubocop backlog to be decided on."
   state: blocked
-  waits-on: "a pull request run, and one look at the gems in SonarCloud"
+  waits-on: "a pull request run. The SonarCloud half was answered on 2026-08-31"
   paths: [".github/workflows/**", "tooling/**", "ruby/**"]
 - file: ci-cd/workflow-restructure.md
   description: "CI - one thing left, and it is a settings page: point branch protection at `Pull Request / Gate`. The composite actions' shell was the other half and it is done"

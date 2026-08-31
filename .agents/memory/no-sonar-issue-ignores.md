@@ -42,6 +42,16 @@ in a benchmark or test kernel disappears once that project is marked as test cod
 `AccountGetResponse`'s OpenAPI example, where `PasswordHash` is the literal `"type::hash::salt"` — it documents
 the *shape* of a stored hash, and the rule fires on the property name, so any literal there would trip it.
 
+**Three more were marked on 2026-08-31**, when reliability went to A:
+
+- `Web:S6850` on `_ErrorsDialog.cshtml:4`
+- `csharpsquid:S125` on `ViPaqBase64Extensions.cs:6`
+- the `_Navbar.cshtml:1` accept
+
+**This list is the only copy.** Accept marks live in SonarCloud's database, not in the repository - they do
+not survive the project being recreated, and they have been lost once already. Read the six above back
+against the UI after anything that touches the project's settings.
+
 **Why:** a finding answered in code stays reviewable and keeps the rule armed for the next occurrence; a
 finding answered in config is invisible and switches the rule off for everything matching the path.
 

@@ -45,6 +45,10 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "Sonar rules cannot be switched off on this project - custom quality profiles start at the Team plan and this one is on Free, so \"Sonar way\" is read-only"
   when: "someone proposes turning a Sonar rule off"
   paths: ["tooling/ci/sonar-analysis.xml"]
+- file: sonar-ruby-coverage-paths.md
+  description: "sonar.ruby.coverage.reportPaths takes no wildcard and resolves against the ruby/ module, not the repo root - the other two coverage properties beside it do neither"
+  when: "changing a coverage report path in the Sonar settings, or adding a gem"
+  paths: ["tooling/ci/sonar-analysis.xml", "tooling/coverage.run.sh"]
 - file: sonar-scope-exclusions.md
   description: "sonar.exclusions and friends are scope exclusions, not issue ignores - they are allowed and already in use"
   when: "reading or editing the exclusion lists in tooling/ci/sonar-analysis.xml"

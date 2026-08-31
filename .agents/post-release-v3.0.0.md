@@ -198,7 +198,6 @@ them.
 | `plans/ci-cd/tests-reach-ci.md` | the ten Ruby tests reaching the PR gate. Held off the release gate because Ruby does not build the image |
 | `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
 | `plans/sites/docs-client-generation.md` | nothing the release owned. **It has a blocker of its own** - every page on the site sits under a version folder and this page is not version-specific, so where it lives is unanswered. It sits here because the docs deploy is the natural next docs session |
-| `plans/ci-cd/sonar-scope-and-coverage.md` | a yes or a no. Ten published gems have no tests measured, and the alternative is writing down that this is deliberate |
 
 **`plans/_index.md` lists every plan, with its state and what it waits on.** Nothing above is a ranking.
 

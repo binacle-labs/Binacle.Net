@@ -49,7 +49,7 @@ done
 # A suite that ran and wrote nothing would be missing from the table, which reads as "it does not exist".
 # Every test writes its name into expected.txt before it runs, so a missing report is a red row instead.
 while IFS= read -r name; do
-	[ -n "$name" ] || continue
+	[[ -n "$name" ]] || continue
 	case " $seen " in *" $name "*) continue ;; esac
 	printf '%-44s no report\n' "$name"
 	total_failed=$((total_failed + 1))
@@ -64,7 +64,7 @@ echo ""
 #
 # Not comparable with SonarCloud. Sonar counts coverable lines its own way and drops whole trees that are in
 # scope here. These rows say which project to work on, not what the gate will read.
-if [ "$format" = cobertura ] && [ -d artifacts/coverage/cobertura ]; then
+if [[ "$format" = cobertura && -d artifacts/coverage/cobertura ]]; then
 	dotnet tool restore >/dev/null
 
 	# Inputs and filters come from .netconfig at the repo root, which is reportgenerator's own config file.
@@ -74,7 +74,7 @@ if [ "$format" = cobertura ] && [ -d artifacts/coverage/cobertura ]; then
 		>/dev/null
 
 	summary=artifacts/coverage/summary/Summary.txt
-	if [ -f "$summary" ]; then
+	if [[ -f "$summary" ]]; then
 		# A project sits at column 0 and its classes are indented under it, so the leading space is what
 		# tells them apart.
 		awk '/^[^ ]/ && $0 != "Summary" { printf "%-44s %s\n", $1, $NF }' "$summary"
@@ -84,7 +84,7 @@ if [ "$format" = cobertura ] && [ -d artifacts/coverage/cobertura ]; then
 	fi
 fi
 
-if [ "$total_failed" -gt 0 ]; then
+if [[ "$total_failed" -gt 0 ]]; then
 	echo "$total_failed failed - scroll up for the failures, each suite printed its own."
 	exit 1
 fi

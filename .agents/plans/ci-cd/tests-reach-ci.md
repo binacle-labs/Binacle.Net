@@ -1,7 +1,7 @@
 ---
-description: The suite is split in two and every test now has a step. What is left needs a real run - a pull request that proves each half skips, a Sonar run that executes the gem tests, and the rubocop backlog to be decided on.
+description: The suite is split in two and every test now has a step. The gems execute and report 98.8%. What is left is a pull request that proves each half skips, and the 41-offence rubocop backlog to be decided on.
 state: blocked
-waits-on: "a pull request run, and one look at the gems in SonarCloud"
+waits-on: "a pull request run. The SonarCloud half was answered on 2026-08-31"
 paths:
   - ".github/workflows/**"
   - "tooling/**"
@@ -36,9 +36,8 @@ file under `ruby/`.
 The run of 2026-08-27 died on the first gem: CI installs the bundle into `ruby/vendor/bundle`, so simplecov
 was not on the load path. Fixed on 2026-08-28 and all ten gems re-run green here.
 
-**The gems are still at zero in SonarCloud, and the import is not the reason.** No `.rb` file has ever been
-indexed, so there is nothing for the coverage to attach to.
-`plans/ci-cd/sonar-scope-and-coverage.md` owns that; this file only needs to know the gems executed.
+**The gems read 98.8% in SonarCloud as of 2026-08-31.** The import failed on a wildcard the ruby report-path
+setting does not accept; the memory on Sonar ruby coverage paths carries what bit and why.
 
 ## Rubocop
 
@@ -56,10 +55,6 @@ and reading what it changed is the actual work.
       **By eye.** Open a pull request touching one page and read the gate's table.
 - [ ] A change under `ruby/` runs the site tests and starts no Postgres.
       **By eye.** Open a pull request touching one gem file and read the gate's table.
-- [x] The Sonar run executes the gem tests. First tried 2026-08-27, failed on the load path, fixed
-      2026-08-28.
-- [ ] The gems are not at zero in SonarCloud.
-      **By eye.** Read them after a run. `plans/ci-cd/sonar-scope-and-coverage.md` is where that answer lands.
 - [ ] Rubocop comes back clean, and whether it attaches to anything is decided.
-      `cd ruby && bundle exec rubocop` exits 0, and a line in the Ruby doc or the CI/CD ledger says where it
-      runs, or that it does not.
+      `cd ruby && bundle exec rubocop` exits 0 - **41 offences over 110 files on 2026-08-31, 31 of them
+      autocorrectable** - and a line in the Ruby doc or the CI/CD ledger says where it runs, or that it does not.

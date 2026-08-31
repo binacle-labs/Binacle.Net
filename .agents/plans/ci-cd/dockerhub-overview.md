@@ -1,7 +1,7 @@
 ---
 description: The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run
-state: done
-waits-on: "nothing. Delete this file once the v3.0.0 release has published the page"
+state: blocked
+waits-on: "the v3.0.0 release publishing the page. Both sections are done - the file is kept only to be checked against the published page, then deleted"
 paths:
   - ".github/workflows/**"
 ---
