@@ -2,6 +2,8 @@
 
 require 'spec_helper'
 
+ROBOTS_FILE = 'robots.txt'
+
 RSpec.describe Jekyll::MultiSitemap::LinksTag do
   it 'writes one line per generated file when there is no index' do
     site = build_site(
@@ -14,7 +16,7 @@ RSpec.describe Jekyll::MultiSitemap::LinksTag do
       }
     )
 
-    expect(built(site, 'robots.txt')).to include(
+    expect(built(site, ROBOTS_FILE)).to include(
       "Sitemap: https://example.com/sitemap/pages.xml\nSitemap: https://example.com/sitemap/versions.xml"
     )
   end
@@ -30,18 +32,18 @@ RSpec.describe Jekyll::MultiSitemap::LinksTag do
         ]
       }
     )
-    lines = built(site, 'robots.txt').scan(/^Sitemap: .*$/)
+    lines = built(site, ROBOTS_FILE).scan(/^Sitemap: .*$/)
 
     expect(lines).to eq(['Sitemap: https://example.com/sitemap.xml'])
   end
 
   it 'writes nothing when the site has no sitemaps block' do
-    expect(built(build_site, 'robots.txt')).not_to include('Sitemap:')
+    expect(built(build_site, ROBOTS_FILE)).not_to include('Sitemap:')
   end
 
   it 'leaves the generated urls readable as site.sitemaps.urls' do
     site = build_site(one_file)
 
-    expect(built(site, 'robots.txt')).to include('# urls: https://example.com/sitemap.xml')
+    expect(built(site, ROBOTS_FILE)).to include('# urls: https://example.com/sitemap.xml')
   end
 end

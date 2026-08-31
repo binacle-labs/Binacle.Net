@@ -6,7 +6,7 @@ RSpec.describe Jekyll::PageMeta::MetaTag do
   it 'writes the whole head block from the resolved keys' do
     site = build_site('og_image' => '/media/card.png')
 
-    expect(head(site, 'index.html').split("\n")).to include(
+    expect(head(site, HOME_PAGE).split("\n")).to include(
       '<title>Home - Example</title>',
       '<meta name="description" content="The front page.">',
       '<link rel="canonical" href="https://example.com/">',
@@ -35,7 +35,7 @@ RSpec.describe Jekyll::PageMeta::MetaTag do
   end
 
   it 'writes no image elements when nothing sets an image' do
-    output = head(build_site, 'index.html')
+    output = head(build_site, HOME_PAGE)
 
     expect(output).not_to include('og:image')
     expect(output).not_to include('twitter:image')
@@ -45,23 +45,23 @@ RSpec.describe Jekyll::PageMeta::MetaTag do
     site = build_site
 
     expect(head(site, 'robots.html')).to include('<meta name="robots" content="noindex, follow">')
-    expect(head(site, 'index.html')).not_to include('name="robots"')
+    expect(head(site, HOME_PAGE)).not_to include('name="robots"')
   end
 
   it 'writes no twitter:site unless one is configured' do
-    expect(head(build_site, 'index.html')).not_to include('twitter:site')
+    expect(head(build_site, HOME_PAGE)).not_to include('twitter:site')
   end
 
   it 'writes the configured twitter:site as a handle' do
     site = build_site('page_meta' => { 'twitter_site' => 'example' })
 
-    expect(head(site, 'index.html')).to include('<meta name="twitter:site" content="@example">')
+    expect(head(site, HOME_PAGE)).to include('<meta name="twitter:site" content="@example">')
   end
 
   it 'takes the card type from config' do
     site = build_site('page_meta' => { 'twitter_card' => 'summary_large_image' })
 
-    expect(head(site, 'index.html')).to include('<meta name="twitter:card" content="summary_large_image">')
+    expect(head(site, HOME_PAGE)).to include('<meta name="twitter:card" content="summary_large_image">')
   end
 
   it 'takes og:locale off the page before the site' do
@@ -69,7 +69,7 @@ RSpec.describe Jekyll::PageMeta::MetaTag do
   end
 
   it 'writes no og:locale when neither the page nor the site sets one' do
-    expect(head(build_site('locale' => ''), 'index.html')).not_to include('og:locale')
+    expect(head(build_site('locale' => ''), HOME_PAGE)).not_to include('og:locale')
   end
 
   it 'escapes a value once, whatever the source did to it' do

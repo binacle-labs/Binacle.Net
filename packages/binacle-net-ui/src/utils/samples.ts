@@ -21,9 +21,17 @@ export function randomBin() {
 }
 
 // Items are sized against this bin, so the set always fits at least one candidate.
+// Seeded with bins[0] after the guard. A seedless reduce throws its own message on an empty array, and
+// this is exported, so a caller outside the demo gets told what it did wrong.
 export function largestBin(bins: Bin[]) {
-	return bins.reduce((largest, bin) =>
-		bin.length * bin.width * bin.height > largest.length * largest.width * largest.height ? bin : largest
+	if (bins.length === 0) {
+		throw new Error("largestBin needs at least one bin");
+	}
+
+	return bins.reduce(
+		(largest, bin) =>
+			bin.length * bin.width * bin.height > largest.length * largest.width * largest.height ? bin : largest,
+		bins[0]
 	);
 }
 

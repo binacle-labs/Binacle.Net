@@ -2,11 +2,13 @@
 
 require 'spec_helper'
 
+VERSION_ROOT = '/section/v1.0.x/'
+
 RSpec.describe Jekyll::BreadcrumbTrail::TrailGenerator do
   it 'publishes the trail as name and url pairs, the first crumb first' do
-    expect(trail(build_site(versioned), 'deep.html')).to eq(
+    expect(trail(build_site(versioned), DEEP_PAGE)).to eq(
       [
-        { 'name' => 'Home', 'url' => '/section/v1.0.x/' },
+        { 'name' => 'Home', 'url' => VERSION_ROOT },
         { 'name' => 'Getting Started', 'url' => '/section/v1.0.x/getting-started/' },
         { 'name' => 'Quick start', 'url' => '/section/v1.0.x/getting-started/quick-start.html' }
       ]
@@ -15,7 +17,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::TrailGenerator do
 
   describe 'the home crumb' do
     it 'is the deepest excluded segment above the current page' do
-      expect(trail(build_site(versioned), 'deep.html').first['url']).to eq('/section/v1.0.x/')
+      expect(trail(build_site(versioned), DEEP_PAGE).first['url']).to eq(VERSION_ROOT)
     end
 
     it 'stops at the excluded segment above a page that is itself excluded' do
@@ -27,7 +29,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::TrailGenerator do
     end
 
     it 'is the site root when nothing is excluded' do
-      expect(trail(build_site, 'deep.html').first['url']).to eq('/')
+      expect(trail(build_site, DEEP_PAGE).first['url']).to eq('/')
     end
   end
 
@@ -38,13 +40,13 @@ RSpec.describe Jekyll::BreadcrumbTrail::TrailGenerator do
   end
 
   it 'keeps an excluded segment in every crumb url below it' do
-    urls = trail(build_site(versioned), 'deep.html').map { |crumb| crumb['url'] }
+    urls = trail(build_site(versioned), DEEP_PAGE).map { |crumb| crumb['url'] }
 
-    expect(urls).to all(start_with('/section/v1.0.x/'))
+    expect(urls).to all(start_with(VERSION_ROOT))
   end
 
   it 'gives a crumb for a file no trailing slash' do
-    expect(trail(build_site(versioned), 'deep.html').last['url']).to eq(
+    expect(trail(build_site(versioned), DEEP_PAGE).last['url']).to eq(
       '/section/v1.0.x/getting-started/quick-start.html'
     )
   end

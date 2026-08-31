@@ -2,14 +2,17 @@
 
 require 'spec_helper'
 
+HOME_PAGE = 'index.html'
+TYPELESS_PAGE = 'no-type.html'
+
 RSpec.describe Jekyll::StructuredData::StructuredDataTag do
   it 'writes one block holding the organisation, the page and the trail' do
-    expect(graph(build_site(configured), 'index.html').map { |entry| entry['@type'] })
+    expect(graph(build_site(configured), HOME_PAGE).map { |entry| entry['@type'] })
       .to eq(%w[Organization WebApplication BreadcrumbList])
   end
 
   it 'writes the schema.org context once, at the top' do
-    parsed = JSON.parse(block(build_site(configured), 'index.html'))
+    parsed = JSON.parse(block(build_site(configured), HOME_PAGE))
 
     expect(parsed['@context']).to eq('https://schema.org')
   end
@@ -27,7 +30,7 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
 
   describe 'the page node' do
     it 'reads its values from the page meta keys' do
-      expect(node(build_site(configured), 'index.html', 'WebApplication')).to include(
+      expect(node(build_site(configured), HOME_PAGE, 'WebApplication')).to include(
         '@id' => 'https://example.com/#page',
         'name' => 'The Home Page',
         'description' => 'What the page is about.',
@@ -37,15 +40,15 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
     end
 
     it 'links to the organisation and to the trail by @id' do
-      expect(node(build_site(configured), 'index.html', 'WebApplication')).to include(
+      expect(node(build_site(configured), HOME_PAGE, 'WebApplication')).to include(
         'publisher' => { '@id' => 'https://www.example.com/#organization' },
         'breadcrumb' => { '@id' => 'https://example.com/#breadcrumbs' }
       )
     end
 
     it 'is absent for a page with no type and no default type' do
-      expect(node(build_site(configured), 'no-type.html', 'WebApplication')).to be_nil
-      expect(graph(build_site(configured), 'no-type.html').map do |entry|
+      expect(node(build_site(configured), TYPELESS_PAGE, 'WebApplication')).to be_nil
+      expect(graph(build_site(configured), TYPELESS_PAGE).map do |entry|
         entry['@type']
       end).to eq(%w[Organization BreadcrumbList])
     end
@@ -53,11 +56,11 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
     it 'appears for a typeless page once a default type is configured' do
       site = build_site(configured('default_type' => 'WebPage'))
 
-      expect(node(site, 'no-type.html', 'WebPage')).to include('name' => 'No Type')
+      expect(node(site, TYPELESS_PAGE, 'WebPage')).to include('name' => 'No Type')
     end
 
     it 'takes the per-type defaults from config' do
-      expect(node(build_site(configured), 'index.html', 'WebApplication')).to include(
+      expect(node(build_site(configured), HOME_PAGE, 'WebApplication')).to include(
         'applicationCategory' => 'DeveloperApplication', 'operatingSystem' => 'Any'
       )
     end
@@ -78,28 +81,28 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
 
   describe 'the organisation' do
     it 'keeps the same @id whatever the site url is' do
-      one = node(build_site(configured.merge('url' => 'https://one.example.com')), 'index.html', 'Organization')
-      two = node(build_site(configured.merge('url' => 'https://two.example.com')), 'index.html', 'Organization')
+      one = node(build_site(configured.merge('url' => 'https://one.example.com')), HOME_PAGE, 'Organization')
+      two = node(build_site(configured.merge('url' => 'https://two.example.com')), HOME_PAGE, 'Organization')
 
       expect(one['@id']).to eq('https://www.example.com/#organization')
       expect(two['@id']).to eq(one['@id'])
     end
 
     it 'writes same_as out as sameAs' do
-      expect(node(build_site(configured), 'index.html', 'Organization'))
+      expect(node(build_site(configured), HOME_PAGE, 'Organization'))
         .to include('sameAs' => ['https://github.com/example'])
     end
 
     it 'makes the logo absolute against the organisation url' do
-      expect(node(build_site(configured), 'index.html', 'Organization'))
+      expect(node(build_site(configured), HOME_PAGE, 'Organization'))
         .to include('logo' => 'https://www.example.com/media/logo.png')
     end
 
     it 'is absent when no organisation is configured' do
       site = build_site
 
-      expect(node(site, 'index.html', 'Organization')).to be_nil
-      expect(node(site, 'index.html', 'WebApplication')).not_to have_key('publisher')
+      expect(node(site, HOME_PAGE, 'Organization')).to be_nil
+      expect(node(site, HOME_PAGE, 'WebApplication')).not_to have_key('publisher')
     end
 
     it 'raises when it has no @id' do
@@ -110,7 +113,7 @@ RSpec.describe Jekyll::StructuredData::StructuredDataTag do
 
   describe 'the breadcrumb list' do
     it 'numbers every crumb and writes its url in full' do
-      expect(node(build_site(configured), 'index.html', 'BreadcrumbList')['itemListElement']).to eq(
+      expect(node(build_site(configured), HOME_PAGE, 'BreadcrumbList')['itemListElement']).to eq(
         [
           { '@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://example.com/' },
           { '@type' => 'ListItem', 'position' => 2, 'name' => 'Guides', 'item' => 'https://example.com/guides/' },

@@ -12,6 +12,8 @@ TMP_ROOT = Dir.mktmpdir('jekyll-page-meta').freeze
 
 at_exit { FileUtils.rm_rf(TMP_ROOT) }
 
+HOME_PAGE = 'index.html'
+
 module SiteBuilder
   # Every spec builds the fixture site for real. A hash pretending to be a page tests the spec, not the gem.
   def build_site(overrides = {})

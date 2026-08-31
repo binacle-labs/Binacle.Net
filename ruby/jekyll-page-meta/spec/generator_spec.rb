@@ -2,13 +2,17 @@
 
 require 'spec_helper'
 
+HOME_DESCRIPTION = 'The front page.'
+ABOUT_PAGE = 'about.md'
+LONG_PAGE = 'long.html'
+
 RSpec.describe Jekyll::PageMeta::MetaGenerator do
   it 'writes the four keys onto every page' do
     site = build_site
 
-    expect(meta(site, 'index.html')).to eq(
+    expect(meta(site, HOME_PAGE)).to eq(
       'title' => 'Home - Example',
-      'description' => 'The front page.',
+      'description' => HOME_DESCRIPTION,
       'canonical' => 'https://example.com/'
     )
   end
@@ -16,18 +20,18 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
   it 'writes the image key when there is an image' do
     site = build_site('og_image' => '/media/card.png')
 
-    expect(meta(site, 'index.html')['image']).to eq('https://example.com/media/card.png')
+    expect(meta(site, HOME_PAGE)['image']).to eq('https://example.com/media/card.png')
   end
 
   describe 'the title' do
     it 'joins the page title to the site title with the separator' do
-      expect(meta(build_site, 'about.md')['title']).to eq('About - Example')
+      expect(meta(build_site, ABOUT_PAGE)['title']).to eq('About - Example')
     end
 
     it 'takes the separator from config' do
       site = build_site('page_meta' => { 'title_separator' => ' | ' })
 
-      expect(meta(site, 'about.md')['title']).to eq('About | Example')
+      expect(meta(site, ABOUT_PAGE)['title']).to eq('About | Example')
     end
 
     it 'appends the suffix before the separator' do
@@ -45,7 +49,7 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
 
   describe 'the description' do
     it 'reads the description key first' do
-      expect(meta(build_site, 'index.html')['description']).to eq('The front page.')
+      expect(meta(build_site, HOME_PAGE)['description']).to eq(HOME_DESCRIPTION)
     end
 
     it 'falls through to the excerpt' do
@@ -54,45 +58,45 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
     end
 
     it 'falls through to the site description' do
-      expect(meta(build_site, 'about.md')['description']).to eq('The site description, in one plain sentence.')
+      expect(meta(build_site, ABOUT_PAGE)['description']).to eq('The site description, in one plain sentence.')
     end
 
     it 'reads the page content when the chain names it' do
       site = build_site(from('description', 'content', 'site'))
 
-      expect(meta(site, 'about.md')['description'])
+      expect(meta(site, ABOUT_PAGE)['description'])
         .to eq('A markdown paragraph with a tag in it. A second paragraph nobody reads.')
     end
 
     it 'skips a link that resolves to nothing but whitespace' do
       site = build_site(from('title_suffix', 'description'))
 
-      expect(meta(site, 'index.html')['description']).to eq('The front page.')
+      expect(meta(site, HOME_PAGE)['description']).to eq(HOME_DESCRIPTION)
     end
 
     it 'writes no key when every link is empty' do
       site = build_site(from('description'))
 
-      expect(meta(site, 'about.md')).not_to have_key('description')
+      expect(meta(site, ABOUT_PAGE)).not_to have_key('description')
     end
 
     it 'cuts on characters, not on words' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => 20 } })
 
-      expect(meta(site, 'long.html')['description']).to eq('A page holding enoug')
+      expect(meta(site, LONG_PAGE)['description']).to eq('A page holding enoug')
     end
 
     it 'cuts nothing when truncate is zero' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => 0 } })
 
-      expect(meta(site, 'long.html')['description'])
+      expect(meta(site, LONG_PAGE)['description'])
         .to eq('A page holding enough words that a description has to be cut.')
     end
 
     it 'cuts nothing when truncate is false' do
       site = build_site('page_meta' => { 'description' => { 'truncate' => false } })
 
-      expect(meta(site, 'long.html')['description'].length).to eq(61)
+      expect(meta(site, LONG_PAGE)['description'].length).to eq(61)
     end
 
     it 'raises when truncate is not a whole number' do
@@ -108,7 +112,7 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
 
   describe 'the canonical' do
     it 'is absolute and drops index.html' do
-      expect(meta(build_site, 'index.html')['canonical']).to eq('https://example.com/')
+      expect(meta(build_site, HOME_PAGE)['canonical']).to eq('https://example.com/')
     end
 
     it 'takes the front matter value over the derived url' do
@@ -128,11 +132,11 @@ RSpec.describe Jekyll::PageMeta::MetaGenerator do
     it 'falls back to the site image' do
       site = build_site('og_image' => '/media/card.png')
 
-      expect(meta(site, 'about.md')['image']).to eq('https://example.com/media/card.png')
+      expect(meta(site, ABOUT_PAGE)['image']).to eq('https://example.com/media/card.png')
     end
 
     it 'is absent when nothing sets one' do
-      expect(meta(build_site, 'about.md')).not_to have_key('image')
+      expect(meta(build_site, ABOUT_PAGE)).not_to have_key('image')
     end
   end
 end

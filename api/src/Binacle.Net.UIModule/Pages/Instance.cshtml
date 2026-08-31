@@ -14,15 +14,15 @@
 		<table class="border">
 			<tbody>
 			<tr>
-				<td>Version</td>
+				<th scope="row">Version</th>
 				<td class="right-align"><code>@Model.Version</code></td>
 			</tr>
 			<tr>
-				<td>Environment</td>
+				<th scope="row">Environment</th>
 				<td class="right-align"><code>@Model.Environment</code></td>
 			</tr>
 			<tr>
-				<td>Runtime</td>
+				<th scope="row">Runtime</th>
 				<td class="right-align"><code>.NET 10</code></td>
 			</tr>
 			</tbody>
@@ -38,7 +38,7 @@
 				var isOn = Model.IsOn(featureSwitch);
 				var path = Model.PathFor(featureSwitch);
 				<tr>
-					<td>@featureSwitch.Name</td>
+					<th scope="row">@featureSwitch.Name</th>
 					<td>
 						@if (isOn)
 						{
@@ -71,6 +71,13 @@
 		<h5>Presets <span class="small-text" data-presets-count></span></h5>
 		<p data-presets-status>Reading them from this instance...</p>
 		<table class="border" data-presets-table hidden>
+			<thead>
+			<tr>
+				<th scope="col">Preset</th>
+				<th scope="col">Boxes</th>
+				<th scope="col" class="right-align">Sizes</th>
+			</tr>
+			</thead>
 			<tbody data-presets-body></tbody>
 		</table>
 	</article>

@@ -50,6 +50,10 @@ describe("largestBin", () => {
 
 		expect(largest).toBe(bins[0]);
 	});
+
+	test("says what is wrong when handed no bins", () => {
+		expect(() => largestBin([])).toThrow("largestBin needs at least one bin");
+	});
 });
 
 describe("randomItemFor", () => {

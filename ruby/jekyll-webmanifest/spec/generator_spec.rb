@@ -2,24 +2,28 @@
 
 require 'spec_helper'
 
+DEFAULT_MANIFEST = 'site.webmanifest'
+CONFIGURED_PATH = '/app/manifest.json'
+ICON_TYPE = 'image/png'
+
 RSpec.describe Jekyll::Webmanifest::WebmanifestGenerator do
   it 'writes no file at all when the site has no webmanifest block' do
     site = build_site
 
-    expect(written?(site, 'site.webmanifest')).to be false
+    expect(written?(site, DEFAULT_MANIFEST)).to be false
   end
 
   it 'writes the file at the default path for a block with nothing in it' do
     site = build_site('webmanifest' => {})
 
-    expect(written?(site, 'site.webmanifest')).to be true
+    expect(written?(site, DEFAULT_MANIFEST)).to be true
   end
 
   it 'moves the file to a configured path' do
-    site = build_site('webmanifest' => { 'path' => '/app/manifest.json' })
+    site = build_site('webmanifest' => { 'path' => CONFIGURED_PATH })
 
     expect(written?(site, 'app/manifest.json')).to be true
-    expect(written?(site, 'site.webmanifest')).to be false
+    expect(written?(site, DEFAULT_MANIFEST)).to be false
   end
 
   it 'raises when the path names a directory' do
@@ -64,18 +68,18 @@ RSpec.describe Jekyll::Webmanifest::WebmanifestGenerator do
     site = build_site('webmanifest' => {})
 
     expect(manifest(site)['icons'])
-      .to eq([{ 'src' => '/android-chrome-192x192.png', 'sizes' => '192x192', 'type' => 'image/png' }])
+      .to eq([{ 'src' => '/android-chrome-192x192.png', 'sizes' => '192x192', 'type' => ICON_TYPE }])
   end
 
   it 'writes every configured icon, keys in the order the config declares them' do
     icons = [
-      { 'src' => '/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png' },
-      { 'src' => '/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable' }
+      { 'src' => '/icon-192.png', 'sizes' => '192x192', 'type' => ICON_TYPE },
+      { 'src' => '/icon-512.png', 'sizes' => '512x512', 'type' => ICON_TYPE, 'purpose' => 'maskable' }
     ]
     site = build_site('webmanifest' => { 'icons' => icons })
 
     expect(manifest(site)['icons']).to eq(icons)
-    expect(built(site, 'site.webmanifest')).to include(%("src": "/icon-512.png",\n      "sizes"))
+    expect(built(site, DEFAULT_MANIFEST)).to include(%("src": "/icon-512.png",\n      "sizes"))
   end
 
   it 'writes no icons key for an empty list' do
@@ -113,14 +117,14 @@ RSpec.describe Jekyll::Webmanifest::WebmanifestGenerator do
   it 'writes JSON that parses' do
     site = build_site('webmanifest' => { 'name' => 'A "quoted" name', 'orientation' => 'portrait' })
 
-    expect { JSON.parse(built(site, 'site.webmanifest')) }.not_to raise_error
+    expect { JSON.parse(built(site, DEFAULT_MANIFEST)) }.not_to raise_error
     expect(manifest(site)['name']).to eq('A "quoted" name')
   end
 
   it 'publishes the built path as site.webmanifest.url' do
-    site = build_site('webmanifest' => { 'path' => '/app/manifest.json' })
+    site = build_site('webmanifest' => { 'path' => CONFIGURED_PATH })
 
-    expect(site.config['webmanifest']['url']).to eq('/app/manifest.json')
+    expect(site.config['webmanifest']['url']).to eq(CONFIGURED_PATH)
   end
 
   it 'carries the baseurl into the published url, start_url and every icon' do

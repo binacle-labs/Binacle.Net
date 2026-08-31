@@ -2,12 +2,14 @@
 
 require 'spec_helper'
 
+CAPITALIZED = 'Hello World'
+
 RSpec.describe Jekyll::SiteFilters::Capitalization do
   let(:filter) { Class.new { include Jekyll::SiteFilters::Capitalization }.new }
 
   describe '#capitalize_all' do
     it 'capitalizes the first letter of each word' do
-      expect(filter.capitalize_all('hello world')).to eq('Hello World')
+      expect(filter.capitalize_all('hello world')).to eq(CAPITALIZED)
     end
 
     it 'handles a single word' do
@@ -15,11 +17,11 @@ RSpec.describe Jekyll::SiteFilters::Capitalization do
     end
 
     it 'leaves already-capitalized input unchanged' do
-      expect(filter.capitalize_all('Hello World')).to eq('Hello World')
+      expect(filter.capitalize_all(CAPITALIZED)).to eq(CAPITALIZED)
     end
 
     it 'handles all-uppercase input' do
-      expect(filter.capitalize_all('HELLO WORLD')).to eq('Hello World')
+      expect(filter.capitalize_all('HELLO WORLD')).to eq(CAPITALIZED)
     end
 
     it 'handles an empty string' do
@@ -39,15 +41,15 @@ RSpec.describe Jekyll::SiteFilters::Capitalization do
     end
 
     it 'collapses a run of spaces to one' do
-      expect(filter.capitalize_all('hello   world')).to eq('Hello World')
+      expect(filter.capitalize_all('hello   world')).to eq(CAPITALIZED)
     end
 
     it 'drops leading and trailing spaces' do
-      expect(filter.capitalize_all('  hello world  ')).to eq('Hello World')
+      expect(filter.capitalize_all('  hello world  ')).to eq(CAPITALIZED)
     end
 
     it 'splits on a tab as well as a space' do
-      expect(filter.capitalize_all("hello\tworld")).to eq('Hello World')
+      expect(filter.capitalize_all("hello\tworld")).to eq(CAPITALIZED)
     end
   end
 end

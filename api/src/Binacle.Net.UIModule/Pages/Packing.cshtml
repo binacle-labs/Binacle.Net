@@ -146,12 +146,13 @@
     <fieldset class="s12">
       <div class="grid">
         <div class="s12 m6">
-          <div class="field">
+          <div class="field label">
             <select x-model="model.algorithm" name="algorithm" id="algorithm">
               <template x-for="(item, index) in algorithms" :key="index">
                 <option :value="item.value" x-text="item.text"></option>
               </template>
             </select>
+            <label for="algorithm">Algorithm</label>
             <i>arrow_drop_down</i>
           </div>
         </div>

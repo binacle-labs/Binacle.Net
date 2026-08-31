@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
   it 'renders a navigation landmark, an ordered list and the current page marked' do
-    expect(nav(build_site(versioned), 'deep.html').split("\n")).to eq(
+    expect(nav(build_site(versioned), DEEP_PAGE).split("\n")).to eq(
       [
         '<nav aria-label="breadcrumb">',
         '<ol class="breadcrumb">',
@@ -27,7 +27,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
 
   describe 'link_last' do
     it 'leaves the current page unlinked by default' do
-      expect(nav(build_site(versioned), 'deep.html')).to include(
+      expect(nav(build_site(versioned), DEEP_PAGE)).to include(
         '<li class="breadcrumb-item active" aria-current="page">Quick start</li>'
       )
     end
@@ -35,7 +35,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
     it 'links the current page when it is on, keeping aria-current' do
       site = build_site(versioned('link_last' => true))
 
-      expect(nav(site, 'deep.html')).to include(
+      expect(nav(site, DEEP_PAGE)).to include(
         '<li class="breadcrumb-item active">' \
         '<a href="/section/v1.0.x/getting-started/quick-start.html" aria-current="page">Quick start</a></li>'
       )
@@ -44,13 +44,13 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
 
   describe 'the home crumb' do
     it 'renders its title as text by default' do
-      expect(nav(build_site(versioned), 'deep.html')).to include('<a href="/section/v1.0.x/">Home</a>')
+      expect(nav(build_site(versioned), DEEP_PAGE)).to include('<a href="/section/v1.0.x/">Home</a>')
     end
 
     it 'renders the configured html in place of the title' do
       site = build_site(versioned('home' => { 'html' => '<i class="small">home</i>' }))
 
-      expect(nav(site, 'deep.html')).to include(
+      expect(nav(site, DEEP_PAGE)).to include(
         '<a href="/section/v1.0.x/"><i class="small">home</i></a>'
       )
     end
@@ -58,7 +58,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
     it 'takes a configured title' do
       site = build_site(versioned('home' => { 'title' => 'Start' }))
 
-      expect(nav(site, 'deep.html')).to include('>Start</a>')
+      expect(nav(site, DEEP_PAGE)).to include('>Start</a>')
     end
   end
 
@@ -66,11 +66,11 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
     it 'carries the configured aria-label' do
       site = build_site(versioned('label' => 'fil d\'Ariane'))
 
-      expect(nav(site, 'deep.html')).to include('<nav aria-label="fil d&#39;Ariane">')
+      expect(nav(site, DEEP_PAGE)).to include('<nav aria-label="fil d&#39;Ariane">')
     end
 
     it 'carries a configured class and no class attribute without one' do
-      expect(nav(build_site(versioned('class' => 'tiny-space')), 'deep.html')).to include(
+      expect(nav(build_site(versioned('class' => 'tiny-space')), DEEP_PAGE)).to include(
         '<nav aria-label="breadcrumb" class="tiny-space">'
       )
     end
@@ -85,7 +85,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
   it 'prefixes every href with the baseurl, which the published trail leaves off' do
     site = build_site(versioned, 'baseurl' => '/docs')
 
-    expect(trail(site, 'deep.html').first['url']).to eq('/section/v1.0.x/')
-    expect(nav(site, 'deep.html')).to include('<a href="/docs/section/v1.0.x/">Home</a>')
+    expect(trail(site, DEEP_PAGE).first['url']).to eq('/section/v1.0.x/')
+    expect(nav(site, DEEP_PAGE)).to include('<a href="/docs/section/v1.0.x/">Home</a>')
   end
 end

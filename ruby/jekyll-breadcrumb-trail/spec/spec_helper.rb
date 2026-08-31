@@ -12,6 +12,8 @@ TMP_ROOT = Dir.mktmpdir('jekyll-breadcrumb-trail').freeze
 
 at_exit { FileUtils.rm_rf(TMP_ROOT) }
 
+DEEP_PAGE = 'deep.html'
+
 module SiteBuilder
   # Every spec builds the fixture site for real. A hash pretending to be a page tests the spec, not the gem.
   def build_site(breadcrumbs = {}, overrides = {})

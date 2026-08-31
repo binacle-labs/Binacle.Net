@@ -2,19 +2,21 @@
 
 require 'spec_helper'
 
+V1_LINKS = 'v1.0.x/links.md'
+
 RSpec.describe Binacle::DocsVersions::VLinkTag do
   it 'resolves a static file inside the page version' do
-    expect(doc(build_site, 'v1.0.x/links.md').output)
+    expect(doc(build_site, V1_LINKS).output)
       .to include('static: /versions/v1.0.x/swagger/v3.json')
   end
 
   it 'renders the liquid in its own argument first' do
-    expect(doc(build_site, 'v1.0.x/links.md').output)
+    expect(doc(build_site, V1_LINKS).output)
       .to include('liquid: /versions/v1.0.x/swagger/v3.json')
   end
 
   it 'resolves a document as well as a static file' do
-    expect(doc(build_site, 'v1.0.x/links.md').output).to include('document: /versions/v1.0.x/guide.html')
+    expect(doc(build_site, V1_LINKS).output).to include('document: /versions/v1.0.x/guide.html')
   end
 
   it 'resolves the same path to a different file on a different version' do

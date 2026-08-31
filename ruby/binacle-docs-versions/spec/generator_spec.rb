@@ -2,21 +2,25 @@
 
 require 'spec_helper'
 
+V1_GUIDE = 'v1.0.x/guide.md'
+V2_GUIDE = 'v2.0.x/guide.md'
+REDIRECT_PAGE = 'redirect.md'
+
 RSpec.describe Binacle::DocsVersions::VersionGenerator do
   it 'stamps the version onto the title suffix' do
-    expect(doc(build_site, 'v1.0.x/guide.md').data['title_suffix']).to eq('(v1.0.x)')
+    expect(doc(build_site, V1_GUIDE).data['title_suffix']).to eq('(v1.0.x)')
   end
 
   it 'stamps the current version too, which is titled like any other' do
-    expect(doc(build_site, 'v2.0.x/guide.md').data['title_suffix']).to eq('(v2.0.x)')
+    expect(doc(build_site, V2_GUIDE).data['title_suffix']).to eq('(v2.0.x)')
   end
 
   it 'makes a version that is not current unindexable' do
-    expect(doc(build_site, 'v1.0.x/guide.md').data['robots']).to eq('noindex, follow')
+    expect(doc(build_site, V1_GUIDE).data['robots']).to eq('noindex, follow')
   end
 
   it 'leaves the current version indexable' do
-    expect(doc(build_site, 'v2.0.x/guide.md').data['robots']).to be_nil
+    expect(doc(build_site, V2_GUIDE).data['robots']).to be_nil
   end
 
   it 'never overwrites a value the page set itself' do
@@ -36,35 +40,35 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
   it 'moves which version is indexable when the one knob moves' do
     site = build_with_current('v1.0.x')
 
-    expect(doc(site, 'v1.0.x/guide.md').data['robots']).to be_nil
-    expect(doc(site, 'v2.0.x/guide.md').data['robots']).to eq('noindex, follow')
+    expect(doc(site, V1_GUIDE).data['robots']).to be_nil
+    expect(doc(site, V2_GUIDE).data['robots']).to eq('noindex, follow')
   end
 
   it 'stamps the suffix before a generator at :low reads it' do
-    expect(doc(build_site, 'v1.0.x/guide.md').data['suffix_seen_at_low']).to eq('(v1.0.x)')
+    expect(doc(build_site, V1_GUIDE).data['suffix_seen_at_low']).to eq('(v1.0.x)')
   end
 
   describe 'the redirect stamps' do
     it 'points a redirect page at the current version index' do
       site = build_site
 
-      expect(doc(site, 'redirect.md').data['redirect_to']).to eq(doc(site, 'v2.0.x/index.md').url)
+      expect(doc(site, REDIRECT_PAGE).data['redirect_to']).to eq(doc(site, 'v2.0.x/index.md').url)
     end
 
     it 'gives it a canonical that is the page it points at, not itself' do
-      page = doc(build_site, 'redirect.md')
+      page = doc(build_site, REDIRECT_PAGE)
 
       expect(page.data['canonical']).to eq(page.data['redirect_to'])
     end
 
     it 'makes it unindexable' do
-      expect(doc(build_site, 'redirect.md').data['robots']).to eq('noindex')
+      expect(doc(build_site, REDIRECT_PAGE).data['robots']).to eq('noindex')
     end
 
     it 'moves the redirect when the one knob moves' do
       site = build_with_current('v1.0.x')
 
-      expect(doc(site, 'redirect.md').data['redirect_to']).to eq(doc(site, 'v1.0.x/index.md').url)
+      expect(doc(site, REDIRECT_PAGE).data['redirect_to']).to eq(doc(site, 'v1.0.x/index.md').url)
     end
 
     it 'never overwrites a value the page set itself' do
