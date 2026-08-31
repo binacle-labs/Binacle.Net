@@ -506,11 +506,11 @@ they went - strike either one and it comes back.**
 
 | Item | Why not | Where it went |
 |---|---|---|
-| **Every test on the CI suite** | Ten of the twenty-six tests are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A test nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses its shared test suite as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | `plans/ci-cd/tests-reach-ci.md` |
+| **Every test on the CI suite** | Ten of the twenty-six tests are Ruby, and **Ruby does not build the image** - it builds the Jekyll sites. A test nobody runs cannot ship a broken image. The argument for the gate was that the release workflow uses its shared test suite as its *"this commit passed CI"* proof and that proof is incomplete. **That is true and it is still not an image risk.** | done outside the release, 2026-08-31 |
 | **Docker Hub tag immutability - the rule** | The switch is off, so the rule's value changes nothing about this release either way. Correcting it is what makes the post-release decision a flip rather than a project. **The stored value on 2026-08-13 was `".*"`**, which would freeze `latest` and `3.0`. | `plans/ci-cd/dockerhub-tag-immutability.md` |
 
-**Also not here, and not new:** the Ruby coverage decision (`plans/ci-cd/sonar-scope-and-coverage.md`) and rubocop, which
-lands red before it lands green. **The Docker Hub logo and categories - the rest of
+**Also not here, and not new:** rubocop, which lands red before it lands green. **The Ruby coverage import
+landed on 2026-08-31, outside the release** - the gems read 98.8%. **The Docker Hub logo and categories - the rest of
 `plans/ci-cd/dockerhub-overview.md` - were done outside the release on 2026-08-27.**
 
 **Held back on 2026-08-14, with reasons that still hold:**

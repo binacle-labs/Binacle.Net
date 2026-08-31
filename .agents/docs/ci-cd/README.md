@@ -59,7 +59,8 @@ trigger here is open to changing.
 
 ## `gate` is the only required check
 
-**Branch protection names `Pull Request / Gate` and nothing else.** Everything under it can be renamed, split
+**Branch protection names `Gate` and nothing else** - the job name is the whole context, with no workflow
+prefix. Set as a ruleset on the default branch, 2026-08-31. Everything under it can be renamed, split
 or reordered without touching protection, which retires a trap rather than working around it: required check
 names *are* job names, so every rename silently breaks protection, and a required check that stops reporting
 leaves every pull request waiting on it forever with nothing saying why.
@@ -198,8 +199,7 @@ tag set is computed in `publish`.
 
 **Files.** `<verb>-<object>.yml` for an entry point — `release-docker-image.yml`, `deploy-docs-site.yml`.
 `shared-<noun>.yml` for one that something else calls — `shared-image-tests.yml`, `shared-smoke-image.yml`.
-`pull-request.yml` is the one exception, named for the event it gates rather than for an action, because the
-required check then reads `Pull Request / Gate`.
+`pull-request.yml` is the one exception, named for the event it gates rather than for an action.
 
 **Workflow `name:`** is the sidebar string, so it is where the grouping is actually visible. Entry points get a
 plain name; shared ones get one prefix, consistently — `Shared / Test Suite`, `Shared / Smoke Image`.

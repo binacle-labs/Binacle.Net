@@ -27,18 +27,16 @@ rm -rf artifacts/tests artifacts/coverage
 # it a failed run prints no table at all - the one time you most want to see it.
 COVERAGE_FORMAT="$format" just test all || true
 
-# sonar.ruby.coverage.reportPaths takes no wildcard, so the ten gem reports have to arrive as one file. It is
-# the only coverage setting Sonar has that does not glob; the C# and javascript ones beside it do.
+# sonar.ruby.coverage.reportPaths takes no wildcard, so the ten gem reports have to arrive as one file.
 #
-# Every .json in the sonar folder is a simplecov report - C# writes .xml there and jest writes .info. A path
-# appears in exactly one gem's report, so merging the coverage maps is a plain union.
-if [ "$format" = sonar ]; then
+# Every .json here is a simplecov report - C# writes .xml and jest writes .info. A path appears in one gem
+# only, so the coverage maps merge as a union.
+if [[ "$format" = sonar ]]; then
 	shopt -s nullglob
 	reports=(artifacts/coverage/sonar/*.json)
 
-	if [ ${#reports[@]} -gt 0 ]; then
-		# Written beside them under a name the glob above does not match, so a half-written merge can never
-		# be read back as an eleventh report.
+	if [[ ${#reports[@]} -gt 0 ]]; then
+		# .tmp, or the glob above reads a half-written merge as an eleventh report.
 		jq -s '{meta: .[0].meta, coverage: (map(.coverage) | add), groups: {}}' "${reports[@]}" \
 			>artifacts/coverage/sonar/ruby.json.tmp
 

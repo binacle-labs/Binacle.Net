@@ -1,5 +1,5 @@
 ---
-description: Answered no - linting is one decision for the whole repository, not a TypeScript one. Every language gets the same treatment or none does.
+description: Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does.
 state: deferred
 waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
 paths:
@@ -7,6 +7,8 @@ paths:
   - "sites/**"
   - "api/src/Binacle.Net.UIModule/**"
   - "vipaq/packages/**"
+  - "ruby/**"
+  - ".editorconfig"
 ---
 
 # Linting is a whole-repository decision
@@ -23,8 +25,9 @@ every language here to the same standard.** Then the material below is the TypeS
 - **TypeScript and JavaScript: nothing.** No eslint, no prettier, no biome anywhere. Style is whatever the
   last person typed, held only by `.editorconfig` and `strict` in six copies of `tsconfig.json`.
 - **Ruby: a config, never run.** `ruby/.rubocop.yml` covers every gem and writes down the style it enforces.
-  rubocop is in `ruby/Gemfile`, and nothing calls it - no `just` recipe and no pipeline step. It lands red
-  before it lands green.
+  rubocop is in `ruby/Gemfile`, and nothing calls it - no `just` recipe and no pipeline step. **41 offences
+  over 110 files, measured 2026-08-31, 31 of them autocorrectable.** It lands red before it lands green, and
+  `rubocop -a` clears three quarters of that in one command - reading what it changed is the actual work.
 - **C#: no in-build linter, but not nothing.** There are no analyzer packages, no `EnforceCodeStyleInBuild`,
   no `AnalysisMode` and no `TreatWarningsAsErrors`. The single root `.editorconfig` carries formatting rules
   and exactly one `dotnet_diagnostic` line, and it is a suppression (`IDE0130`, scoped to the ViPaq unit

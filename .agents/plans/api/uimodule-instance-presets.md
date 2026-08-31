@@ -30,3 +30,7 @@ through `IOptionsMonitor`, or accept the staleness and say so where the decision
 
 **When it lands, `_js/instance.js` is dead** along with its webpack entry, and the UI module doc's section
 explaining why the page fetches over HTTP gets replaced, not edited.
+
+**It also closes a watched gap.** That fetch is the only v4 call shipped inside the image, and v4 is
+documented as able to change in a patch release. `plans/unwatched-gaps.md` holds the gap and defers the fix
+here, so nobody edits the call to v3 in a file this plan removes.

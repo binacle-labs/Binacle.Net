@@ -1,5 +1,5 @@
 ---
-description: Coverage is 67.8% against a gate of 80% on new code - where the 2226 uncovered lines actually are, and the 212 of them that already have tests and only need the services started
+description: Coverage is 74.9% against a gate of 80% on new code - where the 1901 uncovered lines actually are, and the 212 of them that already have tests and only need the services started
 state: ready
 waits-on: "nothing"
 paths:
@@ -12,14 +12,17 @@ paths:
 
 # Where the uncovered lines are
 
-**Measured on the `ad2e96b8` run of 2026-08-27: 71.1% overall, 70.6% line. 1892 uncovered of 6429.** The gate
-wants 80% on new code and reads **77.0%**. It cannot be lowered - custom quality gates start at the Team plan
-and the project is on Free - so this closes by testing, not by configuring.
+**Measured on the `1fa5ee40` run of 2026-08-31: 74.9% overall, 1901 uncovered of 7515.** The gate wants 80%
+on new code. It cannot be lowered - custom quality gates start at the Team plan and the project is on Free -
+so this closes by testing, not by configuring.
 
-**334 lines were never coverable** and came out of the denominator through `sonar.coverage.exclusions`: the
-python index generator, the three sites' bundles and webpack configs, and the typescript fixture-provider and
-generator folders. That alone was 67.1% to 70.6%, with no test written. Everything below is the real
-remainder, and the file-level numbers are from the run before the exclusions landed.
+**The gems landing is most of the distance from 64.3% to 74.9%**, and no test was written for it. What is
+left below is real test-writing, plus one more item that is not.
+
+**334 lines were never coverable** and came out of the denominator through `sonar.coverage.exclusions`,
+which now names `tooling`, `sites`, `tests`, `tools` and `spec`: the python index generator, the three
+sites' bundles and webpack configs, and the typescript fixture-provider and generator folders. That alone
+was 67.1% to 70.6%, with no test written. **That part is done.** Everything below is the real remainder.
 
 ## 212 lines already have tests and are not being run
 
@@ -55,17 +58,16 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
   `ConcurrentSortedDictionary` is the one to be careful with: a hand-written concurrent collection at 0% is
   the shape of bug that only appears under load.
 
-## The ten gems contribute nothing either way
+## The ten gems are in, and they are done
 
-Their coverage has never reached SonarCloud, because no `.rb` file has ever been indexed. Until that is
-settled the gem suites cannot move this number. `plans/ci-cd/sonar-scope-and-coverage.md` owns it.
+**98.8% on `1fa5ee40`, 12 uncovered of 1034.** They were 0% until 2026-08-31 - the import failed on a
+wildcard the ruby setting does not accept. The memory on Sonar ruby coverage paths carries what bit and why.
+
+Nothing to do here: 12 uncovered lines across ten gems is not where the next hour goes.
 
 ## Done when
 
 - [ ] The Sonar workflow runs the ServiceModule integration suite against all three backends.
       `AzureTablesAccountRepository.cs` is not 0% on the Code page after a run.
-- [ ] `sonar.coverage.exclusions` covers the four non-product globs and the overall number moved with no test
-      written.
-      `grep 'coverage.exclusions' tooling/ci/sonar-analysis.xml` names tooling, sites, tests and tools.
 - [ ] Each remaining block above is either covered or has a plan of its own naming why it is not.
       **By eye**, on the Code page sorted by uncovered lines.

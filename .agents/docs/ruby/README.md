@@ -350,8 +350,8 @@ there.
 
 **Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is in the bundle, and **nothing runs
 it** - there is no recipe and no pipeline step. Run it by hand with `cd ruby && bundle exec rubocop`. **It
-does not come back clean.** 42 offences in 17 files, measured 27 Aug 2026, all but the ten
-`Gemspec/DevelopmentDependencies` autocorrectable and none of it decided on:
+does not come back clean.** 41 offences over 110 files, measured 31 Aug 2026, 31 of them autocorrectable and
+none of it decided on:
 
 | Count | Cop |
 |---|---|
