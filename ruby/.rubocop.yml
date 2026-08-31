@@ -1,7 +1,7 @@
 # One config for every gem under ruby/. Rubocop is not in the bundle, so run `rubocop` from ruby/ itself.
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.4
   NewCops: enable
   Exclude:
     - '*/spec/fixtures/**/*'

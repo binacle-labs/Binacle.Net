@@ -25,10 +25,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - not near future"
 - file: sonar-issue-triage.md
-  description: "Confirmed by the 2026-08-27 run - security is A and zero findings, high-severity is down to two, and 295 findings remain. What is left, and the answer on whether test and tooling code stays in scope"
+  description: "Read from the 2026-08-30 run - reliability is C not B, six open bugs and all six are in new code, 27 HIGH findings that are all one Ruby rule in our own gem specs"
   state: ready
-  waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
-  paths: ["tooling/ci/sonar-analysis.xml", "api/src/Binacle.Net.UIModule/**", "packages/**"]
+  waits-on: "nothing. Every accept below is recommended in place; a fresh scan is needed to confirm the result"
+  paths: ["api/src/Binacle.Net.UIModule/Pages/**", "api/src/Binacle.Net.UIModule/_js/instance.js", "packages/binacle-net-ui/src/utils/samples.ts", "ruby/*/spec/**", "tooling/ci/sonar-analysis.xml"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
@@ -38,10 +38,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "nothing"
 - file: unwatched-gaps.md
-  description: "Two repository gaps nothing watches - a generated copy on no drift check, and a v4 caller inside the image"
+  description: "Repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, and a drift check no workflow runs"
   state: proposed
   waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
-  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**"]
+  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**", "vipaq/test-vectors/**"]
 ```
 
 ## API

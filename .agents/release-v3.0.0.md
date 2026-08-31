@@ -4,12 +4,15 @@ description: Release - Binacle.Net v3.0.0. A test release first, then the real o
 
 # Release - Binacle.Net v3.0.0
 
-**Status:** Betas 1 to 6 published. **Gate A is closed.** Gate B is where the work is: B1 and B3 are done,
+**Status:** Betas 1 to 7 published. **Gate A is closed.** Gate B is where the work is: B1 and B3 are done,
 B2 needs a browser, B4 and B5 are yours.
 
-**`3.0.0-beta.6` was cut on 2026-08-30 and its run went red on a check that was doing its job.** The image is
-published and verifies; the git tag and the GitHub release are missing. *After beta.5* below has what
-happened and what is left of it.
+**`3.0.0-beta.7` was cut on 2026-08-31 from `ce9e4461` and its run was green.** Tag, GitHub prerelease,
+signature, SBOM and provenance are all there - run `33374185508`. **It is the first image carrying AGPL-3.0**,
+which is the one thing in this release that cannot be corrected after a push. *After beta.5* below has what
+beta.6 was for and how it ended.
+
+**beta.7 is the image every check now runs against**, and it replaces beta.6 everywhere this file names one.
 
 **Why there was a beta.5, kept because the same argument now applies again.** `v3.0.0-beta.4` was tagged on
 2026-08-20 and **247 files changed after it**, 176 of them under `api/`, +2378 / -13149. The UI module was
@@ -63,8 +66,8 @@ the deletion was planned and never done, and the claim had reached three other f
 registry. `latest` is still `2.1.1`. `3.0` does not exist.
 
 **Resolving and verifying are not the same thing.** Betas 1 to 4 were signed under a tag ref, so the published
-`cosign verify` command, anchored at `@refs/heads/main$`, **fails on them**. Only `3.0.0-beta.5` and
-`3.0.0-beta.6` pass it, which is why `README.md:20` now names beta.6 - see the gotchas.
+`cosign verify` command, anchored at `@refs/heads/main$`, **fails on them**. Only `3.0.0-beta.5`,
+`3.0.0-beta.6` and `3.0.0-beta.7` pass it, which is why `README.md:20` names a beta - see the gotchas.
 
 ---
 
@@ -79,6 +82,7 @@ registry. `latest` is still `2.1.1`. `3.0` does not exist.
 | A5 | Check the changelog names every image change since the last test release | here | done - 2026-08-26 |
 | A6 | Swap the demo's random roll for a hand-picked sample set | here | done - 2026-08-26. **Its three by-eye checks passed on A1 on 2026-08-27** |
 | A7 | Cut the test release - dispatch the release workflow with version `3.0.0-beta.5` | here | done - 2026-08-28. **Run `33127006852`, from `72015ff1`** |
+| A8 | Move the code licence to AGPL-3.0 | here | done - 2026-08-31. **Landed in the image at `3.0.0-beta.7`** |
 
 ### A1. Check the light and dark switch works, in a real browser
 
@@ -246,7 +250,28 @@ B1 proves it did not. `run-name` now puts the version in the Actions list, since
 
 ---
 
-## After beta.5 - beta.6, and the run that went red
+### A8. Move the code licence to AGPL-3.0
+
+**It goes in Gate A because the licence is baked into the image**, in three places that no later commit can
+reach: the `org.opencontainers.image.licenses` label, the `LICENSE.AGPL-3.0` file at `/app`, and the footer
+link the UI module renders. An image already pulled keeps whatever it was built with.
+
+- [x] **The label is right, read off the published image - 2026-08-31.**
+      `org.opencontainers.image.licenses=AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`.
+- [x] **`/app/LICENSE.AGPL-3.0` is in the image and `/app/LICENSE.GPL-3.0` is gone - 2026-08-31.**
+      That is GPL sections 4 and 5 satisfied for the conveyed binary.
+- [x] **The footer links `blob/main/LICENSE.AGPL-3.0` and says `AGPL-3.0` - 2026-08-31**, read off a running
+      beta.7 with `UI_MODULE=True`.
+- [x] **GitHub reads the repository as AGPL-3.0 - 2026-08-31.** `spdx_id: AGPL-3.0` off the repository API.
+      This was the one thing that could only be checked after a push.
+- [x] **`tooling/smoke/structure.yaml` asserts the new label and passes - 2026-08-31.** 37 of 37 against the
+      published beta.7. The assertion had never run against a real image before this.
+
+**The boundary sentence is correct as written.** `CHANGELOG.md`, `NOTICE` and the v3 release notes all say
+versions up to and including `3.0.0-beta.6` stay GPL-3.0. beta.7 is the first AGPL image, so that line holds.
+
+
+## After beta.5 - beta.6 went red, beta.7 went green
 
 **Eleven commits landed after `v3.0.0-beta.5`, six of them untested by any dispatch**, which is what beta.6
 was cut for. The image changes were FluxResults vendored in-tree, the licence text and `NOTICE` shipping
@@ -268,13 +293,29 @@ anchored identity, SPDX SBOM with 166 packages, provenance pointing at the run, 
 `aspnet:10.0`, runs as `app (1654)`. `Move the tags that move` printed `moving=` and would have skipped
 anyway, and the `page` job skipped on its prerelease guard. **Nothing is half-published.**
 
-**Missing: the `v3.0.0-beta.6` git tag and the GitHub prerelease**, because the `release` job never ran.
-
 **The fix is a retry in the workflow step, not in the recipe.** Five attempts, 15 seconds apart. The recipe
 stays one shot because it is the command `SECURITY.md` hands readers, and a reader wants an answer rather
-than a wait. **Re-dispatch beta.6 to get the green run and the tag** - the tag is free, the commit is
-unchanged, and it is what proves the retry before the real tag hits the same race with `3.0.0` already on
-Docker Hub.
+than a wait.
+
+**beta.7 proved the retry, and it did it on the commit that mattered.** Dispatched 2026-08-31 from `ce9e4461`,
+the licence commit. Run `33374185508`, green end to end. The `v3.0.0-beta.7` tag and the GitHub prerelease are
+both there, so the `release` job ran this time. `v3.0.0-beta.6` also has its tag and prerelease.
+
+**So the race is closed and beta.6 needs nothing.** beta.7 supersedes it as the image every check runs
+against.
+
+**What beta.7 was checked with, 2026-08-31, all against the published image and not a local build:**
+
+| Check | Result |
+|---|---|
+| `just image verify 3.0.0-beta.7 all` | PASS - signature on `refs/heads/main`, SBOM 166 packages, provenance on run `33374185508`, revision `ce9e4461` |
+| `container-structure-test` against `tooling/smoke/structure.yaml` | 37 of 37 |
+| Five smoke profiles - minimal, quickstart, prod, service, full | 76 requests, 0 failures |
+| `just test all` | 12 dotnet projects 10321 passed, 5 jest suites 854 passed, 10 rspec suites 0 failures |
+| UI pages with `UI_MODULE=True` - `/`, `/packing`, `/vipaq`, `/instance` | 200, and all ten static assets 200 |
+
+**The one thing on that list nobody had run before was the structure test.** It is what asserts the AGPL label,
+and it had been written but never executed against a real image.
 
 ---
 
@@ -285,8 +326,8 @@ list.
 
 | # | Item | Where the work is | State |
 |---|---|---|---|
-| B1 | Check the test image is signed and complete | here | done - 2026-08-31 |
-| B2 | Open the test image in a browser and use it like a visitor | here | open - **the browser half only**, against beta.6, see below |
+| B1 | Check the test image is signed and complete | here | done - 2026-08-31, **re-run against beta.7** |
+| B2 | Open the test image in a browser and use it like a visitor | here | open - **the browser half only**, against beta.7, see below |
 | B3 | Run the first command on the Docker Hub page and paste in the real answer | `plans/ci-cd/dockerhub-overview.md` - section 1 | done - 2026-08-31, **no edit was needed** |
 | B4 | Rename the changelog heading to `3.0.0` | here | open - **the last edit before the release** |
 | B5 | Cut the real release - dispatch the release workflow with version `3.0.0` | here | open |
@@ -305,9 +346,8 @@ list.
 
 ### B2. Open the test image in a browser and use it like a visitor
 
-- [ ] **`docker run` `binacle/binacle-net:3.0.0-beta.6` with `UI_MODULE=True`** and open `/`, `/packing`,
+- [ ] **`docker run` `binacle/binacle-net:3.0.0-beta.7` with `UI_MODULE=True`** and open `/`, `/packing`,
       `/vipaq` and `/instance`. **A1 read a local build; this reads what the pipeline actually bakes.**
-      **It does not wait for the re-dispatch** - beta.6 is published and pullable now.
 
 **What was checked on 2026-08-31 without a browser, so the browser pass is shorter.** The published image was
 run and all four pages answered 200, as did `/swagger/`, `/scalar/` and `/error/404`. Every stylesheet and
@@ -318,6 +358,10 @@ button, the bound `submitStatus`, the error dialog and no `hasUnpackedItems` - s
 - [ ] **Work the packing page like a visitor.** Type your own dimensions, press Add bin, press Clear all, then
       submit each time. **If A4 landed, none of those produces an error dialog.** If A4 was struck, confirm
       what a visitor sees so it is a known cost rather than a surprise.
+
+**Re-read against `3.0.0-beta.7` on 2026-08-31.** Same result: `/`, `/packing`, `/vipaq` and `/instance` all
+200, and all ten `/_content/` assets 200. The footer now says `AGPL-3.0` and links `blob/main/LICENSE.AGPL-3.0`.
+**Only the javascript half is left**, and it is the box above.
 
 ### B3. Run the first command on the Docker Hub page and paste in the real answer
 
@@ -367,11 +411,16 @@ satisfied the first and not the second. The bump to `3.0` is post-release work, 
 carries a beta pin for the length of one run. **They moved early once before, on 2026-08-07, and sat on `main`
 naming an image nobody could pull** - that is what the first rule exists for.
 
+**beta.7 shipped and the pins still say beta.6.** Both rules still hold - beta.6 resolves and verifies - so
+this is not a bug, and moving them buys one thing only: a reader who copies a sample today gets the AGPL
+image rather than the last GPL one. **Weigh that against touching nine files twice**, since they all go to
+`3.0` at the tag anyway. Leaving them is defensible; if any beta is deleted before the tag, it stops being.
+
 **`README.md:20` named an image the published verify command rejects, and it now names `3.0.0-beta.6` -
 moved 2026-08-31.** It pointed at `3.0.0-beta.4`, which resolves but was signed under a tag ref, so
 `cosign verify` anchored at `@refs/heads/main$` failed on it, two lines under a sentence telling the reader to
-run that command. beta.6 passes it, checked rather than assumed. **The line is still deleted at the tag** -
-`post-release-v3.0.0.md` carries that.
+run that command. beta.6 passes it, checked rather than assumed, and so does beta.7. **The line is still
+deleted at the tag** - `post-release-v3.0.0.md` carries that.
 
 **The six sample pins and the two sample READMEs moved with it**, same day, same reason. `tooling/image.just:9`
 named `3.0.0-beta.4` as the example of a **tag-signed** release needing its ref; **the example was cut and the
@@ -435,13 +484,15 @@ release link, which need the tag.** `plans/sites/docs-v3-deploy.md` carries that
 5. **Cut the test release, `v3.0.0-beta.5`.** **Done 2026-08-28.**
 6. **B1** - check the test image. **Done 2026-08-31.**
 7. **B3** - the Docker Hub first command. **Done 2026-08-31, and the page needed no edit.**
-8. **Re-dispatch `3.0.0-beta.6`** for the green run and the missing tag. *After beta.5* above says why the
-   first run went red and what the retry fixes.
-9. **B2** - open the beta.6 image and use the packing page like a visitor. **The one thing left that needs a
-   human**, and it does not wait for step 8.
-10. **B4** - rename the changelog heading to `3.0.0`. The last edit.
-11. **Cut the real release, `v3.0.0`.** Everything after this is automatic, the Docker Hub page included.
-12. **Open `post-release-v3.0.0.md`.**
+8. **A8** - move the code licence to AGPL-3.0. **Done 2026-08-31**, and it had to be in an image before the
+   tag because an image cannot be relicensed after a push.
+9. **Cut `3.0.0-beta.7`** from the licence commit, for the green run and to prove the retry.
+   **Done 2026-08-31** - run `33374185508`, tag and prerelease both there.
+10. **B2** - open the beta.7 image and use the packing page like a visitor. **The one thing left that needs a
+    human.** Everything on that page that can be checked without javascript already has been.
+11. **B4** - rename the changelog heading to `3.0.0`. The last edit.
+12. **Cut the real release, `v3.0.0`.** Everything after this is automatic, the Docker Hub page included.
+13. **Open `post-release-v3.0.0.md`.**
 
 ---
 

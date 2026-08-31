@@ -1,112 +1,229 @@
 ---
-description: Confirmed by the 2026-08-27 run - security is A and zero findings, high-severity is down to two, and 295 findings remain. What is left, and the answer on whether test and tooling code stays in scope
+description: Read from the 2026-08-30 run - reliability is C not B, six open bugs and all six are in new code, 27 HIGH findings that are all one Ruby rule in our own gem specs
 state: ready
-waits-on: "nothing. Every item below is work, and the two that are decisions are recommended in place"
+waits-on: "nothing. Every accept below is recommended in place; a fresh scan is needed to confirm the result"
 paths:
+  - "api/src/Binacle.Net.UIModule/Pages/**"
+  - "api/src/Binacle.Net.UIModule/_js/instance.js"
+  - "packages/binacle-net-ui/src/utils/samples.ts"
+  - "ruby/*/spec/**"
   - "tooling/ci/sonar-analysis.xml"
-  - "api/src/Binacle.Net.UIModule/**"
-  - "packages/**"
 ---
 
-# Sonar - what is left
+# Sonar - getting reliability to A
 
-**Read on 2026-08-28 through the SonarCloud API, against the 2026-08-27 run of `binacle-labs_Binacle.Net`.**
-Every count here is open issues only. The dashboard's own totals mix in closed ones and read about 12% high.
+## The run this was read from
 
-## What the run said, and what most of it was
+**Analysis of 2026-08-30 00:02 UTC on revision `06f18da4` ("Merge pull request #17 from
+binacle-labs/features/results_vendoring").** Read on 2026-08-31 through the public SonarCloud API, so the data
+was one day old at reading. **The scan workflow is `workflow_dispatch` only**, so these numbers do not move
+until someone runs it, and anything committed after `06f18da4` is not in them. **Seven commits are on `main`
+past that revision**, but none of them touches any of the six files below, so every line number here still
+resolves in the working tree.
 
-**384 open findings. 65 of them were other people's gems.** CI installs the bundle into `ruby/vendor/bundle`
-before the scan, and nothing excluded it, so kramdown's html fixtures and four gems' own workflow files were
-being analysed as if we had written them.
+Counts are open issues only. The dashboard mixes in closed ones.
 
-**All 8 open security findings were in that folder.** Not one was in our code. The security rating of C, and
-the gate's `new_security_rating` failure, were both entirely vendored gems - unpinned action tags in
-`http_parser.rb`'s CI, and `bundle install` without a lockfile in `terminal-table`'s.
+## The numbers
 
-| | Open | Security | Reliability | Maintainability | High or worse |
-|---|---|---|---|---|---|
-| Before, `22:20` run | 384 | 8 | 81 | 311 | 34 |
-| After the scope fix | 295 | **0** | **9** | 286 | **2** |
-| After the gems were indexed | 327 | 0 | 9 | 318 | 27 |
+| | |
+|---|---|
+| Reliability | **C** |
+| Security | A |
+| Maintainability | A |
+| Bugs | **6** |
+| Vulnerabilities | 0 |
+| Security hotspots | 0 |
+| Code smells | 318 |
+| Coverage | 64.3% |
+| Duplicated lines | 3.9% |
+| Lines of code | 29381 |
 
-**The 27 are all `ruby:S1192`, all in gem spec files** - a duplicated string literal, which Sonar rates high
-for Ruby and low for C#. They arrived with the gems, not with a regression.
+**Reliability is C, not B.** One MAJOR bug is enough to drop it to C, and all six are MAJOR. The rating is the
+worst single bug, so six MAJOR bugs and one MAJOR bug give the same letter.
 
-Ratings moved with it: **security C to A, reliability D to C, maintainability stayed A.** Coverage 67.8% to
-**71.1%**. Analysed lines dropped from 30048 to 26275, which is the vendored gems leaving.
+Open issues total **324**, by impact severity: **27 HIGH, 177 MEDIUM, 120 LOW, 1 INFO.** Those sum to one
+more than the total, because an issue can carry more than one impact and the facet counts it under each.
 
-The two remaining high findings are `typescript:S1186` on `packages/binacle-net-ui/tests/stubs/orbitControls.ts` -
-empty `update()` and `dispose()` on a stub whose whole point is to do nothing. Answered in code with a
-three-word comment in each body, which is what the rule wants for a body that is empty on purpose.
+**The gate is red on two conditions**, both against new code (a rolling 30 days):
 
-## Test and tooling code stays in scope
+- `new_reliability_rating` **C against A** - all six bugs are in the new-code window.
+- `new_coverage` **40.4% against 80%**. Not this plan's work; the coverage gap is planned on its own.
 
-**Roughly a third of what remains sits in test or tooling code, and it should stay visible.** Three reasons, and
-they are not the same reason:
+The other four conditions pass, including `new_security_rating` and `new_maintainability_rating` at A.
 
-- **The costly half is already handled.** `SonarQubeTestProject` in `Directory.Build.props` takes the .NET
-  support projects out of the coverage denominator and off the product rule set. The globs added to
-  `sonar.coverage.exclusions` do the same for the python, site and typescript files MSBuild cannot see. What
-  is left is test-scope rules on test code, which is what they are for.
-- **Maintainability is rated A and the gate does not read these.** They cost nothing at the gate, so
-  excluding them buys nothing to offset going blind.
-- **The top rules are about test correctness, not tidiness.** `xUnit1042` and `xUnit1050` (33 between them)
-  are untyped `MemberData`/`ClassData`. `CA1816` (14) is the dispose pattern on fixtures. A fixture that
-  disposes wrongly is a flaky suite, and that is exactly the failure nobody debugs from the symptom.
+## Every open bug
 
-**`tooling/ci/` is the strongest case for keeping, not the weakest.** Its 15 high-severity findings were the
-whole of the reliability rating - fourteen `[` tests and a `case` with no default, in the scripts that decide
-whether a release publishes. Excluding the folder would have hidden them. They are fixed instead.
+Six, all MAJOR, all reliability-impact MEDIUM, all created 2026-08-21 or 2026-08-22.
 
-## What is actually left, biggest first
+| Rule | Where | What is actually wrong | Verdict |
+|---|---|---|---|
+| `Web:UnsupportedTagsInHtml5Check` | `api/src/Binacle.Net.UIModule/Pages/Shared/_Navbar.cshtml:1` | Line 1 is `@model IReadOnlyList<Applet>`. Sonar's HTML analyser reads `<Applet>` as the deprecated html element. `Applet` is a C# class in `api/src/Binacle.Net.UIModule/Models/Applet.cs`. | **False positive. Accept.** |
+| `Web:S5256` | `Pages/Instance.cshtml:14` | The Build table is `<tbody>` rows of label + value with no `<th>`. A screen reader gets six unlabelled cells. | **Fix** |
+| `Web:S5256` | `Pages/Instance.cshtml:34` | Same shape - the Switches table, name / state / path, no header cell anywhere. | **Fix** |
+| `Web:S5256` | `Pages/Instance.cshtml:73` | The Presets table ships with an empty `<tbody data-presets-body>`; `_js/instance.js` fills it with three cells per row (name, box count, dimensions) and never adds a header. | **Fix** |
+| `Web:InputWithoutLabelCheck` | `Pages/Packing.cshtml:150` | `<select x-model="model.algorithm" name="algorithm" id="algorithm">` has no `<label for="algorithm">`. The only thing next to it is an `<i>arrow_drop_down</i>` icon. | **Fix** |
+| `typescript:S6959` | `packages/binacle-net-ui/src/utils/samples.ts:25` | `bins.reduce((largest, bin) => ...)` with no seed. `Array.reduce` on an empty array with no initial value throws `TypeError`. | **Fix** |
 
-- **xUnit1042 (22) + xUnit1050 (11)** - `TheoryData<T>` is a real improvement to the ViPaq and Kernel suites,
-  but it is a rewrite per data source rather than an edit. **Biggest single item.**
-- **Six accessibility findings on the shipped UI**, and these are the ones worth doing next: three tables
-  without `<th>` in `Instance.cshtml`, an unlabelled input in `Packing.cshtml`, an empty heading in
-  `_ErrorsDialog.cshtml`, and an `<Applet>` element in `_Navbar.cshtml` that html5 does not have. Real users,
-  real pages.
-- **S101 (38)** - `BestAlgorithm_v1` and its siblings. The identifier is a published format, not a name, so
-  this is an Accept-with-reason sweep rather than a rename.
-- **CA1873 (13)** guard expensive log arguments · **CA1859 (9)** concrete return types · **CA2208 (9)**
-  exception `paramName` used as a message, which needs an exception-type decision rather than a swap.
-- **S1192 (11)** - `box_1/2/3` in both `ExampleData.cs`, `first`/`previous`/`repeat` in `PackingVisualizer`
-  (dictionary keys, so a const prevents a runtime `KeyNotFoundException`), and two canonical URLs.
-- **S2325 (10) + CA1822 (19)** - the residue of the make-static sweep, minus the five that are answered.
-- **~45 TypeScript and JavaScript** modernisation items in `packages/` and `vipaq/packages/`, nearly all in
-  files with little coverage, so each fix costs new-code coverage and buys style.
+### The four Razor findings are one root cause
 
-**`lib/data/**` no longer needs excluding.** The earlier plan asked for it. The 2026-08-27 run indexed no json
-at all - the language breakdown is cs, web, ts, yaml, css, js, shell, py, docker and nothing else - so the
-entry would be dead weight.
+All four are the HTML analyser reading `.cshtml`. Three are real - the tables genuinely have no header cells,
+and the analyser is right about a page that ships to users. One is the analyser mistaking Razor syntax for
+html, and no edit to the file would be an improvement.
 
-## CA1816 on ten test fixtures
+**The three tables want `<th scope="row">` on the first cell of each row**, not a `<thead>`, because Build and
+Switches are label/value lists rather than columnar data. The Presets table is the exception: its rows come
+from javascript and it has three real columns, so it wants a `<thead>` with three `<th>` in the `.cshtml`.
 
-Three of thirteen are done. The other ten are xunit `IAsyncLifetime` classes whose `DisposeAsync` ends in
-`await base.DisposeAsync()`. `GC.SuppressFinalize(this)` on a fixture that will never have a finalizer is
-ceremony. **Accept the ten with "test fixture, no finalizer"** rather than adding the line ten times.
+### The `reduce()` finding is real but narrow
 
-## The gate
+**The one production caller already guards it.** `packages/binacle-net-ui/src/core/packingDemo.ts:89` reads
+`this.model.bins.length > 0 ? largestBin(this.model.bins) : randomBin()`. So nothing in the demo can reach the
+throw today.
 
-**Two conditions still fail, down from three.** `new_security_rating` is now A.
+**It is still worth fixing, because `largestBin` is exported from the package's public surface**
+(`packages/binacle-net-ui/src/utils/index.ts`), and an external caller has no guard. Decide the empty case in
+the function rather than seeding the reduce: seeding with `bins[0]` makes an empty array return `undefined`
+silently, which is worse than the throw.
 
-- `new_coverage` **77.0% against 80%** - it was 63.0%. Three points.
-- `new_reliability_rating` **C against A** - one of the nine findings above sits in new code. Fixing or
-  accepting all nine clears it.
+## The shortest path to Reliability A
 
-**The 80% cannot be lowered.** Custom quality gates need the Team plan and the project is on Free. The gate
-goes green when the untested code gets tested. `plans/ci-cd/sonar-coverage-gap.md` says where that code is.
+**All six. There is no shorter set.** The rating is the worst single bug, so every one of them has to be gone
+or accepted before the letter moves.
+
+That is **five code edits across three files, plus one accept**:
+
+1. `Pages/Instance.cshtml` - `<th scope="row">` in the Build and Switches tables, a `<thead>` on Presets. One file, three findings.
+2. `Pages/Packing.cshtml:150` - a `<label for="algorithm">`.
+3. `packages/binacle-net-ui/src/utils/samples.ts:25` - handle the empty array explicitly.
+4. `Pages/Shared/_Navbar.cshtml:1` - **Accept**, reason "Razor `@model` type, not an html element".
+
+**The same set also clears the gate's `new_reliability_rating`**, because all six are inside the new-code
+window. Nothing else has to happen for that condition to go green.
+
+**Two things to know about accepting.** It needs issue-administration on the project, and the mark lives in
+SonarCloud's database rather than in the repository - the marks were lost once already when the project was
+recreated, so an accept is not a durable answer the way a code edit is.
+
+**Effort: small.** Three files, an afternoon at most, and every edit is local.
+
+## High severity: 27 findings, one rule, and they are ours
+
+**All 27 HIGH findings are `ruby:S1192`, "String literals should not be duplicated", and every one is in a
+`spec/*_spec.rb` file of one of our own Jekyll gems.** Nothing else in the project is HIGH.
+
+**They did not arrive with a vendored gem.** `tooling/ci/sonar-analysis.xml` already excludes
+`ruby/vendor/**` and `ruby/*/spec/fixtures/**`. What is left is `ruby/binacle-docs-versions`,
+`ruby/jekyll-breadcrumb-trail`, `ruby/jekyll-filters`, `ruby/jekyll-gtm`, `ruby/jekyll-multi-sitemap`,
+`ruby/jekyll-page-meta`, `ruby/jekyll-structured-data` and `ruby/jekyll-webmanifest` - all tracked, all ours.
+An earlier reading of this project recorded these as gem findings; that was wrong and it is worth not
+repeating.
+
+**The rule fires at three repeats and Ruby rates it CRITICAL / maintainability HIGH.** The identical rule on
+C# code is rated far lower, which is the whole reason this group dominates the HIGH count while
+`csharpsquid:S1192` (8 findings) does not appear in it.
+
+**27 findings over 14 files.** The heaviest are `jekyll-structured-data/spec/tag_spec.rb:7` ("index.html", 12
+times) and `jekyll-multi-sitemap/spec/generator_spec.rb:9` ("sitemap.xml", 12 times). The rest are three to
+seven repeats of a fixture filename or a fixture string.
+
+**Verdict: fix.** Each file gets a handful of constants at the top and the literals become names. It is
+mechanical, it is confined to spec files, and the specs fail loudly if a rename goes wrong. The alternative
+is turning the rule off for `ruby/**/spec/**` in the quality profile, which is defensible - a fixture filename
+repeated in a spec is not the duplication the rule is aimed at - but it buys nothing that fixing does not, and
+it needs a profile change rather than a repository change.
+
+**Effort: medium and boring.** One pass per file, 14 files, no cross-file reasoning.
+
+There are **no HIGH findings outside this group**, so clearing it takes the project to zero HIGH.
+
+## Medium severity: what is genuinely a small edit
+
+177 MEDIUM findings. These are the ones that are a real edit and nothing more.
+
+**Two are analyser mistakes and want an accept rather than a change:**
+
+- `Web:S6850` on `Pages/Shared/_ErrorsDialog.cshtml:4` - "headings must have content". The element is
+  `<h5 x-text="title">`, filled by Alpine at runtime from the `errors_dialog('One or more Errors occured!')`
+  initialiser on line 1. **Accept.**
+- `csharpsquid:S125` on `vipaq/src/Binacle.ViPaq/ViPaqBase64Extensions.cs:6` - "remove this commented out
+  code". It is the two-line usage example inside the file's header comment. **Accept.**
+
+**Small edits, worth doing:**
+
+| Rule | Count | Where | Why it is small |
+|---|---|---|---|
+| `typescript:S6557` | 5 | `packages/binacle-compact-notation/src/compactNotation.ts:26,102`, `packages/cookies/src/converter.ts:4` | `text[0] !== "("` becomes `!text.startsWith("(")`. Same line, same meaning. |
+| `Web:S5255` | 4 | `Pages/Packing.cshtml:63,134`, `Pages/Shared/_Navbar.cshtml:7,22` | An `aria-label` on four `<nav>` elements. The two navbar ones need different labels - one is the left rail, one is the bottom bar, and they render the same list. |
+| `typescript:S7772` | 6 | `packages/binacle-net-ui/tools/generateSamples.ts`, `vipaq/packages/binacle-vipaq/tools/interopArtifactGenerator.ts`, `vipaq/packages/binacle-vipaq/tests/support/vectorReader.ts` | `node:` prefix on `fs` and `path` imports. |
+| `shelldre:S7679` | 3 | `tooling/ci/changed-paths.sh:15,16`, `tooling/ci/codeql-summary.sh:20` | Assign `$1`/`$2` to a named local at the top of the function. |
+| `typescript:S2933` | 2 | `vipaq/packages/binacle-vipaq/src/ProtocolWriter.ts:6`, `ProtocolReader.ts:5` | Add `readonly` to one field each. |
+| `external_roslyn:CA1850` | 2 | `api/src/Binacle.Net.ServiceModule.Infrastructure/Services/Sha256PasswordHasher.cs:29,36` | `ComputeHash` becomes the static `SHA256.HashData`. Drops the disposable too. |
+| `rubydre:S7840` | 2 | `ruby/jekyll-breadcrumb-trail/lib/jekyll-breadcrumb-trail/labels.rb:13`, `ruby/jekyll-page-meta/lib/jekyll-page-meta/resolver.rb:43` | `each` with an early return becomes `find`. |
+| `rubydre:S8418` | 1 | `ruby/jekyll-multi-sitemap/lib/jekyll-multi-sitemap/renderer.rb:20` | Rename the unused `site` parameter to `_site`. |
+| `javascript:S4043` | 1 | `api/src/Binacle.Net.UIModule/_js/instance.js:26` | `names.sort(...)` becomes `names.toSorted(...)`. `names` is a fresh `Object.keys` result so the mutation is harmless today; the swap is one word. |
+| `external_roslyn:CA1854` | 1 | `lib/test/Binacle.Lib.Benchmarks/Providers/SpecializedScalingProblemsProvider.cs:89` | `ContainsKey` then indexer becomes `TryGetValue`. |
+| `external_roslyn:CA1869` | 1 | `vipaq/tools/Binacle.ViPaq.VectorGenerators/InteropArtifactGenerator.cs:29` | Hoist the `JsonSerializerOptions` to a static field. |
+
+**That is 30 findings across 11 rules, two of them accepts.** None of them changes a signature or a shape.
+Effort: small, and they can be taken one rule at a time.
+
+**One `javascript:S7772` finding is out of reach.** Three of the four sit in `sites/www/webpack.config.js`,
+`sites/demo/webpack.config.js` and `sites/docs/webpack.config.js`. Published sites are not edited from a
+coding session. Only `api/src/Binacle.Net.UIModule/webpack.config.js` is in scope, and it is in the row above.
+
+## What is being left, on purpose
+
+**The remaining ~145 MEDIUM findings stay open.** Not because they are wrong, but because each is a rewrite or
+a design decision rather than an edit, and none of them moves the reliability rating.
+
+- **`external_roslyn:xUnit1042` (22) and `xUnit1050` (11).** Untyped `MemberData` / `ClassData`. `TheoryData<T>`
+  is a real improvement, but it is a rewrite per data source. **Biggest single group left.**
+- **`external_roslyn:CA1816` (14).** The dispose pattern on test fixtures. These are `IAsyncLifetime` classes
+  that will never have a finalizer, so `GC.SuppressFinalize(this)` is ceremony fourteen times over. The right
+  answer is an accept sweep with a reason, not code.
+- **`external_roslyn:CA1873` (13).** Guard expensive log arguments. Each one needs a judgement about whether
+  the argument is actually expensive.
+- **`external_roslyn:CA1822` (13) and `csharpsquid:S2325` (8).** Make members static. A sweep, and some of
+  these members are deliberately instance members for an override.
+- **`external_roslyn:CA1859` (10).** Return concrete types. Changes public signatures in places.
+- **`csharpsquid:S1192` (8).** The C# side of the duplicate-literal rule, rated MEDIUM here rather than HIGH.
+  Some are dictionary keys where a constant would prevent a runtime `KeyNotFoundException`, so it is worth
+  doing eventually, just not as part of this.
+- **`external_roslyn:CA2208` (8).** `ArgumentNullException` constructed with a sentence in the `paramName`
+  slot, in `lib/test/Binacle.Lib.TestsKernel/ResultSelection/ScenarioReader.cs` and
+  `shared/test/Binacle.TestsKernel/Algorithms/ScenarioReader.cs`. The fix is picking a different exception
+  type for "this scenario file is malformed", not swapping an argument.
+- **`typescript:S5976` (7).** Parameterise three-to-five near-identical tests. Test rewrites.
+- **`typescript:S1444` (9) and `external_roslyn:CA2211` (5).** Mutable public/static fields, mostly in test
+  key holders. Making them immutable changes what test code may reference.
+- **`csharpsquid:S1117` (5).** A parameter named `value` shadowing a field, all five in
+  `api/src/Binacle.Net.Kernel/Configuration/Models/ConnectionString.cs`. It reads like a rename, but I have
+  not read the type, so I am not calling it easy.
+- **`csharpsquid:S3881` (3).** The dispose pattern on `vipaq/src/Binacle.ViPaq/ProtocolReader.cs`,
+  `ProtocolWriter.cs` and `api/src/Binacle.Net.Kernel/Logging/TimedOperation.cs`. Shipped types, real pattern
+  change.
+- **`csharpsquid:S1854` (3).** `newAvailableSpaces[--newSpaces]` where the final decrement is never read, once
+  each in the Best Fit, Worst Fit and First Fit Decreasing v2 algorithm operations. The edit is one character
+  of arithmetic, but it is in the packing hot path and each of the three wants reading in full before
+  touching.
+- **The long tail.** `csharpsquid:S3928` (3), `S3442` (3), `S2326` (2), `S4144`, `S3246`, `S2589`, `S2629` and
+  `external_roslyn:CA2254` (the same line of `TimedOperation.cs:32`), `ASP0025`, `CA1861`, `xUnit1045`,
+  `typescript:S1121`, `S4624` (2), `rubydre:S7815` (4). One to four each, and each needs a decision about a
+  type or an API rather than an edit.
+
+**The 120 LOW findings are out of scope here.** The largest is `csharpsquid:S101` (38), the `BestAlgorithm_v1`
+naming family, where the identifier is a published format string rather than a name - an accept-with-reason
+sweep, not a rename.
 
 ## Done when
 
-- [ ] The nine reliability findings are each fixed or Accepted. Four are analyser mistakes and need the
-      Accept: `<Applet>` in `_Navbar.cshtml` is the Razor `@model` type read as the deprecated html element,
-      the empty `<h5>` in `_ErrorsDialog.cshtml` is filled by Alpine at runtime, and the two `charCodeAt`
-      findings are on a byte decoder where code points are the wrong unit.
-      Re-read the project filtered to reliability; the list is empty or every entry is Accepted.
-- [ ] The six accessibility findings on the UIModule pages are fixed or answered.
-      Re-read the project filtered to `Web:` rules on `api/src/Binacle.Net.UIModule/**`; the list is empty or
-      every entry is Accepted.
-- [ ] The findings answered with a reason rather than a code change are marked Accepted again in the current
-      project. The marks live in SonarCloud's database and were lost once when the project was recreated.
-      **By eye.** Open the issue list filtered to Accepted and compare it to the design register.
+- [ ] `api/issues/search?componentKeys=binacle-labs_Binacle.Net&resolved=false&types=BUG` returns 0. Five edits
+      in three files and one accept on `_Navbar.cshtml`.
+- [ ] The reliability rating reads A and the gate's `new_reliability_rating` condition passes.
+      **A scan has to run first** - the workflow is dispatch-only, so nothing above shows up until it does.
+- [ ] `api/issues/search?...&impactSeverities=HIGH` returns 0, which means the 27 `ruby:S1192` findings in the
+      gem specs are gone.
+- [ ] The two medium accepts are marked: `Web:S6850` on `_ErrorsDialog.cshtml:4` and `csharpsquid:S125` on
+      `ViPaqBase64Extensions.cs:6`.
+- [ ] The accept marks are checked by eye against the list above. They live in SonarCloud's database, not in
+      the repository, and they have been lost once before.

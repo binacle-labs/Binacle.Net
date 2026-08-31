@@ -54,5 +54,13 @@ RSpec.describe Jekyll::SiteFilters::Sanitization do
     it 'leaves an entity encoded, so it counts as five characters and reads as one' do
       expect(filter.clean_content('AT&amp;T')).to eq('AT&amp;T')
     end
+
+    it 'does not let a tag re-form when one is nested inside another' do
+      expect(filter.clean_content('<<script>script>alert(1)</script>')).not_to include('<')
+    end
+
+    it 'drops an unclosed angle bracket, which the tag regexp on its own would keep' do
+      expect(filter.clean_content('5 < 10')).to eq('5 10')
+    end
   end
 end

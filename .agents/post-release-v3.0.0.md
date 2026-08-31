@@ -60,9 +60,14 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 - [ ] **Check no image name got locked by accident.** Read `immutable_tags_settings` back from the repository
       API. The publish should have written `3.0.0`, `3.0` and `latest` with nothing in its way.
 
-- [ ] **Check GitHub reads the licence as AGPL-3.0.** Read it back off the API. GitHub works the licence out on
-      its own servers, so pushing is the only way to find out. **This is a read, not a fix** - if it comes
-      back wrong, that is a finding for a plan.
+- [x] **GitHub reads the licence as AGPL-3.0 - checked 2026-08-31, off the repository API.** `spdx_id:
+      AGPL-3.0`, `key: agpl-3.0`. **It did not need the tag** - GitHub works it out on push, so the answer
+      arrived with the licence commit.
+
+- [x] **The `LICENSE.GPL-3.0/` folder link still resolves - checked 2026-08-31.**
+      `blob/main/LICENSE.GPL-3.0` returns a 301 to `tree/main/LICENSE.GPL-3.0`. **That link is baked into
+      `2.1.1`, `3.0.0-beta.3` and `3.0.0-beta.4`**, whose footers cannot be changed, so the folder shape was
+      chosen to keep it working. It does.
 
 ### Read what the release put in front of people
 
@@ -112,7 +117,9 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 **Do this the moment the publish job goes green.** Until then `binacle/binacle-net:3.0` does not exist, and
 **an example on `main` must name an image someone can actually pull.** The tree at tag `v3.0.0` names a test
 image for the length of one run; that is the accepted cost of the rule. **They sit on `3.0.0-beta.6`, moved
-there on 2026-08-31** so that no public surface names a beta the published verify command rejects.
+there on 2026-08-31** so that no public surface names a beta the published verify command rejects. **beta.7
+shipped later the same day and the pins were left alone** - they all go to `3.0` here anyway, and moving nine
+files twice buys nothing.
 
 - [ ] **Six `image:` lines move from `3.0.0-beta.6` to `3.0`.**
       `samples/docker/{minimal,quickstart,prod,service,full}/docker-compose.yml` and
