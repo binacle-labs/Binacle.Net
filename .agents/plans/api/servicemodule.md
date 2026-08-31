@@ -44,3 +44,23 @@ both sides with no transaction, and one-subscription-per-account is enforced in 
 **Two `// TODO`s ride with this:** `ApiUsageRateLimitingPolicy.cs:32` and `AccountBindingResult.cs:57`.
 
 **Goes with the image split** - `plans/api/packing-only-image.md`.
+
+## Done when
+
+- [ ] Azure Table Storage is gone - the backend, its tests and its configuration.
+      `grep -rln 'AzureTables' api/src api/test` returns nothing, and `just test` names no AzureStorage
+      backend.
+- [ ] Three projects are one.
+      `ls api/src | grep -c 'ServiceModule'` returns 1, and the solution builds.
+- [ ] The provider seam survives the collapse.
+      `grep -rn 'interface I.*Repository' api/src/Binacle.Net.ServiceModule` still finds them, with more than
+      one implementation chosen by connection string.
+- [ ] `Username` has a partial unique index, and a second concurrent create fails.
+      **By eye** on the migration or the index script, plus a test that two creates of one username do not
+      both succeed.
+- [ ] Refresh tokens work end to end.
+      `grep -rn 'auth/refresh' api/src api/test` finds the endpoint and a test that rotates one and revokes
+      on logout.
+- [ ] The two `// TODO`s are gone.
+      `grep -n TODO api/src/Binacle.Net.ServiceModule/**/ApiUsageRateLimitingPolicy.cs` and the same for
+      `AccountBindingResult.cs` return nothing.

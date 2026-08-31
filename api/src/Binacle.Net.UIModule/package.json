@@ -9,7 +9,7 @@
     "build:css": "sass --no-source-map --style=compressed _sass/main.scss wwwroot/css/main.css",
     "build:js": "webpack --env build=dist",
     "watch": "concurrently --names 'css,js' 'npm:watch:css' 'npm:watch:js'",
-    "watch:css": "sass --watch _sass/main.scss wwwroot/css/main.css",
+    "watch:css": "sass --watch --no-source-map _sass/main.scss wwwroot/css/main.css",
     "watch:js": "webpack --watch --env build=watch"
   },
   "dependencies": {

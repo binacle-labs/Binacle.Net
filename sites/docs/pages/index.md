@@ -26,7 +26,7 @@ it work, start with the quick start.
 Get up and running quickly with the essential steps to use Binacle.Net.
 
 ## 🔍 [Core Concepts]({% link _common_pages/core-concepts.md %})
-Learn about the algorithms and real-time strategies that power Binacle.Net's packing solutions.
+How the algorithms work, and which one to pick.
 
 ## 🔧 [Configuration Basics]({% link _common_pages/configuration-basics.md %})
 Understand how to customize Binacle.Net to fit your specific needs through its flexible configuration system.

@@ -27,3 +27,19 @@ defaults off and the module has had no public documentation since v2.0.0, so it 
 
 **Goes with it:** the `samples/docker/service/` sample page and the last ServiceModule mentions in the v3
 docs.
+
+## Done when
+
+- [ ] The normal image contains no ServiceModule assembly.
+      `just build image` then `docker run --rm --entrypoint ls binacle/binacle-net:<tag> /app` names no
+      `Binacle.Net.ServiceModule*.dll`.
+- [ ] The packing-only build compiles with the project reference gone, not with it present and unused.
+      `grep -n 'ServiceModule' api/src/Binacle.Net/Binacle.Net.csproj` shows the reference behind a condition.
+- [ ] A second image exists for the module, and the release publishes both.
+      `grep -c 'docker/build-push-action' .github/workflows/release-docker-image.yml` returns 2 or more, and
+      each names its own tag.
+- [ ] The tag naming is decided and written where a user meets it, not only here.
+      **By eye.** The Docker Hub page and `samples/` name both images. If the answer is only in this plan,
+      the box is open.
+- [ ] The v3 docs and `samples/docker/service/` point at the module image, not at the normal one.
+      `grep -rn 'SERVICE_MODULE' samples/ sites/docs/collections/_versions/` resolves against the new image.

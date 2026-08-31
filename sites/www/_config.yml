@@ -21,7 +21,6 @@ author:
 # Every absolute URL on the site is derived from this through `absolute_url`, so the host is named on one
 # line and nowhere else in the build.
 url                     : "http://localhost:7197"
-api_url                 : "https://localhost:7194"
 gtm                     : ''
 
 logo:

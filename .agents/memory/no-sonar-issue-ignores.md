@@ -34,23 +34,42 @@ Worked examples of the first:
 delegate hop (a test reaching its assert through a `Dictionary<Type, Action>` shows the analyser only
 `Action.Invoke`), and there is no code fix for the jwt.io sample JWT in the `TokenResponse` OpenAPI example.
 
-**Three findings survive with nothing honest to change** and are marked in the SonarCloud UI: that jwt.io JWT;
+**Some findings survive with nothing honest to change** and are marked in the SonarCloud UI - the table below
+is the count, this paragraph is the reasoning. That jwt.io JWT;
 **S2245 "use a cryptographically strong RNG"** on `getRandomInt.ts`, not a security context, where swapping in
 `RandomNumberGenerator` to pick a demo box would be cargo cult (the rule is `scope: MAIN`, so the same finding
 in a benchmark or test kernel disappears once that project is marked as test code) - it was also marked on
 `SampleDataService`, which the UIModule rebuild deleted; and **S2068 "hard-coded credential"** on
-`AccountGetResponse`'s OpenAPI example, where `PasswordHash` is the literal `"type::hash::salt"` — it documents
+`AccountGetResponse`'s OpenAPI example, where `PasswordHash` is the literal `"type::hash::salt"` - it documents
 the *shape* of a stored hash, and the rule fires on the property name, so any literal there would trip it.
 
-**Three more were marked on 2026-08-31**, when reliability went to A:
+**Eight findings are marked, under two different statuses** - read back from the API on 2026-08-31. A
+listing that asks for one status silently misses the other:
 
-- `Web:S6850` on `_ErrorsDialog.cshtml:4`
-- `csharpsquid:S125` on `ViPaqBase64Extensions.cs:6`
-- the `_Navbar.cshtml:1` accept
+| Status | Rule | File | Line |
+|---|---|---|---|
+| Accepted | `csharpsquid:S6418` | `ServiceModule/v0/Contracts/Auth/TokenResponse.cs` | 35 |
+| Accepted | `csharpsquid:S2068` | `ServiceModule/v0/Contracts/Admin/AccountGetResponse.cs` | 94 |
+| Accepted | `typescript:S2245` | `packages/binacle-net-ui/src/utils/getRandomInt.ts` | 4 |
+| Accepted | `Web:S6850` | `UIModule/Pages/Shared/_ErrorsDialog.cshtml` | 4 |
+| Accepted | `csharpsquid:S125` | `vipaq/src/Binacle.ViPaq/ViPaqBase64Extensions.cs` | 6 |
+| False positive | `Web:UnsupportedTagsInHtml5Check` | `UIModule/Pages/Shared/_Navbar.cshtml` | 1 |
+| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/core/protocolDecoder.ts` | 30 |
+| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/core/protocolDecoder.ts` | 87 |
 
-**This list is the only copy.** Accept marks live in SonarCloud's database, not in the repository - they do
-not survive the project being recreated, and they have been lost once already. Read the six above back
-against the UI after anything that touches the project's settings.
+**Accepted and False positive are not the same claim.** Accepted says the rule is right and we are keeping
+the code anyway. False positive says the rule is wrong about this line. Use the second only when it is, or
+the next reader cannot tell a judgement from a defect.
+
+**This table is the only copy.** The marks live in SonarCloud's database, not in the repository - they do not
+survive the project being recreated, and they have been lost once already. Read all eight back after anything
+that touches the project's settings, **asking for both statuses**:
+
+    curl -s "https://sonarcloud.io/api/issues/search?componentKeys=binacle-labs_Binacle.Net&branch=main&issueStatuses=ACCEPTED,FALSE_POSITIVE&ps=100"
+
+**Verify against the API, never against a plan's prose.** A plan claimed a sixth accept on `_Navbar.cshtml`;
+an agent copied that here unchecked, then "corrected" it off a listing that had only asked for `ACCEPTED`.
+Both were wrong. It is marked, under the other status.
 
 **Why:** a finding answered in code stays reviewable and keeps the rule armed for the next occurrence; a
 finding answered in config is invisible and switches the rule off for everything matching the path.

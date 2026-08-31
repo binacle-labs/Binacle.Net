@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,10 @@ internal class InstanceModel : AppletPageModel
 	}
 
 	public string Version => Metadata.Version;
+
+	// The page reports what the container runs, so this comes from the container. It used to be typed into
+	// the view.
+	public string Runtime => RuntimeInformation.FrameworkDescription;
 
 	public string Environment { get; }
 

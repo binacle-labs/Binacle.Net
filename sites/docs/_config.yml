@@ -15,7 +15,6 @@ author:
   
 # the base hostname & protocol for your site, e.g. http://example.com# Welcome to Jekyll!
 url                     : "http://localhost:7195"
-api_url                 : "https://localhost:7194"
 gtm                     : ''
 
 logo:

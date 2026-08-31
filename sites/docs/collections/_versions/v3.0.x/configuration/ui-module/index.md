@@ -17,15 +17,13 @@ can try Binacle.Net without writing a request.
 {: .block-note}
 
 ## 📦 Packing Demo
-The Packing Demo allows users to interact with the packing process visually by submitting bin and
-item data and observing how items are packed into bins.
+Put in your own bins and items, pick an algorithm, and watch it pack.
 
-- 🔹 Step-by-step Interaction: Users can navigate through the packing process, handling items one by one.
-- 🔹 Real-time Visualization: Watch as each item is placed inside the bins in real-time.
+- 🔹 Step through it one item at a time.
+- 🔹 Watch each item land in the bin as it is placed.
 
 ## 📜 ViPaq Decoder
-The ViPaq Decoder enables users to decode ViPaq-encoded packing data and visualize the container layouts interactively.
-It helps analyze packing arrangements and navigate through the layout easily.
+Paste a ViPaq string and see the packing drawn. Step through the layout to check how it was arranged.
 
 - 📌 To obtain ViPaq data, set `includeViPaqData` on a packing request in
   [Version 3]({% vlink /api/v3.md %}) or [Version 4]({% vlink /api/v4.md %}) of the API.
