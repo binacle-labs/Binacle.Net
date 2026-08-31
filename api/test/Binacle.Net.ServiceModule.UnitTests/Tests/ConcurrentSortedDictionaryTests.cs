@@ -158,7 +158,7 @@ public class ConcurrentSortedDictionaryTests
 				dictionary[i] = i.ToString();
 				dictionary.Remove(i - 1);
 			}
-		});
+		}, TestContext.Current.CancellationToken);
 
 		var reader = Task.Run(() =>
 		{
@@ -171,7 +171,7 @@ public class ConcurrentSortedDictionaryTests
 				_ = dictionary.GetKeys().ToList();
 				_ = dictionary.Count;
 			}
-		});
+		}, TestContext.Current.CancellationToken);
 
 		await reader;
 		await writing.CancelAsync();

@@ -55,7 +55,12 @@ a 45 minute budget and runs on ubuntu-latest, so azurite and postgres are contai
   generated document reaches: `ApiV3Document`, `ApiV4Document`, `ExampleData` and the example-response classes,
   about 100 lines. **Those need a host with the document endpoint mapped**, which is gated on `SWAGGER_UI` or
   `SCALAR_UI`, so it runs into the harness question `api/integration-test-additions.md` owns.
-- **`Kernel/Logs/` - 76 lines at 0%.** `LogsProcessor` and `LogsRetentionProcessor`, both background work.
+- **`Kernel/Logs/` - done.** `LogsProcessor` is at 100% and `LogsRetentionProcessor` at 95%, from
+  `Binacle.Net.Kernel.UnitTests/Logs/`. **Two things are left uncovered on purpose:** the `catch` around
+  `File.Delete`, which needs a delete to fail and no way to force that is portable (Linux unlinks open files,
+  Windows does not), and the second turn of the retention loop, because `PeriodicTimer` is constructed without a
+  `TimeProvider` so the day between sweeps cannot be faked. Passing the `TimeProvider` in would make that
+  testable, and is a change to the code rather than to a test.
 - **`RequestDebugMiddleware.cs` - 66 lines at 0%**, the whole of `DiagnosticsModule/Middleware` being 50%.
 - **The in-memory repositories and the two support models.** `ConcurrentSortedDictionary` (36) is done - 100%
   from `Binacle.Net.ServiceModule.UnitTests`, including two concurrency cases and a snapshot case. All three

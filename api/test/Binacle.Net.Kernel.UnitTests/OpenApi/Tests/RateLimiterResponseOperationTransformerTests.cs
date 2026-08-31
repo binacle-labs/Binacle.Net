@@ -26,7 +26,7 @@ public class RateLimiterResponseOperationTransformerTests
 		var operation = await Transform(new EnableRateLimitingAttribute("AnyPolicy"));
 
 		operation.Responses!.ShouldContainKey("429");
-		operation.Responses["429"].Description
+		operation.Responses!["429"].Description
 			.ShouldBe(RateLimiterResponseOperationTransformer.OpenApiResponseFor429TooManyRequests.Description);
 	}
 
