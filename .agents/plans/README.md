@@ -9,11 +9,12 @@ folder (e.g. `plans/lib/`, `plans/shared/`); anything that maps to no slice stay
 
 ## Every plan declares where it stands
 
-Two keys in the front matter, on top of the `description:` and `paths:` every file carries:
+Three keys in the front matter, on top of the `description:` and `paths:` every file carries:
 
 ```yaml
 state: idea | proposed | ready | blocked | deferred
 waits-on: what it is waiting for, in plain words
+horizon: now | next-release | near | future | long | on-demand | undecided
 ```
 
 | State | Means |
@@ -28,6 +29,26 @@ waits-on: what it is waiting for, in plain words
 
 **A state is not a priority and not an order** — those are the maintainer's, and an agent never writes one in.
 If you have to pick a state to make a file legible, say so in `waits-on:` so it can be struck.
+
+## How far out it is
+
+`horizon:` says roughly how far out a plan is. Never a date.
+
+| Horizon | Means |
+|---|---|
+| `now` | In flight, or next up. |
+| `next-release` | Right after the next release tag. |
+| `near` | Soon, up to weeks. |
+| `future` | Weeks to months. |
+| `long` | Months out. |
+| `on-demand` | Only when someone asks, or the need appears. |
+| `undecided` | Wanted, distance not judged. |
+
+**The maintainer sets it. An agent never decides one.** If you have to write one to make a file legible, say
+so in `waits-on:` so it can be struck.
+
+It is front matter for the same reason `state:` is - the generated index collects it, so one read of the
+index says how far out everything is. The body of the plan still carries no timing.
 
 ## Rules
 

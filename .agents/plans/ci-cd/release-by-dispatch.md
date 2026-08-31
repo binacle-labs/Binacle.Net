@@ -1,7 +1,8 @@
 ---
 description: The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes
 state: blocked
-waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO"
+waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO. horizon: next-release - chosen by an agent, strike it if wrong"
+horizon: next-release
 paths:
   - ".github/workflows/release-docker-image.yml"
 ---

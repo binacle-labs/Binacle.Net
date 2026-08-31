@@ -14,20 +14,24 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: architecture-checks.md
   description: "Generate the repo's dependency graph, draw it, lint it - plus three greps over api/src, and the one boundary violation to fix first"
   state: idea
-  waits-on: "a maybe"
+  waits-on: "nobody - it is an idea"
+  horizon: near
   paths: ["**/*.csproj", "tooling/**"]
 - file: comment-lint.md
   description: "A check that nothing outside the agent guidance directory points a reader into it"
   state: idea
-  waits-on: "a maybe - the rule has held without it since the 27 sites were fixed"
+  waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
+  horizon: future
 - file: image-base-slimming.md
   description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
-  waits-on: "nobody - not near future"
+  waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
+  horizon: future
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
-  waits-on: "nobody - future"
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
 - file: unwatched-gaps.md
   description: "Repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, a drift check no workflow runs, and a checks list that goes unreadable on the runs you would read it on"
   state: proposed
@@ -38,20 +42,23 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## API
 
 ```yaml
-- file: api/integration-test-additions.md
-  description: "Integration tests: cover what the harness cannot see today"
-  state: ready
-  waits-on: "nothing - phase 1 is agreed and can start"
+- file: api/integration-tests-cover-shipped-modules.md
+  description: "Integration tests that exercise the module set the image ships, not core modules only"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
+  horizon: near
   paths: ["api/**"]
 - file: api/pack-first-bin-endpoint.md
   description: "pack/first-bin endpoint"
-  state: deferred
-  waits-on: "v3.0.0. The v4 stable flip waits on this endpoint or on another candidate"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: next-release
   paths: ["api/**"]
 - file: api/packing-demo-bugs.md
   description: "Two open bugs in the shared packing demo - a partial result names no unfitted items, and the submit button can stick disabled on a page with no visualizer"
-  state: deferred
-  waits-on: "the v3.0.0 tag - the maintainer deferred it on 2026-08-27"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: near
   paths: ["packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "The public image becomes packing-only and the Service Module moves to its own image"
@@ -65,34 +72,33 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
 - file: api/show-me-the-request.md
   description: "The packing demo shows the HTTP call it just made, against this host, ready to copy"
-  state: deferred
-  waits-on: "v3"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: near
   paths: ["api/src/Binacle.Net.UIModule/**", "packages/binacle-net-ui/**"]
 - file: api/ui-clients-off-v3.md
   description: "Migrate the shipped UI clients off the v3 API"
-  state: deferred
-  waits-on: "v3. The site half additionally needs api.binacle.net serving a v3.0.x image; the module half is only waiting on v3"
+  state: idea
+  waits-on: "the shape - what the UI changes to and how is not worked out yet"
+  horizon: near
   paths: ["api/**", "packages/binacle-net-ui/**"]
 - file: api/uimodule-instance-presets.md
   description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
   state: idea
-  waits-on: "the maintainer expanding it"
+  waits-on: "nobody - it is an idea"
+  horizon: next-release
   paths: ["api/src/Binacle.Net.UIModule/**", "api/src/Binacle.Net.Kernel/**"]
 - file: api/v4-stable.md
   description: "v4 - flip from experimental to stable"
-  state: deferred
-  waits-on: "v3.0.0, and an endpoint added to v4 that reshapes no existing contract - none has been chosen"
+  state: idea
+  waits-on: "an endpoint added to v4 that reshapes no existing contract - none has been chosen"
+  horizon: near
   paths: ["api/**"]
 ```
 
 ## CI/CD
 
 ```yaml
-- file: ci-cd/ci-gates.md
-  description: "Two gates the pull request does not have - the integration suites against the shipped module set, and a Sonar verdict without a button press"
-  state: idea
-  waits-on: "nothing to gate yet"
-  paths: [".github/workflows/**"]
 - file: ci-cd/ci-step-review.md
   description: "A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck"
   state: blocked
@@ -102,37 +108,38 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run"
   state: blocked
   waits-on: "the v3.0.0 release publishing the page. Both sections are done - the file is kept only to be checked against the published page, then deleted"
+  horizon: next-release
   paths: [".github/workflows/**"]
 - file: ci-cd/dockerhub-tag-immutability.md
   description: "Turn on Docker Hub tag immutability, for release tags only"
-  state: proposed
-  waits-on: "the maintainer - he is rethinking it as of 27 Aug 2026"
+  state: idea
+  waits-on: "nobody - it is an idea. The maintainer does not know yet whether he wants it"
+  horizon: undecided
   paths: [".github/workflows/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
-  waits-on: "the demand question - nobody has asked for ARM"
+  waits-on: "someone asking for ARM - nobody has"
+  horizon: on-demand
   paths: [".github/workflows/**"]
 - file: ci-cd/release-by-dispatch.md
   description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
   state: blocked
-  waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO"
+  waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO. horizon: next-release - chosen by an agent, strike it if wrong"
+  horizon: next-release
   paths: [".github/workflows/release-docker-image.yml"]
+- file: ci-cd/what-the-pull-request-does-not-run.md
+  description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
+  horizon: near
+  paths: [".github/workflows/**"]
 - file: ci-cd/workflow-restructure.md
   description: "CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report"
   state: ready
-  waits-on: "one pull request, to read the gate's verdict"
+  waits-on: "one pull request, to read the gate's verdict. horizon: now - chosen by an agent, strike it if wrong"
+  horizon: now
   paths: [".github/**"]
-```
-
-## Lib
-
-```yaml
-- file: lib/parallel-processors-decision.md
-  description: "Decide what happens to the three `Parallel*` processors - wire the threshold up, or delete them"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  paths: ["lib/**"]
 ```
 
 ## Shared
@@ -141,12 +148,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: shared/fixture-fill-per-algorithm.md
   description: "The scenario fixtures record which algorithms succeed, not how full the bin got"
   state: idea
-  waits-on: "nobody - wanted sometime"
+  waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
+  horizon: future
   paths: ["shared/data/**", "shared/test/Binacle.TestsKernel/**"]
 - file: shared/testskernel-data-extraction.md
   description: "TestsKernel - grow the shared fixture cases"
-  state: deferred
-  waits-on: "the maintainer - he said \\"not yet\\" on 2026-08-27; it revives when he says the fixture cases are worth growing"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
+  horizon: future
   paths: ["shared/**"]
 ```
 
@@ -166,7 +175,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: sites/docs-v3-deploy.md
   description: "What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches"
   state: blocked
-  waits-on: "the v3.0.0 tag - the release notes need its date and its release link"
+  waits-on: "the v3.0.0 tag - the release notes need its date and its release link. horizon: next-release - chosen by an agent, strike it if wrong"
+  horizon: next-release
   paths: ["sites/docs/**"]
 ```
 
@@ -177,10 +187,12 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does."
   state: deferred
   waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
+  horizon: undecided
   paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**", "ruby/**", ".editorconfig"]
 - file: tooling/where-benchmark-results-live.md
   description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"
-  state: blocked
-  waits-on: "the maintainer answering where benchmark and performance results live and what shape they take. They sit in results/ today and he does not want them there"
+  state: idea
+  waits-on: "a research session coming back with proposals. Nothing here can start until the maintainer picks one"
+  horizon: next-release
   paths: ["tooling/**", "results/**", "lib/**"]
 ```

@@ -1,64 +1,46 @@
 ---
 description: pack/first-bin endpoint
-state: deferred
-waits-on: "v3.0.0. The v4 stable flip waits on this endpoint or on another candidate"
+state: idea
+waits-on: "nobody - it is an idea"
+horizon: next-release
 paths:
   - "api/**"
 ---
 
-**The v4 stable flip is blocked on an endpoint like this one.** v4 cannot go stable until one endpoint is
-added that reshapes no existing contract, and this is the only candidate anyone has worked through.
-**Promote it, pick another, or accept that v4 stays experimental** - all three are answers; having none is
-not.
-
-
 # Idea: pack/first-bin endpoint
 
-**Status:** Unvetted idea. Was planned for v4, then pulled out — it may target v3.1 instead. Nothing is decided.
+A packing endpoint that answers with the first bin that succeeds rather than the best or the smallest one -
+`POST .../pack/first-bin` for custom bins and `POST .../pack/first-bin/{preset}` for preset bins. The caller
+supplies bins in the order they care about and gets back the first one the items fit into. The existing
+selecting endpoints both optimize, and neither lets a caller say "I have a preference order, give me the first
+that works"; a warehouse consuming a stack of box sizes in a set order cannot express that today. It is also
+the only endpoint anyone has costed that could satisfy the condition the v4 stable flip waits on - an endpoint
+added without reshaping an existing contract.
 
-## What
+## Research
 
-A packing endpoint that answers with the first bin that succeeds, rather than the best or the smallest one.
+### Date not recorded - do not call this `first-fit`
 
-- `POST .../pack/first-bin` — custom bins → first success
-- `POST .../pack/first-bin/{preset}` — preset bins → first success
+That name collides with First Fit Decreasing, an algorithm already selectable through `Parameters.Algorithm`.
+v4 shipped the same mistake once as `pack/best-fit` and had to rename it to `pack/best-bin`. A route names the
+bin it returns; the algorithm is a parameter. `first-bin` follows `smallest-bin` and `best-bin`, and a
+`FirstBin` strategy class would match.
 
-The caller supplies bins in the order they care about, and gets back the first one the items fit into.
+### Date not recorded - "first success" means two different endpoints, and that is what blocked it
 
-**Do not call this `first-fit`.** That name collides with First Fit Decreasing, an algorithm already selectable
-through `Parameters.Algorithm`. v4 shipped the same mistake once as `pack/best-fit` and had to rename it to
-`pack/best-bin` — see the naming rule in the v4 API doc. A route names the bin it returns; the algorithm is a
-parameter. `first-bin` follows `smallest-bin` / `best-bin`, and a `FirstBin` strategy class would match.
-
-## Why
-
-The existing selecting endpoints (`pack/smallest-bin`, `pack/best-bin`) both optimize. Neither lets the caller
-say "I have a preference order — give me the first that works". A warehouse with a stack of box sizes it wants
-to consume in a set order can't express that today.
-
-## The two meanings of "first success"
-
-This is the decision that blocked it, and it is still open. The name covers two different endpoints:
-
-- **Selection only** — run every bin, return the first successful one in request order. A small strategy class
-  next to `BestBin` / `SmallestBin` in `lib/src/Binacle.Lib/ResultSelection/`, consistent with how the other
-  selecting endpoints work. But it saves no compute, so the name promises something the endpoint doesn't do.
-- **Short-circuit** — stop at the first bin that packs. This is the version that earns the name and the only
-  one with a performance story. Needs a new bin processor: `IBinProcessor.Process` runs all bins today.
+- **Selection only.** Run every bin, return the first successful one in request order. A small strategy class
+  next to `BestBin` and `SmallestBin` in `lib/src/Binacle.Lib/ResultSelection/`, consistent with how the other
+  selecting endpoints work. It saves no compute, so the name promises something the endpoint does not do.
+- **Short-circuit.** Stop at the first bin that packs. This is the version that earns the name and the only one
+  with a performance story. It needs a new bin processor: `IBinProcessor.Process` runs all bins today.
 
 The second is the interesting one and the expensive one. Pick before writing code.
 
-## Open questions
+### Date not recorded - three open questions
 
-- Which version does this land in? It was cut from v4. If it goes to v3.1, that reopens a frozen surface —
-  worth checking that against how v3 is treated in the v3 API doc.
-- Does short-circuit change the response shape? Every other selecting endpoint has results for all bins
-  available; this one wouldn't.
-- "First" is caller-supplied order, so the answer depends on request order in a way no other selecting endpoint
-  does. Worth saying so in the endpoint description if this ever gets built.
-
-## Related
-
-- the result-selection doc — where a selection-only strategy would live
-- the v4 API doc — the selecting endpoints it would sit beside
-- the v4 add-endpoint guide — the build steps, once decided
+- **Which version.** It was cut from v4. Landing it on v3 would reopen a frozen surface, so check that against
+  how v3 is treated before assuming it is free.
+- **Does short-circuit change the response shape?** Every other selecting endpoint has results for all bins
+  available; this one would not.
+- **"First" is caller-supplied order**, so the answer depends on request order in a way no other selecting
+  endpoint does. Worth saying so in the endpoint description if this is ever built.

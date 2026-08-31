@@ -1,7 +1,8 @@
 ---
 description: What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches
 state: blocked
-waits-on: "the v3.0.0 tag - the release notes need its date and its release link"
+waits-on: "the v3.0.0 tag - the release notes need its date and its release link. horizon: next-release - chosen by an agent, strike it if wrong"
+horizon: next-release
 paths:
   - "sites/docs/**"
 ---

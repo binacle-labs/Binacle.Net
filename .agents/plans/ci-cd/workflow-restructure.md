@@ -1,7 +1,8 @@
 ---
 description: CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report
 state: ready
-waits-on: "one pull request, to read the gate's verdict"
+waits-on: "one pull request, to read the gate's verdict. horizon: now - chosen by an agent, strike it if wrong"
+horizon: now
 paths:
   - ".github/**"
 ---
