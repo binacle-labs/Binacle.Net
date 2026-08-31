@@ -2,7 +2,7 @@
 #
 # Every test with the coverage collector attached, then the one merge Sonar needs.
 #
-#   tooling/coverage.run.sh <cobertura|sonar>
+#   tooling/coverage.run.sh <cobertura|sonar> [test list]
 #
 # Run from the repo root. Writes artifacts/tests and artifacts/coverage; tooling/coverage.table.sh reads them.
 # Needs jq for the sonar format, and nothing extra for cobertura.
@@ -10,6 +10,7 @@
 set -euo pipefail
 
 format="${1:-}"
+list="${2:-all}"
 
 case "$format" in
 cobertura | sonar) ;;
@@ -25,7 +26,7 @@ rm -rf artifacts/tests artifacts/coverage
 
 # `|| true` because a failing suite still wrote its report, and the table is what says pass or fail. Without
 # it a failed run prints no table at all - the one time you most want to see it.
-COVERAGE_FORMAT="$format" just test all || true
+COVERAGE_FORMAT="$format" just test "$list" || true
 
 # sonar.ruby.coverage.reportPaths takes no wildcard, so the ten gem reports have to arrive as one file.
 #

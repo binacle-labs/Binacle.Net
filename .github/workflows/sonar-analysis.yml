@@ -23,6 +23,39 @@ jobs:
     permissions:
       contents: read
 
+    # Same images and health checks as shared-image-tests.yml. Without them the four Postgres and Azure
+    # Tables repositories report 0% while their tests exist and pass.
+    services:
+      # Table storage on 10002 is the only endpoint the tests use. The other two are mapped because the
+      # emulator's "UseDevelopmentStorage=true" shorthand names all three, and a missing one reads as a
+      # connection failure rather than as an unused port.
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite:3.36.0
+        ports:
+          - 10000:10000
+          - 10001:10001
+          - 10002:10002
+        # nc, not curl: the image is alpine-based and ships busybox, not curl.
+        options: >-
+          --health-cmd "nc -z 127.0.0.1 10002"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_USER: appuser
+          POSTGRES_DB: binacle_net
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U appuser -d binacle_net"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -86,7 +119,7 @@ jobs:
       - name: Coverage
         env:
           DOTNET_TEST_ARGS: --configuration Release --no-build
-        run: just coverage all sonar
+        run: just coverage all sonar all-with-services
 
       - name: Sonar end
         env:

@@ -2,6 +2,7 @@
 #
 #   just test                            the list
 #   just test all                        every project
+#   just test all-with-services          the same, plus the backends that need services running
 #   just test image                      the ones the Docker image ships
 #   just test sites                      the ones a site ships
 #   just test cs_binacle-lib_unit        one project
@@ -101,6 +102,12 @@ all:
     just test rb_jekyll-structured-data_unit
     just test rb_jekyll-webmanifest_unit
 
+# Every test, plus the backends that need `just serve services-up -d` first
+all-with-services:
+    just test all
+    just test cs_binacle-net-service-module_integration Postgres
+    just test cs_binacle-net-service-module_integration AzureStorage
+
 # The C# tests. The argument is the test project's folder.
 
 [private]
@@ -154,7 +161,11 @@ cs_binacle-net-service-module_integration backend="":
 
     export BINACLE_TEST_INFRA="{{ backend }}"
 
-    just test::_dotnet_test api/test/Binacle.Net.ServiceModule.IntegrationTests
+    # No backend is the harness's SQLite fallback, so the file says what actually ran.
+    label="{{ backend }}"
+    label="${label:-Sqlite}"
+
+    just test::_dotnet_test api/test/Binacle.Net.ServiceModule.IntegrationTests "$label"
 
 # The TypeScript tests. The argument is the package's jest displayName.
 
@@ -209,9 +220,11 @@ rb_jekyll-webmanifest_unit: (_rspec_test 'jekyll-webmanifest')
 #
 # With COVERAGE_FORMAT unset this is a plain `dotnet test`. With it set, the same run also writes a test
 # report and a coverage file under artifacts/. `just coverage all` is what sets it.
+#
+# The label goes on both file names. Without it a project run twice overwrites its own first run.
 
 [private]
-_dotnet_test project:
+_dotnet_test project label="":
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -228,6 +241,10 @@ _dotnet_test project:
     esac
 
     name=$(basename {{ project }})
+    if [ -n '{{ label }}' ]; then
+        name="$name.{{ label }}"
+    fi
+
     results="$(pwd)/artifacts/tests"
     coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
     mkdir -p "$results" "$coverage"

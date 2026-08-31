@@ -1,7 +1,7 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-08-27
+verified: 2026-08-31
 check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
@@ -86,10 +86,14 @@ backend leg.
 > mechanism. The backend and whether it came from an override are printed to the console on every run, so a
 > green run never hides which one it used. **CI runs the suite three times, one step per backend**
 > (`.github/workflows/shared-image-tests.yml`), against a Postgres and an Azurite service container that stay up for the
-> whole job; Sonar coverage runs SQLite only. The defaults match the CI service containers, so CI sets no
+> whole job. `sonar-analysis.yml` runs the same three through `just coverage all sonar all-with-services`,
+> against the same two service containers. The defaults match the CI service containers, so CI sets no
 > connection string. Locally, `just test all` runs the SQLite test only — it is the set that needs nothing
-> brought up; the other two are a deliberate `just test cs_binacle-net-service-module_integration <backend>` after
-> `just serve services-up -d`.
+> brought up. The other two come from `just test all-with-services`, or one at a time with
+> `just test cs_binacle-net-service-module_integration <backend>`, after `just serve services-up -d`.
+
+> **Each backend writes its own coverage and result files**, named `Binacle.Net.ServiceModule.IntegrationTests.<backend>`.
+> Without that the three runs overwrite each other and only the last one counts.
 
 ## Layout — one folder per endpoint
 
