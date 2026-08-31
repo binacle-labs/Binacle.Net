@@ -335,3 +335,11 @@ _jest_test package:
         mv "$produced" "$coverage/{{ package }}.${produced##*.}"
     done
     rmdir "$coverage/{{ package }}"
+
+    # jest names its cobertura packages after the folders inside the package - "main", "src", "src.core" -
+    # and three of ours are called "main". The merged report adds same-named packages together, so cookies,
+    # theme-switcher and binacle-compact-notation came out as one row. Overwrite them all with the package
+    # name, which is what the C# and ruby files already carry.
+    if [ "$reporter" = cobertura ]; then
+        sed -i 's|<package name="[^"]*"|<package name="{{ package }}"|g' "$coverage/{{ package }}.xml"
+    fi

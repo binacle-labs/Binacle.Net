@@ -5,7 +5,7 @@
 #   just check links-external <site>   the same site, other people's servers included
 #   just check workflows               actionlint over .github/workflows
 #   just check actions                 the .github/actions files, which actionlint cannot read
-#   just check scripts                 shellcheck over the scripts in tooling/ci
+#   just check scripts                 shellcheck over tooling/*.sh and tooling/ci/*.sh
 #
 # `links` reads the built site and never the source, because a href in the source is Liquid and not a URL
 # yet. Build first.
@@ -80,14 +80,16 @@ actions:
 
     echo "${#files[@]} actions, no errors"
 
-# The shell a workflow runs - the scripts in tooling/ci
+# Every shell script under tooling - the workflow ones in ci/, and the ones a recipe calls
 scripts:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    files=(tooling/ci/*.sh)
+    # Both levels. tooling/ci/ is the shell a workflow runs; tooling/*.sh is what a recipe calls instead of
+    # carrying a body, and the only reason those are files is that they can be checked.
+    files=(tooling/*.sh tooling/ci/*.sh)
 
-    echo "checking ${#files[@]} scripts in tooling/ci"
+    echo "checking ${#files[@]} scripts under tooling"
     printf '  %s\n' "${files[@]##*/}"
 
     # shellcheck prints its own errors and exits non-zero, so the line below is only reached on a clean run.

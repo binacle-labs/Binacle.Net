@@ -25,9 +25,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - not near future"
 - file: sonar-issue-triage.md
-  description: "Read from the 2026-08-30 run - reliability is C not B, six open bugs and all six are in new code, 27 HIGH findings that are all one Ruby rule in our own gem specs"
-  state: ready
-  waits-on: "nothing. Every accept below is recommended in place; a fresh scan is needed to confirm the result"
+  description: "Reliability is A and HIGH is zero as of 2026-08-31. What is left is 288 code smells and one red gate condition, new_coverage, which belongs to the coverage plans"
+  state: mostly done
+  waits-on: "a scan. The workflow is dispatch-only, so nothing after fab50ba9 is in the numbers"
   paths: ["api/src/Binacle.Net.UIModule/Pages/**", "api/src/Binacle.Net.UIModule/_js/instance.js", "packages/binacle-net-ui/src/utils/samples.ts", "ruby/*/spec/**", "tooling/ci/sonar-analysis.xml"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"

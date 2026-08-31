@@ -32,7 +32,7 @@ grouped by solution folder, mirroring the repo slices:
 - `/samples/`, `/samples/docker/` (5 `.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
 - Top-level content projects: `assets/assets.proj`, `tooling/tooling.proj`, `sites/docs/docs.proj`,
   `sites/demo/demo.proj`
-- `/_root/` — loose files (`.dockerignore`, `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`, `Dockerfile`, `global.json`, `gulpfile.js`, `package.json`, README)
+- `/_root/` — loose files (`.dockerignore`, `.editorconfig`, `.netconfig`, `Directory.Build.props`, `Directory.Packages.props`, `Dockerfile`, `global.json`, `gulpfile.js`, `package.json`, README)
 
 ## Shared C# props — `Directory.Build.props`
 

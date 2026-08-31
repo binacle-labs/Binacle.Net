@@ -1,7 +1,7 @@
 ---
-description: Read from the 2026-08-30 run - reliability is C not B, six open bugs and all six are in new code, 27 HIGH findings that are all one Ruby rule in our own gem specs
-state: ready
-waits-on: "nothing. Every accept below is recommended in place; a fresh scan is needed to confirm the result"
+description: Reliability is A and HIGH is zero as of 2026-08-31. What is left is 288 code smells and one red gate condition, new_coverage, which belongs to the coverage plans
+state: mostly done
+waits-on: "a scan. The workflow is dispatch-only, so nothing after fab50ba9 is in the numbers"
 paths:
   - "api/src/Binacle.Net.UIModule/Pages/**"
   - "api/src/Binacle.Net.UIModule/_js/instance.js"
@@ -11,6 +11,52 @@ paths:
 ---
 
 # Sonar - getting reliability to A
+
+## Done - 2026-08-31
+
+**Reliability A, Security A, Maintainability A. Zero bugs. Zero HIGH findings.** Read off the API after the
+scan on `fab50ba9`.
+
+| | before | after |
+|---|---|---|
+| Reliability | C | **A** |
+| Bugs | 6 | **0** |
+| HIGH findings | 27 | **0** |
+| Open issues | 324 | 288 |
+
+**What cleared it.** The five code edits below, plus the `_Navbar.cshtml:1` accept, plus the 27 `ruby:S1192`
+literals hoisted to constants across 16 spec files. `Web:S6850` and `csharpsquid:S125` were accepted too.
+
+**Then 30 more MEDIUM findings went in the same day** - the "genuinely a small edit" set below, across 22 files.
+**Those are not in the numbers above**: they landed after `fab50ba9` and the scan is dispatch-only.
+
+**Three of them did not go the way this file said.** `toSorted` is ES2023 and both tsconfigs target `es2016`,
+so `javascript:S4043` was fixed by splitting the sort onto its own statement. `rubydre:S7840` in `resolver.rb`
+needed `lazy` - the obvious `filter_map.first` evaluates every source and each one runs a markdown conversion.
+And `CA1869` had two `JsonSerializerOptions` in that file, not one.
+
+**`CA1850` came with a test the code never had.** `Sha256PasswordHasher` had no coverage at all, and the
+login tests hash and compare in one run, so they pass whatever the algorithm is. `Sha256PasswordHasherTests`
+now pins known answers computed outside C#. A round trip would not have caught the hash changing, and every
+stored password would have stopped matching.
+
+**What is left is one red gate condition and it is not this file's work.**
+
+| | |
+|---|---|
+| `new_coverage` | **40.5% against 80%** - 916 of 1396 new lines uncovered. 637 more lines have to be covered |
+| Everything else | passing |
+
+**Start with `ruby/`: 749 lines, 0.0% coverage, while all ten gem suites pass with 232 examples.** That is a
+reporting gap, not missing tests. `sonar.ruby.coverage.reportPaths` is wired in `tooling/ci/sonar-analysis.xml`
+with the `../` prefix the ruby sensor needs, so the question is whether the report is being written at all.
+It is the largest single block of uncovered lines in the project and the cheapest to move.
+
+After that, by uncovered lines: `ServiceModule.Infrastructure` 432, `Kernel` 357 (of which `Kernel/OpenApi`
+is 173 at 10.8%, and its `Transformers` folder is 140 at 0%), `Binacle.Net` 344, `binacle-net-ui` 201,
+`DiagnosticsModule` 171.
+
+---
 
 ## The run this was read from
 

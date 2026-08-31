@@ -1,0 +1,18 @@
+# reportgenerator's own config file. It is read from the directory the tool runs in, so it has to sit at the
+# repo root under this name - that is the tool's choice, not ours.
+#
+# `just coverage table` and `just coverage report` both call reportgenerator and want the same inputs and the
+# same filters. Those live here. Only targetdir and reporttypes stay on the command line, because the two
+# recipes differ on exactly those.
+
+[ReportGenerator]
+	# tooling/tests.just writes one flat file per suite here.
+	reports = "artifacts/coverage/cobertura/*.xml"
+
+	# Test support scoring itself says nothing about shipped code. `*.TestsKernel` covers every kernel, so
+	# adding one needs no edit here.
+	assemblyfilters = "-*.TestsKernel;-Binacle.TestReporting;-*.UnitTests;-*.IntegrationTests"
+
+	# obj/ is what the source generators wrote. 2268 uncovered lines of it in the run of 2026-08-31, none of
+	# it ours to test.
+	filefilters = "-*/obj/*"

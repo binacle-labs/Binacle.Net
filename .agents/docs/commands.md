@@ -155,8 +155,22 @@ suite, named after the project, package or gem:
 | `artifacts/coverage/cobertura/<suite>.xml` | coverage for the table and the HTML report |
 | `artifacts/coverage/sonar/<suite>.xml` | C# coverage for Sonar; TS is `<package>.info`, Ruby `<gem>.json` |
 | `artifacts/coverage/html-report/` | the merged report, written by `just coverage report` |
+| `artifacts/coverage/summary/Summary.txt` | the per-project coverage the table prints |
 
-The table prints a row per suite (`Passed`/`Failed`/`Skipped`/`Coverage`) and its exit code is the run's verdict.
+The table prints a row per suite (`Passed`/`Failed`/`Skipped`) and its exit code is the run's verdict.
+
+**Under it, coverage per project — not per suite.** A suite is not a project: several suites load the same
+code, and one suite's file holds only what that run reached. `Binacle.CompactNotation` reads 34% in the Lib
+suite's file and 100% once the two are merged. reportgenerator does the merge, drops the test-support
+assemblies and `obj/`, and the block is its output. A `sonar` run gets no coverage block — only cobertura
+carries per-line data.
+
+**These numbers are not SonarCloud's and will not match it.** Sonar counts coverable lines its own way and
+drops whole trees that are in scope here. Use the rows to pick what to work on, not to predict the gate.
+
+**What reportgenerator reads and what it drops is in `.netconfig` at the repo root**, its own config file,
+which it looks for in the directory it runs in. Both recipes share it. Only `targetdir` and `reporttypes`
+are on the command line, because that is all the two differ on.
 
 **A suite that started and wrote nothing gets a `no report` row and fails the run.** Every test writes its
 name into `expected.txt` before it runs, which is the only thing separating "the suite produced nothing" from
@@ -347,7 +361,7 @@ just check links docs                  # one of them
 just check links-external docs         # every link, other people's servers included
 just check workflows                   # actionlint over .github/workflows
 just check actions                     # the .github/actions manifests
-just check scripts                     # shellcheck over tooling/ci/*.sh
+just check scripts                     # shellcheck over tooling/*.sh and tooling/ci/*.sh
 ```
 
 All three print the files they were handed and end with a count, because actionlint, grep and shellcheck are
@@ -365,6 +379,9 @@ on the runner rather than resolving to empty.
 **`scripts` is the one that makes `tooling/ci/` worth having.** Those files exist so the shell a workflow runs
 can be run and checked on its own; without this recipe nothing checked them. shellcheck ships on the runners, so
 the pull request installs nothing for it.
+
+**It covers `tooling/*.sh` as well as `tooling/ci/*.sh`.** The same reason: a recipe that hands its body to a
+`.sh` file gets a script you can run and check, and gets nothing at all if nothing checks it.
 
 Needs `lychee` (pinned, installed from `DEVELOPMENT.md` like the smoke tools) and needs the site built first —
 the recipe stops with `No artifacts/docs` rather than checking nothing and passing. It reads the built output

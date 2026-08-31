@@ -87,6 +87,10 @@ The format names the consumer: `cobertura` is what the table and the HTML report
 xml for C# plus lcov for TS. Output is one flat file per suite under `artifacts/tests/` and
 `artifacts/coverage/<format>/`, named after the project or package.
 
+The table is `coverage.table.sh`, called by the recipe. Suite rows first, then coverage per project - a suite
+is not a project, and only merging every file at once gives a project its real number. The merge is
+reportgenerator's, and what it reads and drops is in `.netconfig` at the repo root, its own config file.
+
 ---
 
 ## 📑 OpenAPI and the agent indexes

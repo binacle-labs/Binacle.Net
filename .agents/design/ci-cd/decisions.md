@@ -247,6 +247,13 @@ true by construction rather than by habit.
 **A single command stays inline.** `dotnet dotnet-sonarscanner begin` and the one-line Docker Hub summary are
 already readable, and wrapping them buys a file and loses nothing.
 
+**It reaches recipe bodies too, and the first one moved on 2026-08-31.** The argument above was written about
+`run:` blocks, but it never depended on where the shell sat - `just coverage table` was 60 lines of it, CI
+calls it through `just coverage all sonar`, and nothing could check it. It is now `tooling/coverage.table.sh`
+and the recipe is one line. `just check scripts` widened to `tooling/*.sh` in the same change, because a
+script nothing checks is a recipe body with a longer name. The other modules still carry bodies; each moves
+when it grows past a command or two, not in a sweep.
+
 **One block was missed by the 2026-08-28 sweep, and it was found on 2026-08-31 by adding to it.** The release's
 `publish` job still copied the image with 20 lines of `run: |`. A change that made it two copies with a sign
 between them grew it rather than moving it, which is how the miss surfaced: **a rule you can add to without
