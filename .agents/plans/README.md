@@ -9,11 +9,12 @@ folder (e.g. `plans/lib/`, `plans/shared/`); anything that maps to no slice stay
 
 ## Every plan declares where it stands
 
-Two keys in the front matter, on top of the `description:` and `paths:` every file carries:
+Three keys in the front matter, on top of the `description:` and `paths:` every file carries:
 
 ```yaml
 state: idea | proposed | ready | blocked | deferred
 waits-on: what it is waiting for, in plain words
+horizon: now | next-release | near | future | long | on-demand | undecided
 ```
 
 | State | Means |
@@ -29,12 +30,32 @@ waits-on: what it is waiting for, in plain words
 **A state is not a priority and not an order** — those are the maintainer's, and an agent never writes one in.
 If you have to pick a state to make a file legible, say so in `waits-on:` so it can be struck.
 
+## How far out it is
+
+`horizon:` says roughly how far out a plan is. Never a date.
+
+| Horizon | Means |
+|---|---|
+| `now` | In flight, or next up. |
+| `next-release` | Right after the next release tag. |
+| `near` | Soon, up to weeks. |
+| `future` | Weeks to months. |
+| `long` | Months out. |
+| `on-demand` | Only when someone asks, or the need appears. |
+| `undecided` | Wanted, distance not judged. |
+
+**The maintainer sets it. An agent never decides one.** If you have to write one to make a file legible, say
+so in `waits-on:` so it can be struck.
+
+It is front matter for the same reason `state:` is - the generated index collects it, so one read of the
+index says how far out everything is. The body of the plan still carries no timing.
+
 ## Rules
 
 - **One item per plan file.** A session should be able to open one file, do the whole thing, and delete it —
   without pulling in three unrelated topics. Something that needs a decision, research, or more than one sitting
-  gets its own file. A single mechanical act with a known answer does not: it belongs in `todos.md`, or as a
-  checkbox on the release file if it gates a release.
+  gets its own file. A single mechanical act with a known answer does not: just do it, or make it a checkbox on
+  the release file if it gates a release.
 - **One master plan per topic**, holding what is done and what is left. When a review turns up issues, put them
   in **one findings file** beside it; a finding lives there until it is fixed, then moves into the master and is
   deleted from findings. Delete findings when it's empty. Don't let a topic sprawl into four overlapping plans,

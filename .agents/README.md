@@ -26,7 +26,7 @@ when: the plain-language trigger                # rules and memory - when this f
 paths: ["lib/src/**"]                           # the code it covers
 ```
 
-Plans carry two more — `state:` and `waits-on:`. `plans/README.md` says what the states mean.
+Plans carry three more — `state:`, `waits-on:` and `horizon:`. `plans/README.md` says what they mean.
 
 **Each layer has a generated `_index.md` listing those fields as yaml**, so one read of an index tells you
 which files matter for the code you are about to touch: match your path against `paths:`, or grep

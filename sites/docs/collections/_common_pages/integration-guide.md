@@ -17,7 +17,7 @@ and keeping the requests you send small.
 
 - Structure product dimensions as integer values (centimeters are highly reccomended)
 - Define bin sets to match your packing environment
-- Connect to Binacle.Net’s API for live packing automation
+- Connect to Binacle.Net's API for live packing automation
 - Ensure requests are fast and efficient
 
 ---
@@ -26,7 +26,7 @@ and keeping the requests you send small.
 
 - Use **centimeters** for all measurements, keep values as integers
 - Represent products as rectangular prisms (length, width, height), irregular shapes must be boxed
-- Convert other units to centimeters—automate this for consistency
+- Convert other units to centimeters. Automate this for consistency
 - Track product **weight** and enforce provider limits during packing
 - Automate entries, standardize dimension format, and always use maximum measurements to prevent errors
 

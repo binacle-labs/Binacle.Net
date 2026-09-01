@@ -116,7 +116,7 @@ def entry(directory, relative_path, index_name, config):
         value = field(path, key)
         if not value:
             continue
-        if key in ("load", "state"):
+        if key in ("load", "state", "horizon"):
             lines.append(f"  {key}: {value}")
         else:
             lines.append('  %s: "%s"' % (key, value.replace('"', r"\"")))

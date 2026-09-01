@@ -1,8 +1,8 @@
 ---
 id: ci-cd/github-surface
 description: What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly
-verified: 2026-08-30
-check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them
+verified: 2026-08-31
+check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them; the Docker Hub page section against .github/dockerhub-overview.md, which must still carry the three-row tag policy table, no tag list, no GHCR mention, no committed version, and a cosign block matching SECURITY.md
 paths:
   - ".github/**"
 ---
@@ -123,6 +123,38 @@ repository.
 - **Merge settings** - squash-only, auto-delete head branches, allow auto-merge. Unverified.
 - **Environments** - all three site deploys declare one, which is what carries the deployment URL. Required
   reviewers and wait timers are available and unused.
+
+---
+
+## What the Docker Hub page carries, and what it deliberately does not
+
+`.github/dockerhub-overview.md` is the source; the release pipeline's `page` job renders and PATCHes it. Each
+of these was decided and each is easy to undo by accident.
+
+- **No tag list.** Fifteen hand-maintained entries duplicating a Tags tab that is always right, and it is what
+  rotted the page the first time. The three-row policy table replaces it and answers the one thing neither tab
+  explains: which tag belongs in a compose file.
+- **No mention of GHCR.** It is staging. The reason to name it would have been handing rate-limited users an
+  escape hatch, and the sponsored badge means there are none. A staging registry on a landing page becomes a
+  support surface nobody meant to own.
+- **No concrete version committed into the file.** Placeholders and substitution, or the page is wrong the day
+  the next minor ships. Same reason the tag list went.
+- **No service module, no ViPaq, no health endpoint.** The module is not advertised here, at the maintainer's
+  call. ViPaq belongs on the docs site: on a page where someone is deciding whether to run one command, a
+  second format name is a reason to hesitate. The health endpoint is off by default and its path is
+  configurable, so a line about it is wrong for most readers.
+- **The `cosign` block is copied verbatim from `SECURITY.md`, only the tag differs, and that file is the
+  source.** A published verify command that fails reads as a bug in the project. For the same reason the page
+  must never name a tag that is absent or unsigned - the org move re-keyed the certificate identity, so
+  anything signed under the old owner fails the published command.
+- **`DOCKERHUB_TOKEN` is not widened.** One registry push credential also writes the repository description,
+  HTTP 200, proved 2026-08-19. It already does both jobs at the scope it has.
+- **Do not dispatch `shared-dockerhub-overview.yml` with an empty version input to check a wording change.**
+  Empty takes the latest non-prerelease release, which is not always the version the page was just edited for.
+  Render it locally with `just image dockerhub-overview <version>`, or type the version.
+
+**And it is not a substitute for the digest-preserving copy.** The page describes the tag policy; the
+pipeline's shape is what makes it true.
 
 ---
 

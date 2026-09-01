@@ -2,6 +2,7 @@
 description: Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does.
 state: deferred
 waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
+horizon: undecided
 paths:
   - "packages/**"
   - "sites/**"

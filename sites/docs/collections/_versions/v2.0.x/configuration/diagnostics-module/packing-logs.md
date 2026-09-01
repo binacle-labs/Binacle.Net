@@ -11,10 +11,10 @@ nav:
 
 Packing Logs track API usage by logging requests, parameters, and results. These logs help you analyze:
 
-- 📊 **Service Usage** – Understand how the API is being utilized.
-- 📏 **Popular Sizes** – Identify the most frequently requested package dimensions.
-- 📦 **Packing Efficiency** – Determine the frequency of successful packings.
-- 🔄 **Function Popularity** – Track which packing or fitting functions are used most often.
+- 📊 **Service Usage**: Understand how the API is being utilized.
+- 📏 **Popular Sizes**: Identify the most frequently requested package dimensions.
+- 📦 **Packing Efficiency**: Determine the frequency of successful packings.
+- 🔄 **Function Popularity**: Track which packing or fitting functions are used most often.
 
 Packing Logs are stored in **NDJSON** (newline-delimited JSON) format.
 
@@ -54,16 +54,16 @@ For more information on overriding configurations, refer to the
 [Configuration Basics]({% link _common_pages/configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
 
 ## 🔧 Configuration Options
-- `Enabled` (_boolean_) – Enables or disables packing logs.
+- `Enabled` (_boolean_): Enables or disables packing logs.
 - Log Types:
-    - `Fitting` – Logs from **v2 & v3 fitting functions**.
-    - `Packing` – Logs from **v2 & v3 packing functions**.
+    - `Fitting`: Logs from **v2 & v3 fitting functions**.
+    - `Packing`: Logs from **v2 & v3 packing functions**.
 
 For each type the options is as follows.
-- `Path` (_string_) – Directory where log files are stored.
-- `FileName` (_string_) – Log file name. `{0}` represents the date.
-- `DateFormat` (_string_) – Defines the format for `{0}` in FileName (e.g., `yyyyMMdd`).
-- `ChannelLimit` (_integer_) – Maximum queue size for logs:
+- `Path` (_string_): Directory where log files are stored.
+- `FileName` (_string_): Log file name. `{0}` represents the date.
+- `DateFormat` (_string_): Defines the format for `{0}` in FileName (e.g., `yyyyMMdd`).
+- `ChannelLimit` (_integer_): Maximum queue size for logs:
     - `0` = Unlimited <br>
       Limited only by available system memory.
     - `> 0` = Limits the log queue size. <br>

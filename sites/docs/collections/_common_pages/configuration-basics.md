@@ -55,11 +55,11 @@ app
 
 Binacle.Net allows multiple ways to override configuration settings. The recommended approach depends on your use case:
 
-- 🔹 **Environment Variables** – Highest priority, ideal for secrets and dynamic configurations.
-- 📝 **Production Overrides** (`<filename>.Production.json`) – Override settings without modifying the default
+- 🔹 **Environment Variables**: Highest priority, ideal for secrets and dynamic configurations.
+- 📝 **Production Overrides** (`<filename>.Production.json`): Override settings without modifying the default
   configuration.
-- 📄 **Direct File Edits** – Modify configuration files directly (use bind mounts in Docker or volumes in Kubernetes).
-- 🔄 **Connection String Fallbacks** – A dedicated method for defining connection strings.
+- 📄 **Direct File Edits**: Modify configuration files directly (use bind mounts in Docker or volumes in Kubernetes).
+- 🔄 **Connection String Fallbacks**: A dedicated method for defining connection strings.
 
 For demonstration, we will use the following `Settings.json`:
 

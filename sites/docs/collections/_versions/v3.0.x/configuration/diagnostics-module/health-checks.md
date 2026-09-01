@@ -49,10 +49,10 @@ For more information on overriding configurations, refer to the
 
 
 ## 🔧 Configuration Options
-- `Enabled` (_boolean_) – Enables (`true`) or disables (`false`) health checks.
-- `Path` (_string_) – The endpoint path that health checks respond to (default: `/_health`).
-- `RestrictedIPs` (_array_) – Which callers may query the endpoint. Empty means everyone.
-- `RestrictedChecks` (_array_) – Which checks run. Empty means all of them.
+- `Enabled` (_boolean_): Enables (`true`) or disables (`false`) health checks.
+- `Path` (_string_): The endpoint path that health checks respond to (default: `/_health`).
+- `RestrictedIPs` (_array_): Which callers may query the endpoint. Empty means everyone.
+- `RestrictedChecks` (_array_): Which checks run. Empty means all of them.
 
 ## 🔒 Restricting Access
 By default, health checks are publicly accessible.
@@ -130,8 +130,8 @@ your monitoring system.
 ## 🛠️ Built-in Checks
 Binacle.Net comes with these health checks:
 
-- ✅ **System** – always present.
-- ✅ **Database** – present only when the [Service Module]({% vlink /configuration/service-module/index.md %})
+- ✅ **System**: always present.
+- ✅ **Database**: present only when the [Service Module]({% vlink /configuration/service-module/index.md %})
   is enabled. Verifies the health of the database connection.
 
 `RestrictedChecks` is an **allow-list, not a skip-list**. When it is empty every check runs. When it is not

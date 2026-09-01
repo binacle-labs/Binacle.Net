@@ -45,7 +45,7 @@ vipaq = "ViPaq"
 # Front matter keys copied into every entry, in this order.
 [fields]
 always = ["when", "load"]
-# Where the work stands. Every other index would carry two empty keys.
-plans_only = ["state", "waits-on"]
+# Where the work stands and roughly how far out. Every other index would carry three empty keys.
+plans_only = ["state", "waits-on", "horizon"]
 # Yaml lists, flattened to one line.
 lists = ["paths"]

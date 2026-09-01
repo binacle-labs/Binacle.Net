@@ -32,7 +32,7 @@ Edit the json in the `binacle-presets-configmap.yaml` file to customize the pres
 
 > [!Note]
 > `binacle-pvc.yaml` assumes your cluster has dynamic provisioning enabled.
-> Otherwise, you’ll need to create a corresponding PersistentVolume.
+> Otherwise, you'll need to create a corresponding PersistentVolume.
 
 
 ## 🚀 Running the Application

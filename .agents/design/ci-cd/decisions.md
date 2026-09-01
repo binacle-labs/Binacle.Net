@@ -953,11 +953,12 @@ A PR now runs both test suites, an image build, the three site builds with their
 somebody presses a button. Both are known gaps rather than oversights, and the shape of the fix is not settled
 — one folded job or three workflows, and what the runtime budget allows.
 
-One part **is** settled: **coverage must not be made blocking yet.** The project runs the read-only "Sonar way"
-gate, which asks 80% on new code, and custom gates need a paid plan. A condition that is red before anyone
-writes a line blocks every PR for a reason none of them caused, and gets waived within a week. It goes green
-when the UI is tested, not by configuration — **excluding the untested areas was considered and rejected**,
-because it moves the number without changing anything true.
+**Whether coverage becomes a blocking check is open, and it is the maintainer's call.** The project runs the
+read-only "Sonar way" gate, which asks 80% on new code; custom gates need a paid plan. This was settled
+against until 2026-08-31, on one argument: the condition was red before anyone wrote a line, so it would block
+every pull request for a reason none of them caused and be waived within a week. **The condition passes on
+`main` as of 2026-08-31**, so that argument is spent. **The shortcut stays rejected** — excluding the untested
+areas was considered and turned down, because it moves the number without changing anything true.
 
 **This is the one place the coverage numbers are recorded.** They moved a long way in two weeks and were
 being re-derived in four files, which is how three of them ended up disagreeing.
@@ -967,6 +968,7 @@ being re-derived in four files, which is how three of them ended up disagreeing.
 | 2026-08-08, from Sonar | 53.3%, 31.4% on new code | the Blazor UI module and three TypeScript packages — 1571 lines, 22.5% of the denominator |
 | 2026-08-22, local cobertura | 56.6% — 9511 of 16785 lines, 20 assemblies | all four now have suites; see the table below |
 | 2026-08-27, from Sonar — run `ad2e96b8` | 71.1%, 70.6% line — 1892 uncovered of 6429. New code reads **77.0%** against the 80% gate | none. All four suites reached Sonar, which is what the UI harness was waiting to see |
+| 2026-08-31, from Sonar | **over 80% on new code — the fixed gate passes on `main`.** The exact percentage was not read; the maintainer confirmed the crossing. Four ServiceModule repositories left 0% because the Sonar workflow ran Sqlite only, and it now starts azurite and postgres | the three below |
 
 **The 2026-08-22 detail**, hand-written code only:
 
@@ -992,6 +994,24 @@ way — the shape held and the digits moved, which is why both are kept.
 them was ever coverable: the python index generator, the three sites' bundles and webpack configs, and the
 typescript fixture-provider and generator folders. That alone moved 67.1% to 70.6% with no test written.
 **It is not the same act as excluding untested code**, which stays rejected above.
+
+**What is left uncovered on purpose**, so it is not re-opened as a gap:
+
+- `Kernel/Logs/LogsRetentionProcessor` — the `catch` around `File.Delete`, because there is no portable way to
+  force a delete to fail (Linux unlinks open files, Windows does not), and the second turn of the retention
+  loop, because the `PeriodicTimer` is built with no `TimeProvider` so the day between sweeps cannot be faked.
+  Passing a `TimeProvider` in would make the second one testable, and that is a change to the code.
+- `InMemoryAccountRepository`, `InMemorySubscriptionRepository` and `FileHashStore` sit at 0%. The two
+  repositories hold their `ConcurrentSortedDictionary` in a static field, so state is shared across the whole
+  process and a test that writes to one has to account for every other test that did.
+
+**Still uncovered and not on purpose:** OpenApi document generation, around 130 lines —
+`Kernel/OpenApi/ExtensionsMethods/OpenApiOptionsExtensions.cs` and `OpenApiServiceCollectionExtensions.cs`,
+`Kernel/OpenApi/Helpers/OpenApiValidationProblemExample.cs`, and `Binacle.Net/v3/ApiV3Document.cs` /
+`v4/ApiV4Document.cs` with their example-response classes. Those last need a host with the document endpoint
+mapped, which is gated on `SWAGGER_UI` or `SCALAR_UI`, so they wait on the integration-harness question. The
+transformers under `Kernel/OpenApi/Transformers/` are at 100% from `api/test/Binacle.Net.Kernel.UnitTests/OpenApi/`,
+against hand-built transformer contexts and no host.
 
 **`binacle-net-ui`'s uncovered third is the Three.js half** — `core/packingVisualizer.ts` and the scene
 helpers in `utils/`. They need a WebGL context, so a test there could only assert that a call happened. They

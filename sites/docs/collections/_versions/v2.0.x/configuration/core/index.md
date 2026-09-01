@@ -28,7 +28,7 @@ app
 ```
 
 ## 🎛️ Presets
-Binacle.Net allows you to predefine bin configurations using presets, so you don’t have to send them with each request.
+Binacle.Net allows you to predefine bin configurations using presets, so you don't have to send them with each request.
 
 visit the [Presets]({% vlink /configuration/core/presets.md %}) page for more details.
 

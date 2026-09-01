@@ -30,7 +30,7 @@ Below are the key sections detailing how the system functions:
 ## 🧠 Algorithms
 In order to solve the Bin Packing problem in real time Binacle.Net employs heuristic algorithms suitable for real-time use.
 
-While such algorithms, like FFD, don’t always guarantee a theoretically optimal solution,
+While such algorithms, like FFD, don't always guarantee a theoretically optimal solution,
 Binacle.Net is designed to ensure that when it confirms a bin is suitable, all items will fit without error. 
 
 However, in rare cases, the algorithm might miss possible fits because of its heuristic approach,

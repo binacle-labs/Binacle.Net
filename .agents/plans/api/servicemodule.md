@@ -41,7 +41,8 @@ index - deletion is soft and a username is reusable - and `CREATE INDEX IF NOT E
 is the one item that works without the migration runner. Also open: the account/subscription link is stored on
 both sides with no transaction, and one-subscription-per-account is enforced in code only.
 
-**Two `// TODO`s ride with this:** `ApiUsageRateLimitingPolicy.cs:32` and `AccountBindingResult.cs:57`.
+**One `// TODO` rides with this:** `ApiUsageRateLimitingPolicy.cs:32`. There were two; the one in
+`AccountBindingResult.cs` went with `d0ba7823`.
 
 **Goes with the image split** - `plans/api/packing-only-image.md`.
 
@@ -61,6 +62,5 @@ both sides with no transaction, and one-subscription-per-account is enforced in 
 - [ ] Refresh tokens work end to end.
       `grep -rn 'auth/refresh' api/src api/test` finds the endpoint and a test that rotates one and revokes
       on logout.
-- [ ] The two `// TODO`s are gone.
-      `grep -n TODO api/src/Binacle.Net.ServiceModule/**/ApiUsageRateLimitingPolicy.cs` and the same for
-      `AccountBindingResult.cs` return nothing.
+- [ ] The `// TODO` is gone.
+      `grep -rn TODO api/src/Binacle.Net.ServiceModule/` returns nothing.

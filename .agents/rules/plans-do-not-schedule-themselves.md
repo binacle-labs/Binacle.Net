@@ -19,7 +19,7 @@ Where scheduling lives instead:
 | In what order do these two go? | it is the maintainer's call |
 | Does it ship in this version? | the `release-v<version>` set |
 
-**The two keys are the whole exception.** Readiness is one word in the front matter, where a generated index
+**The three keys are the whole exception.** Readiness is one word in the front matter, where a generated index
 can collect it. In the body of the plan there is still no scheduling at all.
 
 A plan holds **what the work is, why it is worth doing, and what will bite whoever does it.** That is all.

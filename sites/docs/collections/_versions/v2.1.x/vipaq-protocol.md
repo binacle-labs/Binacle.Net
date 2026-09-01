@@ -36,7 +36,7 @@ preserving all necessary data for visualization and decoding.
 
 - **Header**: Decoding metadata
 - **Number of Items**: Total encoded items
-- **Bin**: Dimensions — Length, Width, Height
+- **Bin**: Dimensions (Length, Width, Height)
 - **Items**: Each with dimensions (L, W, H) and position coordinates (X, Y, Z)
 
 ### 🔑 Encoding & Compression Techniques
