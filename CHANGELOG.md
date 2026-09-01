@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.0] - 2026-09-01
 
 Binacle.Net v3.0.0 is a major update from v2.1.1.
 
