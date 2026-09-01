@@ -26,8 +26,7 @@ docker buildx imagetools inspect binacle/binacle-net:3.0
 
 > **Releases before `3.0.0` cannot be verified.** `2.1.1` and everything earlier were
 > published before the signing pipeline existed, so `cosign verify` answers `no signatures found` against them.
-> The check has not failed; there is nothing there to check. It applies to a moving tag like `latest` too, for
-> as long as it still points at one of those releases.
+> The check has not failed; there is nothing there to check.
 {: .block-warning}
 
 ## 🛠️ Install cosign
