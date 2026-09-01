@@ -63,7 +63,7 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 
   The SPDX SBOM and SLSA provenance travel inside the image index; `docker buildx imagetools inspect binacle/binacle-net:3.0.0` lists them.  
 - **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is written into the signature and does not redirect — a stale one fails the check rather than warning.  
-- **The image is smaller — around 108 MB, where the same image built the old way was 158 MB.** The app is published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead of carrying a second copy of it. Nothing about running the container changes.  
+- **The image is smaller — 100 to 110 MB, where the same image built the old way was 150 to 160 MB.** The app is published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead of carrying a second copy of it. Nothing about running the container changes.  
 - **One environment variable was removed — `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the demo at another API host. The rebuilt module reads no configuration and always calls the API it is served from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went with it, and the image no longer ships a `UiModule` config folder.  
 - Every other environment variable is unchanged.  
 
