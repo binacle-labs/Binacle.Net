@@ -3,7 +3,7 @@
 *
 !artifacts/binacle-net
 
-# GPL-3.0 sections 4 and 5 require a copy of the licence to travel with the binaries, and the vendored
+# AGPL-3.0 sections 4 and 5 require a copy of the licence to travel with the binaries, and the vendored
 # Apache and MIT components require their notices. A label is metadata, it is not a copy.
 !NOTICE
 !LICENSE.AGPL-3.0

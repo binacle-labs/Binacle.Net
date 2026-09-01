@@ -139,7 +139,8 @@ Questions and "it worked" are equally welcome:
 - **Maintained by:** Binacle Labs - <https://github.com/binacle-labs>
 - **Source:** <https://github.com/binacle-labs/Binacle.Net>
 - **Documentation:** <https://docs.binacle.net>
-- **Website and demo:** <https://www.binacle.net>
+- **Website:** <https://www.binacle.net>
+- **Demo:** <https://demo.binacle.net>
 - **File an issue:** <https://github.com/binacle-labs/Binacle.Net/issues>
 - **Releases:** <https://github.com/binacle-labs/Binacle.Net/releases>
 - **Security policy:** <https://github.com/binacle-labs/Binacle.Net/blob/main/SECURITY.md>
