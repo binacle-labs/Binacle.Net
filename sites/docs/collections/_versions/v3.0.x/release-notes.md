@@ -48,13 +48,13 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.
 - **Versioned documentation** now covers every minor line, so older images keep their docs.
 - **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.
+- **Licensing is now stated per part.** The samples, the build tooling, the Ruby gems and the ViPaq and compact
+  notation libraries are permissive, so they can be copied without taking on the code licence. The
+  documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on quoting it.
 - **The code licence changed from GPL-3.0 to AGPL-3.0.** Run the image as it ships and there is nothing to do.
   Change it and run it as a service for other people, and you publish what you changed. The permissive parts
   stay permissive. Versions up to and including `3.0.0-beta.6` remain under GPL-3.0, and that text is kept at
   [`LICENSE.GPL-3.0/`](https://github.com/binacle-labs/Binacle.Net/tree/main/LICENSE.GPL-3.0).
-- **Licensing is now stated per part.** The samples, the build tooling, the Ruby gems and the ViPaq and compact
-  notation libraries are permissive, so they can be copied without taking on the code licence. The
-  documentation moved from CC BY-SA 4.0 to CC BY 4.0, which drops the ShareAlike condition on quoting it.
 
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.
@@ -127,7 +127,7 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
 - **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command
   above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is
   written into the signature and does not redirect - a stale one fails the check rather than warning.
-- **The image is smaller - around 108 MB, where the same image built the old way was 158 MB.** The app is
+- **The image is smaller - 100 to 110 MB, where the same image built the old way was 150 to 160 MB.** The app is
   published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead
   of carrying a second copy of it. Nothing about running the container changes.
 - **One environment variable was removed - `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the
@@ -166,7 +166,7 @@ Release notes for the **v3.0.x** line, newest release first. Every patch in this
   fail startup validation instead of quietly admitting a host you did not name. `192.168.1.1/24` still means the
   whole `192.168.1.0/24` - that is what CIDR notation means - but the startup log now says so.
 
-### 🛡️ Service Module
+### 🔌 Service Module
 - **No migration steps are given for Service Module changes** - see the note at the top of this page. Changes
   before v3.0.0 were not listed at all.
 - **Breaking. The auth token rate limit no longer reads `X-Forwarded-For`.** It partitions on the connection's
