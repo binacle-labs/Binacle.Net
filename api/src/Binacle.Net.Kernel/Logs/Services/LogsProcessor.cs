@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Binacle.Net.Kernel.Logs.Services;
 
 // Generic log processor: drains a channel of requests and appends one JSON line per request to a dated file.
-// Each request maps itself to its log entry (ILogEntryConvertible) in the background — the request thread only
+// Each request maps itself to its log entry (ILogEntryConvertible) in the background. The request thread only
 // enqueued raw references. Knows nothing about any specific feature's request or entry types.
 internal class LogsProcessor<TRequest, TLog> : BackgroundService
 	where TRequest : ILogEntryConvertible<TLog>

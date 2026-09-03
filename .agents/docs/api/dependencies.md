@@ -1,7 +1,7 @@
 ---
 id: api/dependencies
 description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals.
-verified: 2026-08-29
+verified: 2026-09-04
 check: ProjectReference and InternalsVisibleTo entries in api/**/*.csproj match the graph, the table and the walls below, including every test project and the entry point's Using Include items
 paths:
   - "api/**"
@@ -34,6 +34,7 @@ Binacle.Net  (Web SDK, entry / composition root)
              [IVT → UIModule.UnitTests]
 
 Kernel  → Binacle.CompactNotation                                shared API floor (every module refs it)
+   [IVT → Kernel.UnitTests]
 
 Tests  (all xUnit v3, all OutputType Exe)
    UnitTests                       → Binacle.Net
@@ -59,7 +60,7 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.UIModule` | Razor library | Kernel | — | Razor Pages demo host |
 | `Binacle.Net.UnitTests` | xUnit exe | Binacle.Net | Binacle.Net | entry-point units |
 | `Binacle.Net.IntegrationTests` | xUnit exe | Binacle.Net, Packing, TestsKernel | Binacle.Net | v3/v4 HTTP tests |
-| `Binacle.Net.Kernel.UnitTests` | xUnit exe | Kernel | — (public surface only) | Kernel units |
+| `Binacle.Net.Kernel.UnitTests` | xUnit exe | Kernel | Kernel | Kernel units |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | xUnit exe | DiagnosticsModule | DiagnosticsModule | log/telemetry units |
 | `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule | auth/accounts units |
 | `Binacle.Net.ServiceModule.IntegrationTests` | xUnit exe | ServiceModule, Binacle.Net | Binacle.Net, ServiceModule, Domain, Infrastructure | auth + rate-limit tests |
@@ -70,8 +71,8 @@ Tests  (all xUnit v3, all OutputType Exe)
 
 1. **`Binacle.Net` is the only composition root.** It is the single project that references the concrete
    `Binacle.Lib` (and `ViPaq`, and all three modules). Nothing else in the slice references the packer at all -
-   the two modules that need the result vocabulary and the integration suite take `Binacle.Packing` in
-   `shared/src` instead. So the algorithms are wired once, here.
+   `DiagnosticsModule`, which needs the result vocabulary, and `Binacle.Net.IntegrationTests` take
+   `Binacle.Packing` in `shared/src` instead. So the algorithms are wired once, here.
 
 2. **Modules never reference the entry point.** The arrows go one way: `Binacle.Net` → each module. A module
    depending back on `Binacle.Net` would be a cycle and a design break. Modules are compiled in regardless; feature

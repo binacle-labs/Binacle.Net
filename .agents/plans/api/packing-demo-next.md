@@ -10,9 +10,9 @@ paths:
 
 # The packing demo - the next three
 
-**Merged from `packing-demo-bugs.md` and `show-me-the-request.md`.** They were filed as a bug list and an
-idea, and they are neither: they are the next three pieces of work on the same surface, and the first two
-were the last survivors of a ten-item review where the other eight are fixed.
+**These were filed as a bug list and an idea, and they are neither.** They are the next three pieces of work
+on the same surface, and the first two were the last survivors of a ten-item review where the other eight
+are fixed.
 
 **Two of the three ship in the image, one is shared.** Say which before starting - it changes where the code
 goes and how much of it there is.

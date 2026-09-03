@@ -1,7 +1,7 @@
 ---
 id: api/v3/contracts
 description: v3 request and response contracts — field names, outer response wrapper, and enum values for fit and pack.
-verified: 2026-08-19
+verified: 2026-09-04
 check: Every field name, type and nullability here matches BinFitResult in FitResponse.cs and BinPackResult in PackResponse.cs; the enums and the three response wrappers match v3/Contracts/
 also_update:
   - api/v3

@@ -5,7 +5,7 @@ import {Width} from "./width";
 // Ports C#: Header (the record struct's data). The two header bytes (PROTOCOL.md §2), also the encoder's
 // directive:
 //
-//   Byte 0 — form                                Byte 1 — widths
+//   Byte 0 - form                                Byte 1 - widths
 //   [Version][Compressed][Layout][reserved]      [Bin dims][Item dims][Item coords][reserved]
 //   [2 bits ][1 bit     ][1 bit ][4 bits  ]      [2 bits  ][2 bits   ][2 bits     ][2 bits  ]
 //

@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-08-31
+verified: 2026-09-04
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -32,7 +32,7 @@ Ruby 3.4.7 (`.ruby-version` in `sites/docs/`, `sites/demo/` and `sites/www/` —
 ## Set up a fresh clone
 
 ```bash
-just install                           # npm workspaces, all three jekyll sites' gems, then the asset copy
+just install                           # npm workspaces, the gems for all three sites and for ruby/, then the asset copy
 just assets                            # only the asset copy - after changing anything under assets/
 ```
 
@@ -74,7 +74,7 @@ loaded as the `test` module. The same recipes are what CI calls, so a red step i
 package or gem name lowercased with dots turned to dashes, so `cs_binacle-net-kernel_unit` is
 `Binacle.Net.Kernel.UnitTests` and nothing else. `_` separates the segments, `-` belongs inside a name.
 
-**The tests are `[private]`**, so completion offers the four groups and not twenty-six tests. A private
+**The tests are `[private]`**, so completion offers the four groups and not twenty-seven tests. A private
 recipe still runs by name. `just test` with no argument prints the whole list.
 
 ```bash
@@ -118,12 +118,13 @@ just test rb_jekyll-structured-data_unit
 just test rb_jekyll-webmanifest_unit
 ```
 
-**Twenty-six tests, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
+**Twenty-seven tests, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
 from the gem's own folder, which is the only place a `spec_helper` is on the load path.
 
-**Four group recipes, and the two lists in `tooling/tests.just` are the only copy of the set of tests.**
+**Four group recipes, and the three lists in `tooling/tests.just` are the only copy of the set of tests.**
 `just test image` is what the Docker image ships, `just test sites` is what a Jekyll site ships, and
-`just test all` is the two of them with nothing run twice — five javascript tests are in both.
+`just test all` is a third list, written out as the two of them with nothing run twice — five javascript
+tests are in both.
 `just test all-with-services` is `all` plus the ServiceModule suite against Postgres and Azure Tables, which
 need `just serve services-up -d` first. Each group runs every test and reports all the failures, not just the
 first.

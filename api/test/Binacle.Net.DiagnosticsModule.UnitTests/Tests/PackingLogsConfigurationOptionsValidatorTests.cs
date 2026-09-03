@@ -76,7 +76,7 @@ public class PackingLogsConfigurationOptionsValidatorTests
 	}
 
 	[Theory]
-	[InlineData(null)] // no retention — keep every file
+	[InlineData(null)] // no retention, keep every file
 	[InlineData(1)]
 	[InlineData(7)]
 	public void A_null_or_positive_retention_is_accepted(int? retentionDays)

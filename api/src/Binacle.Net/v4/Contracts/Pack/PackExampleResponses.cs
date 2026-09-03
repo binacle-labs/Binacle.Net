@@ -1,6 +1,6 @@
 namespace Binacle.Net.v4.Contracts.Pack;
 
-// The three outcomes every pack example is one of. Only the bin changes between them — the geometry, and so
+// The three outcomes every pack example is one of. Only the bin changes between them. The geometry, and so
 // the layout and the percentages, does not.
 internal static class PackExampleResponses
 {

@@ -9,8 +9,7 @@ paths:
 
 # Delete the old test images
 
-**Was job 4 of `post-release-v3.0.0.md`.** It moved out because it is standing work, not a check, and it was
-holding a file open that is otherwise two browser passes from being deleted.
+**Standing work, not a release check.** It came out of the v3.0.0 post-release list for that reason.
 
 **Answered 2026-08-31: they go. Answered again 2026-09-04: not yet, a few months.** Both are the
 maintainer's, and the second is the live one.

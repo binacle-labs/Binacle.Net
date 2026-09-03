@@ -1,8 +1,8 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-08-27
-check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/JsonStringNullableEnumConverter.cs still holds the factory, the internal NullableEnumConverter<T> and the public generic, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on both public converter types; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
+verified: 2026-09-04
+check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
 paths:
@@ -36,8 +36,12 @@ What `ValidateAsync()` returns before calling your handler:
 |---|---|
 | JSON parse error | `400` with `"Invalid JSON Format"` problem details |
 | Null body | `400` with `"Malformed Request"` problem details |
+| Unknown enum value (`JsonEnumValueException`) | `422`, keyed and worded like a missing value — see Serialization below |
 | Validation failure | `422` with FluentValidation field errors |
 | Other exception | `500` (exception details exposed in Development only) |
+
+`BindingProblem` is the one place that makes this mapping, so the same input cannot answer 422 on one route
+and 400 on the next. `JsonEnumValueException` is a `JsonException`, so it is matched first.
 
 `BindingResult<T>` is registered automatically via `BindAsync()` — no DI setup needed.
 
@@ -190,6 +194,8 @@ module's `ModuleDefinition`.
   Use it to assert "this construction/conversion succeeds" (e.g. a volume calc that could overflow).
 - `ValidationExtensions.GetValidationSummary()` — groups a `ValidationResult` into `Dictionary<string, string[]>`,
   the shape fed to `HttpValidationProblemDetails` (the 422 body).
+- `ValidationMessage` — the shared message text, so a value rejected at bind time and the same value rejected
+  by a rule read the same. `JsonEnumValueException` uses `ValidationMessage.RequiredEnumValues`.
 
 ## Network
 
@@ -294,30 +300,34 @@ Sqlite, Npgsql) registers its own. The registered names, tags and the endpoint a
 
 ## Serialization
 
-`Kernel/Serialization/JsonStringNullableEnumConverter.cs` is the whole folder — converters for a **nullable
-enum** written as a string. Namespace `Binacle.Net.Kernel.Serialization`. Nothing here is registered in DI or
-added to `JsonSerializerOptions`; each one is placed per property with `[JsonConverter]`.
+`Kernel/Serialization/` holds two files — `JsonStringNullableEnumConverter.cs` and `JsonEnumValueException.cs`
+— for a **nullable enum** written as a string. Namespace `Binacle.Net.Kernel.Serialization`. Nothing here is
+registered in DI or added to `JsonSerializerOptions`; the converter is placed per property with
+`[JsonConverter]`.
 
 ```csharp
 [JsonConverter(typeof(JsonStringNullableEnumConverter))]
 public required Algorithm? Algorithm { get; set; }
 ```
 
-The file holds three types, and the names do not say which is which:
+`JsonStringNullableEnumConverter.cs` holds three types, and the names do not say which is which:
 
 | Type | What it is |
 |---|---|
-| `JsonStringNullableEnumConverter` | A `JsonConverterFactory`. `CanConvert` accepts only `Nullable<TEnum>`. This is the one contracts use. |
-| `NullableEnumConverter<T>` | `internal`, and **what the factory actually creates**. Also handles the enum as a property name. |
-| `JsonStringNullableEnumConverter<T>` | A `public` converter carrying the factory's name with a type parameter. Nothing places it; only the OpenAPI transformer names it. |
+| `JsonStringNullableEnumConverter` | `public`, a `JsonConverterFactory`. `CanConvert` accepts only `Nullable<TEnum>`. This is the one contracts place. |
+| `NullableEnumConverter<T>` | `internal`, and **what the factory actually creates**. Also handles the enum as a property name (`ReadAsPropertyName` / `WriteAsPropertyName`). |
+| `EnumValueReader` | `internal static`, the shared read. `Enum.TryParse` case-sensitive first, then case-insensitive. |
 
-Reading is the same in both converters: `Enum.TryParse` case-sensitive first, then case-insensitive. **A string
-that matches no member is not an error** — the read returns `default`, i.e. null, as an empty string and a JSON
-null do. The converter never rejects a value; validation is what turns an unknown algorithm into a 422.
+**A JSON null and an empty string read as `default`, i.e. null. Any other string that matches no member
+throws `JsonEnumValueException`** — a `JsonException` carrying the enum type. `BindingProblem` matches it
+before the plain `JsonException` branch and answers `422`, keyed and worded like a missing value, so the field
+reports one error either way. Reading an unknown value as null would accept the request with the field the
+client actually sent silently dropped.
 
 `EnumStringsSchemaTransformer` (`Kernel/OpenApi/Transformers`) matches on the converter type placed on the
-property and, for either public type, sets the schema to `string` and lists the member names — so a nullable
-enum carrying some other converter is typed but loses its list of values. See `$api/openapi`.
+property, and only for an enum or nullable-enum property. `JsonStringEnumConverter` (the BCL one) sets the
+schema to `string`; `JsonStringNullableEnumConverter` sets `string` **and** lists the member names. Any other
+converter leaves the schema alone. See `$api/openapi`.
 
 Placed on v3 `PackRequestParameters` and `FitRequestParameters`, v4 `OperationParameters`, and the ServiceModule
 admin account and subscription contracts.

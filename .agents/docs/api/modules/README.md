@@ -1,7 +1,7 @@
 ---
 id: api/modules
 description: Optional module system — feature flags, structure, available modules
-verified: 2026-08-27
+verified: 2026-09-04
 check: The Add/Use pair and IModuleMarker of each Binacle.Net.*Module* project exist where stated; the flag reading rules match Kernel/Features/ (both providers, FeatureManager, FeatureManagerConfiguration); the launch profiles match api/src/Binacle.Net/Properties/launchSettings.json
 also_update:
   - api

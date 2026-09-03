@@ -1,7 +1,7 @@
 ---
 id: api
 description: Index for API slice docs — endpoints, contracts, service, kernel, presets, and module docs (Diagnostics, ServiceModule, UIModule)
-verified: 2026-08-27
+verified: 2026-09-04
 check: The startup order matches Program.cs top to bottom, builder half then pipeline half; the dependency map matches every ProjectReference in api/**/*.csproj and the projects those reach; every type named in the v4 request flow still resolves
 also_update:
   - api/modules
@@ -36,8 +36,9 @@ ConfigureForwardedHeaders()              // proxy trust; writes ForwardedHeaders
 AddDiagnosticsModule()
 if SERVICE_MODULE → AddServiceModule()   // calls AddInfrastructure() internally
 if UI_MODULE      → AddUIModule()
-if SWAGGER_UI     → register Swagger OpenAPI docs
-if SCALAR_UI      → register Scalar OpenAPI docs
+read SWAGGER_UI / SCALAR_UI       // into swaggerEnabled / scalarEnabled, then added to FeatureOptions
+                                  // as "SwaggerUI" (/swagger) and "ScalarUI" (/scalar) when on
+Configure<ReservedPathOptions>()  // /api, /openapi, /swagger, /scalar reserved whether or not a UI is on
 ---
 UseForwardedHeaders()                    // FIRST — rewrites RemoteIpAddress and Scheme before anything reads them
 UseHttpsRedirection() / UseExceptionHandler() / UseCors()
@@ -70,12 +71,13 @@ Projects live in four top-level directories: `shared/src/`, `lib/src/`, `api/src
 ```
 shared/src/Binacle.Packing                → Binacle.Geometry
 shared/src/Binacle.CompactNotation        → Binacle.Geometry
+shared/src/Binacle.FluxResults            (no dependencies)
 lib/src/Binacle.Lib                       → Binacle.Packing
 vipaq/src/Binacle.ViPaq                   → Binacle.Geometry
 
 api/src/Binacle.Net.Kernel                → Binacle.CompactNotation
 api/src/Binacle.Net.DiagnosticsModule     → Binacle.Net.Kernel, Binacle.Packing, Binacle.CompactNotation
-api/src/Binacle.Net.ServiceModule.Domain  (no dependencies)
+api/src/Binacle.Net.ServiceModule.Domain  → Binacle.FluxResults
 api/src/Binacle.Net.ServiceModule.Infrastructure → Binacle.Net.Kernel, ServiceModule.Domain
 api/src/Binacle.Net.ServiceModule         → Binacle.Net.Kernel, ServiceModule.Domain, ServiceModule.Infrastructure
 api/src/Binacle.Net.UIModule              → Binacle.Net.Kernel
@@ -88,8 +90,8 @@ This is the API slice's view. The full graph across every slice — including wh
 Key rules:
 - Kernel has no dependency on `Binacle.Net` or any module — safe to use from anywhere
 - Lib and Binacle.Packing have no API dependencies — pure algorithm layer
-- Only `Binacle.Net` references the packer. The two modules that need the result vocabulary (Diagnostics, UI)
-  and the integration suite take `Binacle.Packing` instead; the Kernel takes neither
+- Only `Binacle.Net` references the packer. `DiagnosticsModule`, which needs the result vocabulary, and
+  `Binacle.Net.IntegrationTests` take `Binacle.Packing` instead; the Kernel and `UIModule` take neither
 - Modules depend on Kernel but not on each other
 - `Binacle.Net` is the only project that references everything
 

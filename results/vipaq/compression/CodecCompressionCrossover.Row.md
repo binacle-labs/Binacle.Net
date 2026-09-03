@@ -1,9 +1,9 @@
-# ViPaq codec compression crossover — Row
+# ViPaq codec compression crossover - Row
 
-ViPaq stored size under each codec — raw (NoOp) next to deflate and gzip — so you can see where compressing a pack starts to pay and which codec wins. Ordered by item count.
+ViPaq stored size under each codec: raw (NoOp) next to deflate and gzip, so you can see where compressing a pack starts to pay and which codec wins. Ordered by item count.
 
 
-## Real scenarios — custom packs — Row
+## Real scenarios - custom packs - Row
 Real placed data, Row layout, all three codecs.
 
 | Scenario                                | Items | Widths b/i/c | Raw b64 | Deflate b64 | Gzip b64 | Best    | Saved % |
@@ -32,7 +32,7 @@ Real placed data, Row layout, all three codecs.
 
 
 
-## Real scenarios — Bischoff suite — Row
+## Real scenarios - Bischoff suite - Row
 Real placed data, Row layout, all three codecs.
 
 | Scenario              | Items | Widths b/i/c | Raw b64 | Deflate b64 | Gzip b64 | Best    | Saved % |

@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-08-27
+verified: 2026-09-04
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
 also_update:
   - shared
@@ -68,7 +68,7 @@ this.Fixture.AssertResult(testScenario, result);
 
 Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `PackingBischoffSuiteTests`,
 `PackingCustomProblemsTests` (each a `[Theory]` × `[MemberData]` over all six versions), plus `CreationTests`,
-`SanityTests`, `ResultSelectionTests`.
+`SanityTests`, `ResultSelectionTests`, `BinProcessingCancellationTests`.
 
 `ResultSelectionTestingFixture`:
 
@@ -95,9 +95,11 @@ pass/fail assertions.
 
 BenchmarkDotNet. Two factory paths:
 
-- Bischoff-suite benchmarks use the project's own six `TestAlgorithmFactory` statics via `BischoffSuiteBenchmarkBase`.
-- AlgorithmProcessing benchmarks use the lib's **internal** `AlgorithmFactory_v1()` / `AlgorithmFactory_v2()`
-  (`lib/src/Binacle.Lib/AlgorithmFactories/`) fed into `LoopAlgorithmProcessor` / `ParallelAlgorithmProcessor`.
+- Bischoff-suite and FastValidation benchmarks use the project's own six `TestAlgorithmFactory` statics, via
+  `BischoffSuiteBenchmarkBase` and `FastValidationBenchmarkBase`.
+- AlgorithmProcessing and BinProcessing benchmarks use the lib's **internal** `AlgorithmFactory_v1()` /
+  `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`) fed into `LoopAlgorithmProcessor` /
+  `ParallelAlgorithmProcessor` and `LoopBinProcessor` / `ParallelBinProcessor`.
 
 Families: Fitting + Packing × {BischoffSuite, FastValidation}, Packing × {AlgorithmProcessing (AlgorithmRacing,
 AlgorithmParallelizationThreshold), BinProcessing (BinParallelizationThreshold)}, and ResultSelection. Ordering

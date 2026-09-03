@@ -9,7 +9,7 @@ using Binacle.ViPaq.TestsKernel.ViPaq;
 namespace Binacle.ViPaq.Benchmarks.Benchmarks;
 
 // Decode CPU/memory over the synthetic scenarios, against the protobuf baseline. Setup pre-encodes each form once
-// — plus the header ViPaq's decode needs — so only the read is timed. The codec is NoOp, so this times the format,
+// (plus the header ViPaq's decode needs) so only the read is timed. The codec is NoOp, so this times the format,
 // not decompression. Run with `--filter *SyntheticDecode*`.
 [MemoryDiagnoser]
 public class SyntheticDecodeBenchmarks : SyntheticBenchmarkBase

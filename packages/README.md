@@ -1,6 +1,6 @@
 # Packages
 
-Shared TypeScript packages used across the repo. They are npm workspaces — install once
+Shared TypeScript packages used across the repo. They are npm workspaces, install once
 from the repo root with `npm install`.
 
 ## 📦 Packages
@@ -27,7 +27,7 @@ between them. Its leaf is named after `shared` for that reason, not after this f
 
 ## 🌐 Who imports them
 
-The two sites and the API's UI module pull them in by package name and webpack bundles them —
+The two sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
 the packing demo and the ViPaq decoder, and all three use `theme-switcher`. Nothing is copied: the import
 resolves through the workspace. (`just assets` is a different job - it copies the static files in

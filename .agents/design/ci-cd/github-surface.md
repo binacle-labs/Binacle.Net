@@ -64,21 +64,23 @@ That is what makes them worth writing down rather than rediscovering.
   and a trap when a chain is wanted.
 - **Reusable workflows nest ten levels deep at most**, and loops in the call tree are rejected.
 
-**One unconfirmed, and it matters.** Dependabot's coverage of composite actions is unverified. The docs
-describe the `github-actions` ecosystem with `directory: /` as covering `.github/workflows`; they do not say
-whether an `action.yml` in a subfolder is scanned too. **If it is not, every pin moved into a shared action
-silently stops being updated - worse than an unpinned action, because nothing reports it.** Move one, wait a
-week, see whether the bump arrives.
+**Answered 2026-08-19, and the answer was the bad one.** Dependabot's `github-actions` ecosystem with
+`directory: /` does **not** reach an `action.yml` in a subfolder, so every pin moved into a shared action
+stopped being updated silently - worse than an unpinned action, because nothing reports it. **The fix is one
+`dependabot.yml` entry per action folder**, which is the shape the file carries now. `decisions.md` D11 holds
+the reasoning.
 
 ---
 
 ## What this repository uses today
 
 `.github/` holds `dependabot.yml` (actions only, weekly, grouped minor and patch, with one entry per action
-folder that pins an outside SHA), **ten workflows**, **nine composite actions** under `actions/`, and
-`dockerhub-overview.md` — the source the release pipeline renders onto the Docker Hub page. The root holds
-`README.md`, `SECURITY.md`, `CHANGELOG.md`, `DEVELOPMENT.md`, `CONTRIBUTING.md`, `CLAUDE.md`,
-`LICENSE.GPL-3.0`, `CONTENT-TERMS.md` and `NOTICE`.
+folder that pins an outside SHA), **eleven workflows**, **nine composite actions** under `actions/`,
+`ISSUE_TEMPLATE/` and `PULL_REQUEST_TEMPLATE.md`, and `dockerhub-overview.md` — the source the release
+pipeline renders onto the Docker Hub page. The root holds `README.md`, `SECURITY.md`, `CHANGELOG.md`,
+`DEVELOPMENT.md`, `CONTRIBUTING.md`, `CLAUDE.md`, `CONTENT-TERMS.md`, `NOTICE`, and **one licence file,
+`LICENSE.AGPL-3.0`**. `LICENSE.GPL-3.0` is a *directory* holding the old text and a `README.md`, and that
+shape is load-bearing - `decisions.md` D6 has why. Counted 2026-09-04.
 
 **`CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` landed on 2026-08-30**, and they say the same
 thing: **code contributions are not being taken at the moment, issues are.** The stated reason is that
@@ -87,8 +89,10 @@ pull request opened today is closed with a link to the file, and the template ca
 somebody sees it before they spend the effort. **This is a holding position and the file says so** - it is
 reversible in a way that merging a pull request without terms is not.
 
-**Missing:** issue templates, `CODE_OF_CONDUCT.md`, `CODEOWNERS`, `SUPPORT.md`, `FUNDING.yml` and
-`CITATION.cff` — checked 2026-08-30, and the last three are absent on purpose per the table below.
+**Issue templates landed 2026-09-04** - `bug_report.yml`, `packing_result.yml` and `config.yml` under
+`.github/ISSUE_TEMPLATE/`. **Still missing:** `CODE_OF_CONDUCT.md`, `CODEOWNERS`, `SUPPORT.md`, `FUNDING.yml`
+and `CITATION.cff` — the last three are absent on purpose per the table below, and `SUPPORT.md` is answered
+by `config.yml` linking out.
 
 **Two worth a decision and nothing more:**
 
@@ -160,10 +164,11 @@ pipeline's shape is what makes it true.
 
 ## Platform settings - all unverified
 
-**The one it argues hardest for: a tag ruleset over `v[0-9]*`.** Restrict deletions, block force pushes,
-enforcement Active. The release workflow pushes exactly that namespace as its last job, so the ruleset would
-protect what it creates - and it has to leave the workflow's own `GITHUB_TOKEN` able to create a tag, or every
-release fails at the last step.
+**The one it argued hardest for is now in place, and this section was not updated.** A tag ruleset exists on
+`refs/tags/v*` - note the pattern, not the `v[0-9]*` argued for here - blocking update and deletion, creation
+still allowed, empty bypass list. `decisions.md` D24 is the record and it supersedes this paragraph. **That
+one row of this section is settled; every other row below is still unverified**, and one of them turning out
+to be stale is reason to suspect the rest.
 
 **Why it matters.** Everything downstream of a tag treats it as permanent: the image carries the version as a
 build argument, the release body is drawn from the changelog section that tag names, the signature covers a

@@ -28,7 +28,7 @@ internal class Program
 		builder.Logging.AddSerilog();
 
 		// Reports land in the build-local PerformanceTests.Artifacts folder (scratch, gitignored). Copy the
-		// keepers into results/vipaq/compression by hand — that committed vault is curated, not auto-written.
+		// keepers into results/vipaq/compression by hand. That committed vault is curated, not auto-written.
 		var artifactsDirectory = Path.Combine(
 			AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "PerformanceTests.Artifacts");
 		builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(artifactsDirectory));

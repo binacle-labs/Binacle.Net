@@ -222,10 +222,10 @@ them.
 
 | Plan | What the release freed |
 |---|---|
-| `plans/api/packing-demo-next.md` | nine of the ten. **The browser pass it was waiting on happened on 2026-08-27.** Two things are still open and neither waits on the release: the unfitted items, where the inline block was rejected on layout the day it shipped so the answer becomes a tooltip, and the submit button, which can stay disabled with no visualizer listening. The strings stay in the package |
+| `plans/api/packing-demo-next.md` | eight of the ten bugs, and the browser pass it was waiting on happened on 2026-08-27. **Reframed 2026-09-04 as three pieces of work rather than a bug list** - the unfitted-items tooltip, the submit button, and showing the visitor the request. None waits on the release |
 | `plans/ci-cd/dockerhub-overview.md` | **deleted 2026-09-02.** Its last box was reading the published page, and the page is read and correct. The reasoning behind what the page carries is in the CI/CD design records |
 | `plans/api/ui-clients-off-v3.md` | **both halves now.** `api.binacle.net` serves a 3.0.x image as of 2026-09-02 - AGPL in its OpenAPI document, `/openapi/v4.json` answers, `/openapi/v2.json` is gone. The blocker in its `waits-on:` is the shape, not the host |
-| `plans/sites/docs-client-generation.md` | nothing the release owned. **It has a blocker of its own** - every page on the site sits under a version folder and this page is not version-specific, so where it lives is unanswered. It sits here because the docs deploy is the natural next docs session |
+| `plans/sites/docs-client-generation.md` | **done and deleted 2026-09-04.** The blocker was a false premise - the `common_pages` collection is a non-versioned home and already existed. The page is live at `docs.binacle.net/generate-a-client/` |
 
 **`plans/_index.md` lists every plan, with its state and what it waits on.** Nothing above is a ranking.
 

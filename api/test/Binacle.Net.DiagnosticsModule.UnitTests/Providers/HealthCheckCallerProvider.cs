@@ -3,7 +3,7 @@ using System.Collections;
 namespace Binacle.Net.DiagnosticsModule.UnitTests.Providers;
 
 // Who a configured allow-list lets through to the health check. Row: allow-list entry, caller address, allowed.
-// The IPv4-mapped caller is the container case — a dual mode socket reports an IPv4 caller as ::ffff:a.b.c.d,
+// The IPv4-mapped caller is the container case: a dual mode socket reports an IPv4 caller as ::ffff:a.b.c.d,
 // and before v3.0.0 no IPv4 entry could match it.
 internal class HealthCheckCallerProvider : IEnumerable<object[]>
 {

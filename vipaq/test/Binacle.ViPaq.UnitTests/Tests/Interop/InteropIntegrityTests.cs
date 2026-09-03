@@ -2,10 +2,10 @@ using Binacle.ViPaq.UnitTests.Providers;
 
 namespace Binacle.ViPaq.UnitTests;
 
-// Sanity guard for the interop vectors. Inputs and artifacts are joined by Name, so EVERY artifact file — both
-// producers × all three codecs — must describe the exact same set of scenarios as input.json. If someone adds a
+// Sanity guard for the interop vectors. Inputs and artifacts are joined by Name, so EVERY artifact file, both
+// producers × all three codecs, must describe the exact same set of scenarios as input.json. If someone adds a
 // scenario to input.json but forgets to rerun a generator (or leaves a stale artifact), the Name sets diverge and
-// this fails with a clear "which names differ" — before the decode test fails in a murkier way.
+// this fails with a clear "which names differ", before the decode test fails in a murkier way.
 [Trait("Sanity Tests", "Ensures the tests are configured correctly")]
 public class InteropIntegrityTests
 {

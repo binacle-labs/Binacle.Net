@@ -1,7 +1,7 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-08-31
+verified: 2026-09-04
 check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
@@ -180,7 +180,10 @@ The registered `special` preset has three bins, 60×40 footprint, heights 10/11/
 `CreateSpecialRequest` request bodies differ by version (because the request shapes differ):
 
 - **v3** sends a `Bins` array of three: `special_bin_1` 10×40×60, `_2` 11×40×60, `_3` 12×40×60.
-- **v4** sends a single `Bin`: `{ ID = "special_bin", 10×40×60 }`.
+- **v4 custom-bin** (`Fit/CustomBin`, `Pack/CustomBin`) sends a single `Bin`:
+  `{ ID = "special_bin", 10×40×60 }`.
+- **v4 preset-bin** (`Fit/PresetBin`) sends items only — the bin comes from the route, filled with
+  `special_bin_1`.
 - v4's custom multi-bin endpoints instead take a `Bins` array (`bin_small` 10×40×60 / `bin_medium` 20×40×60 /
   `bin_large` 30×40×60).
 
@@ -260,4 +263,5 @@ covered the day it is added; nobody has to remember.
   (`DefaultAdminAccount`) and a known user; `NonExistentId = EF81C267-A003-44B8-AD89-4B48661C4AA5` is hard-coded.
   Carries the same all-modules TODO. Tests that need their own account seed it per class through
   `EnsureAccountExists`, which takes an optional `AccountStatus` (default `Active`) so a suspended or inactive
-  account can be seeded, and drop it again through `EnsureAccountDoesNotExist`.
+  account can be seeded, or `EnsureAccountExistsWithSubscription` when the test needs one, and drop it again
+  through `EnsureAccountDoesNotExist`.

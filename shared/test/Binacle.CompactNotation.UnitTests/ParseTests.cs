@@ -1,6 +1,6 @@
 namespace Binacle.CompactNotation.UnitTests;
 
-// Everything is parsed as long — it holds the whole interoperable range [0, 2^53-1] exactly and is
+// Everything is parsed as long. It holds the whole interoperable range [0, 2^53-1] exactly and is
 // the natural pair for JS number. Parse is lenient about range; it just reads the integers.
 public class ParseTests
 {

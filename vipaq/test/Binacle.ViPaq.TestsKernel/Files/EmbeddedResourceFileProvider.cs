@@ -3,8 +3,8 @@ using System.Reflection;
 namespace Binacle.ViPaq.TestsKernel.Files;
 
 // Finds packed-data files embedded in this assembly by manifest-name prefix, caching per prefix. The ViPaq
-// kernel owns this rather than sharing one: GetExecutingAssembly resolves to this assembly — the one that embeds
-// the data — so a shared copy would look in the wrong assembly and find nothing.
+// kernel owns this rather than sharing one: GetExecutingAssembly resolves to this assembly, the one that embeds
+// the data, so a shared copy would look in the wrong assembly and find nothing.
 public static class EmbeddedResourceFileProvider
 {
 	private static Dictionary<string, List<IFile>> filesByPrefix = new Dictionary<string, List<IFile>>();

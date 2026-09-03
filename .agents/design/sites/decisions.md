@@ -123,3 +123,28 @@ outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punct
 **A dash doing another job was not turned into a colon.** A pair around an aside became commas, a dash joining
 two clauses became a full stop, and a dash inside a code block, a sample response or a config block is data and
 was left alone.
+
+### S10 — the sites publish no CSS source map
+
+**`sourcemap: never` in the `sass:` block of `sites/docs/_config.yml` and `sites/demo/_config.yml`**, set
+2026-09-04.
+
+**A Jekyll sass source map embeds `sourcesContent` - the full text of every `_sass` partial, comments and
+all - and serves it at a public URL.** `docs.binacle.net/css/main.css.map` and the demo's equivalent both
+answered 200 with it. Anything written in a stylesheet comment was public the moment the site deployed, which
+is not how anyone treats a stylesheet comment.
+
+**`sites/www` never had one** and needs no setting: it has no `sass:` block at all and compiles its CSS
+through `package.json`'s `build:css`. Its webpack `devtool` is `false` in production on all three sites, so
+webpack was never the source.
+
+**What it costs: nothing a visitor sees.** The built CSS is byte-identical apart from the trailing
+`sourceMappingURL` comment, and debugging a published stylesheet was not something anyone was doing. A local
+build can turn it back on for one run.
+
+**The vendored `lib/swagger-ui/*` files still carry `sourceMappingURL` comments and always did.** Those maps
+are not shipped - `swagger-ui.css.map` answers 404 - so the references dangle, harmlessly, in third-party
+code this repository does not build.
+
+**What would reopen it:** wanting to debug a live stylesheet against its source. The answer then is a
+development build, not shipping the map.

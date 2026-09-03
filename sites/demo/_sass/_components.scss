@@ -23,26 +23,20 @@
   margin-block-start: 1rem;
 }
 
-// The on-container colour, not beercss's hardcoded `--primary`, which fails contrast on both panels.
 :is(.primary-container, .secondary-container) button.border {
   color: inherit;
   border-color: color-mix(in srgb, currentcolor 30%, transparent);
 }
 
-// The warning is the container fill, not coloured text - raw `--error` fails contrast here.
-// `.transparent` sets both properties `!important`, so this has to outrank it.
 button.destructive:is(:hover, :focus) {
   background-color: var(--error-container) !important;
   color: var(--on-error-container) !important;
 }
 
-// `--on-primary` cannot just flip to fix contrast here - it also paints the header, whose GitHub and
-// Docker marks are white PNGs.
 button[type="submit"]:not(.border):not(.transparent) {
   color: var(--on-primary-container);
 }
 
-// Without `display: block`, beercss's `a { display: inline-flex }` puts the title beside the copy.
 a.card {
   display: block;
   block-size: 100%;

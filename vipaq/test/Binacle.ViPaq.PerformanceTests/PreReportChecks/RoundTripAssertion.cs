@@ -5,7 +5,7 @@ namespace Binacle.ViPaq.PerformanceTests.PreReportChecks;
 
 // A token round-trips only if its two header bytes decode back to the header written (a `Header.FromBytes` bug
 // otherwise hides behind a geometry-only assert) and the pack decodes back to input. Compressed bytes are never
-// compared — the oracle is always decode-to-input (PROTOCOL.md §6.1).
+// compared. The oracle is always decode-to-input (PROTOCOL.md §6.1).
 internal static class RoundTripAssertion
 {
 	public static void Assert(

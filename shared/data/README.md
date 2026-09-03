@@ -7,7 +7,7 @@ packed data in `vipaq/data`). Four folders:
 | Folder | What | Consumer |
 | --- | --- | --- |
 | [`or-library/`](or-library/README.md) | Raw OR-Library container-loading text, exactly as published. Untouched source. | The converter (produces `bischoff-suite`). |
-| [`bischoff-suite/`](bischoff-suite/README.md) | Converted Bischoff & Ratcliff (BR) instances — `thpack1–7` only — in the tests-kernel scenario format. | The **tests kernel** (lib algorithm tests). |
+| [`bischoff-suite/`](bischoff-suite/README.md) | Converted Bischoff & Ratcliff (BR) instances, `thpack1-7` only, in the tests-kernel scenario format. | The **tests kernel** (lib algorithm tests). |
 | [`custom-problems/`](custom-problems/README.md) | Hand-authored problems (baseline / complex / simple), same tests-kernel format. | The **tests kernel**. |
 | [`demo-samples/`](demo-samples/README.md) | The demo site's sample set, same tests-kernel format. Regenerated from the packer, so a regression baseline rather than an independent check. | The **tests kernel**, and ViPaq. |
 
@@ -15,7 +15,7 @@ The three scenario sets share the tests-kernel **scenario compact format**: a JS
 `Name`, `Bin` (`"LxWxH"`), `Metrics`, `Result`, and `Items` (`["LxWxH [Q]"]`). The tests kernel embeds these
 very files by `Link`, so there is no second copy to keep in step.
 
-`Items` are item **types** with a quantity (`"108x76x30 [40]"`), never *placed* items — there are no x/y/z
+`Items` are item **types** with a quantity (`"108x76x30 [40]"`), never *placed* items. There are no x/y/z
 coordinates here. `Metrics` (`ItemsVolume BinVolume ItemsCount Percentage`) is pure arithmetic over `Bin` +
 `Items`.
 

@@ -2,7 +2,7 @@ import {Coordinates, Dimensions, Header, Item} from "../models";
 import {ProtocolReader} from "../ProtocolReader";
 import {ProtocolWriter} from "../ProtocolWriter";
 
-// Ports C#: ColumnarCodec. Each field for every item before the next field — six runs, each `count` values long
+// Ports C#: ColumnarCodec. Each field for every item before the next field: six runs, each `count` values long
 // (PROTOCOL.md §3.2):
 //
 //   L L L ... | W W W ... | H H H ... | X X X ... | Y Y Y ... | Z Z Z ...

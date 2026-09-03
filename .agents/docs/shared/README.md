@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.TestsKernel (algorithm scenario data, compact-string formats, providers, fixtures) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-08-27
+verified: 2026-09-04
 check: Collection keys, compact-string parsers (Result is a per-algorithm map, not a bare string), and provider class names and methods match shared/test/Binacle.TestsKernel; the embedded-resource folders in Binacle.TestsKernel.csproj match the folders under shared/data and the key sets in Algorithms/CollectionKeys.cs; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -76,7 +76,7 @@ Scenario JSON keeps values terse. Each field has its own parser. Verify against 
 
 | Field | Parser | Rule | Real example |
 |---|---|---|---|
-| Dimensions | `TestBin.FromCompactString` / `TestItem.FromCompactString` (in `Models/`) via the shared `Binacle.CompactNotation` parser | `"LxWxH"` or `"LxWxH [Q]"` — the factory splits off the optional `[Q]` (quantity, default 1), then `CompactNotationParser.ParseDimensions<int>` → 3 ints L,W,H | `"108x76x30 [40]"`, `"60x40x10"` |
+| Dimensions | `TestBin.FromCompactString` / `TestItem.FromCompactString` (in `Models/`) via the shared `Binacle.CompactNotation` parser | `"LxWxH"` or `"LxWxH [Q]"` — `TestBin` calls `CompactNotationParser.ParseDimensions<int>` (3 ints L,W,H); `TestItem` calls `CompactNotationParser.ParseDimensionsAndQuantity<int>`, which splits off the optional `[Q]` (quantity, default 1) | `"108x76x30 [40]"`, `"60x40x10"` |
 | Metrics (4) | `Algorithms/Helpers/ScenarioMetricsHelper.cs` | exactly 4 space-separated: `ItemsVolume BinVolume ItemsCount Percentage` (first 3 int, last decimal, trailing `%` trimmed) | `"29736390 30089620 112 98.83"` |
 | Result (a map) | `Algorithms/Helpers/ScenarioResultHelper.cs` | a JSON object keyed by algorithm name, and **it must name every one** — `FFD`, `WFD`, `BFD`. Each value is 2 space-separated statuses: **`parts[0]` = packing, `parts[1]` = fitting** | `{"FFD": "PartiallyPacked PartiallyPacked", "WFD": …, "BFD": …}` |
 
@@ -89,7 +89,7 @@ name given twice, and a map missing any algorithm — the round trip through `En
 `"0"` and `"ffd"`. **A bare string is rejected**: a scenario whose algorithms all agree repeats the same pair
 under each key rather than collapsing.
 
-Both halves of each **result** string parse as the lib enum `OperationResultStatus`
+Both halves of each **result** string parse as the `Binacle.Packing` enum `OperationResultStatus`
 (`Unknown=-1, FullyPacked, PartiallyPacked, NotPacked, EarlyExit`) — not the API fit/pack enums, so there is no
 `AllItemsFit`/`NotAllItemsFit` here. A half may carry an early-exit reason as `Status-EarlyExitReason`
 (`EarlyExitReason`: `None`, `ContainerVolumeExceeded`, `ContainerDimensionExceeded`); in real data only the

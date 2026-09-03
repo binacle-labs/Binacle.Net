@@ -1,8 +1,8 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-08-29
-check: Every solution folder and project count matches Binacle.Net.slnx (49 projects); the cross-slice edges against both Gemfiles, both webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
+verified: 2026-09-04
+check: Every solution folder and project count matches Binacle.Net.slnx (49 projects); the cross-slice edges against the three site Gemfiles, the four webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
   - samples
@@ -26,13 +26,13 @@ The repo uses the XML `.slnx` solution format. **49 projects** — 36 `.csproj`,
 grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/test/` — `Binacle.Lib` (the only src project) + four lib test projects, one of them `Binacle.Lib.TestsKernel`
-- `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), two integration-test projects and four unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`)
+- `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), three integration-test projects and five unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`)
 - `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.TestsKernel`, `Binacle.TestReporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects
 - `/samples/`, `/samples/docker/` (5 `.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
-- Top-level content projects: `assets/assets.proj`, `tooling/tooling.proj`, `sites/docs/docs.proj`,
-  `sites/demo/demo.proj`
-- `/_root/` — loose files (`.dockerignore`, `.editorconfig`, `.netconfig`, `Directory.Build.props`, `Directory.Packages.props`, `Dockerfile`, `global.json`, `gulpfile.js`, `package.json`, README)
+- `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`
+- Outside any solution folder: `assets/assets.proj`, `tooling/tooling.proj`, `ruby/ruby.rbproj`
+- `/_root/` — loose files (`.dockerignore`, `.editorconfig`, `.gitignore`, `.netconfig`, `Directory.Build.props`, `Directory.Packages.props`, `Dockerfile`, `global.json`, `gulpfile.js`, `package.json`, README)
 
 ## Shared C# props — `Directory.Build.props`
 
@@ -76,8 +76,9 @@ The repo uses **Central Package Management**. Every NuGet version lives in this 
 a csproj writes `<PackageReference Include="Serilog" />` with **no** `Version`. NuGet fails the restore with
 **NU1008** if a project names a version anyway, so the file cannot be bypassed by accident.
 
-That guard is the point. Several packages are referenced by 9 projects, and before this the version was written
-out 9 times - a bump that missed one file is exactly how the xunit/CodeCoverage platform mismatch got in.
+That guard is the point. The three test packages are referenced by 12 projects each, and before this the
+version was written out 12 times - a bump that missed one file is exactly how the xunit/CodeCoverage platform
+mismatch got in.
 
 Two entries are referenced by nobody and exist only to constrain the graph: `Microsoft.OpenApi` and
 `SQLitePCLRaw.lib.e_sqlite3`. Both carry a floor (a transitive dependency would otherwise resolve to a version
@@ -136,8 +137,8 @@ webpack together under a single Ctrl-C), and its only scripts are the asset-copy
 
 `just assets` runs all four, and `just install` runs it after the npm and bundler installs.
 
-`gulpfile.js` copies shared `assets/` (images, js, css, fonts) into the three Jekyll sites and the UI module's
-`wwwroot/`. One `IGNORE` block holds what each target skips, with the weight it saves beside each line — `www`
+`gulpfile.js` copies shared `assets/` (images, js, css, fonts, and the vendored `LICENSE`/`NOTICE` files) into
+the three Jekyll sites and the UI module's `wwwroot/`. One `IGNORE` block holds what each target skips, with the weight it saves beside each line — `www`
 skips `lib/` outright, because that site runs no CSS framework. Each of the four runs its own webpack build —
 see docs site (`$sites/docs`), demo site (`$sites/demo`), marketing site (`$sites/www`) and the UI module
 (`$api/modules/ui`).
@@ -151,10 +152,14 @@ loading a library still has the files until someone removes them by hand.
 The Dockerfile is **single-stage** — the publish happens outside it, in the `build` just module
 (`tooling/build.just`):
 
-1. `just build publish` runs `dotnet publish -c Release -o artifacts/binacle-net --no-self-contained --runtime
-   linux-x64` of `api/src/Binacle.Net/Binacle.Net.csproj`. **Framework-dependent** — the runtime comes from the
-   base image, so the app layer is ~18 MB rather than ~123 MB.
-2. `Dockerfile` (`mcr.microsoft.com/dotnet/aspnet:10.0`) does `COPY ["artifacts/binacle-net", "."]`, sets
+1. `just build publish` copies the assets into the UI module and runs its `npm run build` (dotnet collects
+   static web assets at publish time), then `dotnet publish -c Release -o artifacts/binacle-net
+   --no-self-contained --runtime linux-x64` of `api/src/Binacle.Net/Binacle.Net.csproj`.
+   **Framework-dependent** — the runtime comes from the base image, so the app layer is ~18 MB rather than
+   ~123 MB.
+2. `Dockerfile` (`mcr.microsoft.com/dotnet/aspnet:10.0`) carries the constant OCI labels, installs
+   `libgssapi-krb5-2` (Npgsql probes for GSSAPI on every connection), does `COPY ["artifacts/binacle-net", "."]`
+   plus `NOTICE` and `LICENSE.AGPL-3.0`, creates `/app/data` owned by `$APP_UID`, then sets
    `ARG VERSION → ENV BINACLE_VERSION`, `USER $APP_UID`, `ENTRYPOINT ["dotnet", "Binacle.Net.dll"]`.
 3. `just build image [version]` does step 1 then `docker build --build-arg VERSION=<version>
    -t binacle-net:<version> .` (default `local`), plus the three per-build OCI labels (version, revision,
@@ -162,11 +167,12 @@ The Dockerfile is **single-stage** — the publish happens outside it, in the `b
    CI/CD (`$ci-cd`).
 
 `artifacts/binacle-net` is not configurable: the Dockerfile hardcodes it in its `COPY` and `.dockerignore`
-allowlists that one path, so the publish has to land exactly there.
+allowlists it (with `NOTICE` and `LICENSE.AGPL-3.0`, and nothing else), so the publish has to land exactly
+there.
 
 There is no `EXPOSE`/`ASPNETCORE_HTTP_PORTS` in the Dockerfile — the aspnet:10.0 base defaults to port 8080;
-compose/k8s map it. `artifacts/` is **output only** (generated `binacle-net/`, `docs/`, `demo/`, `openapi/`, plus
-`tests/` and `coverage/` from a test run) — never edit it. Each folder is named after what produced it, so a
+compose/k8s map it. `artifacts/` is **output only** (generated `binacle-net/`, `docs/`, `demo/`, `www/`,
+`openapi/`, plus `tests/` and `coverage/` from a test run) — never edit it. Each folder is named after what produced it, so a
 look at `artifacts/` says which artifact is which.
 
 ## Content projects (`Microsoft.Build.NoTargets`)
@@ -202,10 +208,10 @@ independent shell re-derivation, and npm's own resolver. Re-checked 2026-08-27.
 - **`.github` is a slice and sits above `tooling`.** It hashes `.config/dotnet-tools.json` and names
   `tooling/ci/sonar-analysis.xml`.
 
-**Nineteen global `Using` declarations across thirteen projects have no matching `ProjectReference`** — one in
-every slice that has C#. Every one resolves transitively, so they all compile today, and **every one breaks
-the day the project it borrows from stops referencing what it borrows.** Whether the fix is nineteen added
-references or a decision that transitive resolution is fine here has never been settled.
+**Twenty-one global `Using` declarations across seventeen projects have no matching `ProjectReference`** — in
+`api`, `lib`, `shared` and `vipaq` alike. Every one resolves transitively, so they all compile today, and
+**every one breaks the day the project it borrows from stops referencing what it borrows.** Whether the fix is
+twenty-one added references or a decision that transitive resolution is fine here has never been settled.
 
 ## `tooling/` vs `samples/`
 

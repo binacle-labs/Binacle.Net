@@ -35,6 +35,6 @@ echo "Running benchmarks with filter: $FILTER"
 
 dotnet run -c Release --filter "$FILTER"
 
-# Reports land (markdown only, pinned) in BenchmarkDotNet.Artifacts/results/ — copy keepers into
+# Reports land (markdown only, pinned) in BenchmarkDotNet.Artifacts/results/. Copy keepers into
 # results/lib/benchmarks/ by hand. See results/README.md for the scratch-vs-curated convention.
-echo "Reports in ${PROJECT_PATH}BenchmarkDotNet.Artifacts/results/ — curate keepers into results/lib/benchmarks/"
+echo "Reports in ${PROJECT_PATH}BenchmarkDotNet.Artifacts/results/, curate keepers into results/lib/benchmarks/"

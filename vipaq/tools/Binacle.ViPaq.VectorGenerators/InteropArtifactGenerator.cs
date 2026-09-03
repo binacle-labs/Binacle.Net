@@ -38,7 +38,7 @@ public sealed class InteropArtifactGenerator : IVectorGenerator
 		var interopDir = RepositoryRoot.Bind().Find("vipaq", "test-vectors", "interop");
 		var inputPath = Path.Combine(interopDir, "input.json");
 
-		// This is the C# producer, so it only ever writes its own folder — no language stem anywhere.
+		// This is the C# producer, so it only ever writes its own folder, no language stem anywhere.
 		var outputDir = Path.Combine(interopDir, "cs");
 		Directory.CreateDirectory(outputDir);
 

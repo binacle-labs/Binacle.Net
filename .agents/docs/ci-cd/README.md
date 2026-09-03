@@ -1,7 +1,7 @@
 ---
 id: ci-cd
 description: CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-08-31
+verified: 2026-09-04
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -166,7 +166,7 @@ branches analysing at once is fine, the same branch twice is not.
 ## What the run page says without opening a log
 
 **A summary is a plain markdown append to `$GITHUB_STEP_SUMMARY`** — no job output to declare, no step to
-consume it. **Seven workflows write one, and each writes it from its last job**, carrying only what the log does
+consume it. **Nine workflows write one, and each writes it from its last job**, carrying only what the log does
 not already say. A table that restates the job list is a heading with no fact in it, which is why
 neither test suite writes one: their step names already are that table.
 
@@ -223,8 +223,10 @@ short**, or the required check name becomes unreadable at exactly the moment som
   own, so the recipe is a door and the `.sh` file is the code. A `run:` that is a single command stays inline;
   only multi-line logic moves. Every script takes its inputs as arguments and reads no `github.*` context, so
   a value goes through `env:` and then into the command line. The reasoning is `$ci-cd/decisions#D4`.
-- **One `run:` block is still inline and stays that way**: the Docker Hub copy in the release `publish` job.
-  That job never checks out, and a script is read out of the working copy — see the composite actions section.
+- **Three `run:` blocks are still inline.** The signature retry loop in the release `publish` job, the
+  `Sonar begin` command in `sonar-analysis.yml`, and the one-line summary in `shared-dockerhub-overview.yml`.
+  The first is a wait around a recipe that stays one shot for a reader; the other two are a single command
+  each.
 - **One step per thing that can break, and every step is named.** A red check should name the suite or the
   profile, not make you open a log.
 - **Adding a test or a smoke profile is two edits: one in the module, one step in the workflow.** The
@@ -267,9 +269,9 @@ short**, or the required check name becomes unreadable at exactly the moment som
   and it is what keeps "green in CI" and "green here" the same claim.
 - **`permissions:` is declared per job**, least privilege. `contents: read` almost everywhere; the release job
   takes `contents: write` to create the release, and in each deploy workflow the `tag` job takes it — that job
-  only. The build job takes `packages: write` for GHCR, and the publish job declares no `contents` at all
-  because it never checks out. Both take `id-token: write`, which is what keyless cosign signing needs and the
-  only reason either has it. The CodeQL job takes `security-events: write` to upload its findings — GitHub's
+  only. The build job takes `packages: write` for GHCR; the publish job takes `packages: read`, because it
+  only reads the staged image back. Both take `id-token: write`, which is what keyless cosign signing needs
+  and the only reason either has it. The CodeQL job takes `security-events: write` to upload its findings — GitHub's
   template also lists `actions: read` and `packages: read`, which are for private repositories and private
   query packs and so are left out here. `gate` in `pull-request.yml` and `summary` in `codeql-analysis.yml` each take
   `contents: read` for one reason only — they check out so they can call a `ci` recipe. Neither reads anything
@@ -296,7 +298,7 @@ is the only option when the shared thing needs its own runner or service contain
 
 | Action | Used by | What it does |
 |---|---|---|
-| `setup-just` | sixteen jobs, plus the four site-building jobs through `build-jekyll-site` | The `just` install and the `^1.45` range, once |
+| `setup-just` | seventeen jobs, plus the four site-building jobs through `build-jekyll-site` | The `just` install and the `^1.45` range, once |
 | `setup-dotnet` | `shared-image-tests`, `sonar-analysis`, `pull-request`, the release `build` job | SDK plus the NuGet package cache. Takes the SDK version as an input |
 | `setup-node` | `shared-image-tests`, `shared-site-tests`, `sonar-analysis`, `pull-request`, `release-docker-image`, `build-jekyll-site` | Node and the npm cache. It does not install packages |
 | `setup-ruby` | `build-jekyll-site`, `shared-site-tests`, `sonar-analysis` | Ruby and the gems. Takes the Gemfile directory as an input — `ruby/` for the gem specs, the site's own directory for a build |
@@ -357,8 +359,8 @@ step names the tool rather than the pair — which is why these are two files an
   `timeout-minutes` cannot be set from an action. This is why the three deploy workflows still declare their own
   `environment:` — it carries the deployment URL and differs per site — and why the test suite is a workflow at
   all, since Postgres and Azurite are `services:`.
-- **An action is read out of the working copy**, so a job must check out before it can use one. The release
-  `publish` job deliberately never checks out, so it gets none.
+- **An action is read out of the working copy**, so a job must check out before it can use one. Every job
+  here that uses one checks out first, the release `publish` job included.
 - **Dependabot does not reach this folder on its own.** For the `github-actions` ecosystem, `directory: /`
   covers `.github/workflows` and an `action.yml` at the repo root — nothing below `.github/actions/`, and a
   glob in `directories:` is unreliable here. So `.github/dependabot.yml` carries **one entry per action folder
@@ -432,9 +434,6 @@ Stated plainly, because the gaps are not obvious from a green check.
   somebody presses the button, so a finding is read after the fact — in the Security tab or in SonarCloud — and
   nothing goes red when one appears. That is what keeps `gate` the only required check. Sonar's Automatic
   Analysis is off on top of that: it only reads source, and it fights a CI run that uploads coverage.
-- **Coverage sees one storage backend.** `shared-image-tests.yml` runs the ServiceModule suite against all three, but
-  `sonar-analysis.yml` runs it against SQLite only, so coverage never reaches the Postgres or Azure provider
-  code.
 - **One architecture.** The image is `linux/amd64` only. It does ship an SPDX SBOM and SLSA provenance, and is
   cosign-signed — see `$ci-cd/release-pipeline`.
 - **Nothing verifies a release after it is published.** The `cosign verify` invocation, with the certificate

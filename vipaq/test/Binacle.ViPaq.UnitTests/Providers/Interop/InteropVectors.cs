@@ -50,8 +50,8 @@ internal static class InteropVectors
 		{
 			if (!inputs.TryGetValue(vector.Name, out var input))
 				throw new InvalidOperationException(
-					$"Artifact '{vector.Name}' in '{fileName}' has no matching input in input.json — " +
-					"rerun the generator (the integrity test names the mismatch).");
+					$"Artifact '{vector.Name}' in '{fileName}' has no matching input in input.json. " +
+					"Rerun the generator (the integrity test names the mismatch).");
 
 			// A compressed artifact carries the input's header with the compressed bit set - deflate and gzip
 			// are indistinguishable on the wire (§6).

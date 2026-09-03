@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Binacle.Geometry;
 
-// A thing that has an X,Y,Z position. Read-only — consumers that only read (e.g. formatting) use this.
+// A thing that has an X,Y,Z position. Read-only. Consumers that only read (e.g. formatting) use this.
 public interface IWithReadOnlyCoordinates<T>
 	where T : struct, IBinaryInteger<T>
 {

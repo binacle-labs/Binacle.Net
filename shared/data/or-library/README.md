@@ -1,6 +1,6 @@
 # OR Library Packing Data
 
-This is the **raw** source — the OR-Library text exactly as published, untouched. The converted form used by
+This is the **raw** source: the OR-Library text exactly as published, untouched. The converted form used by
 the tests lives in a sibling folder; see the [data index](../README.md).
 
 The problems presented here originate from the OR Library, maintained by J.E. Beasley. The OR Library is a renowned resource for optimization problems, including those related to bin packing and container loading.
@@ -9,18 +9,18 @@ Binacle.Net utilizes these datasets, after converting them to a suitable format,
 
 It is not certain whether the problems in these datasets have known solutions, but they provide valuable benchmarks for testing and improvement.
 
-## 🔍 Provenance — what "Bischoff suite" means (read this)
+## 🔍 Provenance - what "Bischoff suite" means (read this)
 
-Our **Bischoff suite is `thpack1`–`thpack7` only**. Those seven files were generated and used in
+Our **Bischoff suite is `thpack1`-`thpack7` only**. Those seven files were generated and used in
 **E.E. Bischoff and M.S.W. Ratcliff, "Issues in the development of Approaches to Container Loading", OMEGA
-vol. 23 no. 4 (1995), pp. 377–390.** In the container-loading literature they are the well-known
-**"BR instances" (BR1–BR7)** — 700 single-container problems (100 per file), grouped by number of box types
+vol. 23 no. 4 (1995), pp. 377-390.** In the container-loading literature they are the well-known
+**"BR instances" (BR1-BR7)** - 700 single-container problems (100 per file), grouped by number of box types
 (3, 5, 8, 10, 12, 15, 20), objective: maximise volume use. Naming the suite "Bischoff" is correct for these.
 
-**`thpack8` and `thpack9` are NOT part of the Bischoff suite** — do not sweep them in:
-- `thpack8` — originally **Loh & Nee (1992)**, later reused by Ngoi et al. (1994) and *then* by Bischoff &
+**`thpack8` and `thpack9` are NOT part of the Bischoff suite**. Do not sweep them in:
+- `thpack8` - originally **Loh & Nee (1992)**, later reused by Ngoi et al. (1994) and *then* by Bischoff &
   Ratcliff. Different authors.
-- `thpack9` — originally **Ivancic, Mathur & Mohanty (1989)**, and a **different problem class**: *multiple*
+- `thpack9` - originally **Ivancic, Mathur & Mohanty (1989)**, and a **different problem class**: *multiple*
   containers, objective minimise container count (not single-container volume). Different objective and shape.
 
 The original OR-Library text confirming all of this is preserved verbatim in the excerpt below.

@@ -1,4 +1,4 @@
-// mirrors src/ViPaqSerializer.ts (serialize + deserialize tested together — they are inverses)
+// mirrors src/ViPaqSerializer.ts (serialize + deserialize tested together, they are inverses)
 // ports C#: ViPaqSerializerTests + SerializationEncodingTests + SerializationBehaviorTests
 //
 // ViPaqSerializer is the choosing layer: by default it writes raw, row-major, narrowest. These cover its own
@@ -117,7 +117,7 @@ describe("ViPaqSerializer", () => {
 		const repetitiveItems = (count: number) =>
 			Array.from({length: count}, () => item(300, 300, 300, 0, 0, 0));
 
-		// every combination decodes back to the input — decode-to-input is the oracle (§6.1)
+		// every combination decodes back to the input. Decode-to-input is the oracle (§6.1)
 		test.each([
 			{compress: false, layout: Layout.RowMajor},
 			{compress: false, layout: Layout.Columnar},

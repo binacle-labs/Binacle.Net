@@ -4,7 +4,7 @@ description: Manifest of every file under .agents/memory, grouped by area. Regen
 
 # Agent Memory Index
 
-Every memory in `.agents/memory/`, grouped by area. Durable facts with no home in a doc or plan —
+Every memory in `.agents/memory/`, grouped by area. Durable facts with no home in a doc or plan:
 conventions, decisions, gotchas. See [README.md](README.md) for when and how to add one.
 
 ## General

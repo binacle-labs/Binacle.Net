@@ -58,7 +58,7 @@ services:
     ports:
       - '5432:5432'
     # A named volume, never a bind. Postgres chowns its data dir to its own user and locks it to 0700, which
-    # leaves an unreadable folder in the repo — and `docker build` walks the whole context, so the next build
+    # leaves an unreadable folder in the repo, and `docker build` walks the whole context, so the next build
     # fails on it. Use `just serve services-down -v` to wipe the database.
     volumes:
       - postgres_data:/var/lib/postgresql/data

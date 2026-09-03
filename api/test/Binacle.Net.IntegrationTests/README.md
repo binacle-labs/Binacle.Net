@@ -19,8 +19,8 @@ Each of those folders holds the same **two** files, and the split is the point:
 
 | File | What it covers | Marked with |
 |---|---|---|
-| `…Behavior.cs` | How the endpoint answers - status codes, validation, bad input | `[Trait("Behavioral Tests", …)]` |
-| `…Scenario.cs` | What the packer actually returns, run against the shared fixture corpus | `[Trait("Scenario Tests", …)]` |
+| `...Behavior.cs` | How the endpoint answers - status codes, validation, bad input | `[Trait("Behavioral Tests", ...)]` |
+| `...Scenario.cs` | What the packer actually returns, run against the shared fixture corpus | `[Trait("Scenario Tests", ...)]` |
 
 Behaviour tests build their request inline and assert the response code. Scenario tests take their cases from
 the shared test kernel in [`shared/test/Binacle.TestsKernel`](../../../shared/test/Binacle.TestsKernel) as

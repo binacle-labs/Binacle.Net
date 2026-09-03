@@ -4,7 +4,7 @@ using Microsoft.OpenApi;
 namespace Binacle.Net.Kernel.OpenApi.Transformers;
 
 // Describes the framework's ProblemDetails / HttpValidationProblemDetails schemas, which no contract owns, so they
-// cannot carry a [Description]. The wording is the RFC 7807 standard — not this API's domain — so it lives in the
+// cannot carry a [Description]. The wording is the RFC 7807 standard, not this API's domain, so it lives in the
 // Kernel as generic, reusable infrastructure. Document-only.
 internal class ProblemDetailsDescriptionDocumentTransformer : IOpenApiDocumentTransformer
 {

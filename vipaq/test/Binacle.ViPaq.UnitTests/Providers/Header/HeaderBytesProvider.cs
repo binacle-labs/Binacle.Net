@@ -9,7 +9,7 @@ internal static class HeaderBytesProvider
 
 	public sealed record Scenario(Header Header, byte[] Bytes);
 
-	// Keyed by the header notation, not a Name field — see Keys below.
+	// Keyed by the header notation, not a Name field. See Keys below.
 	private static readonly Dictionary<string, Scenario> scenarios;
 
 	// A static constructor makes it explicit that the vectors load once, on first access to this provider.

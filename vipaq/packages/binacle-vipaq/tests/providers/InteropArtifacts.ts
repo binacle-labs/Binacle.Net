@@ -84,7 +84,7 @@ export function loadInteropArtifactCases(): InteropArtifactCase[] {
 				const input = inputs.get(vector.Name);
 				if (!input) throw new Error(`artifact row '${vector.Producer}' references unknown input '${vector.Name}'.`);
 				cases.push({
-					label: `${vector.Producer} ${codec} — ${vector.Name}`,
+					label: `${vector.Producer} ${codec} - ${vector.Name}`,
 					codec,
 					bytes: Array.from(Buffer.from(vector.Base64, "base64")),
 					expectedHeader: codec === "raw" ? input.expectedHeader : compressedHeader(input.expectedHeader),
