@@ -1,8 +1,8 @@
 const path = require('path');
 const dest = 'js';
 
-// No splitChunks and no vendors group, unlike the other two sites: this site has no npm dependencies at all,
-// so there is nothing to split out. The whole bundle is the two behaviours in _js/main.ts.
+// No splitChunks and no vendors group, unlike the other two sites. One workspace dependency, theme-switcher,
+// is not worth a vendors chunk.
 module.exports = (env, argv) => {
 	const buildType = env.build || 'dist'; // 'dist' or 'watch'
 	const production = buildType === 'dist';

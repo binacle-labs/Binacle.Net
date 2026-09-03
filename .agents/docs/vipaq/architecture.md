@@ -83,9 +83,11 @@ that one method and **nothing else**:
 
 Do not delete the losing codec. Do not collapse the interface.
 
-**Reader and writer move one value, and nothing more.** `WriteValue(value, width)` and `ReadValue(width)` are the
-whole new surface. They do not know what a dimension or a coordinate is, and there is no `WriteDimensions` or
-`ReadCoordinates` — grouping three values into a triple is the caller's business. The layout codecs do it for the
+**Reader and writer move one value, and nothing more.** `WriteValue(value, width)` and `ReadValue(width)` are
+the width-aware pair; `WriteUInt16`/`ReadUInt16` move the header, `Write8Bits`/`Read8Bits` and
+`Write16Bits`/`Read16Bits` are what `WriteValue` dispatches to, and both types are disposable twice over.
+**The point is the shape, not the count:** every one of them moves a single value, and there is no
+`WriteDimensions` or `ReadCoordinates` — grouping three values into a triple is the caller's business. The layout codecs do it for the
 items, because the order of those three *is* the layout. `ProtocolEncoder` does it for the bin, because the bin
 is written the same way in both layouts (§3).
 
@@ -127,8 +129,9 @@ with a `with` expression:
 `Deserialize` is the easy half: `Header.FromBytes` on the first two bytes — which already rejects a bad version,
 a set reserved bit and a reserved width code (§7, steps 2-3) — then hand the encoder the header plus the rest.
 
-That layer, and only that layer, is what the public API and the permanent benchmark harness call, so the harness
-must not churn when the internals move.
+That layer is what the public API calls. **The benchmark harness does not** — it constructs `ViPaqEncoder`
+and `ProtobufEncoder` and drives the blind layer directly, which is what the *Public surface* section below
+says and what this sentence used to contradict.
 
 **One codec rule, read the same way in both directions.** `ResolveCodec(header)` is the only place that maps the
 `Compressed` bit onto a codec — raw DEFLATE when set, `NoOpCodec` when clear — and both `Serialize` and
@@ -136,7 +139,9 @@ must not churn when the internals move.
 
 **There are no typed wrappers.** `Serialize<TBin, TItem, T>` and `Deserialize<TBin, TItem, T>` are the whole public
 surface — every call site names its types on the generic method (`v3/Contracts/PackResponse.cs`,
-`v4/Contracts/BinResponseBase.cs`, both `ViPaqExampleExtensions`, and the UIModule decoder).
+`v4/Contracts/BinResponseBase.cs` and both `ViPaqExampleExtensions`). **The UI module's decoder is not one of
+them** — that page decodes in the browser through the TypeScript package, and the C# in
+`Binacle.Net.UIModule` only carries the applet's title and copy.
 
 ## Public surface, and what tests can reach
 
@@ -162,8 +167,10 @@ The public contract does not grow, yet tests can force any combination.
   round-trips, decode, assert it equals the input. The oracle is **decode-to-input, not byte-equality** (§6.1).
 - **Byte-exact vectors.** Only with the header pinned *and* uncompressed. Compressed bytes must never be compared
   — two compressor builds can emit different, equally valid streams (§6.1).
-- **The chooser is a checkable function** (phase 2). Enumerate the combinations through the blind layer and assert
-  the choosing layer picked the smallest base64.
+- **The chooser is a checkable function** (phase 2). Enumerate the combinations through the blind layer and
+  assert the choosing layer picked the **narrowest widths that hold each section**. **Not the smallest
+  base64** — compression is the caller's choice and is deliberately not decided by the library, because
+  encoding both ways to compare costs a second compression on every call and that cost is unmeasured.
 - **A header that cannot hold its data throws.** The blind layer trusts the header but rejects the impossible —
   1 byte per number forced on a value of 300 (§8, encode side).
 
