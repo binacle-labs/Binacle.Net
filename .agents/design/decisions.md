@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
-verified: 2026-08-31
-check: D6 by running `licensee detect .` at the repo root, which must report GPL-3.0 with LICENSE.GPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies are not a coding session's to change and sit in plans/sites/docs-v3-deploy.md section 7 until a docs session moves them; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
+verified: 2026-09-02
+check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
 paths:
   - "NOTICE"
   - "README.md"
@@ -157,9 +157,10 @@ check rather than warning, and a `cosign verify` failure reads as tampering rath
 Signing, the SBOM and the GHCR staging copy all start at beta 2. Beta 3 is the first tag pushed after the
 move, and `3.0.0-beta.4` followed on 2026-08-19 into the same band.
 
-**`3.0.0-beta.3` is the only image a verify run has passed against under the current identity**, so it is the
-tag to name wherever a doc needs a real one and the tag to re-run any verification against. Beta 2 is signed
-but the published command rejects it. Beta 4 is in the band and untried.
+**`3.0.0` is the tag to name wherever a doc needs a real one, and the tag to re-run any verification
+against** - it passed all four checks on 2026-09-01, and `3.0` and `latest` resolve to the same digest. Before
+it shipped that was `3.0.0-beta.3`, the only image a verify run had passed against under this identity. Beta 2
+is signed but the published command rejects it.
 
 **Proven end to end on 2026-08-17.** `just image verify 3.0.0-beta.3` passed all four checks; the command
 printed in `SECURITY.md` passed verbatim from a clean shell; and the SLSA provenance names
@@ -178,6 +179,18 @@ substitutes, and a concrete version survives only where the point is what happen
 stops being the right thing to pull, and a published command that fails against it reads as our bug rather
 than as history. Agent docs under `.agents/` may name one, and have to: the bands in D3 mean nothing without
 the numbers.
+
+**A page under `sites/docs` also quotes no figure that expires** — settled 2026-08-31, and it is the sharper
+form of the same rule. A versioned page names its own version explicitly, so a `v3.0.x` page names `3.0` and
+`3.0.0`. **What it does not carry is a digest, a package count or a run URL**, however real they were when
+they were pasted.
+
+**This was learned by doing it twice.** `v3.0.x/verifying-a-release.md` quoted `3.0.0-beta.2`, a deleted tag
+signed under the old owner. It was rewritten as a record of `3.0.0-beta.5` carrying real figures, and that
+lasted a day: the betas are deleted once the release is live, so a record of a deleted image is the exact
+fault the first rewrite existed to fix. **The third version describes what the commands print and quotes
+nothing** — the checks, the certificate, the index, the SBOM, the provenance run, the `app (1654)` user. It
+needed no edit when v3.0.0 shipped, which is the whole point. Confirmed against the live page 2026-09-02.
 
 ### D5 — the reference layer is checked by a dated query, and the query is the fragile part
 

@@ -90,7 +90,7 @@ jobs:
         run: just build image
 
   site-build:
-    name: Site build (${{ matrix.site }})
+    name: Site build
     needs: changes
     if: ${{ needs.changes.outputs.site == 'yes' }}
     runs-on: ubuntu-latest

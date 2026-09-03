@@ -49,6 +49,7 @@ data_dir            : _data
 safe                : false
 include             :
   - ".htaccess"
+  - "_redirects"
 exclude             :
   - "Gemfile"
   - "Gemfile.lock"

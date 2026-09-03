@@ -32,11 +32,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea"
   horizon: undecided
-- file: unwatched-gaps.md
-  description: "Repository gaps nothing watches - a generated copy on no drift check, a v4 caller inside the image, a drift check no workflow runs, and a checks list that goes unreadable on the runs you would read it on"
-  state: proposed
-  waits-on: "a yes or a no per gap. State chosen by an agent to make the file legible - strike it if it is wrong."
-  paths: ["sites/**", "tooling/**", "api/src/Binacle.Net.UIModule/**", "vipaq/test-vectors/**", ".github/workflows/pull-request.yml"]
 ```
 
 ## API
@@ -54,28 +49,21 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea"
   horizon: next-release
   paths: ["api/**"]
-- file: api/packing-demo-bugs.md
-  description: "Two open bugs in the shared packing demo - a partial result names no unfitted items, and the submit button can stick disabled on a page with no visualizer"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  horizon: near
-  paths: ["packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**", "sites/demo/**"]
+- file: api/packing-demo-next.md
+  description: "The next three pieces of work on the packing demo - name the items that did not fit, stop the submit button sticking, and show the visitor the HTTP call that was just made"
+  state: proposed
+  waits-on: "two answers - whether the request panel is a UI Module feature or a shared one, and which API version it prints. The other two need no decision. State chosen by an agent to make the file legible; strike it if it is wrong"
+  paths: ["api/src/Binacle.Net.UIModule/**", "packages/binacle-net-ui/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "The public image becomes packing-only and the Service Module moves to its own image"
   state: proposed
-  waits-on: "the v3.0.0 tag - it is the first thing after"
+  waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
   paths: ["api/**"]
 - file: api/servicemodule.md
   description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
   state: proposed
-  waits-on: "the v3.0.0 tag - it goes with the image split"
+  waits-on: "nothing. The tag landed 2026-09-01. It goes with the image split in `packing-only-image.md` and still needs a yes, which is what `proposed` means"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
-- file: api/show-me-the-request.md
-  description: "The packing demo shows the HTTP call it just made, against this host, ready to copy"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  horizon: near
-  paths: ["api/src/Binacle.Net.UIModule/**", "packages/binacle-net-ui/**"]
 - file: api/ui-clients-off-v3.md
   description: "Migrate the shipped UI clients off the v3 API"
   state: idea
@@ -99,47 +87,29 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## CI/CD
 
 ```yaml
-- file: ci-cd/ci-step-review.md
-  description: "A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck"
+- file: ci-cd/ci-open-questions.md
+  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. Six close on a sentence; one needs a dispatch"
   state: blocked
   waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
-- file: ci-cd/dockerhub-overview.md
-  description: "The Docker Hub repository page - both sections are done, and the file is kept only until the release that publishes the page has run"
-  state: blocked
-  waits-on: "the v3.0.0 release publishing the page. Both sections are done - the file is kept only to be checked against the published page, then deleted"
-  horizon: next-release
-  paths: [".github/workflows/**"]
-- file: ci-cd/dockerhub-tag-immutability.md
-  description: "Turn on Docker Hub tag immutability, for release tags only"
-  state: idea
-  waits-on: "nobody - it is an idea. The maintainer does not know yet whether he wants it"
+- file: ci-cd/delete-the-beta-images.md
+  description: "Eight 3.0.0 beta images are still pullable on Docker Hub. They go, deliberately later rather than now."
+  state: deferred
+  waits-on: "the maintainer, who chose to leave them a few months. Nothing depends on it and nothing decays"
   horizon: undecided
-  paths: [".github/workflows/**"]
+  paths: [".github/dockerhub-overview.md"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
   waits-on: "someone asking for ARM - nobody has"
   horizon: on-demand
   paths: [".github/workflows/**"]
-- file: ci-cd/release-by-dispatch.md
-  description: "The three release checks that only a real dispatch can prove - a prerelease run, the moving tags now that they come from an explicit value=, and cosign verify against what it publishes"
-  state: blocked
-  waits-on: "a scratch-repo run for the moving tags - a non-prerelease version against a scratch DOCKERHUB_REPO. horizon: next-release - chosen by an agent, strike it if wrong"
-  horizon: next-release
-  paths: [".github/workflows/release-docker-image.yml"]
 - file: ci-cd/what-the-pull-request-does-not-run.md
   description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
   state: idea
   waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
   horizon: near
   paths: [".github/workflows/**"]
-- file: ci-cd/workflow-restructure.md
-  description: "CI - the restructure is done and branch protection points at `Gate`, set 2026-08-31. One box left, and it needs a pull request to confirm nothing hangs on a check that cannot report"
-  state: ready
-  waits-on: "one pull request, to read the gate's verdict. horizon: now - chosen by an agent, strike it if wrong"
-  horizon: now
-  paths: [".github/**"]
 ```
 
 ## Shared
@@ -169,14 +139,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: ["sites/docs/**"]
 - file: sites/docs-client-generation.md
   description: "A docs page with copy-paste commands that generate a client from the published OpenAPI spec"
-  state: blocked
-  waits-on: "where a page that is not version-specific lives on the docs site - the maintainer said yes to the page on 2026-08-27 and that placement is the one thing still open"
-  paths: ["sites/docs/**"]
-- file: sites/docs-v3-deploy.md
-  description: "What the v3.0.x docs pages still need - the release date and link - plus the live-site checks nothing else watches"
-  state: blocked
-  waits-on: "the v3.0.0 tag - the release notes need its date and its release link. horizon: next-release - chosen by an agent, strike it if wrong"
-  horizon: next-release
+  state: ready
+  waits-on: "one docs deploy. The page is written and builds - 2026-09-04. Every box but the live one passes"
   paths: ["sites/docs/**"]
 ```
 
@@ -189,6 +153,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "a decision to lint every language in this repository to the same standard - TypeScript alone is not the question"
   horizon: undecided
   paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**", "ruby/**", ".editorconfig"]
+- file: tooling/regen-check-runs-nowhere.md
+  description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
+  state: proposed
+  waits-on: "one answer - which of the three ways out. State chosen by an agent to make the file legible; strike it if it is wrong"
+  paths: ["tooling/**", "vipaq/test-vectors/**", ".github/workflows/**"]
 - file: tooling/where-benchmark-results-live.md
   description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"
   state: idea

@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-08-31
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.proj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; and D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, and the open questions about the PR gate and supply-chain attestation.
+verified: 2026-09-02
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.proj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; and D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -591,15 +591,15 @@ actually promise and drops the three that nobody was promised:
 
 | | Under the anchored identity |
 |---|---|
-| `3.0.0` and later | passes - every release signs from `main`, because the release is a dispatch |
+| `3.0.0` and later | passes - every release signs from `main`, because the release is a dispatch. Checked on the published `3.0.0`, 2026-09-01 |
 | `3.0.0-beta.5` | passes - the first release from `main`. Checked, not assumed |
 | `3.0.0-beta.3`, `-beta.4` | **fail, and both still resolve.** The deletion recorded here on 2026-08-31 never happened - read the registry, not this row |
 | `2.1.1` and earlier | unsigned, unchanged, still `no signatures found` |
 
 **One published surface broke, found and fixed 2026-08-31.** The claim here was that every prerelease left
 on Docker Hub signs from `main`. Betas 1 to 4 were never deleted, and `README.md:20` sent a reader to
-`3.0.0-beta.4`, so the command in `SECURITY.md` failed on the one image the front page named. **The README now
-names `3.0.0-beta.6`, which passes.** The betas that fail are still pullable and nothing points at them. `SECURITY.md` briefly carried a paragraph explaining how to check a tag-signed prerelease and it
+`3.0.0-beta.4`, so the command in `SECURITY.md` failed on the one image the front page named. **The README named
+`3.0.0-beta.6` until the tag, and from 2026-09-01 it names `3.0` alone.** The betas that fail are still pullable and nothing points at them. `SECURITY.md` briefly carried a paragraph explaining how to check a tag-signed prerelease and it
 was removed the same day - that removal was right for a different reason: nobody is asked to pull those
 images.
 
@@ -923,28 +923,28 @@ the feature.
 `push-tag.sh` on every site deploy and must stay free.
 
 
+### D25 — the moving tags were proven on the release itself, not on a scratch repository
+
+**Closed on 2026-09-01 by the v3.0.0 run.** Until then this was an open question: a prerelease produces only
+its own immutable tag, so `{{major}}.{{minor}}` and `latest=auto` firing — and `imagetools create` being handed
+three references instead of one — had never run. `Move the tags that move` had only ever skipped itself.
+
+**The plan was a throwaway run against a scratch `DOCKERHUB_REPO`. It was never needed.** The real release
+exercised the same step with nothing standing in for anything: `3.0.0`, `3.0` and `latest` were all written
+after a green verify and all three resolve to `sha256:974f3dda3923`, read off the registry with
+`just image verify 3.0.0` on 2026-09-02.
+
+**Both traps that made a rehearsal awkward are also why the rehearsal was worth skipping.** A version
+containing a hyphen is treated as a prerelease and proves nothing, and a clean `0.0.1` against the real
+repository **would move `latest`**, because metadata-action never queries the registry and `latest=auto` marks
+any non-prerelease semver as latest. A rehearsal that avoids both is a rehearsal of something else.
+
+**What this does not close.** The step is proven for a first major release, where `3.0` and `latest` are
+created. It has still never *moved* either name off an existing image — that happens for the first time on
+3.0.1.
+
+
 ## Open
-
-### O1 — a prerelease cannot test the publish step, and this got worse
-
-**Mostly closed by the D3 reversal on 2026-08-11.** For part of that day `publish` was skipped entirely for a
-prerelease, which meant the Docker Hub login, the copy and the release-side signature were all first exercised
-by a real release. That is no longer true: `publish` runs for every release, so a beta proves the job's
-credentials, its wiring, the cross-registry copy and the signature.
-
-**What is still untested is narrower: the moving tags.** A prerelease produces only its immutable tag, so
-`{{major}}.{{minor}}` and `latest=auto` firing correctly — and `imagetools create` being handed three
-references instead of one — are first proven on the release itself. That is one extra argument to a command
-that will have run several times by then.
-
-**D1 fed this on 2026-08-28.** Both metadata steps take the version from `value=${{ inputs.version }}` now,
-because a dispatch has no tag ref for `type=semver` to read, and that is the input to exactly the two tag rules
-nothing has proven yet.
-
-Whether that residual deserves a throwaway run is a judgement call rather than an obvious yes. If it is
-done, note the two traps: a version containing a hyphen is treated as a prerelease and proves nothing, and a
-clean `0.0.1` against the real repo **would move `latest`**, because metadata-action never queries the registry
-and `latest=auto` marks any non-prerelease semver as latest. Point `DOCKERHUB_REPO` at a scratch repo instead.
 
 ### O2 — how much the pull-request gate should prove
 
@@ -1024,3 +1024,21 @@ above, one layer down. The only exclusion anywhere is `.d.ts`, which carries no 
 
 It stays out because it **changes the artifact** and roughly doubles build time, and because there is no
 evidence of demand. Attestation and signing, which used to share this entry, are now done — see D15.
+
+### D26 — Docker Hub tag immutability stays off
+
+**Answered 2026-09-04: no.** The switch is off and it stays off. Recorded as a decision rather than left as
+an open question, because an open question with no value is worse than either answer.
+
+**What it would have bought:** a published release tag that cannot be overwritten. **What it costs is the
+reason not to.** There is no undo. An immutable tag cannot be deleted either, so a release tag pushed by
+mistake is permanent, and turning it on safely means rehearsing it on a throwaway repository first.
+
+**The stored rule is `.*`, and that is what makes the switch dangerous here rather than merely irreversible.**
+`.*` matches `latest` and `3.0`, the two tags every release moves. Enabling it against that rule would freeze
+the moving tags on the first release after it, which is exactly the mechanism D25 depends on. **If this is
+ever reopened, the rule is the first thing to correct** - released versions only, never the moving tags.
+
+**What already protects the release.** D24 - a tag ruleset that nobody bypasses, so a release tag cannot be
+moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
+the registry side has never gone wrong.

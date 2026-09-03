@@ -1,7 +1,7 @@
 ---
 id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-08-31
+verified: 2026-09-02
 check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; no job in the file has an inline run: | block; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the tag is pushed in the release job before gh release create; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
@@ -229,13 +229,13 @@ never move a tag anyone is following. `page` is the exception — it does not go
 its skip is a job condition. That is safe only because nothing needs it; a condition on any job above would
 skip everything downstream of it.
 
-**The consequence for testing:** a prerelease now exercises every job, `publish` included. What it still does
-not cover is the *moving-tag* half — creating `3.0` and `latest` — since a beta produces neither, so
-`Move the tags that move` skips itself on the empty list. That is now a whole step rather than one extra
-argument, so the residual gap is slightly wider than it was: `latest=auto` firing correctly and that step
-running at all are both first proven on a real release, and both are fed by the `value=` on the semver
-rules. `DOCKERHUB_REPO` pointed at a scratch repo is how that is rehearsed without
-moving a tag anyone follows.
+**The consequence for testing:** a prerelease exercises every job, `publish` included. What it does not cover
+is the *moving-tag* half — creating `3.0` and `latest` — since a beta produces neither, so
+`Move the tags that move` skips itself on the empty list. **That half was first proven on the v3.0.0 run,
+2026-09-01**, which wrote all three names after a green verify onto one digest. The design record is D25.
+
+**It has still never moved either name off an existing image.** 3.0.0 created `3.0` and `latest`; 3.0.1 is the
+first run that repoints them.
 
 ## Where the release body comes from
 

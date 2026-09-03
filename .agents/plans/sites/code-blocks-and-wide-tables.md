@@ -14,18 +14,14 @@ bite `sites/docs`, which keeps it.
 The mono stack is in and stays. The table half was tried, made things worse, and is out again. What follows
 is what that ruled out and what is left.
 
-## The mono stack - done
+## The mono stack - done 2026-08-27
 
 `sites/docs/_sass/_typography.scss` gives `main pre` and `main code` a mono stack.
 
-**It did not fix a visible bug, because there was no visible bug.** `beer.min.css` sets
-`pre{...;font-family:inherit}`, but Rouge puts every block's text inside `<code>` and the browser's own
-stylesheet renders `code` monospace. Measured in the built site: `pre` computes to the body sans stack, the
-`code` inside it computes to `monospace`, and before-and-after screenshots of a fenced block are identical.
-**No reader ever saw a sans-serif code block.** What the rule buys is a pinned face instead of each browser's
-fixed-width default, and a match with the stack `sites/www` already uses.
-
-`sites/demo` and the UI module have no `<pre>` content, so this only ever concerned the docs site.
+**It fixed no visible bug and was never going to.** Rouge puts every block's text inside `<code>` and the
+browser's own stylesheet renders `code` monospace, so before-and-after screenshots of a fenced block are
+identical. What the rule buys is a pinned face instead of each browser's default, and a match with `sites/www`.
+**Do not re-measure this.**
 
 ## Wide tables - still clipped
 
@@ -98,6 +94,20 @@ reported. The fix now costs a wrapper in 8 files or a build hook, against a faul
 width and one page at 1280px.
 
 ## Done when
+
+**What it takes: a yes or a no, then a Jekyll hook.** The CSS-only routes are all measured and all dead, so
+the only remaining shape is a block-level wrapper around each `<table>`.
+
+**Take the hook, not the markup.** A hook wraps every table at build time, in one file, and covers the four
+frozen version folders without editing them. Writing the wrapper into the markdown is 8 files across 4
+version folders that are otherwise frozen copies, and every new version adds a fifth.
+
+**Whatever is chosen needs a visible resting scrollbar**, or the table reads as clipped exactly as it does
+now - see *What will bite*. That is the part that makes this more than one line of sass.
+
+**The no is a real answer.** Nobody has complained in the whole life of the site, it bites four pages at
+phone width and one at 1280px, and *The case against* is written for that. **If the answer is no, record it
+in the general decisions ledger and delete this file** - leaving it open is the outcome with no value.
 
 - [x] `pre` and `code` render monospace on the built docs site.
       `grep -rn 'font-family' sites/docs/_sass/` returns the stack, and the built `css/main.css` carries

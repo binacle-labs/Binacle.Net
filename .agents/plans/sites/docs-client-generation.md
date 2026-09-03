@@ -1,7 +1,7 @@
 ---
 description: A docs page with copy-paste commands that generate a client from the published OpenAPI spec
-state: blocked
-waits-on: "where a page that is not version-specific lives on the docs site - the maintainer said yes to the page on 2026-08-27 and that placement is the one thing still open"
+state: ready
+waits-on: "one docs deploy. The page is written and builds - 2026-09-04. Every box but the live one passes"
 paths:
   - "sites/docs/**"
 ---
@@ -10,7 +10,8 @@ paths:
 
 A site session in `sites/docs/`.
 
-**Agreed by the maintainer, 2026-08-27.** The page gets written. What is not settled is where it goes.
+**Agreed by the maintainer, 2026-08-27.** The page gets written. **Where it goes was settled by the site on
+2026-09-02** - see below. Nothing is open.
 
 **The spec is published and nothing on the site links to it.** Verified: the per-version
 `swagger/<api>.json` under `/version/<version>/` returns 200, and no page mentions it. **A client-generation
@@ -19,12 +20,24 @@ page is the payoff for publishing a spec at all.**
 A short page with copy-paste commands - `hey-api` for TypeScript, `kiota` for C# - turns "there is a spec"
 into "here is your client in thirty seconds".
 
-## Settle this first: where a page that is not version-specific lives
+## Where it lives - answered by the site, 2026-09-02
 
-**Every page on the docs site today sits under a version folder.** This page is not version-specific - the
-same two commands work against every published spec, with the version substituted. So it does not have a
-home, and that is a structural call about the site rather than a wording choice. **Take it before writing the
-page, not during.** Three shapes, and what each one costs:
+**This plan was blocked on a premise that is false.** It said every page on the docs site sits under a version
+folder. **The `common_pages` collection is a non-versioned home and it already exists**, with
+`permalink: /:path/` in `sites/docs/_config.yml:44`. Seven pages are in it, including `core-concepts.md` and
+`quick-start.md`.
+
+**Measured on the live host:** `docs.binacle.net/core-concepts/` answers 200 and
+`docs.binacle.net/version/v3.0.x/core-concepts/` answers 404. The page is served once, outside the version
+tree, exactly as the first row of the table below wanted.
+
+**And the two costs that row named are already paid.** The nav is front matter, not a hand-kept list - a
+`nav:` block with `order:` and `icon:` is all `core-concepts.md` carries. The sitemap is generated: the
+`pages` file in the `sitemaps:` block at `sites/docs/_config.yml:276` already includes the `common_pages`
+collection, so a new page in it is listed without touching the config.
+
+**So there is nothing to decide.** The table below is kept only as the record of what was weighed, and the
+first row is the one the site already implements:
 
 | Where | What it costs |
 |---|---|
@@ -32,8 +45,8 @@ page, not during.** Three shapes, and what each one costs:
 | **A copy under every version** | Nothing structural changes - it is the shape the site already has. The cost is that four near-identical pages drift apart, and each new version adds a fifth copy somebody has to remember to write. The plan already rejects that shape for the version string inside the page; this is the same argument one level up. |
 | **Somewhere else on the site** - the landing page, or a section that is not the versioned docs | Puts a developer task on a page that is not the docs, and readers looking for it will look under the version they are on. Cheapest to build, hardest to find. |
 
-**This plan does not pick one.** The trade is the maintainer's, and it is the only thing between the decision
-and the writing.
+**Row 1 won and it cost nothing**, because the two prices it was marked up with - a hand-kept picker and a
+hand-kept sitemap - are not what the site does.
 
 ## Two things it has to get right
 
@@ -72,9 +85,19 @@ the site's copies are hand-carried.
 
 ## Done when
 
-- [ ] Where the page lives is decided and written down here.
-      **By eye.** One of the three rows above is chosen, with the reason. Until then the page is not started.
-- [ ] One page exists, in the navigation and in the sitemap.
-      `grep -rn 'client' sites/docs/_data/*.yml sites/docs/**/sitemap*` finds it in both.
-- [ ] Both commands have been run against a published spec and their real output is what the page shows.
-      **By eye.** Run each one in a scratch directory before pasting it.
+**What it takes: one docs session and one deploy.** One new file, one `nav:` block, two commands run in a
+scratch directory before anything is pasted. No config edit, no decision left. `sites/docs/` is published, so
+it needs the site grant - `rules/never-edit-published-sites.md`.
+
+- [x] **Where the page lives is settled - 2026-09-02.** The `common_pages` collection, `permalink: /:path/`,
+      already serving seven non-versioned pages. Measured on the live host, not read off the config.
+- [x] **The page exists as a common page - 2026-09-04.** `generate-a-client.md`, `nav: order 4, icon 🧰`,
+      matching `core-concepts.md`'s shape.
+- [x] **It is in the nav and the generated sitemap, with no config edited - 2026-09-04.**
+      `git diff sites/docs/_config.yml` is empty and `artifacts/docs/sitemap/pages.xml` names the path.
+- [x] **Both commands were run against the published spec - 2026-09-04**, not against `artifacts/openapi/`.
+      Both generated, both built, and both printed `FullyPacked 3` against a live API.
+- [x] **The page says v4 is experimental**, in a `.block-warning` using the site's existing wording.
+- [ ] The page is live.
+      `curl -s -o /dev/null -w '%{http_code}' https://docs.binacle.net/generate-a-client/` returns 200. The
+      docs deploy is `workflow_dispatch` only, so nothing fails if this is skipped.

@@ -1,24 +1,19 @@
 # Kubernetes Samples
-This folder provides sample configurations to run Binacle.Net on an existing kubernetes cluster.
 
-
-All the samples assume you: 
-- Have an existing Kubernetes cluster.
-- Have one or more eshops already running in the cluster, typically with Nginx Ingress Controller.
-- Will run Binacle.Net in the same cluster and not exposed.
-- Have `kubectl` configured to interact with your cluster.
+Binacle.Net running in the cluster the shops that call it already run in. Copy the folder, edit the manifests,
+apply them.
 
 ## 📦 Available Samples
 
-### 1️⃣ Minimal
-This sample demonstrates a minimal Kubernetes setup for Binacle.Net with essential features.
-Minimal setup is ideal for Kubernetes clusters as you rarely want to expose the UI in such environments.
+- [minimal](minimal) - one deployment, a ClusterIP service, your bin set in a ConfigMap and a volume for the
+  logs.
 
-**Directory**: `samples/kubernetes/minimal`
+## 📖 What they assume
 
-Key Features:
-- Basic API functionality
-- Lightweight configuration for easy setup and testing
-- Customizable bin configurations via Presets.json
+- You have a cluster, and `kubectl` is pointed at it.
+- The callers are in that same cluster - one or more shops, typically behind an Nginx ingress controller.
+- Binacle.Net is not exposed outside it. Nothing here creates an ingress or terminates TLS, on purpose: the
+  API has no accounts and no authentication unless you turn ServiceModule on, and the
+  [docker/service](../docker/service) sample is what that configuration looks like.
 
-
+Unlike the Docker Compose samples, these are not smoke-tested on release. The image they run is the same one.

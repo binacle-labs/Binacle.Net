@@ -1,7 +1,7 @@
 ---
 description: The public image becomes packing-only and the Service Module moves to its own image
 state: proposed
-waits-on: "the v3.0.0 tag - it is the first thing after"
+waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
 paths:
   - "api/**"
 ---
