@@ -1,7 +1,7 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-08-27
+verified: 2026-09-04
 check: Project list and test aliases match the solution
 also_update:
   - lib/tests
@@ -36,8 +36,8 @@ Plus, in this slice: `lib/test/Binacle.Lib.TestsKernel` (the result-selection fi
 
 | Project | Alias | What it covers |
 |---|---|---|
-| `lib/test/Binacle.Lib.UnitTests` | `lib` | All algorithm versions × all scenarios; result selection strategies |
-| `lib/test/Binacle.Lib.PerformanceTests` | `performance` | Algorithm performance (console runner, not xUnit) |
+| `lib/test/Binacle.Lib.UnitTests` | `cs_binacle-lib_unit` | All algorithm versions × all scenarios; result selection strategies |
+| `lib/test/Binacle.Lib.PerformanceTests` | (none) | Algorithm performance (console runner, not xUnit) — run via `./tooling/performance.lib.sh` |
 | `lib/test/Binacle.Lib.Benchmarks` | (none) | BenchmarkDotNet microbenchmarks — run via `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
 
 See Lib Tests (`$lib/tests`) for fixtures and the test projects, and Shared (`$shared`) for the

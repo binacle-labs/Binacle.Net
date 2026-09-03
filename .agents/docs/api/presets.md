@@ -1,7 +1,7 @@
 ---
 id: api/presets
 description: What presets are, where they're configured, how route params map to bins, and how to add one for tests
-verified: 2026-08-19
+verified: 2026-09-04
 check: Every {preset} and {preset}/{bin} route in v3/Endpoints and v4/Endpoints is accounted for; the flags, lookup methods and validator rules match BinPresetOptions.cs; the shipped preset tables match Presets.json
 also_update:
   - api/configuration

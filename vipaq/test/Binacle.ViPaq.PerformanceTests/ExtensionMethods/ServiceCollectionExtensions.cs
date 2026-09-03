@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
 	// NoOp is the raw-size baseline; deflate and gzip are the two candidates being raced.
 	private static (string Name, ICompressionCodec Codec, string Blurb)[] Codecs =
 	[
-		("NoOp", new NoOpCodec(), "Uncompressed baseline — the codec passes the body through, so these are raw sizes."),
+		("NoOp", new NoOpCodec(), "Uncompressed baseline. The codec passes the body through, so these are raw sizes."),
 		("Deflate", new DeflateCodec(), "Bodies compressed with raw DEFLATE, both sides."),
 		("Gzip", new GzipCodec(), "Bodies compressed with gzip, both sides."),
 	];
@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
 			var sizeFile = new ResultFile
 			{
 				Filename = $"VipaqProtobufSizeComparison.{codecName}",
-				Title = $"ViPaq vs Protobuf — stored size ({codecName})",
+				Title = $"ViPaq vs Protobuf - stored size ({codecName})",
 				Description = blurb + " Real placed data (offline FFD, WFD and BFD), each set shown per layout."
 			};
 
@@ -48,7 +48,7 @@ public static class ServiceCollectionExtensions
 							scenarios,
 							codec,
 							layout,
-							$"Real scenarios — {setLabel} — {layout.LayoutName}",
+							$"Real scenarios - {setLabel} - {layout.LayoutName}",
 							$"Real placed data, {codecName} codec, {layout.LayoutName} layout.",
 							sizeFile,
 							serviceProvider.GetRequiredService<ILogger<VipaqProtobufSizeComparisonTest>>()
@@ -70,8 +70,8 @@ public static class ServiceCollectionExtensions
 			var crossoverFile = new ResultFile
 			{
 				Filename = $"CodecCompressionCrossover.{layout.LayoutName}",
-				Title = $"ViPaq codec compression crossover — {layout.LayoutName}",
-				Description = "ViPaq stored size under each codec — raw (NoOp) next to deflate and gzip — so you can "
+				Title = $"ViPaq codec compression crossover - {layout.LayoutName}",
+				Description = "ViPaq stored size under each codec: raw (NoOp) next to deflate and gzip, so you can "
 					+ "see where compressing a pack starts to pay and which codec wins. Ordered by item count."
 			};
 
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
 					new CodecCompressionCrossoverTest(
 						scenarios,
 						layout,
-						$"Real scenarios — {setLabel} — {layout.LayoutName}",
+						$"Real scenarios - {setLabel} - {layout.LayoutName}",
 						$"Real placed data, {layout.LayoutName} layout, all three codecs.",
 						crossoverFile,
 						serviceProvider.GetRequiredService<ILogger<CodecCompressionCrossoverTest>>()

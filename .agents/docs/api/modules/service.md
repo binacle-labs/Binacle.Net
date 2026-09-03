@@ -1,8 +1,8 @@
 ---
 id: api/modules/service
 description: ServiceModule — JWT auth, rate limiting, account/subscription management. Three projects using clean architecture.
-verified: 2026-08-19
-check: Routes, config file names, connection string name, the AccountStatus values, the list endpoints' paging parameters, and the token endpoint's account-state codes match ServiceModule source
+verified: 2026-09-04
+check: Routes, config file names, connection string name, the project reference direction in the three csproj files, every domain enum's values (AccountRole, AccountStatus, SubscriptionType, SubscriptionStatus), the entity base classes, the list endpoints' paging parameters, and the token endpoint's account-state codes match ServiceModule source
 also_update:
   - api/configuration
 paths:
@@ -24,8 +24,9 @@ Three projects, one feature. Enabled by the `SERVICE_MODULE` feature flag.
 | `api/src/Binacle.Net.ServiceModule.Domain` | Domain | Entities, repository interfaces, value objects |
 | `api/src/Binacle.Net.ServiceModule.Infrastructure` | Infrastructure | Concrete repositories, DB backends, password hashers |
 
-**Dependency direction:** ServiceModule → Domain ← Infrastructure.
-Neither ServiceModule nor Infrastructure knows about each other — both depend on Domain abstractions only.
+**Dependency direction:** ServiceModule → Infrastructure → Domain. ServiceModule references Infrastructure so
+it can call `AddInfrastructure()`; Infrastructure does not reference ServiceModule. Domain references nothing
+in the module beyond `Binacle.FluxResults`.
 
 ## Registration
 
@@ -100,11 +101,14 @@ and the OpenAPI documents follow, carrying no `429` on any endpoint. See `$api/o
 ## Domain Layer
 
 **Entities:**
-- `Account` — user account with `AccountRole` (Admin, User) and `AccountStatus` (Active, Inactive, Suspended)
-- `Subscription` — linked to an account; `SubscriptionType` (Demo, Basic, Pro, Enterprise) and `SubscriptionStatus`
+- `Account` — user account with `AccountRole` (Admin, User, Guest) and `AccountStatus` (Active, Inactive, Suspended)
+- `Subscription` — linked to an account; `SubscriptionType` (Normal, Demo) and `SubscriptionStatus`
+  (Active, Inactive, Suspended)
 
 **Patterns:**
-- `Entity` → `AggregateRoot` → `AuditableEntity` (adds created/modified timestamps)
+- `Entity` is the base. `AuditableEntity : Entity` adds `CreatedAtUtc` and the soft-delete pair
+  (`IsDeleted`, `DeletedAtUtc`); both `Account` and `Subscription` derive from it. `AggregateRoot : Entity`
+  also exists but nothing derives from it.
 - `ValueObject` base for immutable value types
 - `Password` is a `ValueObject` — never stored as plain string
 - `IPasswordService` is the domain abstraction for hashing

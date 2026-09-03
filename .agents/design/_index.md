@@ -4,7 +4,7 @@ description: Manifest of every file under .agents/design, grouped by area. Regen
 
 # Agent Design Index
 
-Every design record in `.agents/design/`, grouped by area. The settled design behind the docs — the
+Every design record in `.agents/design/`, grouped by area. The settled design behind the docs: the
 decisions (why) and the findings (measured evidence). Permanent and citable; read the one you need.
 
 ## General
@@ -74,9 +74,21 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: sites/packing-demo-set.md
   description: "Why the packing demo sizes its items against the largest bin, and how sizingBin and addBin relate - the reasoning behind the numbers a visitor arrives to"
   paths: ["packages/binacle-net-ui/**"]
+- file: sites/site-build.md
+  description: "The webpack and sass machinery behind the three sites - the clean rule that keeps a watch alive, the chunk split and the asset budget, and the cache that lies about a clean build."
+  paths: ["sites/www/webpack.config.js", "sites/docs/webpack.config.js", "sites/demo/webpack.config.js", "sites/*/package.json"]
+- file: sites/site-config-and-data.md
+  description: "What the three sites' _config.yml and _data files carry that a reader cannot recover - the version_tag trap, the cookie domain, the organisation block, and how the www exchange payloads are re-run."
+  paths: ["sites/www/_config.yml", "sites/docs/_config.yml", "sites/demo/_config.yml", "sites/*/_config.prod.yml", "sites/*/_data/**"]
+- file: sites/site-theming-css.md
+  description: "The CSS side of the theme on all three sites - why the attribute is on html, why every dark block also lands on body, and the two rules that keep the switcher element from being a box or a dead control."
+  paths: ["sites/www/_sass/**", "sites/docs/_sass/**", "sites/demo/_sass/**"]
 - file: sites/webmanifest.md
   description: "Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither."
   paths: ["sites/**", "gulpfile.js"]
+- file: sites/www-stylesheets.md
+  description: "The www stylesheet system - the palette and its measured contrast numbers, the separation rhythm, the one-column hero and why the two-column version was dropped, and the exchange card's scroll behaviour."
+  paths: ["sites/www/_sass/**", "sites/www/_js/**"]
 - file: sites/www.md
   description: "Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing."
   paths: ["sites/www/**"]

@@ -1,7 +1,7 @@
 ---
 id: api/endpoints
 description: Endpoint pattern, registration, request validation flow, and route groups for v3 and v4
-verified: 2026-08-14
+verified: 2026-09-04
 check: IGroupedEndpoint hierarchy matches api/src/Binacle.Net.Kernel/Endpoints/
 also_update:
   - api/kernel
@@ -30,10 +30,11 @@ app.RegisterEndpointsFromAssemblyContaining<IModuleMarker>();
 ## Interfaces (in `Binacle.Net.Kernel`)
 
 ```
-IEndpointGroup           — defines a route group prefix and shared metadata
+IEndpointDefinition      — empty root marker; IGroupedEndpoint and IEndpoint both extend it
+IEndpointGroup           — defines a route group prefix and shared metadata (DefineEndpointGroup)
 IGroupedEndpoint         — non-generic base; declares DefineEndpoint(RouteGroupBuilder)
 IGroupedEndpoint<TGroup> — adds the group type constraint; use this in your endpoint class
-IEndpoint                — standalone endpoint, not part of a group
+IEndpoint                — standalone endpoint, not part of a group; DefineEndpoint(IEndpointRouteBuilder)
 ```
 
 `RegisterEndpointsFromAssemblyContaining<T>` scans the assembly for all three and wires them up.
@@ -51,9 +52,10 @@ If you add a new module, create your own `IModuleMarker` in that module's projec
 | `ApiV3EndpointGroup` | `/api/v3` | All v3 endpoints |
 | `ApiV4EndpointGroup` | `/api/v4` | All v4 endpoints |
 
-`ApiV4EndpointGroup` sets shared metadata for every v4 endpoint:
+Both groups set the same shared metadata for every endpoint under them:
 - `ProducesProblem(500)` — do **not** add this per-endpoint
 - 500 `ResponseDescription` and `ResponseExample`
+- `WithGroupName(...)`, which is what puts the endpoint in that version's OpenAPI document
 
 ## Endpoint Anatomy
 
@@ -98,7 +100,12 @@ It handles JSON binding and FluentValidation:
 |---|---|
 | Malformed JSON | `400 Bad Request` |
 | Null body | `400 Bad Request` |
+| Unknown enum value in the body | `422 UnprocessableEntity` |
 | Validation failure | `422 UnprocessableEntity` |
+| Any other exception while binding | `500 Internal Server Error` |
+
+`BindingProblem` (`api/src/Binacle.Net.Kernel/Endpoints/BindingProblem.cs`) is the one place that turns a
+failed bind into a response, so the same input cannot answer 422 on one route and 400 on the next.
 
 The handler only runs if binding and validation both pass.
 
@@ -106,8 +113,11 @@ The handler only runs if binding and validation both pass.
 
 `.RateLimited()` marks an endpoint as user compute. It names no policy — it drops a marker in the endpoint's
 metadata, and the ServiceModule turns that into `ApiUsage` when it is loaded. With the module off nothing reads
-the marker and no limiter exists. `.RequireCors(CorsPolicy.CoreApi)` is likewise a no-op when the module is not
-loaded.
+the marker and no limiter exists.
+
+`.RequireCors(CorsPolicy.CoreApi)` is a different thing: the `CoreApi` policy is registered by the core in
+`Program.cs`, not by a module, so it applies whether or not the ServiceModule is loaded. Every v3 and v4
+endpoint calls it.
 
 ## Contracts Location
 

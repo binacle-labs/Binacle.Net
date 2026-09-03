@@ -12,12 +12,12 @@ function readerOver(bytes: number[]): ProtocolReader {
 describe("ProtocolReader", () => {
 	describe("reads little-endian", () => {
 		// ports C#: Read8Bits_Reads_The_Byte
-		test.each(uint8Cases)("8-bit — $name", ({value, bytes}) => {
+		test.each(uint8Cases)("8-bit - $name", ({value, bytes}) => {
 			expect(readerOver(bytes).read8Bits()).toBe(value);
 		});
 
 		// ports C#: Read16Bits_Widens_To_T
-		test.each(uint16Cases)("16-bit — $name", ({value, bytes}) => {
+		test.each(uint16Cases)("16-bit - $name", ({value, bytes}) => {
 			expect(readerOver(bytes).read16Bits()).toBe(value);
 		});
 	});

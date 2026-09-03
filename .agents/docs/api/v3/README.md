@@ -1,7 +1,7 @@
 ---
 id: api/v3
 description: v3 API — stable, do not modify. Endpoints, algorithm selection, response shape, field names, and enum values.
-verified: 2026-08-19
+verified: 2026-09-04
 check: The endpoint table matches every MapGet/MapPost under v3/Endpoints/; field names and enum values match v3/Contracts/; the pack EarlyFail_* claim still holds against PackResponse.MapResultStatus and the AlgorithmOperation.Fitting guard in the algorithms
 also_update:
   - api/v3/contracts

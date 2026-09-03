@@ -14,9 +14,6 @@
 #
 # `parameters` is required on every fit and pack request - a body without it returns 400. Confirmed against
 # the API on 23 Aug 2026, so do not trim it out of an example to make one shorter.
-#
-# BEFORE GO-LIVE: both blocks were run against the working tree, not against a published tag. Re-run them
-# against the tag the docker run line names, so the page and the image a reader pulls agree.
 
 fit:
   verified: "2026-08-23, source build of the 3.0.x line"
@@ -61,8 +58,6 @@ fit:
       ]
     }
 
-# The page that pays off "and where every item sits". A fit response carries no coordinates - only pack does,
-# so any sentence near a fit example promising placement is wrong.
 pack:
   verified: "2026-08-23, source build of the 3.0.x line"
   method: "POST"
@@ -95,7 +90,6 @@ pack:
       ]
     }
 
-# /cartonization/ - by-preset: the box set is configured once in the image, so the request is only the order.
 carton:
   verified: "2026-08-23, source build of the 3.0.x line"
   method: "POST"
@@ -150,11 +144,6 @@ carton:
       ]
     }
 
-# /parcel-lockers/ - three compartment sizes and one order. The heights are the shape a locker bank has, not
-# anyone's published figures. The page says so.
-#
-# One item on purpose. A multi-item order against a compartment nothing fits produces an empty fittedItems
-# row that reads as a bug unless the page explains the sort order, and that is not a marketing page's job.
 locker:
   verified: "2026-08-23, source build of the 3.0.x line"
   method: "POST"
@@ -202,12 +191,7 @@ locker:
       ]
     }
 
-# The primary conversion on three of the four pages. The tag is a variable so it is changed in one place when
-# the line moves; it must name a tag that is actually published.
 command:
   tag: "3.0"
-  # ONE LINE, no backslash continuations. They were tried and they wrap into nonsense on a phone: pre-wrap
-  # keeps both the newlines and the continuation indents and then wraps on top of them, which left a stray
-  # "-e" alone on its own line in the middle of the primary conversion. A single line wraps at its spaces.
   text: |
     docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3.0

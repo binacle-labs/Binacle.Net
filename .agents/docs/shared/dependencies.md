@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-08-30
+verified: 2026-09-04
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"

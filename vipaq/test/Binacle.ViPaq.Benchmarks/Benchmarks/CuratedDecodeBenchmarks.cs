@@ -9,8 +9,8 @@ using Binacle.ViPaq.TestsKernel.ViPaq;
 namespace Binacle.ViPaq.Benchmarks.Benchmarks;
 
 // Decode cost over the curated scenarios, uncompressed: turning bytes back into a bin and items. The codec is
-// NoOp, so this times the format alone, not decompression. Setup pre-encodes each form once — plus the header
-// ViPaq's decode needs — so only the read is timed. ViPaq is split into its two layouts against the protobuf
+// NoOp, so this times the format alone, not decompression. Setup pre-encodes each form once (plus the header
+// ViPaq's decode needs) so only the read is timed. ViPaq is split into its two layouts against the protobuf
 // baseline.
 [MemoryDiagnoser]
 public class CuratedDecodeBenchmarks : ScenarioBenchmarkBase

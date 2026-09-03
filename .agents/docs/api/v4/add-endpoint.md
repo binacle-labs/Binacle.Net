@@ -1,7 +1,7 @@
 ---
 id: api/v4/add-endpoint
 description: Step-by-step guide for adding a new v4 endpoint
-verified: 2026-08-14
+verified: 2026-09-04
 check: Code template matches a real v4 endpoint file and compiles
 also_update:
   - api/v4
@@ -39,6 +39,7 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
     public void DefineEndpoint(RouteGroupBuilder group)
     {
         group.MapPost("my-route", HandleAsync)
+            .WithOperationId("myTag.myRoute")   // every v3 and v4 endpoint has one; <tag>.<camelCaseRoute>
             .WithTags("MyTag")
             .WithSummary("...")
             .WithDescription("...")
@@ -59,11 +60,11 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
             .ResponseExamples<MyValidationProblemResponseExamples>(StatusCodes.Status422UnprocessableEntity, "application/problem+json")
 
             .RateLimited()   // on user-request (fit/pack) endpoints — the ServiceModule supplies the policy
-            .RequireCors(CorsPolicy.CoreApi);   // include where CORS protection is needed — no-op if ServiceModule is off
+            .RequireCors(CorsPolicy.CoreApi);   // the CoreApi policy comes from the core, not a module
             // do NOT add .ProducesProblem(500) — ApiV4EndpointGroup sets it for all endpoints (see openapi.md)
     }
 
-    internal async Task<IResult> HandleAsync(
+    internal static async Task<IResult> HandleAsync(
         BindingResult<MyRequest> bindingResult,
         IBinacleService binacleService,
         ILogger<MyEndpoint> logger,
@@ -87,8 +88,8 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
 > ServiceModule turns the marker into `ApiUsage` when it is loaded, and nothing does when it is not. The `429`
 > follows the same marker, so a document generated without the module carries no `429` at all.
 
-> **CORS:** add `.RequireCors(CorsPolicy.CoreApi)` where CORS protection is needed. Check existing endpoints in the
-> same group for the expected pattern before deciding.
+> **CORS:** add `.RequireCors(CorsPolicy.CoreApi)` where CORS protection is needed. Every v3 and v4 endpoint
+> calls it today. The policy is registered by `Program.cs`, so it holds with every module off.
 
 ### 3. Create the response type (if new)
 

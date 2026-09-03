@@ -2,7 +2,7 @@ using Binacle.Net.Configuration;
 
 namespace Binacle.Net.UnitTests;
 
-// A bad origin never fails here at runtime — the app starts, and the browser silently blocks the request in
+// A bad origin never fails here at runtime. The app starts, and the browser silently blocks the request in
 // someone else's console. Startup is the only place an operator finds out.
 [Trait("Behavioral Tests", "Ensures CORS configuration is validated as expected")]
 public class CorsOptionsValidatorTests

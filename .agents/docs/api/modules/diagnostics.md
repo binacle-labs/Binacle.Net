@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-08-22
+verified: 2026-09-04
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the FeatureOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
 also_update:
   - api/configuration
@@ -114,9 +114,11 @@ Nothing here trusts a header; they are read only to decide whether to warn.
 | `Config_Files/DiagnosticsModule/PackingLogs.json` | Packing log channels and file paths |
 | `Config_Files/DiagnosticsModule/PackingLogs.{Environment}.json` | Environment override |
 
-**All three base files are required** (`Optional => false` on `HealthCheckConfigurationOptions`,
-`OpenTelemetryConfigurationOptions` and `PackingLogsConfigurationOptions`). The module is always on, so a deploy
-missing any one of them fails to start — unlike the ServiceModule files, which are optional or gated on the flag.
+**All four base files are required.** Three through `Optional => false` on `HealthCheckConfigurationOptions`,
+`OpenTelemetryConfigurationOptions` and `PackingLogsConfigurationOptions`; `Serilog.json` through the
+`optional: false` argument on its `AddJsonConfiguration` call, since it is read by Serilog and has no options
+class. The module is always on, so a deploy missing any one of them fails to start — unlike the ServiceModule
+files, which are optional or gated on the flag. Every `.{Environment}.json` sibling is optional.
 
 ## Logging
 

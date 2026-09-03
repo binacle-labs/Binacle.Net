@@ -2,7 +2,7 @@
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, and the open questions about the PR gate and supply-chain attestation.
 verified: 2026-09-02
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.proj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; and D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; and D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -257,8 +257,13 @@ when it grows past a command or two, not in a sweep.
 **One block was missed by the 2026-08-28 sweep, and it was found on 2026-08-31 by adding to it.** The release's
 `publish` job still copied the image with 20 lines of `run: |`. A change that made it two copies with a sign
 between them grew it rather than moving it, which is how the miss surfaced: **a rule you can add to without
-noticing is a rule nothing enforces.** It is now `tooling/ci/moving-tags.sh` and `tooling/ci/copy-tags.sh`, and
-`release-docker-image.yml` has no inline `run: |` block left at all - `grep -c 'run: |'` returns 0.
+noticing is a rule nothing enforces.** It is now `tooling/ci/moving-tags.sh` and `tooling/ci/copy-tags.sh`.
+
+**And it happened again.** `grep -c 'run: |'` on `release-docker-image.yml` returns **1** as of 2026-09-04,
+not 0 - line 280, a five-attempt retry loop around `just image verify`, added after this entry was written.
+**The entry that says a rule you can add to without noticing is a rule nothing enforces was itself added to
+without anyone noticing.** The block is small and it wraps a recipe rather than replacing one, so it is
+recorded here rather than moved; **the count is the check, and it is 1.**
 
 **Why there is a filter at all, since the simpler shape has none.** Copying the version tag, signing, then
 copying the *whole* list including it again needs no filter, no guard and no step output. It is idempotent and
@@ -307,10 +312,12 @@ fetched and compared on 2026-08-28 and match byte for byte.
 **`build-jekyll-site` keeps its two inline lines.** `npm ci --ignore-scripts` and `just build "$SITE"` are not
 shell worth checking, and a file for each would be a file that says nothing.
 
-**The release `publish` job is the exception and keeps its inline block.** It holds the Docker Hub credential
-and deliberately never checks out, which is also why it gets no composite action. Moving its `imagetools`
-copy into a script would mean checking out repository code beside that credential to save fifteen lines. Not
-worth it; if it ever does check out for another reason, move the block then.
+**The `publish` job used to be the exception, and it is not any more.** This paragraph argued it never checks
+out and therefore gets no composite action and keeps its inline copy. **All three are false as of
+2026-09-04:** it has a `Checkout` step, it uses `./.github/actions/setup-just`, and its copy is
+`just ci copy-tags`. The move is recorded above; this paragraph was the pre-move argument and was never
+deleted. **It is kept as the record of what the objection was** - repository code beside the Docker Hub
+credential - which is still the thing to weigh before adding anything else to that job.
 
 The corollary is that recipes must stay callable from CI as they stand — nothing interactive, no `sudo`, no
 local-only paths. Directory preparation that needs `sudo` is a precondition of *running* a compose stack, not
@@ -502,8 +509,10 @@ idiom, which is what made the old pairing wrong in the first place.
 The second reason is durability: framework-dependent means a .NET security fix reaches users by rebasing on a
 newer `aspnet` tag rather than by republishing the app, which matters for a project that ships months apart.
 
-**Written twice, on purpose.** The flags are in `tooling/build.just` and again in the publish step of
-`release-docker-image.yml`. Nothing checks that the two agree, so changing one means changing the other.
+**One home, as of 2026-09-04.** The flags are `tooling/build.just:40` and nowhere else; the workflow calls
+`just build publish`. This entry used to warn that they were written twice and had to be kept in step - that
+warning describes a shape the repository no longer has, and following it would mean editing a line that does
+not exist.
 
 ### D13 — per-build OCI labels are applied at build time, never as `LABEL` fed by `ARG`
 
@@ -618,13 +627,15 @@ anchor sits in the verifier, which is the only place outside the attacker's reac
 **`just image verify` takes the ref and the repository as arguments**, defaulting to `refs/heads/main` and
 `binacle/binacle-net`. **The ref is part of the identity, so it is an argument rather than a constant** - that
 is what let the same recipe check images from either side of this change. Its first reason was that the old
-betas stayed checkable, and that reason expired within a day when they were deleted; the shape is kept because
-a constant would have to be edited to check anything else, and a recipe you edit to run is not a check.
+betas stayed checkable, and that reason still holds - read off the registry 2026-09-04, all eight
+`3.0.0-beta.*` tags resolve, 23 tags in the repository. The shape would be kept anyway, because a constant
+would have to be edited to check anything else, and a recipe you edit to run is not a check.
 **The repository argument is what the release workflow uses** to verify what it has just pushed, a scratch
 repository included.
 
-**The docs site's two copies are not done.** A coding session cannot write them. `plans/sites/docs-v3-deploy.md`
-section 7 carries what they must say.
+**The docs site's two copies are not a coding session's to write.** They are
+`sites/docs/collections/_versions/v3.0.x/release-notes.md` and `verifying-a-release.md`, and each must end
+`yml@refs/heads/main$` literally, the same as the three copies above.
 
 **Signing starts at `3.0.0-beta.2`**, along with the SBOM and the GHCR staging copy. Everything earlier
 answers `no signatures found`, and that is history rather than a broken check. **Which images verify under
@@ -721,7 +732,7 @@ last.
 
 ### D18 — two test suites, split by what ships
 
-**Decided by the maintainer, 2026-08-27.** `shared-image-tests.yml` runs the sixteen tests that end up in the
+**Decided by the maintainer, 2026-08-27.** `shared-image-tests.yml` runs the seventeen tests that end up in the
 Docker image. `shared-site-tests.yml` runs the fifteen that end up in a Jekyll site. The release pipeline calls
 the first; the three site deploys call the second; the pull request gate calls both.
 
@@ -736,7 +747,10 @@ five javascript packages, `demo` through `binacle-net-ui` to `binacle-vipaq` to 
 three through `theme-switcher` to `cookies`.
 
 **Five tests are in both files, and that is not duplication to remove.** They ship in the image and they ship
-in the sites, so both sides prove them. 16 plus 15 less the 5 shared is 26, the whole list.
+in the sites, so both sides prove them. 17 plus 15 less the 5 shared is 27, the whole list - recounted
+2026-09-04 off `tooling/tests.just`: 12 `cs_`, 5 `ts_`, 10 `rb_`. **It was 16 and 26 here until
+`Binacle.FluxResults.UnitTests` landed on 2026-08-30**, three days after this was written, and nobody redid
+the arithmetic. The counts are the part of this entry that rots; the rule above them does not.
 
 **The pull request gate's path filter overlaps for the same reason — recorded 2026-08-28.** `just ci
 changed-paths` prints `code=` and `site=`, and `packages/`, `shared/` and `vipaq/` set both. That is right:
@@ -826,7 +840,7 @@ A check whose only output is "ok" cannot be read over someone's shoulder.
 
 ### D22 — the gems reach Sonar through a built project, and the project type is what decides that
 
-`ruby/ruby.proj` exists for one reason: to list the 102 gem sources as `Content` so the scanner is offered
+`ruby/ruby.rbproj` exists for one reason: to list the 102 gem sources as `Content` so the scanner is offered
 them. `Microsoft.Build.NoTargets`, so it compiles nothing. It excludes `vendor/**`, the bundle CI installs.
 
 **Without it Sonar saw no Ruby at all.** The run of 2026-08-27 23:08 reported `10 languages detected` and no
@@ -909,8 +923,8 @@ a habit rather than describing a gap.
 
 ### D24 — release tags cannot be moved or deleted, and nobody bypasses that
 
-A tag ruleset on `refs/tags/v*` blocks **update** and **deletion**. It matches 46 tags, every release back
-through v1 and v2. **Creation stays allowed**, or the release would break - `github-release.sh` makes the tag
+A tag ruleset on `refs/tags/v*` blocks **update** and **deletion**. It matches 48 tags, counted 2026-09-04,
+every release back through v1 and v2. **Creation stays allowed**, or the release would break - `github-release.sh` makes the tag
 itself.
 
 **The bypass list is empty on purpose, including the maintainer.** A published image and a GitHub release
@@ -919,8 +933,9 @@ is no undo. This is the only rule here guarding something irreversible, which is
 no way around it. Deleting a tag now means disabling the ruleset, deleting, and re-enabling - the friction is
 the feature.
 
-**`v*` and not everything.** The 14 deploy marker tags - `docs-6`, `web-release-5`, `www-1` - are created by
-`push-tag.sh` on every site deploy and must stay free.
+**`v*` and not everything.** The 20 deploy marker tags - `docs-6`, `web-release-5`, `www-1` - are created by
+`push-tag.sh` on every site deploy and must stay free. Counted 2026-09-04; both numbers here grow on their
+own, so read them rather than trusting them.
 
 
 ### D25 — the moving tags were proven on the release itself, not on a scratch repository
@@ -942,6 +957,30 @@ any non-prerelease semver as latest. A rehearsal that avoids both is a rehearsal
 **What this does not close.** The step is proven for a first major release, where `3.0` and `latest` are
 created. It has still never *moved* either name off an existing image — that happens for the first time on
 3.0.1.
+
+
+### D26 — Docker Hub tag immutability stays off
+
+**Answered 2026-09-04: no, for now.** The switch is off. Recorded as a decision rather than left as an open
+question, because an open question with no value is worse than either answer.
+
+**What would reopen it.** A Docker Hub tag actually being overwritten - the risk this was weighed against has
+never happened, and one occurrence changes the arithmetic. Or a rehearsal on a throwaway repository proving a
+rule scoped to released versions behaves as documented, which is the safe path this entry names and nobody
+has walked.
+
+**What it would have bought:** a published release tag that cannot be overwritten. **What it costs is the
+reason not to.** There is no undo. An immutable tag cannot be deleted either, so a release tag pushed by
+mistake is permanent, and turning it on safely means rehearsing it on a throwaway repository first.
+
+**The stored rule is `.*`, and that is what makes the switch dangerous here rather than merely irreversible.**
+`.*` matches `latest` and `3.0`, the two tags every release moves. Enabling it against that rule would freeze
+the moving tags on the first release after it, which is exactly the mechanism D25 depends on. **If this is
+ever reopened, the rule is the first thing to correct** - released versions only, never the moving tags.
+
+**What already protects the release.** D24 - a tag ruleset that nobody bypasses, so a release tag cannot be
+moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
+the registry side has never gone wrong.
 
 
 ## Open
@@ -1024,21 +1063,3 @@ above, one layer down. The only exclusion anywhere is `.d.ts`, which carries no 
 
 It stays out because it **changes the artifact** and roughly doubles build time, and because there is no
 evidence of demand. Attestation and signing, which used to share this entry, are now done — see D15.
-
-### D26 — Docker Hub tag immutability stays off
-
-**Answered 2026-09-04: no.** The switch is off and it stays off. Recorded as a decision rather than left as
-an open question, because an open question with no value is worse than either answer.
-
-**What it would have bought:** a published release tag that cannot be overwritten. **What it costs is the
-reason not to.** There is no undo. An immutable tag cannot be deleted either, so a release tag pushed by
-mistake is permanent, and turning it on safely means rehearsing it on a throwaway repository first.
-
-**The stored rule is `.*`, and that is what makes the switch dangerous here rather than merely irreversible.**
-`.*` matches `latest` and `3.0`, the two tags every release moves. Enabling it against that rule would freeze
-the moving tags on the first release after it, which is exactly the mechanism D25 depends on. **If this is
-ever reopened, the rule is the first thing to correct** - released versions only, never the moving tags.
-
-**What already protects the release.** D24 - a tag ruleset that nobody bypasses, so a release tag cannot be
-moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
-the registry side has never gone wrong.

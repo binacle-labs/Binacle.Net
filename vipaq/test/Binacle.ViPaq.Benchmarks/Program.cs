@@ -9,7 +9,7 @@ internal class Program
 {
 	static void Main(string[] args)
 	{
-		// Start from the defaults but export only the GitHub markdown report — no csv/html clutter to curate.
+		// Start from the defaults but export only the GitHub markdown report. No csv/html clutter to curate.
 		var defaults = DefaultConfig.Instance;
 		var config = ManualConfig.CreateEmpty()
 			.AddColumnProvider(defaults.GetColumnProviders().ToArray())

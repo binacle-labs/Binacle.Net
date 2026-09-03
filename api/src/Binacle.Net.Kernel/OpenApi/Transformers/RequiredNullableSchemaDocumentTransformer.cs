@@ -63,7 +63,7 @@ internal class RequiredNullableSchemaDocumentTransformer : IOpenApiDocumentTrans
 				continue;
 			}
 
-			// Collapse `oneOf: [null, X]` down to X — a required property cannot be null here.
+			// Collapse `oneOf: [null, X]` down to X. A required property cannot be null here.
 			var valueBranch = branches.First(branch => !ReferenceEquals(branch, nullBranch));
 			schema.Properties[propertyName] = valueBranch;
 		}

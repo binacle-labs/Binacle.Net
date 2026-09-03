@@ -1,7 +1,7 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-09-02
+verified: 2026-09-04
 check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
 paths:
   - "sites/www/**"
@@ -93,7 +93,7 @@ reasons are `$sites/www-design#W8`.
 
 ## Every code block is a real response
 
-`_data/exchange.yml` holds every request and response on the site, and the file says how to re-run them.
+`_data/exchange.yml` holds every request and response on the site. **How to re-run them is in the design records now**, not in the data file - its comments were moved out on 2026-09-04.
 Nothing is hand-written. **A response that looks plausible but is not what the API returns is the one lie
 this audience catches**, and they are the least likely to forgive it.
 
@@ -148,7 +148,7 @@ Any grid holding a code pane also needs `min-width: 0` on its children - a grid 
 
 ## The JavaScript, and there is very little
 
-`_js/main.ts`, about 770 bytes gzipped, two behaviours, both degrading cleanly:
+`_js/main.ts`, about 2.8 KB gzipped as `js/main.js`, two behaviours, both degrading cleanly:
 
 - **A theme toggle.** `packages/theme-switcher`, the same element the other three hosts use. The pre-paint
   read is *not* in this file — it is its own bundle, `js/theme-init.js`, loaded blocking in `<head>`.
@@ -175,8 +175,8 @@ what makes it one exchange instead of two code blocks; the verdict row is the wh
 rather than documentation. Code is two-tone only - keys muted, values full text, punctuation lighter. **No
 syntax rainbow.**
 
-**`sitemap.xml` lists this site's four pages and nothing else.** The old `/apps/*` paths will be served from
-here as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
+**`sitemap.xml` lists this site's four pages and nothing else.** The old `/apps/*` paths are served from here
+as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
 reports as an error.
 
 **The `docker run` line names `binacle/binacle-net:3.0`, and that tag is published** — v3.0.0 shipped on
@@ -201,6 +201,7 @@ them, which left a stray `-e` alone on a line in the middle of the primary conve
 takes row 2, and pushes the theme control onto a row of its own - a four-row, 200px header before the reader
 reaches anything. Placed explicitly it is 144px.
 
-**The redirects are not written yet.** Until they are, `/apps/`, `/apps/packing-demo/` and
-`/apps/protocol-decoder/` return 404 on a host that has answered them for three years. Do not tear down the
-current marketing site before they exist.
+**The old `/apps/*` paths redirect from `sites/www/_redirects`.** Six lines, each a 301 to the demo host:
+`/apps/packing-demo` to `/packing/`, `/apps/protocol-decoder` to `/vipaq/`, `/apps` to the demo root, each
+with and without the trailing slash. `_redirects` is in the `include:` list in `_config.yml`, so it ships
+with the build.

@@ -38,7 +38,7 @@ public static class BischoffSuiteScenarioProvider
 		=> scenarios[name];
 
 	// The bins these scenarios run against, one entry per ID. The API test host registers exactly this set as the
-	// `biscoff-suite` preset — see the note on CustomProblemsScenarioProvider.GetDistinctBins.
+	// `biscoff-suite` preset. See the note on CustomProblemsScenarioProvider.GetDistinctBins.
 	public static IReadOnlyList<TestBin> GetDistinctBins()
 		=> distinctBins;
 }

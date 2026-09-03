@@ -42,7 +42,7 @@ A ViPaq blob is a two-byte header followed by a body:
 
 Each byte has one job. Byte 0 says **how to read** the body; byte 1 says **how wide** its integers are.
 
-### 2.1 Byte 0 — form
+### 2.1 Byte 0 - form
 
 | Bits | Field | Values |
 |---|---|---|
@@ -55,7 +55,7 @@ Each byte has one job. Byte 0 says **how to read** the body; byte 1 says **how w
 byte0 = (Version << 6) | (Compressed << 5) | (Layout << 4)
 ```
 
-### 2.2 Byte 1 — widths
+### 2.2 Byte 1 - widths
 
 | Bits | Field | Values |
 |---|---|---|
@@ -70,8 +70,8 @@ byte1 = (BinDimensionsWidth << 6) | (ItemDimensionsWidth << 4) | (ItemCoordinate
 
 ### 2.3 Room to grow
 
-- `Version` claims code `0`; three codes remain. A change the flags and width codes cannot express — a different
-  compression codec, a new body shape — takes the next `Version`.
+- `Version` claims code `0`; three codes remain. A change the flags and width codes cannot express (a different
+  compression codec, a new body shape) takes the next `Version`.
 - `Compressed` and `Layout` describe *this* blob, not the format. An encoder chooses them per blob; a decoder
   obeys them. Both may vary between two blobs of the same `Version`.
 - Each width field has **two spare codes**, leaving room for a variable-length encoding (§4) with one code still
@@ -108,7 +108,7 @@ L L L ... | W W W ... | H H H ... | X X X ... | Y Y Y ... | Z Z Z ...
 
 Dimensions are at `ItemDimensionsWidth`, coordinates at `ItemCoordinatesWidth`, in both layouts. Columnar puts
 like magnitudes next to each other, which usually compresses better; row-major is easier to read in a hex dump.
-Neither is normative — the bit says which was used.
+Neither is normative. The bit says which was used.
 
 ## 4. Integer widths (`Width`)
 
@@ -118,8 +118,8 @@ Each of the three sections is stored at one width, chosen independently:
 |---|---|---|---|
 | `Eight` | `0` | 1 | 255 |
 | `Sixteen` | `1` | 2 | 65,535 |
-| reserved | `2` | — | — |
-| reserved | `3` | — | — |
+| reserved | `2` | - | - |
+| reserved | `3` | - | - |
 
 A decoder **MUST** reject width codes `2` and `3`.
 
@@ -134,7 +134,7 @@ A decoder **MUST** reject width codes `2` and `3`.
   the values it reads.
 
 **Selection (policy).** An encoder **SHOULD** pick the **smallest** width that holds the section's largest value:
-`Eight` if that value is ≤ 255, otherwise `Sixteen`. It **MAY** pick a wider one — a blob whose sections are
+`Eight` if that value is ≤ 255, otherwise `Sixteen`. It **MAY** pick a wider one. A blob whose sections are
 wider than they need to be is larger, but conformant, and decodes to the same input. This is what makes every
 width combination forceable for testing.
 
@@ -149,7 +149,7 @@ Every dimension and coordinate is an unsigned integer in **`[0, 65,535]`**.
 |---|---|
 | Bin dimensions L, W, H | **MUST** be ≥ 1 |
 | Item dimensions L, W, H | **MUST** be ≥ 1 |
-| Item coordinates X, Y, Z | **MUST** be ≥ 0. **Zero is valid** — an item flush to the bin origin. |
+| Item coordinates X, Y, Z | **MUST** be ≥ 0. **Zero is valid**, an item flush to the bin origin. |
 | All of the above | **MUST** be ≤ 65,535 |
 | Item count | **MUST** be ≤ 65,535 |
 
@@ -161,8 +161,8 @@ A decoder has **nothing to range-check**: a value read from an 8- or 16-bit fiel
 
 `Compressed` (§2.1) records what the encoder did. It does not tell a decoder to guess.
 
-- `Compressed = 0` — the bytes after the header are the body.
-- `Compressed = 1` — the bytes after the header are a **compressed stream** whose contents are the body.
+- `Compressed = 0` - the bytes after the header are the body.
+- `Compressed = 1` - the bytes after the header are a **compressed stream** whose contents are the body.
 
 The codec is fixed by `Version`. There is no codec field, so changing the codec takes the next `Version`.
 
@@ -174,24 +174,24 @@ stream are a malformed blob.
 
 **Choosing.** An encoder **SHOULD** compress the body, keep whichever of the two is shorter, and set `Compressed`
 to say which it kept. This never inflates a blob and has no threshold to get wrong. An encoder **MAY** compress
-unconditionally or never — for measurement, or because it knows its data. Any such blob is still conformant: the
+unconditionally or never, for measurement, or because it knows its data. Any such blob is still conformant: the
 bit is normative, the policy is not.
 
 A decoder **MUST** accept both values regardless of what it would have chosen itself.
 
-### 6.1 Determinism — when bytes may be compared
+### 6.1 Determinism - when bytes may be compared
 
 Three things are the encoder's choice: the widths (§4), `Layout`, and `Compressed`. All three are recorded in the
-header, so a decoder never has to guess — but it means **two conformant encoders given the same input may emit
+header, so a decoder never has to guess, but it means **two conformant encoders given the same input may emit
 different blobs**, and both are right. Byte-comparison is only meaningful once the header is pinned.
 
-- **Same header, uncompressed** → the body is **byte-identical**, always, in every implementation. This is the
+- **Same header, uncompressed** -> the body is **byte-identical**, always, in every implementation. This is the
   only exact-comparison contract, and it is what golden test vectors rest on. A vector that expects exact bytes
   **MUST** state the full header it expects them under.
-- **Compressed** → bytes **MUST NOT** be compared at all. The same body, the same codec, and two different
+- **Compressed** -> bytes **MUST NOT** be compared at all. The same body, the same codec, and two different
   compressor builds can each emit different, equally valid streams. Never rely on compressed bytes being equal
   *or* unequal.
-- **Any blob, either way** → the contract is **decode-to-input**: any conformant blob **MUST** decode back to the
+- **Any blob, either way** -> the contract is **decode-to-input**: any conformant blob **MUST** decode back to the
   original bin and items, in the original order, in every implementation.
 
 ## 7. Decoding order
@@ -210,7 +210,7 @@ A decoder **MUST**:
 
 No value check is needed while reading. An 8- or 16-bit field cannot hold an out-of-range value.
 
-## 8. Errors — what MUST be rejected
+## 8. Errors - what MUST be rejected
 
 | Condition | Side |
 |---|---|
@@ -245,9 +245,9 @@ encodes them.
 
 Input: bin `10x20x30`, one item `1x2x3` at `(4,5,6)`.
 
-- Every value ≤ 255 → all three sections are `Eight` (`0`).
-- Byte 0: `Version 0`, `Compressed 0`, `Layout 0` → `0b00_0_0_0000` = `0x00`.
-- Byte 1: all widths `0` → `0x00`.
+- Every value ≤ 255 -> all three sections are `Eight` (`0`).
+- Byte 0: `Version 0`, `Compressed 0`, `Layout 0` -> `0b00_0_0_0000` = `0x00`.
+- Byte 1: all widths `0` -> `0x00`.
 
 ```
 00 00  01 00  0A 14 1E  01 02 03  04 05 06
@@ -259,7 +259,7 @@ Input: bin `10x20x30`, one item `1x2x3` at `(4,5,6)`.
 
 Input: bin `1000x2x3`, one item `1x1x1` at `(0,0,0)`.
 
-- Bin max `1000` → `Sixteen` (`1`). Item dims max `1` → `Eight`. Item coords max `0` → `Eight`.
+- Bin max `1000` -> `Sixteen` (`1`). Item dims max `1` -> `Eight`. Item coords max `0` -> `Eight`.
 - Byte 0: `0x00`. Byte 1: `0b01_00_00_00` = `0x40`.
 - Bin dims as little-endian `uint16`: `1000` = `E8 03`, `2` = `02 00`, `3` = `03 00`.
 
@@ -274,7 +274,7 @@ This shows both the little-endian order and a `0` coordinate being valid.
 
 Input: bin `10x20x30`; items `1x2x3` at `(0,0,0)` and `4x5x6` at `(1,2,3)`.
 
-- All sections `Eight`. Byte 0: `Layout 1` → `0b00_0_1_0000` = `0x10`. Byte 1: `0x00`.
+- All sections `Eight`. Byte 0: `Layout 1` -> `0b00_0_1_0000` = `0x10`. Byte 1: `0x00`.
 
 ```
 10 00  02 00  0A 14 1E  01 04  02 05  03 06  00 01  00 02  00 03
@@ -287,7 +287,7 @@ The same items row-major would be `01 02 03 00 00 00  04 05 06 01 02 03`.
 
 An implementation conforms if it:
 
-1. Encodes and decodes every structure in §1–§6 exactly as written.
+1. Encodes and decodes every structure in §1-§6 exactly as written.
 2. Rejects every condition in §8.
 3. Round-trips: decoding an encoded blob returns the original bin and items, in the original order.
 4. Reproduces the worked examples in §10 byte for byte (they pin their full header).
@@ -301,4 +301,4 @@ language.
 
 ## 12. Open questions
 
-None. The one that stood here — the compression codec for `Version = 0` — is settled: raw DEFLATE (§6).
+None. The one that stood here, the compression codec for `Version = 0`, is settled: raw DEFLATE (§6).

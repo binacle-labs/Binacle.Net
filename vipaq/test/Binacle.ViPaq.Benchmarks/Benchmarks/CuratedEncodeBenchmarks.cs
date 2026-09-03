@@ -8,8 +8,8 @@ using Binacle.ViPaq.TestsKernel.ViPaq;
 
 namespace Binacle.ViPaq.Benchmarks.Benchmarks;
 
-// Encode cost over the curated scenarios, uncompressed: turning a scenario into bytes. The codec is NoOp — the
-// body is passed straight through — so this times the format alone, not compression. ViPaq is split into its two
+// Encode cost over the curated scenarios, uncompressed: turning a scenario into bytes. The codec is NoOp and the
+// body is passed straight through, so this times the format alone, not compression. ViPaq is split into its two
 // layouts, row-major and columnar, against the protobuf baseline. Compression time (deflate vs gzip) is a
 // separate question, to be measured when the codec is raced on time.
 [MemoryDiagnoser]

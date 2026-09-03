@@ -20,7 +20,7 @@
         files the TypeScript suite reads. The vectors are foldered to mirror the Providers/ folders
         (header, interop, protocol, serialization, width); LogicalName flattens each file's path to
         "Data.<folder>.<file>" (e.g. "Data.serialization.exact-bytes.json"), and VectorReader reads
-        them by that name — mapping the '/' in the path a caller passes to '.'. Link keeps these
+        them by that name, mapping the '/' in the path a caller passes to '.'. Link keeps these
         out-of-project files under a virtual Data/ folder in the IDE instead of the project root.
     -->
     <ItemGroup>

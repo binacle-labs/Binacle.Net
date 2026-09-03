@@ -1,6 +1,6 @@
 name: binacle-net-volume
 
-# Simple — the locally built image on its own, with the ServiceModule on SQLite. No telemetry, no extra
+# Simple: the locally built image on its own, with the ServiceModule on SQLite. No telemetry, no extra
 # containers. Two stacks out of this one file, differing only in where /app/data goes:
 #
 #   volume  just image up volume   the named volume binacle-net-data. Nothing to set up
@@ -15,7 +15,7 @@ name: binacle-net-volume
 # BINACLE_DATA_DIR is the switch and `just image up bind` sets it. Set it yourself to bind elsewhere - it must
 # start with ./ or / or compose reads it as a volume name and refuses to start. Unset is the named volume.
 #
-# Log in as admin@binacle.net / B1n4cl3Adm!n — seeded on first start by a startup task.
+# Log in as admin@binacle.net / B1n4cl3Adm!n, seeded on first start by a startup task.
 
 configs:
   # The ServiceModule validates these options at startup, so it will not boot without them.
@@ -47,7 +47,7 @@ services:
       - SERVICE_MODULE=True
       - HealthChecks__Enabled=True
       - PackingLogs__Enabled=True
-      # Storage providers are tried in order — AzureStorage, Postgres, Sqlite — first with a connection
+      # Storage providers are tried in order (AzureStorage, Postgres, Sqlite), first with a connection
       # string wins. Only this one is set here. The db file lands in /app/data, next to the logs.
       - SQLITE_CONNECTION_STRING=Data Source=/app/data/binacle-net-service.db;
 

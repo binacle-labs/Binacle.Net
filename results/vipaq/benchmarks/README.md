@@ -1,4 +1,4 @@
-# ViPaq — encode/decode speed
+# ViPaq - encode/decode speed
 
 BenchmarkDotNet reports for encoding and decoding, per mode (raw, deflate, gzip, and the no-op path that prices
 the compressed framing without the squeezing). Produced by `vipaq/test/Binacle.ViPaq.Benchmarks`, which writes to
@@ -6,6 +6,6 @@ its own build-local `BenchmarkDotNet.Artifacts`; copy the reports worth keeping 
 `results/lib/benchmarks/`.
 
 **Empty for now.** The size numbers are measured (see [../compression/](../compression/)), but the compression
-*time* has not been run yet — so which codec is fastest, as opposed to smallest, is still an open question.
+*time* has not been run yet, so which codec is fastest, as opposed to smallest, is still an open question.
 Drop the first reports here when that run lands, following the scratch-vs-curated convention in the
 [parent README](../../README.md).

@@ -1,4 +1,4 @@
-// mirrors src/headerNotation.ts (no direct C# test — the C# HeaderNotation is exercised indirectly; TS pins it
+// mirrors src/headerNotation.ts (no direct C# test. The C# HeaderNotation is exercised indirectly; TS pins it
 // directly here since the vectors depend on it). Every one of the 32 header combos must round-trip through
 // parse/format, and a malformed label must be rejected. Reuses header-bytes.json (notation + parsed header).
 import {parseHeader, formatHeader} from "../src/headerNotation";

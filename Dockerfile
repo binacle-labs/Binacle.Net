@@ -20,8 +20,8 @@ LABEL org.opencontainers.image.title="Binacle.Net" \
 ARG VERSION
 ENV BINACLE_VERSION=$VERSION
 
-# Npgsql probes for GSSAPI whenever it opens a connection. The app works without it — we authenticate with a
-# password, not Kerberos — but it prints "Cannot load library libgssapi_krb5.so.2" on every start, which reads
+# Npgsql probes for GSSAPI whenever it opens a connection. The app works without it, we authenticate with a
+# password, not Kerberos, but it prints "Cannot load library libgssapi_krb5.so.2" on every start, which reads
 # like a fatal error in the logs of anyone running the Postgres backend. Cheaper to ship the library than to
 # explain the message. Kept above the COPY so it caches across builds.
 RUN apt-get update \

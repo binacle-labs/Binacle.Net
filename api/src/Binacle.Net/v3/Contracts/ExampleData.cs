@@ -68,7 +68,7 @@ internal static class ExampleData
 		new() { ID = "box_1", Quantity = 2 },
 	];
 
-	// An item larger than any example bin — what triggers an early-fail check. Not one of Items().
+	// An item larger than any example bin: what triggers an early-fail check. Not one of Items().
 	internal static List<UnfittedBox> OversizedItemUnfitted() =>
 	[
 		new() { ID = "large_box", Quantity = 1 },

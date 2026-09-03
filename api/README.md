@@ -9,8 +9,8 @@ over versioned REST endpoints.
 
 | Path | What it is |
 |---|---|
-| `src/Binacle.Net` | Entry point — `Program.cs`, versioned endpoint groups (v3, v4) |
-| `src/Binacle.Net.Kernel` | Shared building blocks — endpoint registration, validation, OpenAPI, feature flags |
+| `src/Binacle.Net` | Entry point - `Program.cs`, versioned endpoint groups (v3, v4) |
+| `src/Binacle.Net.Kernel` | Shared building blocks - endpoint registration, validation, OpenAPI, feature flags |
 
 **Modules**
 
@@ -18,14 +18,14 @@ over versioned REST endpoints.
 |---|---|---|
 | `src/Binacle.Net.DiagnosticsModule` | always on | Logging, OpenTelemetry, health checks |
 | `src/Binacle.Net.ServiceModule` | `SERVICE_MODULE` | JWT auth, rate limiting, account management |
-| `src/Binacle.Net.ServiceModule.Domain` | — | Domain layer for ServiceModule |
-| `src/Binacle.Net.ServiceModule.Infrastructure` | — | Database backends (SQLite / PostgreSQL / Azure Tables) |
-| [`src/Binacle.Net.UIModule`](src/Binacle.Net.UIModule) | `UI_MODULE` | Razor Pages demo host — packing demo and ViPaq decoder |
+| `src/Binacle.Net.ServiceModule.Domain` | - | Domain layer for ServiceModule |
+| `src/Binacle.Net.ServiceModule.Infrastructure` | - | Database backends (SQLite / PostgreSQL / Azure Tables) |
+| [`src/Binacle.Net.UIModule`](src/Binacle.Net.UIModule) | `UI_MODULE` | Razor Pages demo host - packing demo and ViPaq decoder |
 
 ## 🔢 API versions
 
-- **v3** (`/api/v3`) — stable. Do not modify.
-- **v4** (`/api/v4`) — active development.
+- **v3** (`/api/v3`) - stable. Do not modify.
+- **v4** (`/api/v4`) - active development.
 
 Each version offers **fit** (do all items fit?) and **pack** (pack as many as you can). See the
 root [README](../README.md) for what those mean.
@@ -50,4 +50,4 @@ Once running, the API serves under `/api/v3` and `/api/v4`. With the UIs enabled
 
 ## 🧩 Other
 
-- `requests/` — `.http` files for manual testing, grouped by version (`v3`, `v4`, `Service`).
+- `requests/` - `.http` files for manual testing, grouped by version (`v3`, `v4`, `Service`).

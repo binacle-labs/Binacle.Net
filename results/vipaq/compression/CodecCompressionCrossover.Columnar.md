@@ -1,9 +1,9 @@
-# ViPaq codec compression crossover — Columnar
+# ViPaq codec compression crossover - Columnar
 
-ViPaq stored size under each codec — raw (NoOp) next to deflate and gzip — so you can see where compressing a pack starts to pay and which codec wins. Ordered by item count.
+ViPaq stored size under each codec: raw (NoOp) next to deflate and gzip, so you can see where compressing a pack starts to pay and which codec wins. Ordered by item count.
 
 
-## Real scenarios — custom packs — Columnar
+## Real scenarios - custom packs - Columnar
 Real placed data, Columnar layout, all three codecs.
 
 | Scenario                                | Items | Widths b/i/c | Raw b64 | Deflate b64 | Gzip b64 | Best    | Saved % |
@@ -32,7 +32,7 @@ Real placed data, Columnar layout, all three codecs.
 
 
 
-## Real scenarios — Bischoff suite — Columnar
+## Real scenarios - Bischoff suite - Columnar
 Real placed data, Columnar layout, all three codecs.
 
 | Scenario              | Items | Widths b/i/c | Raw b64 | Deflate b64 | Gzip b64 | Best    | Saved % |

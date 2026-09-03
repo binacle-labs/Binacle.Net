@@ -283,5 +283,10 @@ Both are still pullable. Under D4 no public surface names either, and under D3 n
 command — beta 1 was never signed, and beta 2 needs a string no page carries any more. So anyone who pulls one
 gets a failure with nothing anywhere to explain it.
 
-Deleting both tags once v3.0.0 is out is the clean end of it, and **it has a deadline**: Docker Hub tag
-immutability is off today, and an immutable tag cannot be deleted. Not decided.
+Deleting both tags is the clean end of it. **The deadline this entry claimed is gone** - Docker Hub tag
+immutability was answered no on 2026-09-04 and the switch stays off, so nothing is about to make these
+undeletable. The decision and its reversal condition are in the CI/CD ledger under D26.
+
+**Answered 2026-09-04: they go, in a few months.** Not urgent, because no public surface names a beta since
+the example pins moved to `3.0`. All eight `3.0.0-beta.*` tags still resolve, read off the registry the same
+day - 23 tags in the repository. **This is no longer an open question and the work has its own plan.**

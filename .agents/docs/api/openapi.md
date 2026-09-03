@@ -1,7 +1,7 @@
 ---
 id: api/openapi
 description: OpenAPI wiring — IOpenApiDocument, the Kernel transformers (JWT, 429, response descriptions, enum-as-string), what endpoint groups auto-wire, and the external OpenApiExamples package
-verified: 2026-08-14
+verified: 2026-09-04
 check: IOpenApiDocument, transformers, and OpenApiOptions extensions match api/src/Binacle.Net.Kernel/OpenApi/; group 500 wiring matches v4/ApiV4EndpointGroup.cs; RateLimiterResponseOperationTransformer checks the endpoint metadata only, and RateLimitedEndpointConvention in the ServiceModule is the only thing that attaches it
 also_update:
   - api/v4/add-endpoint
@@ -41,9 +41,18 @@ document's `Configure()`:
 | Extension | Wires | Effect |
 |---|---|---|
 | `AddResponseDescription()` | `ResponseDescriptionOperationTransformer` | Applies the per-endpoint response description set via the `.ResponseDescription(status, text)` endpoint extension, formatted by `ResponseDescription.Format` |
-| `AddJwtAuthentication()` | JWT document + operation transformers | Adds a `"Bearer"` security scheme and marks `[Authorize]` operations. No-ops when there's no auth scheme (ServiceModule off) — driven by `IOptionalDependency<IAuthenticationSchemeProvider>` |
+| `AddOperationIds()` | `OperationIdOperationTransformer` | Applies the operation id set via `.WithOperationId(...)`, off `OperationIdMetadata` |
+| `AddJwtAuthentication()` | `JwtBearerSecuritySchemeDocumentTransformer` + `JwtBearerSecuritySchemeOperationTransformer` | Adds a `"Bearer"` security scheme and marks `[Authorize]` operations. No-ops when there's no auth scheme (ServiceModule off) — driven by `IOptionalDependency<IAuthenticationSchemeProvider>` |
 | `AddRateLimiterResponse()` | `RateLimiterResponseOperationTransformer` | Adds a `429` response to operations with `[EnableRateLimiting]`, which only the ServiceModule attaches (see below) |
-| `AddEnumStringsSchema()` | `EnumStringsSchemaTransformer` | Renders enum properties as `string` schemas (and fills enum names for the nullable converters) |
+| `AddEnumStringsSchema()` | `EnumStringsSchemaTransformer` + `RequiredNullableSchemaDocumentTransformer` | Renders enum properties as `string` schemas (and fills enum names for the nullable converter) |
+| `AddNumericSchemas()` | `StringNumberUnionDocumentTransformer` + `SchemaRangeSchemaTransformer` | Numeric schemas, including the `[OpenApiSchemaRange]` attribute |
+| `AddProblemDetailsDescriptions()` | `ProblemDetailsDescriptionDocumentTransformer` | Descriptions on the shared problem-details schemas |
+| `AddRequiredNonNullableProperties()` | `RequiredNonNullableSchemaTransformer` | Marks non-nullable properties required, off the `[OpenApiRequireNonNullable]` attribute |
+
+**Not every document calls every one.** `ApiV4Document` calls all eight; `ApiV3Document` calls all but
+`AddRequiredNonNullableProperties`; `ServiceModuleApiDocument` calls only `AddResponseDescription`,
+`AddJwtAuthentication`, `AddRateLimiterResponse` and `AddEnumStringsSchema`. All three also call the package's
+`AddExamples()` and a document transformer of their own.
 
 ### The `429` follows the metadata, and the metadata follows the module
 
@@ -58,9 +67,11 @@ profile, so ServiceModule is off — that document already has no `v0` ServiceMo
 `/api/auth/token`, and it must have no `429` either, or it describes a shape that exists nowhere. A live instance
 running with the module on serves a document that does carry the `429`, correctly.
 
-Helpers in Kernel: `ResponseDescription.Format`, `HttpStatusDescriptions` (int → status name map),
-`OpenApiValidationProblemExample`, `ResponseDescriptionMetadata`, and the `.ResponseDescription(status, text)`
-endpoint-builder extension (`OpenApiRouteHandlerBuilderExtensions`).
+Helpers in Kernel (`OpenApi/Helpers`, `OpenApi/Models`, `OpenApi/Attributes`): `ResponseDescription.Format`,
+`HttpStatusDescriptions` (int -> status name map), `OpenApiValidationProblemExample`,
+`ResponseDescriptionMetadata`, `OperationIdMetadata`, the `[OpenApiRequireNonNullable]` and
+`[OpenApiSchemaRange]` attributes, and the `.ResponseDescription(status, text)` / `.WithOperationId(id)`
+endpoint-builder extensions (`OpenApiRouteHandlerBuilderExtensions`).
 
 ## What the endpoint group wires for you
 
@@ -91,7 +102,7 @@ version-local constant in `v4/Constants.cs` (and `v3/Constants.cs`).
 - `OpenApiExample.Create(...)`, `OpenApiOptions.AddExamples()`, `services.AddOpenApiExamples(...)`
 - Endpoint-builder helpers `.RequestExample<T>(...)`, `.ResponseExample<T>(...)`, `.ResponseExamples<T>(...)`
 
-From **Kernel**: `IOpenApiDocument`, the four `OpenApiOptions` extensions + their transformers,
+From **Kernel**: `IOpenApiDocument`, the eight `OpenApiOptions` extensions + their transformers,
 `.ResponseDescription(...)` (endpoint metadata), `AddOpenApiDocumentsFromAssemblyContaining<T>`, and the helpers
 listed above.
 

@@ -15,14 +15,14 @@ const widthCeilings = [
 describe("ProtocolWriter", () => {
 	describe("writes little-endian", () => {
 		// ports C#: Write8Bits_Narrows_T_And_Writes
-		test.each(uint8Cases)("8-bit — $name", ({value, bytes}) => {
+		test.each(uint8Cases)("8-bit - $name", ({value, bytes}) => {
 			const writer = new ProtocolWriter(1);
 			writer.write8Bits(value);
 			expectBytes(writer.buffer, bytes);
 		});
 
 		// ports C#: Write16Bits_Narrows_T_And_Writes_Little_Endian
-		test.each(uint16Cases)("16-bit — $name", ({value, bytes}) => {
+		test.each(uint16Cases)("16-bit - $name", ({value, bytes}) => {
 			const writer = new ProtocolWriter(2);
 			writer.write16Bits(value);
 			expectBytes(writer.buffer, bytes);

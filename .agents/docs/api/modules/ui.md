@@ -1,7 +1,7 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-08-27
+verified: 2026-09-04
 check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing
 also_update:
   - packages

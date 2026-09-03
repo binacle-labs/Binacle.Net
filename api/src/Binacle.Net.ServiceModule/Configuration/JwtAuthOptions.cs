@@ -39,7 +39,7 @@ internal class JwtAuthOptionsValidator: AbstractValidator<JwtAuthOptions>
 				"'{PropertyName}' must be at least {MinLength} characters. It signs every token the module "
 				+ "issues. You entered {TotalLength}."
 			);
-		// A non-nullable int, so NotNull could never fail and NotEmpty only meant "not 0" — which then reported
+		// A non-nullable int, so NotNull could never fail and NotEmpty only meant "not 0", which then reported
 		// a second time as the real rule below. The floor is the only rule there is.
 		RuleFor(x => x.ExpirationInSeconds)
 			.GreaterThanOrEqualTo(120)

@@ -1,9 +1,9 @@
-# ViPaq vs Protobuf — stored size (NoOp)
+# ViPaq vs Protobuf - stored size (NoOp)
 
-Uncompressed baseline — the codec passes the body through, so these are raw sizes. Real placed data (offline FFD), each set shown per layout.
+Uncompressed baseline. The codec passes the body through, so these are raw sizes. Real placed data (offline FFD), each set shown per layout.
 
 
-## Real scenarios — custom packs — Row
+## Real scenarios - custom packs - Row
 Real placed data, NoOp codec, Row layout.
 
 | Scenario                                | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -32,7 +32,7 @@ Real placed data, NoOp codec, Row layout.
 
 
 
-## Real scenarios — custom packs — Columnar
+## Real scenarios - custom packs - Columnar
 Real placed data, NoOp codec, Columnar layout.
 
 | Scenario                                | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -61,7 +61,7 @@ Real placed data, NoOp codec, Columnar layout.
 
 
 
-## Real scenarios — Bischoff suite — Row
+## Real scenarios - Bischoff suite - Row
 Real placed data, NoOp codec, Row layout.
 
 | Scenario              | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -769,7 +769,7 @@ Real placed data, NoOp codec, Row layout.
 
 
 
-## Real scenarios — Bischoff suite — Columnar
+## Real scenarios - Bischoff suite - Columnar
 Real placed data, NoOp codec, Columnar layout.
 
 | Scenario              | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |

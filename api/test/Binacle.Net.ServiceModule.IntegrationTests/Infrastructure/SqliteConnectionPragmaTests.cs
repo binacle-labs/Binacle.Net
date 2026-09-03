@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Binacle.Net.ServiceModule.IntegrationTests.Infrastructure;
 
 // WAL and busy_timeout are not Microsoft.Data.Sqlite connection-string keywords, so the SQLite provider sets
-// them by PRAGMA on open. This pins that it does — but only when SQLite is the configured backend; on the
+// them by PRAGMA on open. This pins that it does, but only when SQLite is the configured backend; on the
 // Postgres/Azure runs no SqliteConnection is registered and the test skips.
 public class SqliteConnectionPragmaTests
 {

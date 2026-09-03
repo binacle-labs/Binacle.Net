@@ -7,7 +7,7 @@ namespace Binacle.Net.v4.Contracts;
 // dimensions are rotations of the requested ones.
 internal static class ExampleData
 {
-	// Every example bin is this shape unless it is one of a set — see Bins.
+	// Every example bin is this shape unless it is one of a set. See Bins.
 	private const int binLength = 10;
 	private const int binWidth = 40;
 	private const int binHeight = 60;

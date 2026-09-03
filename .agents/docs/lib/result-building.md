@@ -1,7 +1,7 @@
 ---
 id: lib/result-building
 description: OperationResultBuilder — how OperationResult is constructed, status rules, volume percentages, and integrity checks
-verified: 2026-08-19
+verified: 2026-09-04
 check: The builder's methods, status branches, integrity checks and rounding match lib/src/Binacle.Lib/Models/OperationResultBuilder.cs; the entry point matches ExtensionMethods/AlgorithmResultBuilderExtensions.cs; OperationResult and its enums are still in shared/src/Binacle.Packing/Models/OperationResultStatus.cs
 paths:
   - "lib/src/Binacle.Lib/Models/OperationResultBuilder.cs"

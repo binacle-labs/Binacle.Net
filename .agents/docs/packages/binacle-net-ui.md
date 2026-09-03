@@ -1,7 +1,7 @@
 ---
 id: packages/binacle-net-ui
 description: packages/binacle-net-ui — Alpine.js components + Three.js visualizer for the packing demo. Components, plugins, model layers, and the window.binacle global.
-verified: 2026-08-27
+verified: 2026-09-04
 check: Every Alpine.data name in src/core/ appears in the component table and vice versa; the two plugins register exactly what is listed; the model-layer folders and the utils split match src/; utils/sampleData.ts still carries its generated-do-not-edit line and randomize still steps a sampleIndex rather than rolling; the hardcoded endpoint in core/packingDemo.ts is still the one named here; the suite/test/coverage figures still match `npx jest --selectProjects binacle-net-ui --coverage`
 also_update:
   - packages
@@ -128,7 +128,7 @@ pick the same one, is in the packing-demo design record (`$sites/packing-demo-se
 ## Tests
 
 `just test ts_binacle-net-ui_unit`. jsdom, because the components read `document` and `window` even where the
-logic under test does not. **20 suites, 349 tests, 70.53% of lines** — measured 2026-08-27.
+logic under test does not. **20 suites, 350 tests, 70.62% of lines** — measured 2026-09-04.
 
 `tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is
 the Alpine half: each component factory is a plain object, so a test calls it directly with a stub `$dispatch`

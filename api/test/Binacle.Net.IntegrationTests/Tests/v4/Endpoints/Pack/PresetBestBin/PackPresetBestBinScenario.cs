@@ -10,7 +10,7 @@ namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetBestBin;
 // the scenario's result cannot be asserted directly. What must hold is the selection invariant: the scenario's
 // bin is one of the candidates, and BestBin scores any fully packed result above every partial one, so if the
 // items pack fully into the scenario's bin the answer must be fully packed. Unlike smallest, the winning bin
-// need not be the small one — highest utilization decides.
+// need not be the small one. Highest utilization decides.
 [Trait("Scenario Tests", "Actual calculation for the algorithms")]
 public class PackPresetBestBinScenario
 {

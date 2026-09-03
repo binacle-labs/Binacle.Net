@@ -1,7 +1,7 @@
 ---
 id: api/v4/contracts
 description: Request/response contract types, validators, and OpenAPI examples for v4 (v3 follows the same shape)
-verified: 2026-08-19
+verified: 2026-09-04
 check: Types and validators match api/src/Binacle.Net/v4/Contracts/; mappers match v4/ExtensionMethods/; every enum named here resolves to the assembly it is attributed to, and the BinResponseBase.From body matches field for field
 also_update:
   - api/v4

@@ -12,7 +12,7 @@ rules:
   # generated-SDK sample - it ships straight into someone's code.
   oas3-valid-media-example: error
 
-  # Built-in rules raised to errors — these back the SDK-grade guarantees a generated client relies on.
+  # Built-in rules raised to errors. These back the SDK-grade guarantees a generated client relies on.
   operation-operationId: error
   operation-operationId-unique: error
   operation-tag-defined: error
@@ -49,7 +49,7 @@ rules:
 
   # ServiceModule paths must never appear in the generated documents. Generation runs with no launch profile,
   # which keeps ServiceModule off; a run under a profile that turns it on produces a valid-looking document
-  # with an extra path, and that failure is silent — nobody diffs a swagger document by eye.
+  # with an extra path, and that failure is silent. Nobody diffs a swagger document by eye.
   # /api/auth/token is the only ServiceModule path confirmed to leak this way: it has no WithGroupName, so
   # ASP.NET's default rule puts it in every document. ServiceModule's other routes (/api/admin/...) declare
   # WithGroupName("service") and stay out of v3/v4, so they are not checked here.
@@ -63,7 +63,7 @@ rules:
     then:
       function: undefined
 
-  # Numeric fields must not be documented as an [integer, string] / [number, string] union — that makes a
+  # Numeric fields must not be documented as an [integer, string] / [number, string] union. That makes a
   # generated SDK type every dimension as `int | string`. Collapse to the numeric type instead.
   binacle-no-numeric-string-union:
     description: "Numeric fields must not be typed as a string union."

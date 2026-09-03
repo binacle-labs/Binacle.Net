@@ -1,5 +1,5 @@
 // SHAPE 1 consumer.  ports C#: DecodeInvalidTests
-// The test file is pure assertions — the parsing lives in providers/decodeInvalid.ts.
+// The test file is pure assertions. The parsing lives in providers/decodeInvalid.ts.
 
 import ViPaqSerializer from "../src/ViPaqSerializer";
 import {decodeInvalidCases} from "./providers/DecodeInvalid";

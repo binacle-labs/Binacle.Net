@@ -55,6 +55,14 @@ already gone wrong or are reserved for change:
 `configuration-basics.md` is the model to copy: it teaches the mechanism with entirely invented names
 (`AModule`, `Settings__Logs__Retention`), so it has nothing to go stale, and it defers on the specifics.
 
+**One exception, and it is forced rather than chosen.** `generate-a-client.md` names a version and an
+endpoint path, because the commands on it fetch a published OpenAPI document and there is no version-free URL
+to fetch. `/version/latest/` is a meta-refresh page, not a folder: `/version/latest/swagger/v3.json` returns
+404 while `/version/v3.0.x/swagger/v3.json` returns 200 - measured 2026-09-04. The page renders the version
+through `{{ site.data.versions.current }}`, so it moves with the site rather than being typed, and it tells
+the reader to swap the segment. **A page that has to name a real file is not the same as a page that names a
+version out of habit.**
+
 Two mechanical notes for a common page that needs to point at a versioned one. It has no `version` in its front
 matter, so **`vlink` cannot be used** — build the URL from `site.data.versions.current` instead, the same way
 `_layouts/redirect.html` and `_includes/sidebar.html` do, and it follows `current` with no edit. And never
@@ -193,12 +201,17 @@ so links stay correct across versions.
 
 ## JS and Vendor Libs
 
-Webpack bundles `sites/docs/_js/main.js` → `sites/docs/js/main.js` (entry `main`, ts-loader for `.ts`).
+Webpack bundles `sites/docs/_js/main.js` → `sites/docs/js/main.js` (entry `main`, ts-loader for `.ts`). A
+`vendors` split chunk is configured but its `minSize` is 20000, so a built site is `main.js` alone. A second
+config in the same file builds `_js/theme-init.ts` → `js/theme-init.js`, the pre-paint theme read loaded
+blocking in `<head>`; it is its own config, not a second entry, because that script has to be one
+self-contained file with no runtime or vendors chunk.
 
 **`clean` is on only for a production build** (`env.build=dist`), not in watch mode. Watch shares
 `sites/docs/js/` with a running jekyll, and deleting a file jekyll has already listed makes its next `File.stat`
 raise `ENOENT` and kills `just serve docs`. So a watch run leaves stale bundles behind on purpose;
-`just build docs` is what clears them.
+`just build docs` is what clears them. The production `clean` keeps `theme-init.js`, because the two configs
+run in parallel into the one directory.
 
 Vendor libs the docs site loads:
 - BeerCSS — theming (`/lib/beercss/`, via `sites/docs/_data/includes.yml`)
