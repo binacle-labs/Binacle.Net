@@ -1,0 +1,72 @@
+name: Packing result looks wrong
+description: The API answered, but the answer does not look right
+labels: ["packing result"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Read this first - it saves you writing the report.**
+
+        A **yes** is reliable: if Binacle.Net says the items fit, they fit, and the pack endpoints show you
+        where. A **no** is not a proof - the algorithms are heuristics, so there may be an arrangement they
+        did not find. A no you disagree with is still worth sending, because it is how the heuristics get
+        better. Say which arrangement you believe works.
+
+        Binacle.Net works one box at a time. "It did not split my order across two boxes" is scope rather
+        than a wrong result.
+
+  - type: input
+    id: version
+    attributes:
+      label: Image tag or version
+      placeholder: "3.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: endpoint
+    attributes:
+      label: Endpoint
+      placeholder: /api/v3/fit/by-custom
+    validations:
+      required: true
+
+  - type: dropdown
+    id: algorithm
+    attributes:
+      label: Algorithm
+      options:
+        - FFD
+        - WFD
+        - BFD
+        - Best - v4 only
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: The request
+      description: The full body, exactly as sent. Real dimensions matter; product names do not.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: response
+    attributes:
+      label: The response
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is wrong
+      description: >
+        If you are saying the items do fit, give the arrangement that works - which item sits where, or a
+        sketch. If an item came back in a position that overlaps another or leaves the box, say which.
+    validations:
+      required: true

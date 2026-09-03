@@ -4,11 +4,16 @@ description: Post-release - what to look at once v3.0.0 is out, what the release
 
 # Post-release - v3.0.0
 
-**Status:** Open once `v3.0.0` is tagged and the pipeline has run. **None of it gates anything** - the release
-is already out by the time this file opens.
+**Status:** `v3.0.0` was tagged on 2026-09-01 and the pipeline ran green. **Open. None of it gates anything.**
 
-**A pointer surface, like the release file.** Where a row names a plan, the plan holds the work. Where a row
-has no plan, it is a single mechanical act with a known answer and it lives here.
+**Where it stands, 2026-09-02.** Everything under *Things to look at* that a command can answer has been run
+and passes - the image, the three names on one digest, the signature, the published verify commands, the
+Docker Hub page, the docs host, the beta grep. **What is left there needs a browser.** Under *Things to do*,
+job 1 is done and committed, job 2 is one deploy away, job 3 is a decision, and job 4 has not started.
+
+**A pointer surface. `release-v3.0.0.md` is deleted** - this file is what is left of the release set. Where a
+row names a plan, the plan holds the work. Where a row has no plan, it is a single mechanical act with a known
+answer and it lives here.
 
 **Three lists, and they are in the order they should be worked.**
 
@@ -32,33 +37,37 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 
 ### Check the release landed
 
-- [ ] **Run the published image and check it answers.** `just smoke all binacle/binacle-net:3.0.0`. About a
-      minute, nothing to bring up.
+- [x] **Ran 2026-09-02 - all profiles green.** `just smoke all binacle/binacle-net:3.0.0`, 27 requests in the
+      full profile, no failures.
 
       **This confirms, it does not protect.** The pipeline already runs and checks the staging copy before
       anything is copied across, so a broken image cannot reach Docker Hub. What this still buys is the one
       thing the pipeline cannot check: that the **copy** landed something that runs, not just something with
       the right ID.
 
-- [ ] **Check that `3.0` and `latest` now point at the new image.** **This is the one thing no test release
-      could rehearse.** A test release publishes its own exact name and nothing else, so `3.0` and `latest`
-      are created for the first time here. Until now `latest` meant `2.1.1`.
+- [x] **`3.0` and `latest` are on the new image - read off the registry 2026-09-02.** Both created for the
+      first time by this release; until now `latest` meant `2.1.1`. **This is the one thing no test release
+      could rehearse.** It also closed the last two boxes of the release-by-dispatch plan, which is now deleted
+      - the scratch-repo run it was blocked on was never needed, because the real release proved the same step.
+      The design record is D25.
 
-- [ ] **Check all three names point at exactly the same image.**
-      `docker buildx imagetools inspect binacle/binacle-net:3.0.0 --format '{{ .Manifest.Digest }}'`, then the
-      same for `3.0` and `latest`. Three identical strings.
+- [x] **All three names are one image - 2026-09-02.** `3.0.0`, `3.0` and `latest` all report
+      `sha256:974f3dda3923`, 105986171 bytes, published 2026-09-01.
 
-- [ ] **Check the signature and the build record on the real `3.0.0`.**
-      `cosign verify binacle/binacle-net:3.0.0` with **both** the certificate-identity regexp and the OIDC
-      issuer - the identity flag is the entire value, since anyone with a GitHub account can sign anything.
-      Then `docker buildx imagetools inspect` for the SBOM and provenance entries.
+- [x] **Signed, and the build record is there - `just image verify 3.0.0` PASS, 2026-09-02.** Signed by the
+      release workflow on `refs/heads/main`, a 166-package SBOM, and provenance naming run
+      `33553918851`. Revision `150b61ed`, base `mcr.microsoft.com/dotnet/aspnet:10.0`, runs as `app` (1654),
+      4 `System.*.dll` in `/app`. **The identity flag is the entire value**, since anyone with a GitHub
+      account can sign anything.
 
       **Docker Hub only.** Only the release workflow touches the staging registry, so nothing ever reads the
       staging copy's signature. This passed on every test release including `3.0.0-beta.5`, under the same
       identity v3.0.0 uses. **All that is new is that the copy writes three names instead of one.**
 
-- [ ] **Check no image name got locked by accident.** Read `immutable_tags_settings` back from the repository
-      API. The publish should have written `3.0.0`, `3.0` and `latest` with nothing in its way.
+- [x] **Nothing got locked - read off the repository API 2026-09-02.** `immutable_tags_settings` is
+      `{"enabled": false, "rules": [".*"]}`, unchanged since 2026-08-13. The publish wrote `3.0.0`, `3.0` and
+      `latest` with nothing in its way. **The rule is still `.*`**, which is the value job 3 has to correct
+      before the switch is ever touched.
 
 - [x] **GitHub reads the licence as AGPL-3.0 - checked 2026-08-31, off the repository API.** `spdx_id:
       AGPL-3.0`, `key: agpl-3.0`. **It did not need the tag** - GitHub works it out on push, so the answer
@@ -71,46 +80,59 @@ test-release-then-real-release order, and put into plain English, 2026-08-26.**
 
 ### Read what the release put in front of people
 
-- [ ] **Read the repository's front page.** `README.md` is the most read file in the repo, and its pin
-      warning names `binacle/binacle-net:3.0` - a tag that only starts resolving with this release. **A wrong
+- [x] **Read 2026-09-02, and it is right.** `README.md`'s pin warning names `binacle/binacle-net:3.0` and
+      nothing else; the test-build line is gone. `3.0` resolves on Docker Hub to the release digest. **A wrong
       pin there outlives every other miss**, and a stale one would not fail loudly, because every tag this
-      project has ever published is still pullable. You have to look.
+      project has ever published is still pullable - which is why it had to be looked at.
 
-- [ ] **Read the Docker Hub page - the release wrote it, and that step had never run before.** No test
-      release reaches it; that job is skipped for them. So Docker Hub went from the old hand-written 2.x page
-      straight to this one in a single write. Check that the description names 3.x
-      rather than `2.1.1`, the version placeholders were substituted with real numbers, the hand-maintained
-      tag list is gone, the verification section is there, and the logo and categories took.
+- [x] **Read 2026-09-02, off the registry API, and it is right.** The page names `3.0.0` and nowhere names
+      `2.1.1`, no placeholder survived, there is no hand-maintained tag list, the verification section is
+      there, and both categories took - *API management* and *Developer tools*. **That step had never run
+      before**: no test release reaches it, so Docker Hub went from the old hand-written 2.x page straight to
+      this one in a single write.
 
-      **Run the quick start off the page itself** - the `docker run` and the `curl` - and check the response
+      **This closed `plans/ci-cd/dockerhub-overview.md`, which is now deleted.** It existed only to be
+      checked against the published page.
+
+- [ ] **Run the quick start off the page itself** - the `docker run` and the `curl` - and check the response
       matches what the page prints. It is the first thing most readers do, and **the response on it was
       taken from the test image**, so this is where you find out whether the two images agree.
 
       **This is an eyeball, not a rewrite.** If it turns into a rewrite, the pre-tag half did not happen.
+      **`just smoke all` passing on 2026-09-02 is not this check** - the smoke suite runs its own requests,
+      not the two commands printed on the page.
 
-- [ ] **Run the published verification commands from a clean shell.** **Check that the command printed on the
-      Docker Hub page and in `SECURITY.md` is the one that actually works** - a published command that fails
-      reads as our bug.
+- [x] **The published commands work as printed - 2026-09-02.** Run from a clean shell against `3.0`:
+      `cosign verify` printed the three checks and a certificate naming the release workflow on
+      `refs/heads/main`, and `imagetools inspect` printed the digest and the attestation manifest. **A
+      published command that fails reads as our bug**, and this one does not. The same block appears in
+      `SECURITY.md`, on the Docker Hub page and on the docs site's verifying page.
 
 - [ ] **Open the demo in a browser, from the published `3.0.0` image.** `docker run` it with `UI_MODULE=True`
       and open `/`, `/packing`, `/vipaq` and `/instance`. **The test release covered the same code; this
       confirms the copy to Docker Hub carried it.** Use the packing page like a visitor - type your own
       numbers, press Add bin, press Clear all - and check none of them puts an error box on the screen.
 
-- [ ] **Check the documentation site now shows v3.0.x.** `/version/latest/` should land on `v3.0.x` and the
-      version picker should show four versions. **The item most likely to be quietly skipped**, because
-      nothing fails when it is. **The rest of the live-site reads are in the docs plan** - they are not
-      repeated here.
+- [x] **The site shows v3.0.x - checked 2026-09-02.** `docs.binacle.net/version/latest/` answers 200 and
+      lands on `v3.0.x`, and all four version folders answer 200. The host serves from Cloudflare, so the
+      DNS move happened too.
 
-- [ ] **Check no public file still *pins* a test release.** `grep -rn "3\.0\.0-beta" --exclude-dir=.agents`
-      over the repo. **Five hits are correct and stay**, so read the list rather than the count:
+- [x] **The two v3.0.x page edits are published - 2026-09-02.** The release-notes page reads *"Released 1
+      September 2026"* and links `releases/tag/v3.0.0`; the verifying page no longer carries the moving-tag
+      sentence. **The four live-site reads passed the same day** - every version page carries a title, a
+      description and a canonical; `/version/latest/` is a meta-refresh page with `noindex` and a canonical
+      pointing at `/version/v3.0.x/`; the three sites' `robots.txt` files are identical apart from the
+      `Sitemap:` host; and all three manifests and their icons resolve.
+
+- [x] **Checked 2026-09-02 - exactly the five correct hits and nothing else.** `grep -rn "3\.0\.0-beta"
+      --exclude-dir=.agents` over the repo. Read the list rather than the count:
 
       | Hit | Why it stays |
       |---|---|
       | `NOTICE:16` | the AGPL boundary sentence - versions up to and including `3.0.0-beta.6` stay GPL-3.0 |
       | `CHANGELOG.md:30` | the same sentence |
       | `LICENSE.GPL-3.0/README.md:4` | the same sentence |
-      | `sites/docs/collections/_versions/v3.0.x/release-notes.md:53` | the same sentence |
+      | `sites/docs/collections/_versions/v3.0.x/release-notes.md:55` | the same sentence |
       | `tooling/ci/check-version.sh:10` | the string is inside a semver error message, not a pin |
 
       **Anything else is a real hit.** The `sites/www` comment that named two was deleted on 2026-08-31, and
@@ -131,67 +153,64 @@ there on 2026-08-31** so that no public surface names a beta the published verif
 shipped later the same day and the pins were left alone** - they all go to `3.0` here anyway, and moving nine
 files twice buys nothing.
 
-- [ ] **Six `image:` lines move from `3.0.0-beta.6` to `3.0`.**
-      `samples/docker/{minimal,quickstart,prod,service,full}/docker-compose.yml` and
-      `samples/kubernetes/minimal/binacle-deployment.yaml`.
+**All four boxes landed and are committed** - `4c735c25`, *post release pins*, 2026-09-02. Checked against
+the tree the same day.
+
+- [x] **Six `image:` lines are on `3.0`.**
       `grep -rn '3\.0\.0-beta' samples/` returns nothing.
-- [ ] **Drop the expiring comment in the same six files.** Each `image:` line carries two extra lines - *"Pinned
-      to the test build for now because `binacle/binacle-net:3.0` does not exist on Docker Hub yet - move to
-      the 3.0 minor tag once v3.0.0 is published."* Delete those two, leaving only *"Pinned on purpose - a
-      copied sample must not jump to a new major on the next pull."* **That reason expires the moment v3.0.0
-      publishes; the second one does not.**
-- [ ] **Rewrite the same reason in prose in `samples/README.md` and `samples/docker/README.md`.** Both name
-      `3.0.0-beta.6` and explain why; both become `3.0` with the explanation cut.
-- [ ] **Delete the test-build line from `README.md`.** The pin warning carries a second line - *"Until
-      `3.0.0` is published, the only name that resolves is `binacle/binacle-net:3.0.0-beta.6`."* The `3.0`
-      sentence above it is true on its own from this release onward, so the line becomes wrong the moment the
-      publish job goes green. `grep -n '3\.0\.0-beta' README.md` returns nothing.
+- [x] **The expiring comment is gone from all six**, leaving only *"Pinned on purpose - a copied sample must
+      not jump to a new major on the next pull."*
+- [x] **`samples/README.md` and `samples/docker/README.md` both name `3.0`** with the explanation cut.
+- [x] **The test-build line is out of `README.md`.** `grep -n '3\.0\.0-beta' README.md` returns nothing.
 
 **Someone who copies an example keeps that version forever**, which is why this is worth doing on the day
 rather than at leisure.
 
+**Committed, so job 4 is unblocked.** Nothing public names a beta any more, which is the condition job 4
+was waiting on.
+
 ### 2. Finish the documentation site's v3.0.x pages
 
-**`plans/sites/docs-v3-deploy.md`**, which is now down to two page edits and the live-site reads. The
-corrections, the swagger copies and the release-notes carry-over are done.
+**Done - 2026-09-02.** The site is on `docs.binacle.net` from Cloudflare, both page edits are published, and
+the four live-site reads passed. `/version/latest/` lands on `v3.0.x` and all four version folders answer.
 
-**The deploy itself is done** - the site runs on a temporary domain and the maintainer switches DNS to it when
-v3 lands. **Do not re-run it.**
+**What is left of that plan is one wording decision** - whether the v3.0.x quickstart page uses the canonical
+tool names. Everything else in it was cut on 2026-09-02.
 
-**Both page edits have to be after the tag** - the notes need the date and the `releases/tag/v3.0.0` link, and
-the command on `verifying-a-release.md` has to be run once against the real image. **The page already names
-`3.0` and `3.0.0`, and it names no beta**, so nothing on it needs re-cutting; what is left is running
-`just image verify 3.0.0` against the published image and pasting the real output where the page describes
-what a checked release looks like.
+**The instruction that used to sit here was stale and was not followed.** It said to run the verify and paste
+the real output onto `verifying-a-release.md`. The docs plan settled the opposite on 2026-08-31, later and
+more specifically: no page under `sites/docs` quotes a figure that expires. Pasting output would have
+reintroduced the fault that page was rewritten to fix. **The rule is now in the general decisions ledger under
+D4**, so it stops living in a plan that is nearly deleted. **The check was still worth running** - both
+commands, copied off the page, ran green from a clean shell on 2026-09-02.
 
-**This is the single most losable item in the release.** Nothing fails if the pages are left as they are - the
-notes just keep saying the release has not happened.
+**This was called the single most losable item in the release.** It was not lost.
 
-### 3. Decide whether image names can be locked
+### 3. Decide whether image names can be locked - **answered, no**
 
-**`plans/ci-cd/dockerhub-tag-immutability.md`** - it holds the trap, the pattern, why test releases are left
-out, and how to try it on a throwaway repository first.
+- [x] **Answered 2026-09-04: no. The switch stays off and the plan is deleted.** The decision and the trap
+      that produced it are in the CI/CD decisions ledger under D26 - the stored rule is `.*`, which would
+      freeze `latest` and `3.0`, and that is the first thing to correct if this is ever reopened.
 
-- [ ] **Correct the rule to released versions only, and read the value back from the API.** The stored value on
-      2026-08-13 was `".*"`, which would freeze `latest` and `3.0` - the two tags this release moves. The
-      switch is off, so nothing broke either way.
-- [ ] **Decide the switch, now that a real release is behind it.** Turning it on means the scratch repo first:
-      there is no undo, and an immutable tag cannot be deleted either, so a release tag pushed by mistake is
-      permanent. **If the answer is no, write that down as a decision and drop the plan.** Leaving it a
-      permanently open question is the one outcome with no value.
+### 4. Delete the old test images - **moved out 2026-09-04**
 
-### 4. Delete the old test images
+**Answered 2026-08-31 as "they go", and on 2026-09-04 the maintainer chose to leave them a few months.**
+That makes it standing work rather than a post-release check, so it is a plan now:
+`plans/ci-cd/delete-the-beta-images.md`, `state: deferred`. It holds the list of eight, including
+`3.0.0-beta.8` which is recorded in no other file.
 
-**Answered 2026-08-31: they go.** All six betas can be pulled today - the deletion several files already
-described had not happened. **Once `3.0.0` is live, delete every `3.0.0-beta.*` tag from Docker Hub.** Two
-reasons: betas 1 to 4 fail the published verify command, and a test build kept forever is a second answer to
-"which image do I pull".
+**Nothing here is waiting on it.** The example pins moved to `3.0` in `4c735c25`, so no public surface names
+a beta either way.
+
+---|---|
+| `3.0.0-beta.1` to `-beta.4` | fail the published verify command |
+| `3.0.0-beta.5`, `-beta.6`, `-beta.7` | pass it |
+| `3.0.0-beta.8` | 2026-09-01, recorded nowhere else |
 
 **This is what makes job 1 above mandatory rather than tidy-up.** After the deletions a beta pin names nothing
-at all, so the README line and the seven sample pins have to be off `3.0.0-beta.6` before the betas go.
-**Order: publish `3.0.0`, move the pins, then delete.** Whichever it is, the tag-policy table in
-`.github/dockerhub-overview.md` is where the answer belongs. **Putting this row here was my call - strike it if the answer is obviously "leave
-them".**
+at all. **Job 1 is done and committed - `4c735c25`, so nothing is in the way of the deletion.**
+The tag-policy table in `.github/dockerhub-overview.md` is where the answer belongs. **Putting this row here
+was my call - strike it if the answer is obviously "leave them".**
 
 ---
 
@@ -203,9 +222,9 @@ them.
 
 | Plan | What the release freed |
 |---|---|
-| `plans/api/packing-demo-bugs.md` | nine of the ten. **The submit button went in after all - checked 2026-08-27**, and both hosts render it. What is left is the browser pass on four, which rides on A1, plus the unfitted items: the inline block was rejected on layout the day it shipped, so the markup comes out of both templates and the answer becomes a tooltip. The strings stay in the package |
-| `plans/ci-cd/dockerhub-overview.md` | section 2, the logo and the categories - **done 2026-08-27**. Section 1, the quick start's response, was taken by the release as B3 and done 2026-08-31 with no edit needed. **What is left is reading the page the release publishes, then the file goes** |
-| `plans/api/ui-clients-off-v3.md` | **the module half only.** The site half still waits on `api.binacle.net` serving a v3.0.x image |
+| `plans/api/packing-demo-next.md` | nine of the ten. **The browser pass it was waiting on happened on 2026-08-27.** Two things are still open and neither waits on the release: the unfitted items, where the inline block was rejected on layout the day it shipped so the answer becomes a tooltip, and the submit button, which can stay disabled with no visualizer listening. The strings stay in the package |
+| `plans/ci-cd/dockerhub-overview.md` | **deleted 2026-09-02.** Its last box was reading the published page, and the page is read and correct. The reasoning behind what the page carries is in the CI/CD design records |
+| `plans/api/ui-clients-off-v3.md` | **both halves now.** `api.binacle.net` serves a 3.0.x image as of 2026-09-02 - AGPL in its OpenAPI document, `/openapi/v4.json` answers, `/openapi/v2.json` is gone. The blocker in its `waits-on:` is the shape, not the host |
 | `plans/sites/docs-client-generation.md` | nothing the release owned. **It has a blocker of its own** - every page on the site sits under a version folder and this page is not version-specific, so where it lives is unanswered. It sits here because the docs deploy is the natural next docs session |
 
 **`plans/_index.md` lists every plan, with its state and what it waits on.** Nothing above is a ranking.
@@ -214,9 +233,14 @@ them.
 
 ## Tidy up
 
-- [ ] **Delete `release-v3.0.0.md`** once the release is out and the docs are deployed.
-- [ ] **Move anything left in it back into a plan** rather than carrying it forward. If it was not done for the
-      release, it is standing work now.
+- [x] **`release-v3.0.0.md` is deleted - 2026-09-02.** Every gate row was done: B4 and B5 landed with the tag,
+      and B2 and B3's remaining boxes are covered by the checks above against the published image rather than
+      the test one. Its gotchas were checked against the design records first and none was the only copy - the
+      changelog mechanics are in `$ci-cd/release-pipeline`, label ownership under D13, the moving-tag gap
+      under D25.
+- [x] **Nothing was carried forward.** The one thing it held that had not landed was the browser pass on the
+      test image, and *Open the demo in a browser, from the published `3.0.0` image* above supersedes it -
+      checking the published image is strictly better than checking the one it was copied from.
 - [ ] **Delete this file** when the first two lists are clear. **The third list is not a reason to keep it** -
       those plans stand on their own.
 

@@ -1,7 +1,7 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-08-27
+verified: 2026-09-02
 check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
 paths:
   - "sites/www/**"
@@ -179,13 +179,13 @@ syntax rainbow.**
 here as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
 reports as an error.
 
-**The `docker run` line names a tag that is not published yet.** As of 23 Aug 2026 Docker Hub's newest tags
-are `3.0.0-beta.4` and `3.0.0-beta.3`, and `latest` still resolves to `2.1.1` from January. `binacle/binacle-net:3.0`
-appears when 3.0.0 ships. **The site must not go live before it does** — that command is the primary
-conversion on three pages and it fails with `manifest unknown` today.
+**The `docker run` line names `binacle/binacle-net:3.0`, and that tag is published** — v3.0.0 shipped on
+1 Sep 2026, so `3.0` and `latest` both resolve to it. That command is the primary conversion on three pages,
+and it used to fail with `manifest unknown`, which is why the site was held back until the tag existed. That
+gate is met.
 
-**Three links point at hosts that do not answer yet.** `demo.binacle.net` has no DNS, and it is linked from
-the nav, the footer and `/how-it-works/`. The link check runs offline and will not catch it.
+**`demo.binacle.net` answers**, and it is linked from the nav, the footer and `/how-it-works/`. The link check
+runs offline and will not catch a host that stops answering.
 
 **The code panes scroll on a phone and that is deliberate.** Wrapping them was tried and reverted: a wrapped
 line starts at a different indent from the line it continues, so the JSON's own structure stops being

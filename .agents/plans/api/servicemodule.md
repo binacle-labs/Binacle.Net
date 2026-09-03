@@ -1,7 +1,7 @@
 ---
 description: How far ServiceModule is taken - answered. One store, one project, refresh tokens
 state: proposed
-waits-on: "the v3.0.0 tag - it goes with the image split"
+waits-on: "nothing. The tag landed 2026-09-01. It goes with the image split in `packing-only-image.md` and still needs a yes, which is what `proposed` means"
 paths:
   - "api/src/Binacle.Net.ServiceModule/**"
   - "api/src/Binacle.Net.ServiceModule.Domain/**"

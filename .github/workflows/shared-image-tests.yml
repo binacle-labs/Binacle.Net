@@ -83,6 +83,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: just openapi lint
 
+      # The docs site's copies are hand-placed, so nothing else catches them drifting.
+      - name: Check - OpenAPI docs-site copies
+        if: ${{ !cancelled() }}
+        run: just openapi check-site-copies
+
       # !cancelled() so every test still runs after one fails - you see all the red, not just the first.
       # The quick unit tests go first, so an obvious break shows up before the integration hosts start.
       - name: Test - Binacle.Lib.UnitTests

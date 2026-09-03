@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions, ideas and anything not built yet
+    url: https://github.com/binacle-labs/Binacle.Net/discussions
+    about: Discussions is the place for these. It is also where to say it is running in something you built.
+  - name: Documentation
+    url: https://docs.binacle.net
+    about: The HTTP API, configuration, deployment and the ViPaq result format.
+  - name: Report a security vulnerability
+    url: https://github.com/binacle-labs/Binacle.Net/security/advisories/new
+    about: Private report, never a public issue.

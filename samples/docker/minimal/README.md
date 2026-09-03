@@ -1,70 +1,64 @@
-# Binacle.Net - Minimal Setup
-This sample demonstrates how to set up and run Binacle.Net with custom presets using Docker Compose.
-It is a minimal setup that showcases basic API functionality with customizable bin configurations.
+# Minimal
 
-## 🛠️ Prerequisites
-Before you start, make sure you have [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/) installed on your machine.
+**The smallest thing that answers.** The API on port 8080 with your own bin set, and nothing else switched on:
+no interactive docs, no web UI, no health checks, no accounts.
 
-## 📥 Getting Started
+Take it when you want the API with nothing in front of it. [quickstart](../quickstart) is the same thing with
+the docs and the packing demo on; [prod](../prod) is the one to run for real, with health checks and packing
+logs.
 
-1. **Clone the Repository**<br>
-   Clone or download this repository to your local machine.
-   ```bash
-   git clone https://github.com/binacle-labs/Binacle.Net.git
-   ```
-   Alternatively, download the contents of this folder directly.
-
-2. **Verify Files**<br>
-   Ensure the following files are present in the same directory:
-   - `docker-compose.yml` – Docker Compose configuration for all services.
-   - `Presets.json` – Your custom bin configurations.
-
-3. **Customize (Optional)**<br>
-   Edit the `Presets.json` file to adjust the bin configurations as per your needs.
-
-## 🚀 Running the Application
-In the project directory, start the application by running:
-```bash
-docker compose up
-```
-This will launch the Binacle.Net API with:
-- 📖 **Custom Presets**: Loaded from your `Presets.json`.
-- 📂 **Logs Folder**: A `./data/logs` folder will be created to store API logs for monitoring and debugging.
-
-##🌐 Accessing the API
-Once the containers are running, you can start to interact with the API on:
-```bash
-http://localhost:8080/
-```
-
-## ⚙️ Customizing Presets
-To modify bin configurations:
-1. Open the `Presets.json` file in your preferred editor.
-2. Make your changes to the bin definitions.
-3. Restart the application to apply the updates:<br>
-    ```bash
-    docker compose down
-    docker compose up
-    ```
-
-## 📂 Logs Folder
-When running the application, a `./data` folder will be created to store application data, including logs for monitoring and debugging. 
-It's important to ensure that the `./data` and `./data/logs` directories have write permissions for proper functionality.
-
-### 🔒 Setting Permissions
-Run the following commands to create the directory and set the required permissions:
+## 🚀 Run it
 
 ```bash
-mkdir -p ./data/logs
-sudo chmod -R 777 ./data
+docker compose up -d
 ```
-This will grant full access to `./data` and its subdirectories.
 
-> [!Note]
-> 777 gives full access to all users. Adjust permissions as needed for security.
+There is nothing to browse to. Ask it which of the two example bins holds a 30x20x15 item:
 
-## 📄 Additional Resources
-- [Binacle.Net Documentation](https://docs.binacle.net/)
-- [Docker Compose Reference](https://docs.docker.com/compose/)
+```bash
+curl -X POST http://localhost:8080/api/v3/fit/by-preset/custom-preset-1 \
+  -H 'Content-Type: application/json' \
+  -d '{"parameters":{"algorithm":"FFD"},"items":[{"id":"item-1","quantity":1,"length":30,"width":20,"height":15}]}'
+```
 
-Happy packing! 📦✨
+One result per bin in the preset. `bin-1` is 10 deep, so the item does not go in; `bin-2` is 20 deep and takes
+it:
+
+```json
+{"result":"Success","data":[
+  {"result":"NotAllItemsFit","bin":{"id":"bin-1","length":60,"width":40,"height":10},
+   "fittedItems":[],"unfittedItems":[{"id":"item-1","quantity":1}],
+   "fittedBinVolumePercentage":0,"fittedItemsVolumePercentage":0},
+  {"result":"AllItemsFit","bin":{"id":"bin-2","length":60,"width":40,"height":20},
+   "fittedItems":[{"id":"item-1","length":30,"width":20,"height":15}],"unfittedItems":[],
+   "fittedBinVolumePercentage":18.75,"fittedItemsVolumePercentage":100}]}
+```
+
+## ✏️ Change this first
+
+**`Presets.json` is your bin set.** `custom-preset-1` and `custom-preset-2` are examples, and until you
+replace them the answers describe someone else's packaging. Edit the file, then restart to pick it up:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+## 📂 The `./data` folder
+
+Logs are written to `/app/data`, which is bind-mounted to `./data`. The image runs as a non-root user, uid
+1654, and docker does not change the owner of a bind mount, so create the folder and hand it over before the
+first run:
+
+```bash
+mkdir -p ./data
+sudo chown -R 1654:1654 ./data
+```
+
+`sudo chmod -R 777 ./data` also works and is what older copies of this sample said. It gives every user on the
+host full access to the folder; the chown above is the narrow version of the same fix.
+
+## ✅ Tested on every release
+
+This configuration is smoke-tested against the image on every release, so it is a shape that is checked rather
+than one nobody runs.

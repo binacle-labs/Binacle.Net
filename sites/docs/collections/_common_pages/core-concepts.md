@@ -13,7 +13,7 @@ Binacle.Net is designed to solve the 3D Bin Packing Problem efficiently using sp
 **heuristic algorithms** and **real-time computation techniques**. 
 
 By balancing speed and accuracy, it picks the smallest bin that holds your items, for logistics, 
-warehousing and e-commerce.
+warehousing and e-commerce. The warehouse and shipping trade calls this cartonization.
 
 ---
 
@@ -30,8 +30,9 @@ Below are the key sections detailing how the system functions:
 ## 🧠 Algorithms
 In order to solve the Bin Packing problem in real time Binacle.Net employs heuristic algorithms suitable for real-time use.
 
-While such algorithms, like FFD, don't always guarantee a theoretically optimal solution,
-Binacle.Net is designed to ensure that when it confirms a bin is suitable, all items will fit without error. 
+These algorithms do not examine every possible arrangement, so the packing they find is not the best one
+that exists. What they do give you is a reliable yes: when Binacle.Net confirms a bin is suitable, all the
+items fit. 
 
 However, in rare cases, the algorithm might miss possible fits because of its heuristic approach,
 a trade-off favoring speed in practical scenarios.
@@ -41,7 +42,7 @@ Binacle.Net's hybrid First Fit Decreasing (FFD) algorithm sorts items by decreas
 first available space that fits within a bin.
 
 - ✅ Places each item as soon as a space is found, without searching for a better one
-- ⚖️ Not always perfectly optimal, may leave unused space
+- ⚖️ Can leave space unused, because it never compares the spaces an item would fit in
 
 ### 🧊 Worst Fit Decreasing (WFD)
 Worst Fit Decreasing (WFD) is another hybrid heuristic. 

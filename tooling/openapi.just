@@ -3,6 +3,7 @@
 #   just openapi generate          write artifacts/openapi/Binacle.Net_v3.json and _v4.json
 #   just openapi generate <dir>    write them somewhere else
 #   just openapi lint [<dir>]      generate, then lint them against tooling/openapi.spectral.yaml
+#   just openapi check-site-copies generate, then fail if the docs site's copies have drifted
 #
 # The documents come out of the build and not out of a running server, so nothing has to be brought up. The
 # host it starts has no launch profile, so ServiceModule is off - which is the shape the committed specs
@@ -39,3 +40,12 @@ generate dir=openapi_dir:
 # Generate the documents, then lint them against tooling/openapi.spectral.yaml [dir]
 lint dir=openapi_dir: (generate dir)
     npx --yes @stoplight/spectral-cli lint --ruleset '{{ ruleset }}' --fail-severity=warn '{{ dir }}'/*
+
+# Moves with each minor. The frozen folders below it are never compared.
+current_docs_version := "v3.0.x"
+site_swagger := justfile_directory() / "sites" / "docs" / "collections" / "_versions" / current_docs_version / "swagger"
+
+# Generate the documents, then fail if the docs site's copies have drifted
+check-site-copies: (generate openapi_dir)
+    diff '{{ openapi_dir }}/Binacle.Net_v3.json' '{{ site_swagger }}/v3.json'
+    diff '{{ openapi_dir }}/Binacle.Net_v4.json' '{{ site_swagger }}/v4.json'

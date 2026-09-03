@@ -193,7 +193,14 @@ name into `expected.txt` before it runs, which is the only thing separating "the
 just openapi generate                  # artifacts/openapi/Binacle.Net_v3.json + _v4.json
 just openapi generate <dir>            # write them somewhere else (pass an absolute path)
 just openapi lint [<dir>]              # generate, then lint with Spectral against tooling/openapi.spectral.yaml
+just openapi check-site-copies         # generate, then fail if the docs site's copies have drifted
 ```
+
+`check-site-copies` diffs the two generated documents against
+`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`, which are hand-placed and which
+nothing else compares. The current version is a variable at the top of `openapi.just` and moves with each
+minor. The frozen version folders below it are records of what those releases documented and are never
+compared. `shared-image-tests.yml` runs it beside the lint.
 
 Nothing needs to be brought up — the documents come out of the build, not out of a running server:
 `Microsoft.Extensions.ApiDescription.Server` starts the app host itself and dumps every registered

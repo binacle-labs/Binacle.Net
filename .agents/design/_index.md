@@ -14,7 +14,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   description: "Why the repo's dependency graph is generated rather than declared, what no generator can see, what an InternalsVisibleTo grant means for the graph, and the heavier architecture tools that were surveyed and not taken."
   paths: ["**/*.csproj", "Directory.Packages.props"]
 - file: decisions.md
-  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model."
+  description: "General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model."
   paths: ["NOTICE", "README.md", "SECURITY.md", "CHANGELOG.md", "Dockerfile", "CONTENT-TERMS.md", "sites/docs/**", "shared/src/Binacle.Packing/**"]
 - file: sonar-accepted-findings.md
   description: "The Sonar findings answered with a reason rather than a code change, why each one stands, and why this register has to live in the repository rather than in the SonarCloud UI."
@@ -25,7 +25,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: api/decisions.md
-  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, and why an unknown enum answers with the same error a missing one does."
+  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, and why the shipped image carries one caller of the experimental v4 API."
   paths: ["api/**"]
 ```
 
@@ -33,7 +33,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: ci-cd/decisions.md
-  description: "CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, and the open questions about the PR gate and supply-chain attestation."
+  description: "CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, and the open questions about the PR gate and supply-chain attestation."
   paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
 - file: ci-cd/github-surface.md
   description: "What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly"

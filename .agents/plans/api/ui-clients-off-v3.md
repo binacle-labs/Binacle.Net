@@ -29,11 +29,14 @@ a smaller request and a smaller response than fetching every bin's result and th
 `packages/binacle-net-ui/src/core/packingDemo.ts`. The UIModule rebuild deleted the second call site: the
 module now serves the same TypeScript component the demo site does, so both hosts move on that one edit.
 
-### 2026-08-22 - the two hosts are not equally ready
+### 2026-08-22 - the two hosts were not equally ready, and now they are
 
-The demo inside the image calls its own instance on a relative URL and is unaffected. The demo site's copy
-calls `api.binacle.net`, which serves image `2.1.1` and answers 404 on v4 - probed that day. Moving that copy
-to v4 breaks the live demo until that host serves a v3.0.x image.
+The demo inside the image calls its own instance on a relative URL and was never affected. The demo site's
+copy calls `api.binacle.net`, which served `2.1.1` and answered 404 on v4 when this was probed.
+
+**That cleared. Probed 2026-09-02:** the host serves a 3.0.x image - AGPL in its OpenAPI document,
+`/openapi/v4.json` answers 200, `/openapi/v2.json` is gone. **Neither host blocks this any more**, and what
+is left is the open question in `waits-on:` - what the UI changes to.
 
 ### Date not recorded - expect to touch the call site again
 

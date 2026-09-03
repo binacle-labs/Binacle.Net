@@ -1,82 +1,42 @@
-# Binacle.Net - UI Setup
+# Quickstart
 
-This sample demonstrates how to set up and run Binacle.Net with the UI Module Enabled.
+**A first look at Binacle.Net.** The same API as [minimal](../minimal), with the interactive docs and the
+packing demo switched on so you can click around before writing any code against it.
 
-## 🛠️ Prerequisites
-Before you start, make sure you have [Docker](https://www.docker.com) and 
-[Docker Compose](https://docs.docker.com/compose/) installed on your machine.
+Those three pages are on because looking around is the point. For something you keep running, [prod](../prod)
+has nothing browsable at all, and [service](../service) keeps the docs but adds accounts and rate limiting.
 
-## 📥 Getting Started
-
-1. **Clone the Repository**<br>
-   Clone or download this repository to your local machine.
-   ```bash
-   git clone https://github.com/binacle-labs/Binacle.Net.git
-   ```
-   Alternatively, download the contents of this folder directly.
-
-2. **Verify Files**<br>
-   Ensure the following files are present in the same directory:
-   - `docker-compose.yml` – Docker Compose configuration for all services.
-   - `Presets.json` – Your custom bin configurations.
-
-3. **Customize (Optional)**<br>
-   Edit the `Presets.json` file to adjust the bin configurations as per your needs.
-
-## 🚀 Running the Application
-In the project directory, start the application by running:
-```bash
-docker compose up
-```
-This will launch the Binacle.Net API with:
-- 📖 **Custom Presets**: Loaded from your `Presets.json`.
-- 🌐 **Swagger UI**: http://localhost:8080/swagger/ for easy API exploration.
-- 🌐 **Scalar UI**: http://localhost:8080/scalar/ as an alternative to Swagger API.
-- 🖥️ **UI Module**: Accessible via http://localhost:8080/, providing an intuitive user interface for interacting with Binacle.Net.
-- 📂 **Logs Folder**: A `./data/logs` folder will be created to store API logs for monitoring and debugging.
-
-## ⚙️ Customizing Presets
-To modify bin configurations:
-1. Open the `Presets.json` file in your preferred editor.
-2. Make your changes to the bin definitions.
-3. Restart the application to apply the updates:<br>
-    ```bash
-    docker compose down
-    docker compose up
-    ```
-Your custom presets will now be active in the API.
-
-## 🔍 Accessing the API and UI
-- **API Documentation (Swagger UI)**:<br>
-  http://localhost:8080/swagger/ <br>
-  Use this to explore and test API endpoints directly.
-
-- **Alternative API Documentation (Scalar UI)**:<br>
-  http://localhost:8080/scalar/ <br>
-  Use this as an alternative method for exploring and testing API endpoints.
-
-- **UI Module (Packing Demo)**:<br>
-  http://localhost:8080/<br>
-  Interact with Binacle.Net through a user-friendly interface.
-
-## 📂 Logs Folder
-When running the application, a `./data` folder will be created to store application data, including logs for monitoring and debugging.
-It's important to ensure that the `./data` and `./data/logs` directories have write permissions for proper functionality.
-
-### 🔒 Setting Permissions
-Run the following commands to create the directory and set the required permissions:
+## 🚀 Run it
 
 ```bash
-mkdir -p ./data/logs
-sudo chmod -R 777 ./data
+docker compose up -d
 ```
-This will grant full access to `./data` and its subdirectories.
 
-> [!Note]
-> 777 gives full access to all users. Adjust permissions as needed for security.
+| What | Where |
+|---|---|
+| Packing demo (web UI) | http://localhost:8080/ |
+| Swagger UI | http://localhost:8080/swagger/ |
+| Scalar UI | http://localhost:8080/scalar/ |
 
-## 📄 Additional Resources
-- [Binacle.Net Documentation](https://docs.binacle.net/)
-- [Docker Compose Reference](https://docs.docker.com/compose/)
+The API itself is under `/api/v3` and `/api/v4` and needs none of them. Swagger and Scalar both send real
+requests, so the quickest first call is a `fit` from either page.
 
-Happy packing! 📦✨
+## ✏️ Change this first
+
+**`Presets.json` is your bin set.** The shipped presets are examples, and until you replace them the answers
+describe someone else's packaging. Edit the file, then restart to pick it up:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+## 📂 The `./data` folder
+
+Logs are written to `/app/data`, bind-mounted to `./data`. The folder has to be writable by the container's
+non-root user before the first run - the [minimal](../minimal) sample has the two commands.
+
+## ✅ Tested on every release
+
+This configuration is smoke-tested against the image on every release, so it is a shape that is checked rather
+than one nobody runs.

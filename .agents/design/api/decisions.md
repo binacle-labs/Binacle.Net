@@ -1,8 +1,8 @@
 ---
 id: api/decisions
-description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, and why an unknown enum answers with the same error a missing one does.
+description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, and why the shipped image carries one caller of the experimental v4 API.
 verified: 2026-08-27
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must return the instance page's presets fetch and nothing else
 paths:
   - "api/**"
 ---
@@ -156,3 +156,24 @@ silently undone.
 contract by reflection and fails if one does not carry the converter — a new field is covered the day it is
 added, without anyone remembering to add a test. The integration suites assert the 422 body, not just the
 status, because the status was right while the key was wrong.
+
+### D5 — the shipped image carries one caller of the experimental v4 API, and that is accepted
+
+`api/src/Binacle.Net.UIModule/_js/instance.js` fetches `/api/v4/presets`. It is the only v4 consumer that
+ships inside the image; everything else in the module and both site demos call v3, which is frozen. The
+marketing site tells a reader v4 can change in a patch release and not to integrate against it by accident,
+so the image doing exactly that is worth writing down rather than leaving for someone to find.
+
+**It is accepted, not overlooked.** Two reasons.
+
+**The blast radius is one page.** `/instance` lists the presets the running container was configured with. If
+a v4 change broke the shape, that page stops listing presets. No packing call, no result, no data written -
+and the two pages a visitor actually uses, `/packing` and `/vipaq`, are untouched.
+
+**Moving it to v3 is work that gets thrown away.** The plan for that page renders the presets server-side and
+deletes the fetch entirely, so the file this call lives in is on its way out. Editing the version string now
+means editing a file that is scheduled for deletion, and it would read afterwards as a deliberate v3 choice
+rather than as a stopgap.
+
+**What would change this.** A v4 breaking change landing before that page is rewritten. The signal is the
+`/instance` page listing nothing; the fix at that point is the rewrite, not a version bump.

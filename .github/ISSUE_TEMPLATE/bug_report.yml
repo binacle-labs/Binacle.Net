@@ -1,0 +1,79 @@
+name: Bug report
+description: Something does not work
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **A result you disagree with is a different form.** The algorithms are heuristics: a yes is
+        reliable, a no is not a proof. If the API answered and the answer looks wrong, use
+        **Packing result looks wrong** instead.
+
+        **Never report a security vulnerability here.** Use the private form:
+        <https://github.com/binacle-labs/Binacle.Net/security/advisories/new>
+
+  - type: input
+    id: version
+    attributes:
+      label: Image tag or version
+      description: The tag you ran. If you built from source, the commit.
+      placeholder: "3.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: how
+    attributes:
+      label: How it is running
+      options:
+        - docker run
+        - Docker Compose
+        - Kubernetes
+        - From source
+        - Something else
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where it goes wrong
+      options:
+        - The API - /api/v3
+        - The API - /api/v4
+        - Startup or configuration
+        - The packing demo, Swagger or Scalar
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: For an API call, include the status code and the response body.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: The request
+      description: >
+        The full request body, or the command you ran. Swap real product data for anything the same shape -
+        the numbers are what matter.
+      render: json
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Whatever the container wrote around the failure - `docker logs binacle-net`.
+      render: shell

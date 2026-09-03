@@ -1,5 +1,5 @@
 ---
-description: A read-only sweep of everything CI does, asking for each thing whether an official or first-party mechanism already does it - twelve findings, the biggest being Docker Hub's OIDC login, gh release create making its own tag, and the fact that nothing in CI runs shellcheck
+description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. Six close on a sentence; one needs a dispatch
 state: blocked
 waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
 paths:
@@ -8,7 +8,7 @@ paths:
   - "tooling/ci/**"
 ---
 
-# Is there a better way to do what CI does
+# CI - the questions the platform sweep left open
 
 Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine composite actions in
 `.github/actions/`, the sixteen scripts in `tooling/ci/` and `tooling/ci.just`, plus `tooling/check.just`,
@@ -61,59 +61,18 @@ setting.
 
 ## 2. `gh release create` makes the tag itself, so the release job's tag step can be deleted
 
-**Now:** the `release` job runs `just ci push-tag "$TAG" "$COMMIT"` and then `just ci github-release`, in that
-order, and the ordering is deliberate - the window in which the image is published and the tag does not exist
-is kept one step wide.
+**Done 2026-08-28.** `github-release.sh` takes the commit and passes `--target`; the "Push the release tag"
+step is gone. D1 was amended with it - the window in which the image is published and the tag does not exist
+**closes** rather than narrows, because the tag and the release are one API call.
 
-**The supported way:** `gh release create` already creates the tag. Its manual says "If a matching git tag does
-not yet exist, one will automatically get created from the latest state of the default branch", and "Use
-`--target` to point to a different branch or commit for the automatic tag creation". `--target` takes a commit
-sha, which is exactly what the job has in `github.sha`.
-
-**What it becomes:** `github-release.sh` takes a third argument, the commit, and its two create branches gain
-`--target "$commit"`. The "Push the release tag" step is deleted from the workflow.
-
-**Benefit:** the window closes completely rather than narrowing. The tag and the release are made in one API
-call, so the failure mode the release ordering was designed around - image published, tag missing - stops
-being possible at all rather than being one step wide. It also deletes a step, an argument and a call into a
-script that does something else entirely.
-
-**What it does not break.** The retry path is preserved: if the tag already exists on this run's commit (the
-gate allows that on purpose, so a run that published and then failed can be dispatched again), `gh release
-create` uses the existing tag and ignores `--target`. The create-or-edit branch for a tag made by hand in
-GitHub's web UI is untouched.
-
-**Cost:** the tag is then created by the Releases API rather than by `git push`, so it is not visible in the
-job's git output. The run log gets the release URL instead, which is the thing a reader actually follows.
-
-**Confidence:** high.
+**v3.0.0 is the real release that proved it**, 2026-09-01.
 
 ## 3. Nothing in CI runs shellcheck over `tooling/ci/*.sh`
 
-**Now:** 285 lines of shell were moved out of the workflows into `tooling/ci/` because a `.just` body and a
-`run:` block cannot be handed to shellcheck and a `.sh` file can. That is the stated reason those files exist.
-**No workflow runs shellcheck on them.** The `workflows` job installs actionlint and runs `just check
-workflows` and `just check actions`; neither touches `tooling/ci/`. Checked by grep across `.github/` and
-`tooling/`: the only mentions of shellcheck in the repository outside `.agents/` are comments and
-`DEVELOPMENT.md`.
+**Done 2026-08-28.** `just check scripts`, called by the lint job. Sixteen scripts, no errors. It also covers
+the four install scripts that came out of finding 11, so the unlinted shell in CI is now roughly zero.
 
-**The supported way:** shellcheck ships on the GitHub-hosted Ubuntu runners - `DEVELOPMENT.md` already says so
-- and actionlint already invokes it for inline `run:` blocks. So this is one step in the `workflows` job with
-nothing to install:
-
-```yaml
-- name: Check - scripts
-  if: ${{ !cancelled() }}
-  run: shellcheck tooling/ci/*.sh
-```
-
-It would sit better behind a `just check scripts` recipe, to match the two beside it.
-
-**Benefit:** the reason those files are files becomes a fact rather than a habit. A quoting mistake in
-`github-release.sh` or `check-release-tag.sh` is caught on the pull request instead of during a release, which
-is the one run where a shell bug is most expensive. It costs one step and about two seconds.
-
-**Confidence:** high. The gap is certain; only the exact recipe shape is a choice.
+**It also forced one correction to D4** - see *Already decided*.
 
 ## 4. The identity lines in `push-tag.sh` do nothing, and the whole script has a first-party replacement
 
@@ -184,26 +143,9 @@ he wants to read the host name, not a technical question.
 
 ## 6. `container-structure-test` publishes checksums now, and the pin's comment says it does not
 
-**Now:** `.github/actions/install-container-structure-test` carries
-
-```
-# Upstream publishes none. Taken from the binary in use, so it proves later downloads match that
-# one, not that it was genuine.
-SHA256: fa35e89512a8978585f76cf41397956d2e3a30c62c2ad3fb857b1597074d14ca
-```
-
-**That is out of date.** The v1.22.1 release publishes `checksums.txt`, and its line for
-`container-structure-test-linux-amd64` is `fa35e895...d14ca` - the same value, byte for byte. Fetched from the
-release on 2026-08-28.
-
-**What it becomes:** the same pin, with the comment corrected to say where the value came from - "Published by
-upstream in checksums.txt", matching the wording the actionlint and lychee actions already use.
-
-**Benefit:** the checksum stops being self-confirming and starts being upstream's. It also removes the one
-place in the four install actions where the reader is told the weaker guarantee applies, when it no longer
-does. Two lines of comment; no behaviour change.
-
-**Confidence:** high. Both halves were fetched and compared.
+**Done 2026-08-28.** Fetched `checksums.txt` from the v1.22.1 release and compared: the same value, byte for
+byte. The comment in `.github/actions/install-container-structure-test` names upstream as the source now, so
+the checksum stopped being self-confirming.
 
 ## 7. An environment with a branch policy would scope the Docker Hub credential to `main`
 
@@ -251,20 +193,8 @@ this is to remove it on the next prerelease dispatch, where a failure costs a re
 
 ## 9. A step that prints `just --version` and nothing reads it
 
-**Now:** `shared-smoke-image.yml` has a step whose whole body is `just --version`, between the two install
-actions and the GHCR login.
-
-**Why it is there:** the four `install-*` actions each end by printing the version they installed, so a red
-step names the tool. `setup-just` does not, so one caller added a bare step to get the same line - and only one
-of the sixteen jobs that install just has it.
-
-**What it becomes:** delete the step, and add a `just --version` line to the end of `.github/actions/setup-just`
-so every caller gets it for free, the way the install actions already work.
-
-**Benefit:** the convention applies in sixteen jobs instead of one, and a workflow loses a step that says
-nothing about that workflow.
-
-**Confidence:** high.
+**Done 2026-08-28.** `.github/actions/setup-just` prints its version and the bare step in
+`shared-smoke-image.yml` is gone. Sixteen jobs get the line now instead of one.
 
 ## 10. Sonar's five-minute poll loop is one scanner property
 
@@ -289,34 +219,15 @@ call, and it is the whole decision here.
 
 ## 11. The four `install-*` actions are one script written four times
 
-**Now:** four composite actions, each about twenty lines of `mkdir`, `curl`, `sha256sum -c`, `tar`, `install`,
-`GITHUB_PATH`, version print. They differ in the URL, the checksum, and where the binary sits inside the
-archive - a bare binary for container-structure-test, a nested `bin/` for hurl, a folder for lychee, the root
-for actionlint. This shell is the only shell in CI that nothing lints.
+**Done 2026-08-28, and it settled the opposite of what this finding proposed.** Each action is a single
+`run: tooling/ci/install-<tool>.sh` - **four scripts, one per tool, not one script taking the tool as an
+argument.** A repeated readable thing beat a shared clever one. The version and the checksum moved into the
+script too, rather than staying in the action's `env:` where a reader and Dependabot were said to look -
+Dependabot never looked, because it rewrites `uses:` pins and these four are hand-pinned binaries.
 
-**No official action replaces any of the four**, and I checked each on its own:
-
-- **hurl** - no action, and see the runner-pin note under **Already decided** for why the musl trick used for
-  lychee is not available.
-- **container-structure-test** - no action. Google publishes binaries and, as of finding 6, checksums.
-- **actionlint** - upstream ships a `download-actionlint.bash` and a Docker action; the download script is the
-  route upstream recommends, and it is what this action already does by hand.
-- **lychee** - has an action, deliberately not used, and the reason still holds. See **Already decided**.
-
-**So the finding is a shape, not a swap:** one script under `tooling/ci/`, taking the tool name, URL, checksum
-and archive path as arguments, called from four thin actions that keep their version and checksum in `env:`
-where a reader and Dependabot look. That is the direction the workflow-restructure work already settled on
-(a local action is read out of the working copy, so it can call a script in the repo); this review confirms it
-and adds that nothing official replaces any of the four, so the script is worth writing.
-
-**Benefit:** the unlinted shell in CI goes to roughly zero, and finding 3's `shellcheck tooling/ci/*.sh` then
-covers it automatically. Four copies of a download-and-verify become one.
-
-**Cost:** an argument list is less readable than four flat scripts, and the "one action per tool so a red step
-names the tool" property has to be kept by naming the caller's step, not the script.
-
-**Confidence:** high that it works. This overlaps with work already planned elsewhere and is listed here only
-because the investigation it was waiting on is the one above.
+**Nothing official replaces any of the four, and this is the reason not to check again.**
+container-structure-test and hurl publish no action, actionlint's own advice is the download script this
+already does by hand, and lychee's action is refused under D16.
 
 ## 12. A workflow edit builds all three Jekyll sites
 
@@ -415,6 +326,21 @@ reasoning can be found; in every case the reason still holds.
 ## Done when
 
 Every box here is a decision recorded or a change made. Several are independent; none blocks another.
+
+**Trimmed 2026-09-02.** Findings 2, 3, 6, 9 and 11 landed on 2026-08-28 and their arguments were cut to what
+a reader still needs. Seven are left and **six of the seven close on a sentence, not on work**:
+
+| Finding | What it takes |
+|---|---|
+| 1, Docker Hub OIDC | **one login.** Open the Docker Hub org settings and see whether OIDC connections are offered. If not, the finding is dead and this is a one-line strike |
+| 4, `persist-credentials` | a yes or a no. Yes is fifteen lines across every checkout; no is one line in the ledger |
+| 5, one deploy workflow | a yes or a no. **This one is taste, not mechanics** - where you want to read the host name |
+| 7, scope the credential | a yes or a no. Yes is a GitHub environment and moving two secrets into it |
+| 8, drop `setup-buildx-action` | **the only one needing a run.** Remove it on the next prerelease dispatch, where a failure costs a re-dispatch |
+| 10, the Sonar wait | a yes or a no. Yes paints the Sonar run red every time until coverage passes, and that is the whole decision |
+| 12, the path filter | a yes or a no, and *low confidence it is worth doing* is already written into it |
+
+**Nothing here blocks anything and nothing decays.** It is seven answers, and a no is an answer.
 
 - [ ] The Docker Hub plan question is answered - does the org have an OIDC connection available.
       **By eye.** Open the Docker Hub org's settings and look for GitHub OIDC connections. If yes, finding 1

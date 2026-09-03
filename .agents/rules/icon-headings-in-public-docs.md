@@ -46,6 +46,11 @@ for without reading the headings. Dropping them makes a page that is harder to s
   there and the two never overlap, because that rule covers text inside source and this one covers markdown
   a person reads.
 - **`CHANGELOG.md` entries for shipped versions**, which are a record of what was written at the time.
+- **The marketing site's pages.** `sites/www/pages/` is HTML, not markdown, and its `h2` headings carry no
+  emoji on purpose. They are full sentences - *Checkout has to answer before the customer pays.* - and an
+  emoji in front of one reads as a documentation page, which is the look that design is escaping. Decided
+  26 Aug 2026 by shipping the pages and reading them. `sites/**` stays in `paths:` above because the docs
+  site's markdown is covered.
 
 **Why:** it is the maintainer's documentation style, used consistently across the README and the docs site
 since the project started. A page written without it does not read as more professional - it reads as written
