@@ -54,8 +54,11 @@ All three `Process` methods take the same trailing optional token, and all three
 
 ## Cancellation is between units, not inside one
 
-Every `Process` calls `ThrowIfCancellationRequested()` at the top of its loop and nowhere else. A cancelled
-token stops the next algorithm or the next bin; it never interrupts a packing run in progress. That is
+**The three `Loop` processors** call `ThrowIfCancellationRequested()` at the top of their loop and nowhere
+else — `LoopAlgorithmProcessor`, `LoopBinProcessor` and `LoopMultiAlgorithmBinProcessor`, which are the only
+ones a factory returns. A cancelled token stops the next algorithm or the next bin; it never interrupts a
+packing run in progress. **The `Parallel` variants do not call it at all** — see *Parallel variants* below;
+nothing the API runs reaches them. That is
 deliberate — one bin's run is tens of milliseconds, and tearing it apart mid-run would cost more than it saves.
 
 ## LoopAlgorithmProcessor
@@ -135,7 +138,10 @@ See `$lib/result-selection` for scoring rules and how tests verify each strategy
 
 `ParallelAlgorithmProcessor` (`lib/src/Binacle.Lib/AlgorithmProcessing/`) and `ParallelBinProcessor` /
 `ParallelMultiAlgorithmBinProcessor` (`lib/src/Binacle.Lib/BinProcessing/`) exist, and **no factory returns
-one** — so nothing the API runs ever reaches them. What does construct them directly is
-`lib/test/Binacle.Lib.Benchmarks`, which measures them against the `Loop` versions, and one cancellation test
-in `lib/test/Binacle.Lib.UnitTests`. Whether any of them should be wired in is an open question with measured
+one** — so nothing the API runs ever reaches them. The first two are constructed directly by
+`lib/test/Binacle.Lib.Benchmarks`, which measures them against the `Loop` versions, and by one cancellation
+test in `lib/test/Binacle.Lib.UnitTests`.
+
+**`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — checked 2026-09-04, the only file
+that names it is its own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be wired in is an open question with measured
 evidence behind it; do not settle it as a local change.

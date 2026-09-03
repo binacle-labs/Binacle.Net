@@ -106,8 +106,12 @@ fails **silently** — verify with `strings <dll> | grep <prefix>` after any cha
 ### O1 — the `Parallel*` processors are unreachable
 
 `BinProcessorFactory.Create` and `CreateMultiAlgorithm` take `binCount` and `itemCount` and **ignore both** —
-they always return the `Loop` variants. Nothing in `lib/src` or `api/src` constructs `ParallelBinProcessor`,
-`ParallelAlgorithmProcessor`, or `ParallelMultiAlgorithmBinProcessor`; only the benchmarks do.
+they always return the `Loop` variants. Nothing in `lib/src` or `api/src` constructs `ParallelBinProcessor` or
+`ParallelAlgorithmProcessor`; only the benchmarks and one cancellation test do.
+
+**`ParallelMultiAlgorithmBinProcessor` is not even that** — checked 2026-09-04, the only file that names it
+is its own. It is a public type nothing anywhere constructs, so the measurement below does not cover it and
+nothing would notice if it broke.
 
 The signature promises a decision that is never made.
 
