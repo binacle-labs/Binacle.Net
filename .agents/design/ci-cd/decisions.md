@@ -1,7 +1,7 @@
 ---
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-09-02
+verified: 2026-09-05
 check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; and D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list
 paths:
   - ".github/workflows/**"
@@ -982,6 +982,30 @@ ever reopened, the rule is the first thing to correct** - released versions only
 moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
 the registry side has never gone wrong.
 
+
+### D27 — a released version is never deleted, and prereleases stop reaching the public repository
+
+**The half that is settled: a released version stays, whatever happens to its line.**
+`.github/dockerhub-overview.md` tells a reader that an exact version never moves, which they read as a promise
+that it is there tomorrow. Deleting one breaks the user who took that advice and pinned. A line that is no
+longer patched is retired in words, not by removing the images.
+
+**The eight `3.0.0-beta.*` tags were deleted by hand on 2026-09-05** - read off the registry the same day, no
+beta in the tag list and `docker buildx imagetools inspect` failing on `beta.1`, `beta.5` and `beta.8`. Two
+reasons they went: betas 1 to 4 fail the published verify command, so anyone following `SECURITY.md` against
+one sees what reads as tampering, and a test build kept forever is a second answer to "which image do I pull".
+
+**That was a one-off cleanup, not a policy.** The direction is a public staging repository, so a prerelease
+never lands where users pull from and there is nothing to delete afterwards. It is not worked out - see
+`plans/ci-cd/prerelease-staging-repository.md` - and until it is, **nothing about prerelease lifetime goes on
+the Docker Hub page.** A rule published and then replaced is worse than one a reader never saw.
+
+**Docker Hub has no lifecycle rules**, so no cleanup happens on its own. Deleting is the Hub API,
+`DELETE /v2/repositories/{repo}/tags/{tag}/` with a JWT - the sibling of the tag list `tooling/image.just`
+already reads. The registry delete verb is not accepted.
+
+**This is a second reason the D26 rule would have to be corrected before immutability is ever enabled.** An
+immutable tag cannot be deleted, so a rule of `.*` freezes any prerelease that does reach the repository.
 
 ## Open
 
