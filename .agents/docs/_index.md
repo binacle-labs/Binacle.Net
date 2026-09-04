@@ -87,6 +87,9 @@ table of [README.md](README.md).
 - file: ci-cd/README.md
   description: "CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
   paths: [".github/workflows/**", ".github/actions/**"]
+- file: ci-cd/branches.md
+  description: "Branch names — the two kinds in use, the snake_case subject, and the one constraint that is mechanical today: Sonar analyses main and pull requests targeting main, and nothing else"
+  paths: [".github/workflows/**"]
 - file: ci-cd/release-pipeline.md
   description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
   paths: [".github/workflows/**"]

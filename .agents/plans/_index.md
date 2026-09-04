@@ -99,11 +99,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   horizon: on-demand
   paths: [".github/workflows/**"]
 - file: ci-cd/prerelease-staging-repository.md
-  description: "Prereleases go to a public staging repository instead of the one users pull from"
+  description: "Prereleases and branch builds go to a public staging repository, so the repository users pull from only ever receives a final release"
   state: idea
-  waits-on: "nobody - it is an idea. horizon: undecided - chosen by an agent, strike it if wrong"
+  waits-on: "whether this replaces the GHCR staging step, and what the published verify command covers. horizon: undecided - chosen by an agent, strike it if wrong"
   horizon: undecided
-  paths: [".github/workflows/**", "tooling/image.just"]
+  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
 - file: ci-cd/what-the-pull-request-does-not-run.md
   description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
   state: idea

@@ -92,6 +92,7 @@ benchmarks, and build the Docker image.
 | Change a GitHub Actions workflow | `$ci-cd`, `$tooling` (the recipe it calls) |
 | Understand how the image gets released | `$ci-cd/release-pipeline`, `$build-topology` |
 | Add a CI check or a PR gate | `$ci-cd`, `$tooling` |
+| Name a branch, or open one | `$ci-cd/branches` |
 
 ## Slice Docs
 
