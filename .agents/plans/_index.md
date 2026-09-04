@@ -92,18 +92,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
-- file: ci-cd/delete-the-beta-images.md
-  description: "Eight 3.0.0 beta images are still pullable on Docker Hub. They go, deliberately later rather than now."
-  state: deferred
-  waits-on: "the maintainer, who chose to leave them a few months. Nothing depends on it and nothing decays"
-  horizon: undecided
-  paths: [".github/dockerhub-overview.md"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
   waits-on: "someone asking for ARM - nobody has"
   horizon: on-demand
   paths: [".github/workflows/**"]
+- file: ci-cd/prerelease-staging-repository.md
+  description: "Prereleases go to a public staging repository instead of the one users pull from"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: undecided - chosen by an agent, strike it if wrong"
+  horizon: undecided
+  paths: [".github/workflows/**", "tooling/image.just"]
 - file: ci-cd/what-the-pull-request-does-not-run.md
   description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
   state: idea

@@ -5,14 +5,17 @@ position, not an oversight, and everything below says what to do instead.
 
 ## 🐛 What is welcome, and it is most of it
 
-**Issues.** Bugs, questions, and anything that does not behave the way the documentation says it should.
+**Issues, for reports.** Bugs and anything that does not behave the way the documentation says it should.
 There is no bar. A one-line "this is wrong and here is what I ran" is genuinely useful.
 
 **Corrections to the documentation.** Open an issue saying what is wrong and where, and I will fix it. You do
 not need to write the fix.
 
-**What you are building.** If you are using this for something, say so in an issue or a discussion. Knowing
-what people actually do with it changes what gets built next, and almost nobody tells me.
+**Questions and ideas go to [Discussions](https://github.com/binacle-labs/Binacle.Net/discussions)**, not to
+the issue tracker. Anything not built yet belongs there too.
+
+**What you are building.** If you are using this for something, say so in a discussion. Knowing what people
+actually do with it changes what gets built next, and almost nobody tells me.
 
 ## 🚫 Why pull requests are closed for now
 
