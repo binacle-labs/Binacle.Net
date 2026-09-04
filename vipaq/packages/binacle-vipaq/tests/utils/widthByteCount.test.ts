@@ -1,6 +1,6 @@
 // mirrors src/utils/widthByteCount.ts
 // ports C#: WidthHelper.ByteCount coverage. Maps a Width to its wire byte width; getBodyLength multiplies by it.
-// Only Eight and Sixteen have a byte count — a reserved width never reaches the wire, so it throws.
+// Only Eight and Sixteen have a byte count. A reserved width never reaches the wire, so it throws.
 import {widthByteCount} from "../../src/utils";
 import {Width} from "../../src/models";
 

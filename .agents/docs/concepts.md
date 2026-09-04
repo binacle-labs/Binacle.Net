@@ -1,7 +1,7 @@
 ---
 id: concepts
 description: Fit exits early on first failure; pack continues and returns positions. Both return the same result shape — packed items and unpacked items. Used by both Lib algorithms and API endpoints.
-verified: 2026-08-19
+verified: 2026-09-04
 check: Fit/pack behaviour matches the AlgorithmOperation.Fitting guards in every lib/src/Binacle.Lib/Algorithms/*/AlgorithmOperation.cs — the pre-loop early exit and the in-loop break — and the unpacked set still includes items the loop never reached
 paths:
   - "lib/src/Binacle.Lib/Algorithms/**"

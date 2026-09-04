@@ -4,14 +4,14 @@ Hand-authored result-selection scenarios, for the **lib tests kernel**. Read by 
 benchmarks only - not by the api suite, and not by ViPaq.
 
 These fixtures exercise how the lib picks a single winning result out of many candidate packings. Unlike the
-algorithm fixtures (Bischoff suite, custom-problems) these do not describe a packing problem — each case lists a set
+algorithm fixtures (Bischoff suite, custom-problems) these do not describe a packing problem. Each case lists a set
 of already-computed results and the one the selector is expected to choose. One folder per selector:
 
-- `BestAlgorithm/` — pick the best result across algorithms.
-- `BestBin/` — pick the best bin.
-- `SmallestBin/` — pick the smallest bin that still fits.
+- `BestAlgorithm/` - pick the best result across algorithms.
+- `BestBin/` - pick the best bin.
+- `SmallestBin/` - pick the smallest bin that still fits.
 
-Each folder has a single `baseline.json` today (thin coverage — see the extraction plan for growth notes).
+Each folder has a single `baseline.json` today (thin coverage, see the extraction plan for growth notes).
 
 ## 🧾 Format
 
@@ -29,12 +29,12 @@ A JSON array of scenarios. Each scenario names the expected winner and the candi
 }
 ```
 
-- `ExpectedResult` — the bin key the selector under test must choose.
-- `Results` — candidate results keyed by bin; each value is a compact operation result
+- `ExpectedResult` - the bin key the selector under test must choose.
+- `Results` - candidate results keyed by bin; each value is a compact operation result
   `Bin Algorithm PackingStatus <metric> <metric>`.
 
 This set uses its **own** provider/reader/model (`ResultSelection/ScenarioCollectionsProvider.cs`, its own
-`Scenario` model and `CollectionKeys`) — a different shape from the algorithm fixtures; the two are kept separate.
+`Scenario` model and `CollectionKeys`), a different shape from the algorithm fixtures; the two are kept separate.
 
 This folder is the single source: the lib tests kernel embeds these files directly (via `Link`/`LogicalName` in
 `lib/test/Binacle.Lib.TestsKernel/Binacle.Lib.TestsKernel.csproj`) under the manifest name

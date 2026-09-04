@@ -1,15 +1,4 @@
-// Two-tone only, and that is the whole rule. No syntax rainbow. This is the single biggest lever on whether
-// the exchange card reads as marketing or as a documentation snippet.
-//
-// The class names come from Rouge's json lexer, confirmed against a real build on 23 Aug 2026:
-//   .nl  key names          .s2  strings        .mi / .mf  integers and floats
-//   .p   punctuation        .w   whitespace     .kc  true / false / null
-//
-// Everything else about the card - the border, the seam, the verdict row, the response line markers - is in
-// _content.scss.
-
 .exchange-code {
-	// Keys recede, values carry. Punctuation lighter than either.
 	.nl { color: var(--muted); }
 	.s2, .mi, .mf, .kc { color: var(--text); }
 	.p { color: color-mix(in oklab, var(--bg), var(--fg) 55%); }
@@ -19,8 +8,6 @@
 	pre { margin: 0; }
 }
 
-// Orange is what you type, and nothing else. Roughly four appearances on the whole site: the method chip and
-// the $ prompt. Never a button, a heading, a link, a hover state or a section background.
 .method-chip {
 	font-family: var(--font-mono);
 	font-size: 0.75rem;

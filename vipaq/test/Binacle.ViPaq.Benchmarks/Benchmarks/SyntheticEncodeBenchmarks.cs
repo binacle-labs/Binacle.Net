@@ -8,7 +8,7 @@ using Binacle.ViPaq.TestsKernel.ViPaq;
 namespace Binacle.ViPaq.Benchmarks.Benchmarks;
 
 // Encode CPU/memory over the synthetic scenarios (2000 and 5000 items, 8- and 16-bit), against the protobuf
-// baseline. The codec is NoOp — the body is passed straight through — so this times the format, not compression
+// baseline. The codec is NoOp and the body is passed straight through, so this times the format, not compression
 // Run with `--filter *SyntheticEncode*`.
 [MemoryDiagnoser]
 public class SyntheticEncodeBenchmarks : SyntheticBenchmarkBase

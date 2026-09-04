@@ -27,14 +27,14 @@ internal class RateLimiterConfigurationOptionsValidator : AbstractValidator<Rate
 	public RateLimiterConfigurationOptionsValidator()
 	{
 		// One chain per setting, stopping at the first failure. Split across two RuleFor blocks the operator got
-		// the same "must not be empty" twice plus a third line for the parse — three errors describing one
+		// the same "must not be empty" twice plus a third line for the parse: three errors describing one
 		// missing setting.
 		RuleForLimiter(x => x.ApiUsageAnonymous);
 		RuleForLimiter(x => x.AuthToken);
 		RuleForLimiter(x => x.ApiUsageDemoSubscription);
 	}
 
-	// The limiters are configured as strings, so the message has to carry the format — "check the configuration"
+	// The limiters are configured as strings, so the message has to carry the format. "Check the configuration"
 	// leaves an operator with a rejected file and nowhere to look.
 	private void RuleForLimiter(Expression<Func<RateLimiterConfigurationOptions, string?>> setting)
 	{

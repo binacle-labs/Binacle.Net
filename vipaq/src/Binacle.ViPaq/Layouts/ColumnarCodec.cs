@@ -3,7 +3,7 @@ using Binacle.Geometry;
 
 namespace Binacle.ViPaq.Layouts;
 
-// Each field for every item before the next field — six runs, each `count` values long (PROTOCOL.md §3.2):
+// Each field for every item before the next field: six runs, each `count` values long (PROTOCOL.md §3.2):
 //
 //   L L L ... | W W W ... | H H H ... | X X X ... | Y Y Y ... | Z Z Z ...
 //

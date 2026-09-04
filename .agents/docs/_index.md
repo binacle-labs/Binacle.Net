@@ -4,7 +4,7 @@ description: Manifest of every file under .agents/docs, grouped by area. Regener
 
 # Agent Docs Index
 
-Every doc in `.agents/docs/`, grouped by area. Scan for your topic, then read that file — do not work
+Every doc in `.agents/docs/`, grouped by area. Scan for your topic, then read that file. Do not work
 from this summary. Task-based entry points ("I want to add a v4 endpoint") are in the "Common Tasks"
 table of [README.md](README.md).
 

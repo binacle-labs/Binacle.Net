@@ -1,8 +1,3 @@
-# The nav shows this site's own pages, then the two other hosts. A marketing site's nav is its own page set -
-# hiding two of four pages from someone who arrived on the homepage is a documentation habit.
-#
-# No hamburger. Five text items wrap to a second row on a phone and that is fine.
-# GitHub is not here. It lives in the hero and in the footer.
 wordmark: "Binacle.Net"
 
 nav:

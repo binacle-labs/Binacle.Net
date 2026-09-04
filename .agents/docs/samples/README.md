@@ -1,7 +1,7 @@
 ---
 id: samples
 description: Deployment samples — Docker Compose (minimal, quickstart, prod, service, full) and Kubernetes (minimal); each folder name is a smoke profile name, feature flags, config wiring, and the keep-in-sync rule
-verified: 2026-08-22
+verified: 2026-09-04
 check: Sample folders, compose env vars, bind-mounted config paths, the k8s resource bounds, and the pinned image tag match samples/; the compose project name still comes from a top-level name: key and not a .env file; every samples/docker folder name has a tooling/smoke/<name>.yml with the same module set
 also_update:
   - api/configuration
@@ -12,7 +12,7 @@ paths:
 
 # Samples
 
-Deployment examples under `samples/`. They run the published image at an **exact pinned version** and demonstrate
+Deployment examples under `samples/`. They run the published image at a **pinned tag** and demonstrate
 real module configurations. Index: `samples/README.md` (the in-tree one).
 
 **`samples/` vs `tooling/`** — `samples/` are **starting points a user copies** to stand up their own deployment.
@@ -95,12 +95,9 @@ bug fixes flow, breaking changes never do, and the pin only changes when a new m
 `{{major}}` tag on purpose: `3` crosses minor lines. An exact patch is the right pin only for a line that will get no
 further ones, which is why v1.3.x and v2.x samples are pinned that way in the published docs snapshots.
 
-**Until a minor tag exists, the pin sits on one prerelease and does not chase later ones.** All six currently
-name the same beta, and they move once — straight to the minor tag when it opens. Read the value out of the
-sample files rather than from here; a version named in a doc goes stale silently. The samples document v3-only
-settings, so the old `2.1.1` would be wrong in a different way, and `3.0` does not resolve on Docker Hub until
-v3.0.0 is published. **The rule that governs every move: a pin on `main` must name an image that already
-exists**, so the pin follows a publish and never precedes one.
+**All six now sit on that minor tag**, which opened with v3.0.0. Read the value out of the sample files rather
+than from here; a version named in a doc goes stale silently. **The rule that governs every move: a pin on
+`main` must name an image that already exists**, so the pin follows a publish and never precedes one.
 
 Three files outside the six carry the tag in prose and have to move with them: `README.md` at the repo root,
 `samples/README.md` and `samples/docker/README.md`. Two more mention it as an example only —

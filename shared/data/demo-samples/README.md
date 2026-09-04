@@ -1,7 +1,7 @@
 # Demo Samples
 
 The demo site's sample set, converted to the tests-kernel compact scenario format. One entry per bin per
-sample — 20 files, 51 entries. Read by the **tests kernel**, and by ViPaq, which packs them into placed
+sample: 20 files, 51 entries. Read by the **tests kernel**, and by ViPaq, which packs them into placed
 results under `vipaq/data/packed/demo-samples/`.
 
 **This folder is the source. The demo reads from it, not the other way round.** Each file is one sample: its
@@ -34,14 +34,14 @@ Same compact format as the [Bischoff suite](../bischoff-suite/README.md) and
 }
 ```
 
-Half the point of this set is that the three algorithms disagree, so every entry names all three — including
+Half the point of this set is that the three algorithms disagree, so every entry names all three, including
 the ones where they agree. Why `Result` is keyed by algorithm and never by version is in the
 [parent README](../README.md).
 
 ## ⚠️ It is a baseline, not an oracle
 
 `Metrics` is arithmetic over `Bin` + `Items`, so it needs no packer. `Result` is different: it is **the
-packer's own output, recorded**. Nobody worked out by hand that BFD should fully pack that 60x40x20 bin — the
+packer's own output, recorded**. Nobody worked out by hand that BFD should fully pack that 60x40x20 bin. The
 API said so and the answer was written down.
 
 That makes this set a **regression baseline**. It catches a change in behaviour, and it proves nothing about

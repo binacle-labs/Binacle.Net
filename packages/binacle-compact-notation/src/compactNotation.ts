@@ -30,7 +30,7 @@ export function parseQuantity(compact: string): number {
 
 export function parseItem(compact: string): Item {
 	if (compact.includes("["))
-		throw new Error(`Item '${compact}' carries a '[Q]' quantity — use parseItems to expand it.`);
+		throw new Error(`Item '${compact}' carries a '[Q]' quantity. Use parseItems to expand it.`);
 	return parseItemGeometry(compact);
 }
 

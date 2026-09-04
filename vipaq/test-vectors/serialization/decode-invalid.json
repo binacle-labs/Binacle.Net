@@ -57,7 +57,7 @@
   {
     "Name": "old-v2 8-bit, count byte looks like a valid header",
     "Blob": ["0x00", "0x04", "0x00", "0x28", "0x28", "0x28", "0x0a", "0x0a", "0x0a", "0x00", "0x00", "0x00", "0x0a", "0x0a", "0x0a", "0x0a", "0x00", "0x00", "0x0a", "0x0a", "0x0a", "0x00", "0x0a", "0x00", "0x0a", "0x0a", "0x0a", "0x00", "0x00", "0x0a"],
-    "Reason": "genuine v2.1.1 token; its first two bytes form a VALID new header, so it passes the header check and reaches body parsing, where the declared item count outruns the body — the body-length check is the backstop (PROTOCOL.md §7.1/§7.8)"
+    "Reason": "genuine v2.1.1 token; its first two bytes form a VALID new header, so it passes the header check and reaches body parsing, where the declared item count outruns the body. The body-length check is the backstop (PROTOCOL.md §7.1/§7.8)"
   },
   {
     "Name": "old-v2 uncompressed 16-bit",

@@ -4,7 +4,7 @@ using Binacle.Net.DiagnosticsModule.Configuration.Validators;
 namespace Binacle.Net.DiagnosticsModule.UnitTests;
 
 // Telemetry is off in a default deployment, so the empty section has to stay valid. What must be caught is a
-// value the exporters cannot use — those surface at startup, long before anyone looks at a dashboard.
+// value the exporters cannot use. Those surface at startup, long before anyone looks at a dashboard.
 [Trait("Behavioral Tests", "Ensures OpenTelemetry configuration is validated as expected")]
 public class OpenTelemetryConfigurationOptionsValidatorTests
 {
@@ -45,7 +45,7 @@ public class OpenTelemetryConfigurationOptionsValidatorTests
 		this.validator.Validate(OptionsWith(samplingRatio: samplingRatio)).IsValid.ShouldBeTrue();
 	}
 
-	// 0 is the tempting value for "sample nothing" and it is rejected — turn the exporter off instead.
+	// 0 is the tempting value for "sample nothing" and it is rejected. Turn the exporter off instead.
 	[Theory]
 	[InlineData(0f)]
 	[InlineData(0.05f)]

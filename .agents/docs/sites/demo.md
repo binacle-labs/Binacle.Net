@@ -57,9 +57,12 @@ Webpack bundles from `sites/demo/_js/` and npm packages into `sites/demo/js/`:
 | `runtime.js` | Webpack runtime, loaded on every page |
 | `vendors.js` | Shared npm dependencies, loaded on every page |
 | `three.js` | Three.js on its own, **601 KiB** — demo pages only |
+| `theme-init.js` | The pre-paint theme read, loaded blocking in `<head>` |
 
-Only `main`, `packing_demo` and `protocol_decoder` are webpack entry points; the rest are split chunks or
-package builds.
+`main`, `packing_demo` and `protocol_decoder` are the entry points of the main webpack config; the rest of
+that config's output is split chunks and package builds. `theme-init` is a second config in the same file,
+built from `_js/theme-init.ts`, because the head script has to be one self-contained file with no runtime or
+vendors chunk. The main config's `clean` keeps `theme-init.js` so the two do not delete each other.
 
 **The demo bundles are split out on purpose, and `sites/demo/_data/includes.yml` is the one list that decides
 it.** `runtime.js`, `main.js` and `vendors.js` load on every page. `three.js`, `binacle-net-ui.js` and

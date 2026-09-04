@@ -24,7 +24,7 @@ public class InteropDecodeTests
 
 	private static void AssertDecodes(InteropVectors.ArtifactCase artifact)
 	{
-		// The two header bytes confirm the blob really is what it claims — compression flag, layout, all widths.
+		// The two header bytes confirm the blob really is what it claims: compression flag, layout, all widths.
 		Header.FromBytes(artifact.Bytes[0], artifact.Bytes[1]).ShouldBe(artifact.ExpectedHeader);
 
 		ICompressionCodec codec = artifact.Codec switch

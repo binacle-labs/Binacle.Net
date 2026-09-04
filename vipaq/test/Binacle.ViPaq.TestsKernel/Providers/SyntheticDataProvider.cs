@@ -46,7 +46,7 @@ public static class SyntheticDataProvider
 
 	private static Scenario Generate(int count, int widthBits)
 	{
-		// Deterministic per (count, widthBits): same seed → same bytes every run.
+		// Deterministic per (count, widthBits): same seed -> same bytes every run.
 		var random = new Random(SeedBase + (widthBits * 100_000) + count);
 
 		// 16-bit forces two bytes by starting dimensions past 255. Bin is the width max so any item is in range.

@@ -1,6 +1,6 @@
 namespace Binacle.Net.v4.Contracts.Fit;
 
-// The three outcomes every fit example is one of. Only the bin changes between them — the geometry, and so
+// The three outcomes every fit example is one of. Only the bin changes between them. The geometry, and so
 // the layout and the percentages, does not.
 internal static class FitExampleResponses
 {
@@ -49,7 +49,7 @@ internal static class FitExampleResponses
 	}
 
 	// Nothing is placed, so the bin is only ever the one the caller named. The oversized item is not one of
-	// ExampleData.Items() — it is what triggers the exit.
+	// ExampleData.Items(). It is what triggers the exit.
 	internal static FitBinResponse EarlyExit(string binId)
 	{
 		var response = new FitBinResponse

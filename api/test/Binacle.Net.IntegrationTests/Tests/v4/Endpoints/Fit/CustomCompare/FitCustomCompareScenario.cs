@@ -9,7 +9,7 @@ using Binacle.Net.IntegrationTests.v4.ExtensionMethods;
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Fit.CustomCompare;
 
 // Sends the scenario's bin as a one-element list. The single result must match what the single-bin endpoint
-// produces for the same geometry — that is what pins the multi-bin path to the same answer.
+// produces for the same geometry. That is what pins the multi-bin path to the same answer.
 [Trait("Scenario Tests", "Actual calculation for the algorithms")]
 public class FitCustomCompareScenario
 {

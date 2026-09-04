@@ -2,7 +2,7 @@ namespace Binacle.TestReporting;
 
 // Writes each report to <outputDirectory>/<Filename>.md. The directory is passed in, so each project points
 // it wherever its results live (e.g. a repo-level results folder). One file per report, overwritten each
-// run — the file is the recorded baseline the next run is diffed against.
+// run. The file is the recorded baseline the next run is diffed against.
 public class MarkdownFileWriter : IFileWriter
 {
 	private readonly string outputDirectory;

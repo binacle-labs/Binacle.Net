@@ -4,7 +4,7 @@
 import {readVectors} from "../support/vectorReader";
 import {parseBytes} from "../support/vectorParser";
 
-// Raw decode-invalid.json row. Reason is documentation only — each language rejects for its own reason.
+// Raw decode-invalid.json row. Reason is documentation only. Each language rejects for its own reason.
 interface Vector {
 	Name: string;
 	Blob: string[];

@@ -3,7 +3,7 @@ using Binacle.Net.ServiceModule.Configuration;
 namespace Binacle.Net.ServiceModule.UnitTests;
 
 // The rate limits are configured as strings, so a typo is only found when the string is parsed. Startup is the
-// place for that — the alternative is a module that starts and then throws on the first request it throttles.
+// place for that. The alternative is a module that starts and then throws on the first request it throttles.
 [Trait("Behavioral Tests", "Ensures rate limiter configuration is validated as expected")]
 public class RateLimiterConfigurationOptionsValidatorTests
 {

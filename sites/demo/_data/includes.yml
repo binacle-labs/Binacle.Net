@@ -1,4 +1,3 @@
-# The icon files land in the site root from assets/, copied by gulp.
 icons:
   - rel: 'icon'
     href: '/favicon.ico'
@@ -28,7 +27,7 @@ links:
 scripts_body_end:
   - type: 'module'
     src: '/lib/beercss/beer.min.js'
-#   We recommend using the material-dynamic-colors only when your app needs to change theme at runtime
+# Load only if the site ever needs runtime theme switching.
 #  - src: '/lib/material-dynamic-colors/material-dynamic-colors.min.js'
 #    type: 'module'
   - type: "text/javascript"
@@ -39,11 +38,6 @@ scripts_body_end:
     src: '/js/vendors.js'
 
 
-#   What only the two app pages execute. `demo: true` in a page's front matter loads them; every other
-#   page prefetches this same list. One list, so the two can never drift.
-#
-#   Those pages carry `applet: true` as well, and it is a different switch: the navbar builds its menu from
-#   it (_includes/navbar/menu.html). A page can have one without the other.
 demo_scripts:
   - type: 'text/javascript'
     src: '/js/three.js'

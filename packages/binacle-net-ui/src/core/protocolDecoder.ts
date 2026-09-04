@@ -55,7 +55,7 @@ export const protocolDecoderApp = defineComponent(() => ({
 				return parsed.results;
 			}
 		} catch {
-			// not valid JSON — fall through and treat as stale
+			// not valid JSON, fall through and treat as stale
 		}
 
 		this.$dispatch('error-occurred', ['Your saved results were cleared: the packing token format changed and the old saved tokens can no longer be decoded.']);

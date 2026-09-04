@@ -84,7 +84,7 @@ public class AlgorithmOperationLogChannelRequest : ILogEntryConvertible<PackingL
 	}
 }
 
-// One packing log line — the typed shape written as JSON by the background LogsProcessor.
+// One packing log line: the typed shape written as JSON by the background LogsProcessor.
 // Bins / items are compact strings keyed by id ("small-box" -> "10x10x10").
 public sealed record PackingLogEntry
 {

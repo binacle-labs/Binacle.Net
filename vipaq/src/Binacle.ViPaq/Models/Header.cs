@@ -6,7 +6,7 @@ namespace Binacle.ViPaq;
 
 // The two header bytes (PROTOCOL.md §2). Also the encoder's directive - there is no separate directive type.
 //
-//   Byte 0 — form                                Byte 1 — widths
+//   Byte 0 - form                                Byte 1 - widths
 //   [Version][Compressed][Layout][reserved]      [Bin dims][Item dims][Item coords][reserved]
 //   [2 bits ][1 bit     ][1 bit ][4 bits  ]      [2 bits  ][2 bits   ][2 bits     ][2 bits  ]
 //

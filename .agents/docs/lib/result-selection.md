@@ -1,7 +1,7 @@
 ---
 id: lib/result-selection
 description: IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them
-verified: 2026-08-19
+verified: 2026-09-04
 check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and the TestsKernel Scenario
 also_update:
   - api/service
@@ -28,7 +28,8 @@ Each delegates to an `IResultSelectionStrategy`:
 IResultSelectionStrategy.Select(IDictionary<string, OperationResult> results) → OperationResult
 ```
 
-All strategies: throw `ArgumentException` if the dictionary is empty; return immediately if it has one entry.
+All three `_v2` strategies: throw `ArgumentException` if the dictionary is empty; return immediately if it has
+one entry. The `_v1` strategies carry no such guard.
 Called by `LoopMultiAlgorithmBinProcessor` (per bin) and by `BinacleService` — see `$lib/processors`.
 
 `OperationResultStatus` includes `Unknown = -1` as a sentinel default. **None of the three strategies checks

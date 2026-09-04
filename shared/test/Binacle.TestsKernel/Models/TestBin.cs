@@ -16,7 +16,7 @@ public sealed class TestBin : IWithID, IWithDimensions
 		this.Height = dimensions.Height;
 	}
 
-	// "LxWxH" — a bin carries no quantity. Parsed via the shared Binacle.CompactNotation notation.
+	// "LxWxH": a bin carries no quantity. Parsed via the shared Binacle.CompactNotation notation.
 	public static TestBin FromCompactString(string compact)
 		=> new(compact, Binacle.CompactNotation.CompactNotationParser.ParseDimensions<int>(compact));
 

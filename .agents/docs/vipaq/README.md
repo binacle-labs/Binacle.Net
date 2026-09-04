@@ -1,7 +1,7 @@
 ---
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
-verified: 2026-08-27
+verified: 2026-09-04
 check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in PerformanceTests/PreReportChecks/
 also_update:
   - vipaq/typescript

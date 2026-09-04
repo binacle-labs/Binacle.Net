@@ -1,7 +1,7 @@
 ---
 id: lib/algorithm-factory
 description: IAlgorithmFactory — how algorithm instances are created, DI registration, and how tests construct algorithms directly
-verified: 2026-08-19
+verified: 2026-09-04
 check: The signature, constraints and switch arms match lib/src/Binacle.Lib/AlgorithmFactory.cs and both files under AlgorithmFactories/; DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; a grep for AlgorithmFactory_v1 and AlgorithmFactory_v2 over lib/ lands only in the benchmarks
 also_update:
   - lib/algorithms

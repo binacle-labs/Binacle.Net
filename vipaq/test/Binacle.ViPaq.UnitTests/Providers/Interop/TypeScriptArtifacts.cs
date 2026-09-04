@@ -1,6 +1,6 @@
 namespace Binacle.ViPaq.UnitTests.Providers;
 
-// The TypeScript producer's artifacts — the interop/ts folder, mirror of CSharpArtifacts. Same shared loader, same
+// The TypeScript producer's artifacts: the interop/ts folder, mirror of CSharpArtifacts. Same shared loader, same
 // "<codec>/<name>" keying.
 internal static class TypeScriptArtifacts
 {

@@ -1,7 +1,7 @@
 ---
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references TestsKernel; no test project references a generator).
-verified: 2026-08-27
+verified: 2026-09-04
 check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gates match PerformanceTests/PreReportChecks/ and the families each one sweeps
 paths:
   - "vipaq/**"
@@ -16,7 +16,7 @@ just the wiring.
 ## The graph
 
 Arrows point at what a project references. `[IVT]` marks a project that can see `Binacle.ViPaq` internals
-(`Header`, `ProtocolEncoder`, `Layout`, `Width`, the codecs).
+(`Header`, `ProtocolEncoder`, `Width`, the codecs).
 
 ```
 Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dimensions/Coordinates

@@ -33,6 +33,6 @@ public sealed class RepositoryRootLocator
 			$"Could not find the repository root (no {markerFileName} above the binary).");
 	}
 
-	// The repo root, or a path under it: Find() → the root; Find("a", "b") → <root>/a/b.
+	// The repo root, or a path under it: Find() -> the root; Find("a", "b") -> <root>/a/b.
 	public string Find(params string[] segments) => Path.Combine([this.root, .. segments]);
 }

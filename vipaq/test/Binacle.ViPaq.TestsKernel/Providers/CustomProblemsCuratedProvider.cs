@@ -16,7 +16,7 @@ public static class CustomProblemsCuratedProvider
 		"Simple_16bit-4_FitIn_600x400x300.ffd"           // 4 items, 16-bit
 	];
 
-	// One dense pack that ViPaq compresses — the gzip path.
+	// One dense pack that ViPaq compresses: the gzip path.
 	public static IEnumerable<string> CompressedNames =>
 	[
 		"Simple_5x5x5-100_FitIn_60x40x10.ffd"     // 100 items

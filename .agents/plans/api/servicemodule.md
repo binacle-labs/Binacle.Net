@@ -1,7 +1,7 @@
 ---
 description: How far ServiceModule is taken - answered. One store, one project, refresh tokens
 state: proposed
-waits-on: "nothing. The tag landed 2026-09-01. It goes with the image split in `packing-only-image.md` and still needs a yes, which is what `proposed` means"
+waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
 paths:
   - "api/src/Binacle.Net.ServiceModule/**"
   - "api/src/Binacle.Net.ServiceModule.Domain/**"
@@ -44,7 +44,7 @@ both sides with no transaction, and one-subscription-per-account is enforced in 
 **One `// TODO` rides with this:** `ApiUsageRateLimitingPolicy.cs:32`. There were two; the one in
 `AccountBindingResult.cs` went with `d0ba7823`.
 
-**Goes with the image split** - `plans/api/packing-only-image.md`.
+**Goes with the packing-only image split.** One answer places both.
 
 ## Done when
 

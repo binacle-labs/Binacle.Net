@@ -40,6 +40,8 @@ sass:
   sass_dir          : _sass
   cache             : false
   style             : compressed
+  # A source map ships sourcesContent - every comment in _sass, served to anyone.
+  sourcemap         : never
 
 ################################################################
 # Handling Reading

@@ -1,7 +1,7 @@
 ---
 id: ruby
 description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
-verified: 2026-08-28
+verified: 2026-09-04
 check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
@@ -13,7 +13,7 @@ Jekyll plugins for the three sites — `sites/docs/`, `sites/demo/` and `sites/w
 
 | Gem | What it adds | Loaded by |
 |---|---|---|
-| `jekyll-filters` | Three Liquid filters: `clean_content`, `capitalize_all`, `expand_year` | all three, used by docs |
+| `jekyll-filters` | Three Liquid filters: `clean_content`, `capitalize_all`, `expand_year` | all three sites |
 | `jekyll-gtm` | Two Liquid tags: `{% gtm_head %}`, `{% gtm_body %}` | all three sites |
 | `jekyll-multi-sitemap` | A generator that writes the sitemap files, and three tags | all three sites |
 | `jekyll-page-meta` | A generator that resolves four page keys, and `{% page_meta %}` | all three sites |
@@ -34,8 +34,8 @@ half stops the plugin loading.
 
 ## jekyll-filters
 
-**All three sites load it, and one filter of the three has a caller.** `sites/docs` pipes `capitalize_all`
-through its two breadcrumb includes. Nothing calls the other two.
+**All three sites load it, and one filter of the three has a caller.** All three footers pipe `expand_year`.
+Nothing calls the other two.
 
 **`clean_content(input, length = 160)`** — strips HTML tags, collapses newlines and runs of spaces, trims,
 truncates to `length`, then trims again so a cut landing on a space leaves none. **No site calls it.**
@@ -46,8 +46,8 @@ word, so `API` becomes `Api`, and `String#capitalize` reaches only the first let
 becomes `Getting-started`. Runs of whitespace collapse to one space and the ends are trimmed.
 
 **`expand_year(input, placeholder = "{now}")`** — replaces the placeholder with the year of `site.time`.
-Added 24 Aug 2026. **No site calls it yet** - all three footers still do the replace with
-`{% assign %}` and `replace:`.
+Added 24 Aug 2026. **All three footers pipe their copyright line through it**; `sites/docs` pipes its licence
+line too.
 
 Source: `ruby/jekyll-filters/lib/jekyll-filters/` — `sanitization.rb`, `capitalization.rb` and `dates.rb`.
 **The module is `Jekyll::SiteFilters`, not `Jekyll::Filters`** — that name is Jekyll's own, and is where
@@ -319,7 +319,7 @@ missing `current` stops the build too, for the mirror reason: it would leave eve
 The suffix is stamped from the page's own `version` and does not read `current` at all.
 
 **`{% vlink /path %}` moved here from `sites/docs/_plugins/VLink.rb`** unchanged in behaviour, and gained a
-spec suite in the move — nothing runs a `.rb` under `sites/`. `sites/docs/_plugins/` is now empty.
+spec suite in the move — nothing runs a `.rb` under `sites/`. `sites/docs/_plugins/` is gone.
 
 **Deleting the include without this gem is a silent regression**: 74 pages lose their `noindex` and every
 versioned title loses its version. That is what the wiring pass measured before and after.
@@ -350,7 +350,7 @@ there.
 
 **Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is in the bundle, and **nothing runs
 it** - there is no recipe and no pipeline step. Run it by hand with `cd ruby && bundle exec rubocop`. **It
-does not come back clean.** 41 offences over 110 files, measured 31 Aug 2026, 31 of them autocorrectable and
+does not come back clean.** 41 offences over 110 files, measured 4 Sep 2026, 31 of them autocorrectable and
 none of it decided on:
 
 | Count | Cop |
@@ -358,7 +358,7 @@ none of it decided on:
 | 16 | `Style/StringLiterals` |
 | 10 | `Gemspec/DevelopmentDependencies` |
 | 10 | `Gemspec/RequireMFA` |
-| 1 each | `Layout/EmptyLineAfterGuardClause`, `Lint/UnusedMethodArgument`, `Style/FrozenStringLiteralComment`, `Style/RedundantRegexpEscape`, `Style/SafeNavigation`, `Style/StringConcatenation` |
+| 1 each | `Layout/EmptyLineAfterGuardClause`, `Style/FrozenStringLiteralComment`, `Style/RedundantRegexpEscape`, `Style/SafeNavigation`, `Style/StringConcatenation` |
 
 **It is on no pipeline and in no test group.** A test that fails on arrival is not a test. `just check
 ruby` ran it until 2026-08-27, when it was deleted - no linting is set up in this repository, so the recipe

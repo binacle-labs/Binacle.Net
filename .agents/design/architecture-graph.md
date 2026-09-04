@@ -97,7 +97,7 @@ Four things to settle before adopting ArchUnitNET, and the first decides whether
 - **Its test project must reference every slice it inspects**, becoming a node with an edge to everything.
 
 For `dependency-cruiser`, reading a graph file is the easy half. **There is no root `tsconfig.json`** - there
-are nine, and `sites/demo/` has none despite running `ts-loader` - and imports are bare specifiers resolved
+are nine, one per workspace - and imports are bare specifiers resolved
 through npm workspace symlinks, so rules must be written against resolved real paths with symlink handling
 pinned.
 

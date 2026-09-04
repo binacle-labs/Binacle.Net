@@ -4,7 +4,7 @@ description: Manifest of every file under .agents/plans, grouped by area. Regene
 
 # Agent Plans Index
 
-Every plan in `.agents/plans/` (recursive), grouped by area. Plans are work not yet done — read the one
+Every plan in `.agents/plans/` (recursive), grouped by area. Plans are work not yet done. Read the one
 you need, and trim or delete it once the work lands. `state:` and `waits-on:` say where each one stands;
 [README.md](README.md) defines the five states.
 
@@ -62,7 +62,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: api/servicemodule.md
   description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
   state: proposed
-  waits-on: "nothing. The tag landed 2026-09-01. It goes with the image split in `packing-only-image.md` and still needs a yes, which is what `proposed` means"
+  waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
 - file: api/ui-clients-off-v3.md
   description: "Migrate the shipped UI clients off the v3 API"
@@ -92,18 +92,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: blocked
   waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
-- file: ci-cd/delete-the-beta-images.md
-  description: "Eight 3.0.0 beta images are still pullable on Docker Hub. They go, deliberately later rather than now."
-  state: deferred
-  waits-on: "the maintainer, who chose to leave them a few months. Nothing depends on it and nothing decays"
-  horizon: undecided
-  paths: [".github/dockerhub-overview.md"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
   waits-on: "someone asking for ARM - nobody has"
   horizon: on-demand
   paths: [".github/workflows/**"]
+- file: ci-cd/prerelease-staging-repository.md
+  description: "Prereleases go to a public staging repository instead of the one users pull from"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: undecided - chosen by an agent, strike it if wrong"
+  horizon: undecided
+  paths: [".github/workflows/**", "tooling/image.just"]
 - file: ci-cd/what-the-pull-request-does-not-run.md
   description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
   state: idea
@@ -137,11 +137,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: proposed
   waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
   paths: ["sites/docs/**"]
-- file: sites/docs-client-generation.md
-  description: "A docs page with copy-paste commands that generate a client from the published OpenAPI spec"
-  state: ready
-  waits-on: "one docs deploy. The page is written and builds - 2026-09-04. Every box but the live one passes"
-  paths: ["sites/docs/**"]
 ```
 
 ## Tooling
@@ -155,8 +150,8 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: ["packages/**", "sites/**", "api/src/Binacle.Net.UIModule/**", "vipaq/packages/**", "ruby/**", ".editorconfig"]
 - file: tooling/regen-check-runs-nowhere.md
   description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
-  state: proposed
-  waits-on: "one answer - which of the three ways out. State chosen by an agent to make the file legible; strike it if it is wrong"
+  state: ready
+  waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
   paths: ["tooling/**", "vipaq/test-vectors/**", ".github/workflows/**"]
 - file: tooling/where-benchmark-results-live.md
   description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"

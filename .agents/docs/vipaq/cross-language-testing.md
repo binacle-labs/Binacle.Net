@@ -1,7 +1,7 @@
 ---
 id: vipaq/cross-language-testing
 description: ViPaq cross-language wire testing — the C#/TS shared-vector apparatus, its inventory, and the decode-to-input contract
-verified: 2026-08-27
+verified: 2026-09-04
 check: Vector file list, generator paths, the regen recipe names, and interop test names match vipaq/test-vectors/, tooling/regen.just and the two suites
 also_update:
   - vipaq/typescript

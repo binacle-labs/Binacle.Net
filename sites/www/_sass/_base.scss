@@ -1,18 +1,14 @@
-// Reset and base type only. Sections, cards, tables, buttons and callouts are in _content.scss.
-
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
 
 body {
 	margin: 0;
-	// An explicit background, always. Nothing inherits a ground from the browser.
 	background: var(--bg);
 	color: var(--text);
 	font-family: var(--font-body);
 	font-size: 1.0625rem;
 	line-height: 1.65;
-	// The page body never scrolls sideways. Wide things scroll inside their own wrapper.
 	overflow-x: hidden;
 }
 
@@ -30,8 +26,6 @@ h4 { font-size: 1.0625rem; line-height: 1.35; }
 
 p { margin: 0 0 var(--s-4); }
 
-// In body copy: neutral text, underlined, the underline mixed toward primary and going full primary on
-// hover. The link is never coloured as running text.
 a {
 	color: var(--text);
 	text-decoration: underline;
@@ -50,18 +44,14 @@ code, pre, kbd, samp {
 pre {
 	margin: 0;
 	line-height: 1.6;
-	// Inside its own scroller, never the page's.
 	overflow-x: auto;
 	white-space: pre;
 }
 
 img, svg { max-width: 100%; height: auto; }
 
-// The whole image budget: a tick and a balance mark, currentColor, stroke only. They carry his
-// tick-and-scales notation. The shapes are in _includes/glyphs.html. No icon font.
 .glyph { width: 12px; height: 12px; flex: none; }
 
-// The glyphs carry meaning, so every verdict line pairs one with a word only a screen reader hears.
 .visually-hidden {
 	position: absolute;
 	width: 1px;

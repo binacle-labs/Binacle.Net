@@ -1,9 +1,9 @@
-# ViPaq vs Protobuf — stored size (Deflate)
+# ViPaq vs Protobuf - stored size (Deflate)
 
 Bodies compressed with raw DEFLATE, both sides. Real placed data (offline FFD), each set shown per layout.
 
 
-## Real scenarios — custom packs — Row
+## Real scenarios - custom packs - Row
 Real placed data, Deflate codec, Row layout.
 
 | Scenario                                | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -32,7 +32,7 @@ Real placed data, Deflate codec, Row layout.
 
 
 
-## Real scenarios — custom packs — Columnar
+## Real scenarios - custom packs - Columnar
 Real placed data, Deflate codec, Columnar layout.
 
 | Scenario                                | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -61,7 +61,7 @@ Real placed data, Deflate codec, Columnar layout.
 
 
 
-## Real scenarios — Bischoff suite — Row
+## Real scenarios - Bischoff suite - Row
 Real placed data, Deflate codec, Row layout.
 
 | Scenario              | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |
@@ -769,7 +769,7 @@ Real placed data, Deflate codec, Row layout.
 
 
 
-## Real scenarios — Bischoff suite — Columnar
+## Real scenarios - Bischoff suite - Columnar
 Real placed data, Deflate codec, Columnar layout.
 
 | Scenario              | Items | Widths b/i/c | ViPaq bytes | ViPaq b64 | Proto bytes | Proto b64 | ViPaq/Proto |

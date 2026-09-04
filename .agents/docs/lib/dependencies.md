@@ -50,10 +50,15 @@ Binacle.Packing ─────────────────────�
 
 ## Notes
 
-1. **Composition-root rule.** Only `Binacle.Net` references `Binacle.Lib`, and only to wire the packer up. The
-   api `Kernel`, both modules and the integration suite are all off lib entirely — what they need is the result
-   vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it that way: a new consumer should take
-   `Binacle.Packing`, not `Binacle.Lib`.
+1. **Composition-root rule.** `Binacle.Net` is the only *application* project that references `Binacle.Lib`,
+   and only to wire the packer up. The api `Kernel`, both modules and the integration suite are all off lib
+   entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
+   that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
+
+   **Six projects reference it in total, counted 2026-09-04**, and the other five are not consumers in the
+   sense this rule is about: `shared/src/Binacle.Packing`, the three `lib/test/*` harnesses, and
+   `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`, which is a generator run by hand rather than anything
+   that ships.
 
 2. **Two tests kernels, split by audience.** The shared `Binacle.TestsKernel` holds the algorithm fixtures, which
    the api integration suite reads too. `Binacle.Lib.TestsKernel` holds result selection, which nothing outside

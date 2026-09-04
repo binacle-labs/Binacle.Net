@@ -1,8 +1,8 @@
 ---
 id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-09-02
-check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; no job in the file has an inline run: | block; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the tag is pushed in the release job before gh release create; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
+verified: 2026-09-04
+check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; the signature retry is the only inline run: | block in the file; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the release job makes the tag through gh release create --target and pushes none of its own; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
   - tooling
@@ -31,7 +31,7 @@ test      every test the image ships plus the OpenAPI lint, by calling shared-im
 build     just build publish, push the immutable tag to GHCR, capture the digest
 smoke     pull that digest back from GHCR, structure check + all five profiles
 publish   imagetools copy to Docker Hub - a prerelease gets its immutable tag only
-release   git tag v3.0.0 on this run's commit, then gh release create, body from CHANGELOG.md
+release   gh release create, which makes the tag v3.0.0 on this run's commit, body from CHANGELOG.md
 page      render .github/dockerhub-overview.md and write it to the Docker Hub page  (real releases only)
 ```
 
@@ -110,7 +110,7 @@ signature in between**:
 | `Which tags move` | `just ci moving-tags` splits the version tag off the list and prints the rest |
 | `Copy the smoked digest to Docker Hub` | `just ci copy-tags` moves the manifest **by digest** under the version tag alone |
 | `Sign the published image` | cosign, against the digest |
-| `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes |
+| `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes. Retried five times, 15s apart, in the one inline `run:` block in the file: Docker Hub's referrers index is eventually consistent and this reads it seconds after the sign. The recipe itself stays one shot, because a reader running it wants an answer rather than a wait |
 | `Move the tags that move` | `just ci copy-tags` again, for `3.0` and `latest`. Skipped on a prerelease, which has none |
 
 **Why in halves.** All three tags used to be written before anything was signed, so a failed `cosign sign` left
@@ -262,9 +262,10 @@ Three sources, and they do not collide.
 - **Per-build labels are applied at build time**, never as `LABEL` fed by `ARG`: version, revision and created
   change every build, so as Dockerfile layers they would bust the cache from that point down. `--label` sets
   image-config metadata with no layer.
-- **The `build` job's metadata step overrides two** that metadata-action gets wrong on its own: `licenses`,
-  because auto-detection returns `NOASSERTION` for a repo that declares more than one licence, and `url`, which should be the landing
-  site rather than the repo.
+- **The `build` job's metadata step sets three by hand**, because metadata-action gets them wrong on its own:
+  `licenses`, since auto-detection returns `NOASSERTION` for a repo that declares more than one licence; `url`,
+  which should be the landing site rather than the repo; and `description`, which would otherwise be the GitHub
+  repo description. The `Dockerfile` comment says where else that description string is pinned.
 
 `tooling/build.just` does the same three per-build labels for a local `just build image`, so a locally built
 image carries the same metadata shape a pushed one does.

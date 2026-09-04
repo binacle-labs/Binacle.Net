@@ -15,4 +15,4 @@ dotnet run -c Release
 
 # Reports land in PerformanceTests.Artifacts (gitignored scratch). Copy keepers into
 # results/lib/efficiency/ by hand. See results/README.md for the scratch-vs-curated convention.
-echo "Reports in ${PROJECT_PATH}PerformanceTests.Artifacts/ — curate keepers into results/lib/efficiency/"
+echo "Reports in ${PROJECT_PATH}PerformanceTests.Artifacts/, curate keepers into results/lib/efficiency/"

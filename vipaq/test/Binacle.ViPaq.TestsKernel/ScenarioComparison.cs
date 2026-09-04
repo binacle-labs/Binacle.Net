@@ -3,7 +3,7 @@ using Binacle.ViPaq.TestsKernel.Models;
 namespace Binacle.ViPaq.TestsKernel;
 
 // The decode-to-input oracle: does a decoded (bin, items) equal the `Scenario` it came from. `Bin`/`Item` are
-// plain classes with no value equality, so it compares field by field — which also turns a field-swap wiring bug
+// plain classes with no value equality, so it compares field by field, which also turns a field-swap wiring bug
 // into a clear mismatch. Public and geometry-only so both ViPaq harnesses share it; the paired header-bytes check
 // names the internal `Header`, so that half stays with the caller.
 public static class ScenarioComparison
