@@ -16,7 +16,7 @@
 # the API on 23 Aug 2026, so do not trim it out of an example to make one shorter.
 
 fit:
-  verified: "2026-08-23, source build of the 3.0.x line"
+  verified: "2026-09-04, binacle/binacle-net:3.0.0 pulled from Docker Hub"
   method: "POST"
   path: "/api/v3/fit/by-custom"
   request: |
@@ -59,7 +59,7 @@ fit:
     }
 
 pack:
-  verified: "2026-08-23, source build of the 3.0.x line"
+  verified: "2026-09-04, binacle/binacle-net:3.0.0 pulled from Docker Hub"
   method: "POST"
   path: "/api/v3/pack/by-custom"
   request: |
@@ -91,7 +91,7 @@ pack:
     }
 
 carton:
-  verified: "2026-08-23, source build of the 3.0.x line"
+  verified: "2026-09-04, binacle/binacle-net:3.0.0 pulled from Docker Hub"
   method: "POST"
   path: "/api/v3/fit/by-preset/rectangular-cuboids"
   request: |
@@ -145,7 +145,7 @@ carton:
     }
 
 locker:
-  verified: "2026-08-23, source build of the 3.0.x line"
+  verified: "2026-09-04, binacle/binacle-net:3.0.0 pulled from Docker Hub"
   method: "POST"
   path: "/api/v3/fit/by-custom"
   request: |
