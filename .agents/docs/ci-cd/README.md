@@ -17,7 +17,8 @@ paths:
 Eleven workflows in `.github/workflows/`, over nine shared actions in `.github/actions/`. They gate a pull
 request, analyse it, release the Docker image, write its Docker Hub page, and deploy the three Jekyll sites.
 This doc covers what runs, when, and the conventions every one of them follows. The release pipeline has its
-own page (`$ci-cd/release-pipeline`) because it is seven jobs with an ordering that matters.
+own page (`$ci-cd/release-pipeline`) because it is seven jobs with an ordering that matters. **Branch names
+have one too** (`$ci-cd/branches`) - `main` is the only long-lived branch, and Sonar is why.
 
 **Four of the eleven carry a `shared-` prefix**, which means something else calls them — the release pipeline
 calls three, the three deploys call the site tests, and the pull request gate calls both test suites. It does
