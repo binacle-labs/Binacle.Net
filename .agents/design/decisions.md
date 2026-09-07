@@ -277,16 +277,20 @@ start to drift.
 
 ## Open
 
-### O1 — what happens to `3.0.0-beta.1` and `3.0.0-beta.2` on Docker Hub
+**Nothing is open.** O1 closed on 2026-09-05.
 
-Both are still pullable. Under D4 no public surface names either, and under D3 neither passes the published
-command — beta 1 was never signed, and beta 2 needs a string no page carries any more. So anyone who pulls one
-gets a failure with nothing anywhere to explain it.
+### O1 — what happens to `3.0.0-beta.1` and `3.0.0-beta.2` on Docker Hub — **done 2026-09-05**
 
-Deleting both tags is the clean end of it. **The deadline this entry claimed is gone** - Docker Hub tag
-immutability was answered no on 2026-09-04 and the switch stays off, so nothing is about to make these
-undeletable. The decision and its reversal condition are in the CI/CD ledger under D26.
+The question was that both were still pullable while no public surface named either and neither passed the
+published verify command — beta 1 was never signed, and beta 2 needs a string no page carries any more. So
+anyone who pulled one got a failure with nothing anywhere to explain it.
 
-**Answered 2026-09-04: they go, in a few months.** Not urgent, because no public surface names a beta since
-the example pins moved to `3.0`. All eight `3.0.0-beta.*` tags still resolve, read off the registry the same
-day - 23 tags in the repository. **This is no longer an open question and the work has its own plan.**
+**All eight `3.0.0-beta.*` tags were deleted, read off the registry on 2026-09-05.** Nothing is left to
+explain.
+
+**It was a one-off cleanup, not a policy.** Nothing stops the next release leaving its own prereleases in the
+same place. The direction is a separate staging repository, so a prerelease never lands where users pull from,
+and that is not built.
+
+**Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no on
+2026-09-04 and the switch stays off; the reversal condition is in the CI/CD ledger under D26.
