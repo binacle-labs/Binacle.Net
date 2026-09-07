@@ -38,6 +38,17 @@ copy calls `api.binacle.net`, which served `2.1.1` and answered 404 on v4 when t
 `/openapi/v4.json` answers 200, `/openapi/v2.json` is gone. **Neither host blocks this any more**, and what
 is left is the open question in `waits-on:` - what the UI changes to.
 
+### 2026-09-07 - the component keeps every bin's result, so it is `pack/compare-bins`
+
+**The plan's own warning was to check this before assuming.** Checked: `getResults` stores the whole array -
+`this.results = response.data` - and `selectResult` / `isSelected` let the visitor click between them, so the
+page is a list of results and not just the winner. `selectedResult` merely defaults to the first entry with a
+bin.
+
+**So `pack/smallest-bin` does not cover it.** Dropping to it would delete the result list, which is a feature
+of the page and not an accident. The v4 endpoint with the same shape is `pack/compare-bins` - one result per
+bin, in the order the bins were sent.
+
 ### Date not recorded - expect to touch the call site again
 
 v4 is experimental for the whole 3.0.x line and may change. Migrating our own UI to it is fine, and it is the

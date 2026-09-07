@@ -59,6 +59,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
   paths: ["api/**"]
+- file: api/rate-limit-error-is-unreadable.md
+  description: "A rate-limited packing request tells the visitor the error response could not be parsed, which is not what happened and not what they need to know"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  paths: ["packages/binacle-net-ui/**"]
 - file: api/servicemodule.md
   description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
   state: proposed
