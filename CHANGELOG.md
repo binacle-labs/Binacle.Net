@@ -2,9 +2,21 @@
 
 ## [Unreleased]
 
+### 🔎 Overview
+- **The demo now calls V4.** Both the demo site and the UI module inside the image moved off V3.  
+- **The demo gained the `Best` algorithm**, which was never reachable from V3, and now shows which algorithm won.  
+- V3 endpoints are unchanged and remain stable. V4 remains experimental.  
+
+### 🎨 UI Module
+- **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin you give it and still lets you click between the results — the endpoint with the same shape, on the newer version. Nothing about the page's behaviour changed with it.  
+- **The algorithm list gained `Best`.** It runs more than one heuristic and returns whichever packed best, and it exists only on V4, so the demo could not offer it before. It is listed as **Try all, keep the best**, to keep it apart from **Best Fit Decreasing**, which is one specific heuristic.  
+- **Each result now says which algorithm actually ran**, shown only when you asked for `Best` — with a single heuristic selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.  
+- **The demo no longer builds its own HTTP calls.** It goes through the new client package, which owns the request and response shapes.  
+
 ### 🏗️ Internal Work
 
 - **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy — so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
+- **Restructured `binacle-net-ui` into apps, components and shared code.** It was three flat folders, and 19 of the 25 files in `utils/` turned out to be the visualizer's own internals sitting where any file could import them. The visualizer now owns them and offers an app its component and one contract type. No behaviour changed — the same 348 tests passed before and after, with no assertion edited.  
 - **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync — a person runs it and commits what it writes.  
 
 ## [3.0.0] - 2026-09-01

@@ -69,18 +69,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
-- file: api/ui-clients-off-v3.md
-  description: "Migrate the shipped UI clients off the v3 API"
-  state: idea
-  waits-on: "the shape - what the UI changes to and how is not worked out yet"
-  horizon: near
-  paths: ["api/**", "packages/binacle-net-ui/**"]
-- file: api/ui-package-structure.md
-  description: "binacle-net-ui has no layers - 19 of its 25 utils are visualizer internals sitting in a shared bag. Split it into apps, components and plugins"
-  state: ready
-  waits-on: "nothing. horizon: now - taken from the maintainer's instruction to start it, strike it if wrong"
-  horizon: now
-  paths: ["packages/binacle-net-ui/**"]
 - file: api/uimodule-instance-presets.md
   description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
   state: idea

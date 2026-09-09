@@ -25,7 +25,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: api/decisions.md
-  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, and why the shipped image carries one caller of the experimental v4 API."
+  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, and why the shipped image calls the experimental v4 API from two places."
   paths: ["api/**"]
 ```
 
@@ -49,6 +49,14 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: lib/findings.md
   description: "Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions."
   paths: ["lib/**"]
+```
+
+## Packages
+
+```yaml
+- file: packages/decisions.md
+  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, and why the visualizer owns its own internals instead of sharing a utils folder."
+  paths: ["packages/**"]
 ```
 
 ## Ruby

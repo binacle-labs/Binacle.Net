@@ -131,10 +131,13 @@ table of [README.md](README.md).
 
 ```yaml
 - file: packages/README.md
-  description: "TypeScript packages under packages/ (npm workspaces) — UI components, compact-notation mirror, cookie utilities, and theme switching."
+  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, compact-notation mirror, cookie utilities, and theme switching."
+  paths: ["packages/**"]
+- file: packages/binacle-net-client.md
+  description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
   paths: ["packages/**"]
 - file: packages/binacle-net-ui.md
-  description: "packages/binacle-net-ui — Alpine.js components + Three.js visualizer for the packing demo. Components, plugins, model layers, and the window.binacle global."
+  description: "packages/binacle-net-ui — Alpine.js apps and components plus a Three.js visualizer for the packing demo. The apps/components/shared split, the plugins, and the window.binacle global."
   paths: ["packages/**"]
 - file: packages/dependencies.md
   description: "TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which."
