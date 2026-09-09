@@ -23,6 +23,15 @@ const resultStatusTexts: Record<string, string> = {
 	FullyPacked: 'Fully packed',
 };
 
+// The API's Algorithm values, in the words a visitor reads. The dropdown and the result row read this one
+// table, so the two can never disagree.
+const algorithmTexts: Record<string, string> = {
+	FFD: 'First Fit Decreasing',
+	BFD: 'Best Fit Decreasing',
+	WFD: 'Worst Fit Decreasing',
+	Best: 'Try all, keep the best',
+};
+
 export function packingDemoAppPlugin(Alpine: AlpineType) {
 	Alpine.data('packing_demo_app', packingDemoApp);
 }
@@ -38,13 +47,11 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		items: [] as Item[],
 		algorithm: '',
 	},
-	algorithms: [
-		{value: 'FFD', text: 'First Fit Decreasing'},
-		{value: 'BFD', text: 'Best Fit Decreasing'},
-		{value: 'WFD', text: 'Worst Fit Decreasing'},
-	],
+	algorithms: Object.entries(algorithmTexts).map(([value, text]) => ({value, text})),
 	results: [] as PackBinResponse[],
 	selectedResult: null as PackBinResponse | null,
+	// What was asked for when `results` came back, not what the dropdown reads now.
+	resultsAlgorithm: '',
 	formErrors: [] as string[],
 	sampleIndex: 0,
 	submitting: false,
@@ -205,12 +212,14 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 				if(!response || !response.results){
 					this.results = [];
 					this.selectedResult = null;
+					this.resultsAlgorithm = '';
 					this.submitStatus = 'No results.';
 					return null;
 				}
 				const firstSuccessfulResult = response.results.find(x => !!x.bin);
 				this.results = response.results;
 				this.selectedResult = firstSuccessfulResult || null;
+				this.resultsAlgorithm = request.parameters.algorithm;
 				this.submitStatus = this.results.length > 0 ? '' : 'No results.';
 				return {
 					bin: firstSuccessfulResult?.bin,
@@ -245,6 +254,14 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	},
 	resultStatusText(result: PackBinResponse) {
 		return resultStatusTexts[result.status] ?? 'Unknown';
+	},
+	// A code the table does not know prints as the code. It is short, and it is the only answer there is.
+	resultAlgorithmText(result: PackBinResponse) {
+		return `Winner: ${algorithmTexts[result.algorithmUsed] ?? result.algorithmUsed}`;
+	},
+	// With one heuristic asked for, every row would repeat the dropdown a line below it.
+	showsAlgorithmUsed() {
+		return this.resultsAlgorithm === 'Best';
 	},
 	resultTitle(result: PackBinResponse) {
 		return `Bin: ${result.bin.id}`;

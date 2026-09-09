@@ -192,6 +192,31 @@ describe("init", () => {
 	});
 });
 
+describe("the algorithm dropdown", () => {
+	test("offers every algorithm the api takes", () => {
+		const {app} = createApp();
+
+		expect(app.algorithms.map(x => x.value)).toEqual(["FFD", "BFD", "WFD", "Best"]);
+	});
+
+	// Two entries reading as a Best would leave a visitor no way to tell them apart.
+	test("Best does not read as a second Best Fit", () => {
+		const {app} = createApp();
+
+		const best = app.algorithms.find(x => x.value === "Best")!;
+
+		expect(best.text).toBe("Try all, keep the best");
+		expect(best.text).not.toMatch(/Best Fit/);
+	});
+
+	// A visitor reads these, so they stay plain ASCII.
+	test("every entry is plain ASCII", () => {
+		const {app} = createApp();
+
+		app.algorithms.forEach(entry => expect(entry.text).toMatch(/^[\x20-\x7e]+$/));
+	});
+});
+
 describe("isValid", () => {
 	test("a good model is valid", () => {
 		const {app} = createApp();
@@ -1283,6 +1308,39 @@ describe("result labels", () => {
 		expect(text).toBe("Unknown");
 	});
 
+	// The API sends the short code; the page owes the visitor the name the dropdown offered.
+	test.each([
+		["FFD", "Winner: First Fit Decreasing"],
+		["BFD", "Winner: Best Fit Decreasing"],
+		["WFD", "Winner: Worst Fit Decreasing"],
+	])("the winner %s reads as %s", (algorithmUsed, expected) => {
+		const {app} = createApp();
+		const result = packedData({algorithmUsed});
+
+		const text = app.resultAlgorithmText(result);
+
+		expect(text).toBe(expected);
+	});
+
+	// One table behind both, so a new algorithm cannot reach the dropdown and miss the result row.
+	test("the winner reads as the dropdown wrote it", () => {
+		const {app} = createApp();
+		const ffd = app.algorithms.find(x => x.value === "FFD")!;
+
+		const text = app.resultAlgorithmText(packedData({algorithmUsed: "FFD"}));
+
+		expect(text).toBe(`Winner: ${ffd.text}`);
+	});
+
+	test("an algorithm the page does not know still names one", () => {
+		const {app} = createApp();
+		const result = packedData({algorithmUsed: "NFD"});
+
+		const text = app.resultAlgorithmText(result);
+
+		expect(text).toBe("Winner: NFD");
+	});
+
 	test("only a fully packed result reports as fully packed", () => {
 		const {app} = createApp();
 		const result = packedData({status: "PartiallyPacked"});
@@ -1290,6 +1348,60 @@ describe("result labels", () => {
 		const fullyPacked = app.resultIsFullyPacked(result);
 
 		expect(fullyPacked).toBe(false);
+	});
+});
+
+describe("naming the algorithm that won", () => {
+	test("a run of one heuristic keeps it off the row", () => {
+		const {app} = createApp();
+		app.resultsAlgorithm = "FFD";
+
+		expect(app.showsAlgorithmUsed()).toBe(false);
+	});
+
+	test("a Best run puts it on the row", () => {
+		const {app} = createApp();
+		app.resultsAlgorithm = "Best";
+
+		expect(app.showsAlgorithmUsed()).toBe(true);
+	});
+
+	test("results carry the algorithm they were asked for", async () => {
+		const {app, dispatched} = createApp();
+		app.init();
+		app.model.algorithm = "Best";
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.showsAlgorithmUsed()).toBe(true);
+	});
+
+	// The dropdown moves on its own; the results on the page did not change with it.
+	test("changing the dropdown after a run leaves the row alone", async () => {
+		const {app, dispatched} = createApp();
+		app.init();
+		app.model.algorithm = "Best";
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+		await sceneThunk(dispatched)();
+
+		app.model.algorithm = "FFD";
+
+		expect(app.showsAlgorithmUsed()).toBe(true);
+	});
+
+	test("a run with no results names nothing", async () => {
+		const {app, dispatched} = createApp();
+		app.init();
+		app.model.algorithm = "Best";
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse(null)));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.showsAlgorithmUsed()).toBe(false);
 	});
 });
 

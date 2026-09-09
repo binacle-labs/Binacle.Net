@@ -1,10 +1,11 @@
 ---
 id: packages
-description: TypeScript packages under packages/ (npm workspaces) — UI components, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-09-04
+description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, compact-notation mirror, cookie utilities, and theme switching.
+verified: 2026-09-10
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
+  - packages/binacle-net-client
   - sites/demo
   - api/modules/ui
 paths:
@@ -13,14 +14,15 @@ paths:
 
 # Packages
 
-npm workspaces at the repo root. All four are `private: true` — none is published to npm, and all four are
+npm workspaces at the repo root. All five are `private: true` — none is published to npm, and all five are
 TypeScript with no build step of their own: `main` points at a `.ts` entry and each host compiles the source
-with its own webpack + ts-loader. `binacle-compact-notation` puts that entry at `src/index.ts`; the other
-three keep an `index.ts` barrel at the package root.
+with its own webpack + ts-loader. `binacle-compact-notation` and `binacle-net-client` put that entry at
+`src/index.ts`; the other three keep an `index.ts` barrel at the package root.
 
 | Package | Description |
 |---|---|
 | `binacle-net-ui` | Alpine.js + Three.js frontend for the packing demo and ViPaq decoder — see `$packages/binacle-net-ui` |
+| `binacle-net-client` | Hand-written TypeScript client for the v4 API, with a committed copy of the OpenAPI document and a contract test against it — see `$packages/binacle-net-client` |
 | `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) and `binacle-net-ui` (its sample generator) |
 | `cookies` | Cookie read/write utility (based on js-cookie v3.0.5, MIT) |
 | `theme-switcher` | Light/dark theme switching — the custom element and the pre-paint read |
