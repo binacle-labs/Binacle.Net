@@ -1,0 +1,1384 @@
+import type {Alpine as AlpineType} from "alpinejs";
+
+import {
+	ApiFailure,
+	ApiProblem,
+	BinPackResultStatus,
+	PackBinResponse,
+	PackCompareResponse,
+	PackCustomRequest
+} from "binacle-net-client";
+
+import {Logger} from "../../../src/components/logger/logger";
+import {packingDemoApp, packingDemoAppPlugin, PackingDemoOptions} from "../../../src/apps/packingDemo/packingDemo";
+import {sampleData} from "../../../src/apps/packingDemo/sampleData";
+import {largestBin, sampleAt} from "../../../src/apps/packingDemo/samples";
+import Bin from "../../../src/apps/packingDemo/bin";
+import Item from "../../../src/apps/packingDemo/item";
+
+const packEndpoint = "/api/v4/pack/compare-bins";
+
+interface Dispatched {
+	name: string;
+	detail: any;
+}
+
+type SceneThunk = () => Promise<{bin: unknown; items: unknown} | null>;
+
+type PackingDemo = ReturnType<typeof packingDemoApp> & {
+	$dispatch: (event: string, detail?: any) => void;
+	$logger: Logger;
+	$watch: (key: string, callback: () => void) => void;
+};
+
+// Alpine hands the component a reactive proxy, so $watch sees writes anywhere under the watched value. The
+// harness has plain objects, so it wraps the watched one to get the same reach.
+// One proxy per target, or an identity check on a re-read would fail.
+function deepWatched<T extends object>(target: T, onChange: () => void, seen: WeakMap<object, any>): T {
+	const cached = seen.get(target);
+	if (cached) {
+		return cached;
+	}
+	const proxy = new Proxy(target, {
+		get(obj, key) {
+			const value = Reflect.get(obj, key);
+			return value && typeof value === "object" ? deepWatched(value, onChange, seen) : value;
+		},
+		set(obj, key, value) {
+			const written = Reflect.set(obj, key, value);
+			onChange();
+			return written;
+		},
+		deleteProperty(obj, key) {
+			const deleted = Reflect.deleteProperty(obj, key);
+			onChange();
+			return deleted;
+		},
+	});
+	seen.set(target, proxy);
+	return proxy;
+}
+
+function createApp(options: PackingDemoOptions = {}) {
+	const dispatched: Dispatched[] = [];
+	const logger = {info: jest.fn(), log: jest.fn(), warn: jest.fn(), error: jest.fn()};
+	const app = packingDemoApp(options) as PackingDemo;
+	app.$dispatch = (name: string, detail?: any) => {dispatched.push({name, detail});};
+	app.$logger = logger as unknown as Logger;
+	app.$watch = (key: string, callback: () => void) => {
+		const seen = new WeakMap<object, any>();
+		(app as any)[key] = deepWatched((app as any)[key], callback, seen);
+	};
+
+	return {app, dispatched, logger};
+}
+
+// The client reads the body with text() and parses it itself, so the stub carries the raw text. No body at
+// all is the third argument left out, which is what the rate limiter sends on a 429.
+function stubResponse(status: number, body?: unknown): Response {
+	return {
+		ok: status >= 200 && status < 300,
+		status,
+		text: () => Promise.resolve(body === undefined ? "" : JSON.stringify(body)),
+	} as unknown as Response;
+}
+
+// What the client hands handleErrorResponse. `problem` is null when the response carried no body.
+function failedResponse(status: number, problem: ApiProblem | null): ApiFailure {
+	return {ok: false, status, problem};
+}
+
+function mockFetch(response: Response) {
+	const fetchMock = jest.fn().mockResolvedValue(response);
+	globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+	return fetchMock;
+}
+
+function mockFailingFetch(reason: unknown) {
+	const fetchMock = jest.fn().mockRejectedValue(reason);
+	globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+	return fetchMock;
+}
+
+function packedData(overrides: Partial<PackBinResponse> = {}): PackBinResponse {
+	return {
+		status: "FullyPacked",
+		bin: {id: "10x10x10", length: 10, width: 10, height: 10},
+		algorithmUsed: "FFD",
+		packedItems: [],
+		unpackedItems: null,
+		packedItemsVolumePercentage: 100,
+		packedBinVolumePercentage: 42,
+		viPaqData: null,
+		...overrides,
+	};
+}
+
+function packingResponse(results: PackBinResponse[] | null): PackCompareResponse {
+	return {results: results as PackBinResponse[]};
+}
+
+// Runs the request the way the visualizer would.
+function sceneThunk(dispatched: Dispatched[]): SceneThunk {
+	return dispatched.find(x => x.name === "update-scene")!.detail as SceneThunk;
+}
+
+describe("init", () => {
+	test("seeds bins", () => {
+		const {app} = createApp();
+
+		app.init();
+
+		expect(app.model.bins.length).toBeGreaterThan(0);
+	});
+
+	test("seeds items", () => {
+		const {app} = createApp();
+
+		app.init();
+
+		expect(app.model.items.length).toBeGreaterThan(0);
+	});
+
+	test("picks the first algorithm", () => {
+		const {app} = createApp();
+
+		app.init();
+
+		expect(app.model.algorithm).toBe("FFD");
+	});
+
+	test("the seeded model is submittable", () => {
+		const {app} = createApp();
+
+		app.init();
+
+		expect(app.isValid()).toBe(true);
+	});
+
+	test("the seeded items fit the seeded bin", () => {
+		const {app} = createApp();
+
+		app.init();
+
+		const bin = largestBin(app.model.bins);
+		expect(app.model.items.every(i => i.length <= bin.length && i.width <= bin.width && i.height <= bin.height))
+			.toBe(true);
+	});
+
+	test("opens on sample zero, the same set every time", () => {
+		const first = createApp().app;
+		const second = createApp().app;
+
+		first.init();
+		second.init();
+
+		expect(first.sampleIndex).toBe(0);
+		expect(second.model.bins.map(bin => bin.id)).toEqual(first.model.bins.map(bin => bin.id));
+		expect(second.model.items.map(item => item.id)).toEqual(first.model.items.map(item => item.id));
+	});
+
+	test("editing the seeded model leaves the set alone", () => {
+		const first = createApp().app;
+		const second = createApp().app;
+		first.init();
+
+		first.model.bins[0].length = 1;
+		second.init();
+
+		expect(second.model.bins[0].length).not.toBe(1);
+	});
+});
+
+describe("isValid", () => {
+	test("a good model is valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(true);
+	});
+
+	test("a bin with a dimension below the floor is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("a bin with a dimension above the ceiling is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 65536, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("an item with a dimension that is not a number is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(Number.NaN, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("an item with a fractional dimension is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2.5, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	// Both lists are checked with `every`, which is true on an empty list.
+	test("an emptied model is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("no bins is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+
+	test("no items is not valid", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [];
+
+		const valid = app.isValid();
+
+		expect(valid).toBe(false);
+	});
+});
+
+describe("the empty-list messages", () => {
+	test("a full model has none", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		const errors = app.listErrors();
+
+		expect(errors).toEqual([]);
+	});
+
+	test("an emptied model names both lists", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		const errors = app.listErrors();
+
+		expect(errors).toEqual(["Add at least one bin.", "Add at least one item."]);
+	});
+
+	test("submitting an emptied model shows them on the form", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(app.formErrors).toEqual(["Add at least one bin.", "Add at least one item."]);
+	});
+
+	test("submitting an emptied model sends nothing", () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(dispatched).toEqual([]);
+	});
+
+	test("a later good submit clears them", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+		app.onSubmit();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.formErrors).toEqual([]);
+	});
+});
+
+describe("the submit guard", () => {
+	test("an invalid model sends nothing", () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(dispatched).toEqual([]);
+	});
+
+	test("an invalid model is logged", () => {
+		const {app, logger} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(logger.error).toHaveBeenCalledWith("[Binacle] Model is not valid");
+	});
+});
+
+describe("pressing the submit button", () => {
+	test("nothing is in flight before it is pressed", () => {
+		const {app} = createApp();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("the button reads Get results when nothing is in flight", () => {
+		const {app} = createApp();
+
+		expect(app.submitButtonText()).toBe("Get results");
+	});
+
+	test("a valid submit marks the request as in flight straight away", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitting).toBe(true);
+	});
+
+	test("the button reads Working while the request is in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitButtonText()).toBe("Working...");
+	});
+
+	test("the status line says so while the request is in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitStatus).toBe("Packing...");
+	});
+
+	test("an invalid submit is not in flight", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		app.onSubmit();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("an invalid submit leaves the status line empty", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("results end the flight", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("results clear the status line, because the panel itself is the answer", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("an empty body says so on the status line", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFetch(stubResponse(200, packingResponse(null)));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitStatus).toBe("No results.");
+	});
+
+	test("a failed request ends the flight", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFailingFetch(new Error("offline"));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitting).toBe(false);
+	});
+
+	test("the button is pressable again after a failed request", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		mockFailingFetch(new Error("offline"));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.submitButtonText()).toBe("Get results");
+	});
+});
+
+describe("adding a bin", () => {
+	test("copies the last bin rather than rolling a new one", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(60, 60, 60), new Bin(31, 32, 33)];
+
+		app.addBin["@click"].call(app);
+
+		const added = app.model.bins[2];
+		expect([added.length, added.width, added.height]).toEqual([31, 32, 33]);
+	});
+
+	// The API rejects two bins with the same id.
+	test("the copy does not take the id of the bin it copied", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+
+		app.addBin["@click"].call(app);
+
+		expect(app.model.bins[1].id).not.toBe(app.model.bins[0].id);
+	});
+
+	test("a run of copies all get their own id", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+
+		const ids = app.model.bins.map(b => b.id);
+		expect(new Set(ids).size).toBe(4);
+	});
+
+	test("removing a copy does not free its id for the next one", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(31, 32, 33)];
+		app.addBin["@click"].call(app);
+		app.addBin["@click"].call(app);
+		app.removeBin(1);
+
+		app.addBin["@click"].call(app);
+
+		const ids = app.model.bins.map(b => b.id);
+		expect(new Set(ids).size).toBe(3);
+	});
+
+	test("the copy is a new instance", () => {
+		const {app} = createApp();
+		const last = new Bin(31, 32, 33);
+		app.model.bins = [last];
+
+		app.addBin["@click"].call(app);
+
+		expect(app.model.bins[1]).not.toBe(last);
+	});
+
+	test("with no bins it rolls one inside the sample bounds", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+
+		app.addBin["@click"].call(app);
+
+		const rolled = app.model.bins[0];
+		expect([rolled.length, rolled.width, rolled.height].every(side => side >= 30 && side <= 60)).toBe(true);
+	});
+});
+
+describe("editing the lists", () => {
+	test("removing a bin drops the one at that index", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10), new Bin(20, 20, 20), new Bin(30, 30, 30)];
+
+		app.removeBin(1);
+
+		expect(app.model.bins.map(b => b.id)).toEqual(["10x10x10", "30x30x30"]);
+	});
+
+	test("clearing the bins empties the list", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+
+		app.clearAllBins["@click"].call(app);
+
+		expect(app.model.bins).toEqual([]);
+	});
+
+	test("removing an item drops the one at that index", () => {
+		const {app} = createApp();
+		app.model.items = [new Item(1, 1, 1, 1), new Item(2, 2, 2, 1)];
+
+		app.removeItem(0);
+
+		expect(app.model.items.map(i => i.id)).toEqual(["2x2x2-1"]);
+	});
+
+	test("clearing the items empties the list", () => {
+		const {app} = createApp();
+		app.model.items = [new Item(1, 1, 1, 1)];
+
+		app.clearAllItems["@click"].call(app);
+
+		expect(app.model.items).toEqual([]);
+	});
+
+	test("a new item is sized to fit the largest bin", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(40, 40, 40), new Bin(60, 60, 60)];
+
+		app.addItem["@click"].call(app);
+
+		const added = app.model.items[0];
+		expect([added.length, added.width, added.height].every(side => side <= 30)).toBe(true);
+	});
+
+	test("a new item has a quantity of one", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(40, 40, 40)];
+
+		app.addItem["@click"].call(app);
+
+		expect(app.model.items[0].quantity).toBe(1);
+	});
+
+	test("the sizing bin is the largest by volume", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(60, 10, 10), new Bin(30, 30, 30), new Bin(10, 60, 10)];
+
+		const bin = app.sizingBin();
+
+		expect(bin.id).toBe("30x30x30");
+	});
+
+	test("with no bins the sizing bin is a rolled one", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+
+		const bin = app.sizingBin();
+
+		expect([bin.length, bin.width, bin.height].every(side => side >= 30 && side <= 60)).toBe(true);
+	});
+});
+
+describe("randomize", () => {
+	test("replaces the bins", () => {
+		const {app} = createApp();
+		app.init();
+		const before = app.model.bins;
+
+		app.randomize["@click"].call(app);
+
+		expect(app.model.bins).not.toBe(before);
+	});
+
+	test("replaces the items in the same call", () => {
+		const {app} = createApp();
+		app.init();
+		const before = app.model.items;
+
+		app.randomize["@click"].call(app);
+
+		expect(app.model.items).not.toBe(before);
+	});
+
+	test("the new bins and items are the ones the picked sample carries", () => {
+		const {app} = createApp();
+		app.init();
+
+		app.randomize["@click"].call(app);
+
+		const picked = sampleAt(app.sampleIndex);
+		expect(app.model.bins.map(bin => bin.id)).toEqual(picked.bins.map(bin => bin.id));
+		expect(app.model.items.map(item => item.id)).toEqual(picked.items.map(item => item.id));
+	});
+
+	test("the new bins and items are fresh objects", () => {
+		const {app} = createApp();
+		app.init();
+
+		app.randomize["@click"].call(app);
+		const picked = sampleAt(app.sampleIndex);
+		app.model.bins[0].length = 999;
+		app.model.items[0].quantity = 999;
+
+		expect(picked.bins[0].length).not.toBe(999);
+		expect(picked.items[0].quantity).not.toBe(999);
+	});
+
+	test("never lands on the sample already on screen", () => {
+		const {app} = createApp();
+		app.init();
+
+		const repeats = Array.from({length: 500}, () => {
+			const before = app.sampleIndex;
+			app.randomize["@click"].call(app);
+			return {before, after: app.sampleIndex};
+		}).filter(step => step.before === step.after);
+
+		expect(repeats).toEqual([]);
+	});
+
+	test("the bins and items on screen change with it", () => {
+		const {app} = createApp();
+		app.init();
+		const before = app.model.bins.map(bin => bin.id).join();
+
+		app.randomize["@click"].call(app);
+
+		expect(app.model.bins.map(bin => bin.id).join()).not.toBe(before);
+	});
+
+	test("the picked set is submittable", () => {
+		const {app} = createApp();
+		app.init();
+
+		app.randomize["@click"].call(app);
+
+		expect(app.isValid()).toBe(true);
+	});
+
+	test("clears the status line, so it cannot outlive the result it described", () => {
+		const {app} = createApp();
+		app.init();
+		app.submitStatus = "No results.";
+
+		app.randomize["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+});
+
+describe("the status line goes stale", () => {
+	function submittedApp() {
+		const {app} = createApp();
+		app.init();
+		app.submitStatus = "No results.";
+		return app;
+	}
+
+	test("loading a sample clears it", () => {
+		const app = submittedApp();
+
+		app.showSample(1);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("editing a bin clears it", () => {
+		const app = submittedApp();
+
+		app.model.bins[0].length = 12;
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("adding a bin clears it", () => {
+		const app = submittedApp();
+
+		app.addBin["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("clearing the bins clears it", () => {
+		const app = submittedApp();
+
+		app.clearAllBins["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("adding an item clears it", () => {
+		const app = submittedApp();
+
+		app.addItem["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+
+	test("clearing the items clears it", () => {
+		const app = submittedApp();
+
+		app.clearAllItems["@click"].call(app);
+
+		expect(app.submitStatus).toBe("");
+	});
+});
+
+describe("the request", () => {
+	test("goes to the pack endpoint", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(fetchMock.mock.calls[0][0]).toBe(packEndpoint);
+	});
+
+	test("a baseUrl is put in front of the endpoint", async () => {
+		const {app, dispatched} = createApp({baseUrl: "https://api.example.com"});
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(fetchMock.mock.calls[0][0]).toBe(`https://api.example.com${packEndpoint}`);
+	});
+
+	test("is a POST", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(fetchMock.mock.calls[0][1].method).toBe("POST");
+	});
+
+	test("declares a JSON body", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(fetchMock.mock.calls[0][1].headers).toEqual({"Content-Type": "application/json"});
+	});
+
+	test("carries the chosen algorithm", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.model.algorithm = "BFD";
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).parameters).toEqual({algorithm: "BFD"});
+	});
+
+	test("maps the bin view models to plain api bins", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 20, 30), new Bin(40, 50, 60)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins).toEqual([
+			{id: "10x20x30", length: 10, width: 20, height: 30},
+			{id: "40x50x60", length: 40, width: 50, height: 60},
+		]);
+	});
+
+	// x-model without the .number modifier stores the input's string, and the API declares these as int.
+	test("sends bin dimensions as numbers even when the model holds strings", async () => {
+		const {app, dispatched} = createApp();
+		const bin = new Bin(10, 20, 30);
+		Object.assign(bin, {length: "10", width: "20", height: "30"});
+		app.model.bins = [bin];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins[0])
+			.toEqual({id: "10x20x30", length: 10, width: 20, height: 30});
+	});
+
+	test("sends item dimensions and quantity as numbers even when the model holds strings", async () => {
+		const {app, dispatched} = createApp();
+		const item = new Item(2, 3, 4, 5);
+		Object.assign(item, {length: "2", width: "3", height: "4", quantity: "5"});
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [item];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items[0])
+			.toEqual({id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5});
+	});
+
+	test("maps the item view models to plain api items, quantity included", async () => {
+		const {app, dispatched} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 3, 4, 5)];
+		app.onSubmit();
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await sceneThunk(dispatched)();
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items).toEqual([
+			{id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5},
+		]);
+	});
+});
+
+describe("an error response", () => {
+	test("a 422 field-errors bag becomes one line per field error", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(422, {
+			title: "Validation failed",
+			errors: {Bins: ["Bins is required", "Bins must not be empty"], Items: ["Items is required"]},
+		});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.errors).toEqual([
+			"Bins: Bins is required",
+			"Bins: Bins must not be empty",
+			"Items: Items is required",
+		]);
+	});
+
+	test("a 422 takes its title from the body", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(422, {
+			title: "Validation failed",
+			errors: {Bins: ["Bins is required"]},
+		});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.title).toBe("Validation failed");
+	});
+
+	test("a 422 puts the detail ahead of the field errors", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(422, {
+			title: "Validation failed",
+			detail: "One or more fields are invalid",
+			errors: {Bins: ["Bins is required"]},
+		});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.errors).toEqual(["One or more fields are invalid", "Bins: Bins is required"]);
+	});
+
+	test("a plain problem response shows its detail", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(400, {title: "Bad Request", detail: "Algorithm is unknown"});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail).toEqual({title: "Bad Request", errors: ["Algorithm is unknown"]});
+	});
+
+	test("a field-errors bag on a status other than 422 is ignored", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(400, {
+			title: "Bad Request",
+			errors: {Bins: ["Bins is required"]},
+		});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.errors).toEqual([]);
+	});
+
+	test("a body with neither title nor detail falls back to the status text", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(503, {});
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail).toEqual({title: "Error: Service Unavailable", errors: []});
+	});
+
+	test("an empty body falls back to the status text", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(404, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.title).toBe("Error: Not Found");
+	});
+
+	test("a body that will not parse says so", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(500, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.errors).toEqual(["An error occurred, but the error response could not be parsed."]);
+	});
+
+	test("a body that will not parse still names the status", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(500, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.title).toBe("Error: Internal Server Error");
+	});
+
+	test("a missing status text is looked up from the status", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(429, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.title).toBe("Error: Too Many Requests");
+	});
+
+	test("an unknown status with no status text still gets a title", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(418, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.title).toBe("Error: Error");
+	});
+});
+
+describe("getResults", () => {
+	const request: PackCustomRequest = {parameters: {algorithm: "FFD"}, bins: [], items: []};
+
+	test("a 200 hands back the parsed body", async () => {
+		const {app} = createApp();
+		const body = packingResponse([packedData()]);
+		mockFetch(stubResponse(200, body));
+
+		const result = await app.getResults(request);
+
+		expect(result).toEqual(body);
+	});
+
+	test("a non-200 hands back nothing", async () => {
+		const {app} = createApp();
+		mockFetch(stubResponse(400, {title: "Bad Request"}));
+
+		const result = await app.getResults(request);
+
+		expect(result).toBeNull();
+	});
+
+	test("a non-200 surfaces the error", async () => {
+		const {app, dispatched} = createApp();
+		mockFetch(stubResponse(400, {title: "Bad Request", detail: "Algorithm is unknown"}));
+
+		await app.getResults(request);
+
+		expect(dispatched).toEqual([{
+			name: "error-occurred",
+			detail: {title: "Bad Request", errors: ["Algorithm is unknown"]},
+		}]);
+	});
+
+	test("fetch throwing hands back nothing", async () => {
+		const {app} = createApp();
+		mockFailingFetch(new TypeError("Failed to fetch"));
+
+		const result = await app.getResults(request);
+
+		expect(result).toBeNull();
+	});
+
+	test("fetch throwing surfaces the message", async () => {
+		const {app, dispatched} = createApp();
+		mockFailingFetch(new TypeError("Failed to fetch"));
+
+		await app.getResults(request);
+
+		expect(dispatched).toEqual([{
+			name: "error-occurred",
+			detail: {title: "Error while fetching packing results", errors: ["Failed to fetch"]},
+		}]);
+	});
+
+	test("fetch throwing is logged", async () => {
+		const {app, logger} = createApp();
+		const reason = new TypeError("Failed to fetch");
+		mockFailingFetch(reason);
+
+		await app.getResults(request);
+
+		expect(logger.error).toHaveBeenCalledWith("[Binacle] Error while fetching packing results", reason);
+	});
+
+	test("a rejection that is not an error is stringified", async () => {
+		const {app, dispatched} = createApp();
+		mockFailingFetch("the network went away");
+
+		await app.getResults(request);
+
+		expect(dispatched[0].detail.errors).toEqual(["the network went away"]);
+	});
+});
+
+describe("the scene the results feed", () => {
+	function submit(app: PackingDemo) {
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		app.onSubmit();
+	}
+
+	test("the first result with a bin is selected", async () => {
+		const {app, dispatched} = createApp();
+		const packed = packedData({status: "PartiallyPacked"});
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any}), packed])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.selectedResult).toEqual(packed);
+	});
+
+	test("every result is kept for the list", async () => {
+		const {app, dispatched} = createApp();
+		const data = [packedData({status: "FullyPacked"}), packedData({status: "PartiallyPacked"})];
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse(data)));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.results).toEqual(data);
+	});
+
+	test("the scene gets the selected bin and its packed items", async () => {
+		const {app, dispatched} = createApp();
+		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 0, y: 0, z: 0}];
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems})])));
+
+		const scene = await sceneThunk(dispatched)();
+
+		expect(scene).toEqual({bin: {id: "10x10x10", length: 10, width: 10, height: 10}, items: packedItems});
+	});
+
+	test("a result with no packed items gives the scene an empty list", async () => {
+		const {app, dispatched} = createApp();
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: null})])));
+
+		const scene = await sceneThunk(dispatched)();
+
+		expect(scene!.items).toEqual([]);
+	});
+
+	test("no result with a bin leaves nothing selected", async () => {
+		const {app, dispatched} = createApp();
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any})])));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.selectedResult).toBeNull();
+	});
+
+	test("a body with no data clears the results", async () => {
+		const {app, dispatched} = createApp();
+		app.results = [packedData()];
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse(null)));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.results).toEqual([]);
+	});
+
+	test("a body with no data leaves the scene empty", async () => {
+		const {app, dispatched} = createApp();
+		submit(app);
+		mockFetch(stubResponse(200, packingResponse(null)));
+
+		const scene = await sceneThunk(dispatched)();
+
+		expect(scene).toBeNull();
+	});
+
+	test("a failed request clears the selection", async () => {
+		const {app, dispatched} = createApp();
+		app.selectedResult = packedData();
+		submit(app);
+		mockFailingFetch(new TypeError("Failed to fetch"));
+
+		await sceneThunk(dispatched)();
+
+		expect(app.selectedResult).toBeNull();
+	});
+});
+
+describe("picking a result from the list", () => {
+	test("marks it as selected", () => {
+		const {app} = createApp();
+		const result = packedData();
+
+		app.selectResult(result);
+
+		expect(app.isSelected(result)).toBe(true);
+	});
+
+	test("another result is not selected", () => {
+		const {app} = createApp();
+		const chosen = packedData();
+		app.selectResult(chosen);
+
+		const isSelected = app.isSelected(packedData());
+
+		expect(isSelected).toBe(false);
+	});
+
+	test("hands the scene that result's bin and items", async () => {
+		const {app, dispatched} = createApp();
+		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 1, y: 2, z: 3}];
+		const result = packedData({packedItems});
+
+		app.selectResult(result);
+
+		const scene = await sceneThunk(dispatched)();
+		expect(scene).toEqual({bin: result.bin, items: packedItems});
+	});
+});
+
+describe("result labels", () => {
+	test("a fully packed result is green", () => {
+		const {app} = createApp();
+		const result = packedData({status: "FullyPacked"});
+
+		const colour = app.colorClass(result);
+
+		expect(colour).toBe("green");
+	});
+
+	test("a partially packed result is orange", () => {
+		const {app} = createApp();
+		const result = packedData({status: "PartiallyPacked"});
+
+		const colour = app.colorClass(result);
+
+		expect(colour).toBe("orange");
+	});
+
+	test("anything else is red", () => {
+		const {app} = createApp();
+		const result = packedData({status: "NotPacked"});
+
+		const colour = app.colorClass(result);
+
+		expect(colour).toBe("red");
+	});
+
+	test("the title names the bin", () => {
+		const {app} = createApp();
+		const result = packedData();
+
+		const title = app.resultTitle(result);
+
+		expect(title).toBe("Bin: 10x10x10");
+	});
+
+	test("the bin percentage reads as a percentage", () => {
+		const {app} = createApp();
+		const result = packedData({packedBinVolumePercentage: 42});
+
+		const text = app.resultBinPercentageText(result);
+
+		expect(text).toBe("Packed Bin Volume: 42%");
+	});
+
+	test("the items percentage reads as a percentage", () => {
+		const {app} = createApp();
+		const result = packedData({packedItemsVolumePercentage: 87});
+
+		const text = app.resultItemPercentageText(result);
+
+		expect(text).toBe("Packed Items Volume: 87%");
+	});
+
+	// The API sends its own enum names; none of them belongs on a page a visitor reads.
+	test.each([
+		["Unknown", "Unknown"],
+		["NotPacked", "Not packed"],
+		["PartiallyPacked", "Partially packed"],
+		["FullyPacked", "Fully packed"],
+	])("%s reads as %s", (status, expected) => {
+		const {app} = createApp();
+		const result = packedData({status: status as BinPackResultStatus});
+
+		const text = app.resultStatusText(result);
+
+		expect(text).toBe(expected);
+	});
+
+	test("a status the page does not know still reads as English", () => {
+		const {app} = createApp();
+		const result = packedData({status: "SomethingNew" as BinPackResultStatus});
+
+		const text = app.resultStatusText(result);
+
+		expect(text).toBe("Unknown");
+	});
+
+	test("only a fully packed result reports as fully packed", () => {
+		const {app} = createApp();
+		const result = packedData({status: "PartiallyPacked"});
+
+		const fullyPacked = app.resultIsFullyPacked(result);
+
+		expect(fullyPacked).toBe(false);
+	});
+});
+
+describe("the items a result could not fit", () => {
+	test("a fully packed result has none", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: null});
+
+		expect(app.hasUnpackedItems(result)).toBe(false);
+	});
+
+	test("an empty list counts as none", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: []});
+
+		expect(app.hasUnpackedItems(result)).toBe(false);
+	});
+
+	test("a partial result has some", () => {
+		const {app} = createApp();
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+
+		expect(app.hasUnpackedItems(result)).toBe(true);
+	});
+
+	test("a missing list reads as an empty one", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: null});
+
+		expect(app.unpackedItemsOf(result)).toEqual([]);
+	});
+
+	test("the heading counts the quantities, not the lines", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: [{id: "a", quantity: 2}, {id: "b", quantity: 3}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 5 items");
+	});
+
+	test("one left out reads as one item", () => {
+		const {app} = createApp();
+		const result = packedData({unpackedItems: [{id: "a", quantity: 1}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 1 item");
+	});
+
+	test("a line names how many and which item", () => {
+		const {app} = createApp();
+
+		expect(app.unpackedItemText({id: "20x20x20-3", quantity: 2})).toBe("2 x 20x20x20-3");
+	});
+
+	// A visitor reads these, so they stay plain ASCII and carry no field name from the contract.
+	test("the heading and the lines are plain ASCII with no contract name in them", () => {
+		const {app} = createApp();
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+
+		const text = [app.unpackedItemsTitle(result), ...app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))]
+			.join(" ");
+
+		expect(text).toMatch(/^[\x20-\x7e]+$/);
+		expect(text).not.toMatch(/unpacked/i);
+	});
+
+	// 02-packs-nowhere is the sample that exists to show a partial pack - the volume fits, the geometry does not.
+	test("the partial-pack sample names what was left out", () => {
+		const {app} = createApp();
+		const sample = sampleData.find(x => x.name === "02-packs-nowhere")!;
+		const item = new Item(...sample.items[0]);
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
+
+		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 2 items");
+		expect(app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))).toEqual(["2 x 20x20x20-3"]);
+	});
+
+	test("the partial-pack sample is still in the set", () => {
+		const sample = sampleData.find(x => x.name === "02-packs-nowhere");
+
+		expect(sample).toEqual({name: "02-packs-nowhere", bins: [[30, 30, 30]], items: [[20, 20, 20, 3]]});
+	});
+});
+
+describe("the plugin", () => {
+	test("registers the factory under its x-data name", () => {
+		const registered: Record<string, unknown> = {};
+		const alpine = {data: (name: string, factory: unknown) => {registered[name] = factory;}} as unknown as AlpineType;
+
+		packingDemoAppPlugin(alpine);
+
+		expect(registered).toEqual({packing_demo_app: packingDemoApp});
+	});
+});

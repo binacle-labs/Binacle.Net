@@ -19,7 +19,7 @@ interface Sample {
 }
 
 const sourceDir = path.resolve(__dirname, "..", "..", "..", "shared", "data", "demo-samples");
-const outputPath = path.resolve(__dirname, "..", "src", "utils", "sampleData.ts");
+const outputPath = path.resolve(__dirname, "..", "src", "apps", "packingDemo", "sampleData.ts");
 
 // "LxWxH [Q]". parseItem in the notation package is the placed shape, which carries coordinates instead.
 function parseItem(compact: string): [number, number, number, number] {

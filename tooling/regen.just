@@ -65,7 +65,7 @@ check: all
         ':(glob)vipaq/test-vectors/header/**/*.json'
         ':(glob)vipaq/test-vectors/interop/cs/**/*.json'
         ':(glob)vipaq/test-vectors/interop/ts/**/*.json'
-        'packages/binacle-net-ui/src/utils/sampleData.ts'
+        'packages/binacle-net-ui/src/apps/packingDemo/sampleData.ts'
     )
 
     changed="$(git status --porcelain -- "${generated[@]}")"

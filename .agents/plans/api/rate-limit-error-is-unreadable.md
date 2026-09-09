@@ -10,18 +10,23 @@ paths:
 
 The one error a visitor to the public demo is most likely to see is the one that reads as broken software.
 
-## What happens, read in the code 2026-09-07
+## What happens, read in the code 2026-09-09
 
-`handleErrorResponse` in `packages/binacle-net-ui/src/core/packingDemo.ts:122` builds a title from
-`response.statusText`, falling back to `getResponseStatusText(response.status)` - which maps `429` to
-`Too Many Requests`. That half is right.
+`handleErrorResponse` in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts:122` builds a title
+from `getResponseStatusText(failure.status)`, which maps `429` to `Too Many Requests`. That half is right.
 
-It then calls `await response.json()` unconditionally. **The rate limiter returns no body**, so the parse
-throws, the `catch` pushes `An error occurred, but the error response could not be parsed.` into the errors
-list, and the dialog shows that sentence under the title.
+**The rate limiter returns no body.** The client hands that back as `problem: null`, and the branch for
+`problem === null` pushes `An error occurred, but the error response could not be parsed.` into the errors
+list, so the dialog shows that sentence under the title.
 
 So the visitor is told the software failed to read a reply, when what actually happened is that they were
 asked to wait. **Nothing failed.**
+
+**The mechanism changed on 2026-09-09 and the wrong sentence survived on purpose.** The demo used to call
+`response.json()` unconditionally and catch the throw; it now goes through `binacle-net-client`, which
+separates an absent body from one that will not parse. The migration kept the old wording so that choosing
+the new wording stayed this file's decision. **So the work here is now only the message**, not the
+control flow - the branch it needs already exists.
 
 ## Why it reaches a real person
 

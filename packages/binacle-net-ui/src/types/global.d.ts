@@ -1,6 +1,5 @@
-import { VisualizerState } from '../models/visualizerState';
 import { Alpine as AlpineType } from 'alpinejs';
-import { Binacle as BinacleType } from '../core';
+import { Binacle as BinacleType } from '../components/visualizer';
 
 declare global {
 	let Alpine: AlpineType;

@@ -50,12 +50,12 @@ listing that asks for one status silently misses the other:
 |---|---|---|---|
 | Accepted | `csharpsquid:S6418` | `ServiceModule/v0/Contracts/Auth/TokenResponse.cs` | 35 |
 | Accepted | `csharpsquid:S2068` | `ServiceModule/v0/Contracts/Admin/AccountGetResponse.cs` | 94 |
-| Accepted | `typescript:S2245` | `packages/binacle-net-ui/src/utils/getRandomInt.ts` | 4 |
+| Accepted | `typescript:S2245` | `packages/binacle-net-ui/src/apps/packingDemo/getRandomInt.ts` | 4 |
 | Accepted | `Web:S6850` | `UIModule/Pages/Shared/_ErrorsDialog.cshtml` | 4 |
 | Accepted | `csharpsquid:S125` | `vipaq/src/Binacle.ViPaq/ViPaqBase64Extensions.cs` | 6 |
 | False positive | `Web:UnsupportedTagsInHtml5Check` | `UIModule/Pages/Shared/_Navbar.cshtml` | 1 |
-| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/core/protocolDecoder.ts` | 30 |
-| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/core/protocolDecoder.ts` | 87 |
+| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/apps/protocolDecoder/protocolDecoder.ts` | 30 |
+| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/apps/protocolDecoder/protocolDecoder.ts` | 87 |
 
 **Accepted and False positive are not the same claim.** Accepted says the rule is right and we are keeping
 the code anyway. False positive says the rule is wrong about this line. Use the second only when it is, or

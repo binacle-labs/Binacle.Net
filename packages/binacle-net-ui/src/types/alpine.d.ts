@@ -1,4 +1,4 @@
-import { Logger } from '../core';
+import { Logger } from '../components/logger/logger';
 import type { Alpine as AlpineType } from 'alpinejs';
 
 declare module 'alpinejs' {
