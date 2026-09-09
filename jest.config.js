@@ -8,6 +8,7 @@
 module.exports = {
   projects: [
     "<rootDir>/packages/binacle-compact-notation",
+    "<rootDir>/packages/binacle-net-client",
     "<rootDir>/packages/binacle-net-ui",
     "<rootDir>/packages/cookies",
     "<rootDir>/packages/theme-switcher",

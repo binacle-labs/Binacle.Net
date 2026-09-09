@@ -48,6 +48,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-vipaq_unit
 
+      - name: Test - binacle-net-client
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-net-client_unit
+
       - name: Test - binacle-net-ui
         if: ${{ !cancelled() }}
         run: just test ts_binacle-net-ui_unit

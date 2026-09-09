@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### 🏗️ Internal Work
+
+- **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy — so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
+- **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync — a person runs it and commits what it writes.  
+
 ## [3.0.0] - 2026-09-01
 
 Binacle.Net v3.0.0 is a major update from v2.1.1.

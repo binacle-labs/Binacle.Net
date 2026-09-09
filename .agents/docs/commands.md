@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-04
+verified: 2026-09-09
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -194,14 +194,19 @@ name into `expected.txt` before it runs, which is the only thing separating "the
 just openapi generate                  # artifacts/openapi/Binacle.Net_v3.json + _v4.json
 just openapi generate <dir>            # write them somewhere else (pass an absolute path)
 just openapi lint [<dir>]              # generate, then lint with Spectral against tooling/openapi.spectral.yaml
-just openapi check-site-copies         # generate, then fail if the docs site's copies have drifted
+just openapi check-all-copies          # generate, then fail if any committed copy has drifted
+just openapi sync-all-copies           # generate, then write every committed copy
 ```
 
-`check-site-copies` diffs the two generated documents against
-`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`, which are hand-placed and which
-nothing else compares. The current version is a variable at the top of `openapi.just` and moves with each
-minor. The frozen version folders below it are records of what those releases documented and are never
-compared. `shared-image-tests.yml` runs it beside the lint.
+`check-all-copies` diffs the generated documents against the three committed copies:
+`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`, and
+`packages/binacle-net-client/spec/v4.json`. The client package is v4 only, so it takes no copy of v3. The
+current docs version is a variable at the top of `openapi.just` and moves with each minor; the frozen version
+folders below it are records of what those releases documented and are never compared.
+`shared-image-tests.yml` runs the check beside the lint.
+
+`sync-all-copies` writes those three. **No workflow calls it** - CI only ever checks, and a human runs the
+sync and commits what it writes.
 
 Nothing needs to be brought up — the documents come out of the build, not out of a running server:
 `Microsoft.Extensions.ApiDescription.Server` starts the app host itself and dumps every registered
