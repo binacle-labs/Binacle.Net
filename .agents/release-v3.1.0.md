@@ -41,7 +41,7 @@ written before the clients have moved.
 
 | # | Plan | The slice this release takes |
 |---|---|---|
-| 1 | `plans/api/ui-clients-off-v3.md` | the whole plan. One line in `packages/binacle-net-ui/src/core/packingDemo.ts:153`, both hosts rebuilt. **The endpoint is `pack/compare-bins`** - the component keeps every bin's result and lets the visitor click between them, checked 2026-09-07 |
+| 1 | `plans/api/ui-clients-off-v3.md` | the whole plan. One line in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts:153`, both hosts rebuilt. **The endpoint is `pack/compare-bins`** - the component keeps every bin's result and lets the visitor click between them, checked 2026-09-07 |
 | 2 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip.** Needs no decision - the four helpers and their ten tests already exist |
 | 3 | `plans/api/uimodule-instance-presets.md` | the whole plan. It deletes `_js/instance.js` and its webpack entry, and removes the last v4 call made from a browser inside the image |
 | 4 | `plans/api/packing-demo-next.md` | **item 3, the request panel.** *(ordering chosen by an agent - it is last because it is the only row here that can be cut without leaving anything half-done)* |
@@ -129,7 +129,7 @@ the harnesses have the optional modules on, and that is the half of the row abov
 - [ ] Every row above is either ticked with a date, or moved out of this file with a reason.
       **By eye.** A row that is neither is the state this file exists to refuse.
 - [ ] The shipped UI calls v4 on both hosts.
-      `grep -n 'api/v3' packages/binacle-net-ui/src/core/packingDemo.ts` returns nothing, with both bundles
+      `grep -n 'api/v3' packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` returns nothing, with both bundles
       rebuilt.
 - [ ] A partial result names the items it could not fit, and the result row keeps its height.
       **By eye.** Randomize to `02-packs-nowhere` and reach the unpacked items from the row without the row

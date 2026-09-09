@@ -1,8 +1,8 @@
 ---
 id: sites/packing-demo-set
 description: Why the packing demo sizes its items against the largest bin, and how sizingBin and addBin relate - the reasoning behind the numbers a visitor arrives to
-verified: 2026-08-27
-check: largestBin and randomItemFor in packages/binacle-net-ui/src/utils/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/core/packingDemo.ts - the bin each one picks is the claim that moves; the module's _sass/_theme.scss still matches sites/demo/_sass/_theme.scss once whitespace is stripped; utils/_itemMaterial.ts is still one shared MeshNormalMaterial
+verified: 2026-09-09
+check: largestBin and randomItemFor in packages/binacle-net-ui/src/apps/packingDemo/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts - the bin each one picks is the claim that moves; the module's _sass/_theme.scss still matches sites/demo/_sass/_theme.scss once whitespace is stripped; components/visualizer/itemMaterial.ts is still one shared MeshNormalMaterial
 paths:
   - "packages/binacle-net-ui/**"
 ---
@@ -49,7 +49,7 @@ always meant to match - that is what produced the false finding.
 
 ## The pink and teal faces are not item colours
 
-`utils/_itemMaterial.ts` is a single shared `MeshNormalMaterial`, which colours each face by the direction
+`components/visualizer/itemMaterial.ts` is a single shared `MeshNormalMaterial`, which colours each face by the direction
 its normal points. There is one kind of item and no categories anywhere in the API.
 
 **Any change to how items are coloured is design work.** It is not a bug and there is nothing to fix.

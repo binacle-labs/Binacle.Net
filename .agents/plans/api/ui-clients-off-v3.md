@@ -19,14 +19,14 @@ a smaller request and a smaller response than fetching every bin's result and th
 ## Done when
 
 - [ ] The packing demo calls v4, using the endpoint shaped like the answer it actually renders.
-      **By eye** in `packages/binacle-net-ui/src/core/packingDemo.ts`, and both hosts have had their bundle
+      **By eye** in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts`, and both hosts have had their bundle
       rebuilt.
 
 ## Research
 
 ### Date not recorded - it is one line, in one place
 
-`packages/binacle-net-ui/src/core/packingDemo.ts`. The UIModule rebuild deleted the second call site: the
+`packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts`. The UIModule rebuild deleted the second call site: the
 module now serves the same TypeScript component the demo site does, so both hosts move on that one edit.
 
 ### 2026-08-22 - the two hosts were not equally ready, and now they are

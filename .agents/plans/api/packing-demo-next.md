@@ -34,7 +34,7 @@ tooltip**, and it has to be reachable by hover, touch and keyboard - that is the
 strings.
 
 **The strings survived the revert and are tested.** `hasUnpackedItems`, `unpackedItemsOf`,
-`unpackedItemsTitle` and `unpackedItemText` are in `packages/binacle-net-ui/src/core/packingDemo.ts` with ten
+`unpackedItemsTitle` and `unpackedItemText` are in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` with ten
 tests behind them in `packages/binacle-net-ui/tests/components/packingDemo.test.ts`. Whoever builds the
 tooltip starts from checked strings.
 
@@ -44,8 +44,8 @@ not the feature.
 ## 2. The submit button can stick disabled
 
 **This one is a defect, and it is latent rather than live.**
-`packages/binacle-net-ui/src/core/packingDemo.ts:183` sets `submitting = true` in `onSubmit`, and the only
-thing that clears it is the `finally` at `:225` - which sits inside the thunk handed to
+`packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts:177` sets `submitting = true` in `onSubmit`, and the only
+thing that clears it is the `finally` at `:220` - which sits inside the thunk handed to
 `$dispatch('update-scene', ...)`. **Nothing runs that thunk unless a visualizer is listening.**
 
 Both packing pages include the visualizer today, so nothing is broken in public. A page that embeds the
@@ -103,7 +103,7 @@ does: what the UI changes to.
       from the row without the row growing. Hover, touch and keyboard all reach it.
 - [ ] The four helpers and their ten tests are still there and still drive the tooltip.
       `grep -c 'unpackedItemsTitle\|unpackedItemText\|hasUnpackedItems\|unpackedItemsOf'` returns 6 on
-      `packages/binacle-net-ui/src/core/packingDemo.ts` and 10 on
+      `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` and 10 on
       `packages/binacle-net-ui/tests/components/packingDemo.test.ts`.
 - [ ] Both hosts render it, to the same count.
       `grep -c hasUnpackedItems sites/demo/pages/packing.html` and the same on
