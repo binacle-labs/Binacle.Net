@@ -75,6 +75,12 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "the shape - what the UI changes to and how is not worked out yet"
   horizon: near
   paths: ["api/**", "packages/binacle-net-ui/**"]
+- file: api/ui-package-structure.md
+  description: "binacle-net-ui has no layers - 19 of its 25 utils are visualizer internals sitting in a shared bag. Split it into apps, components and plugins"
+  state: ready
+  waits-on: "nothing. horizon: now - taken from the maintainer's instruction to start it, strike it if wrong"
+  horizon: now
+  paths: ["packages/binacle-net-ui/**"]
 - file: api/uimodule-instance-presets.md
   description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
   state: idea

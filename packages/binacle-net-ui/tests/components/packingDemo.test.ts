@@ -1,13 +1,21 @@
 import type {Alpine as AlpineType} from "alpinejs";
 
-import {PackedData, PackingResponse} from "../../src/apiModels/packingResponse";
+import {
+	ApiFailure,
+	ApiProblem,
+	BinPackResultStatus,
+	PackBinResponse,
+	PackCompareResponse,
+	PackCustomRequest
+} from "binacle-net-client";
+
 import {Logger} from "../../src/core/logger";
 import {packingDemoApp, packingDemoAppPlugin, PackingDemoOptions} from "../../src/core/packingDemo";
 import {sampleData} from "../../src/utils/sampleData";
 import {largestBin, sampleAt} from "../../src/utils/samples";
 import {Bin, Item} from "../../src/viewModels";
 
-const packEndpoint = "/api/v3/pack/by-custom";
+const packEndpoint = "/api/v4/pack/compare-bins";
 
 interface Dispatched {
 	name: string;
@@ -64,14 +72,19 @@ function createApp(options: PackingDemoOptions = {}) {
 	return {app, dispatched, logger};
 }
 
-// The response the component reads is only ever consumed through status, statusText and json(), so a stub is
-// enough and a real Response would need a body stream per case.
-function stubResponse(status: number, statusText: string, body: unknown | (() => Promise<never>)): Response {
+// The client reads the body with text() and parses it itself, so the stub carries the raw text. No body at
+// all is the third argument left out, which is what the rate limiter sends on a 429.
+function stubResponse(status: number, body?: unknown): Response {
 	return {
+		ok: status >= 200 && status < 300,
 		status,
-		statusText,
-		json: typeof body === "function" ? body : () => Promise.resolve(body),
+		text: () => Promise.resolve(body === undefined ? "" : JSON.stringify(body)),
 	} as unknown as Response;
+}
+
+// What the client hands handleErrorResponse. `problem` is null when the response carried no body.
+function failedResponse(status: number, problem: ApiProblem | null): ApiFailure {
+	return {ok: false, status, problem};
 }
 
 function mockFetch(response: Response) {
@@ -88,10 +101,11 @@ function mockFailingFetch(reason: unknown) {
 	return fetchMock;
 }
 
-function packedData(overrides: Partial<PackedData> = {}): PackedData {
+function packedData(overrides: Partial<PackBinResponse> = {}): PackBinResponse {
 	return {
-		result: "FullyPacked",
+		status: "FullyPacked",
 		bin: {id: "10x10x10", length: 10, width: 10, height: 10},
+		algorithmUsed: "FFD",
 		packedItems: [],
 		unpackedItems: null,
 		packedItemsVolumePercentage: 100,
@@ -101,8 +115,8 @@ function packedData(overrides: Partial<PackedData> = {}): PackedData {
 	};
 }
 
-function packingResponse(data: PackedData[] | null): PackingResponse {
-	return {result: "Success", data: data as PackedData[]};
+function packingResponse(results: PackBinResponse[] | null): PackCompareResponse {
+	return {results: results as PackBinResponse[]};
 }
 
 // Runs the request the way the visualizer would.
@@ -405,7 +419,7 @@ describe("pressing the submit button", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData()])));
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
 		await sceneThunk(dispatched)();
 
@@ -417,7 +431,7 @@ describe("pressing the submit button", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData()])));
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
 		await sceneThunk(dispatched)();
 
@@ -429,7 +443,7 @@ describe("pressing the submit button", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		mockFetch(stubResponse(200, "OK", packingResponse(null)));
+		mockFetch(stubResponse(200, packingResponse(null)));
 
 		await sceneThunk(dispatched)();
 
@@ -754,7 +768,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -766,7 +780,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -778,7 +792,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -790,7 +804,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -803,7 +817,7 @@ describe("the request", () => {
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.model.algorithm = "BFD";
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -815,7 +829,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 20, 30), new Bin(40, 50, 60)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -833,7 +847,7 @@ describe("the request", () => {
 		app.model.bins = [bin];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -848,7 +862,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [item];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -861,7 +875,7 @@ describe("the request", () => {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 3, 4, 5)];
 		app.onSubmit();
-		const fetchMock = mockFetch(stubResponse(200, "OK", packingResponse([])));
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
 		await sceneThunk(dispatched)();
 
@@ -872,14 +886,14 @@ describe("the request", () => {
 });
 
 describe("an error response", () => {
-	test("a 422 field-errors bag becomes one line per field error", async () => {
+	test("a 422 field-errors bag becomes one line per field error", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(422, "Unprocessable Entity", {
+		const response = failedResponse(422, {
 			title: "Validation failed",
 			errors: {Bins: ["Bins is required", "Bins must not be empty"], Items: ["Items is required"]},
 		});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.errors).toEqual([
 			"Bins: Bins is required",
@@ -888,114 +902,114 @@ describe("an error response", () => {
 		]);
 	});
 
-	test("a 422 takes its title from the body", async () => {
+	test("a 422 takes its title from the body", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(422, "Unprocessable Entity", {
+		const response = failedResponse(422, {
 			title: "Validation failed",
 			errors: {Bins: ["Bins is required"]},
 		});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.title).toBe("Validation failed");
 	});
 
-	test("a 422 puts the detail ahead of the field errors", async () => {
+	test("a 422 puts the detail ahead of the field errors", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(422, "Unprocessable Entity", {
+		const response = failedResponse(422, {
 			title: "Validation failed",
 			detail: "One or more fields are invalid",
 			errors: {Bins: ["Bins is required"]},
 		});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.errors).toEqual(["One or more fields are invalid", "Bins: Bins is required"]);
 	});
 
-	test("a plain problem response shows its detail", async () => {
+	test("a plain problem response shows its detail", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(400, "Bad Request", {title: "Bad Request", detail: "Algorithm is unknown"});
+		const response = failedResponse(400, {title: "Bad Request", detail: "Algorithm is unknown"});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail).toEqual({title: "Bad Request", errors: ["Algorithm is unknown"]});
 	});
 
-	test("a field-errors bag on a status other than 422 is ignored", async () => {
+	test("a field-errors bag on a status other than 422 is ignored", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(400, "Bad Request", {
+		const response = failedResponse(400, {
 			title: "Bad Request",
 			errors: {Bins: ["Bins is required"]},
 		});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.errors).toEqual([]);
 	});
 
-	test("a body with neither title nor detail falls back to the status text", async () => {
+	test("a body with neither title nor detail falls back to the status text", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(503, "Service Unavailable", {});
+		const response = failedResponse(503, {});
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail).toEqual({title: "Error: Service Unavailable", errors: []});
 	});
 
-	test("an empty body falls back to the status text", async () => {
+	test("an empty body falls back to the status text", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(404, "Not Found", null);
+		const response = failedResponse(404, null);
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
-		expect(dispatched[0].detail).toEqual({title: "Error: Not Found", errors: []});
+		expect(dispatched[0].detail.title).toBe("Error: Not Found");
 	});
 
-	test("a body that will not parse says so", async () => {
+	test("a body that will not parse says so", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(500, "Internal Server Error", () => Promise.reject(new SyntaxError("bad json")));
+		const response = failedResponse(500, null);
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.errors).toEqual(["An error occurred, but the error response could not be parsed."]);
 	});
 
-	test("a body that will not parse still names the status", async () => {
+	test("a body that will not parse still names the status", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(500, "Internal Server Error", () => Promise.reject(new SyntaxError("bad json")));
+		const response = failedResponse(500, null);
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.title).toBe("Error: Internal Server Error");
 	});
 
-	test("a missing status text is looked up from the status", async () => {
+	test("a missing status text is looked up from the status", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(429, "", () => Promise.reject(new SyntaxError("bad json")));
+		const response = failedResponse(429, null);
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.title).toBe("Error: Too Many Requests");
 	});
 
-	test("an unknown status with no status text still gets a title", async () => {
+	test("an unknown status with no status text still gets a title", () => {
 		const {app, dispatched} = createApp();
-		const response = stubResponse(418, "", () => Promise.reject(new SyntaxError("bad json")));
+		const response = failedResponse(418, null);
 
-		await app.handleErrorResponse(response);
+		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.title).toBe("Error: Error");
 	});
 });
 
 describe("getResults", () => {
-	const request = {parameters: {algorithm: "FFD"}, bins: [], items: []};
+	const request: PackCustomRequest = {parameters: {algorithm: "FFD"}, bins: [], items: []};
 
 	test("a 200 hands back the parsed body", async () => {
 		const {app} = createApp();
 		const body = packingResponse([packedData()]);
-		mockFetch(stubResponse(200, "OK", body));
+		mockFetch(stubResponse(200, body));
 
 		const result = await app.getResults(request);
 
@@ -1004,7 +1018,7 @@ describe("getResults", () => {
 
 	test("a non-200 hands back nothing", async () => {
 		const {app} = createApp();
-		mockFetch(stubResponse(400, "Bad Request", {title: "Bad Request"}));
+		mockFetch(stubResponse(400, {title: "Bad Request"}));
 
 		const result = await app.getResults(request);
 
@@ -1013,7 +1027,7 @@ describe("getResults", () => {
 
 	test("a non-200 surfaces the error", async () => {
 		const {app, dispatched} = createApp();
-		mockFetch(stubResponse(400, "Bad Request", {title: "Bad Request", detail: "Algorithm is unknown"}));
+		mockFetch(stubResponse(400, {title: "Bad Request", detail: "Algorithm is unknown"}));
 
 		await app.getResults(request);
 
@@ -1073,9 +1087,9 @@ describe("the scene the results feed", () => {
 
 	test("the first result with a bin is selected", async () => {
 		const {app, dispatched} = createApp();
-		const packed = packedData({result: "PartiallyPacked"});
+		const packed = packedData({status: "PartiallyPacked"});
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData({bin: null as any}), packed])));
+		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any}), packed])));
 
 		await sceneThunk(dispatched)();
 
@@ -1084,9 +1098,9 @@ describe("the scene the results feed", () => {
 
 	test("every result is kept for the list", async () => {
 		const {app, dispatched} = createApp();
-		const data = [packedData({result: "FullyPacked"}), packedData({result: "PartiallyPacked"})];
+		const data = [packedData({status: "FullyPacked"}), packedData({status: "PartiallyPacked"})];
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse(data)));
+		mockFetch(stubResponse(200, packingResponse(data)));
 
 		await sceneThunk(dispatched)();
 
@@ -1097,7 +1111,7 @@ describe("the scene the results feed", () => {
 		const {app, dispatched} = createApp();
 		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 0, y: 0, z: 0}];
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData({packedItems})])));
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems})])));
 
 		const scene = await sceneThunk(dispatched)();
 
@@ -1107,7 +1121,7 @@ describe("the scene the results feed", () => {
 	test("a result with no packed items gives the scene an empty list", async () => {
 		const {app, dispatched} = createApp();
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData({packedItems: null})])));
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: null})])));
 
 		const scene = await sceneThunk(dispatched)();
 
@@ -1117,7 +1131,7 @@ describe("the scene the results feed", () => {
 	test("no result with a bin leaves nothing selected", async () => {
 		const {app, dispatched} = createApp();
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse([packedData({bin: null as any})])));
+		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any})])));
 
 		await sceneThunk(dispatched)();
 
@@ -1128,7 +1142,7 @@ describe("the scene the results feed", () => {
 		const {app, dispatched} = createApp();
 		app.results = [packedData()];
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse(null)));
+		mockFetch(stubResponse(200, packingResponse(null)));
 
 		await sceneThunk(dispatched)();
 
@@ -1138,7 +1152,7 @@ describe("the scene the results feed", () => {
 	test("a body with no data leaves the scene empty", async () => {
 		const {app, dispatched} = createApp();
 		submit(app);
-		mockFetch(stubResponse(200, "OK", packingResponse(null)));
+		mockFetch(stubResponse(200, packingResponse(null)));
 
 		const scene = await sceneThunk(dispatched)();
 
@@ -1192,7 +1206,7 @@ describe("picking a result from the list", () => {
 describe("result labels", () => {
 	test("a fully packed result is green", () => {
 		const {app} = createApp();
-		const result = packedData({result: "FullyPacked"});
+		const result = packedData({status: "FullyPacked"});
 
 		const colour = app.colorClass(result);
 
@@ -1201,7 +1215,7 @@ describe("result labels", () => {
 
 	test("a partially packed result is orange", () => {
 		const {app} = createApp();
-		const result = packedData({result: "PartiallyPacked"});
+		const result = packedData({status: "PartiallyPacked"});
 
 		const colour = app.colorClass(result);
 
@@ -1210,7 +1224,7 @@ describe("result labels", () => {
 
 	test("anything else is red", () => {
 		const {app} = createApp();
-		const result = packedData({result: "NotPacked"});
+		const result = packedData({status: "NotPacked"});
 
 		const colour = app.colorClass(result);
 
@@ -1250,11 +1264,9 @@ describe("result labels", () => {
 		["NotPacked", "Not packed"],
 		["PartiallyPacked", "Partially packed"],
 		["FullyPacked", "Fully packed"],
-		["EarlyFail_ContainerVolumeExceeded", "Items exceed bin volume"],
-		["EarlyFail_ContainerDimensionExceeded", "Item longer than bin"],
 	])("%s reads as %s", (status, expected) => {
 		const {app} = createApp();
-		const result = packedData({result: status});
+		const result = packedData({status: status as BinPackResultStatus});
 
 		const text = app.resultStatusText(result);
 
@@ -1263,7 +1275,7 @@ describe("result labels", () => {
 
 	test("a status the page does not know still reads as English", () => {
 		const {app} = createApp();
-		const result = packedData({result: "SomethingNew"});
+		const result = packedData({status: "SomethingNew" as BinPackResultStatus});
 
 		const text = app.resultStatusText(result);
 
@@ -1272,7 +1284,7 @@ describe("result labels", () => {
 
 	test("only a fully packed result reports as fully packed", () => {
 		const {app} = createApp();
-		const result = packedData({result: "PartiallyPacked"});
+		const result = packedData({status: "PartiallyPacked"});
 
 		const fullyPacked = app.resultIsFullyPacked(result);
 
@@ -1297,7 +1309,7 @@ describe("the items a result could not fit", () => {
 
 	test("a partial result has some", () => {
 		const {app} = createApp();
-		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
 
 		expect(app.hasUnpackedItems(result)).toBe(true);
 	});
@@ -1332,7 +1344,7 @@ describe("the items a result could not fit", () => {
 	// A visitor reads these, so they stay plain ASCII and carry no field name from the contract.
 	test("the heading and the lines are plain ASCII with no contract name in them", () => {
 		const {app} = createApp();
-		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
 
 		const text = [app.unpackedItemsTitle(result), ...app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))]
 			.join(" ");
@@ -1346,7 +1358,7 @@ describe("the items a result could not fit", () => {
 		const {app} = createApp();
 		const sample = sampleData.find(x => x.name === "02-packs-nowhere")!;
 		const item = new Item(...sample.items[0]);
-		const result = packedData({result: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
 
 		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 2 items");
 		expect(app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))).toEqual(["2 x 20x20x20-3"]);
