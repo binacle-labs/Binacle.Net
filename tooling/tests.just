@@ -42,6 +42,7 @@ image:
     just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
@@ -58,6 +59,7 @@ image:
 sites:
     just test ts_binacle-compact-notation_unit
     just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
@@ -80,6 +82,7 @@ all:
     just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
+    just test ts_binacle-net-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
@@ -174,6 +177,9 @@ ts_binacle-compact-notation_unit: (_jest_test 'binacle-compact-notation')
 
 [private]
 ts_binacle-vipaq_unit: (_jest_test 'binacle-vipaq')
+
+[private]
+ts_binacle-net-client_unit: (_jest_test 'binacle-net-client')
 
 [private]
 ts_binacle-net-ui_unit: (_jest_test 'binacle-net-ui')

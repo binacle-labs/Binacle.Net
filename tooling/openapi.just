@@ -3,7 +3,8 @@
 #   just openapi generate          write artifacts/openapi/Binacle.Net_v3.json and _v4.json
 #   just openapi generate <dir>    write them somewhere else
 #   just openapi lint [<dir>]      generate, then lint them against tooling/openapi.spectral.yaml
-#   just openapi check-site-copies generate, then fail if the docs site's copies have drifted
+#   just openapi check-all-copies  generate, then fail if any committed copy has drifted
+#   just openapi sync-all-copies   generate, then write every committed copy
 #
 # The documents come out of the build and not out of a running server, so nothing has to be brought up. The
 # host it starts has no launch profile, so ServiceModule is off - which is the shape the committed specs
@@ -45,7 +46,19 @@ lint dir=openapi_dir: (generate dir)
 current_docs_version := "v3.0.x"
 site_swagger := justfile_directory() / "sites" / "docs" / "collections" / "_versions" / current_docs_version / "swagger"
 
-# Generate the documents, then fail if the docs site's copies have drifted
-check-site-copies: (generate openapi_dir)
+# The client package is v4 only, so it takes no copy of v3.
+client_spec := justfile_directory() / "packages" / "binacle-net-client" / "spec"
+
+# Generate the documents, then fail if any committed copy has drifted
+check-all-copies: (generate openapi_dir)
     diff '{{ openapi_dir }}/Binacle.Net_v3.json' '{{ site_swagger }}/v3.json'
     diff '{{ openapi_dir }}/Binacle.Net_v4.json' '{{ site_swagger }}/v4.json'
+    diff '{{ openapi_dir }}/Binacle.Net_v4.json' '{{ client_spec }}/v4.json'
+
+# No workflow calls this. CI only ever checks; a human runs this and commits what it writes.
+
+# Generate the documents, then write every committed copy
+sync-all-copies: (generate openapi_dir)
+    cp '{{ openapi_dir }}/Binacle.Net_v3.json' '{{ site_swagger }}/v3.json'
+    cp '{{ openapi_dir }}/Binacle.Net_v4.json' '{{ site_swagger }}/v4.json'
+    cp '{{ openapi_dir }}/Binacle.Net_v4.json' '{{ client_spec }}/v4.json'

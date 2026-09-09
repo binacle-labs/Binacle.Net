@@ -13,7 +13,7 @@ paths:
 **One of four gaps that were filed together. The other three are closed.**
 
 **What `regen` covers is settled**: data generated *into* the repository, and nothing else. The docs site's
-OpenAPI copies are not that - they are hand-carried, and `just openapi check-site-copies` compares them now.
+OpenAPI copies are not that - they are hand-carried, and `just openapi check-all-copies` compares them now.
 
 ## No workflow calls it
 
