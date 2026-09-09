@@ -34,6 +34,19 @@ empty one alike, so it goes in with the first real entry rather than on its own.
 
 ---
 
+## What the UI rows stand on
+
+**Both landed 2026-09-09 and both are structural** - no endpoint moved and no page changed behaviour. They
+are here because they ship in this version, not because anything is waiting on them.
+
+| Plan | The slice this release takes | Landed |
+|---|---|---|
+| no plan - it came out of a decision taken in session | **`packages/binacle-net-client`, a private hand-written TypeScript client for v4.** No generator and no runtime dependency. It carries its own committed copy of the v4 OpenAPI document and a test that validates the hand-written types against it, so a contract change in the API fails a test rather than reaching a page. Covers `pack/compare-bins`. `just openapi check-site-copies` became `check-all-copies` and gained `sync-all-copies` to keep that copy in step | `35be5a5e`, `929612d1` |
+| plan landed and deleted - the reasoning is in the packages decisions ledger | **`binacle-net-ui` split into `apps/`, `components/` and `shared/`. 19 of its 25 utils were visualizer internals sitting where any file could import them; the visualizer now owns them and exposes its component plus one contract type. No behaviour changed - 348 tests passed before and after with no assertion edited | `f3350689` |
+
+**Neither is ticked in *Done when* yet.** Both are proven by the same thing every UI row is: the two bundles
+rebuilt and the pages exercised.
+
 ## The UI, in this order
 
 **The order is a dependency, not a preference.** The request panel prints an API version, so it cannot be
@@ -41,14 +54,15 @@ written before the clients have moved.
 
 | # | Plan | The slice this release takes |
 |---|---|---|
-| 1 | `plans/api/ui-clients-off-v3.md` | the whole plan. One line in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts:153`, both hosts rebuilt. **The endpoint is `pack/compare-bins`** - the component keeps every bin's result and lets the visitor click between them, checked 2026-09-07 |
-| 2 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip.** Needs no decision - the four helpers and their ten tests already exist |
-| 3 | `plans/api/uimodule-instance-presets.md` | the whole plan. It deletes `_js/instance.js` and its webpack entry, and removes the last v4 call made from a browser inside the image |
-| 4 | `plans/api/packing-demo-next.md` | **item 3, the request panel.** *(ordering chosen by an agent - it is last because it is the only row here that can be cut without leaving anything half-done)* |
+| 1 | plan landed and deleted | **The shipped UI calls v4.** `pack/compare-bins`, through `packages/binacle-net-client` - the component keeps every bin's result and lets the visitor click between them, so the single-bin endpoints do not cover it. Landed `33a4dfcc`. **Both bundles still have to be rebuilt**, which is what this row waits on |
+| 2 | no plan - release paperwork | **The `Best` algorithm, and the algorithm each result used.** `Best` is in the v4 enum and was unreachable from v3, so row 1 is what makes it offerable; `algorithmUsed` is on every v4 result and is rendered nowhere. **One feature, not two** - `Best` runs several heuristics and returns the winner, so without the display the visitor cannot tell what won. Both hosts' result rows. *(placed after row 1 by an agent because it depends on it - strike the placement, not the row)* |
+| 3 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip.** Needs no decision - the four helpers and their ten tests already exist |
+| 4 | `plans/api/uimodule-instance-presets.md` | the whole plan. It deletes `_js/instance.js` and its webpack entry, and removes the last v4 call made from a browser inside the image |
+| 5 | `plans/api/packing-demo-next.md` | **item 3, the request panel.** *(ordering chosen by an agent - it is last because it is the only row here that can be cut without leaving anything half-done)* |
 
-**Do not edit the v4 call in `_js/instance.js` on the way past.** Row 3 deletes the file.
+**Do not edit the v4 call in `_js/instance.js` on the way past.** Row 4 deletes the file.
 
-**Row 4 has four questions left and one of them decides its cost** - whether the panel lives inside the shared
+**Row 5 has four questions left and one of them decides its cost** - whether the panel lives inside the shared
 component or in the Razor page around it. The version question that used to gate it is answered by row 1.
 
 ## The two fixes
@@ -128,12 +142,22 @@ the harnesses have the optional modules on, and that is the half of the row abov
       `just changelog check Unreleased` passes.
 - [ ] Every row above is either ticked with a date, or moved out of this file with a reason.
       **By eye.** A row that is neither is the state this file exists to refuse.
+- [ ] The demo bundles the client, and no chunk is published that nothing loads.
+      `ls api/src/Binacle.Net.UIModule/wwwroot/js` lists no `binacle-net-client*` file, because both hosts
+      list their chunks by hand and the client rides in the `binacle-net-ui` chunk.
+- [ ] The restructured package still exports exactly the two plugins.
+      `cat packages/binacle-net-ui/index.ts` shows both `export` lines and both `/// <reference` lines.
 - [ ] The shipped UI calls v4 on both hosts.
       `grep -n 'api/v3' packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` returns nothing, with both bundles
       rebuilt.
 - [ ] A partial result names the items it could not fit, and the result row keeps its height.
       **By eye.** Randomize to `02-packs-nowhere` and reach the unpacked items from the row without the row
       growing. Hover, touch and keyboard all reach it.
+- [ ] The demo offers `Best`, and it is not confusable with `Best Fit Decreasing`.
+      **By eye** in the algorithm dropdown. Two entries a visitor cannot tell apart is the failure here.
+- [ ] Every result says which algorithm actually ran, by name and not by code.
+      **By eye.** Pack with `Best` selected and read the winner off the result row. `BFD` on the page rather
+      than a friendly name means the box is open.
 - [ ] The instance page renders its presets without a browser fetch.
       `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js`, and no `instance:` entry in that module's
       `webpack.config.js`.

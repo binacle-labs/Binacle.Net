@@ -225,8 +225,13 @@ excerpt: |
 
                 <div class="s4" x-text="resultStatusText(result)">
                 </div>
+                <template x-if="showsAlgorithmUsed()">
+                  <div class="s4" x-text="resultAlgorithmText(result)">
+                  </div>
+                </template>
                 <template x-if="!resultIsFullyPacked(result)">
-                  <div class="s8 right-align" x-text="resultItemPercentageText(result)">
+                  <div :class="showsAlgorithmUsed() ? 's4 right-align' : 's8 right-align'"
+                       x-text="resultItemPercentageText(result)">
                   </div>
                 </template>
               </div>
