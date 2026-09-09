@@ -9,9 +9,15 @@ import {
 	sampleAt
 } from "../utils";
 import {Bin, Item, Error as ErrorViewModel} from "../viewModels";
-import {PackingRequest, PackingResponse} from "../apiModels";
-import {PackedData} from "../apiModels/packingResponse";
-import {UnpackedItem} from "../apiModels/unpackedItem";
+import {
+	ApiFailure,
+	BinacleClient,
+	hasValidationErrors,
+	PackBinResponse,
+	PackCompareResponse,
+	PackCustomRequest,
+	UnpackedBox
+} from "binacle-net-client";
 
 // The API's BinPackResultStatus, in the words a visitor reads.
 const resultStatusTexts: Record<string, string> = {
@@ -19,8 +25,6 @@ const resultStatusTexts: Record<string, string> = {
 	NotPacked: 'Not packed',
 	PartiallyPacked: 'Partially packed',
 	FullyPacked: 'Fully packed',
-	EarlyFail_ContainerVolumeExceeded: 'Items exceed bin volume',
-	EarlyFail_ContainerDimensionExceeded: 'Item longer than bin',
 };
 
 export function packingDemoAppPlugin(Alpine: AlpineType) {
@@ -43,8 +47,8 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		{value: 'BFD', text: 'Best Fit Decreasing'},
 		{value: 'WFD', text: 'Worst Fit Decreasing'},
 	],
-	results: [] as PackedData[],
-	selectedResult: null as PackedData | null,
+	results: [] as PackBinResponse[],
+	selectedResult: null as PackBinResponse | null,
 	formErrors: [] as string[],
 	sampleIndex: 0,
 	submitting: false,
@@ -119,49 +123,43 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			this.showSample(nextSampleIndex(this.sampleIndex));
 		}
 	},
-	async handleErrorResponse(response: Response) {
+	handleErrorResponse(failure: ApiFailure) {
 		let errorObj = {
-			title: `Error: ${response.statusText || getResponseStatusText(response.status) || response.status}`,
+			title: `Error: ${getResponseStatusText(failure.status)}`,
 			errors: []
 		} as ErrorViewModel;
 
-		try {
-			const responseJson = await response.json();
-			if(responseJson?.title){
-				errorObj.title = responseJson.title;
+		const problem = failure.problem;
+		if(problem === null){
+			errorObj.errors.push('An error occurred, but the error response could not be parsed.');
+		}
+		else {
+			if(problem.title){
+				errorObj.title = problem.title;
 			}
-			if(responseJson?.detail){
-				errorObj.errors.push(responseJson.detail);
+			if(problem.detail){
+				errorObj.errors.push(problem.detail);
 			}
-			if(response.status === 422 && responseJson?.errors){
-				for(const key in responseJson.errors){
-					const fieldErrors = responseJson.errors[key];
+			if(failure.status === 422 && hasValidationErrors(problem)){
+				const errorsByField = problem.errors ?? {};
+				for(const key in errorsByField){
+					const fieldErrors = errorsByField[key];
 					fieldErrors.forEach((err: string) => {
 						errorObj.errors.push(`${key}: ${err}`);
 					});
 				}
 			}
 		}
-		catch (error) {
-			this.$logger.error("[Binacle] Error while parsing error response", error);
-			errorObj.errors.push('An error occurred, but the error response could not be parsed.');
-		}
 		this.$dispatch('error-occurred', errorObj);
 	},
-	async getResults(request: PackingRequest) : Promise<PackingResponse | null> {
+	async getResults(request: PackCustomRequest) : Promise<PackCompareResponse | null> {
 		try {
-			const response = await fetch(`${options.baseUrl ?? ''}/api/v3/pack/by-custom`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(request)
-			})
-			if(response.status === 200){
-				const responseJson = await response.json();
-				return responseJson as PackingResponse;
+			const client = new BinacleClient({baseUrl: options.baseUrl ?? ''});
+			const response = await client.packCompareBins(request);
+			if(response.ok){
+				return response.data;
 			}
-			await this.handleErrorResponse(response);
+			this.handleErrorResponse(response);
 			return null;
 		} catch (error) {
 			this.$logger.error("[Binacle] Error while fetching packing results", error);
@@ -201,21 +199,21 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 				height: Number(x.height),
 				quantity: Number(x.quantity)
 			}))
-		} as PackingRequest;
+		} as PackCustomRequest;
 
 		this.$dispatch('update-scene', async () => {
 			try {
 				this.$logger.log('[Binacle] Packing request sent', request);
 				const response = await this.getResults(request);
 				this.$logger.log('[Binacle] Packing results received', response);
-				if(!response || !response.data){
+				if(!response || !response.results){
 					this.results = [];
 					this.selectedResult = null;
 					this.submitStatus = 'No results.';
 					return null;
 				}
-				const firstSuccessfulResult = response.data.find(x => !!x.bin);
-				this.results = response.data;
+				const firstSuccessfulResult = response.results.find(x => !!x.bin);
+				this.results = response.results;
 				this.selectedResult = firstSuccessfulResult || null;
 				this.submitStatus = this.results.length > 0 ? '' : 'No results.';
 				return {
@@ -228,10 +226,10 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		});
 
 	},
-	isSelected(result: PackedData) {
+	isSelected(result: PackBinResponse) {
 		return this.selectedResult === result;
 	},
-	selectResult(result: PackedData) {
+	selectResult(result: PackBinResponse) {
 		this.selectedResult = result;
 		this.$dispatch('update-scene', async () => {
 			return {
@@ -240,44 +238,44 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			};
 		});
 	},
-	colorClass(result: PackedData) {
-		if (result.result === 'FullyPacked') {
+	colorClass(result: PackBinResponse) {
+		if (result.status === 'FullyPacked') {
 			return 'green';
 		}
-		if (result.result === 'PartiallyPacked') {
+		if (result.status === 'PartiallyPacked') {
 			return 'orange';
 		}
 		return 'red';
 	},
-	resultStatusText(result: PackedData) {
-		return resultStatusTexts[result.result] ?? 'Unknown';
+	resultStatusText(result: PackBinResponse) {
+		return resultStatusTexts[result.status] ?? 'Unknown';
 	},
-	resultTitle(result: PackedData) {
+	resultTitle(result: PackBinResponse) {
 		return `Bin: ${result.bin.id}`;
 	},
-	resultBinPercentageText(result: PackedData) {
+	resultBinPercentageText(result: PackBinResponse) {
 		return `Packed Bin Volume: ${result.packedBinVolumePercentage}%`;
 	},
-	resultItemPercentageText(result: PackedData) {
+	resultItemPercentageText(result: PackBinResponse) {
 		return `Packed Items Volume: ${result.packedItemsVolumePercentage}%`
 	},
-	resultIsFullyPacked(result: PackedData) {
-		return result.result === 'FullyPacked';
+	resultIsFullyPacked(result: PackBinResponse) {
+		return result.status === 'FullyPacked';
 	},
 	submitButtonText() {
 		return this.submitting ? 'Working...' : 'Get results';
 	},
-	unpackedItemsOf(result: PackedData): UnpackedItem[] {
+	unpackedItemsOf(result: PackBinResponse): UnpackedBox[] {
 		return result.unpackedItems ?? [];
 	},
-	hasUnpackedItems(result: PackedData) {
+	hasUnpackedItems(result: PackBinResponse) {
 		return this.unpackedItemsOf(result).length > 0;
 	},
-	unpackedItemsTitle(result: PackedData) {
+	unpackedItemsTitle(result: PackBinResponse) {
 		const count = this.unpackedItemsOf(result).reduce((total, item) => total + item.quantity, 0);
 		return count === 1 ? 'Could not fit 1 item' : `Could not fit ${count} items`;
 	},
-	unpackedItemText(item: UnpackedItem) {
+	unpackedItemText(item: UnpackedBox) {
 		return `${item.quantity} x ${item.id}`;
 	}
 }));
