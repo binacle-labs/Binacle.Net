@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using Binacle.Net.DiagnosticsModule.Middleware;
+using Binacle.Net.Kernel.Instance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
@@ -20,7 +21,7 @@ public class RequestDebugMiddlewareTests
 	private static async Task<Call> Invoke(
 		string path,
 		Action<HttpContext>? arrangeRequest = null,
-		Action<FeatureOptions>? arrangeFeatures = null,
+		Action<InstanceOptions>? arrangeFeatures = null,
 		Action<ReservedPathOptions>? arrangeReservedPaths = null
 	)
 	{
@@ -35,7 +36,7 @@ public class RequestDebugMiddlewareTests
 		var body = new MemoryStream();
 		context.Response.Body = body;
 
-		var features = new FeatureOptions();
+		var features = new InstanceOptions();
 		arrangeFeatures?.Invoke(features);
 
 		var reservedPaths = new ReservedPathOptions();

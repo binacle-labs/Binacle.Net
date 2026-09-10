@@ -34,14 +34,15 @@ request with one field replaced by raw JSON, which is how a value the C# type ca
 an ordinal - reaches the endpoint. The field is named with `nameof`, so a renamed property is a build error
 rather than a test that quietly passes on nothing.
 
-## 🧩 Two fixtures
+## 🧩 Fixtures
 
-Both are assembly fixtures, so the app starts once for the whole run.
+`BinacleApi` and `BinacleApiWithoutPresets` are assembly fixtures, so the app starts once for the whole run.
 
 | Fixture | Why |
 |---|---|
-| `BinacleApi` | The normal one. Presets loaded, used by almost everything |
+| `BinacleApi` | The normal one. Presets loaded, used by almost everything. Carries no `Cors.json`, which is what proves CORS is closed by default |
 | `BinacleApiWithoutPresets` | The same app with no presets, to prove the endpoints answer sensibly when there are none |
+| `CorsConfiguredBinacleApi` | A class fixture, not assembly-wide - the one host with an allowed origin set, for `Tests/CorsTests.cs` |
 
 `PresetKeys.cs` holds the preset names the tests ask for, so a renamed preset breaks in one place.
 

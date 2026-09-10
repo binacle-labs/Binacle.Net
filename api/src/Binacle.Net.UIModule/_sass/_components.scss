@@ -57,3 +57,21 @@ button.destructive:is(:hover, :focus) {
 button[type="submit"]:not(.border):not(.transparent) {
 	color: var(--on-primary-container);
 }
+
+// beercss reveals a tooltip on `:hover > .tooltip` and nowhere else, so a keyboard never reaches one and a
+// touch device has no hover to give. This repeats its hover rule for focus, which covers both.
+:focus-within > .tooltip {
+	visibility: visible;
+	opacity: 1;
+	transform: translate(-50%, -100%) scale(1);
+}
+
+// The tooltip's own <p> lines. beercss styles the box, not its content.
+.tooltip.max p {
+	margin: 0;
+}
+
+.tooltip.max p:first-child {
+	font-weight: 600;
+	margin-block-end: .25rem;
+}

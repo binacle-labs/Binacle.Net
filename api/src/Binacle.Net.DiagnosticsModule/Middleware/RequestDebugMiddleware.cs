@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using Binacle.Net.Kernel.Instance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -12,21 +13,21 @@ internal class RequestDebugMiddleware
 
 	private readonly RequestDelegate next;
 	private readonly IHostEnvironment hostEnvironment;
-	private readonly IOptions<FeatureOptions> featureOptions;
+	private readonly IOptions<InstanceOptions> instanceOptions;
 	private readonly IOptions<ReservedPathOptions> reservedPathOptions;
 	private readonly TimeProvider timeProvider;
 
 	public RequestDebugMiddleware(
 		RequestDelegate next,
 		IHostEnvironment hostEnvironment,
-		IOptions<FeatureOptions> featureOptions,
+		IOptions<InstanceOptions> instanceOptions,
 		IOptions<ReservedPathOptions> reservedPathOptions,
 		TimeProvider timeProvider
 	)
 	{
 		this.next = next;
 		this.hostEnvironment = hostEnvironment;
-		this.featureOptions = featureOptions;
+		this.instanceOptions = instanceOptions;
 		this.reservedPathOptions = reservedPathOptions;
 		this.timeProvider = timeProvider;
 	}
@@ -111,7 +112,7 @@ internal class RequestDebugMiddleware
 		output.AppendLine();
 
 		output.AppendLine("[features]");
-		AppendLines(output, this.featureOptions.Value.EnabledFeatures);
+		AppendLines(output, this.instanceOptions.Value.EnabledFeatures);
 
 		output.AppendLine();
 

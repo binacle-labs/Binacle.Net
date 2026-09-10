@@ -4,6 +4,7 @@ using Binacle.Net.Configuration;
 using Binacle.Net.DiagnosticsModule;
 using Binacle.Net.ExtensionMethods;
 using Binacle.Net.Kernel.Features;
+using Binacle.Net.Kernel.Instance;
 using Binacle.Net.Kernel.OpenApi.ExtensionsMethods;
 using Binacle.Net.ServiceModule;
 using Binacle.Net.Services;
@@ -143,7 +144,12 @@ public static class Program
 		// SCALAR_UI from environment vars
 		var scalarEnabled = Feature.IsEnabled("SCALAR_UI");
 
-		builder.Services.Configure<FeatureOptions>(options =>
+		// Filled once at startup, not read live. BinPresetOptions.ReloadOnChange is true, so an operator who
+		// edits Presets.json will see this page disagree with /api/v4/presets until the process restarts.
+		var binPresetOptions = builder.Configuration.GetConfigurationOptions<BinPresetOptions>();
+		var instancePresets = binPresetOptions.ToInstancePresets();
+
+		builder.Services.Configure<InstanceOptions>(options =>
 		{
 			if (swaggerEnabled)
 			{
@@ -154,6 +160,8 @@ public static class Program
 			{
 				options.AddFeature("ScalarUI", "/scalar");
 			}
+
+			options.SetPresets(instancePresets);
 		});
 
 		// Reserved whether or not the UI that serves them is switched on, so a mistyped API route never comes

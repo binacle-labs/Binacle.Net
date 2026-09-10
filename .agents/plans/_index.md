@@ -59,22 +59,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
   paths: ["api/**"]
-- file: api/rate-limit-error-is-unreadable.md
-  description: "A rate-limited packing request tells the visitor the error response could not be parsed, which is not what happened and not what they need to know"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  paths: ["packages/binacle-net-ui/**"]
 - file: api/servicemodule.md
   description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
-- file: api/uimodule-instance-presets.md
-  description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  horizon: next-release
-  paths: ["api/src/Binacle.Net.UIModule/**", "api/src/Binacle.Net.Kernel/**"]
 - file: api/v4-stable.md
   description: "v4 - flip from experimental to stable"
   state: idea
@@ -104,7 +93,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   horizon: undecided
   paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
 - file: ci-cd/what-the-pull-request-does-not-run.md
-  description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
+  description: "What a pull request does not run - the integration suites against the shipped module set. Sonar now runs on every pull request that can carry the token; that half is done"
   state: idea
   waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
   horizon: near

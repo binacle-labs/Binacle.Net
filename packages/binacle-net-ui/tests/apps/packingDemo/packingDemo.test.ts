@@ -441,63 +441,72 @@ describe("pressing the submit button", () => {
 	});
 
 	test("results end the flight", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.submitting).toBe(false);
 	});
 
 	test("results clear the status line, because the panel itself is the answer", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.submitStatus).toBe("");
 	});
 
 	test("an empty body says so on the status line", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse(null)));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.submitStatus).toBe("No results.");
 	});
 
 	test("a failed request ends the flight", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		mockFailingFetch(new Error("offline"));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.submitting).toBe(false);
 	});
 
 	test("the button is pressable again after a failed request", async () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		mockFailingFetch(new Error("offline"));
+
+		await app.onSubmit();
+
+		expect(app.submitButtonText()).toBe("Get results");
+	});
+
+	// packingVisualizer's own x-data is what normally runs this thunk. A host that embeds the component
+	// without a visualizer dispatches update-scene into nothing, and the button still has to come back.
+	test("submitting clears the flight even when nothing is listening for update-scene", async () => {
 		const {app, dispatched} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
-		mockFailingFetch(new Error("offline"));
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
-		expect(app.submitButtonText()).toBe("Get results");
+		expect(app.submitting).toBe(false);
+		expect(dispatched.some(x => x.name === "update-scene")).toBe(true);
 	});
 });
 
@@ -790,74 +799,68 @@ describe("the status line goes stale", () => {
 
 describe("the request", () => {
 	test("goes to the pack endpoint", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(fetchMock.mock.calls[0][0]).toBe(packEndpoint);
 	});
 
 	test("a baseUrl is put in front of the endpoint", async () => {
-		const {app, dispatched} = createApp({baseUrl: "https://api.example.com"});
+		const {app} = createApp({baseUrl: "https://api.example.com"});
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(fetchMock.mock.calls[0][0]).toBe(`https://api.example.com${packEndpoint}`);
 	});
 
 	test("is a POST", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(fetchMock.mock.calls[0][1].method).toBe("POST");
 	});
 
 	test("declares a JSON body", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(fetchMock.mock.calls[0][1].headers).toEqual({"Content-Type": "application/json"});
 	});
 
 	test("carries the chosen algorithm", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
 		app.model.algorithm = "BFD";
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).parameters).toEqual({algorithm: "BFD"});
 	});
 
 	test("maps the bin view models to plain api bins", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 20, 30), new Bin(40, 50, 60)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins).toEqual([
 			{id: "10x20x30", length: 10, width: 20, height: 30},
@@ -867,43 +870,40 @@ describe("the request", () => {
 
 	// x-model without the .number modifier stores the input's string, and the API declares these as int.
 	test("sends bin dimensions as numbers even when the model holds strings", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		const bin = new Bin(10, 20, 30);
 		Object.assign(bin, {length: "10", width: "20", height: "30"});
 		app.model.bins = [bin];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins[0])
 			.toEqual({id: "10x20x30", length: 10, width: 20, height: 30});
 	});
 
 	test("sends item dimensions and quantity as numbers even when the model holds strings", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		const item = new Item(2, 3, 4, 5);
 		Object.assign(item, {length: "2", width: "3", height: "4", quantity: "5"});
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [item];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items[0])
 			.toEqual({id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5});
 	});
 
 	test("maps the item view models to plain api items, quantity included", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 3, 4, 5)];
-		app.onSubmit();
 		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items).toEqual([
 			{id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5},
@@ -1114,30 +1114,29 @@ describe("getResults", () => {
 });
 
 describe("the scene the results feed", () => {
-	function submit(app: PackingDemo) {
+	function arrangeValidModel(app: PackingDemo) {
 		app.model.bins = [new Bin(10, 10, 10)];
 		app.model.items = [new Item(2, 2, 2, 1)];
-		app.onSubmit();
 	}
 
 	test("the first result with a bin is selected", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		const packed = packedData({status: "PartiallyPacked"});
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any}), packed])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.selectedResult).toEqual(packed);
 	});
 
 	test("every result is kept for the list", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		const data = [packedData({status: "FullyPacked"}), packedData({status: "PartiallyPacked"})];
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse(data)));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.results).toEqual(data);
 	});
@@ -1145,9 +1144,10 @@ describe("the scene the results feed", () => {
 	test("the scene gets the selected bin and its packed items", async () => {
 		const {app, dispatched} = createApp();
 		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 0, y: 0, z: 0}];
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse([packedData({packedItems})])));
 
+		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
 		expect(scene).toEqual({bin: {id: "10x10x10", length: 10, width: 10, height: 10}, items: packedItems});
@@ -1155,52 +1155,54 @@ describe("the scene the results feed", () => {
 
 	test("a result with no packed items gives the scene an empty list", async () => {
 		const {app, dispatched} = createApp();
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: null})])));
 
+		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
 		expect(scene!.items).toEqual([]);
 	});
 
 	test("no result with a bin leaves nothing selected", async () => {
-		const {app, dispatched} = createApp();
-		submit(app);
+		const {app} = createApp();
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse([packedData({bin: null as any})])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.selectedResult).toBeNull();
 	});
 
 	test("a body with no data clears the results", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.results = [packedData()];
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse(null)));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.results).toEqual([]);
 	});
 
 	test("a body with no data leaves the scene empty", async () => {
 		const {app, dispatched} = createApp();
-		submit(app);
+		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse(null)));
 
+		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
 		expect(scene).toBeNull();
 	});
 
 	test("a failed request clears the selection", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.selectedResult = packedData();
-		submit(app);
+		arrangeValidModel(app);
 		mockFailingFetch(new TypeError("Failed to fetch"));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.selectedResult).toBeNull();
 	});
@@ -1376,25 +1378,23 @@ describe("naming the algorithm that won", () => {
 	});
 
 	test("results carry the algorithm they were asked for", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.init();
 		app.model.algorithm = "Best";
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse([packedData()])));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.showsAlgorithmUsed()).toBe(true);
 	});
 
 	// The dropdown moves on its own; the results on the page did not change with it.
 	test("changing the dropdown after a run leaves the row alone", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.init();
 		app.model.algorithm = "Best";
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse([packedData()])));
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		app.model.algorithm = "FFD";
 
@@ -1402,13 +1402,12 @@ describe("naming the algorithm that won", () => {
 	});
 
 	test("a run with no results names nothing", async () => {
-		const {app, dispatched} = createApp();
+		const {app} = createApp();
 		app.init();
 		app.model.algorithm = "Best";
-		app.onSubmit();
 		mockFetch(stubResponse(200, packingResponse(null)));
 
-		await sceneThunk(dispatched)();
+		await app.onSubmit();
 
 		expect(app.showsAlgorithmUsed()).toBe(false);
 	});

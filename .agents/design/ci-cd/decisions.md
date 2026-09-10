@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-09-05
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; and D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, and the open questions about the PR gate and supply-chain attestation.
+verified: 2026-09-10
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -396,10 +396,12 @@ Two mechanical consequences: the checkout needs `fetch-depth: 0`, because a shal
 new to the new-code comparison; and the scanner is a Java program whatever language it analyses, so the job sets
 up a JDK.
 
-**The trigger is `workflow_dispatch` and nothing else — recorded 2026-08-28.** No schedule: a nightly run
-re-analyses a commit nothing changed and reports the same numbers, which teaches everyone that the run means
-nothing. No `pull_request` either, for the reason in O2 — the coverage condition is red before anyone writes a
-line.
+**The trigger was `workflow_dispatch` and nothing else — recorded 2026-08-28, superseded 2026-09-10.** No
+schedule: a nightly run re-analyses a commit nothing changed and reports the same numbers, which teaches
+everyone that the run means nothing. The `pull_request` half of this is no longer current — the recorded
+reason was that the coverage condition was red before anyone wrote a line, and that argument was spent once
+the gate started passing on `main` on 2026-08-31. **D28 below is the current shape**: `workflow_call`, called
+from `pull-request.yml`, not a direct `pull_request` trigger.
 
 **Scope and coverage paths live in `tooling/ci/sonar-analysis.xml`, not in the workflow.** The Scanner for .NET
 ignores `sonar-project.properties`, so that XML is the file form it reads, and `/s:` needs an absolute path.
@@ -1007,14 +1009,84 @@ already reads. The registry delete verb is not accepted.
 **This is a second reason the D26 rule would have to be corrected before immutability is ever enabled.** An
 immutable tag cannot be deleted, so a rule of `.*` freezes any prerelease that does reach the repository.
 
+### D28 — Sonar runs on every pull request that can carry the token, parallel and non-blocking
+
+**Decided 2026-09-10.** `sonar-analysis.yml` gained `on: workflow_call`; `pull-request.yml` adds a `sonar`
+job off `changes`, calling it with `secrets: inherit`. `workflow_dispatch` stays, so a manual run is still
+possible.
+
+**Path-filtered the same as the other code jobs.** `if: needs.changes.outputs.code == 'yes'` - a docs-only or
+site-only pull request does not run it, the same trade-off the manual-only run already had. A site-only pull
+request still gets no PR-time Sonar even though the "sites in scope" reversal above means Sonar does read those
+files on `main` - the path filter this job reuses carries no `site` branch, and adding one is a later decision,
+not this one.
+
+**Not in `gate`'s `needs` - decided both ways, argument recorded rather than assumed.**
+
+*For blocking:* the read-only "Sonar way" gate already passes on `main` - 80% on new code, crossed 2026-08-31,
+O2 below - so blocking would cost nothing today, and it would catch a regression before merge instead of after.
+
+*For reporting only, which is what shipped:* whether coverage blocks a merge is a separate decision from
+whether Sonar runs on the merge candidate, and O2 below already reserves that call for the maintainer,
+unanswered. Blocking here would decide it by side effect. It is also the whole lever on wall-clock: `gate`
+finishes when its slowest required dependency does, and Sonar would become that dependency - see the
+measurement below - while reporting only lets `gate` finish on the jobs it already waits for, with Sonar's
+result landing a little later, read but never waited on.
+
+**Measured before choosing, not assumed.** Read off the public Actions API for `binacle-labs/Binacle.Net` on
+`main`, 2026-09-10. The nine most recent completed `sonar-analysis.yml` dispatches each ran one job, `Analyse
+and publish`, in 260-357 seconds (roughly 4.5-6 minutes). The fifteen most recent `pull-request.yml` runs'
+jobs: `Image tests` (`shared-image-tests.yml`, the current longest) at a 189-second median, up to 471 seconds
+under runner contention; `Site tests` similar; `Image build`, `Lint` and the three `Site build` jobs all
+faster. So Sonar typically becomes the slowest job in the fan-out, by about two minutes over the current
+longest, worse under contention. Blocking would add that to every pull request's time to merge; reporting only
+adds nothing, because `gate` does not wait for it.
+
+**Skips, never fails, when the token cannot be present.** Two blockers, one `if:`:
+
+```yaml
+if: >-
+  ${{ needs.changes.outputs.code == 'yes' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]' }}
+```
+
+`secrets.SONAR_TOKEN` reads empty on a `pull_request` run from a fork - the `head.repo.full_name` comparison
+catches that. A Dependabot pull request runs from a branch on this repository, not a fork, but reads from the
+Dependabot secret store rather than the Actions one - the actor check catches that case separately, because
+the fork check alone would not.
+
+**`pull_request_target` was ruled out, not merely passed over.** It would hand secrets to a run that checks
+out and can execute the pull request's own, possibly untrusted, code, on a public repository - a
+credential-exposure route. Skipping the job is the only shape considered.
+
+**`gate.sh` already reads a skipped dependency as passing** - `[[ "$result" != "success" ]] && [[ "$result" !=
+"skipped" ]]` - so this would have worked whichever way blocking went; it is not what decided blocking
+against.
+
+**The concurrency group could not stay `${{ github.workflow }}-${{ github.ref }}`.** `github.workflow`
+resolves to the *caller's* name when a workflow runs as a called (`workflow_call`) workflow, so under the old
+key a PR-triggered Sonar run would carry the same group string as `pull-request.yml`'s own top-level
+concurrency (`Pull Request-refs/pull/<n>/merge`) - colliding with a group already enforced one level up.
+Changed to a literal `sonar-analysis-${{ github.ref }}`, unique to this workflow whichever way it starts. The
+dispatch path is unaffected beyond the group's string changing.
+
+**Nothing shared with the `image` job's build.** `image` runs `just build image`, a multi-stage Docker build;
+Sonar runs a plain `dotnet build Binacle.Net.slnx --configuration Release` that the coverage run and the
+scanner both need un-containerised. They produce different artifacts for different consumers, and
+`shared-image-tests.yml` already runs its own separate `dotnet build` in parallel with both - a third
+independent build following the same, already-accepted shape. Caching one job's output for another would mean
+uploading and restoring a full solution build across jobs, for a step that costs on the order of a minute -
+not worth building.
+
 ## Open
 
 ### O2 — how much the pull-request gate should prove
 
-A PR now runs both test suites, an image build, the three site builds with their link checks, and the
-`.github/` lints. What is still missing: the integration suites cover core modules only, and Sonar runs when
-somebody presses a button. Both are known gaps rather than oversights, and the shape of the fix is not settled
-— one folded job or three workflows, and what the runtime budget allows.
+A PR now runs both test suites, an image build, the three site builds with their link checks, the `.github/`
+lints, and - as of D28 - Sonar analysis on a code change from this repository. What is still missing: the
+integration suites cover core modules only. That is a known gap rather than an oversight, and the shape of the
+fix is not settled — one folded job or three workflows, and what the runtime budget allows.
 
 **Whether coverage becomes a blocking check is open, and it is the maintainer's call.** The project runs the
 read-only "Sonar way" gate, which asks 80% on new code; custom gates need a paid plan. This was settled

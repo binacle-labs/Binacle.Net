@@ -12,6 +12,8 @@ import {
 	PackBinResponse,
 	PackCompareResponse,
 	PackCustomRequest,
+	PackedBox,
+	Bin as ApiBin,
 	UnpackedBox
 } from "binacle-net-client";
 
@@ -180,14 +182,14 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			return null;
 		}
 	},
-	onSubmit() {
+	async onSubmit() {
 		this.formErrors = this.listErrors();
 		if (!this.isValid()) {
 			this.submitStatus = '';
 			this.$logger.error("[Binacle] Model is not valid");
 			return;
 		}
-		// Set before the dispatch, so the button and the status line change in the click's own frame.
+		// Set before the request, so the button and the status line change in the click's own frame.
 		this.submitting = true;
 		this.submitStatus = 'Packing...';
 
@@ -211,32 +213,34 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 			}))
 		} as PackCustomRequest;
 
-		this.$dispatch('update-scene', async () => {
-			try {
-				this.$logger.log('[Binacle] Packing request sent', request);
-				const response = await this.getResults(request);
-				this.$logger.log('[Binacle] Packing results received', response);
-				if(!response || !response.results){
-					this.results = [];
-					this.selectedResult = null;
-					this.resultsAlgorithm = '';
-					this.submitStatus = 'No results.';
-					return null;
-				}
+		let scene: {bin: ApiBin | undefined; items: PackedBox[]} | null = null;
+		try {
+			this.$logger.log('[Binacle] Packing request sent', request);
+			const response = await this.getResults(request);
+			this.$logger.log('[Binacle] Packing results received', response);
+			if (!response || !response.results) {
+				this.results = [];
+				this.selectedResult = null;
+				this.resultsAlgorithm = '';
+				this.submitStatus = 'No results.';
+			} else {
 				const firstSuccessfulResult = response.results.find(x => !!x.bin);
 				this.results = response.results;
 				this.selectedResult = firstSuccessfulResult || null;
 				this.resultsAlgorithm = request.parameters.algorithm;
 				this.submitStatus = this.results.length > 0 ? '' : 'No results.';
-				return {
+				scene = {
 					bin: firstSuccessfulResult?.bin,
 					items: firstSuccessfulResult?.packedItems || []
 				};
-			} finally {
-				this.submitting = false;
 			}
-		});
+		} finally {
+			// Cleared once the response is in hand, not inside the thunk below - nothing runs that thunk
+			// unless a visualizer is listening for update-scene, and the button must not depend on one.
+			this.submitting = false;
+		}
 
+		this.$dispatch('update-scene', async () => scene);
 	},
 	isSelected(result: PackBinResponse) {
 		return this.selectedResult === result;

@@ -41,6 +41,48 @@ tooltip starts from checked strings.
 **Both hosts or neither.** The demo site and `Binacle.Net.UIModule` consume the same package; one host is
 not the feature.
 
+### The UI module half landed 2026-09-10. The demo site half has not
+
+**The shared package needs nothing.** The four helpers were already on the component. The tooltip is
+beercss's own `.tooltip`, so there is no directive and no TypeScript to add - the demo site picks it up from
+the stylesheet it already loads.
+
+**A first attempt on 2026-09-10 built a native `popover` with an Alpine directive and was thrown away.**
+It rendered at the top-left of the viewport instead of against its trigger: an open `popover` is painted in
+the top layer, where `position: absolute` no longer resolves against the wrapper. **Do not rebuild that.**
+beercss positions its own tooltip correctly and is already loaded.
+
+**What is left is markup and two style rules**, to be written in a site session because `sites/` is off
+limits to a coding session. Two files:
+
+**`sites/demo/pages/packing.html`.** Its results block is the same markup as the UI module's, with `@click`
+where the module writes `x-on:click`. Copy what `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` now
+does, dropping the Razor `@* *@` comments. **Inside the existing `<a class="row wave padding max">`**, after
+the `<div class="grid no-space max">` and before the anchor closes, add:
+
+- a `<template x-if="hasUnpackedItems(result)">` holding a `<div style="position:relative;z-index:10">`,
+  which carries two children: a `<button type="button" class="transparent circle"
+  :aria-label="unpackedItemsTitle(result)" @click.prevent.stop="$el.focus()">` containing `<i>info</i>`, and
+  a `<div class="tooltip max large-space">` holding a `<p x-text="unpackedItemsTitle(result)">` and an
+  `x-for` over `unpackedItemsOf(result)` writing one `<p x-text="unpackedItemText(unpackedItem)">` per entry.
+
+**Two things that were got wrong once each and cost a rebuild.** `position:relative` on the wrapper is not
+optional - `.tooltip` is `position:absolute`, so without it the panel anchors to an ancestor up the page and
+lands nowhere near the button. And **the click handler needs a non-empty expression**: Alpine compiles
+`__self.result = <expression>`, so a bare `@click.prevent.stop` is a syntax error it logs once per row.
+`$el.focus()` is the expression to use - it also makes a tap open the tooltip, which Safari does not do on
+its own.
+
+**The button goes inside the anchor**, which is what the ViPaq page already does with its delete button -
+`z-index` lifts it over the row and `.prevent.stop` keeps the click off the row. **The wrapping `<div>` is
+required**: beercss reveals a tooltip with `:hover > .tooltip`, so the tooltip has to be a direct child of
+the element being hovered, and `<p>` is not allowed inside a `<button>`.
+
+**`sites/demo/_sass/_components.scss`.** Copy the `:focus-within > .tooltip` rule and the two `.tooltip.max p`
+rules added to the module's `_sass/_components.scss` on the same date. **The focus rule is not decoration** -
+beercss reveals a tooltip on hover alone, so without it a keyboard never reaches one and a touch device has
+no hover to give.
+
 ## 2. The submit button can stick disabled
 
 **This one is a defect, and it is latent rather than live.**

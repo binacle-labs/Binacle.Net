@@ -3,6 +3,7 @@ using Binacle.Net.DiagnosticsModule.ExtensionMethods;
 using Binacle.Net.DiagnosticsModule.Middleware;
 using Binacle.Net.DiagnosticsModule.Services;
 using Binacle.Net.Kernel.Features;
+using Binacle.Net.Kernel.Instance;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
@@ -158,7 +159,7 @@ public static class ModuleDefinition
 
 		if (Feature.IsEnabled("DEBUG_ENDPOINT"))
 		{
-			builder.Services.Configure<FeatureOptions>(options =>
+			builder.Services.Configure<InstanceOptions>(options =>
 			{
 				options.AddFeature("DebugEndpoint", RequestDebugMiddleware.Path);
 			});
@@ -166,7 +167,7 @@ public static class ModuleDefinition
 
 		// Health checks are switched on in a config file, not by a flag, so this has to resolve after build.
 		builder.Services
-			.AddOptions<FeatureOptions>()
+			.AddOptions<InstanceOptions>()
 			.Configure<IOptions<HealthCheckConfigurationOptions>>((features, healthChecks) =>
 			{
 				if (healthChecks.Value.Enabled)

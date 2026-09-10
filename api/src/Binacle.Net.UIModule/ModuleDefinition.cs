@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Binacle.Net.Kernel.Instance;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -16,7 +17,7 @@ public static class ModuleDefinition
 
 		builder.WebHost.UseStaticWebAssets();
 
-		builder.Services.Configure<FeatureOptions>(options =>
+		builder.Services.Configure<InstanceOptions>(options =>
 		{
 			options.AddFeature("UIModule");
 		});
