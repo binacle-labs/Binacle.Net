@@ -134,7 +134,14 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 
 		const problem = failure.problem;
 		if(problem === null){
-			errorObj.errors.push('An error occurred, but the error response could not be parsed.');
+			// An empty body means the server sent no details, not that a body failed to parse - a
+			// response that fails to parse throws before it reaches this branch.
+			if(failure.status === 429){
+				errorObj.errors.push('You have been rate limited. Wait a moment, then try again.');
+			}
+			else {
+				errorObj.errors.push('The server did not send any further details about this error.');
+			}
 		}
 		else {
 			if(problem.title){

@@ -992,22 +992,31 @@ describe("an error response", () => {
 		expect(dispatched[0].detail.title).toBe("Error: Not Found");
 	});
 
-	test("a body that will not parse says so", () => {
+	test("an empty body on a non-429 status says the server gave no details", () => {
 		const {app, dispatched} = createApp();
 		const response = failedResponse(500, null);
 
 		app.handleErrorResponse(response);
 
-		expect(dispatched[0].detail.errors).toEqual(["An error occurred, but the error response could not be parsed."]);
+		expect(dispatched[0].detail.errors).toEqual(["The server did not send any further details about this error."]);
 	});
 
-	test("a body that will not parse still names the status", () => {
+	test("an empty body on a non-429 status still names the status", () => {
 		const {app, dispatched} = createApp();
 		const response = failedResponse(500, null);
 
 		app.handleErrorResponse(response);
 
 		expect(dispatched[0].detail.title).toBe("Error: Internal Server Error");
+	});
+
+	test("a 429 with no body says the caller is rate limited", () => {
+		const {app, dispatched} = createApp();
+		const response = failedResponse(429, null);
+
+		app.handleErrorResponse(response);
+
+		expect(dispatched[0].detail.errors).toEqual(["You have been rate limited. Wait a moment, then try again."]);
 	});
 
 	test("a missing status text is looked up from the status", () => {

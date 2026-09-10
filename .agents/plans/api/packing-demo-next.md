@@ -35,7 +35,7 @@ strings.
 
 **The strings survived the revert and are tested.** `hasUnpackedItems`, `unpackedItemsOf`,
 `unpackedItemsTitle` and `unpackedItemText` are in `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` with ten
-tests behind them in `packages/binacle-net-ui/tests/components/packingDemo.test.ts`. Whoever builds the
+tests behind them in `packages/binacle-net-ui/tests/apps/packingDemo/packingDemo.test.ts`. Whoever builds the
 tooltip starts from checked strings.
 
 **Both hosts or neither.** The demo site and `Binacle.Net.UIModule` consume the same package; one host is
@@ -104,7 +104,7 @@ does: what the UI changes to.
 - [ ] The four helpers and their ten tests are still there and still drive the tooltip.
       `grep -c 'unpackedItemsTitle\|unpackedItemText\|hasUnpackedItems\|unpackedItemsOf'` returns 6 on
       `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` and 10 on
-      `packages/binacle-net-ui/tests/components/packingDemo.test.ts`.
+      `packages/binacle-net-ui/tests/apps/packingDemo/packingDemo.test.ts`.
 - [ ] Both hosts render it, to the same count.
       `grep -c hasUnpackedItems sites/demo/pages/packing.html` and the same on
       `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` return the same non-zero number.
