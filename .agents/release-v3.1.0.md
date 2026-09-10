@@ -134,8 +134,10 @@ already bitten: anything built from a branch signs under that branch's ref and f
 `proposed`. The image split changes what a self-hoster pulls, which a minor version may not do. They are the
 next major, and the `// TODO` in `ApiUsageRateLimitingPolicy.cs:32` goes with them.
 
-**`plans/ci-cd/what-the-pull-request-does-not-run.md`, the integration-suite half.** It cannot close before
+**`plans/api/integration-tests-cover-shipped-modules.md`, the optional-modules half.** It cannot close before
 the harnesses have the optional modules on, and that is the half of the row above that is allowed to slip.
+The pull-request plan that used to be named here was deleted on 2026-09-11 - the suites already ran on every
+pull request, so the only thing left in it was this same half, and it now lives in one file.
 
 **Everything with a `future`, `long`, `on-demand` or `undecided` horizon.** Read `plans/_index.md`.
 
@@ -156,7 +158,7 @@ the harnesses have the optional modules on, and that is the half of the row abov
 - [x] **2026-09-10.** The shipped UI calls v4 on both hosts.
       `grep -n 'api/v3' packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` returns nothing, with both bundles
       rebuilt.
-- [ ] A partial result names the items it could not fit, and the result row keeps its height.
+- [x] **2026-09-11, confirmed by the maintainer.** A partial result names the items it could not fit, and the result row keeps its height.
       **By eye.** Randomize to `02-packs-nowhere` and reach the unpacked items from the row without the row
       growing. Hover, touch and keyboard all reach it.
       **Half done 2026-09-10.** On the UI module, **hover is confirmed by eye** - the panel floats above the
@@ -174,7 +176,7 @@ the harnesses have the optional modules on, and that is the half of the row abov
       `webpack.config.js`. Both hold, the bundle was rebuilt so `wwwroot/js` no longer emits it, and
       `just test all` passes. **The presets are a startup snapshot** - deliberate, and written at the fill
       point in `Program.cs` as well as in the ledger.
-- [ ] The submit button cannot stay disabled when no visualizer is listening.
+- [x] **2026-09-11, confirmed by the maintainer.** The submit button cannot stay disabled when no visualizer is listening.
       **By eye.** Render the demo component on a page with no visualizer, submit, and the button comes back.
       **Code landed 2026-09-10** with tests covering it; the by-eye pass is what is left.
 - [x] **2026-09-10.** A rate-limited request does not tell the visitor the reply could not be parsed.

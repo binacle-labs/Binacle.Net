@@ -140,17 +140,17 @@ does: what the UI changes to.
 
 ## Done when
 
-- [ ] A partial result names the items it could not fit, in a tooltip, and the result row keeps its height.
+- [x] **2026-09-11, confirmed by the maintainer.** A partial result names the items it could not fit, in a tooltip, and the result row keeps its height.
       **By eye.** Randomize to `02-packs-nowhere` and reach `Could not fit 2 items` and `2 x 20x20x20-3`
       from the row without the row growing. Hover, touch and keyboard all reach it.
-- [ ] The four helpers and their ten tests are still there and still drive the tooltip.
+- [x] **2026-09-11.** The four helpers and their ten tests are still there and still drive the tooltip.
       `grep -c 'unpackedItemsTitle\|unpackedItemText\|hasUnpackedItems\|unpackedItemsOf'` returns 6 on
       `packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts` and 10 on
       `packages/binacle-net-ui/tests/apps/packingDemo/packingDemo.test.ts`.
-- [ ] Both hosts render it, to the same count.
+- [x] **2026-09-11.** Both hosts render it, to the same count - 1 and 1.
       `grep -c hasUnpackedItems sites/demo/pages/packing.html` and the same on
       `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml` return the same non-zero number.
-- [ ] The submit button cannot stay disabled when no visualizer is listening.
+- [x] **2026-09-11, confirmed by the maintainer.** The submit button cannot stay disabled when no visualizer is listening.
       **By eye.** What clears `submitting` runs whether or not anything handles `update-scene`. Render the
       demo component on a page with no visualizer, submit, and the button comes back.
 - [ ] The request panel shows the call that was actually sent, against the host the page is served from.
