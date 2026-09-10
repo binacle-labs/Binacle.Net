@@ -76,9 +76,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: ci-cd/ci-open-questions.md
-  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. Six close on a sentence; one needs a dispatch"
+  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
   state: blocked
-  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
+  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. Re-verified 2026-09-11: nothing upstream has died, finding 8 no longer needs a run, and only the Docker Hub eligibility in finding 1 cannot be checked from the repository. State chosen by an agent - `proposed` reads closer to what this file is; strike either if wrong"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
