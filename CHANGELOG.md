@@ -12,6 +12,7 @@
 - **The algorithm list gained `Best`.** It runs more than one heuristic and returns whichever packed best, and it exists only on V4, so the demo could not offer it before. It is listed as **Try all, keep the best**, to keep it apart from **Best Fit Decreasing**, which is one specific heuristic.  
 - **Each result now says which algorithm actually ran**, shown only when you asked for `Best` — with a single heuristic selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.  
 - **The demo no longer builds its own HTTP calls.** It goes through the new client package, which owns the request and response shapes.  
+- **A rate-limited request now says so.** Hitting the demo too often used to show a message about a response that could not be parsed. It now tells you that you have been rate limited and to wait a moment before trying again.  
 
 ### 🏗️ Internal Work
 
