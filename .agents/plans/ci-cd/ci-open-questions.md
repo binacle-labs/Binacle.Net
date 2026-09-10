@@ -1,7 +1,7 @@
 ---
-description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. Six close on a sentence; one needs a dispatch
+description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: blocked
-waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
+waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. Re-verified 2026-09-11: nothing upstream has died, finding 8 no longer needs a run, and only the Docker Hub eligibility in finding 1 cannot be checked from the repository. State chosen by an agent - `proposed` reads closer to what this file is; strike either if wrong"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"
@@ -11,8 +11,19 @@ paths:
 # CI - the questions the platform sweep left open
 
 Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine composite actions in
-`.github/actions/`, the sixteen scripts in `tooling/ci/` and `tooling/ci.just`, plus `tooling/check.just`,
+`.github/actions/`, the scripts in `tooling/ci/` and `tooling/ci.just`, plus `tooling/check.just`,
 `tooling/build.just` and `.github/dependabot.yml` where a workflow step reaches into them.
+
+**Where the maintainer stands, 2026-09-11.** He read the verification and said he leans **yes on 1, 4, 5, 10
+and 12**, and **not on 7 and 8** - stated before the verification came back, and finding 8's only obstacle
+turned out to be gone, so that one is worth re-asking. **These are leans, not decisions**: no box below is
+ticked on them, and each still needs his yes or no. Recorded here because the next session will otherwise
+start from nothing.
+
+**Every open finding was re-checked on 2026-09-11** and each carries a dated verdict line. Where a number in
+this file was measured and found wrong it has been corrected in place. One of those: `tooling/ci/` holds
+twenty-two `.sh` files, and `just check scripts` globs `tooling/*.sh tooling/ci/*.sh`, so it checks
+twenty-eight.
 
 The question asked of every step was not "is there a different action for this" but "does the platform already
 do this, and can the work be deleted rather than swapped". Twelve findings. Each names its benefit; where the
@@ -59,6 +70,14 @@ setting.
 
 **Confidence:** high on the mechanism and the action version, unknown on eligibility.
 
+**Verified 2026-09-11 - holds, except the eligibility half.** The pin `dbcb8138` resolves through the GitHub
+tags API to v4.6.0, and v4.6.0 is also where the `v4` tag points, so this is the newest v4. OIDC login landed
+in v4.5.0, released 2026-07-23. The README still shows the snippet above word for word: `username:` kept,
+no `password:`, `DOCKERHUB_OIDC_CONNECTIONID` in `env:`, `id-token: write` in `permissions:`. The tiers are
+still Team, Business, Hardened Images and the Sponsored Open Source Program, and they still cannot be checked
+from outside the org. The page half holds too - `shared-dockerhub-overview.yml` still hands `username` and
+`password` to `peter-evans/dockerhub-description`, so that secret survives either way.
+
 ## 2. `gh release create` makes the tag itself, so the release job's tag step can be deleted
 
 **Done 2026-08-28.** `github-release.sh` takes the commit and passes `--target`; the "Push the release tag"
@@ -101,26 +120,50 @@ With finding 2 taking the release's tag, the three deploy marker tags are the on
 would replace the last `git push` in the repository.
 
 **Benefit, and it is the one worth having:** no job would then need the git credential that
-`actions/checkout` writes into `.git/config`. `persist-credentials: true` is checkout's default, and GitHub's
-own hardening guidance is to turn it off where a job does not push. With no pushes left, every checkout in
-every workflow can carry `persist-credentials: false` uniformly - so a compromised step in any job cannot read
-a working token out of the checkout. Today two jobs genuinely need it and thirteen carry it for nothing.
+`actions/checkout` persists. `persist-credentials: true` is checkout's default. With no pushes left, every
+checkout in every workflow can carry `persist-credentials: false` uniformly, so a compromised step in any job
+cannot use or read a working token. **Measured 2026-09-11:** twenty-two `actions/checkout` steps across
+`.github/workflows/`, none in `.github/actions/`. Three push - the `tag` job of each of the three deploy
+workflows, which is the only `git push` left in the repository. Nineteen do not.
 
-**Cost:** fifteen `persist-credentials: false` lines, and a failure message from the API that reads worse than
-git's ("Reference already exists" rather than "tag already exists"). The deploy `tag` job still checks out,
-because `deploy-summary.sh` reads the commit subject with `git log`.
+**Cost:** nineteen `persist-credentials: false` lines today, twenty-two once the tag push is replaced, and a
+failure message from the API that reads worse than git's ("Reference already exists" rather than "tag already
+exists"). The deploy `tag` job still checks out, because `deploy-summary.sh` reads the commit subject with
+`git log`.
 
 **Confidence:** high on the dead config lines - they are proved. High on the API working; medium on whether
-fifteen added lines are worth the hardening, which is the maintainer's call.
+the added lines are worth the hardening, which is the maintainer's call.
+
+**Verified 2026-09-11 - holds in mechanism, and two claims were wrong.** The pin `3d3c42e5` is
+`actions/checkout` v7.0.1, the newest v7. `persist-credentials` still defaults to `true` - read from
+`action.yml` at v5.0.0, v6.0.0 and v7.0.1 - so nothing about the default has moved. The breaking change in
+those versions was `allow-unsafe-pr-checkout`, a different input.
+
+Two corrections. **First, the attribution.** GitHub's own Actions security pages do not mention
+`persist-credentials` at all - the *Secure use reference* and three neighbouring pages were grepped and none
+carries it. The guidance is real but it comes from workflow auditors, chiefly zizmor's `artipacked` audit, not
+from GitHub. **Second, the benefit is smaller than written.** checkout v6.0.0 moved the persisted credential
+out of `.git/config` into `$RUNNER_TEMP`, and zizmor lowered `artipacked`'s severity for checkout v6 and above
+because of it. This repository is on v7.0.1, so the leak this guards against - a `.git/config` carried out
+inside an uploaded artifact - is already closed. What remains is that a compromised step inside the job can
+still use the token.
+
+`POST repos/{repo}/git/refs` is still the documented way to create a ref, taking `ref` and `sha`, so the
+replacement for `push-tag.sh` works as written.
 
 ## 5. The three deploy workflows are one workflow with three sets of five values
 
 **Now:** `deploy-docs-site.yml`, `deploy-demo-site.yml` and `deploy-www-site.yml` are 80 lines each and
-identical except for five values - the site name, its directory, the environment name, the URL and the
-wrangler config path. 240 lines, three copies of the same three-job chain, three places to edit when the host
-changes or a step is added.
+identical except for the site slug. 240 lines, three copies of the same three-job chain, three places to edit
+when the host changes or a step is added.
 
-**The supported way:** a reusable workflow, `shared-deploy-site.yml`, taking those five as inputs. A reusable
+**Measured 2026-09-11 by diffing all three:** everything that differs is derived from one value, the slug
+`docs` / `demo` / `www`. The environment is `binacle-net-<slug>`, the URL `https://<slug>.binacle.net`, the
+directory `sites/<slug>`, the wrangler config `tooling/cloudflare/<slug>.wrangler.jsonc`, the marker tag
+`<slug>-<run number>`, and the link check `just check links <slug>`. Only the human-readable `name:` at the
+top of the file is a second value. So the reusable workflow takes one input, not five.
+
+**The supported way:** a reusable workflow, `shared-deploy-site.yml`, taking the slug as an input. A reusable
 workflow brings its own job, so unlike a composite action it **can** set `runs-on`, `permissions`,
 `timeout-minutes` and `environment:` - and `environment.name` and `environment.url` both accept expressions,
 so the deployment URL still shows in the Actions UI. Each of the three files stays a real workflow with its own
@@ -140,6 +183,18 @@ The site-deploys-are-manual rule is untouched: the three callers keep `workflow_
 
 **Confidence:** high that it works; medium on whether the maintainer wants it. This is a judgement about where
 he wants to read the host name, not a technical question.
+
+**Verified 2026-09-11 - holds, and it is cheaper than the finding claimed.** The mechanics are confirmed
+twice over. GitHub's context table allows `inputs` in both `jobs.<job_id>.environment` and
+`jobs.<job_id>.environment.url`, so the environment name and the deployment URL can both come from the input.
+A called workflow's jobs are ordinary jobs and set their own `runs-on`, `permissions` and `timeout-minutes` -
+`shared-site-tests.yml` already does all three and is called with `uses:` from four places. `environment:` at
+job level in a called workflow is documented as allowed.
+
+**One gotcha to carry into the work.** GitHub's docs warn that `on.workflow_call` has no `environment`
+keyword, and that where the called job declares `environment:`, an environment secret wins over one passed
+from the caller. The two Cloudflare secrets are repository secrets today, so they must be passed on the call
+or moved into each environment - not left to chance.
 
 ## 6. `container-structure-test` publishes checksums now, and the pin's comment says it does not
 
@@ -170,6 +225,12 @@ way.
 
 **Confidence:** medium-high on the mechanism, high that the benefit is real.
 
+**Verified 2026-09-11 - holds.** GitHub's docs are explicit on all three parts. An environment secret is
+readable only by a job that names that environment; a job cannot reach it until the environment's protection
+rules have passed; and the deployment branch or tag rule is matched against the run's `GITHUB_REF`. So a job
+on any other ref cannot read the secret, which is exactly what the finding claims. Nothing upstream moved and
+the cost argument is unchanged.
+
 ## 8. The `publish` job probably does not need `docker/setup-buildx-action`
 
 **Now:** the `publish` job runs `docker/setup-buildx-action` before `docker buildx imagetools create`.
@@ -186,10 +247,25 @@ and about fifteen seconds off every release. Fewer moving parts in the job where
 `sbom: true`, which need the container driver the action sets up. This finding is about `publish` only.
 
 **Cost and risk:** if `imagetools` turns out to want a configured builder for registry auth, the release fails
-at the copy step - late, and on a real release. **I could not run docker to prove it.** The safe way to take
-this is to remove it on the next prerelease dispatch, where a failure costs a re-dispatch.
+at the copy step - late, and on a real release. A prerelease dispatch is still the cheapest place to find out.
 
-**Confidence:** medium. The reading is clear; the proof is one run away and I did not have it.
+**Confidence:** high. See the verdict below - it is no longer a reading.
+
+**Verified 2026-09-11 - holds, and it is now proved rather than argued.** Three pieces of evidence.
+
+- **The numbers are right.** `ubuntu-latest` still resolves to Ubuntu 24.04 - 26.04 exists but only under its
+  own label and in preview - and the 24.04 image README still lists `Docker-Buildx 0.36.1`. Docker's reference
+  still says the sources "must already exist in the registry where the new manifest is created".
+- **It was run.** With only the default `docker`-driver builder, which is the state a runner is in with no
+  `setup-buildx-action`, `docker buildx imagetools create` copied a tag inside a throwaway local registry and
+  the new tag read back as the source digest. Local buildx was 0.30.1 against the runner's 0.36.1.
+- **The authenticated case is already proved in this repository.** `shared-smoke-image.yml` has no buildx
+  setup at all, and `pull-image.sh` runs `docker buildx imagetools inspect` there against an authenticated
+  `ghcr.io` image. That step ran green on the v3.0.0 release. Auth for `imagetools` comes from the docker
+  config that the login action writes, which `setup-buildx-action` has nothing to do with.
+
+What a prerelease dispatch would still prove is the release path end to end, not whether `imagetools` needs a
+builder. That question is answered.
 
 ## 9. A step that prints `just --version` and nothing reads it
 
@@ -200,14 +276,15 @@ this is to remove it on the next prerelease dispatch, where a failure costs a re
 
 **Now:** `sonar-summary.sh` polls `ceTaskUrl` up to sixty times, five seconds apart, waiting for SonarCloud to
 finish processing, because `Sonar end` returns when the upload finishes rather than when the analysis is done.
-About twenty lines.
+Twelve lines of loop, sixteen with its comment and the `status` it seeds. The ten lines below it that handle a
+task which never reached `SUCCESS` stay whatever happens.
 
 **The supported way:** `/d:sonar.qualitygate.wait=true` on the `begin` command. The scanner then blocks at
 `end` until the analysis is processed, and exits non-zero if the gate fails. The summary script keeps its two
 API calls but drops the loop: one request to `ceTaskUrl` returns `SUCCESS` straight away.
 
-**Benefit:** twenty lines of retry logic replaced by one flag on a command that is already there, and the wait
-becomes the tool's problem rather than a timeout we chose.
+**Benefit:** the retry logic replaced by one flag on a command that is already there, and the wait becomes the
+tool's problem rather than a timeout we chose.
 
 **Cost, and it is the reason this is not an obvious yes:** `wait=true` also **fails the step** on a red gate.
 Coverage is deliberately not blocking anywhere yet - the read-only gate asks 80% on new code and the project is
@@ -216,6 +293,20 @@ to still write its table. Whether a red run that blocks nothing is honest or is 
 call, and it is the whole decision here.
 
 **Confidence:** high on the mechanism, and the decision is his, not mine.
+
+**Verified 2026-09-11 - the mechanism holds, but the cost is bigger than when this was written.** Sonar's
+docs confirm the flag: the Scanner for .NET takes `/d:sonar.qualitygate.wait=true` on `begin`, waits for the
+gate and fails the job when it is red. `sonar.qualitygate.timeout` defaults to 300 seconds, the same five
+minutes the loop here chose by hand.
+
+**What changed.** On 2026-08-28 `sonar-analysis.yml` was `workflow_dispatch` only, and its own comment said
+"By hand only - no schedule, and no pull request trigger yet". It now also carries `workflow_call`, and
+`pull-request.yml` has a `sonar` job that calls it on every pull request that touches code. So "this would
+paint the Sonar run red every time it ran" is no longer once per hand-dispatch, it is once per pull request.
+The merge is not affected either way: `sonar` is deliberately outside `gate`'s `needs`. Whether that red is
+honest or is noise is still the whole decision, only louder.
+
+The 80%-on-new-code gate is a SonarCloud setting and could not be read from here.
 
 ## 11. The four `install-*` actions are one script written four times
 
@@ -237,7 +328,7 @@ markdown file under `.github/`, runs the site test suite and builds all three si
 **What it could be:** narrow that alternative to `^\.github/actions/`, which is the only part of `.github/` a
 site build actually depends on - `build-jekyll-site`.
 
-**Benefit:** a workflow-only pull request stops paying for three Jekyll builds and a fifteen-test suite.
+**Benefit:** a workflow-only pull request stops paying for three Jekyll builds and a sixteen-test suite.
 
 **Cost, and it is why this is last:** a change to `shared-site-tests.yml` itself would then not run the site
 tests it changes. That is a real hole, and it may be worth the current breadth. Both halves of the filter are
@@ -245,6 +336,17 @@ deliberately generous today and the reasoning for that is written down; this is 
 risk, and either answer is defensible.
 
 **Confidence:** medium on the mechanics, low that it is worth doing.
+
+**Verified 2026-09-11 - holds, and the benefit is smaller than it reads.** `changed-paths.sh` does carry
+`^\.github/` in its `site_input` alternation, so the mechanic is exactly as described, and the suite it fires
+is sixteen tests, not fifteen - six typescript, ten ruby.
+
+**But the same script sets `code=yes` for a `.github/` edit too.** Its `not_code` pattern is
+`^(\.agents/|sites/|ruby/)|\.md$`, which does not exclude `.github/`, so a workflow-only pull request already
+runs the image tests, the image build, the lint job and now Sonar whatever the site half decides. Narrowing
+the site half removes the three Jekyll builds and the site suite; it does not make a workflow-only pull
+request cheap. A markdown file under `.github/` on its own is the one case that goes fully quiet, because
+`\.md$` takes the code half out.
 
 ## What to keep as it is
 
@@ -259,7 +361,10 @@ so the next session does not check them again.
 - **`actions/checkout` sparse-checkout and `filter: blob:none` for the small jobs.** Same measurement. There is
   no time to save.
 - **`gate.sh`.** GitHub provides no built-in "did every job pass" gate, and feeding it `toJSON(needs)` is
-  already the only shape in which the job list cannot drift from `needs:`.
+  already the only shape in which the job list cannot drift from `needs:`. Re-checked 2026-09-11: GitHub's own
+  docs still say a workflow skipped by a `paths:` filter leaves its checks pending and blocks the merge, and
+  still recommend one always-running workflow instead. A skipped *job* reports success. That is exactly the
+  shape here - one workflow, a `changes` job, per-job `if:`, one collector - so this stands.
 - **`check-version.sh`.** `workflow_dispatch` inputs have no pattern or regex validation; a `type: choice` would
   need every version enumerated. A check in the run is the only option.
 - **`peter-evans/dockerhub-description`.** Docker publishes no action for the repository description, and the
@@ -321,14 +426,17 @@ reasoning can be found; in every case the reason still holds.
   warning is simply describing a shape that no longer exists.
 - **D18 - two test suites split by what ships, with five javascript tests in both.** Correct as written.
   Finding 12 is about the path filter, not the split.
-- **D8 - Sonar runs by hand and Automatic Analysis stays off.** Finding 10 does not touch the trigger.
+- **D8 - Automatic Analysis stays off.** Finding 10 does not touch the trigger. The "runs by hand" half of
+  that entry is out of date and the ledger needs it corrected: since 2026-08-28 `sonar-analysis.yml` has
+  gained `workflow_call` and the pull request gate calls it on every code change.
 
 ## Done when
 
 Every box here is a decision recorded or a change made. Several are independent; none blocks another.
 
 **Trimmed 2026-09-02.** Findings 2, 3, 6, 9 and 11 landed on 2026-08-28 and their arguments were cut to what
-a reader still needs. Seven are left and **six of the seven close on a sentence, not on work**:
+a reader still needs. Seven are left and **every one of them now closes on a sentence, not on work** - the one
+that needed a run got it on 2026-09-11:
 
 | Finding | What it takes |
 |---|---|
@@ -336,7 +444,7 @@ a reader still needs. Seven are left and **six of the seven close on a sentence,
 | 4, `persist-credentials` | a yes or a no. Yes is fifteen lines across every checkout; no is one line in the ledger |
 | 5, one deploy workflow | a yes or a no. **This one is taste, not mechanics** - where you want to read the host name |
 | 7, scope the credential | a yes or a no. Yes is a GitHub environment and moving two secrets into it |
-| 8, drop `setup-buildx-action` | **the only one needing a run.** Remove it on the next prerelease dispatch, where a failure costs a re-dispatch |
+| 8, drop `setup-buildx-action` | a yes or a no. The mechanics were proved on 2026-09-11; a prerelease dispatch now only proves the release path |
 | 10, the Sonar wait | a yes or a no. Yes paints the Sonar run red every time until coverage passes, and that is the whole decision |
 | 12, the path filter | a yes or a no, and *low confidence it is worth doing* is already written into it |
 

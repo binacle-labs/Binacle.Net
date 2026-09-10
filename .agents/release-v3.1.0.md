@@ -82,7 +82,7 @@ release of their own. *(chosen by an agent)*
 | Plan | The slice this release takes |
 |---|---|
 | `plans/api/integration-tests-cover-shipped-modules.md` | **the CORS assertion. Landed 2026-09-10** in `api/test/Binacle.Net.IntegrationTests` - four tests: preflight and simple request from a configured origin carry the header, an unconfigured origin does not, and with no `Cors.json` no origin is allowed. Proven by breaking `app.UseCors()` and watching the right two fail. **Turning the optional modules on is the larger half and is still open** |
-| `plans/ci-cd/ci-open-questions.md` | **a part of it, his pick.** Seven of its twelve items are open, six of those close on a sentence and need no work; one needs a dispatch |
+| `plans/ci-cd/ci-open-questions.md` | **most or all of it - he said so on 2026-09-11.** Seven of its twelve items are open and **all seven now close on a sentence**: the one that used to need a real dispatch, dropping `setup-buildx-action` from `publish`, was proved on 2026-09-11 against the repository's own smoke path. All seven were re-verified the same day, and only the Docker Hub eligibility in finding 1 needs something no agent can reach |
 
 **Why CORS is the one to take even if the rest slips.** `Program.cs` always registers the policy and every
 core endpoint requires it, the origins come from an optional `Cors.json`, and with none present the fallback
