@@ -1,3 +1,4 @@
+using Binacle.Net.Kernel.Instance;
 using Binacle.Net.UIModule.Pages;
 using Binacle.Net.UIModule.Services;
 using Microsoft.Extensions.Options;
@@ -32,9 +33,9 @@ public class AppletPageModelTests
 	[Fact]
 	public void The_Instance_Page_Resolves_Its_Applet()
 	{
-		var featureOptions = Options.Create(new FeatureOptions());
+		var instanceOptions = Options.Create(new InstanceOptions());
 
-		var page = new InstanceModel(appletsService, featureOptions, new FakeWebHostEnvironment("Production"));
+		var page = new InstanceModel(appletsService, instanceOptions, new FakeWebHostEnvironment("Production"));
 
 		page.Applet.Page.ShouldBe("/Instance");
 	}

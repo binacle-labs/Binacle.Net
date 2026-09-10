@@ -42,3 +42,19 @@ a.card {
   block-size: 100%;
   color: inherit;
 }
+
+// beercss only reveals a tooltip on hover, so without this a keyboard never reaches one and touch has no hover to give.
+:focus-within > .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}
+
+.tooltip.max p {
+  margin: 0;
+}
+
+.tooltip.max p:first-child {
+  font-weight: 600;
+  margin-block-end: .25rem;
+}

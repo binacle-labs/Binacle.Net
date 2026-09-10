@@ -1,5 +1,5 @@
 ---
-description: Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only
+description: What a pull request does not run - the integration suites against the shipped module set. Sonar now runs on every pull request that can carry the token; that half is done
 state: idea
 waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
 horizon: near
@@ -9,12 +9,13 @@ paths:
 
 # What the pull request does not run
 
-Two things a pull request does not check. The integration harnesses run core modules only, so every module
+One thing a pull request still does not check: the integration harnesses run core modules only, so every module
 combination the image ships is untested end to end on a pull request - and writing those tests is separate
-work; this is only that they run once they exist. And `sonar-analysis.yml` is `workflow_dispatch` only, so
-analysis happens when somebody remembers, which is never on the pull request that introduced the problem.
+work; this is only that they run once they exist. Sonar analysis used to be the other gap - `sonar-analysis.yml`
+was `workflow_dispatch` only, so it ran when somebody remembered, never on the pull request that introduced the
+problem - and that half closed 2026-09-10.
 
-Two things that are easy to get wrong:
+Things that are easy to get wrong:
 
 - **Neither goes in `shared-image-tests.yml`.** The release calls that file whole and takes no inputs, so every
   step added there is a step the release pays for. They belong in `pull-request.yml`.
@@ -23,14 +24,17 @@ Two things that are easy to get wrong:
 
 ## Done when
 
-- [ ] `sonar-analysis.yml` runs without a button press.
-      `grep -n 'pull_request' .github/workflows/sonar-analysis.yml` matches, or `pull-request.yml` calls it
-      with a `uses:` line naming it.
+- [x] `sonar-analysis.yml` runs without a button press.
+      Done 2026-09-10. `pull-request.yml` calls it with a `uses:` line, off the same path filter as the
+      other code jobs, skipping rather than failing when a fork or a Dependabot pull request cannot carry
+      the token. It stays out of the merge gate - the reasoning and the measurements behind both calls are
+      in the CI/CD decisions ledger, not repeated here.
 - [ ] The integration suites run on every pull request, against the module set the image ships.
       **By eye** in `.github/workflows/pull-request.yml`: a job runs the all-modules suite. The harnesses have
       to have the optional modules on first, so this box cannot close before that work does.
-- [ ] Neither gate was added to `shared-image-tests.yml`.
-      `git diff` on that file shows no new step.
+- [x] Neither gate was added to `shared-image-tests.yml`.
+      `git diff` on that file shows no new step, true as of 2026-09-10. Re-check this box when the second
+      item above is picked up - it is the one still open.
 
 ## Research
 

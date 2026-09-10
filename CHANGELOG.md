@@ -13,12 +13,19 @@
 - **Each result now says which algorithm actually ran**, shown only when you asked for `Best` — with a single heuristic selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.  
 - **The demo no longer builds its own HTTP calls.** It goes through the new client package, which owns the request and response shapes.  
 - **A rate-limited request now says so.** Hitting the demo too often used to show a message about a response that could not be parsed. It now tells you that you have been rate limited and to wait a moment before trying again.  
+- **A result that could not fit everything now says what was left out.** An info button on the result row opens a small panel listing the items that did not fit and how many of each. It opens on hover, on tap and from the keyboard, and it floats over the row rather than making it taller.  
+- **The Get results button can no longer stick.** It came back only once something had drawn the packed bin, so a page showing the form without the 3D view could leave it disabled. It now comes back as soon as the answer arrives.  
+- **The instance page no longer calls the API to list its presets.** It renders them with the rest of the page, so the list still appears behind a proxy, an auth layer or a CORS rule - which is usually when you are looking at that page. A change to `Presets.json` shows up there after a restart.  
+- **The demo site shows unpacked items too.** The tooltip that landed on the packing page inside the image is now on the public demo as well.  
 
 ### 🏗️ Internal Work
 
 - **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy — so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
 - **Restructured `binacle-net-ui` into apps, components and shared code.** It was three flat folders, and 19 of the 25 files in `utils/` turned out to be the visualizer's own internals sitting where any file could import them. The visualizer now owns them and offers an app its component and one contract type. No behaviour changed — the same 348 tests passed before and after, with no assertion edited.  
 - **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync — a person runs it and commits what it writes.  
+- **Added an integration test for CORS.** Nothing asserted `Access-Control-Allow-Origin` before. A preflight from an allowed origin now has a test that fails the way the 2026-09-01 break did, and a second proves that with no `Cors.json` present no origin is allowed at all.  
+- **Sonar analysis now runs on every pull request that can carry the token**, in parallel with the existing checks rather than only by hand. It reports and does not block a merge; a pull request from a fork or from Dependabot skips it rather than failing.  
+- **Added a `Instance` slice to the Kernel** holding what a running instance reports about itself. The feature list moved into it and its values became a small closed set of types, so the presets the instance loaded can sit beside the switched-on features without being mistaken for one - the health check payload lists features by type now, not by key. The instance page's javascript is gone with it.  
 
 ## [3.0.0] - 2026-09-01
 

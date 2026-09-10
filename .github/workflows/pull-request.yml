@@ -1,4 +1,5 @@
 #   changes -> image tests, image build, site tests, site build, lint -> gate
+#            \-> sonar (report only - not in gate's needs)
 #
 # `gate` is the only name branch protection holds. Never move the image build into the test suite - the
 # release calls that file whole and would build a throwaway image every time.
@@ -151,6 +152,20 @@ jobs:
       - name: Check - scripts
         if: ${{ !cancelled() }}
         run: just check scripts
+
+  sonar:
+    name: Sonar
+    needs: changes
+    # Skips rather than fails: a fork's SONAR_TOKEN reads empty here, and Dependabot pull requests read
+    # from a separate secret store. Not in gate's needs, so a skip or a red run never blocks a merge.
+    if: >-
+      ${{ needs.changes.outputs.code == 'yes' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.actor != 'dependabot[bot]' }}
+    uses: ./.github/workflows/sonar-analysis.yml
+    secrets: inherit
+    permissions:
+      contents: read
 
   gate:
     name: Gate

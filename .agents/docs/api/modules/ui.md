@@ -1,8 +1,8 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-09-04
-check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing
+verified: 2026-09-10
+check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds
 also_update:
   - packages
   - api/configuration
@@ -73,12 +73,12 @@ chunks `_AppletScripts.cshtml` loads, and the stylesheet directly, against a bui
 are asserted separately from the entries** — a demo entry is 227 bytes and everything it needs is in
 `vendors`, `three`, `binacle-net-ui` and `binacle-vipaq`, so an entry alone answering 200 proves nothing.
 
-The webpack entries are `main`, `instance`, `packing_demo` and `protocol_decoder`. The chunk names and
-priorities match `sites/demo/webpack.config.js`; both compile the same package source, so there is one
-implementation and only the config is duplicated.
+The webpack entries are `main`, `packing_demo` and `protocol_decoder`. The chunk names and priorities match
+`sites/demo/webpack.config.js`; both compile the same package source, so there is one implementation and only
+the config is duplicated.
 
-`instance` imports nothing, so it is its own 1 KB file and pulls in no shared chunk. The instance page loads
-`runtime` + `main` + `instance` and none of `vendors`, `three` or the two package chunks.
+**The instance page has no entry of its own.** It renders server-side and loads `runtime` + `main` only —
+none of `vendors`, `three` or the two package chunks.
 
 **The module is a root npm workspace member.** `binacle-net-ui`, `binacle-vipaq`, `cookies` and
 `theme-switcher` resolve to symlinks in the root `node_modules`. One root `npm ci` covers the module; it has
@@ -111,10 +111,14 @@ the machine. The three Jekyll sites reach the same end through `default_theme: "
 Everything that needs the API runs in the browser and fetches relative. There is no `HttpClient`, no
 `IHttpContextAccessor`, and the csproj has one project reference, `Binacle.Net.Kernel`.
 
-**That is why the instance page reads presets over HTTP.** `BinPresetOptions` lives in `Binacle.Net`, the entry
-project, which references this module — so a project reference would be a cycle. `_js/instance.js` calls
-`GET /api/v4/presets` instead, always relative, because that page describes the instance serving it and never
-whichever API `ApiBaseUrl` points at.
+**The instance page makes no call at all.** `BinPresetOptions` lives in `Binacle.Net`, the entry project,
+which references this module — so a project reference back would be a cycle. The entry project projects its
+presets into `InstanceOptions` in the Kernel's `Instance/` slice at startup, and `Instance.cshtml.cs` reads
+them through `IOptions` the same way it reads the switch list. The page has no javascript of its own.
+
+**The presets are a snapshot taken at startup.** `BinPresetOptions.ReloadOnChange` is `true`, so an operator
+who edits `Presets.json` sees this page disagree with `GET /api/v4/presets` until the process restarts. That
+was chosen deliberately over a live provider; the reasoning is in the API decisions ledger.
 
 ## Services
 

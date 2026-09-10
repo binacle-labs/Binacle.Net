@@ -6,12 +6,15 @@
 name: Sonar Analysis
 
 on:
-  # By hand only - no schedule, and no pull request trigger yet.
+  # By hand, or called from the pull request gate. No schedule.
   workflow_dispatch:
+  workflow_call:
 
 # Cancellable: SonarCloud shows the branch's latest state, so superseded numbers get overwritten anyway.
+# A literal name, not `github.workflow` - that resolves to the CALLER's name when this runs as a called
+# workflow, and would collide with the caller's own concurrency group.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: sonar-analysis-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -132,5 +135,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           COMMIT: ${{ github.sha }}
-          BRANCH: ${{ github.ref_name }}
+          # On a pull request github.ref_name is "123/merge". head_ref is the branch a reader recognises.
+          BRANCH: ${{ github.head_ref || github.ref_name }}
         run: just ci sonar-summary .sonarqube/out/.sonar/report-task.txt "$COMMIT" "$BRANCH"

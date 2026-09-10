@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Binacle.Net.Kernel.Instance;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -8,19 +9,19 @@ namespace Binacle.Net.DiagnosticsModule.Services;
 internal class SystemHealthCheck : IHealthCheck
 {
 	private readonly IHostEnvironment hostEnvironment;
-	private readonly IOptions<FeatureOptions> featureOptions;
+	private readonly IOptions<InstanceOptions> instanceOptions;
 	private readonly IOptions<ReservedPathOptions> reservedPathOptions;
 	private readonly TimeProvider timeProvider;
 
 	public SystemHealthCheck(
 		IHostEnvironment hostEnvironment,
-		IOptions<FeatureOptions> featureOptions,
+		IOptions<InstanceOptions> instanceOptions,
 		IOptions<ReservedPathOptions> reservedPathOptions,
 		TimeProvider timeProvider
 	)
 	{
 		this.hostEnvironment = hostEnvironment;
-		this.featureOptions = featureOptions;
+		this.instanceOptions = instanceOptions;
 		this.reservedPathOptions = reservedPathOptions;
 		this.timeProvider = timeProvider;
 	}
@@ -41,7 +42,7 @@ internal class SystemHealthCheck : IHealthCheck
 				{"StartedAt", startedAt.ToString("O")},
 				{"Uptime", (this.timeProvider.GetUtcNow() - startedAt).ToString(@"d\.hh\:mm\:ss")},
 				{"Processors", Environment.ProcessorCount},
-				{"Features", this.featureOptions.Value.EnabledFeatures.Order().ToArray()},
+				{"Features", this.instanceOptions.Value.EnabledFeatures.Order().ToArray()},
 				{"ReservedPaths", this.reservedPathOptions.Value.Prefixes.Order().ToArray()},
 			};
 			return Task.FromResult(HealthCheckResult.Healthy("System Info", data));

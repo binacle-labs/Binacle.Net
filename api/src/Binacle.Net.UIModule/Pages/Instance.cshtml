@@ -65,21 +65,36 @@
 		</table>
 	</article>
 
-	@* Fetched in the browser, from this host. The module makes no server-side calls and holds no packing code,
-	   so the presets it shows are whatever the running API answers with. *@
 	<article class="s12" id="presets">
-		<h5>Presets <span class="small-text" data-presets-count></span></h5>
-		<p data-presets-status>Reading them from this instance...</p>
-		<table class="border" data-presets-table hidden>
-			<thead>
-			<tr>
-				<th scope="col">Preset</th>
-				<th scope="col">Boxes</th>
-				<th scope="col" class="right-align">Sizes</th>
-			</tr>
-			</thead>
-			<tbody data-presets-body></tbody>
-		</table>
+		<h5>Presets <span class="small-text">@(Model.Presets.Count == 1 ? "1 loaded" : $"{Model.Presets.Count} loaded")</span></h5>
+		@if (Model.Presets.Count == 0)
+		{
+			<p>None. Add them to Presets.json and restart, or pack against your own boxes in the packing demo.</p>
+		}
+		else
+		{
+			<table class="border">
+				<thead>
+				<tr>
+					<th scope="col">Preset</th>
+					<th scope="col">Boxes</th>
+					<th scope="col" class="right-align">Sizes</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach (var preset in Model.Presets)
+				{
+					var boxLabel = preset.Bins.Count == 1 ? "1 box" : $"{preset.Bins.Count} boxes";
+					var sizes = string.Join(", ", preset.Bins.Select(bin => $"{bin.Id} {bin.Length}x{bin.Width}x{bin.Height}"));
+					<tr>
+						<th scope="row"><code>@preset.Name</code></th>
+						<td>@boxLabel</td>
+						<td class="right-align small-text">@sizes</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		}
 	</article>
 </div>
 
@@ -88,7 +103,3 @@
 <p class="small-text">
 	Running this? <a class="underline" href="@($"{Metadata.GitHub}/discussions")" target="_blank">Say hello</a>
 </p>
-
-@section Scripts {
-	<script src="/_content/Binacle.Net.UIModule/js/instance.js"></script>
-}

@@ -235,6 +235,22 @@ excerpt: |
                   </div>
                 </template>
               </div>
+              <template x-if="hasUnpackedItems(result)">
+                <div style="position:relative;z-index:10">
+                  <button type="button"
+                          class="transparent circle"
+                          :aria-label="unpackedItemsTitle(result)"
+                          @click.prevent.stop="$el.focus()">
+                    <i>info</i>
+                  </button>
+                  <div class="tooltip max large-space">
+                    <p x-text="unpackedItemsTitle(result)"></p>
+                    <template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
+                      <p x-text="unpackedItemText(unpackedItem)"></p>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </a>
           </template>
         </fieldset>

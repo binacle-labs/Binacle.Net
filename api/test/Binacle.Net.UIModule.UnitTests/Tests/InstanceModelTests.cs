@@ -1,3 +1,5 @@
+using Binacle.Net.Kernel.Instance;
+using Binacle.Net.Kernel.Instance.Models;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Pages;
 using Binacle.Net.UIModule.Services;
@@ -6,22 +8,34 @@ using Microsoft.Extensions.Options;
 namespace Binacle.Net.UIModule.UnitTests;
 
 // The page a self-hoster opens to check their own configuration arrived. It reports the off half too, which
-// is why FeatureSwitch.All exists alongside FeatureOptions.
-[Trait("Behavioral Tests", "Ensures the instance page reports both halves of the switch list")]
+// is why FeatureSwitch.All exists alongside InstanceOptions.
+[Trait("Behavioral Tests", "Ensures the instance page reports both halves of the switch list, and the presets it loaded")]
 public class InstanceModelTests
 {
 	private static InstanceModel InstanceWith(string environmentName, params (string Feature, string? Path)[] enabled)
 	{
-		var featureOptions = new FeatureOptions();
+		var instanceOptions = new InstanceOptions();
 		foreach (var (feature, path) in enabled)
 		{
-			featureOptions.AddFeature(feature, path);
+			instanceOptions.AddFeature(feature, path);
 		}
 
 		return new InstanceModel(
 			new AppletsService(),
-			Options.Create(featureOptions),
+			Options.Create(instanceOptions),
 			new FakeWebHostEnvironment(environmentName)
+		);
+	}
+
+	private static InstanceModel InstanceWithPresets(PresetsValue presets)
+	{
+		var instanceOptions = new InstanceOptions();
+		instanceOptions.SetPresets(presets);
+
+		return new InstanceModel(
+			new AppletsService(),
+			Options.Create(instanceOptions),
+			new FakeWebHostEnvironment("Production")
 		);
 	}
 
@@ -90,5 +104,25 @@ public class InstanceModelTests
 
 		features.Distinct().Count().ShouldBe(features.Count);
 		features.ShouldNotContain("UIModule");
+	}
+
+	[Fact]
+	public void No_Presets_Reports_An_Empty_List()
+	{
+		var page = InstanceWithPresets(PresetsValue.Empty);
+
+		page.Presets.ShouldBeEmpty();
+	}
+
+	[Fact]
+	public void Presets_Are_Sorted_By_Name()
+	{
+		var small = new InstancePreset("Small", [new InstancePresetBin("box", 10, 10, 10)]);
+		var large = new InstancePreset("Large", [new InstancePresetBin("crate", 100, 100, 100)]);
+		var presets = new PresetsValue([small, large]);
+
+		var page = InstanceWithPresets(presets);
+
+		page.Presets.Select(x => x.Name).ShouldBe(["Large", "Small"]);
 	}
 }
