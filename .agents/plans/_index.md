@@ -92,12 +92,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "whether this replaces the GHCR staging step, and what the published verify command covers. horizon: undecided - chosen by an agent, strike it if wrong"
   horizon: undecided
   paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
-- file: ci-cd/what-the-pull-request-does-not-run.md
-  description: "What a pull request does not run - the integration suites against the shipped module set. Sonar now runs on every pull request that can carry the token; that half is done"
-  state: idea
-  waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
-  horizon: near
-  paths: [".github/workflows/**"]
 ```
 
 ## Shared
