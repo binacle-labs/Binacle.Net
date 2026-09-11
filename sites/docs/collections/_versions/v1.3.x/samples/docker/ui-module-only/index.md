@@ -3,7 +3,6 @@ title: UI Module Only
 description: >-
   Docker Compose for Binacle.Net v1.3.x with only the UI Module enabled, so you can try packing from a browser.
   The files to download and run.
-permalink: /version/v1.3.x/samples/docker/ui-module-only/
 nav:
   order: 3
   parent: Docker

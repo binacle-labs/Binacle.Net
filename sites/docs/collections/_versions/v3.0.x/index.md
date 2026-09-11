@@ -4,7 +4,6 @@ description: >-
   Documentation for Binacle.Net v3.0.x: quick start, the HTTP API, configuration, Docker and Kubernetes samples,
   and the release notes.
 menu_title  : v3.0.x
-permalink: /version/v3.0.x/
 nav:
   exclude: true
   order: 1

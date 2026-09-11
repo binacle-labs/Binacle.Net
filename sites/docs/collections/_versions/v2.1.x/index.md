@@ -4,7 +4,6 @@ description: >-
   Documentation for Binacle.Net v2.1.x: quick start, the V2 and V3 APIs, configuration, Docker and Kubernetes
   samples, and the release notes.
 menu_title  : v2.1.x
-permalink: /version/v2.1.x/
 nav:
   exclude: true
   order: 1

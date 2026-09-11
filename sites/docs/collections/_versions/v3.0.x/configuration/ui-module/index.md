@@ -3,7 +3,6 @@ title: UI Module
 description: >-
   The UI Module adds a browser interface for trying Binacle.Net without writing API calls. Off by default, and
   it reads no configuration.
-permalink: /version/v3.0.x/configuration/ui-module/
 nav:
   parent: Configuration
   order: 4

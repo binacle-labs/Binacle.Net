@@ -4,7 +4,6 @@ menu_title: Minimal Setup
 description: >-
   A minimal Kubernetes deployment of Binacle.Net v2.0.x: deployment, service, a presets ConfigMap and a PVC. The
   manifests to download.
-permalink: /version/v2.0.x/samples/kubernetes/minimal-setup/
 nav:
   order: 1
   parent: Kubernetes

@@ -3,7 +3,6 @@ title: Service Module
 description: >-
   The Service Module turns Binacle.Net into a service with accounts, authentication and rate limiting.
   No public documentation is provided for it.
-permalink: /version/v3.0.x/configuration/service-module/
 nav:
   parent: Configuration
   order: 3

@@ -4,7 +4,6 @@ menu_title: Minimal
 description: >-
   The smallest Docker Compose setup that still answers requests: the API, your presets, and somewhere to write
   logs. Nothing else is switched on.
-permalink: /version/v3.0.x/samples/docker/minimal/
 nav:
   order: 1
   parent: Docker
