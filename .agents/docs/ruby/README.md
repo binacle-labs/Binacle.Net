@@ -300,17 +300,17 @@ version scheme of `sites/docs` — the front matter key `version`, the data path
 collection folder `_versions` — all hardcoded, because a shared gem holding one site's vocabulary is the
 thing this split exists to avoid.
 
-**A generator decides every url under `_versions/`** - `/version/<url_segment>/<rest>`, the segment read off
-`_data/versions.yml` beside the folder's id, a page as a folder with an index, a static
-file under its own name. A `permalink` a page writes is overwritten. Static files get a settable url through
+**A generator decides every url under `_versions/`** - the `current` folder at the site root, every other at
+`/version/<url_segment>/<rest>`, the segment read off `_data/versions.yml` beside the folder's id, a page as a
+folder with an index, a static file under its own name. A `permalink` a page writes is overwritten. Static files get a settable url through
 `VersionedFile`, a `StaticFile` subclass, because Jekyll's own ignores data. **It also stamps plain keys**,
 all at `:high` priority. On every document under `_versions/<folder>/`:
 `version` (the folder name - no config block has to say it), `version_tag` and `version_label` (from the list
 entry beside that id in `_data/versions.yml`; every entry carries `url_segment`, `label` and `version_tag`, and
-a folder with no entry or an entry missing a key stops the build), `title_suffix` (`(v2.1.1)`, from the label)
-and, on every version
-that is not `current`, `robots: noindex, follow`, and `version_urls` (this page's url in every other version,
-or that version's index where the page is missing - for the selector). On every page whose layout is `redirect`:
+a folder with no entry or an entry missing a key stops the build), and `version_urls` (this page's url in
+every other version, or that version's index where the page is missing - for the selector). On every version
+that is not `current`: `title_suffix` (`(v2.1.1)`, from the label) and `robots: noindex, follow` - the current
+version's url carries no version, so its title carries none, and it is the one that is indexed. On every page whose layout is `redirect`:
 `redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing
 about versions. The generator also **fails the build when two files render at one url** - Jekyll only warns -
 and **prints the pages the previous version has that the current one lacks**, the redirect list for a major.

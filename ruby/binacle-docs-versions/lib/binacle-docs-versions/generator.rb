@@ -27,14 +27,18 @@ module Binacle
         stamp_urls(site, versioned)
         pages = Pages.new(versioned)
         stamp_list_urls(site, pages)
-        # The label, suffix and tag come off the page's own version, never off current.
+        # The label and tag come off the page's own version. The suffix keeps an old page's title apart from
+        # the root page of the same name; the root page itself carries no version in its url, so none in its
+        # title either.
         versioned.each do |doc|
           version = version_of(doc)
           entry = entries.fetch(version)
           doc.data['version_label'] ||= entry['label']
-          doc.data['title_suffix'] ||= "(#{entry['label']})"
           doc.data['version_tag'] ||= entry['version_tag']
-          doc.data['robots'] ||= 'noindex, follow' unless version == current
+          next if version == current
+
+          doc.data['title_suffix'] ||= "(#{entry['label']})"
+          doc.data['robots'] ||= 'noindex, follow'
         end
 
         stamp_version_urls(pages, versioned)

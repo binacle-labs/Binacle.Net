@@ -52,7 +52,7 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
       site = build_site
 
       expect(site.data['versions']['list'].map { |entry| entry['url'] })
-        .to eq(['/version/2.0.4/', '/version/1.0.3/'])
+        .to eq(['/', '/version/1.0.3/'])
     end
   end
 
@@ -60,8 +60,8 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     expect(doc(build_site, V1_GUIDE).data['title_suffix']).to eq('(v1.0.3)')
   end
 
-  it 'stamps the current version too, which is titled like any other' do
-    expect(doc(build_site, V2_GUIDE).data['title_suffix']).to eq('(v2.0.4)')
+  it 'gives the current version no suffix - its url carries no version either' do
+    expect(doc(build_site, V2_GUIDE).data).not_to have_key('title_suffix')
   end
 
   it 'makes a version that is not current unindexable' do
@@ -98,7 +98,22 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
   end
 
   describe 'the url' do
-    it 'renders a page under /version/<url_segment>/ as a folder with an index' do
+    it 'renders the current version at the root, with no version in the url' do
+      site = build_site
+
+      expect(doc(site, V2_GUIDE).url).to eq('/guide/')
+      expect(doc(site, 'v2.x/index.md').url).to eq('/')
+      expect(doc(site, V2_GUIDE).destination(site.dest)).to end_with('/guide/index.html')
+    end
+
+    it 'moves the root when the one knob moves' do
+      site = build_with_current('v1.x')
+
+      expect(doc(site, V1_GUIDE).url).to eq('/guide/')
+      expect(doc(site, V2_GUIDE).url).to eq('/version/2.0.4/guide/')
+    end
+
+    it 'renders a closed version under /version/<url_segment>/ as a folder with an index' do
       site = build_site
 
       expect(doc(site, V1_GUIDE).url).to eq('/version/1.0.3/guide/')
@@ -128,8 +143,14 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
       expect(site.data['versions']['list'].last['url']).to eq('/version/1.0.9/')
     end
 
+    it 'ignores the url segment of the current version' do
+      site = build_with_list([V2_ENTRY.merge('url_segment' => '9.9.9'), V1_ENTRY.dup])
+
+      expect(doc(site, V2_GUIDE).url).to eq('/guide/')
+    end
+
     it 'overrides a permalink the page wrote itself' do
-      expect(doc(build_site, 'v2.x/hand.md').url).to eq('/version/2.0.4/hand/')
+      expect(doc(build_site, 'v2.x/hand.md').url).to eq('/hand/')
     end
 
     it 'leaves a document outside _versions alone' do
@@ -161,7 +182,7 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     it 'fails the build when a page outside the versions claims a versioned url' do
       expect { build_site({}, COLLISION_SITE) }
         .to raise_error(Binacle::DocsVersions::Error,
-                        %r{_versions/v1.x/guide.md and clash.md both render at /version/1.0.3/guide/})
+                        %r{_versions/v1.x/guide.md and clash.md both render at /guide/})
     end
 
     it 'passes a site where every url is claimed once' do

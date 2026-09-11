@@ -2,13 +2,15 @@
 
 module Binacle
   module DocsVersions
-    # Where a versioned file renders. The folder name never appears in a url: a version renders under
-    # /version/<url_segment>/, and the segment is what versions.yml lists beside the folder's id - or the id.
+    # Where a versioned file renders. The folder name never appears in a url: the current version renders at
+    # the site root, every other one under /version/<url_segment>/, the segment being what versions.yml lists
+    # beside the folder's id - or the id.
     class Urls
       INDEX = 'index'
 
       def initialize(site)
         @segments = segments_of(site)
+        @current = site.data.dig('versions', 'current').to_s
       end
 
       def for(item)
@@ -19,6 +21,8 @@ module Binacle
       private
 
       def prefix(version)
+        return '' if version == @current
+
         "/version/#{@segments.fetch(version, version)}"
       end
 

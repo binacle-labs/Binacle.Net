@@ -187,7 +187,7 @@ while the moves are still being checked.
 
 ### The common pages - one commit per page
 
-- [ ] **11 - S. Six commits, one per page:** `quick-start`, `vipaq-protocol`, `core-concepts`,
+- [x] **11 - S. Six commits, one per page:** `quick-start`, `vipaq-protocol`, `core-concepts`,
       `configuration-basics`, `integration-guide`, `generate-a-client`. For each: **do not trust either copy.**
       Read it as it stood at `v3.0.0` (`git show v3.0.0:sites/docs/collections/_common_pages/<page>`), read it
       as it is now, diff them, and decide line by line what is a fix and what is v3.1 content. Then:
@@ -255,14 +255,15 @@ while the moves are still being checked.
       has no page at `/` until step 14 - expected; the breadcrumb home on `version.html` and `404.html` is the
       one link that does not resolve until then (checked 2026-09-12: that one, nothing else). Current renders
       under `/version/3.0.0/` for the same one commit.
-- [ ] **14 - C.** The current folder renders at the root: the rule from step 7 gives the folder named by
+- [x] **14 - C.** The current folder renders at the root: the rule from step 7 gives the folder named by
       `current:` no prefix at all - `/<rest>`. **`title_suffix`:** none for `current` - `Quick Start (v3.0.0) -
       Binacle.Net Docs` is noise on a URL that carries no version; keep it for the others, where it stops a
       title colliding with the root page of the same name. Spec for both. **Left over from step 13, for the
       maintainer:** `_layouts/redirect.html` and the gem's `redirect_to`/`canonical` stamps have no page left
       to serve - `version-latest.html` was their only user. Delete both here, or keep them for the next major.
       `just test rb_binacle-docs-versions_unit` passes, and after `bundle exec jekyll build` in `sites/docs`
-      the first two *Done when* boxes hold.
+      the first two *Done when* boxes hold. Done 2026-09-12: 51 specs; the redirect layout and stamps were
+      kept, not deleted - the maintainer has not said.
 
 ### The agent docs
 
@@ -279,6 +280,11 @@ while the moves are still being checked.
 - [ ] **16 - S.** Every line in `_redirects` becomes `301`, once each has been checked on the deployed site with
       the `curl -sI` calls under *Done when*. Until then they are `302`, so a wrong one is not cached.
       `grep -c 302 sites/docs/_redirects` returns 0.
+
+**The sidebar order is not a step here either.** The six moved pages kept their old `nav.order`, so the
+current line's sidebar reads Quick Start, Release Notes, Core Concepts, Configuration Basics, Generate a
+Client, API, Configuration, … - the maintainer saw it on 2026-09-12 and gave it a session of its own:
+`plans/sites/docs-sidebar-order.md`.
 
 **The 3.1.0 release notes are not a step here.** A `## v3.1.0` section at the top of `v3.x/release-notes.md`
 names a date and a link that exist only after the run is green, so on `main` before the tag they would be
@@ -311,51 +317,55 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
 
 ## Done when
 
-- [ ] The current folder renders at the root and every closed line under `/version/<url_segment>/`.
+- [x] **2026-09-12.** The current folder renders at the root and every closed line under `/version/<url_segment>/`.
       After `bundle exec jekyll build` in `sites/docs`: `test -f artifacts/docs/quick-start/index.html`,
       `test -f artifacts/docs/version/2.1.1/quick-start/index.html`,
       `test -f artifacts/docs/version/1.3.0/quick-start/index.html`, and `ls artifacts/docs/version/`
       prints `1.3.0 2.1.1 index.html` - no folder name, no `latest`.
-- [ ] Static files follow the same rule.
+- [x] **2026-09-12.** Static files follow the same rule.
       `test -f artifacts/docs/samples/docker/minimal/Presets.json` and
       `test -f artifacts/docs/swagger/v4.json`.
-- [ ] No page in `collections/` decides its own URL.
+- [x] **2026-09-12.** No page in `collections/` decides its own URL.
       `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing.
-- [ ] `versions.yml` is the one knob.
+- [x] **2026-09-12.** `versions.yml` is the one knob.
       `grep -c 'v3\.' sites/docs/_config.yml` returns 0, `grep -n version_tag sites/docs/_data/versions.yml`
       lists one per folder, and so do `grep -n 'url_segment:'` and `grep -n 'label:'`, and
       `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just` returns nothing.
-- [ ] Three folders, no common layer.
+- [x] **2026-09-12.** Three folders, no common layer.
       `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`, and
       `ls sites/docs/collections/_common_pages/` prints `version.html` alone.
-- [ ] Every old-line link to a common page is a `vlink` into its own folder.
+- [x] **2026-09-12.** Every old-line link to a common page is a `vlink` into its own folder.
       `grep -rn '_common_pages' sites/docs/collections/_versions/ | grep -v version.html` returns nothing, and
       the build passes.
-- [ ] The six pages were merged from both copies, not taken from one.
+- [x] **2026-09-12.** The six pages were merged from both copies, not taken from one.
       **By eye.** For each, `git diff v3.0.0 -- sites/docs/collections/_common_pages/<page>` was read and
       the session's notes say what was kept from which side. `core-concepts` names `Best` in `v3.x` and does
       not in `v2.x` or `v1.x`.
-- [ ] `v2.x` carries the whole v2 line.
+- [x] **2026-09-12.** `v2.x` carries the whole v2 line.
       `grep -c '^## v2\.' sites/docs/collections/_versions/v2.x/release-notes.md` returns 4, and the swagger
       pages say "added in 2.1.0". **By eye** for the rest of the diff.
-- [ ] Indexing is unchanged in shape: current `✓`, everything else `✗`.
+- [x] **2026-09-12.** Indexing is unchanged in shape: current `✓`, everything else `✗`.
       `grep -L 'noindex' artifacts/docs/version/*/**/index.html` returns nothing;
       `grep -l 'noindex' artifacts/docs/quick-start/index.html` returns nothing;
       `artifacts/docs/sitemap/version-current.xml` lists root URLs only.
-- [ ] Every old URL answers with a redirect, not a 404.
+- [ ] Every old URL answers with a redirect, not a 404. `test -f artifacts/docs/_redirects` holds 2026-09-12; the
+      rest is after deploy.
       `test -f artifacts/docs/_redirects`, and after deploy `curl -sI docs.binacle.net/version/v3.0.x/api/v3/`,
       `.../version/latest/`, `.../version/v2.0.x/quick-start/`, `.../version/v1.3.x/` and
       `.../version/v3.0.x/swagger/v4.html` each return `301` with the location `_redirects` says (`302` until
       step 16).
-- [ ] The selector is on every page and lands on the same page.
+- [ ] The selector is on every page and lands on the same page. The option values were read off the built
+      pages 2026-09-12 (`/configuration/core/` → `/version/2.1.1/configuration/core/`); the click is the
+      maintainer's.
       **By eye.** Open `/configuration/core/`, pick `v2.1.1`, land on `/version/2.1.1/configuration/core/`.
       Pick `v1.3.0` on a page v1 does not have, land on `/version/1.3.0/`. The selector reads `v3.1.0 (current)`,
       `v2.1.1`, `v1.3.0`.
-- [ ] The gem's spec suite covers the URL rule with and without `url_segment:`, the current-at-root rule, the
-      static-file rule, the collision check and the removed-page list.
+- [x] **2026-09-12.** The gem's spec suite covers the URL rule with and without `url_segment:`, the
+      current-at-root rule, the static-file rule, the collision check and the removed-page list.
       `just test rb_binacle-docs-versions_unit` passes, and
       `grep -c "^\s*it " ruby/binacle-docs-versions/spec/*_spec.rb` grew.
-- [ ] `release-docker-image.yml` publishes the major tag.
+- [ ] `release-docker-image.yml` publishes the major tag. The grep holds since step 1; the manifest is after
+      the release.
       `grep -n 'pattern={{major}}' .github/workflows/release-docker-image.yml` matches, and after the next release
       `docker manifest inspect binacle/binacle-net:3` succeeds.
 - [ ] The agent docs say what the tree does.
