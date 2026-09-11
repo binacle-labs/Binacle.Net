@@ -85,7 +85,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ci-cd/README.md
-  description: "CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
+  description: "CI/CD — the nine GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
   paths: [".github/workflows/**", ".github/actions/**"]
 - file: ci-cd/branches.md
   description: "Branch names — the two kinds in use, the snake_case subject, and the one constraint that is mechanical today: Sonar analyses main and pull requests targeting main, and nothing else"
