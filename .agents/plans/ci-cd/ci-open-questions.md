@@ -501,6 +501,7 @@ that needed a run got it on 2026-09-11:
 - [x] The four install actions hold no inline shell.
       Done 2026-08-28. Each is a door onto `tooling/ci/install-<tool>.sh`, called by path rather than through
       `just`. Four scripts, not one parameterised script - the argument list would read worse than the copies.
-- [ ] The site half of the path filter is decided.
-      **By eye.** Either `changed-paths.sh` narrows `.github/` to `.github/actions/`, or a comment in that file
-      says the breadth is deliberate.
+- [x] **2026-09-11.** The site half of the path filter is decided.
+      Narrowed to the site's own `.github/` files - `D31`. `just check scripts` clean; the pattern was run by
+      hand against nine paths, and only the actions, `pull-request.yml`, `shared-site-tests.yml` and a deploy
+      workflow match.
