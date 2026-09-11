@@ -13,7 +13,8 @@
 # tag was ever published for it. The current line carries a moving tag, which the release workflow publishes
 # and which resolves to the newest patch.
 #
-# A version also needs a `defaults` scope block in _config.yml or it is invisible in the selector.
+# Every folder under collections/_versions/ has to be in the list, with its tag. The gem reads the version off
+# the folder name and the tag off this list, and stops the build on a folder the list does not have.
 
 current: v3.0.x
 

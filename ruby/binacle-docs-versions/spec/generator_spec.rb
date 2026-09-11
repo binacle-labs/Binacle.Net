@@ -119,6 +119,77 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     end
   end
 
+  describe 'the selector data' do
+    it 'stamps where the same page is in every version' do
+      site = build_site
+
+      expect(doc(site, V1_GUIDE).data['version_urls'])
+        .to eq('v1.0.x' => doc(site, V1_GUIDE).url, 'v2.0.x' => doc(site, V2_GUIDE).url)
+    end
+
+    it 'points at the index of a version that does not have the page' do
+      site = build_site
+
+      expect(doc(site, 'v1.0.x/deep/nested.md').data['version_urls']['v2.0.x'])
+        .to eq(doc(site, 'v2.0.x/index.md').url)
+    end
+
+    it 'never overwrites a value the page set itself' do
+      expect(doc(build_site, 'v2.0.x/own.md').data['version_urls']).to eq('v1.0.x' => '/pinned/')
+    end
+  end
+
+  describe 'the collision check' do
+    it 'fails the build when a page outside the versions claims a versioned url' do
+      expect { build_site({}, COLLISION_SITE) }
+        .to raise_error(Binacle::DocsVersions::Error,
+                        %r{_versions/v1.0.x/guide.md and clash.md both render at /versions/v1.0.x/guide.html})
+    end
+
+    it 'passes a site where every url is claimed once' do
+      expect { build_site }.not_to raise_error
+    end
+  end
+
+  describe 'the removed-page list' do
+    let(:generator) { described_class.new }
+
+    def pages_of(site)
+      Binacle::DocsVersions::Pages.new(site.documents.select { |doc| doc.data['version'] })
+    end
+
+    it 'names every page and file in the previous version that the current one lacks' do
+      site = build_site
+
+      expect(generator.removed_pages(pages_of(site), 'v2.0.x', 'v1.0.x'))
+        .to eq(['deep/nested.md', 'swagger.md', 'swagger/v3.json'])
+    end
+
+    it 'is empty when there is no previous version' do
+      expect(generator.removed_pages(pages_of(build_site), 'v1.0.x', nil)).to eq([])
+    end
+
+    it 'prints the list at build, one page per line' do
+      allow(Jekyll.logger).to receive(:info)
+
+      build_site
+
+      expect(Jekyll.logger).to have_received(:info)
+        .with('Docs versions:', '3 pages in v1.0.x have no counterpart in v2.0.x')
+      expect(Jekyll.logger).to have_received(:info).with('', '  v1.0.x/deep/nested.md')
+      expect(Jekyll.logger).to have_received(:info).with('', '  v1.0.x/swagger.md')
+      expect(Jekyll.logger).to have_received(:info).with('', '  v1.0.x/swagger/v3.json')
+    end
+
+    it 'prints nothing when the current version is the oldest' do
+      allow(Jekyll.logger).to receive(:info)
+
+      build_with_current('v1.0.x')
+
+      expect(Jekyll.logger).not_to have_received(:info).with('Docs versions:', /counterpart in v1.0.x/)
+    end
+  end
+
   it 'fails the build when the site has no versions data' do
     expect { build_site('data_dir' => '_nothing') }
       .to raise_error(Binacle::DocsVersions::Error, /current is not set/)

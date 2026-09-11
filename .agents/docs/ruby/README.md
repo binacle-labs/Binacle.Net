@@ -303,8 +303,12 @@ thing this split exists to avoid.
 **A generator stamps plain keys** at `:high` priority. On every document under `_versions/<folder>/`:
 `version` (the folder name - no config block has to say it), `version_tag` (the tag listed beside that id in
 `_data/versions.yml`; a folder with none stops the build), `title_suffix` (`(v2.1.x)`) and, on every version
-that is not `current`, `robots: noindex, follow`. On every page whose layout is `redirect`: `redirect_to`,
-`canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing about versions.
+that is not `current`, `robots: noindex, follow`, and `version_urls` (this page's url in every other version,
+or that version's index where the page is missing - for the selector). On every page whose layout is `redirect`:
+`redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing
+about versions. The generator also **fails the build when two files render at one url** - Jekyll only warns -
+and **prints the pages the previous version has that the current one lacks**, the redirect list for a major.
+`site.documents` holds the collection's static files too, so the stamps land on their `data`.
 **It never overwrites a key the page already set**, which is how the swagger pages keep `noindex, nofollow`
 from their `defaults:` scope.
 

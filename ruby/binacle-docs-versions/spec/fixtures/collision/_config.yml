@@ -1,0 +1,7 @@
+title: Example
+url: https://example.com
+
+collections:
+  versions:
+    output: true
+
