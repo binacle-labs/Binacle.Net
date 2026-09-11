@@ -88,7 +88,7 @@ sample pages named `Minimal` under different parents read fine in a tree and col
 ## Versioning model
 
 **Every folder is a version; there is no moving folder.** Folders are `vMAJOR.MINOR.x` — one per minor line
-(`v1.3.x`, `v2.0.x`, `v2.1.x`, `v3.0.x`). The current line is edited in place; when a new line opens, its folder
+(`v1.x`, `v2.0.x`, `v2.1.x`, `v3.x`). The current line is edited in place; when a new line opens, its folder
 is copied and the old one is never touched again. `/version/latest/` survives only as a **redirect** to
 `current`, holding no content.
 
@@ -124,7 +124,7 @@ Everything below reads `current`; nothing names a version.
 **Why per-minor, not per-major.** A folder answers "what does my image do", and the API set is what changes:
 versions are **added at minors** (v1.2.0 added API v3) and **removed at majors** (v2.0.0 removed v1, v3.0.0
 removes v2). Per-major would show a v3 to a v1.1.4 image that never had it. Per-minor also caught the swagger UI:
-`v2.0.x` has no `swagger/` while `v1.3.x`, `v2.1.x` and `v3.0.x` all do, so the folder tree records that it was
+`v2.0.x` has no `swagger/` while `v1.x`, `v2.1.x` and `v3.x` all do, so the folder tree records that it was
 there, went away, and came back — which a per-major tree could not have shown. Patches never move the docs
 (every patch pair in history is byte-identical across `sites/docs/`). This makes the freeze **structural** — an
 old folder is frozen because nothing edits it, not because someone remembered to snapshot it. That discipline
@@ -141,14 +141,16 @@ published spec out of step with what the code serves, and the diff hides inside 
 
 ### When a new line opens (standing rule)
 
-A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.0.x`):
+A line opens on every new **major** (`v3.x` → `v4.x`); a minor edits the current folder in place:
 
-1. `cp -r _versions/v3.0.x _versions/v3.1.x` — copy the folder the new line grows out of.
-2. Rewrite every `permalink`/`menu_title`:
-   `grep -rl "/version/v3\.0\.x/" v3.1.x/ | xargs sed -i 's|/version/v3\.0\.x/|/version/v3.1.x/|g'`
+1. `cp -r _versions/v3.x _versions/v4.x` — copy the folder the new line grows out of. Nothing inside names its
+   url; the gem decides every url from `_data/versions.yml`, so there is no permalink to rewrite.
+2. Rewrite `menu_title` and the descriptions that name the line.
 3. Add it to the top of `list` in `_data/versions.yml` with its `version_tag`, and point `current` at it (also
-   moves the `latest` redirect). The gem stamps `version` from the folder name and `version_tag` from the list;
-   a folder the list does not have fails the build. There is no per-folder block in `_config.yml`.
+   moves the `latest` redirect). Give the line that just closed a `url_segment` - the highest version it
+   shipped - and write its old urls into `_redirects`. The gem stamps `version` from the folder name and
+   `version_tag` from the list; a folder the list does not have fails the build. There is no per-folder block
+   in `_config.yml`.
 4. `bundle exec jekyll build` to confirm.
 5. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
 

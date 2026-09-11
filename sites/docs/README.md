@@ -10,7 +10,8 @@ The documentation site, built with [Jekyll](https://jekyllrb.com/). It hosts the
 | `collections/_versions/` | The versioned documentation, one folder per line. A closed line's folder is frozen |
 | `collections/_common_pages/` | Pages shared by every version - quick start, core concepts, the configuration basics |
 | `pages/` | The unversioned pages - the landing page, `404.html`, `robots.txt` |
-| `_data/` | Site data. `versions.yml` is the version list and says which one is current |
+| `_data/` | Site data. `versions.yml` is the version list: which one is current, where each renders, what docker tag each pulls |
+| `_redirects` | Old urls and where they went, one per line. Cloudflare reads it from the output root |
 | `_layouts/`, `_includes/`, `_sass/`, `css/` | Templates, partials and styles |
 | `_js/` | TypeScript and JavaScript sources. Webpack bundles them into `js/` |
 
@@ -36,10 +37,12 @@ Run `just install` once on a fresh clone, and `just assets` after changing anyth
 
 `_data/versions.yml` is the single source of truth for the list, newest first - Jekyll's own ordering sorts by
 path and would put `v3.10.x` before `v3.2.x`. Opening a new line takes two steps, and the file says so at the
-top: add the folder to `list` with its `version_tag`, and point `current` at it. The gem reads the version
-off the folder name.
+top: add the folder to `list` with its four keys, and point `current` at it. The gem reads the version off the
+folder name; no folder name appears in a url - a line renders under its `url_segment` and is called by its
+`label`, both the highest version it shipped, and pulls with its `version_tag`.
 
-**A folder that is not in the list fails the build** - a page would print a pull command with no tag.
+**A folder that is not in the list, or an entry missing a key, fails the build** - a page would print a pull
+command with no tag, or a selector row with no name.
 
 ## ⚙️ Two things that bite
 

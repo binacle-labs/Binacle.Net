@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if(!!versionSelects){
         versionSelects.forEach(versionSelect => {
             versionSelect.addEventListener('change', function (event) {
-                const url = versionSelect.dataset.versionselect;
-                const selectedVersion = event.target.value;
-                if (selectedVersion) {
-                    const target = new URL(url + selectedVersion, window.location.origin);
+                // The option value is the url of this page in the chosen version, written by the build.
+                const selected = event.target.value;
+                if (selected) {
+                    const target = new URL(selected, window.location.origin);
                     if (target.origin === window.location.origin) {
                         window.location.href = target.href;
                     }

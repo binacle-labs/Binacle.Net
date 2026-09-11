@@ -53,6 +53,7 @@ collections:
 safe                : false
 include             :
   - ".htaccess"
+  - "_redirects"     # the old-url table Cloudflare reads; an underscore file is dropped unless named here
 exclude             :
   - "Gemfile"
   - "Gemfile.lock"

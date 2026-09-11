@@ -1,14 +1,14 @@
 ---
 title: Release Notes
 description: >-
-  What changed in the Binacle.Net v3.0.x line, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
+  What changed in the Binacle.Net v3.x line, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
   so read the migration guide.
 nav:
   order: 2
   icon: 🛠️
 ---
 
-Release notes for the **v3.0.x** line, newest release first. Every patch in this line is on this page.
+Release notes for the **v3.x** line, newest release first. Every patch in this line is on this page.
 
 > **v3.0.0 introduces breaking changes.** Existing integrations must be reviewed and updated. V2 endpoints are
 > removed, ViPaq strings from earlier versions no longer decode, and health check IP restrictions are matched

@@ -7,6 +7,8 @@ module Binacle
       COLLECTION = '_versions'
       REDIRECT_LAYOUT = 'redirect'
       FOLDER = %r{\A#{Regexp.escape(COLLECTION)}/([^/]+)/}
+      # What every entry in the versions list carries, beside its id.
+      KEYS = %w[url_segment label version_tag].freeze
 
       safe true
       # title_suffix is read by a generator at :low. Stamp after it and the suffix is silently missing.
@@ -21,19 +23,21 @@ module Binacle
         versioned.each { |doc| doc.data['version'] ||= folder_of(doc) }
 
         current = current_version(site, versioned)
+        entries = list_entries(site, versioned)
         stamp_urls(site, versioned)
-        tags = version_tags(site)
-        # The suffix and the tag come off the page's own version, never off current.
+        pages = Pages.new(versioned)
+        stamp_list_urls(site, pages)
+        # The label, suffix and tag come off the page's own version, never off current.
         versioned.each do |doc|
           version = version_of(doc)
-          doc.data['title_suffix'] ||= "(#{version})"
-          doc.data['version_tag'] ||= tags.fetch(version) { raise Error, missing_tag(version, tags) }
+          entry = entries.fetch(version)
+          doc.data['version_label'] ||= entry['label']
+          doc.data['title_suffix'] ||= "(#{entry['label']})"
+          doc.data['version_tag'] ||= entry['version_tag']
           doc.data['robots'] ||= 'noindex, follow' unless version == current
         end
 
-        pages = Pages.new(versioned)
         stamp_version_urls(pages, versioned)
-        stamp_list_urls(site, pages)
         stamp_redirects(site, current)
         check_collisions(site)
         print_removed(pages, current, previous_version(site, current))
@@ -99,6 +103,23 @@ module Binacle
         end
       end
 
+      # Every version folder has a list entry, and every entry carries all of KEYS - nothing is derived. A
+      # folder without one would print a pull command with nothing after the colon, or a nameless selector row.
+      def list_entries(site, versioned)
+        list = site.data.dig('versions', 'list')
+        list = [] unless list.is_a?(Array)
+        entries = list.select { |entry| entry.is_a?(Hash) && entry['id'] }.to_h { |entry| [entry['id'].to_s, entry] }
+
+        versioned.map { |doc| version_of(doc) }.uniq.each do |version|
+          entry = entries[version]
+          raise Error, "versions list has no entry for #{version}; it has #{entries.keys.sort.join(', ')}" if entry.nil?
+
+          missing = KEYS.reject { |key| entry[key] }
+          raise Error, "versions list entry #{version} has no #{missing.join(', ')}" unless missing.empty?
+        end
+        entries.transform_values { |entry| entry.transform_values(&:to_s) }
+      end
+
       # Jekyll only warns when two files render to one destination, and a warning is how the wrong page ships.
       def check_collisions(site)
         outputs = (site.pages + site.documents).select(&:write?)
@@ -131,23 +152,6 @@ module Binacle
 
       def folder_of(doc)
         doc.relative_path.to_s[FOLDER, 1]
-      end
-
-      # Raising rather than skipping: a page would print a pull command with no tag on it, and nothing would say so.
-      def missing_tag(version, tags)
-        known = tags.keys.sort
-        "versions list has no version_tag for #{version}; it has one for #{known.empty? ? 'nothing' : known.join(', ')}"
-      end
-
-      def version_tags(site)
-        list = site.data.dig('versions', 'list')
-        return {} unless list.is_a?(Array)
-
-        list.each_with_object({}) do |entry, tags|
-          next unless entry.is_a?(Hash) && entry['id'] && entry['version_tag']
-
-          tags[entry['id'].to_s] = entry['version_tag'].to_s
-        end
       end
 
       # The redirect page's canonical is the page it points at, which is what says the two are one

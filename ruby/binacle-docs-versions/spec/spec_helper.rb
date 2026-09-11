@@ -48,6 +48,8 @@ module SiteBuilder
     site.read
     site.data['versions'].merge!(overrides)
     site.generate
+    site.render
+    site.write
     site
   end
 end

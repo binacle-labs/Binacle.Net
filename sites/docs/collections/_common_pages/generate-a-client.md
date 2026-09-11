@@ -7,6 +7,7 @@ nav:
   order: 4
   icon: 🧰
 ---
+{%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
 
 Every documented version publishes its OpenAPI document. Point a generator at one and you get a typed client
 in two commands.
@@ -22,13 +23,13 @@ Each version serves one document per API version, at:
 https://docs.binacle.net/version/<version>/swagger/<api>.json
 ```
 
-For {{ site.data.versions.current }} those are:
+For {{ current.label }} those are:
 
-- V3: [`https://docs.binacle.net/version/{{ site.data.versions.current }}/swagger/v3.json`]({{ '/version/' | append: site.data.versions.current | append: '/swagger/v3.json' | relative_url }})
-- V4: [`https://docs.binacle.net/version/{{ site.data.versions.current }}/swagger/v4.json`]({{ '/version/' | append: site.data.versions.current | append: '/swagger/v4.json' | relative_url }})
+- V3: [`https://docs.binacle.net/version/{{ current.label }}/swagger/v3.json`]({{ current.url | append: 'swagger/v3.json' | relative_url }})
+- V4: [`https://docs.binacle.net/version/{{ current.label }}/swagger/v4.json`]({{ current.url | append: 'swagger/v4.json' | relative_url }})
 
 Swap the version segment for the one you run. The [Versions]({% link _common_pages/version.html %}) page lists
-them, and the [API reference for {{ site.data.versions.current }}]({{ '/version/' | append: site.data.versions.current | append: '/api/' | relative_url }})
+them, and the [API reference for {{ current.label }}]({{ current.url | append: 'api/' | relative_url }})
 describes the endpoints.
 
 > ⚠️ V4 is **experimental and can change at any time**. A client generated from `v4.json` will need
@@ -51,7 +52,7 @@ mkdir binacle-client && cd binacle-client
 npm init -y
 npm pkg set type=module
 npm install --save-dev @hey-api/openapi-ts typescript@5
-npx @hey-api/openapi-ts -i https://docs.binacle.net/version/{{ site.data.versions.current }}/swagger/v4.json -o src/client
+npx @hey-api/openapi-ts -i https://docs.binacle.net/version/{{ current.label }}/swagger/v4.json -o src/client
 ```
 
 That writes `src/client` with the request functions, the types and a fetch client.
@@ -85,7 +86,7 @@ dotnet tool install --global Microsoft.OpenApi.Kiota
 dotnet new console -o binacle-client
 cd binacle-client
 dotnet add package Microsoft.Kiota.Bundle
-kiota generate -l CSharp -d https://docs.binacle.net/version/{{ site.data.versions.current }}/swagger/v4.json -c BinacleClient -n Binacle.Client -o ./Client
+kiota generate -l CSharp -d https://docs.binacle.net/version/{{ current.label }}/swagger/v4.json -c BinacleClient -n Binacle.Client -o ./Client
 ```
 
 That writes `Client` with one request builder per path segment and the models under `Client/Models`.

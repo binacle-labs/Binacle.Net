@@ -1,7 +1,7 @@
 ---
 title: Configuration
 description: >-
-  How Binacle.Net v3.0.x is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
+  How Binacle.Net v3.x is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
   modules each need.
 nav:
   order: 6
