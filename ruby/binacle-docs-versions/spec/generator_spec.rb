@@ -119,6 +119,47 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     end
   end
 
+  describe 'the url' do
+    it 'renders a page under /version/<folder>/ as a folder with an index' do
+      site = build_site
+
+      expect(doc(site, V1_GUIDE).url).to eq('/version/v1.0.x/guide/')
+      expect(doc(site, V1_GUIDE).destination(site.dest)).to end_with('/version/v1.0.x/guide/index.html')
+    end
+
+    it 'renders the folder index as the folder' do
+      expect(doc(build_site, 'v1.0.x/index.md').url).to eq('/version/v1.0.x/')
+    end
+
+    it 'keeps the path below the folder, however deep' do
+      expect(doc(build_site, 'v1.0.x/deep/nested.md').url).to eq('/version/v1.0.x/deep/nested/')
+    end
+
+    it 'gives a static file the same prefix and leaves its name alone' do
+      site = build_site
+      file = site.static_files.find { |candidate| candidate.relative_path.end_with?('swagger/v3.json') }
+
+      expect(file.url).to eq('/version/v1.0.x/swagger/v3.json')
+      expect(File).to exist(File.join(site.dest, 'version/v1.0.x/swagger/v3.json'))
+    end
+
+    it 'uses the label from the versions list instead of the folder name' do
+      site = build_with_list([{ 'id' => 'v2.0.x', 'version_tag' => '2.0' },
+                              { 'id' => 'v1.0.x', 'version_tag' => '1.0.3', 'label' => '1.0.3' }])
+
+      expect(doc(site, V1_GUIDE).url).to eq('/version/1.0.3/guide/')
+      expect(doc(site, V2_GUIDE).url).to eq('/version/v2.0.x/guide/')
+    end
+
+    it 'overrides a permalink the page wrote itself' do
+      expect(doc(build_site, 'v2.0.x/hand.md').url).to eq('/version/v2.0.x/hand/')
+    end
+
+    it 'leaves a document outside _versions alone' do
+      expect(doc(build_site, 'unversioned.md').url).to eq('/unversioned.html')
+    end
+  end
+
   describe 'the selector data' do
     it 'stamps where the same page is in every version' do
       site = build_site
@@ -143,7 +184,7 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     it 'fails the build when a page outside the versions claims a versioned url' do
       expect { build_site({}, COLLISION_SITE) }
         .to raise_error(Binacle::DocsVersions::Error,
-                        %r{_versions/v1.0.x/guide.md and clash.md both render at /versions/v1.0.x/guide.html})
+                        %r{_versions/v1.0.x/guide.md and clash.md both render at /version/v1.0.x/guide/})
     end
 
     it 'passes a site where every url is claimed once' do
