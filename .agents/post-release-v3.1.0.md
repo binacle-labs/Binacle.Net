@@ -59,7 +59,7 @@ two lists are clear** - the third is plans, and plans outlive it.
       the GitHub release link, and the body is the `3.1.0` changelog section. No warning block; this line has
       no breaking change. **By eye.** It is the same text as the release body, so `just changelog extract 3.1.0`
       is the source.
-- [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Docs Site` is dispatched and green.
+- [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Site` is dispatched with `docs` and green.
       `docs.binacle.net/release-notes/` shows 3.1.0 at the top, and `docs.binacle.net/version/v3.0.x/` answers
       `301` to `/`.
 
@@ -99,7 +99,7 @@ maintainer took.
 ### 3. The www `docker run` line - a site session
 
 - [ ] `sites/www/_data/exchange.yml` names `binacle/binacle-net:3` in `command.tag` and `command.text`,
-      and `Deploy WWW Site` is dispatched and green.
+      and `Deploy Site` is dispatched with `www` and green.
       `grep -n '3\.0' sites/www/_data/exchange.yml` matches only the `verified:` lines, which record what was
       pulled on a date and are history.
 - [ ] The four `verified:` lines are re-run against `3.1.0` or left dated as they are. **His call**; the

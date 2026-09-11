@@ -17,7 +17,7 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `install-container-structure-test.sh` | Installs container-structure-test, the same way |
 | `install-hurl.sh` | Installs hurl, the same way |
 | `install-lychee.sh` | Installs lychee, the same way |
-| `create-tag.sh` | Tags a commit through the API - the three deploy markers; the release makes its own |
+| `create-tag.sh` | Tags a commit through the API - the deploy marker; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
 | `sonar-summary.sh` | Writes the SonarCloud quality gate to the run summary |
 | `check-release-ref.sh` | Passes only if the release was dispatched on `main` |

@@ -1,10 +1,23 @@
-name: Deploy Docs Site
+name: Deploy Site
+run-name: Deploy ${{ inputs.site }}
 
+# Everything a deploy needs - the environment, the URL, the source directory, the wrangler config, the marker
+# tag - is derived from the site chosen at dispatch.
 on:
   workflow_dispatch:
+    inputs:
+      site:
+        description: 'The site to deploy'
+        required: true
+        type: choice
+        options:
+          - docs
+          - demo
+          - www
 
+# One site queues behind itself; two sites deploy side by side.
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ inputs.site }}
   cancel-in-progress: false
 
 jobs:
@@ -22,8 +35,8 @@ jobs:
     permissions:
       contents: read
     environment:
-      name: binacle-net-docs
-      url: https://docs.binacle.net
+      name: binacle-net-${{ inputs.site }}
+      url: https://${{ inputs.site }}.binacle.net
 
     steps:
       - name: Checkout
@@ -31,29 +44,31 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build - docs site
+      - name: Build - site
         uses: ./.github/actions/build-jekyll-site
         with:
-          site: docs
-          directory: sites/docs
+          site: ${{ inputs.site }}
+          directory: sites/${{ inputs.site }}
 
       - name: Install - lychee
         uses: ./.github/actions/install-lychee
 
       - name: Check - links
-        run: just check links docs
+        env:
+          SITE: ${{ inputs.site }}
+        run: just check links "$SITE"
 
       # The label Cloudflare files the deploy under, read below as env.DEPLOY_MESSAGE.
       - name: Describe the deploy
         run: just ci deploy-message "$GITHUB_SHA" | tee -a "$GITHUB_ENV"
 
-      # Uploads what the link check just read - artifacts/docs, set as `directory` in the config file.
+      # Uploads what the link check just read - artifacts/<site>, set as `directory` in the config file.
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config tooling/cloudflare/docs.wrangler.jsonc --message "${{ env.DEPLOY_MESSAGE }}"
+          command: deploy --config tooling/cloudflare/${{ inputs.site }}.wrangler.jsonc --message "${{ env.DEPLOY_MESSAGE }}"
 
   tag:
     name: Tag the deployed commit
@@ -64,9 +79,9 @@ jobs:
       contents: write
 
     env:
-      TAG_NAME: docs-${{ github.run_number }}
+      TAG_NAME: ${{ inputs.site }}-${{ github.run_number }}
       COMMIT: ${{ github.sha }}
-      URL: https://docs.binacle.net
+      URL: https://${{ inputs.site }}.binacle.net
 
     steps:
       - name: Checkout

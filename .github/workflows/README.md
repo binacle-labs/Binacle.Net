@@ -16,9 +16,7 @@ one** - most of what looks odd here was deliberate.
 |---|---|---|
 | `pull-request.yml` | Every pull request | Works out what changed, then runs the image tests, an image build, the site tests, the three site builds and the workflow lint. Its `gate` job is the only name branch protection holds |
 | `release-docker-image.yml` | By hand, with the version typed in | The release: gate the version, tests, build and push to GHCR, smoke, copy to Docker Hub by digest, then the git tag, the GitHub release and the Docker Hub page |
-| `deploy-docs-site.yml` | By hand | Runs the site tests, builds the docs site, checks its links offline, deploys to Cloudflare, tags the commit it published |
-| `deploy-demo-site.yml` | By hand | The same for the demo site |
-| `deploy-www-site.yml` | By hand | The same for the marketing site |
+| `deploy-site.yml` | By hand, choosing `docs`, `demo` or `www` | Runs the site tests, builds the chosen site, checks its links offline, deploys to Cloudflare, tags the commit it published |
 | `sonar-analysis.yml` | By hand | Coverage to SonarCloud. Keep Automatic Analysis off in the Sonar UI - the two fight |
 | `codeql-analysis.yml` | Merge to `main`, weekly, by hand | Code scanning. Findings land in the Security tab, not on a check |
 
@@ -30,7 +28,7 @@ manual trigger, because running one by hand is the point.
 | Workflow | Called by | Also runnable by hand for |
 |---|---|---|
 | `shared-image-tests.yml` | The pull request gate, the release | Running every test the Docker image ships, plus the OpenAPI lint, against a branch |
-| `shared-site-tests.yml` | The pull request gate, all three deploys | Running every test a Jekyll site ships - the ten gems and the javascript packages |
+| `shared-site-tests.yml` | The pull request gate, the site deploy | Running every test a Jekyll site ships - the ten gems and the javascript packages |
 | `shared-smoke-image.yml` | The release | Smoking any published tag - it must test a **published** image, not a local build |
 | `shared-dockerhub-overview.yml` | The release, as its last job | Fixing the wording on the Docker Hub page without cutting a release |
 
