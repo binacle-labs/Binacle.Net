@@ -1,7 +1,7 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-08-27
+verified: 2026-09-12
 check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
 paths:
   - "sites/docs/**"
@@ -146,11 +146,11 @@ A line opens on every new **minor** (`v3.0.x` → `v3.1.x`, or `v3.1.x` → `v4.
 1. `cp -r _versions/v3.0.x _versions/v3.1.x` — copy the folder the new line grows out of.
 2. Rewrite every `permalink`/`menu_title`:
    `grep -rl "/version/v3\.0\.x/" v3.1.x/ | xargs sed -i 's|/version/v3\.0\.x/|/version/v3.1.x/|g'`
-3. Add the folder's `defaults` block in `sites/docs/_config.yml`, or it is invisible in the selector.
-4. Add it to the top of `list` in `_data/versions.yml` and point `current` at it (also moves the `latest`
-   redirect).
-5. `bundle exec jekyll build` to confirm.
-6. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
+3. Add it to the top of `list` in `_data/versions.yml` with its `version_tag`, and point `current` at it (also
+   moves the `latest` redirect). The gem stamps `version` from the folder name and `version_tag` from the list;
+   a folder the list does not have fails the build. There is no per-folder block in `_config.yml`.
+4. `bundle exec jekyll build` to confirm.
+5. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
 
 **Watch out:**
 - `vlink` (`ruby/binacle-docs-versions`) **raises and fails the build** on a missing target. Removing a page

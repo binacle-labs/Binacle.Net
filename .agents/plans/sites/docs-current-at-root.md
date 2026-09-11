@@ -93,10 +93,10 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       no longer needs a `defaults` block per folder. Spec for both.
       `just test rb_binacle-docs-versions_unit` passes, and the output diff is empty - the blocks still stamp the
       same values.
-- [ ] **5 - S.** `_config.yml`: the four per-version `defaults` blocks and the comment above them go. The
+- [x] **5 - S.** `_config.yml`: the four per-version `defaults` blocks and the comment above them go. The
       `version-current` sitemap and the two `**/swagger/**` blocks stay.
       `grep -c 'v3\.' sites/docs/_config.yml` returns 0, and the output diff is empty.
-- [ ] **6 - C.** Three gem additions, each with its spec. **The collision check:** a page outside `_versions/`
+- [x] **6 - C.** Three gem additions, each with its spec. **The collision check:** a page outside `_versions/`
       and a page in the current folder claiming the same URL raises and fails the build - Jekyll only warns,
       and a warning is how the wrong page ships. **The selector data:** for the page being rendered, the URL
       of the same path in every other version, or that version's index where the page does not exist. **The
@@ -175,7 +175,8 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       read. **Static files:** `Presets.json`, the compose and yaml files and `swagger/*.json` are `StaticFile`s.
       They take their URL from the collection's `/version/:path/` template and have no `permalink` to
       override. Replace each one in `site.static_files` with a subclass whose `url` applies the same rule.
-      This is the fiddly part; write its spec first. **`title_suffix`:** none for `current` - `Quick Start
+      This is the fiddly part; write its spec first. The same rule turns `swagger/v4.html` into
+      `/swagger/v4.html` and `swagger/v4.json` into `/swagger/v4.json`. **`title_suffix`:** none for `current` - `Quick Start
       (v3.x) - Binacle.Net Docs` is noise on a URL that carries no version; keep it for the others, where it
       stops a title colliding with the root page of the same name. `vlink` needs no change: it finds the file
       and returns whatever URL the file has.
@@ -203,9 +204,10 @@ lies. It is in the post-release set, with the `version_tag: "3"` and `samples/` 
 
 - **`doc.url` is memoised.** If anything reads it before the generator sets `permalink`, the old URL sticks
   with no error. The spec asserts the rendered URL, not the data key.
-- **Static files in a collection are not documents.** `site.documents` does not contain them;
-  `site.static_files` does, with `collection` set. Miss them and every download link on the current line
-  404s while the pages look right.
+- **Static files in a collection are in `site.documents`, but a `permalink` does nothing to them.** Jekyll 4
+  merges `collection.files` into `site.documents`, so the stamps land on their `data` - but `StaticFile#url`
+  reads the collection's template and the extension, never `data['permalink']`. Miss them and every download
+  link on the current line 404s while the pages look right. Measured 2026-09-12 on the fixture site.
 - **The swagger pages are `.html` permalinks** (`/version/v3.0.x/swagger/v4.html`). A rule that turns every
   document into `/<rest>/` moves them to `/swagger/v4/`, and `/version/v3.0.x/* -> /:splat` then lands the old
   URL on a 404. Keep a `.html` document a file, or add a redirect line per swagger page.

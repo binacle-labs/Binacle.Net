@@ -1,0 +1,4 @@
+current: v1.0.x
+list:
+  - id: v1.0.x
+    version_tag: "1.0.3"

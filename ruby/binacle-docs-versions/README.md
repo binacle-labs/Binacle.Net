@@ -11,7 +11,7 @@ Two pieces, both keyed on the version the page belongs to.
 
 | Surface | Does |
 |---|---|
-| the generator | stamps `version`, `version_tag`, `title_suffix` and `robots` onto every document under `_versions/` |
+| the generator | stamps `version`, `version_tag`, `title_suffix`, `robots` and `version_urls` onto every document under `_versions/`, fails the build on two files at one url, and prints the pages the previous version had that the current one lacks |
 | `{% vlink /path %}` | links to a file inside the current page's version |
 
 ## 🚀 Quick start
@@ -51,6 +51,8 @@ On every document under `_versions/<folder>/`:
   A folder with no tag in the list stops the build: the page would print a pull command with nothing after
   the colon.
 - `title_suffix` - `(v2.1.x)`, for whatever writes the page title.
+- `version_urls` - a map from every version to the url of this same page in that version, or to that
+  version's index where the page does not exist. For a version selector that lands on the same page.
 - `robots` - `noindex, follow` on every version that is not `current`.
 
 On every page whose layout is `redirect`:
@@ -74,8 +76,21 @@ documents at all.
 value it was given and the versions it found. A `current` nobody notices is wrong would put `noindex` on
 every page of the site while the sitemap still lists them.
 
-Neither key knows why it is set. Whatever renders them reads two ordinary values and needs to know nothing
-about versions.
+## 🛑 The collision check
+
+Two files rendering at one url is a Jekyll warning, and a warning is how the wrong page ships. Here it stops the
+build and names both files. It covers every page and document that writes output, so a root page claiming a
+versioned url fails, and so would two pages in one version.
+
+## 🗑️ The removed-page list
+
+At build, the generator prints every page and file in the previous version that has no counterpart at the
+same path in the current one. The previous version is the entry listed right after `current` in
+`_data/versions.yml`. It is printed and written nowhere: it is the redirect list whoever opens a new major
+has to write.
+
+No key knows why it is set. Whatever renders them reads ordinary values and needs to know nothing about
+versions.
 
 ## 🔗 The tag
 

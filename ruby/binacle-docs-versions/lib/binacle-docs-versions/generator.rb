@@ -13,8 +13,11 @@ module Binacle
       priority :high
 
       def generate(site)
-        versioned = site.documents.select { |doc| stamp_version(doc) }
+        versioned = site.documents.select { |doc| folder_of(doc) }
         return if versioned.empty?
+
+        # The folder under _versions/ is the version. Nothing in the folder, and no config block, has to say so.
+        versioned.each { |doc| doc.data['version'] ||= folder_of(doc) }
 
         current = current_version(site, versioned)
         tags = version_tags(site)
@@ -26,18 +29,65 @@ module Binacle
           doc.data['robots'] ||= 'noindex, follow' unless version == current
         end
 
+        pages = Pages.new(versioned)
+        stamp_version_urls(pages, versioned)
         stamp_redirects(site, current)
+        check_collisions(site)
+        print_removed(pages, current, previous_version(site, current))
+      end
+
+      # Every page in the previous version with no page at the same path in the current one. Printed, not
+      # written anywhere: it is the redirect list whoever opens a major has to write.
+      def removed_pages(pages, current, previous)
+        return [] if previous.nil?
+
+        pages.missing_from(previous, current)
       end
 
       private
 
-      # The folder under _versions/ is the version. Nothing in the folder, and no config block, has to say so.
-      def stamp_version(doc)
-        folder = doc.relative_path.to_s[FOLDER, 1]
-        return false if folder.nil?
+      # For the selector: where this same page is in every version, or the index of a version that lacks it.
+      def stamp_version_urls(pages, versioned)
+        versioned.each do |doc|
+          doc.data['version_urls'] ||= pages.versions.each_with_object({}) do |version, urls|
+            target = pages.counterpart(doc, version)
+            urls[version] = target.url unless target.nil?
+          end
+        end
+      end
 
-        doc.data['version'] ||= folder
-        true
+      # Jekyll only warns when two files render to one destination, and a warning is how the wrong page ships.
+      def check_collisions(site)
+        outputs = (site.pages + site.documents).select(&:write?)
+        outputs.group_by(&:url).each_value do |files|
+          next if files.size < 2
+
+          paths = files.map { |file| file.relative_path.to_s }.sort
+          raise Error, "#{paths.join(' and ')} both render at #{files.first.url}"
+        end
+      end
+
+      # The folder listed right after current in versions.yml. The list is newest first, so that is the line
+      # current grew out of.
+      def previous_version(site, current)
+        list = site.data.dig('versions', 'list')
+        return nil unless list.is_a?(Array)
+
+        ids = list.filter_map { |entry| entry['id'].to_s if entry.is_a?(Hash) && entry['id'] }
+        position = ids.index(current)
+        position.nil? ? nil : ids[position + 1]
+      end
+
+      def print_removed(pages, current, previous)
+        removed = removed_pages(pages, current, previous)
+        return if removed.empty?
+
+        Jekyll.logger.info 'Docs versions:', "#{removed.size} pages in #{previous} have no counterpart in #{current}"
+        removed.each { |path| Jekyll.logger.info '', "  #{previous}/#{path}" }
+      end
+
+      def folder_of(doc)
+        doc.relative_path.to_s[FOLDER, 1]
       end
 
       # Raising rather than skipping: a page would print a pull command with no tag on it, and nothing would say so.
