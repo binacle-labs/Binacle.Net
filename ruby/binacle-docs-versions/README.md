@@ -11,7 +11,7 @@ Two pieces, both keyed on the version the page belongs to.
 
 | Surface | Does |
 |---|---|
-| the generator | stamps `version`, `version_tag`, `title_suffix`, `robots` and `version_urls` onto every document under `_versions/`, fails the build on two files at one url, and prints the pages the previous version had that the current one lacks |
+| the generator | decides the url of every file under `_versions/`; stamps `version`, `version_tag`, `title_suffix`, `robots` and `version_urls`; fails the build on two files at one url; prints the pages the previous version had that the current one lacks |
 | `{% vlink /path %}` | links to a file inside the current page's version |
 
 ## 🚀 Quick start
@@ -34,13 +34,22 @@ One thing has to be true of the site - every folder under `_versions/` is in the
 
 ```yaml
 # _data/versions.yml
-current: v3.0.x
+current: v3.x
 list:
-  - id: v3.0.x
-    version_tag: "3.0"
-  - id: v2.1.x
+  - id: v3.x            # the folder under _versions/
+    version_tag: "3.0"  # what docker pulls
+  - id: v2.x
+    label: 2.1.1        # the url segment and the selector text; the id when absent
     version_tag: "2.1.1"
 ```
+
+## 🌐 The url
+
+Nothing in a folder says where it renders, and a `permalink` a page writes is overwritten. Every file under
+`_versions/<folder>/` renders at `/version/<label>/<rest>` - a page as a folder with an index inside
+(`api/v3.md` → `/version/2.1.1/api/v3/`, `index.md` → `/version/2.1.1/`), a static file under its own name
+(`swagger/v3.json` → `/version/2.1.1/swagger/v3.json`). Static files get this through `VersionedFile`, a
+`StaticFile` whose url can be set - Jekyll's own reads the collection template and ignores data.
 
 ## 🏷️ The stamps
 

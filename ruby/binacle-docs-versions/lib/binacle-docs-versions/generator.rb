@@ -13,6 +13,7 @@ module Binacle
       priority :high
 
       def generate(site)
+        replace_static_files(site)
         versioned = site.documents.select { |doc| folder_of(doc) }
         return if versioned.empty?
 
@@ -20,6 +21,7 @@ module Binacle
         versioned.each { |doc| doc.data['version'] ||= folder_of(doc) }
 
         current = current_version(site, versioned)
+        stamp_urls(site, versioned)
         tags = version_tags(site)
         # The suffix and the tag come off the page's own version, never off current.
         versioned.each do |doc|
@@ -45,6 +47,32 @@ module Binacle
       end
 
       private
+
+      # The gem is the only place a url is decided, so a permalink a page wrote is overwritten, not kept.
+      # Set before anything reads url: Jekyll memoises it on the first read and a later permalink is ignored.
+      def stamp_urls(site, versioned)
+        urls = Urls.new(site)
+        versioned.each do |item|
+          if item.is_a?(VersionedFile)
+            item.url = urls.for(item)
+          else
+            item.data['permalink'] = urls.for(item)
+          end
+        end
+      end
+
+      # Every static file under _versions/ becomes one whose url can be set, in both lists Jekyll keeps it in.
+      def replace_static_files(site)
+        replaced = {}
+        site.collections.each_value do |collection|
+          collection.files.map! do |file|
+            next file unless folder_of(file)
+
+            replaced[file] = VersionedFile.from(file)
+          end
+        end
+        site.static_files.map! { |file| replaced.fetch(file, file) }
+      end
 
       # For the selector: where this same page is in every version, or the index of a version that lacks it.
       def stamp_version_urls(pages, versioned)

@@ -21,10 +21,10 @@ outside the versions as "common" because the root had to hold something. After t
 today                                          after
 
 _common_pages/  6 pages, version-free, at /    _common_pages/  version.html only (the list at /version/)
-_versions/v3.0.x/  renders at /version/v3.0.x/ _versions/v3.x/  renders at /            current, indexed
-_versions/v2.1.x/  renders at /version/v2.1.x/ _versions/v2.x/  renders at /version/v2.x/  noindex
+_versions/v3.0.x/  renders at /version/v3.0.x/ _versions/v3.x/  renders at /                current, indexed
+_versions/v2.1.x/  renders at /version/v2.1.x/ _versions/v2.x/  renders at /version/2.1.1/  noindex
 _versions/v2.0.x/  renders at /version/v2.0.x/ (merged into v2.x)
-_versions/v1.3.x/  renders at /version/v1.3.x/ _versions/v1.x/  renders at /version/v1.x/  noindex
+_versions/v1.3.x/  renders at /version/v1.3.x/ _versions/v1.x/  renders at /version/1.3.0/  noindex
 /version/latest/   meta-refresh page           (gone - the root is latest)
 ```
 
@@ -34,7 +34,10 @@ Three rules replace the old ones:
    "added in 3.1.0" note where a reader on an older patch needs one. Semver says a minor only adds, so a
    reader never sees something their image lost, only something it does not have yet.
 2. **The folder named by `current:` in `_data/versions.yml` renders with no prefix.** Every other folder
-   renders at `/version/<folder>/`. Nothing in a folder says where it renders.
+   renders at `/version/<label>/`, where `label:` sits beside the folder's `id:` in `versions.yml` and is the
+   highest version the line produced - `2.1.1`, `1.3.0`. It is also the selector text. `version_tag:` is a
+   different thing: what docker pulls. Nothing in a folder says where it renders. The maintainer set this on
+   2026-09-12: a closed line is named by what it shipped last, not by its folder.
 3. **No common layer.** Every page belongs to a line. A page that is true for every version lives in the
    current folder and is copied forward with it at the next major.
 
@@ -60,28 +63,32 @@ Three rules replace the old ones:
 **One step, one commit, and the build is green after each.** The check under a step is what reviews that
 commit; the end state is checked once, under *Done when*. "The output diff is empty" means: build
 `sites/docs` before and after, then `diff -r -I '<lastmod>' <before> <after>` prints nothing - the sitemaps
-carry the build time, nothing else does. **C** is a coding session, which may not touch
-`sites/`. **S** is a site session, which touches only `sites/docs/`. Tick a step when its commit is in.
+carry the build time, nothing else does. **C** is a coding session, which may not touch `sites/`. **S** is a
+site session, which touches only `sites/docs/`. Tick a step when its commit is in.
 
-**The order is set by one fact.** The gem's root rule and the common layer cannot coexist: with both, the
-collision check of step 6 raises on `/`, `/quick-start/` and `/vipaq-protocol/`. So the site deletes the
-common layer (step 11) before the gem moves the URLs (step 12). Between those two commits the built site has
-no page at `/`. That is fine - the branch never deploys; `Deploy Site` is a dispatch.
+**Two facts set the order.** First: Jekyll takes a collection URL from the folder name, so a folder rename
+moves URLs - unless the gem already decides every URL. So the gem's URL rule lands (step 7) before any folder
+is renamed (steps 9, 10), and a rename moves nothing. Second: the gem's root rule and the common layer cannot
+coexist - the collision check raises on `/`, `/quick-start/` and `/vipaq-protocol/`. So the site deletes the
+common layer (step 13) before the current folder moves to the root (step 14). Between those two commits the
+built site has no page at `/`. That is fine - the branch never deploys; `Deploy Site` is a dispatch.
 
-Steps 1 to 6 change no URL. Steps 7 and 8 move URLs under `/version/` and cover every move with a redirect.
-Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the flip and its cleanup.
+**The only URLs that ever move are the ones this plan wants moved:** `/version/v1.3.x/` → `/version/1.3.0/`,
+`/version/v2.1.x/` and `/version/v2.0.x/` → `/version/2.1.1/`, and `/version/v3.0.x/` and `/version/latest/`
+→ `/`. **Every redirect is a 302 until step 16** - a browser caches a 301, so a wrong one cannot be taken back
+while the moves are still being checked.
 
 ### Tooling and data - no URL moves
 
 - [x] **1 - C.** `release-docker-image.yml` publishes a major tag next to the minor one:
       `type=semver,pattern={{major}}`. The docs then pull with `version_tag: "3"` and never name a minor. The
       moving-tag advice in `quick-start.md` and `samples/index.md` changes from "the minor tag" to "the
-      major tag" in step 9. **`samples/` at the repo root pins `3` too - the maintainer decided on
+      major tag" in step 11. **`samples/` at the repo root pins `3` too - the maintainer decided on
       2026-09-11.** The pin, and the `"3"` in `versions.yml`, land only after the `3` tag exists - a pin on
       `main` must name an image that resolves. Both are in the post-release set.
       `grep -n 'pattern={{major}}' .github/workflows/release-docker-image.yml` matches.
 - [x] **2 - C.** `tooling/openapi.just` stops carrying `current_docs_version` and reads `current:` from
-      `sites/docs/_data/versions.yml`. Done before step 7, so the rename needs no tooling edit.
+      `sites/docs/_data/versions.yml`. Done before step 9, so the rename needs no tooling edit.
       `just openapi check-all-copies` passes, and `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just`
       returns nothing.
 - [x] **3 - S.** `_data/versions.yml` gains `version_tag` beside each `id` - the values the four `defaults`
@@ -106,32 +113,60 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       `just test rb_binacle-docs-versions_unit` passes and `grep -c "^\s*it " ruby/binacle-docs-versions/spec/*_spec.rb`
       grew. The build prints the list and the output diff is empty.
 
-### Folders - URLs move under `/version/`, every move redirected
+### The gem decides every URL - still no URL moves
 
-- [ ] **7 - S.** `v3.0.x` becomes `v3.x` and `v1.3.x` becomes `v1.x` (it only ever held 1.3). `current: v3.x`
-      and the `list:` in `versions.yml`. The folder name is replaced in the 61 hand-written `permalink:`
-      lines and in every description that names it - they are deleted in step 13, not here, so this commit
-      moves URLs and nothing else. `_redirects` is created at the site root and added to `include:`:
+- [x] **7 - C.** The gem sets the URL of every file under `_versions/`, and for now every folder stays under
+      `/version/`. **The rule:** strip the folder segment; the URL is `/version/<label>/<rest>` where `label`
+      is the list entry's `label:`, or its `id:` when it has none. A document renders as `/<rest>/`
+      (`index.md` maps to its parent path); a static file keeps its name and extension. **One shape for every
+      page, so the seven swagger pages move from `swagger/v4.html` to `swagger/v4/`** - the only URL this
+      step moves; they are noindex, nothing links the `.html` shape, and each old URL gets a redirect line
+      when its folder's lines are written (steps 9, 10, 13). Set `doc.data['permalink']` before anything reads
+      `doc.url` - Jekyll memoises the URL on first read. **Static files:** `Presets.json`, the compose and yaml
+      files and `swagger/*.json` are `StaticFile`s. They are in `site.documents`, but `StaticFile#url` reads
+      the collection template and never `data['permalink']`. Replace each one in `site.static_files` (and in
+      its collection's `files`) with a subclass whose `url` applies the same rule. This is the fiddly part;
+      write its spec first. `vlink` needs no change: it finds the file and returns whatever URL the file has.
+      `just test rb_binacle-docs-versions_unit` passes, and the output diff shows only the seven swagger pages
+      moving and the seven api pages that link them - with no `label:` set, the rule reproduces every other
+      URL exactly, hand-written permalinks included. Measured 2026-09-12: 44 specs, 21 output files differ.
+- [ ] **8 - S.** The 61 hand-written `permalink:` lines go. The gem overrides them since step 7, so this commit
+      changes no output.
+      `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing, and the output diff is empty.
+
+### Folders - renamed, and the closed lines take their final URLs
+
+- [ ] **9 - S.** `v3.0.x` becomes `v3.x` and `v1.3.x` becomes `v1.x` (it only ever held 1.3). `versions.yml`:
+      `current: v3.x`; the `v3.x` entry carries `label: v3.0.x` **for now**, so its URLs do not move before
+      the flip; the `v1.x` entry carries `label: 1.3.0`. The folder name is replaced in `menu_title` and in
+      every description that names it. `_redirects` is created at the site root and added to `include:`:
       ```
-      /version/v3.0.x/*   /version/v3.x/:splat    301
-      /version/v1.3.x/*   /version/v1.x/:splat    301
+      /version/v1.3.x/swagger/v1.html   /version/1.3.0/swagger/v1/    302
+      /version/v1.3.x/swagger/v2.html   /version/1.3.0/swagger/v2/    302
+      /version/v1.3.x/swagger/v3.html   /version/1.3.0/swagger/v3/    302
+      /version/v1.3.x/*                 /version/1.3.0/:splat         302
       ```
+      Exact lines before the wildcard: Cloudflare matches an exact path first whatever the order, but a reader
+      of the file should not have to know that.
       `ls sites/docs/collections/_versions/` prints `v1.x v2.0.x v2.1.x v3.x`;
-      `test -f artifacts/docs/_redirects`; `grep -rn 'v3\.0\.x\|v1\.3\.x' sites/docs --exclude-dir=node_modules`
-      matches only `_redirects` and release notes.
-- [ ] **8 - S.** `v2.0.x` and `v2.1.x` become one `v2.x`. Diffed 2026-09-11: they differ in the version label in
-      every description, the image tag in the sample files (`2.0.1` against `2.1.1`), and `swagger/` exists
-      only in 2.1. So `v2.x` is the 2.1.x content. The 2.0.0 and 2.0.1 sections of the 2.0.x release notes
-      merge into the `v2.x` release notes, newest first, and anything the diff shows as 2.1-only - the swagger
-      pages, the `swagger:` key on the api pages - gets an "added in 2.1.0" note. **Read the diff; do not
-      assume it is only those.** Two more `_redirects` lines: `/version/v2.1.x/*` and `/version/v2.0.x/*` to
-      `/version/v2.x/:splat`.
+      `test -d artifacts/docs/version/1.3.0` and `test -d artifacts/docs/version/v3.0.x`;
+      `test -f artifacts/docs/_redirects`; the output diff, with `v1.3.x` substituted by `1.3.0` in the old
+      output's paths and page text, is empty.
+- [ ] **10 - S.** `v2.0.x` and `v2.1.x` become one `v2.x`, `label: 2.1.1`. Diffed 2026-09-11: they differ in the
+      version label in every description, the image tag in the sample files (`2.0.1` against `2.1.1`), and
+      `swagger/` exists only in 2.1. So `v2.x` is the 2.1.x content. The 2.0.0 and 2.0.1 sections of the 2.0.x
+      release notes merge into the `v2.x` release notes, newest first, and anything the diff shows as
+      2.1-only - the swagger pages, the `swagger:` key on the api pages - gets an "added in 2.1.0" note.
+      **Read the diff; do not assume it is only those.** `_redirects` gains `/version/v2.1.x/*` and
+      `/version/v2.0.x/*` to `/version/2.1.1/:splat`, and the two exact swagger lines
+      (`/version/v2.1.x/swagger/v2.html` → `/version/2.1.1/swagger/v2/`, same for `v3`).
       `grep -c '^## v2\.' sites/docs/collections/_versions/v2.x/release-notes.md` returns 4, the swagger
-      pages say "added in 2.1.0", and the build passes. **By eye** for the rest of the diff.
+      pages say "added in 2.1.0", `test -d artifacts/docs/version/2.1.1`, and the build passes. **By eye** for
+      the rest of the diff.
 
 ### The common pages - one commit per page
 
-- [ ] **9 - S. Six commits, one per page:** `quick-start`, `vipaq-protocol`, `core-concepts`,
+- [ ] **11 - S. Six commits, one per page:** `quick-start`, `vipaq-protocol`, `core-concepts`,
       `configuration-basics`, `integration-guide`, `generate-a-client`. For each: **do not trust either copy.**
       Read it as it stood at `v3.0.0` (`git show v3.0.0:sites/docs/collections/_common_pages/<page>`), read it
       as it is now, diff them, and decide line by line what is a fix and what is v3.1 content. Then:
@@ -146,55 +181,52 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
         line and links that stop failing the build are both allowed under it.
       - Every `{% link _common_pages/<page> %}` in a versioned page becomes a `{% vlink %}` into its own
         folder. 49 files link to `_common_pages` today: 13 in v3.x, 12 in each v2 line, 17 in v1.x.
-      - **The common copy stays** until step 11, so the root URL keeps serving and each commit is about one
+      - **The common copy stays** until step 13, so the root URL keeps serving and each commit is about one
         page's content.
-      With the first of the six: the text of `pages/index.md` moves into `v3.x/index.md` or goes, so step 11
+      With the first of the six: the text of `pages/index.md` moves into `v3.x/index.md` or goes, so step 13
       can delete the file.
       `grep -rln '_common_pages' sites/docs/collections/_versions/ | wc -l` shrinks with each commit and is 0
       after the sixth; the build passes after each. The session's notes say what was kept from which side.
-- [ ] **10 - S.** Includes and script. `_includes/sidebar.html`, `_includes/versions/outdated-notice.html`
+- [ ] **12 - S.** Includes and script. `_includes/sidebar.html`, `_includes/versions/outdated-notice.html`
       and `_includes/versions/sidebar.html` build `'/version/' + current` by hand; they use what the gem
-      stamps. The selector renders on every page, since every page is versioned after step 11. `_js/main.js`
-      navigates to the URL the gem stamped for the chosen version, so the reader lands on the same page and
-      not the index.
+      stamps. The selector shows each entry's `label:` (its `id:` when it has none), renders on every page
+      since every page is versioned after step 13, and `_js/main.js` navigates to the URL the gem stamped in
+      `version_urls` for the chosen version, so the reader lands on the same page and not the index.
       `grep -rn "'/version/'" sites/docs/_includes sites/docs/_js` returns nothing. **By eye:** open
-      `/version/v3.x/configuration/core/`, pick `v2.x`, land on `/version/v2.x/configuration/core/`.
+      `/version/v3.0.x/configuration/core/`, pick `2.1.1`, land on `/version/2.1.1/configuration/core/`.
 
 ### The flip
 
-- [ ] **11 - S.** The common layer goes: the five pages in `_common_pages/` other than `version.html`,
-      `version-latest.html`, and `pages/index.md`. `_redirects` gains `/version/latest/*   /:splat   301` and
-      the `v3.0.x` line now points at `/:splat`. The old root `/quick-start/` and `/vipaq-protocol/` need no
-      redirect: after step 12 the same URL serves the real page.
+- [ ] **13 - S.** The common layer goes: the five pages in `_common_pages/` other than `version.html`,
+      `version-latest.html`, and `pages/index.md`. The `v3.x` entry in `versions.yml` loses its `label:`.
+      `_redirects` gains `/version/latest/*   /:splat   302`, `/version/v3.0.x/*   /:splat   302` and the two
+      exact swagger lines (`/version/v3.0.x/swagger/v3.html` → `/swagger/v3/`, same for `v4`). The old root
+      `/quick-start/` and `/vipaq-protocol/` need no redirect: after step 14 the same URL serves the real
+      page.
       `ls sites/docs/collections/_common_pages/` prints `version.html` alone, and the build passes. The site
-      has no page at `/` until step 12 - expected.
-- [ ] **12 - C.** The gem decides every URL. **The permalink rule:** for every document in `_versions/`, strip
-      the folder segment; if the folder is `current`, `permalink` is `/<rest>/`, else `/version/<folder>/<rest>/`.
-      `index.md` maps to its parent path; a `.html` document stays a file, so `swagger/v4.html` keeps its
-      shape. Set `doc.data['permalink']` before anything reads `doc.url` - Jekyll memoises the URL on first
-      read. **Static files:** `Presets.json`, the compose and yaml files and `swagger/*.json` are `StaticFile`s.
-      They take their URL from the collection's `/version/:path/` template and have no `permalink` to
-      override. Replace each one in `site.static_files` with a subclass whose `url` applies the same rule.
-      This is the fiddly part; write its spec first. The same rule turns `swagger/v4.html` into
-      `/swagger/v4.html` and `swagger/v4.json` into `/swagger/v4.json`. **`title_suffix`:** none for `current` - `Quick Start
-      (v3.x) - Binacle.Net Docs` is noise on a URL that carries no version; keep it for the others, where it
-      stops a title colliding with the root page of the same name. `vlink` needs no change: it finds the file
-      and returns whatever URL the file has.
+      has no page at `/` until step 14 - expected.
+- [ ] **14 - C.** The current folder renders at the root: the rule from step 7 gives the folder named by
+      `current:` no prefix at all - `/<rest>`. **`title_suffix`:** none for `current` - `Quick Start (v3.x) -
+      Binacle.Net Docs` is noise on a URL that carries no version; keep it for the others, where it stops a
+      title colliding with the root page of the same name. Spec for both.
       `just test rb_binacle-docs-versions_unit` passes, and after `bundle exec jekyll build` in `sites/docs`
       the first two *Done when* boxes hold.
-- [ ] **13 - S.** The 61 hand-written `permalink:` lines go. The gem overrode them in step 12, so this commit
-      changes no output.
-      `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing, and the output diff is empty.
 
 ### The agent docs
 
-- [ ] **14 - any session.** `docs/sites/docs.md`: the "one folder per minor" section, the "when a new line
+- [ ] **15 - any session.** `docs/sites/docs.md`: the "one folder per minor" section, the "when a new line
       opens" rule, the common-page rule and the `current` table are rewritten to what the tree now does. The
       new-line rule becomes a new-major rule: copy the folder, remove what the major removed, print the
-      removed-page list, write the redirects, move `current:`. `design/sites/decisions.md`: one entry with the
-      reasoning under *Why* above, and the pages read on 2026-09-11 as the evidence. The doc that describes
-      `openapi.just`: it reads `current:` now.
+      removed-page list, write the redirects, give the closed line its `label:`, move `current:`.
+      `design/sites/decisions.md`: one entry with the reasoning under *Why* above, and the pages read on
+      2026-09-11 as the evidence. The doc that describes `openapi.just`: it reads `current:` now.
       **By eye** - the last *Done when* box.
+
+### After the first deploy
+
+- [ ] **16 - S.** Every line in `_redirects` becomes `301`, once each has been checked on the deployed site with
+      the `curl -sI` calls under *Done when*. Until then they are `302`, so a wrong one is not cached.
+      `grep -c 302 sites/docs/_redirects` returns 0.
 
 **The 3.1.0 release notes are not a step here.** A `## v3.1.0` section at the top of `v3.x/release-notes.md`
 names a date and a link that exist only after the run is green, so on `main` before the tag they would be
@@ -208,11 +240,11 @@ lies. It is in the post-release set, with the `version_tag: "3"` and `samples/` 
   merges `collection.files` into `site.documents`, so the stamps land on their `data` - but `StaticFile#url`
   reads the collection's template and the extension, never `data['permalink']`. Miss them and every download
   link on the current line 404s while the pages look right. Measured 2026-09-12 on the fixture site.
-- **The swagger pages are `.html` permalinks** (`/version/v3.0.x/swagger/v4.html`). A rule that turns every
-  document into `/<rest>/` moves them to `/swagger/v4/`, and `/version/v3.0.x/* -> /:splat` then lands the old
-  URL on a 404. Keep a `.html` document a file, or add a redirect line per swagger page.
+- **The swagger pages were `.html` permalinks** (`/version/v3.0.x/swagger/v4.html`) and are `/swagger/v4/`
+  since step 7. A wildcard redirect sends the old `.html` URL to a 404, so every folder's redirect block
+  carries an exact line per swagger page.
 - **`{% link %}` raises on a missing target.** Delete a common page before the 49 files that link to it are
-  rewritten and the build fails on the first one. That is why step 9 keeps the common copies and step 11 is
+  rewritten and the build fails on the first one. That is why step 11 keeps the common copies and step 13 is
   the delete. Grep `_common_pages` across `collections/` before and after.
 - **`_redirects` starts with an underscore.** Jekyll excludes it silently unless `include:` names it. Check
   `artifacts/docs/_redirects` exists after a build.
@@ -221,14 +253,15 @@ lies. It is in the post-release set, with the `version_tag: "3"` and `samples/` 
 - **Breadcrumbs.** `breadcrumbs: exclude: ["version", "*.*"]` in `_config.yml` starts a versioned trail at its
   own version. A root page has no `version` segment, so its trail starts at home, which is right. Check one of
   each by eye.
-- **`og_image` and canonical.** Check one root page and one `/version/` page by eye after step 12.
+- **`og_image` and canonical.** Check one root page and one `/version/` page by eye after step 14.
 
 ## Done when
 
-- [ ] The current folder renders at the root and every other folder under `/version/<folder>/`.
+- [ ] The current folder renders at the root and every closed line under `/version/<label>/`.
       After `bundle exec jekyll build` in `sites/docs`: `test -f artifacts/docs/quick-start/index.html`,
-      `test -f artifacts/docs/version/v2.x/quick-start/index.html`, and
-      `test ! -d artifacts/docs/version/v3.x`.
+      `test -f artifacts/docs/version/2.1.1/quick-start/index.html`,
+      `test -f artifacts/docs/version/1.3.0/quick-start/index.html`, and `ls artifacts/docs/version/`
+      prints `1.3.0 2.1.1 index.html` - no folder name, no `latest`.
 - [ ] Static files follow the same rule.
       `test -f artifacts/docs/samples/docker/minimal/Presets.json` and
       `test -f artifacts/docs/swagger/v4.json`.
@@ -236,7 +269,8 @@ lies. It is in the post-release set, with the `version_tag: "3"` and `samples/` 
       `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing.
 - [ ] `versions.yml` is the one knob.
       `grep -c 'v3\.' sites/docs/_config.yml` returns 0, `grep -n version_tag sites/docs/_data/versions.yml`
-      lists one per folder, and `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just` returns nothing.
+      lists one per folder, `grep -n 'label:' sites/docs/_data/versions.yml` lists one per closed line and
+      none for current, and `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just` returns nothing.
 - [ ] Three folders, no common layer.
       `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`, and
       `ls sites/docs/collections/_common_pages/` prints `version.html` alone.
@@ -255,13 +289,15 @@ lies. It is in the post-release set, with the `version_tag: "3"` and `samples/` 
       `artifacts/docs/sitemap/version-current.xml` lists root URLs only.
 - [ ] Every old URL answers with a redirect, not a 404.
       `test -f artifacts/docs/_redirects`, and after deploy `curl -sI docs.binacle.net/version/v3.0.x/api/v3/`,
-      `.../version/latest/`, `.../version/v2.0.x/quick-start/` and `.../version/v3.0.x/swagger/v4.html` each
-      return `301` with the location `_redirects` says.
+      `.../version/latest/`, `.../version/v2.0.x/quick-start/`, `.../version/v1.3.x/` and
+      `.../version/v3.0.x/swagger/v4.html` each return `301` with the location `_redirects` says (`302` until
+      step 16).
 - [ ] The selector is on every page and lands on the same page.
-      **By eye.** Open `/configuration/core/`, pick `v2.x`, land on `/version/v2.x/configuration/core/`.
-      Pick `v1.x` on a page v1 does not have, land on `/version/v1.x/`.
-- [ ] The gem's spec suite covers the permalink rule, the static-file rule, the collision check and the
-      removed-page list.
+      **By eye.** Open `/configuration/core/`, pick `2.1.1`, land on `/version/2.1.1/configuration/core/`.
+      Pick `1.3.0` on a page v1 does not have, land on `/version/1.3.0/`. The selector reads `v3.x`, `2.1.1`,
+      `1.3.0`.
+- [ ] The gem's spec suite covers the URL rule with and without `label:`, the current-at-root rule, the
+      static-file rule, the collision check and the removed-page list.
       `just test rb_binacle-docs-versions_unit` passes, and
       `grep -c "^\s*it " ruby/binacle-docs-versions/spec/*_spec.rb` grew.
 - [ ] `release-docker-image.yml` publishes the major tag.
