@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Build - docs site
         uses: ./.github/actions/build-jekyll-site
@@ -69,12 +71,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      - name: Push the marker tag
-        run: just ci push-tag "$TAG_NAME" "$COMMIT"
+      - name: Create the marker tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: just ci create-tag "$TAG_NAME" "$COMMIT"
 
       - name: Summarise the deploy
         run: just ci deploy-summary "$COMMIT" "$TAG_NAME" "$URL"

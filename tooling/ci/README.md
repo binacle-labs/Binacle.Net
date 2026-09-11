@@ -17,7 +17,7 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `install-container-structure-test.sh` | Installs container-structure-test, the same way |
 | `install-hurl.sh` | Installs hurl, the same way |
 | `install-lychee.sh` | Installs lychee, the same way |
-| `push-tag.sh` | Tags a commit and pushes the tag - the three deploy markers; the release makes its own |
+| `create-tag.sh` | Tags a commit through the API - the three deploy markers; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
 | `sonar-summary.sh` | Waits for SonarCloud to finish, then writes its quality gate |
 | `check-release-ref.sh` | Passes only if the release was dispatched on `main` |
@@ -75,8 +75,9 @@ fallback is what makes it runnable here; do not drop it.
 **They must pass `shellcheck` clean.** That is the whole reason they are files rather than recipe bodies, and
 `just check scripts` is what enforces it - on the pull request and on a laptop.
 
-`push-tag.sh` sets no git identity. With no `-a` or `-m` the tag is lightweight, which is a ref and not an
-object, so git never asks who you are.
+**Nothing in CI runs `git push`.** `create-tag.sh` makes the marker tag with `gh api`, so every checkout carries
+`persist-credentials: false` and no job holds a git credential after checkout. A script that needs to write to
+the repository takes `GH_TOKEN`, like `github-release.sh` does.
 
 **`check-release-tag.sh` reaches origin.** It asks `git ls-remote` as well as the local clone, because the tag
 it is guarding against is usually one only origin has.

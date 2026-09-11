@@ -60,7 +60,7 @@ tag step failed.
 
 **Amended 2026-08-28 — the tag is made by the release, not pushed before it.** `gh release create` creates a
 missing tag itself and `--target` says on which commit, so the separate `just ci push-tag` step is gone from
-this workflow. `push-tag.sh` stays for the three deploy marker tags. `--target` is ignored when the tag already
+this workflow. The three deploy marker tags are made by `create-tag.sh`, D30. `--target` is ignored when the tag already
 exists, so the load-bearing exception above — a re-dispatch on a run whose tag is already there — still works
 exactly as written.
 
@@ -936,7 +936,7 @@ no way around it. Deleting a tag now means disabling the ruleset, deleting, and 
 the feature.
 
 **`v*` and not everything.** The 20 deploy marker tags - `docs-6`, `web-release-5`, `www-1` - are created by
-`push-tag.sh` on every site deploy and must stay free. Counted 2026-09-04; both numbers here grow on their
+`create-tag.sh` on every site deploy and must stay free. Counted 2026-09-04; both numbers here grow on their
 own, so read them rather than trusting them.
 
 
@@ -1095,6 +1095,23 @@ worth keeping open while the prerelease staging repository is still undecided.
 **What this does not decide.** Whether a prerelease may ever be dispatched from a branch. It cannot today -
 `gate` refuses the ref, and a branch-built image signs under the branch and fails the published verify
 command - and nothing here changes that.
+
+### D30 — no job holds a git credential after checkout
+
+**Decided 2026-09-11.** Every `actions/checkout` step in `.github/workflows/` - twenty-two of them - carries
+`persist-credentials: false`, and nothing in CI runs `git push`. The last push, the deploy marker tag, became
+one `gh api` call (`create-tag.sh`, `POST repos/{repo}/git/refs`) taking `GH_TOKEN` for that step alone.
+
+**What it closes.** A compromised step inside any job could use the token checkout leaves behind. Checkout
+v6 already moved that token out of `.git/config` into `$RUNNER_TEMP`, so the older leak - the config file
+carried out inside an uploaded artifact - was closed before this; what this closes is use of the token by a
+later step in the same job. The advice comes from workflow auditors (zizmor's `artipacked`), not from GitHub's
+own pages, which do not mention the setting.
+
+**What it costs.** Twenty-two one-line entries, and the API's "Reference already exists" where git said "tag
+already exists". `check-release-tag.sh` still reaches origin with `git ls-remote`, which works anonymously on
+a public repository, and the deploy `tag` job still checks out because `deploy-summary.sh` reads the subject
+with `git log`.
 
 ## Open
 
