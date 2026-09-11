@@ -37,10 +37,9 @@ Output goes to `artifacts/<site>` at the repo root, which is what gets deployed.
 
 ## ☁️ Deploying
 
-All three go to Cloudflare, each from its own workflow - `Deploy Docs Site`, `Deploy Demo Site` and
-`Deploy WWW Site`. All are **manual** (`workflow_dispatch`), all build the site fresh, check its links
-offline, upload `artifacts/<site>`, and then tag the commit they published so a live site maps back to a
-commit.
+All three go to Cloudflare from one workflow, `Deploy Site`, with the site picked at dispatch - `docs`, `demo`
+or `www`. It is **manual** (`workflow_dispatch`), builds the site fresh, checks its links offline, uploads
+`artifacts/<site>`, and then tags the commit it published so a live site maps back to a commit.
 
 The wrangler config for each lives in [`tooling/cloudflare/`](../tooling/cloudflare). The `directory` it
 uploads has to match the `destination` in that site's `_config.yml`.

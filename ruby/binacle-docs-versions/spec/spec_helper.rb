@@ -34,11 +34,18 @@ module SiteBuilder
 
   # The one knob, moved. Jekyll reads _data before any generator runs, so a spec sets it after the read.
   def build_with_current(version)
+    build_with_versions('current' => version)
+  end
+
+  def build_with_list(list)
+    build_with_versions('list' => list)
+  end
+
+  def build_with_versions(overrides)
     site = build_site
-    site.data['versions']['current'] = version
     site.reset
     site.read
-    site.data['versions']['current'] = version
+    site.data['versions'].merge!(overrides)
     site.generate
     site
   end

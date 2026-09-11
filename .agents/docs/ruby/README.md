@@ -1,7 +1,7 @@
 ---
 id: ruby
 description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
-verified: 2026-09-04
+verified: 2026-09-12
 check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
@@ -300,11 +300,13 @@ version scheme of `sites/docs` — the front matter key `version`, the data path
 collection folder `_versions` — all hardcoded, because a shared gem holding one site's vocabulary is the
 thing this split exists to avoid.
 
-**A generator stamps plain keys** at `:high` priority. On every versioned document: `title_suffix`
-(`(v2.1.x)`) and, on every version that is not `current`, `robots: noindex, follow`. On every page whose
-layout is `redirect`: `redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all
-out and knows nothing about versions. **It never overwrites a key the page already set**, which is how the
-swagger pages keep `noindex, nofollow` from their `defaults:` scope.
+**A generator stamps plain keys** at `:high` priority. On every document under `_versions/<folder>/`:
+`version` (the folder name - no config block has to say it), `version_tag` (the tag listed beside that id in
+`_data/versions.yml`; a folder with none stops the build), `title_suffix` (`(v2.1.x)`) and, on every version
+that is not `current`, `robots: noindex, follow`. On every page whose layout is `redirect`: `redirect_to`,
+`canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing about versions.
+**It never overwrites a key the page already set**, which is how the swagger pages keep `noindex, nofollow`
+from their `defaults:` scope.
 
 **The redirect stamps landed 24 Aug 2026 and closed the last head under `sites/` that composed its own.**
 `sites/docs/_layouts/redirect.html` built its title, canonical and `robots` inline, because its canonical
