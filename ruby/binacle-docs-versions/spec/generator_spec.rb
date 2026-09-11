@@ -180,6 +180,22 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     end
   end
 
+  describe 'the version list' do
+    it 'stamps the index url onto every entry' do
+      site = build_site
+
+      expect(site.data['versions']['list'].map { |entry| entry['url'] })
+        .to eq(['/version/v2.0.x/', '/version/v1.0.x/'])
+    end
+
+    it 'follows the label' do
+      site = build_with_list([{ 'id' => 'v2.0.x', 'version_tag' => '2.0' },
+                              { 'id' => 'v1.0.x', 'version_tag' => '1.0.3', 'label' => '1.0.3' }])
+
+      expect(site.data['versions']['list'].last['url']).to eq('/version/1.0.3/')
+    end
+  end
+
   describe 'the collision check' do
     it 'fails the build when a page outside the versions claims a versioned url' do
       expect { build_site({}, COLLISION_SITE) }

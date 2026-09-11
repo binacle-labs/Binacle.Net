@@ -25,8 +25,11 @@ module Binacle
 
       # The same page in another version, or that version's index when the page is not there.
       def counterpart(doc, version)
-        pages = @by_version[version]
-        pages[path_of(doc)] || pages.values.find { |candidate| path_of(candidate).match?(INDEX) }
+        @by_version[version][path_of(doc)] || index_of(version)
+      end
+
+      def index_of(version)
+        @by_version[version].values.find { |candidate| path_of(candidate).match?(INDEX) }
       end
 
       # Every page in one version with no page at the same path in another. The redirect list for a major.

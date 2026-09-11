@@ -33,6 +33,7 @@ module Binacle
 
         pages = Pages.new(versioned)
         stamp_version_urls(pages, versioned)
+        stamp_list_urls(site, pages)
         stamp_redirects(site, current)
         check_collisions(site)
         print_removed(pages, current, previous_version(site, current))
@@ -81,6 +82,20 @@ module Binacle
             target = pages.counterpart(doc, version)
             urls[version] = target.url unless target.nil?
           end
+        end
+      end
+
+      # For the version list and the selector: each entry in versions.yml learns where its index renders, so no
+      # template builds a url from an id.
+      def stamp_list_urls(site, pages)
+        list = site.data.dig('versions', 'list')
+        return unless list.is_a?(Array)
+
+        list.each do |entry|
+          next unless entry.is_a?(Hash) && entry['id']
+
+          index = pages.index_of(entry['id'].to_s)
+          entry['url'] ||= index.url unless index.nil?
         end
       end
 

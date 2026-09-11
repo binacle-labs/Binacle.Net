@@ -136,6 +136,10 @@ while the moves are still being checked.
 
 ### Folders - renamed, and the closed lines take their final URLs
 
+- [x] **9a - C.** Each entry in the `versions.yml` list is stamped with `url`, the URL of that version's index.
+      `version.html` and the selector build `/version/<id>/` by hand today, which a `label:` would break; they
+      read `version.url` instead from step 9 on. Spec for it.
+      `just test rb_binacle-docs-versions_unit` passes, and the output diff is empty.
 - [ ] **9 - S.** `v3.0.x` becomes `v3.x` and `v1.3.x` becomes `v1.x` (it only ever held 1.3). `versions.yml`:
       `current: v3.x`; the `v3.x` entry carries `label: v3.0.x` **for now**, so its URLs do not move before
       the flip; the `v1.x` entry carries `label: 1.3.0`. The folder name is replaced in `menu_title` and in

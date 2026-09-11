@@ -64,6 +64,10 @@ On every document under `_versions/<folder>/`:
   version's index where the page does not exist. For a version selector that lands on the same page.
 - `robots` - `noindex, follow` on every version that is not `current`.
 
+On every entry of the `list` in `_data/versions.yml`:
+
+- `url` - where that version's index renders, so a template lists versions without building a url from an id.
+
 On every page whose layout is `redirect`:
 
 - `redirect_to` - the url of the current version's index, for the layout to send a reader to.
