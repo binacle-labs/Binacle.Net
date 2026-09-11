@@ -2,7 +2,7 @@
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, and the open questions about the PR gate and supply-chain attestation.
 verified: 2026-09-11
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D32 against deploy-site.yml, whose dispatch must take a site choice of docs, demo and www and whose concurrency group must carry inputs.site; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and deploy-site.yml's link-check step, D17 against deploy-site.yml's trigger, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against deploy-site.yml's first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -60,7 +60,7 @@ tag step failed.
 
 **Amended 2026-08-28 — the tag is made by the release, not pushed before it.** `gh release create` creates a
 missing tag itself and `--target` says on which commit, so the separate `just ci push-tag` step is gone from
-this workflow. The three deploy marker tags are made by `create-tag.sh`, D30. `--target` is ignored when the tag already
+this workflow. The deploy marker tags are made by `create-tag.sh`, D30. `--target` is ignored when the tag already
 exists, so the load-bearing exception above — a re-dispatch on a run whose tag is already there — still works
 exactly as written.
 
@@ -716,9 +716,9 @@ for that reason before anyone writes a line is a gate people learn to ignore.
 
 ### D17 — the site deploys are published by hand, and never on a push
 
-**Decided by the maintainer, 2026-08-19, and it covers `deploy-www-site.yml` too, added after.**
-`deploy-docs-site.yml`, `deploy-demo-site.yml` and `deploy-www-site.yml` are `workflow_dispatch` and stay that
-way. No `push` trigger on `sites/**`, and no scheduled run.
+**Decided by the maintainer, 2026-08-19, and it covered `deploy-www-site.yml` too, added after.** The site
+deploy is `workflow_dispatch` and stays that way - `deploy-site.yml` since D32, three files before it. No
+`push` trigger on `sites/**`, and no scheduled run.
 
 **Why:** publishing to the internet is a deliberate act, not a side effect of a commit. Those folders are
 written in their own session, and pressing the button is part of how that session ends — a merge that happens
@@ -1106,7 +1106,8 @@ command - and nothing here changes that.
 
 ### D30 — no job holds a git credential after checkout
 
-**Decided 2026-09-11.** Every `actions/checkout` step in `.github/workflows/` - twenty-two of them - carries
+**Decided 2026-09-11.** Every `actions/checkout` step in `.github/workflows/` - twenty-two then, eighteen once
+D32 folded the deploys into one file - carries
 `persist-credentials: false`, and nothing in CI runs `git push`. The last push, the deploy marker tag, became
 one `gh api` call (`create-tag.sh`, `POST repos/{repo}/git/refs`) taking `GH_TOKEN` for that step alone.
 
@@ -1116,7 +1117,7 @@ carried out inside an uploaded artifact - was closed before this; what this clos
 later step in the same job. The advice comes from workflow auditors (zizmor's `artipacked`), not from GitHub's
 own pages, which do not mention the setting.
 
-**What it costs.** Twenty-two one-line entries, and the API's "Reference already exists" where git said "tag
+**What it costs.** One line per checkout, and the API's "Reference already exists" where git said "tag
 already exists". `check-release-tag.sh` still reaches origin with `git ls-remote`, which works anonymously on
 a public repository, and the deploy `tag` job still checks out because `deploy-summary.sh` reads the subject
 with `git log`.
@@ -1126,7 +1127,7 @@ with `git log`.
 **Decided 2026-09-11.** `changed-paths.sh` used to set `site=yes` for anything under `.github/`, so a
 workflow-only pull request built all three Jekyll sites and ran the sixteen-test site suite. It now matches
 `.github/actions/` and the workflows a site build or test runs through - `pull-request.yml`,
-`shared-site-tests.yml` and `deploy-*-site.yml` - and nothing else there.
+`shared-site-tests.yml` and `deploy-site.yml` - and nothing else there.
 
 **Why named files and not `.github/actions/` alone.** The narrower pattern leaves a hole: an edit to the site
 test workflow, or to the pull request workflow whose `site-build` job does the building, would not run the
@@ -1136,6 +1137,32 @@ jobs it changed. Naming those files keeps the saving and closes the hole.
 request. The `code` half still matches every `.github/` file, so that pull request still runs the image tests,
 the image build, the lint job and Sonar. It does not become cheap; it stops doing the one thing that could
 not have found anything.
+
+### D32 — the three site deploys are one workflow with a site chosen at dispatch
+
+**Decided 2026-09-12, by the maintainer.** `deploy-site.yml` holds the three-job chain - site tests,
+build-check-deploy, tag - and its `workflow_dispatch` takes one `choice` input, `site`, from `docs`, `demo`
+and `www`. `deploy-docs-site.yml`, `deploy-demo-site.yml` and `deploy-www-site.yml` are gone. D17 is
+untouched: it is still by hand and never on a push.
+
+**Why one input.** The three files were diffed on 2026-09-11 and everything that differed came from the
+slug: the environment `binacle-net-<slug>`, the URL `https://<slug>.binacle.net`, the source `sites/<slug>`,
+the wrangler config `tooling/cloudflare/<slug>.wrangler.jsonc`, the marker tag `<slug>-<run>`, the link check.
+Three copies of that chain could not stay in step, and two of them had never run.
+
+**Why a choice input and not a called workflow.** The first draft was `shared-deploy-site.yml` plus three
+fifteen-line callers. The maintainer asked for the enum instead, and it is simpler on every count: one file
+rather than four, no `workflow_call`, no secrets handed across by name, no permissions cap on the caller, and
+none of the environment-secret precedence rules a called job with `environment:` brings.
+
+**What it costs.** `github.run_number` counts per workflow, so the marker tags share one sequence -
+`docs-40`, `demo-41`, `www-42` - where each site used to count on its own. A tag maps a site to the commit that
+is live, which it still does; only the per-site numbering is gone. The concurrency group carries the site,
+`${{ github.workflow }}-${{ inputs.site }}`, so one site still queues behind itself and two sites still deploy
+side by side, and `run-name` names the site so the run list stays readable.
+
+**What is unproved.** No site had deployed through this file when it was written. The demo deploy in the
+v3.1.0 release set is the first.
 
 ## Open
 

@@ -3,7 +3,7 @@
 #
 # No .NET, no service containers, no OpenAPI lint. None of that reaches a site.
 #
-# `shared-` because the pull request gate and all three deploys call it. The dispatch trigger stays, so it
+# `shared-` because the pull request gate and the site deploy call it. The dispatch trigger stays, so it
 # can still be run by hand.
 
 name: Shared / Site Tests

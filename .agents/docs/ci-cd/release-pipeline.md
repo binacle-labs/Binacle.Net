@@ -79,7 +79,7 @@ runs after the gate job rather than beside it, so a bad version or a missing sec
 instead of after a full suite. It takes that file whole, so the release also gets its OpenAPI lint step.
 
 **The gems are not in it.** The ten Jekyll plugins under `ruby/` ship in the three sites and never in the
-image, so they run in `shared-site-tests.yml`, which the three deploys call and this pipeline does not. Every
+image, so they run in `shared-site-tests.yml`, which the site deploy calls and this pipeline does not. Every
 step added to the image suite is a step every release pays for — see `$ci-cd/decisions#D18`.
 
 **`build`** — checkout, .NET, `just`, then `just build publish`. One `docker/metadata-action` step, a GHCR

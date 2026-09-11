@@ -107,6 +107,7 @@ step added there is a step every release pays for.
 | Plan | The slice this release takes |
 |---|---|
 | `plans/sites/docs-current-at-root.md` | **The whole plan - the maintainer put it in on 2026-09-11.** One folder per major, the current one at the site root, the common layer gone, `v2.0.x` and `v2.1.x` merged. The gem and tooling half is a coding session; the folder moves are a site session. Everything in it is true before the tag except the `## v3.1.0` release-notes section, which names a date and a link that exist only after the run - that one edit is in `post-release-v3.1.0.md` |
+| no plan - two lines, a site session | **`sites/README.md:40-41` names `Deploy Docs Site`, `Deploy Demo Site` and `Deploy WWW Site`**, three workflows that no longer exist - finding 5 folded them into `deploy-site.yml` with the site chosen at dispatch, 2026-09-12. A coding session may not touch `sites/`; whichever site session comes first rewrites those two lines to name `Deploy Site` and its `site` choice |
 
 **Why it rides in a UI release.** The old scheme opens a `v3.1.x` folder the day after the tag and moves every
 indexed URL with it. Doing that once more and then restructuring would move the URLs twice. Landing the plan
@@ -186,6 +187,8 @@ first stage happens on the branch and everything from the merge on happens on `m
       **By eye** - `git log --stat main..HEAD` lists the paths; each doc's `paths:` says which one owns it.
       **The docs site restructure is its own row above and can land in this stage.** Only the `## v3.1.0`
       release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
+- [ ] `sites/README.md` names `Deploy Site`, not three workflows.
+      `grep -c 'Deploy Docs Site\|Deploy Demo Site\|Deploy WWW Site' sites/README.md` returns 0.
 
 ### Stage 3 - the rest
 
@@ -206,7 +209,9 @@ first stage happens on the branch and everything from the merge on happens on `m
       dispatch `beta.2`.
       **The beta lands in `binacle/binacle-net` and stays** - `D27` says a published version is never
       deleted, and the staging repository that would take it instead is still an idea.
-- [ ] `Deploy Demo Site` dispatched from `main` and green, and `demo.binacle.net/packing` packs with `Best`.
+- [ ] `Deploy Site` dispatched from `main` with `demo`, green, and `demo.binacle.net/packing` packs with `Best`.
+      **This is also the first run of `deploy-site.yml` and of `create-tag.sh`** - the fold and the API tag
+      are both unproved until it.
       **Safe before the real image** - the v3.0.0 image already serves `pack/compare-bins`, `Best` and
       `algorithmUsed` on v4, read off the committed `v3.0.x` swagger copy on 2026-09-11. It is also the
       first time the v4 client runs against the public API.

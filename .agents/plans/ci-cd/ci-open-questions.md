@@ -20,11 +20,11 @@ Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine compo
 |---|---|---|
 | 1 | **yes** | check the org can create an OIDC connection first; the page job keeps its token |
 | 4 | **yes, both halves** | delete the two dead lines, tag through `gh api`, then `persist-credentials: false` on every checkout |
-| 5 | **yes** | one called workflow taking the slug; hand it the two Cloudflare secrets explicitly |
+| 5 | **yes** | one workflow, the site as a `choice` input at dispatch - his call on 2026-09-12, over the called workflow first proposed |
 | 7 | **no** | recorded as `D29` in the CI/CD decisions ledger |
 | 8 | **yes** | delete the step from `publish` |
 | 10 | **yes** | `qualitygate.wait=true` on `begin`, drop the loop, `if: always()` on the summary step |
-| 12 | **yes, narrowed** | not `^\.github/actions/` alone - also `shared-site-tests.yml` and the three deploy-site workflows, so a change to a site workflow still runs the site tests |
+| 12 | **yes, narrowed** | not `^\.github/actions/` alone - also `shared-site-tests.yml` and the site deploy workflow, so a change to a site workflow still runs the site tests |
 
 **How the release-path changes get proved.** Findings 1 and 8 both edit the `publish` job, and nothing short
 of a run proves that job. The proof is a prerelease dispatched from `main` after the changes merge - the
@@ -481,9 +481,11 @@ that needed a run got it on 2026-09-11:
       `grep -rn 'git push' tooling/ci` returns nothing - the marker tag is `create-tag.sh`, through `gh api`.
       `D30`. **The API call is unproved until a site deploys** - the demo deploy in the release set is the
       first.
-- [ ] The three deploy workflows share one body, or a line says why they should not.
-      **By eye.** Either `.github/workflows/shared-deploy-site.yml` exists and the three callers are under
-      twenty lines each, or the decision to keep three copies is written down where the next reviewer meets it.
+- [x] **2026-09-12.** The three deploy workflows share one body, or a line says why they should not.
+      `.github/workflows/deploy-site.yml` exists with a `choice` input, and `ls .github/workflows/deploy-*`
+      lists nothing else. `just check workflows` - 9 workflows, no errors. `D32`. **Unproved until a site
+      deploys.** `sites/README.md:40-41` still names the three old workflows - the release set carries that
+      for a site session.
 - [x] The container-structure-test checksum names its upstream source.
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.
 - [x] **2026-09-11.** The Docker Hub credential is scoped, or the decision not to is recorded.
