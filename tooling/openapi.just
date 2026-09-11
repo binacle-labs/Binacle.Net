@@ -42,9 +42,10 @@ generate dir=openapi_dir:
 lint dir=openapi_dir: (generate dir)
     npx --yes @stoplight/spectral-cli lint --ruleset '{{ ruleset }}' --fail-severity=warn '{{ dir }}'/*
 
-# Moves with each minor. The frozen folders below it are never compared.
-current_docs_version := "v3.0.x"
-site_swagger := justfile_directory() / "sites" / "docs" / "collections" / "_versions" / current_docs_version / "swagger"
+# The current docs folder is the one knob in versions.yml. The frozen folders beside it are never compared.
+versions_yml := justfile_directory() / "sites" / "docs" / "_data" / "versions.yml"
+current_docs_folder := shell("sed -n 's/^current: *//p' '" + versions_yml + "'")
+site_swagger := justfile_directory() / "sites" / "docs" / "collections" / "_versions" / current_docs_folder / "swagger"
 
 # The client package is v4 only, so it takes no copy of v3.
 client_spec := justfile_directory() / "packages" / "binacle-net-client" / "spec"

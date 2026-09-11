@@ -246,7 +246,7 @@ already exists, so the pin follows the publish and never precedes it.
       **By eye.** Open the packing page on a running container, submit, paste what the panel prints into a
       terminal. It answers.
 - [ ] The docs site renders the current line at the root, with no `v3.1.x` folder opened.
-      Every box in `plans/sites/docs-current-at-root.md` *Done when* is ticked except the release-notes one,
+      Every box in `plans/sites/docs-current-at-root.md` *Done when* is ticked,
       and `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`.
 - [ ] The six CI findings are in and the seventh is recorded.
       `grep -c '^- \[x\]' .agents/plans/ci-cd/ci-open-questions.md` returns 13 - every box in that plan.

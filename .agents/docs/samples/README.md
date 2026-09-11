@@ -1,7 +1,7 @@
 ---
 id: samples
 description: Deployment samples — Docker Compose (minimal, quickstart, prod, service, full) and Kubernetes (minimal); each folder name is a smoke profile name, feature flags, config wiring, and the keep-in-sync rule
-verified: 2026-09-04
+verified: 2026-09-12
 check: Sample folders, compose env vars, bind-mounted config paths, the k8s resource bounds, and the pinned image tag match samples/; the compose project name still comes from a top-level name: key and not a .env file; every samples/docker folder name has a tooling/smoke/<name>.yml with the same module set
 also_update:
   - api/configuration
@@ -89,11 +89,12 @@ All six samples pin the same tag — `samples/docker/*/docker-compose.yml` and
 years, so `latest` hands the reader the next major release on their next pull, with nothing in their config saying
 what changed.
 
-**Pin the minor line where one exists.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` beside
-`{{version}}`, so from v3.0.0 the pin is `binacle/binacle-net:3.0` and the sample inherits every later patch —
-bug fixes flow, breaking changes never do, and the pin only changes when a new minor line opens. There is no
-`{{major}}` tag on purpose: `3` crosses minor lines. An exact patch is the right pin only for a line that will get no
-further ones, which is why v1.3.x and v2.x samples are pinned that way in the published docs snapshots.
+**Pin the major line where one exists.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` and
+`{{major}}` beside `{{version}}`. The pin is `binacle/binacle-net:3.0` today, because `3` is first written by the
+next release and a pin must name an image that resolves; once it does, the pin becomes `3` and a minor no longer
+touches `samples/`. A major is a breaking change, so the pin moves by hand at a major and never by itself. An
+exact patch is the right pin only for a line that will get no further ones, which is why v1.3.x and v2.x samples
+are pinned that way in the published docs snapshots.
 
 **All six now sit on that minor tag**, which opened with v3.0.0. Read the value out of the sample files rather
 than from here; a version named in a doc goes stale silently. **The rule that governs every move: a pin on

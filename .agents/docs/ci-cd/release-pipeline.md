@@ -111,7 +111,7 @@ signature in between**:
 | `Copy the smoked digest to Docker Hub` | `just ci copy-tags` moves the manifest **by digest** under the version tag alone |
 | `Sign the published image` | cosign, against the digest |
 | `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes. Retried five times, 15s apart, in the one inline `run:` block in the file: Docker Hub's referrers index is eventually consistent and this reads it seconds after the sign. The recipe itself stays one shot, because a reader running it wants an answer rather than a wait |
-| `Move the tags that move` | `just ci copy-tags` again, for `3.0` and `latest`. Skipped on a prerelease, which has none |
+| `Move the tags that move` | `just ci copy-tags` again, for `3.0`, `3` and `latest`. Skipped on a prerelease, which has none |
 
 **Why in halves.** All three tags used to be written before anything was signed, so a failed `cosign sign` left
 `latest` on an unsigned image with the run red and nothing saying so. **Why the split and not simply copying
@@ -217,25 +217,25 @@ A hyphen in the version is the prerelease marker. Every job runs either way; wha
 | Section the `gate` job checks | `3.0.0` | `Unreleased` |
 | Pushed to GHCR | `3.0.0` | `3.0.0-beta.3` |
 | `publish` job | runs | runs |
-| Docker Hub tags | `3.0.0`, `3.0`, `latest` | `3.0.0-beta.3` only |
+| Docker Hub tags | `3.0.0`, `3.0`, `3`, `latest` | `3.0.0-beta.3` only |
 | `Move the tags that move` | runs | **skipped** - nothing moves |
 | Git tag created | `v3.0.0` | `v3.0.0-beta.3` |
 | GitHub release | normal | marked `--prerelease` |
 | `page` job | runs | **skipped** |
 
 **One job is conditional, and it is the last one.** For the six that build and publish, the narrowing is
-entirely `metadata-action`'s: it withholds `{{major}}.{{minor}}` and `latest` for a prerelease, so a beta can
+entirely `metadata-action`'s: it withholds `{{major}}.{{minor}}`, `{{major}}` and `latest` for a prerelease, so a beta can
 never move a tag anyone is following. `page` is the exception — it does not go through `metadata-action`, so
 its skip is a job condition. That is safe only because nothing needs it; a condition on any job above would
 skip everything downstream of it.
 
 **The consequence for testing:** a prerelease exercises every job, `publish` included. What it does not cover
-is the *moving-tag* half — creating `3.0` and `latest` — since a beta produces neither, so
+is the *moving-tag* half — creating `3.1`, `3` and `latest` — since a beta produces none, so
 `Move the tags that move` skips itself on the empty list. **That half was first proven on the v3.0.0 run,
-2026-09-01**, which wrote all three names after a green verify onto one digest. The design record is D25.
+2026-09-01**, which wrote `3.0.0`, `3.0` and `latest` after a green verify onto one digest. The design record is D25.
 
-**It has still never moved either name off an existing image.** 3.0.0 created `3.0` and `latest`; 3.0.1 is the
-first run that repoints them.
+**It has still never moved a name off an existing image.** 3.0.0 created `3.0` and `latest`; the next release
+is the first run that repoints `latest`, and the first to write `{{major}}` at all.
 
 ## Where the release body comes from
 
@@ -277,7 +277,7 @@ image carries the same metadata shape a pushed one does.
 - **Writing the `[Unreleased]` section of `CHANGELOG.md`** as the work lands, and renaming that heading to the
   version before the real release.
 - **The moving-tag check on a scratch repository.** A prerelease reaches the `publish` job but produces only
-  its immutable tag, so `3.0` and `latest` are first created on a real release.
+  its immutable tag, so the minor tag, the major tag and `latest` are first created on a real release.
 - **Deploying the docs site**, which is its own `workflow_dispatch` workflow and is not chained to a release.
 
 **What no longer happens by hand: the tag.** `git tag v3.0.0 && git push origin v3.0.0` builds nothing now, and
