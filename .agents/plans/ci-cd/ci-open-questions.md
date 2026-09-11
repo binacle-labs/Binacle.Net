@@ -495,9 +495,10 @@ that needed a run got it on 2026-09-11:
       action goes back and a line here says so.
 - [x] `setup-just` prints its version and the smoke workflow's bare version step is gone.
       Done 2026-08-28. Sixteen jobs get the line now instead of one.
-- [ ] The Sonar wait is decided.
-      **By eye.** Either `sonar.qualitygate.wait=true` is on the `begin` command and the summary step carries
-      `if: always()`, or a line says the poll stays because a red run for coverage is not wanted yet.
+- [x] **2026-09-12.** The Sonar wait is decided.
+      `grep -c qualitygate.wait tooling/ci/sonar-analysis.xml` returns 1, `grep -c 'for _' tooling/ci/sonar-summary.sh`
+      returns 0, and the summary step in `sonar-analysis.yml` carries `if: always()`. D28 amended.
+      **Unproved until the next pull request runs it.**
 - [x] The four install actions hold no inline shell.
       Done 2026-08-28. Each is a door onto `tooling/ci/install-<tool>.sh`, called by path rather than through
       `just`. Four scripts, not one parameterised script - the argument list would read worse than the copies.

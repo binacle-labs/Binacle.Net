@@ -1079,6 +1079,14 @@ independent build following the same, already-accepted shape. Caching one job's 
 uploading and restoring a full solution build across jobs, for a step that costs on the order of a minute -
 not worth building.
 
+**Amended 2026-09-12 — the job goes red on a failed gate, and still blocks nothing.** `sonar.qualitygate.wait`
+is set in `tooling/ci/sonar-analysis.xml`, so `Sonar end` blocks until SonarCloud has processed the analysis
+and exits non-zero when the gate is red. That replaced a hand-written sixty-turn poll in `sonar-summary.sh`
+that existed only to wait for the same thing; the summary step now carries `if: always()` so the table is
+written either way. The wait is the scanner's own setting, in the file it reads, rather than a loop we timed
+ourselves. **"Non-blocking" is unchanged**: the job is still outside `gate`'s `needs`, so a red Sonar is a red
+check on the pull request and nothing more. Whether it should become more is still O2.
+
 ### D29 — the Docker Hub credential is not scoped to an environment
 
 **Decided 2026-09-11, put to the maintainer as a yes or no.** The `publish` job stays out of a GitHub

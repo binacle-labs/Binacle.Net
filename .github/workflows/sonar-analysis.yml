@@ -130,9 +130,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # The recipe waits for SonarCloud to finish processing. `end` returns when the upload does, so reading
-      # the gate straight away returns the previous run's numbers.
+      # `end` fails the job on a red gate; the table is still worth having, so this runs anyway.
       - name: Summarise the quality gate
+        if: always()
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           COMMIT: ${{ github.sha }}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Wait for SonarCloud to finish processing, then write its quality gate to the run summary.
+# Write the SonarCloud quality gate to the run summary.
 #   sonar-summary.sh <path to report-task.txt> <commit> <branch>        needs SONAR_TOKEN
 set -euo pipefail
 
@@ -11,26 +11,23 @@ branch="$3"
 # Where the run writes its summary page. Falls back to the screen, so this also runs on a laptop.
 summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
 
-# `sonar end` writes this file, and it is the only place the task and dashboard URLs appear.
+# `sonar end` writes this file. The step runs even when `end` failed, so a missing file means the scan never
+# reached the upload.
+if [[ ! -f "$report" ]]; then
+    {
+        echo '## Sonar'
+        echo
+        echo 'No analysis was uploaded. No gate to read.'
+    } >>"$summary"
+    exit 0
+fi
+
 ce_task_url=$(grep -m1 '^ceTaskUrl=' "$report" | cut -d= -f2-)
 dashboard_url=$(grep -m1 '^dashboardUrl=' "$report" | cut -d= -f2-)
 
-status=unknown
-
-# 5 minutes. `end` returns as soon as the report is uploaded and SonarCloud processes it after, so reading the
-# gate without this wait returns the PREVIOUS analysis. A task still queued after 5 minutes is an outage.
-for _ in $(seq 1 60); do
-    task=$(curl -sS -u "${SONAR_TOKEN}:" "$ce_task_url")
-    status=$(printf '%s' "$task" | jq -r '.task.status')
-
-    case "$status" in
-        SUCCESS|FAILED|CANCELED) break ;;
-        # PENDING and IN_PROGRESS land here - keep polling.
-        *) ;;
-    esac
-
-    sleep 5
-done
+# One read, no wait: sonar.qualitygate.wait in sonar-analysis.xml makes `end` block until processing is done.
+task=$(curl -sS -u "${SONAR_TOKEN}:" "$ce_task_url")
+status=$(printf '%s' "$task" | jq -r '.task.status')
 
 if [[ "$status" != "SUCCESS" ]]; then
     {
