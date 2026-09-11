@@ -4,7 +4,6 @@ description: >-
   Documentation for Binacle.Net v1.3.x: quick start, the V1, V2 and V3 APIs, configuration, Docker samples, and
   the release notes.
 menu_title  : v1.3.x
-permalink: /version/v1.3.x/
 nav:
   exclude: true
   order: 1

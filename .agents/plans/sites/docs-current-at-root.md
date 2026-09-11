@@ -130,7 +130,7 @@ while the moves are still being checked.
       `just test rb_binacle-docs-versions_unit` passes, and the output diff shows only the seven swagger pages
       moving and the seven api pages that link them - with no `label:` set, the rule reproduces every other
       URL exactly, hand-written permalinks included. Measured 2026-09-12: 44 specs, 21 output files differ.
-- [ ] **8 - S.** The 61 hand-written `permalink:` lines go. The gem overrides them since step 7, so this commit
+- [x] **8 - S.** The 61 hand-written `permalink:` lines go. The gem overrides them since step 7, so this commit
       changes no output.
       `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing, and the output diff is empty.
 

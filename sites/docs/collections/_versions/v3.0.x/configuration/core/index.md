@@ -3,7 +3,6 @@ title: Core
 description: >-
   The Core module: presets, the interactive docs, CORS and forwarded headers. Where its configuration files live
   and what each one sets.
-permalink: /version/v3.0.x/configuration/core/
 nav:
   parent: Configuration
   order: 1

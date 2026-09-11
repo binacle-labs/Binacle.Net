@@ -3,7 +3,6 @@ title: Configuration
 description: >-
   How Binacle.Net v2.1.x is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
   modules each need.
-permalink: /version/v2.1.x/configuration/
 nav:
   order: 6
   icon: 🔧

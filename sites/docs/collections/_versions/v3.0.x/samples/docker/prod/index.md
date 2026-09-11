@@ -3,7 +3,6 @@ title: Prod
 description: >-
   Docker Compose for Binacle.Net behind your own backend: health checks and packing logs on, no interactive
   docs, no accounts and no database.
-permalink: /version/v3.0.x/samples/docker/prod/
 nav:
   order: 3
   parent: Docker

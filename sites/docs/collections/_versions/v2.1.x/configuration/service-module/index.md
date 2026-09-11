@@ -3,7 +3,6 @@ title: Service Module
 description: >-
   The Service Module in Binacle.Net v2.1.x has no public documentation. What it is, and what it means if
   you self-host.
-permalink: /version/v2.1.x/configuration/service-module/
 nav:
   parent: Configuration
   order: 3
