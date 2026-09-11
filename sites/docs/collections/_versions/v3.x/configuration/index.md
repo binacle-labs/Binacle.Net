@@ -13,7 +13,7 @@ provided through modules, each with its own requirements, configuration options,
 
 This guide covers the configuration system for {{ page.version_label }} version.
 
-Make sure to read [Configuration Basics]({% link _common_pages/configuration-basics.md %}) first then proceed with the
+Make sure to read [Configuration Basics]({% vlink /configuration-basics.md %}) first then proceed with the
 specifics for this version.
 
 ---

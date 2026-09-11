@@ -7,30 +7,22 @@ nav:
   order: 4
   icon: 🧰
 ---
-{%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
 
-Every documented version publishes its OpenAPI document. Point a generator at one and you get a typed client
+Every documented version publishes its OpenAPI documents. Point a generator at one and you get a typed client
 in two commands.
 
 There are no SDK packages to install. The published document is the deliverable, and the client is yours to
 generate, read and keep in your own repository.
 
-## 📡 Where the Document Is
+## 📡 Where the Documents Are
 
-Each version serves one document per API version, at:
+{{ page.version_label }} serves one document per API version:
 
-```text
-https://docs.binacle.net/version/<version>/swagger/<api>.json
-```
+- V3: [`{{ site.url }}{% vlink /swagger/v3.json %}`]({% vlink /swagger/v3.json %})
+- V4: [`{{ site.url }}{% vlink /swagger/v4.json %}`]({% vlink /swagger/v4.json %})
 
-For {{ current.label }} those are:
-
-- V3: [`https://docs.binacle.net/version/{{ current.url_segment }}/swagger/v3.json`]({{ current.url | append: 'swagger/v3.json' | relative_url }})
-- V4: [`https://docs.binacle.net/version/{{ current.url_segment }}/swagger/v4.json`]({{ current.url | append: 'swagger/v4.json' | relative_url }})
-
-Swap the version segment for the one you run. The [Versions]({% link _common_pages/version.html %}) page lists
-them, and the [API reference for {{ current.label }}]({{ current.url | append: 'api/' | relative_url }})
-describes the endpoints.
+The [API]({% vlink /api/index.md %}) pages describe the endpoints. Another version's documents are on its own
+pages - the [Versions]({% link _common_pages/version.html %}) page lists them.
 
 > ⚠️ V4 is **experimental and can change at any time**. A client generated from `v4.json` will need
 > regenerating, and your calling code will need editing, when the contracts move. Use V3 for anything you keep.
@@ -52,7 +44,7 @@ mkdir binacle-client && cd binacle-client
 npm init -y
 npm pkg set type=module
 npm install --save-dev @hey-api/openapi-ts typescript@5
-npx @hey-api/openapi-ts -i https://docs.binacle.net/version/{{ current.url_segment }}/swagger/v4.json -o src/client
+npx @hey-api/openapi-ts -i {{ site.url }}{% vlink /swagger/v4.json %} -o src/client
 ```
 
 That writes `src/client` with the request functions, the types and a fetch client.
@@ -86,7 +78,7 @@ dotnet tool install --global Microsoft.OpenApi.Kiota
 dotnet new console -o binacle-client
 cd binacle-client
 dotnet add package Microsoft.Kiota.Bundle
-kiota generate -l CSharp -d https://docs.binacle.net/version/{{ current.url_segment }}/swagger/v4.json -c BinacleClient -n Binacle.Client -o ./Client
+kiota generate -l CSharp -d {{ site.url }}{% vlink /swagger/v4.json %} -c BinacleClient -n Binacle.Client -o ./Client
 ```
 
 That writes `Client` with one request builder per path segment and the models under `Client/Models`.

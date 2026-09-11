@@ -1,15 +1,24 @@
 ---
 title: ViPaq Protocol
 description: >-
-  The ViPaq wire format as Binacle.Net writes and reads it: header, body and compression. The format
-  changed in v3.0.0 and has no fallback reader.
+  ViPaq packs one bin and its items into a single copy-pastable string. What it carries, and the wire format
+  as Binacle.Net writes and reads it: header, body and compression. The format changed in v3.0.0.
 nav:
   order: 7
   icon: 🗜️
 ---
 
-This page describes the ViPaq wire format as produced and read by Binacle.Net {{ page.version_label }}.
-For what ViPaq is and why it exists, see [ViPaq Protocol]({% link _common_pages/vipaq-protocol.md %}).
+**ViPaq** packs one bin and its items into a single copy-pastable string. Binacle.Net's packing responses get
+large with many items; ViPaq condenses one result - a single bin plus the items packed into it - into a string
+that is small to store, cheap to send and easy to share.
+
+It carries:
+
+- **Bin**: its dimensions - Length, Width, Height
+- **Items**: each item's dimensions (L, W, H) and its position in the bin (X, Y, Z)
+
+That is everything needed to redraw the packing, and nothing else. Items come back in the order they were sent.
+This page is the wire format as Binacle.Net {{ page.version_label }} writes and reads it.
 
 > 🚨 **The format changed in v3.0.0.** Strings produced by v2.1.1 and earlier do not decode here, and strings
 > produced here do not decode there. There is no fallback reader. An old string is rejected with a format error

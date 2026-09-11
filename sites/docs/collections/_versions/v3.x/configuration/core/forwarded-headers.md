@@ -49,7 +49,7 @@ file, or by using **Environment Variables**.
 - 📌 **Full Path**: `/app/Config_Files/ForwardedHeaders.Production.json`
 
 For more information on overriding configurations, refer to the
-[Configuration Basics]({% link _common_pages/configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
+[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
 
 ## 🔧 Configuration Options
 
