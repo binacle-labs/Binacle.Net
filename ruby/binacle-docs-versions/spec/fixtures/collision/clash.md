@@ -1,5 +1,5 @@
 ---
 title: Clash
-permalink: /version/v1.0.x/guide/
+permalink: /version/1.0.3/guide/
 ---
 A page outside the collection that claims a versioned url.

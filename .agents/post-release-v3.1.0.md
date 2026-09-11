@@ -59,6 +59,10 @@ two lists are clear** - the third is plans, and plans outlive it.
       the GitHub release link, and the body is the `3.1.0` changelog section. No warning block; this line has
       no breaking change. **By eye.** It is the same text as the release body, so `just changelog extract 3.1.0`
       is the source.
+- [ ] The `v3.x` entry in `sites/docs/_data/versions.yml` says what the line has shipped: `label: v3.1.0`,
+      `url_segment: 3.1.0`, `version_tag: "3"` (the major tag - it exists once this release publishes it, and
+      then every page pulls with it and no later minor edits the line).
+      `grep -A3 'id: v3.x' sites/docs/_data/versions.yml` shows the three values.
 - [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Site` is dispatched with `docs` and green.
       `docs.binacle.net/release-notes/` shows 3.1.0 at the top, and `docs.binacle.net/version/v3.0.x/` answers
       `301` to `/`.

@@ -1,6 +1,10 @@
-current: v2.0.x
+current: v2.x
 list:
-  - id: v2.0.x
+  - id: v2.x
+    url_segment: 2.0.4
+    label: v2.0.4
     version_tag: "2.0"
-  - id: v1.0.x
+  - id: v1.x
+    url_segment: 1.0.3
+    label: v1.0.3
     version_tag: "1.0.3"

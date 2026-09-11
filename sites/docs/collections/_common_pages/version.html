@@ -1,7 +1,7 @@
 ---
 title: Versions
 description: >-
-  Every documented release line of Binacle.Net: v3.0.x, v2.1.x, v2.0.x and v1.3.x. Pick the one that matches the
+  Every documented release line of Binacle.Net: v3.0.0, v2.1.1, v2.0.1 and v1.3.0. Pick the one that matches the
   image you run.
 nav:
   order: 11
@@ -28,8 +28,8 @@ excerpt: |
     <ul class="list border">
         {% for version in site.data.versions.list %}
         <li>
-            <a href="{{ '/version/' | append: version.id | append: '/' | relative_url }}">
-                {{ version.id }}
+            <a href="{{ version.url | relative_url }}">
+                {{ version.label }}
             </a>
             {% if version.id == site.data.versions.current %}
             <span class="chip small">current</span>

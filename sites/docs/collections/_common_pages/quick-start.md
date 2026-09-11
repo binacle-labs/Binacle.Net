@@ -7,6 +7,7 @@ nav:
   order: 1
   icon: 🚀
 ---
+{%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
 
 Getting started with Binacle.Net is simple.
 Run it locally using Docker or deploy it to the cloud with minimal setup.
@@ -14,7 +15,7 @@ Run it locally using Docker or deploy it to the cloud with minimal setup.
 The default setup includes **Swagger UI** and the **UI Module** for easy testing and interaction.
 
 For version-specific details, see the
-[Quick Start Guide for {{ site.data.versions.current }}]({{ '/version/' | append: site.data.versions.current | append: '/quick-start/' | relative_url }}),
+[Quick Start Guide for {{ current.label }}]({{ current.url | append: 'quick-start/' | relative_url }}),
 or pick your version from the [Versions]({% link _common_pages/version.html %}) page.
 
 ## 🖥️ Run Locally with Docker

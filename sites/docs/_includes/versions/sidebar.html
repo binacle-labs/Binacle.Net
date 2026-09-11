@@ -11,16 +11,21 @@
             </div>
             {% if site.data.versions.list.size != 0 %}
             <div class="field suffix small">
-                <select id="version-select" data-versionselect="{{ '/version/' | relative_url }}">
+                {%- comment -%}
+                Each option carries the url of this same page in that version, stamped by the gem - or that
+                version's index where the page does not exist there.
+                {%- endcomment -%}
+                <select id="version-select" data-versionselect>
                     {% for version in site.data.versions.list %}
-                    {% assign label = version.id %}
+                    {% assign label = version.label %}
                     {% if version.id == site.data.versions.current %}
                     {% assign label = label | append: ' (current)' %}
                     {% endif %}
+                    {% assign target = page.version_urls[version.id] | default: version.url %}
                     {% if version.id == page.version %}
-                    <option value="{{ version.id }}" selected>{{ label }}</option>
+                    <option value="{{ target | relative_url }}" selected>{{ label }}</option>
                     {% else %}
-                    <option value="{{ version.id }}">{{ label }}</option>
+                    <option value="{{ target | relative_url }}">{{ label }}</option>
                     {% endif %}
                     {% endfor %}
                 </select>

@@ -3,12 +3,12 @@
 module Binacle
   module DocsVersions
     # Where a versioned file renders. The folder name never appears in a url: a version renders under
-    # /version/<label>/, and the label is what versions.yml lists beside the folder's id - or the id itself.
+    # /version/<url_segment>/, and the segment is what versions.yml lists beside the folder's id - or the id.
     class Urls
       INDEX = 'index'
 
       def initialize(site)
-        @labels = labels_of(site)
+        @segments = segments_of(site)
       end
 
       def for(item)
@@ -19,7 +19,7 @@ module Binacle
       private
 
       def prefix(version)
-        "/version/#{@labels.fetch(version, version)}"
+        "/version/#{@segments.fetch(version, version)}"
       end
 
       # A page renders as a folder with an index inside, so its url ends in a slash. The folder's own index
@@ -31,14 +31,14 @@ module Binacle
         segments.empty? ? '' : "#{segments.join('/')}/"
       end
 
-      def labels_of(site)
+      def segments_of(site)
         list = site.data.dig('versions', 'list')
         return {} unless list.is_a?(Array)
 
-        list.each_with_object({}) do |entry, labels|
-          next unless entry.is_a?(Hash) && entry['id'] && entry['label']
+        list.each_with_object({}) do |entry, segments|
+          next unless entry.is_a?(Hash) && entry['id'] && entry['url_segment']
 
-          labels[entry['id'].to_s] = entry['label'].to_s
+          segments[entry['id'].to_s] = entry['url_segment'].to_s
         end
       end
     end

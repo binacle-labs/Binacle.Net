@@ -15,15 +15,30 @@
 #
 # Every folder under collections/_versions/ has to be in the list, with its tag. The gem reads the version off
 # the folder name and the tag off this list, and stops the build on a folder the list does not have.
+#
+# Every entry carries all four keys; the build stops on one that does not.
+#   id           the folder under collections/_versions/. Never appears in a url.
+#   url_segment  where the line renders, /version/<url_segment>/ - the highest version it shipped. The current
+#                line renders at the root instead; its segment is where it lands the day it closes.
+#   label        what the selector and every page call the line - the highest version it shipped, with its v.
+#   version_tag  what docker pulls. A closed line pins its newest patch; the current line a moving tag.
 
-current: v3.0.x
+current: v3.x
 
 list:
-  - id: v3.0.x
+  - id: v3.x
+    url_segment: v3.0.x    # keeps the current line's urls where they are until it moves to the root
+    label: v3.0.0
     version_tag: "3.0"
   - id: v2.1.x
+    url_segment: v2.1.x
+    label: v2.1.1
     version_tag: "2.1.1"
   - id: v2.0.x
+    url_segment: v2.0.x
+    label: v2.0.1
     version_tag: "2.0.1"
-  - id: v1.3.x
+  - id: v1.x
+    url_segment: 1.3.0
+    label: v1.3.0
     version_tag: "1.3.0"

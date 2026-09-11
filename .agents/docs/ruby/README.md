@@ -300,13 +300,15 @@ version scheme of `sites/docs` — the front matter key `version`, the data path
 collection folder `_versions` — all hardcoded, because a shared gem holding one site's vocabulary is the
 thing this split exists to avoid.
 
-**A generator decides every url under `_versions/`** - `/version/<label>/<rest>`, the label read off
-`_data/versions.yml` beside the folder's id (the id when absent), a page as a folder with an index, a static
+**A generator decides every url under `_versions/`** - `/version/<url_segment>/<rest>`, the segment read off
+`_data/versions.yml` beside the folder's id, a page as a folder with an index, a static
 file under its own name. A `permalink` a page writes is overwritten. Static files get a settable url through
 `VersionedFile`, a `StaticFile` subclass, because Jekyll's own ignores data. **It also stamps plain keys**,
 all at `:high` priority. On every document under `_versions/<folder>/`:
-`version` (the folder name - no config block has to say it), `version_tag` (the tag listed beside that id in
-`_data/versions.yml`; a folder with none stops the build), `title_suffix` (`(v2.1.x)`) and, on every version
+`version` (the folder name - no config block has to say it), `version_tag` and `version_label` (from the list
+entry beside that id in `_data/versions.yml`; every entry carries `url_segment`, `label` and `version_tag`, and
+a folder with no entry or an entry missing a key stops the build), `title_suffix` (`(v2.1.1)`, from the label)
+and, on every version
 that is not `current`, `robots: noindex, follow`, and `version_urls` (this page's url in every other version,
 or that version's index where the page is missing - for the selector). On every page whose layout is `redirect`:
 `redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing

@@ -1,4 +1,4 @@
 ---
 title: Home
 ---
-The v1.0.x line.
+The v1.x line.

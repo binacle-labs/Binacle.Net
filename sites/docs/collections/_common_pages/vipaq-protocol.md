@@ -7,6 +7,7 @@ nav:
   icon: 🗜️
   order: 99
 ---
+{%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
 
 **ViPaq** is a protocol for compactly encoding the packing information of a single bin.
 
@@ -16,7 +17,7 @@ By using efficient binary-level encoding, ViPaq enables:
 - ✅ Easy sharing via a concise copy-pastable string
 
 > This page describes what ViPaq is. The exact format is documented per version - see
-> [the ViPaq Protocol page for {{ site.data.versions.current }}]({{ '/version/' | append: site.data.versions.current | append: '/vipaq-protocol/' | relative_url }}),
+> [the ViPaq Protocol page for {{ current.label }}]({{ current.url | append: 'vipaq-protocol/' | relative_url }}),
 > or pick your version from the [Versions]({% link _common_pages/version.html %}) page.
 {: .block-note}
 
