@@ -1,7 +1,7 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-09-10
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, and the open questions about the PR gate and supply-chain attestation.
+verified: 2026-09-11
 check: Decisions still match .github/workflows/*.yml and tooling/build.just; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry no prerelease condition, D7 against tooling/changelog.just, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and the deploy workflows' link-check step, D17 against all three deploy workflows' triggers, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against the deploy workflows' first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just, whose verify recipes must take a version with no default and reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
 paths:
   - ".github/workflows/**"
@@ -1078,6 +1078,23 @@ scanner both need un-containerised. They produce different artifacts for differe
 independent build following the same, already-accepted shape. Caching one job's output for another would mean
 uploading and restoring a full solution build across jobs, for a step that costs on the order of a minute -
 not worth building.
+
+### D29 — the Docker Hub credential is not scoped to an environment
+
+**Decided 2026-09-11, put to the maintainer as a yes or no.** The `publish` job stays out of a GitHub
+environment with a `main`-only branch policy, and the two Docker Hub values stay repository secrets.
+`check-release-ref.sh` in `gate` remains the thing that keeps a release on `main`.
+
+**Why not.** Two reasons, and the first is the one that decides it. The long-lived registry token is leaving
+`publish` anyway: the Docker Hub login moves to an OIDC connection minted per run, so the credential the
+environment would have fenced stops existing in that job. What would be left to scope is the page job's
+token, which writes the repository description through the web API and has no OIDC path. Second, an
+environment that admits `main` only refuses a prerelease dispatched from anywhere else, and that door is
+worth keeping open while the prerelease staging repository is still undecided.
+
+**What this does not decide.** Whether a prerelease may ever be dispatched from a branch. It cannot today -
+`gate` refuses the ref, and a branch-built image signs under the branch and fails the published verify
+command - and nothing here changes that.
 
 ## Open
 

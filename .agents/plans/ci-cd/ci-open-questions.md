@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
-state: blocked
-waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. Re-verified 2026-09-11: nothing upstream has died, finding 8 no longer needs a run, and only the Docker Hub eligibility in finding 1 cannot be checked from the repository. State chosen by an agent - `proposed` reads closer to what this file is; strike either if wrong"
+state: ready
+waits-on: "nobody - answered by the maintainer 2026-09-11. Findings 1, 4, 5, 8, 10 and 12 are approved, 7 is rejected. Finding 1 still needs the Docker Hub eligibility checked at the org, and finding 12 goes in narrowed to site files"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"
@@ -14,11 +14,23 @@ Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine compo
 `.github/actions/`, the scripts in `tooling/ci/` and `tooling/ci.just`, plus `tooling/check.just`,
 `tooling/build.just` and `.github/dependabot.yml` where a workflow step reaches into them.
 
-**Where the maintainer stands, 2026-09-11.** He read the verification and said he leans **yes on 1, 4, 5, 10
-and 12**, and **not on 7 and 8** - stated before the verification came back, and finding 8's only obstacle
-turned out to be gone, so that one is worth re-asking. **These are leans, not decisions**: no box below is
-ticked on them, and each still needs his yes or no. Recorded here because the next session will otherwise
-start from nothing.
+**Answered by the maintainer, 2026-09-11 - each one put to him for a yes or a no.**
+
+| Finding | Answer | What the yes takes |
+|---|---|---|
+| 1 | **yes** | check the org can create an OIDC connection first; the page job keeps its token |
+| 4 | **yes, both halves** | delete the two dead lines, tag through `gh api`, then `persist-credentials: false` on every checkout |
+| 5 | **yes** | one called workflow taking the slug; hand it the two Cloudflare secrets explicitly |
+| 7 | **no** | recorded as `D29` in the CI/CD decisions ledger |
+| 8 | **yes** | delete the step from `publish` |
+| 10 | **yes** | `qualitygate.wait=true` on `begin`, drop the loop, `if: always()` on the summary step |
+| 12 | **yes, narrowed** | not `^\.github/actions/` alone - also `shared-site-tests.yml` and the three deploy-site workflows, so a change to a site workflow still runs the site tests |
+
+**How the release-path changes get proved.** Findings 1 and 8 both edit the `publish` job, and nothing short
+of a run proves that job. The proof is a prerelease dispatched from `main` after the changes merge - the
+workflow that runs is the changed one and the signature is on the right ref. **Not from a branch**: `gate`
+refuses any other ref, a branch-built image signs under the branch and fails the published verify command,
+and the direction is that a prerelease never lands where users pull from. The release set says when.
 
 **Every open finding was re-checked on 2026-09-11** and each carries a dated verdict line. Where a number in
 this file was measured and found wrong it has been corrected in place. One of those: `tooling/ci/` holds
@@ -224,6 +236,10 @@ the same objection that removed three repo variables. It is weaker here, because
 way.
 
 **Confidence:** medium-high on the mechanism, high that the benefit is real.
+
+**Rejected 2026-09-11 by the maintainer.** With finding 1 the long-lived token leaves `publish` anyway, so
+most of what this would scope stops existing; what is left is the page job's token. And an environment that
+admits `main` only refuses any prerelease dispatched elsewhere, which is a door worth keeping open. `D29`.
 
 **Verified 2026-09-11 - holds.** GitHub's docs are explicit on all three parts. An environment secret is
 readable only by a job that names that environment; a job cannot reach it until the environment's protection
@@ -468,10 +484,11 @@ that needed a run got it on 2026-09-11:
       twenty lines each, or the decision to keep three copies is written down where the next reviewer meets it.
 - [x] The container-structure-test checksum names its upstream source.
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.
-- [ ] The Docker Hub credential is scoped, or the decision not to is recorded.
-      **By eye.** Either the `publish` job declares an `environment:` with a `main`-only branch policy, or a
-      line says why a repository secret is accepted.
-- [ ] `docker/setup-buildx-action` is gone from `publish`, proved by a real dispatch.
+- [x] **2026-09-11.** The Docker Hub credential is scoped, or the decision not to is recorded.
+      Not scoped; the decision is `D29` in the CI/CD decisions ledger.
+- [ ] `docker/setup-buildx-action` is gone from `publish`, proved by a prerelease dispatched from `main`.
+      **The step was deleted 2026-09-11** - `grep -c setup-buildx .github/workflows/release-docker-image.yml`
+      returns 1, the `build` job's. The box closes on the beta run.
       **By eye.** A prerelease run whose copy step is green with no buildx setup above it. If it fails, the
       action goes back and a line here says so.
 - [x] `setup-just` prints its version and the smoke workflow's bare version step is gone.

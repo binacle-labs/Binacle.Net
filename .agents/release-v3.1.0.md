@@ -4,8 +4,11 @@ description: Release - Binacle.Net v3.1.0. The demo UI release - the shipped cli
 
 # Release - Binacle.Net v3.1.0
 
-**Status:** scope narrowed by the maintainer on 2026-09-07. **Rows 1 and 2 and one of the two fixes are in.**
-No branch, no beta, no date.
+**Status:** scope narrowed by the maintainer on 2026-09-07. **Two rows of work are left** - row 5, and the
+six CI answers - and the maintainer set the order on 2026-09-11: **features first, then the changelog and
+the docs, then the rest.** Branch `release/v3-1-0`. A `3.1.0-beta.1` from `main` proves the CI changes
+before the real tag. **The steps from here to the tag are under *Before the tag*, and what happens after it
+is `post-release-v3.1.0.md`.**
 
 **What this release is.** The shipped UI still calls v3, and the demo has two faults nobody outside would
 call a bug but everybody hits. **This release moves the clients to v4 and finishes the demo surface.** It is
@@ -21,6 +24,8 @@ release*.
 **This file points; it does not hold work it can point at.** Each row names the plan and the slice this
 release takes. The plan holds the work, the traps and the research. **This file holds the order and the
 dependencies.** Where a row has no plan, it is release paperwork and lives here because nothing else owns it.
+
+Companion: `post-release-v3.1.0.md` - the checks to run once the image is out, and the work the tag causes.
 
 **The scope is the maintainer's.** Rows marked *(chosen by an agent)* are orderings or readiness calls written
 to make the file legible - strike any of them.
@@ -56,15 +61,14 @@ written before the clients have moved.
 |---|---|---|
 | 1 | plan landed and deleted | **The shipped UI calls v4.** `pack/compare-bins`, through `packages/binacle-net-client` - the component keeps every bin's result and lets the visitor click between them, so the single-bin endpoints do not cover it. **Landed `33a4dfcc`.** Both bundles rebuilt clean and the pages exercised 2026-09-10 |
 | 2 | no plan - release paperwork | **The `Best` algorithm, and the algorithm each result used.** `Best` is in the v4 enum and was unreachable from v3, so row 1 is what makes it offerable; `algorithmUsed` is on every v4 result and is rendered nowhere. **One feature, not two** - `Best` runs several heuristics and returns the winner, so without the display the visitor cannot tell what won. Both hosts' result rows. **Landed `a8050583`**, verified with the rebuild on 2026-09-10 |
-| 3 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip. UI module landed 2026-09-10.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away. **The `sites/demo/` markup is still to write** - a coding session may not touch `sites/`, so the plan carries the exact spec for a site session |
+| 3 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip. Landed on both hosts - UI module 2026-09-10, demo site 2026-09-11.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away |
 | 4 | plan landed and deleted - the reasoning is `D6` in the API decisions ledger | **The whole plan. Landed 2026-09-10.** A `Kernel/Instance/` slice now holds what the instance reports about itself; `FeatureOptions` moved in as `InstanceOptions` with a closed value hierarchy, so the presets sit beside the switched-on features without being counted as one. `_js/instance.js`, its webpack entry and its script tag are gone, and with them the last v4 call made from a browser inside the image |
-| 5 | `plans/api/packing-demo-next.md` | **item 3, the request panel.** *(ordering chosen by an agent - it is last because it is the only row here that can be cut without leaving anything half-done)* |
+| 5 | `plans/api/packing-demo-next.md` | **item 3, the request panel. In - the maintainer said so on 2026-09-11, and it gets a session of its own.** The plan carries five questions; the fourth, inside the component or in the Razor page around it, decides the cost and is answered first. The version question is answered by row 1 |
 
 **Row 4 deleted `_js/instance.js`.** The warning that used to stand here - not to edit its v4 call on the
 way past - is spent.
 
-**Row 5 has four questions left and one of them decides its cost** - whether the panel lives inside the shared
-component or in the Razor page around it. The version question that used to gate it is answered by row 1.
+**Row 5 is the last feature.** Nothing under *Before the tag* past step 1 starts until it lands.
 
 ## The two fixes
 
@@ -82,7 +86,7 @@ release of their own. *(chosen by an agent)*
 | Plan | The slice this release takes |
 |---|---|
 | `plans/api/integration-tests-cover-shipped-modules.md` | **the CORS assertion. Landed 2026-09-10** in `api/test/Binacle.Net.IntegrationTests` - four tests: preflight and simple request from a configured origin carry the header, an unconfigured origin does not, and with no `Cors.json` no origin is allowed. Proven by breaking `app.UseCors()` and watching the right two fail. **Turning the optional modules on is the larger half and is still open** |
-| `plans/ci-cd/ci-open-questions.md` | **most or all of it - he said so on 2026-09-11.** Seven of its twelve items are open and **all seven now close on a sentence**: the one that used to need a real dispatch, dropping `setup-buildx-action` from `publish`, was proved on 2026-09-11 against the repository's own smoke path. All seven were re-verified the same day, and only the Docker Hub eligibility in finding 1 needs something no agent can reach |
+| `plans/ci-cd/ci-open-questions.md` | **the six findings he approved on 2026-09-11 - 1, 4, 5, 8, 10 and 12; 7 is rejected, `D29`.** The plan's answer table says what each yes takes. Two of them, 1 and 8, edit the release `publish` job, and **only a run proves that job**: after the merge, `3.1.0-beta.1` is dispatched from `main` and its run is the proof. Finding 1 first needs the org checked for an OIDC connection - a login-only fact |
 
 **Why CORS is the one to take even if the rest slips.** `Program.cs` always registers the policy and every
 core endpoint requires it, the origins come from an optional `Cors.json`, and with none present the fallback
@@ -97,6 +101,16 @@ land before that gap is closed.
 
 **Nothing here goes in `shared-image-tests.yml`.** The release calls that file whole and takes no inputs, so a
 step added there is a step every release pays for.
+
+## The docs site
+
+| Plan | The slice this release takes |
+|---|---|
+| `plans/sites/docs-current-at-root.md` | **The whole plan - the maintainer put it in on 2026-09-11.** One folder per major, the current one at the site root, the common layer gone, `v2.0.x` and `v2.1.x` merged. The gem and tooling half is a coding session; the folder moves are a site session. Everything in it is true before the tag except the `## v3.1.0` release-notes section, which names a date and a link that exist only after the run - that one edit is in `post-release-v3.1.0.md` |
+
+**Why it rides in a UI release.** The old scheme opens a `v3.1.x` folder the day after the tag and moves every
+indexed URL with it. Doing that once more and then restructuring would move the URLs twice. Landing the plan
+first means 3.1.0 is the first minor that moves none.
 
 ---
 
@@ -143,6 +157,73 @@ pull request, so the only thing left in it was this same half, and it now lives 
 
 ---
 
+## Before the tag
+
+**Three stages, in the order the maintainer set on 2026-09-11: finish the features, then the changelog and
+the docs, then the rest.** Each step needs the one above it. The release dispatches from `main` only, so the
+first stage happens on the branch and everything from the merge on happens on `main`.
+
+### Stage 1 - the features
+
+- [ ] **Row 5, the request panel, landed.** A session of its own, started from
+      `plans/api/packing-demo-next.md` item 3. The plan's *Done when* has the two checks.
+- [ ] **The six CI findings landed** - 1, 4, 5, 8, 10 and 12 in `plans/ci-cd/ci-open-questions.md`, each
+      ticked in that plan's *Done when*. Finding 1 starts with the org's Docker Hub settings: no OIDC
+      connection, no finding 1. **What lands here is the workflow edit only** - the `publish` half is proved
+      by the beta in stage 3, not by anything on the branch.
+- [ ] `just test all` passes, and `just openapi check-all-copies` passes.
+
+### Stage 2 - the changelog and the docs
+
+- [ ] The `## [Unreleased]` section describes the whole release and nothing that did not ship - row 5 and
+      the CI work included. **By eye.** Read it top to bottom against the rows above.
+- [ ] No line reads as a contract change. *(chosen by an agent - strike it)* The Internal Work line saying
+      the health check payload "lists features by type now, not by key" reads as one. It is not: the
+      `Features` array is the same list of names it was, and the type filter is internal to `InstanceOptions`.
+      In a minor release that sentence sends a reader looking for a break that is not there. Cut the clause.
+- [ ] `.agents/docs/` says what the tree now does. The `verified:` and `check:` of every doc whose paths the
+      release touched are current: `docs/api/modules/ui.md`, `docs/ci-cd/*.md`, `docs/packages/*.md`.
+      **By eye** - `git log --stat main..HEAD` lists the paths; each doc's `paths:` says which one owns it.
+      **The docs site restructure is its own row above and can land in this stage.** Only the `## v3.1.0`
+      release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
+
+### Stage 3 - the rest
+
+- [ ] Both bundles are rebuilt from the current sources and the rebuilt output is in the tree.
+      `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, then
+      `git status` shows nothing new under `api/src/Binacle.Net.UIModule/wwwroot/`.
+- [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
+      first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
+      red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.
+- [ ] Merged.
+- [ ] **`3.1.0-beta.1` dispatched from `main`, run green.** This is what proves findings 1 and 8 - the
+      changed `publish` job runs for real, signs on `refs/heads/main`, and copies to Docker Hub under its own
+      immutable tag. The `page` job skips on the hyphen. Then, against the published beta:
+      `just image verify 3.1.0-beta.1` passes, `just smoke all binacle/binacle-net:3.1.0-beta.1` is green,
+      and the four UI pages open from it with `UI_MODULE=True` - on `/packing`: pick `Best`, read the winner
+      off the row, randomize to `02-packs-nowhere` and open the unpacked list, and the request panel prints
+      a call that answers when pasted. **A red run here is the cheap place to find out** - fix on `main`,
+      dispatch `beta.2`.
+      **The beta lands in `binacle/binacle-net` and stays** - `D27` says a published version is never
+      deleted, and the staging repository that would take it instead is still an idea.
+- [ ] `Deploy Demo Site` dispatched from `main` and green, and `demo.binacle.net/packing` packs with `Best`.
+      **Safe before the real image** - the v3.0.0 image already serves `pack/compare-bins`, `Best` and
+      `algorithmUsed` on v4, read off the committed `v3.0.x` swagger copy on 2026-09-11. It is also the
+      first time the v4 client runs against the public API.
+- [ ] `## [Unreleased]` is `## [3.1.0] - <date>` on `main`. **The last edit before the tag.**
+      `just changelog check 3.1.0` passes, and `just changelog extract 3.1.0` prints what will be the release
+      body. Read it once.
+- [ ] Actions -> Build and Release Docker Image -> Run workflow, on `main`, version `3.1.0`. Everything after
+      the dispatch is automatic: gate, tests, build, smoke on staging, copy to Docker Hub under `3.1.0`,
+      `3.1`, `3` and `latest`, signature, the GitHub release built from the `3.1.0` section, the tag, and the
+      Docker Hub page. Watch the run, then open `post-release-v3.1.0.md`.
+
+**`3.1` and `3` are new tags and `latest` moves.** `3.0` keeps pointing at `3.0.0` and every sample and README still
+names it until the post-release pin move - which is deliberate: a pin on `main` must name an image that
+already exists, so the pin follows the publish and never precedes it.
+
+---
+
 ## Done when
 
 - [ ] `CHANGELOG.md` has an `## [Unreleased]` section describing this release.
@@ -150,6 +231,16 @@ pull request, so the only thing left in it was this same half, and it now lives 
       below is in it, because the section has to describe the whole release and not the part that landed first.
 - [ ] Every row above is either ticked with a date, or moved out of this file with a reason.
       **By eye.** A row that is neither is the state this file exists to refuse.
+- [ ] Every box under *Before the tag* is ticked, in order, and the `3.1.0` run is green.
+      **By eye**, and the release page at `github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0` exists.
+- [ ] Row 5 is in: the request panel prints the call that was sent, against the host the page is served from.
+      **By eye.** Open the packing page on a running container, submit, paste what the panel prints into a
+      terminal. It answers.
+- [ ] The docs site renders the current line at the root, with no `v3.1.x` folder opened.
+      Every box in `plans/sites/docs-current-at-root.md` *Done when* is ticked except the release-notes one,
+      and `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`.
+- [ ] The six CI findings are in and the seventh is recorded.
+      `grep -c '^- \[x\]' .agents/plans/ci-cd/ci-open-questions.md` returns 13 - every box in that plan.
 - [x] **2026-09-10.** The demo bundles the client, and no chunk is published that nothing loads.
       `ls api/src/Binacle.Net.UIModule/wwwroot/js` lists no `binacle-net-client*` file, because both hosts
       list their chunks by hand and the client rides in the `binacle-net-ui` chunk.
@@ -160,12 +251,8 @@ pull request, so the only thing left in it was this same half, and it now lives 
       rebuilt.
 - [x] **2026-09-11, confirmed by the maintainer.** A partial result names the items it could not fit, and the result row keeps its height.
       **By eye.** Randomize to `02-packs-nowhere` and reach the unpacked items from the row without the row
-      growing. Hover, touch and keyboard all reach it.
-      **Half done 2026-09-10.** On the UI module, **hover is confirmed by eye** - the panel floats above the
-      row and the row keeps its height. Two things left there: tab to the button, and a touch device. Both
-      ride on the `:focus-within` rule in `_sass/_components.scss`, because beercss reveals a tooltip on
-      hover alone; if either fails, that rule is what is wrong. **The demo site has none of it yet** - the
-      markup and the two style rules are specced in the plan for a site session.
+      growing. Hover, touch and keyboard all reach it. Both hosts - `grep -c hasUnpackedItems` returns 1 on
+      `sites/demo/pages/packing.html` and 1 on `api/src/Binacle.Net.UIModule/Pages/Packing.cshtml`.
 - [x] **2026-09-10.** The demo offers `Best`, and it is not confusable with `Best Fit Decreasing`.
       **By eye** in the algorithm dropdown. Two entries a visitor cannot tell apart is the failure here.
 - [x] **2026-09-10.** Every result says which algorithm actually ran, by name and not by code.
