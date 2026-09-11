@@ -1,17 +1,17 @@
 ---
 title: API
 description: >-
-  The two API versions in Binacle.Net v3.x: V3, which is stable and recommended, and V4, which is
+  The two API versions in Binacle.Net: V3, which is stable and recommended, and V4, which is
   experimental. V2 was removed in v3.0.0.
 nav:
   order: 5
   icon: 📡
 ---
 
-Two API versions are available in {{ page.version }}.
+Two API versions are available in {{ page.version_label }}.
 
 **API v2 was removed in v3.0.0.** If you still call it, see the
-[v2.1.x documentation]({{ '/version/v2.1.x/' | relative_url }}) for the old contract and the
+[v2.x documentation]({% vlink v2.x /index.md %}) for the old contract and the
 [Release Notes]({% vlink release-notes.md %}) for how to move off it.
 
 ## Prerequisites

@@ -1,7 +1,7 @@
 ---
 title: API
 description: >-
-  The three API versions in Binacle.Net v1.3.x: V1, fitting only and deprecated, V2, which adds packing, and V3,
+  The three API versions in Binacle.Net: V1, fitting only and deprecated, V2, which adds packing, and V3,
   experimental.
 nav:
   order: 5

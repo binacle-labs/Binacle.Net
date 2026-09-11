@@ -1,7 +1,7 @@
 ---
 title: Configuration
 description: >-
-  How Binacle.Net v1.3.x is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
+  How Binacle.Net is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
   modules each need.
 nav:
   order: 6
@@ -11,7 +11,7 @@ nav:
 Binacle.Net is designed for flexibility, allowing you to enable only the features you need. Most functionality is
 provided through modules, each with its own requirements, configuration options, and dependencies.
 
-This guide covers the configuration system for {{ page.version }} version.
+This guide covers the configuration system for {{ page.version_label }} version.
 
 Make sure to read [Configuration Basics]({% link _common_pages/configuration-basics.md %}) first then proceed with the
 specifics for this version.

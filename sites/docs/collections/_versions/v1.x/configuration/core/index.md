@@ -1,7 +1,7 @@
 ---
 title: Core
 description: >-
-  The Core module in Binacle.Net v1.3.x: presets, Swagger UI, and the configuration files under
+  The Core module in Binacle.Net: presets, Swagger UI, and the configuration files under
   /app/Config_Files, with the defaults for each.
 nav:
   parent: Configuration

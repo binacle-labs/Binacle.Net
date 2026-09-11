@@ -2,7 +2,7 @@
 title: Users API
 menu_title: Users
 description: >-
-  The User Management API in Binacle.Net v1.3.x, available once the Service Module is on. Auth tokens, admin-
+  The User Management API in Binacle.Net, available once the Service Module is on. Auth tokens, admin-
   only management, and the rules.
 nav:
   parent: API

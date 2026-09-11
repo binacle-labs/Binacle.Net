@@ -1,7 +1,7 @@
 ---
 title: Packing Logs
 description: >-
-  Record fit and pack requests as NDJSON in Binacle.Net v1.3.x, so you can see which bin sizes and which
+  Record fit and pack requests as NDJSON in Binacle.Net, so you can see which bin sizes and which
   functions your callers use most.
 nav:
   parent: Diagnostics Module

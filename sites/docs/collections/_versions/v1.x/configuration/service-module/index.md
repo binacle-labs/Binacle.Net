@@ -1,7 +1,7 @@
 ---
 title: Service Module
 description: >-
-  The Service Module in Binacle.Net v1.3.x adds rate limiting, user management and JWT authentication. It is off
+  The Service Module in Binacle.Net adds rate limiting, user management and JWT authentication. It is off
   by default.
 nav:
   parent: Configuration
@@ -19,12 +19,12 @@ Authenticated users can bypass rate limits, ensuring seamless access to API endp
 > This module is disabled by default.
 {: .block-note}
 
-> ⚠️ **{{ page.version }} is the last version with public Service Module documentation.**
+> ⚠️ **{{ page.version_label }} is the last version with public Service Module documentation.**
 >
 > The module was rebuilt in v2.0.0 and its public documentation was withdrawn from that release onward. These
-> pages describe {{ page.version }} and are not a guide to any later version. From v2.0.0 the module is also
+> pages describe {{ page.version_label }} and are not a guide to any later version. From v2.0.0 the module is also
 > exempt from the usual versioning rules - a breaking change to it does not force a major version increment.
-> The [v2.0.x Service Module page]({{ '/version/v2.0.x/configuration/service-module/' | relative_url }})
+> The [v2.x Service Module page]({% vlink v2.x /configuration/service-module/index.md %})
 > explains the reasoning.
 {: .block-warning}
 

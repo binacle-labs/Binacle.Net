@@ -1,7 +1,7 @@
 ---
 title: Samples
 description: >-
-  Sample configurations for running Binacle.Net v1.3.x with Docker Compose: a minimal setup, a full deployment,
+  Sample configurations for running Binacle.Net with Docker Compose: a minimal setup, a full deployment,
   or the UI Module only.
 nav:
   order: 20

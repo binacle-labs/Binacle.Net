@@ -12,7 +12,7 @@ Two pieces, both keyed on the version the page belongs to.
 | Surface | Does |
 |---|---|
 | the generator | decides the url of every file under `_versions/`; stamps `version`, `version_tag`, `title_suffix`, `robots` and `version_urls`; fails the build on two files at one url; prints the pages the previous version had that the current one lacks |
-| `{% vlink /path %}` | links to a file inside the current page's version |
+| `{% vlink /path %}` | links to a file inside the current page's version, or inside the version named first |
 
 ## 🚀 Quick start
 
@@ -115,11 +115,14 @@ versions.
 ```liquid
 {% vlink /swagger/v3.json %}
 {% vlink /swagger/{{ page.swagger }}.json %}
+{% vlink v2.x /configuration/service-module/index.md %}
 ```
 
 The path is resolved inside `_versions/<the page's version>/`, against documents and static files alike, and
-comes back as a url. Liquid inside the argument is rendered first, so a page can build the path from its own
-front matter. A path that resolves to nothing fails the build rather than writing a link to a 404.
+comes back as a url. A first word that is a version id in `versions.yml` picks that version's folder instead -
+the way a page links its counterpart in another line without knowing where that line renders. Liquid inside
+the argument is rendered first, so a page can build the path from its own front matter. A path that resolves
+to nothing fails the build rather than writing a link to a 404.
 
 ## ⚠️ Gotchas
 
