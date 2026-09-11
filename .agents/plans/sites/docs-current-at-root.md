@@ -1,7 +1,7 @@
 ---
 description: The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL.
 state: ready
-waits-on: "nothing - the maintainer said yes on 2026-09-11 and put it in the v3.1.0 release set"
+waits-on: "the docs deploy - everything on the branch landed 2026-09-12; what is open needs the deployed site (the redirect curls, the selector click, the 301 flip), the release (the major tag manifest), or the maintainer's word on two questions under Open"
 horizon: now
 paths:
   - "sites/docs/**"
@@ -267,13 +267,33 @@ while the moves are still being checked.
 
 ### The agent docs
 
-- [ ] **15 - any session.** `docs/sites/docs.md`: the "one folder per minor" section, the "when a new line
+- [x] **15 - any session.** `docs/sites/docs.md`: the "one folder per minor" section, the "when a new line
       opens" rule, the common-page rule and the `current` table are rewritten to what the tree now does. The
       new-line rule becomes a new-major rule: copy the folder, remove what the major removed, print the
       removed-page list, write the redirects, give the closed line its `url_segment:`, move `current:`.
       `design/sites/decisions.md`: one entry with the reasoning under *Why* above, and the pages read on
       2026-09-11 as the evidence. The doc that describes `openapi.just`: it reads `current:` now.
-      **By eye** - the last *Done when* box.
+      **By eye** - the last *Done when* box. Done 2026-09-12: `docs/sites/docs.md` rewritten (content
+      structure, no common layer, the four keys, the new-major rule), `S11` in the sites ledger with the
+      per-minor argument as the history it now is, `docs/tooling/README.md` since step 2, the gem README and
+      `docs/ruby/README.md` step by step.
+
+### Open - the maintainer's
+
+- [ ] **Is `version.html` still needed?** It is the one page left in `_common_pages/`, at `/version/`, listing
+      the lines - and the selector on every page lists the same lines, on every page, landing on the same page.
+      If it goes: the `common_pages` collection and its `defaults` block go with it, `pages.xml` covers
+      `404.html` alone, the `📚 Versions` entry on `v3.x/index.md` and the link on `generate-a-client.md` go, and
+      `/version/*` gets a redirect line to `/`. If it stays, nothing changes. The maintainer raised it on
+      2026-09-12; his call.
+      `ls sites/docs/collections/_common_pages/` prints nothing or `version.html`, and the plan says which.
+- [ ] **Does the sidebar still need the "Latest Version Docs" button?** Two places show it: the plain sidebar
+      (on `/version/` and `404.html`) always, and the versioned sidebar on a page of a closed line. The logo
+      and title above it already link the current line's index, and the selector's `(current)` option lands on
+      the same page in the current line - so the button is a third way to the same place. If it goes, both
+      includes lose it and `_data/sidebar.yml` loses `latest_version_link_text`. The maintainer raised it on
+      2026-09-12; his call.
+      `grep -rn latest_version_link_text sites/docs` returns nothing, or the plan says it stays.
 
 ### After the first deploy
 
@@ -368,6 +388,6 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
       the release.
       `grep -n 'pattern={{major}}' .github/workflows/release-docker-image.yml` matches, and after the next release
       `docker manifest inspect binacle/binacle-net:3` succeeds.
-- [ ] The agent docs say what the tree does.
+- [x] **2026-09-12.** The agent docs say what the tree does.
       **By eye.** `docs/sites/docs.md` has no "per minor" and no "when a new line opens"; its `verified:` is
       the day it was checked; `design/sites/decisions.md` has the entry.

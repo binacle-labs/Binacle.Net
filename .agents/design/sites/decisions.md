@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
-description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate.
-verified: 2026-08-31
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder and the shared pages, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui
+description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate.
+verified: 2026-09-12
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major, no permalink line and no _common_pages page but version.html, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -148,3 +148,56 @@ code this repository does not build.
 
 **What would reopen it:** wanting to debug a live stylesheet against its source. The answer then is a
 development build, not shipping the map.
+
+### S11 - one folder per major, the current line at the site root, no common layer
+
+**Set by the maintainer on 2026-09-11 and 2026-09-12; landed 2026-09-12** across `ruby/binacle-docs-versions`
+and `sites/docs`. Three rules replaced the old scheme: one folder per major (`v1.x`, `v2.x`, `v3.x`); the
+folder named by `current` renders with no prefix and every other under `/version/<url_segment>/`; no page
+renders once for every version.
+
+**What it replaced, and why that was wrong.** Until 2026-09-12 every minor opened a new folder
+(`v3.0.x`, then `v3.1.x`), rendered at `/version/<folder>/`, and six pages sat outside the versions as
+"common" because the root had to hold something. The per-minor argument was that the API set changes at
+minors (v1.2.0 added V3) so a folder must answer "what does my image do". It does - but semver says a minor
+only adds, so a reader on 3.0 who sees a 3.1 page sees something their image does not have yet, never
+something it lost, and an "added in 3.1.0" note says which. The cost of per-minor was paid at every release:
+a minor copied 52 files, rewrote 18 permalinks, added a config block, and **moved every indexed URL** -
+`current` moved, every URL search had ranked went `noindex`, and a set it had never seen went live. Landing
+this before 3.1.0 made it the first minor that moved none.
+
+**The common pages were not common - read on 2026-09-11.** `core-concepts` listed three algorithms and V4
+has four (`Best`). `generate-a-client` named `v4.json`, `packCustomBin`, `Algorithm.Best` and "V4 is
+experimental". `configuration-basics` named `/app/Config_Files`, `.Production.json` and the
+`_CONNECTION_STRING` fallback. Only `integration-guide` was advice that survives any version. ViPaq had shown
+it first: its common page had been stripped, category by category - codec, base64, integer widths, header,
+body layout, then "experimental", when v3.0.0 made ViPaq stable and the shared page kept saying experimental
+to a v3 reader - until it said nothing. A page that is true for every version lives in the current folder and
+is copied forward with it; the six moved in with their content merged from the `v3.0.0` tag and the working
+tree, and `generate-a-client`, written after the tag, into `v3.x` alone.
+
+**A closed line is named by what it shipped last, not by its folder - 2026-09-12.** The maintainer's first
+call was to leave the old URLs (`/version/v1.3.x/`) untouched; the second, the one that stands, is that a
+closed line renders at the highest version it produced, `/version/1.3.0/`, and the selector says `v1.3.0`.
+So every `versions.yml` entry carries four keys, nothing derived and the build stopping on a missing one:
+`id` (the folder, never in a URL), `url_segment` (`1.3.0`), `label` (`v1.3.0`), `version_tag` (what docker
+pulls - `1.3.0` for a closed line, a moving tag for the current one). The old URLs redirect through a
+`_redirects` file Cloudflare reads, **302 until each has been checked on the deployed site, then 301** - a
+browser caches a 301 and a wrong one cannot be taken back.
+
+**Descriptions name no version - 2026-09-12.** Sixty-four of them said "Binacle.Net v2.x" or "for v1.3.x".
+Front matter cannot read the label (`jekyll-page-meta` strips Liquid from it), a folder name is not what a
+reader should see, and a written version would need editing at every release; the title suffix and the URL
+carry the version, so the description does not. Prose writes `{{ page.version_label }}`.
+
+**The gem is the only place a URL is decided.** Sixty-one hand-written `permalink:` lines went; a
+`permalink` a page writes is overwritten. Static files needed a `StaticFile` subclass with a settable url,
+because Jekyll's own reads the collection template and ignores data - and, measured on the way,
+`site.documents` does include a collection's static files, which the plan had said it did not. The seven
+swagger pages moved from `swagger/v4.html` to `swagger/v4/` for one URL shape; each old `.html` URL has an
+exact redirect line. `{% vlink v2.x /path %}` links another line by file, so a cross-line link fails the build
+rather than 404.
+
+**What would reopen it:** a major that removes pages from the root - the gem prints the removed-page list at
+build for exactly that day - or a minor that turns out to change what an existing page says rather than add
+to it, which semver says does not happen.

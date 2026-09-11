@@ -106,7 +106,7 @@ step added there is a step every release pays for.
 
 | Plan | The slice this release takes |
 |---|---|
-| `plans/sites/docs-current-at-root.md` | **The whole plan - the maintainer put it in on 2026-09-11.** One folder per major, the current one at the site root, the common layer gone, `v2.0.x` and `v2.1.x` merged. The gem and tooling half is a coding session; the folder moves are a site session. Everything in it is true before the tag except the `## v3.1.0` release-notes section, which names a date and a link that exist only after the run - that one edit is in `post-release-v3.1.0.md` |
+| `plans/sites/docs-current-at-root.md` | **The whole plan - the maintainer put it in on 2026-09-11. Landed on the branch 2026-09-12**, steps 1-15 of 16. One folder per major, the current one at the site root, the common layer gone, `v2.0.x` and `v2.1.x` merged into `v2.x`, closed lines at `/version/1.3.0/` and `/version/2.1.1/`. Open in the plan: the deployed-site checks, the 302→301 flip after them, and two questions for the maintainer (`version.html`, the sidebar button). The `## v3.1.0` release-notes section and the `versions.yml` bump are in `post-release-v3.1.0.md` |
 | no plan - two lines, a site session | **`sites/README.md:40-41` names `Deploy Docs Site`, `Deploy Demo Site` and `Deploy WWW Site`**, three workflows that no longer exist - finding 5 folded them into `deploy-site.yml` with the site chosen at dispatch, 2026-09-12. A coding session may not touch `sites/`; whichever site session comes first rewrites those two lines to name `Deploy Site` and its `site` choice |
 
 **Why it rides in a UI release.** The old scheme opens a `v3.1.x` folder the day after the tag and moves every

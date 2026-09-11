@@ -2,7 +2,7 @@
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
 verified: 2026-09-12
-check: Collections, versions, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/; `current` and `list` in sites/docs/_data/versions.yml match the folders and the order the sidebar renders; the common-page rule matches what is actually on collections/_common_pages/; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; a built artifacts/docs still has `noindex, follow` on every non-current version page, none on the current one, and no sitemap listing a `noindex` URL; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
+check: Collections, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/ - one folder per major, named vN.x; every folder has an entry in sites/docs/_data/versions.yml carrying id, url_segment, label and version_tag, in the order the sidebar renders; collections/_common_pages/ holds version.html alone and pages/ holds 404.html and robots.txt alone; no file under collections/_versions/ carries a permalink; a built artifacts/docs renders the current folder at the root and every other under /version/<url_segment>/, has `noindex, follow` on every non-current version page and none on a root page, no sitemap listing a `noindex` URL, and a _redirects file at its root; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
 paths:
   - "sites/docs/**"
 ---
@@ -26,58 +26,39 @@ just build docs   # the same site built once, into artifacts/docs
 
 | Path | What it is |
 |---|---|
-| `collections/_versions/` | Versioned docs — each subfolder is a version |
-| `collections/_common_pages/` | Pages shared across all versions |
-| `pages/` | Top-level pages (index, 404, robots.txt) |
+| `collections/_versions/` | Every page. One folder per major line - `v1.x`, `v2.x`, `v3.x` |
+| `collections/_common_pages/` | `version.html` alone - the list of lines at `/version/` |
+| `pages/` | `404.html` and `robots.txt` |
+| `_data/versions.yml` | The one knob: which folder is current, and the four keys of every folder |
+| `_redirects` | Every old URL and where it went. Cloudflare reads it from the output root |
 
-Versioned docs are served at `/version/:path/`. See "Versioning model" below.
+The current folder renders at the site root; every other folder under `/version/<url_segment>/`. See
+"Versioning model" below.
 
-### What may go on a common page {#common-page-rule}
+### No common layer {#common-page-rule}
 
-A `_common_pages/` page renders **once**, at `/<name>/`, and every version's reader sees that one copy. So it
-carries only what is true for **all** of them: what a thing is, why it exists, and advice that does not turn on
-the version. Anything that varies goes on the versioned page and is linked to.
+**Every page belongs to a line.** There is no page that renders once for every version. A page that is true
+for every version - what an algorithm does, how configuration files are laid out - lives in the current folder
+and is copied forward with it at the next major, like every other page. The six pages that used to sit outside
+the versions moved in on 2026-09-12; the ledger entry `$sites/decisions#S11` holds why, with what each of them
+had quietly come to say.
 
-**Never on a common page**, using the ViPaq pair as the worked example — these are the categories that have
-already gone wrong or are reserved for change:
-
-- The compression codec, or that compression happens at all.
-- Base64, or any statement about the stored or text form.
-- Integer encoding — fixed widths, width codes, "variable length encoding".
-- The header, its size, or any byte or bit layout.
-- Structure diagrams, field order, or the body layouts.
-- **Whether a feature is experimental or stable.** ViPaq was experimental through v2.1.1 and is stable from
-  v3.0.0, so the claim is version-varying like any other. Added 2026-08-07, when that flip left the general
-  ViPaq page saying "experimental" to a v3.0.0 reader.
-- A real config key, an endpoint path, or an API version number.
-- Comparative performance claims — they describe an implementation, and implementations change.
-
-`configuration-basics.md` is the model to copy: it teaches the mechanism with entirely invented names
-(`AModule`, `Settings__Logs__Retention`), so it has nothing to go stale, and it defers on the specifics.
-
-**One exception, and it is forced rather than chosen.** `generate-a-client.md` names a version and an
-endpoint path, because the commands on it fetch a published OpenAPI document and there is no version-free URL
-to fetch. `/version/latest/` is a meta-refresh page, not a folder: `/version/latest/swagger/v3.json` returns
-404 while `/version/v3.0.x/swagger/v3.json` returns 200 - measured 2026-09-04. The page renders the version
-through `{{ site.data.versions.current }}`, so it moves with the site rather than being typed, and it tells
-the reader to swap the segment. **A page that has to name a real file is not the same as a page that names a
-version out of habit.**
-
-Two mechanical notes for a common page that needs to point at a versioned one. It has no `version` in its front
-matter, so **`vlink` cannot be used** — build the URL from `site.data.versions.current` instead, the same way
-`_layouts/redirect.html` and `_includes/sidebar.html` do, and it follows `current` with no edit. And never
-hardcode a version or `latest` in prose or a command without saying what it tracks.
+**Two consequences for a page in a version folder.** It may name real config keys, endpoint paths, API versions
+and whether a feature is experimental - the folder says which release those hold for. And it links another page
+with `{% vlink %}`, never with `{% link %}` into some shared place, because there is none.
 
 ## Page metadata
 
-**Every page carries a written `description`** in its front matter - all 118, every version line included.
+**Every page carries a written `description`** in its front matter - all 96 under `_versions/`, every line
+included - and **no description names a version**; see below.
 `jekyll-page-meta` still falls back to the excerpt and then the site description, cut at 160 characters,
 which severs mid-word; that fallback is a safety net for a page that forgets, not the mechanism.
 
 **`seo_title` overrides the composed title verbatim.** The composed form is
-`<title> (<version>) - <site.title>`, where the version half is the `title_suffix` that
-`binacle-docs-versions` stamps; a page that sets `seo_title` gets exactly that string and **nothing is
-appended**, so a page using it writes its own suffix.
+`<title> (<label>) - <site.title>` on a closed line and `<title> - <site.title>` on the current one; the
+version half is the `title_suffix` that `binacle-docs-versions` stamps, and it stamps none on the current
+line because its URL carries no version. A page that sets `seo_title` gets exactly that string and
+**nothing is appended**, so a page using it writes its own suffix. `v3.x/index.md` does, for the root.
 
 **Nav labels and breadcrumbs use `menu_title` where a page sets one**, falling back to `title`
 (`_includes/versions/menu.html`, and the `title_from` list in the site's `breadcrumbs:` config). It exists
@@ -87,15 +68,35 @@ sample pages named `Minimal` under different parents read fine in a tree and col
 
 ## Versioning model
 
-**Every folder is a version; there is no moving folder.** Folders are `vMAJOR.MINOR.x` — one per minor line
-(`v1.x`, `v2.0.x`, `v2.1.x`, `v3.x`). The current line is edited in place; when a new line opens, its folder
-is copied and the old one is never touched again. `/version/latest/` survives only as a **redirect** to
-`current`, holding no content.
+**One folder per major, and the current one renders at the root.** Folders are `vMAJOR.x` - `v1.x`, `v2.x`,
+`v3.x`. A minor edits the current folder in place: it appends to the release-notes page and edits or adds
+pages, with an "added in 3.1.0" note where a reader on an older patch needs one. Semver says a minor only adds,
+so a reader never sees something their image lost, only something it does not have yet. A major copies the
+folder; the old one is never touched again. The reasoning is `$sites/decisions#S11`.
 
-**The one knob:** `current` in `sites/docs/_data/versions.yml` says which folder is current, where the
-`latest` redirect points, and which folder search engines may index. One edit per new line. That file also
-carries `list`, the rendered version order — newest first, because the order is read from the file rather
-than sorted.
+**Nothing in a folder says where it renders.** `binacle-docs-versions` decides every URL from
+`_data/versions.yml`, static files included, and overwrites any `permalink` a page writes. The folder named by
+`current` renders with no prefix - `/quick-start/`, `/swagger/v4.json`; every other folder renders at
+`/version/<url_segment>/…`.
+
+**Every folder has one entry in `_data/versions.yml`, and every entry carries four keys.** The build stops on
+a folder with no entry or an entry missing one:
+
+| Key | Is | `v3.x` today | `v2.x` |
+|---|---|---|---|
+| `id` | the folder. Never in a URL | `v3.x` | `v2.x` |
+| `url_segment` | where a closed line renders: the highest version shipped, unused while current | `3.0.0` | `2.1.1` |
+| `label` | what the selector and every page call the line | `v3.0.0` | `v2.1.1` |
+| `version_tag` | what docker pulls - a closed line's newest patch, the current line's moving tag | `3.0` | `2.1.1` |
+
+`current` is the one knob: it names the folder at the root, the line search engines may index, and the line
+the selector marks. `list` is the rendered order - newest first, because it is read from the file rather than
+sorted. A release edits the current entry's `label` (and `url_segment`, for the day it closes); nothing else.
+
+**The gem also stamps what templates read.** On every page: `version` (the folder), `version_label`,
+`version_tag`, and `version_urls` - this page's URL in every other line, or that line's index where the page is
+missing, which is what the selector's options carry. On every list entry: `url`, the line's index URL. No
+template builds a `/version/` URL by hand, and a `grep -rn "'/version/'" sites/docs` finding one is a bug.
 
 ### What `current` decides about search {#search-and-current}
 
@@ -106,30 +107,20 @@ Everything below reads `current`; nothing names a version.
 | `<meta name="robots">` | none | `noindex, follow` |
 | Listed in a sitemap | yes | no |
 
-- **Neither value is written by a layout any more.** `binacle-docs-versions` stamps `robots` and
-  `title_suffix` onto every versioned document at a high priority, and `{% page_meta %}` writes them out —
-  `Quick Start (v3.0.x) - Binacle.Net Docs` — so a versioned page cannot collide with the same page at the
-  site root or with another version of itself. `_layouts/versions/swagger.html` calls the same tag.
+- **Neither value is written by a layout.** `binacle-docs-versions` stamps `robots` and `title_suffix` onto
+  every page of a closed line at a high priority, and `{% page_meta %}` writes them out —
+  `Quick Start (v2.1.1) - Binacle.Net Docs` — so an old page cannot collide with the same page at the root.
+  The current line gets neither. `_layouts/versions/swagger.html` calls the same tag.
 - **The sitemaps are generated, not written.** `jekyll-multi-sitemap` reads the `sitemaps:` block in
   `_config.yml`: `version-current.xml` selects the `versions` collection where `version` matches
-  `site.data.versions.current`, and `pages.xml` covers `pages/` and `_common_pages/`. Both are served under
-  `/sitemap/`, with an index over them at `/sitemap.xml`.
+  `site.data.versions.current` - root URLs only - and `pages.xml` covers `pages/` and `_common_pages/`, which
+  is `/version/` and `/404.html`. Both are served under `/sitemap/`, with an index over them at `/sitemap.xml`.
 - Swagger pages are `noindex, nofollow` in every version, current included. A `**/swagger/**` defaults block
   in `_config.yml` sets that `robots` value in page data, where the stamp leaves it alone, and keeps them out
   of the sitemap. A submitted `noindex` URL is a Search Console error.
 - `robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for the `Sitemap:` line, which
   emits the index alone, so no
   version-agnostic edit is needed there either.
-
-**Why per-minor, not per-major.** A folder answers "what does my image do", and the API set is what changes:
-versions are **added at minors** (v1.2.0 added API v3) and **removed at majors** (v2.0.0 removed v1, v3.0.0
-removes v2). Per-major would show a v3 to a v1.1.4 image that never had it. Per-minor also caught the swagger UI:
-`v2.0.x` has no `swagger/` while `v1.x`, `v2.1.x` and `v3.x` all do, so the folder tree records that it was
-there, went away, and came back — which a per-major tree could not have shown. Patches never move the docs
-(every patch pair in history is byte-identical across `sites/docs/`). This makes the freeze **structural** — an
-old folder is frozen because nothing edits it, not because someone remembered to snapshot it. That discipline
-is exactly what failed before: four releases (v2.0.0 → v2.1.1) shipped with no snapshot, and only one folder
-was ever authored.
 
 **A description names no version.** The title carries it as the suffix the gem stamps (`V3 (v2.1.1) -
 Binacle.Net Docs`) and the URL carries it too; a description that said "Binacle.Net v3.x" would have to change
@@ -145,20 +136,21 @@ writes `artifacts/openapi/Binacle.Net_v3.json` and `_v4.json`; they are copied i
 `swagger/v4.json`, so the rename is part of the copy. **Regenerate, never hand-edit** — a hand edit puts the
 published spec out of step with what the code serves, and the diff hides inside whatever else was edited.
 
-### When a new line opens (standing rule)
+### When a new major opens (standing rule)
 
-A line opens on every new **major** (`v3.x` → `v4.x`); a minor edits the current folder in place:
+A line opens on every new **major** (`v3.x` → `v4.x`) and never on a minor:
 
 1. `cp -r _versions/v3.x _versions/v4.x` — copy the folder the new line grows out of. Nothing inside names its
-   url; the gem decides every url from `_data/versions.yml`, so there is no permalink to rewrite.
-2. Rewrite `menu_title` and the descriptions that name the line.
-3. Add it to the top of `list` in `_data/versions.yml` with its `version_tag`, and point `current` at it (also
-   moves the `latest` redirect). Give the line that just closed a `url_segment` - the highest version it
-   shipped - and write its old urls into `_redirects`. The gem stamps `version` from the folder name and
-   `version_tag` from the list; a folder the list does not have fails the build. There is no per-folder block
-   in `_config.yml`.
-4. `bundle exec jekyll build` to confirm.
-5. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
+   URL, so there is no permalink to rewrite; fix `menu_title` on the index page.
+2. Remove from `v4.x` what the major removed. Then build once: the gem prints every page the previous folder
+   has that the current one lacks (`Docs versions: N pages in v3.x have no counterpart in v4.x`). That is the
+   redirect list.
+3. In `_data/versions.yml`: add the `v4.x` entry at the top of `list` with its four keys and point `current`
+   at it. The line that just closed keeps its entry; its `url_segment` is where it renders from now on.
+4. In `_redirects`: one line per removed page, from its old root URL to wherever it went. The pages that
+   survived need none - `/quick-start/` is still `/quick-start/`. A line's old URLs never move again.
+5. `bundle exec jekyll build` to confirm, and check every internal link resolves.
+6. Edit only the new folder. **Never touch an old one** — that is what keeps it true.
 
 **Watch out:**
 - `vlink` (`ruby/binacle-docs-versions`) **raises and fails the build** on a missing target. Removing a page
@@ -197,15 +189,13 @@ starting at its own version; **drop it and every breadcrumb on the site silently
 A page still turns its trail off with `breadcrumbs: false`, which now works everywhere rather than only on
 versioned pages.
 
-**The redirect layout is on `{% page_meta %}` like every other head**, since 24 Aug 2026.
-`_layouts/redirect.html` reads `page.redirect_to`, which `binacle-docs-versions` stamps from
-`versions.current`, for the script, the meta refresh and the visible link; the canonical comes from the same
-stamp. **Moving `versions.current` moves where `/version/latest/` goes and what it declares canonical**, and
-nothing in the layout needs editing.
+**`_layouts/redirect.html` has no page left.** It served `/version/latest/`, which went when the current line
+moved to the root - `/version/latest/*` is a line in `_redirects` now. The layout and the gem's
+`redirect_to`/`canonical` stamps are still there for a page that sets `layout: redirect`; none does.
 
-**vlink** (`{% vlink path %}`) — resolves a relative path to the correct versioned URL based on the
-current page's `version` front matter. Use it instead of plain links inside `_versions/` pages
-so links stay correct across versions.
+**vlink** (`{% vlink path %}`) — resolves a path inside the current page's version folder to the URL the gem
+gave that file; `{% vlink v2.x path %}` resolves it inside another line. Use it for every link inside
+`_versions/`; a missing target fails the build.
 
 ## JS and Vendor Libs
 
