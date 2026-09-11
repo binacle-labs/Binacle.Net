@@ -31,9 +31,9 @@ gate results:
 deploy-message commit:
     @tooling/ci/deploy-message.sh {{ quote(commit) }}
 
-# Tag a commit and push the tag
-push-tag tag commit:
-    @tooling/ci/push-tag.sh {{ quote(tag) }} {{ quote(commit) }}
+# Tag a commit through the API
+create-tag tag commit:
+    @tooling/ci/create-tag.sh {{ quote(tag) }} {{ quote(commit) }}
 
 # Write the deploy's run summary: commit, marker tag, site
 deploy-summary commit tag url:

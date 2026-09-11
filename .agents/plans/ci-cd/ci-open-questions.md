@@ -476,9 +476,11 @@ that needed a run got it on 2026-09-11:
       Done 2026-08-28. `just check scripts`, called by the lint job. Sixteen scripts, no errors.
 - [x] `push-tag.sh` sets no git identity.
       Done 2026-08-28. The three deploy marker tags still use it.
-- [ ] The `persist-credentials` question is answered either way.
-      **By eye.** Either every checkout that does not push carries `persist-credentials: false`, or a line in
-      the CI/CD decisions ledger says why not.
+- [x] **2026-09-11.** The `persist-credentials` question is answered either way.
+      `grep -c 'persist-credentials: false' .github/workflows/*.yml` sums to 22, one per checkout, and
+      `grep -rn 'git push' tooling/ci` returns nothing - the marker tag is `create-tag.sh`, through `gh api`.
+      `D30`. **The API call is unproved until a site deploys** - the demo deploy in the release set is the
+      first.
 - [ ] The three deploy workflows share one body, or a line says why they should not.
       **By eye.** Either `.github/workflows/shared-deploy-site.yml` exists and the three callers are under
       twenty lines each, or the decision to keep three copies is written down where the next reviewer meets it.

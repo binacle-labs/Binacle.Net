@@ -1,7 +1,7 @@
 ---
 id: ci-cd
 description: CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-09-09
+verified: 2026-09-11
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -112,7 +112,7 @@ its last job; the three deploy workflows create `docs-<run>`, `demo-<run>` and `
 deploy. **Nothing here is tag-triggered**, so a pushed tag starts nothing and the namespaces are a naming
 convention rather than a guard — see `$ci-cd/decisions#D1` for what that replaced.
 
-**The three marker tags are pushed after a successful deploy, not before it.** The tag exists so a live site maps
+**The three marker tags are created after a successful deploy, not before it.** The tag exists so a live site maps
 back to a commit; pushed first, it claims that of a deploy that then failed. Each deploy workflow is three jobs
 in that order — **site tests, build-and-deploy, then tag** — chained by `needs:`, which is the gate: a job with
 an unsatisfied `needs:` is skipped, so a failed suite never reaches the deploy and a failed deploy never
@@ -321,7 +321,7 @@ declared where a reader meets it.
 
 **The deploy is in the workflow, not in an action.** `build-jekyll-site` covers the part that is the same for
 every site and would drift if copied; deploying is one `uses:` of a vendor action, and wrapping it buys
-nothing. Two things it costs, though, and both matter more: the marker tag's `git push` is visible next to the
+nothing. Two things it costs, though, and both matter more: the marker tag's API call is visible next to the
 `contents: write` that allows it, and the host is named where you would look for it. Changing host is then an
 edit to one step in each of three workflows, not to the inside of something called "deploy site".
 
@@ -420,8 +420,11 @@ Actions UI: `binacle-net-docs` (https://docs.binacle.net), `binacle-net-demo` (h
 `deploy-web-site.yml` before it was ever dispatched and the www workflow is newer still, so for both of them
 neither the environment nor the Worker exists on either side yet.
 
-All three deploy workflows also push a marker tag after deploying, so a deployed site maps back to a commit.
+All three deploy workflows also create a marker tag after deploying, so a deployed site maps back to a commit.
 The workflow table above names each one.
+
+**Every checkout carries `persist-credentials: false`.** Nothing in CI runs `git push` - the marker tag goes
+through `gh api` with `GH_TOKEN` - so no job keeps a git credential past the checkout. `$ci-cd/decisions#D30`.
 
 ## What CI does not cover
 
