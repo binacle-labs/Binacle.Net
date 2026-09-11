@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: ready
-waits-on: "nobody - answered by the maintainer 2026-09-11. Findings 1, 4, 5, 8, 10 and 12 are approved, 7 is rejected. Finding 1 still needs the Docker Hub eligibility checked at the org, and finding 12 goes in narrowed to site files"
+waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first beta from main, which proves the publish job. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"

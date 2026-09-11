@@ -61,9 +61,9 @@ written before the clients have moved.
 |---|---|---|
 | 1 | plan landed and deleted | **The shipped UI calls v4.** `pack/compare-bins`, through `packages/binacle-net-client` - the component keeps every bin's result and lets the visitor click between them, so the single-bin endpoints do not cover it. **Landed `33a4dfcc`.** Both bundles rebuilt clean and the pages exercised 2026-09-10 |
 | 2 | no plan - release paperwork | **The `Best` algorithm, and the algorithm each result used.** `Best` is in the v4 enum and was unreachable from v3, so row 1 is what makes it offerable; `algorithmUsed` is on every v4 result and is rendered nowhere. **One feature, not two** - `Best` runs several heuristics and returns the winner, so without the display the visitor cannot tell what won. Both hosts' result rows. **Landed `a8050583`**, verified with the rebuild on 2026-09-10 |
-| 3 | `plans/api/packing-demo-next.md` | **item 1, the unpacked-items tooltip. Landed on both hosts - UI module 2026-09-10, demo site 2026-09-11.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away |
+| 3 | plan trimmed - the ledger has the reasoning | **The unpacked-items tooltip. Landed on both hosts - UI module 2026-09-10, demo site 2026-09-11.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away |
 | 4 | plan landed and deleted - the reasoning is `D6` in the API decisions ledger | **The whole plan. Landed 2026-09-10.** A `Kernel/Instance/` slice now holds what the instance reports about itself; `FeatureOptions` moved in as `InstanceOptions` with a closed value hierarchy, so the presets sit beside the switched-on features without being counted as one. `_js/instance.js`, its webpack entry and its script tag are gone, and with them the last v4 call made from a browser inside the image |
-| 5 | `plans/api/packing-demo-next.md` | **item 3, the request panel. In - the maintainer said so on 2026-09-11, and it gets a session of its own.** The plan carries five questions; the fourth, inside the component or in the Razor page around it, decides the cost and is answered first. The version question is answered by row 1 |
+| 5 | `plans/api/packing-demo-next.md` | **The request panel. In - the maintainer said so on 2026-09-11, and it gets a session of its own.** The plan carries four questions; the third, inside the component or in the Razor page around it, decides the cost and is answered first |
 
 **Row 4 deleted `_js/instance.js`.** The warning that used to stand here - not to edit its v4 call on the
 way past - is spent.
@@ -74,7 +74,7 @@ way past - is spent.
 
 | Plan | The slice this release takes |
 |---|---|
-| `plans/api/packing-demo-next.md` | **item 2, the submit button. Landed 2026-09-10.** `onSubmit` awaits the response and clears `submitting` in its own `finally` before dispatching `update-scene`, so the button no longer depends on a visualizer listening. The answer is written at the line it was taken |
+| plan trimmed - the ledger has the reasoning | **The submit button. Landed 2026-09-10.** `onSubmit` awaits the response and clears `submitting` in its own `finally` before dispatching `update-scene`, so the button no longer depends on a visualizer listening. The answer is written at the line it was taken |
 | plan landed and deleted | **The whole plan. Landed `9f277ef6` on 2026-09-10.** A 429 now says the caller has been rate limited and to wait; every other empty body says the server sent no details. The parse-failure wording is gone, because an unparseable body throws out of the client before it reaches that branch and lands in the `catch` in `getResults`. **It is a demo-site fix, not an image one** - the limiter is
 registered only by the Service Module, so an image running the shipped defaults never answers 429 |
 
@@ -167,7 +167,7 @@ first stage happens on the branch and everything from the merge on happens on `m
 ### Stage 1 - the features
 
 - [ ] **Row 5, the request panel, landed.** A session of its own, started from
-      `plans/api/packing-demo-next.md` item 3. The plan's *Done when* has the two checks.
+      `plans/api/packing-demo-next.md`, which now holds nothing else. Its *Done when* has the two checks.
 - [ ] **The six CI findings landed** - 1, 4, 5, 8, 10 and 12 in `plans/ci-cd/ci-open-questions.md`, each
       ticked in that plan's *Done when*. **What lands here is the workflow edit only** - the `publish` half
       is proved by the beta in stage 3, not by anything on the branch.
