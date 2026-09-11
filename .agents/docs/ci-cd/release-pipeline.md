@@ -1,7 +1,7 @@
 ---
 id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-09-04
+verified: 2026-09-12
 check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; the signature retry is the only inline run: | block in the file; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the release job makes the tag through gh release create --target and pushes none of its own; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
@@ -101,8 +101,8 @@ Job outputs: `staging` (the full `ghcr.io/...:tag` the smoke job pulls), `versio
 a maintainer runs by hand, rather than copying its steps, so the release path and a manual check are the same
 thing. See `$ci-cd` for that workflow's runner pin.
 
-**`publish`** — the only job that touches Docker Hub and the only place the stored Docker Hub credential is
-used. A `metadata-action` step computes the public tag set, and then **the copy happens in two halves with the
+**`publish`** — the only job that pushes to Docker Hub. It logs in with the run's OIDC token through the org's
+connection (`vars.DOCKERHUB_OIDC_CONNECTIONID`), so no stored registry credential exists in this job. A `metadata-action` step computes the public tag set, and then **the copy happens in two halves with the
 signature in between**:
 
 | Step | What it does |
