@@ -2,7 +2,7 @@
 title: Quick Start
 description: >-
   Run Binacle.Net with one Docker command, with Swagger UI, Scalar UI and the web UI switched on so you
-  can try it from a browser.
+  can try it from a browser, or deploy the same container to Azure, AWS, Google Cloud, Koyeb or Digital Ocean.
 nav:
   order: 1
   icon: 🚀
@@ -42,6 +42,22 @@ breaking change.
 - Swagger UI: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
 - Scalar UI: [http://localhost:8080/scalar/](http://localhost:8080/scalar/)
 - UI Module: [http://localhost:8080/](http://localhost:8080/)
+
+## ☁️ Run in the Cloud
+
+Binacle.Net is one container, so it runs on every platform that runs one. Pick by what you already use:
+
+| Deployment     | Best Use Case                                | Platform URL                                                                        |
+|----------------|----------------------------------------------|-------------------------------------------------------------------------------------|
+| Local (Docker) | Quick development, testing, demos            | [Docker](https://www.docker.com/)                                                   |
+| Azure          | Microsoft stack integration, scalable apps   | [Azure App Service](https://azure.microsoft.com/en-us/products/app-service/)        |
+| AWS            | Large-scale microservices, container scaling | [AWS ECS](https://aws.amazon.com/ecs/) / [Fargate](https://aws.amazon.com/fargate/) |
+| Google Cloud   | Serverless, efficient API deployment         | [Google Cloud Run](https://cloud.google.com/run)                                    |
+| Koyeb          | Simple, cost-effective small workloads       | [Koyeb](https://www.koyeb.com/)                                                     |
+| Digital Ocean  | Easy, affordable for SMB apps                | [Digital Ocean](https://www.digitalocean.com/products/app-platform/)                |
+
+Whatever the platform, pin the same tag as above and never `latest` - it follows the newest release, and a
+major release can bring breaking changes.
 
 ## ➡️ Where to go next
 

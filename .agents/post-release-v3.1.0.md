@@ -62,7 +62,11 @@ two lists are clear** - the third is plans, and plans outlive it.
 - [ ] The `v3.x` entry in `sites/docs/_data/versions.yml` says what the line has shipped: `label: v3.1.0`,
       `url_segment: 3.1.0`, `version_tag: "3"` (the major tag - it exists once this release publishes it, and
       then every page pulls with it and no later minor edits the line).
-      `grep -A3 'id: v3.x' sites/docs/_data/versions.yml` shows the three values.
+      `grep -A3 'id: v3.x' sites/docs/_data/versions.yml` shows the three values. Same commit: the sentence
+      under the `docker run` in `v3.x/quick-start.md` and in `v3.x/samples/index.md` says "the major tag", not
+      "the minor tag" - true only once the tag printed is `3`.
+      `grep -n 'minor tag' sites/docs/collections/_versions/v3.x/quick-start.md sites/docs/collections/_versions/v3.x/samples/index.md`
+      returns nothing.
 - [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Site` is dispatched with `docs` and green.
       `docs.binacle.net/release-notes/` shows 3.1.0 at the top, and `docs.binacle.net/version/v3.0.x/` answers
       `301` to `/`.

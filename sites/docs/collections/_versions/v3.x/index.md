@@ -23,6 +23,15 @@ see it work, start with the quick start.
 ## 🚀 [Quick Start]({% vlink /quick-start.md %})
 One `docker run`, then a request. Start here if you have not run it yet.
 
+## 🔍 [Core Concepts]({% vlink /core-concepts.md %})
+How the algorithms work, and which one to pick.
+
+## 🔧 [Configuration Basics]({% vlink /configuration-basics.md %})
+The files under `/app/Config_Files`, environment variable overrides, and which one wins.
+
+## 🧰 [Generate a Client]({% vlink /generate-a-client.md %})
+A typed client from the published OpenAPI documents - hey-api for TypeScript, Kiota for C#.
+
 ## 🛠️ [Release Notes]({% vlink release-notes.md %})
 See what's new in the {{ page.version_label }} version of Binacle.Net.
 
@@ -49,3 +58,9 @@ Customize Binacle.Net to suit your environment. Explore the following configurat
 
 ## 📦 [Samples]({% vlink /samples/index.md %})
 Docker Compose and Kubernetes setups to copy and edit, including one for running the API behind your own backend.
+
+## 🔗 [Integration Guide]({% vlink /integration-guide.md %})
+Wiring Binacle.Net into checkout: sizing products, choosing your bin set, calling the API.
+
+## 📚 [Versions]({% link _common_pages/version.html %})
+Every documented line, for a reader on an older image.

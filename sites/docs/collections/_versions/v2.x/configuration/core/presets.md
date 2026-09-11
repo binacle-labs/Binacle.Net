@@ -56,10 +56,10 @@ This file contains predefined bin configurations that can be used directly in yo
 ```
 
 Although you can modify the presets using any method described in the
-[Configuration Basics]({% link _common_pages/configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page,
+[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page,
 it's generally recommended to replace the entire file rather than making incremental changes.
 
-Please refer to the [Configuration Basics > Direct File Edits]({% link _common_pages/configuration-basics.md %}#-direct-file-edits)
+Please refer to the [Configuration Basics > Direct File Edits]({% vlink /configuration-basics.md %}#-direct-file-edits)
 section of the page for more information on overriding configurations.
 
 - 📁 **Location**: `/app/Config_Files`

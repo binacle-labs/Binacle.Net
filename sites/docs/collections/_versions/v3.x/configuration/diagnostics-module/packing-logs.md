@@ -49,7 +49,7 @@ You can modify the Packing Logs using **Production Overrides** by creating a
 - 📌 **Full Path**: `/app/Config_Files/DiagnosticsModule/PackingLogs.Production.json`
 
 For more information on overriding configurations, refer to the
-[Configuration Basics]({% link _common_pages/configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
+[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
 
 ## 🔧 Configuration Options
 - `Enabled` (_boolean_): Enables or disables packing logs.

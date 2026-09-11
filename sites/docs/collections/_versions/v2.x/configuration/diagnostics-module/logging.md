@@ -82,7 +82,7 @@ You can modify the logging configuration through **Production Overrides** by cre
 - 📌 **Full Path**: `/app/Config_Files/DiagnosticsModule/Serilog.Production.json`
 
 For more details on overriding configurations,
-refer to the [Configuration Basics]({% link _common_pages/configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
+refer to the [Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
 
 > Modifying the logging configuration is not recommended unless you fully understand its implications,
 > as improper configurations can impact application stability or even cause crashes.

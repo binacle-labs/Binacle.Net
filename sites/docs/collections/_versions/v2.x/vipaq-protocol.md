@@ -8,8 +8,11 @@ nav:
   icon: 🗜️
 ---
 
-This page describes the ViPaq wire format as produced and read by Binacle.Net {{ page.version_label }}.
-For what ViPaq is and why it exists, see [ViPaq Protocol]({% link _common_pages/vipaq-protocol.md %}).
+**ViPaq** packs one bin and its items into a single copy-pastable string. Binacle.Net's packing responses get
+large with many items; ViPaq condenses one result - a single bin plus the items packed into it - into a string
+that is small to store, cheap to send and easy to share. It carries the bin's dimensions and each item's
+dimensions and position, which is everything needed to redraw the packing. This page is the wire format as
+Binacle.Net {{ page.version_label }} writes and reads it.
 
 > ⚠️ ViPaq is experimental and may change between versions.
 >

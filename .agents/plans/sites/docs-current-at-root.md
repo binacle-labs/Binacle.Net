@@ -193,7 +193,8 @@ while the moves are still being checked.
       as it is now, diff them, and decide line by line what is a fix and what is v3.1 content. Then:
       - It moves into `v3.x/`. `quick-start.md` and `vipaq-protocol.md` merge into the versioned page of the
         same name. `core-concepts` gains `Best`. `generate-a-client` points at `/swagger/v4.json` and drops the
-        "swap the version segment" advice. `quick-start` and `samples/index.md` say "the major tag".
+        "swap the version segment" advice. `quick-start` and `samples/index.md` keep saying "the minor tag" -
+        the tag they print is `3.0` until the post-release set moves it to `3`, and the sentence moves with it.
       - **Backfill.** `core-concepts` (three algorithms - no `Best`), `configuration-basics` and
         `integration-guide` go into `v2.x` and `v1.x` too. Same rule: read the page at that line's tag
         (`v2.1.1`, `v1.3.0`), read the current one, carry over only what was true then plus wording fixes made
@@ -204,10 +205,33 @@ while the moves are still being checked.
         folder. 49 files link to `_common_pages` today: 13 in v3.x, 12 in each v2 line, 17 in v1.x.
       - **The common copy stays** until step 13, so the root URL keeps serving and each commit is about one
         page's content.
-      With the first of the six: the text of `pages/index.md` moves into `v3.x/index.md` or goes, so step 13
-      can delete the file.
-      `grep -rln '_common_pages' sites/docs/collections/_versions/ | wc -l` shrinks with each commit and is 0
-      after the sixth; the build passes after each. The session's notes say what was kept from which side.
+      `v3.x/index.md` already carries the intro of `pages/index.md`; each commit adds the moved page's entry to
+      it (Versions with the first), so step 13 can delete `pages/index.md`. Its `seo_title` and
+      `breadcrumbs: false` move onto `v3.x/index.md` in step 13, when that page becomes the root.
+      - [x] `quick-start` - 2026-09-12. The versioned page was already the better one; it gained the cloud
+        platforms table and the pin-not-`latest` line from the common page. Nothing else on the common page was
+        missing from it, and the common page had not changed since `v3.0.0` apart from the link fix in step 9.
+      - [x] `vipaq-protocol` - 2026-09-12. Unchanged since `v3.0.0` but for the step-9 link fix. Its "what ViPaq
+        is" intro (purpose, what a string carries) went into all three versioned pages in place of the sentence
+        that pointed at the common page; the "strings do not move between versions" section was already on
+        each versioned page as its warning block.
+      - [x] `core-concepts` - 2026-09-12. Two wording fixes since `v3.0.0` (cartonization; what a heuristic
+        does and does not promise), both kept in all three copies. `v3.x` gained a `Best` section and a note
+        saying V3 has three heuristics and `Best` is V4; `v2.x` and `v1.x` say only V3 lets you choose. Both
+        "consult the API documentation for your version" lines became `vlink`s. 11 links flipped.
+      - [x] `configuration-basics` - 2026-09-12. Byte-identical at `v1.3.0`, `v2.1.1`, `v3.0.0` and now, so one
+        copy in all three folders; the two "see the documentation for your version" sentences became
+        `vlink`s to `/configuration/`. The three anchors the 28 links use are unchanged.
+      - [x] `integration-guide` - 2026-09-12. Unchanged since `v1.3.0`. One copy in all three folders; the
+        Presets sentence became a `vlink`, one spelling fix. Nothing linked it but `pages/index.md`.
+      - [x] `generate-a-client` - 2026-09-12. Did not exist at `v3.0.0` - the whole page is post-tag, so it is
+        `v3.x` only. Its document URLs are `{{ site.url }}{% vlink /swagger/v4.json %}` now, so they follow the
+        page to the root at the flip without an edit; the "swap the version segment" paragraph went.
+      `v3.x/index.md` lists all six. The old lines' index pages were not edited; the sidebar lists the new
+      pages by `nav.order`.
+      `grep -rn '_common_pages' sites/docs/collections/_versions/ | grep -v version.html` returns nothing (the
+      two links to `version.html` stay - that page stays); the build passes; 0 broken internal links. What
+      was kept from which side is written beside each page above.
 - [x] **12 - S.** Includes and script - **done in step 9**, because the segment broke them there. Left for
       this step: nothing, unless step 13 shows a template still reading `page.version` for display; the
       reader-facing name is `page.url_segment`.
@@ -269,8 +293,9 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
   the delete. Grep `_common_pages` across `collections/` before and after.
 - **`_redirects` starts with an underscore.** Jekyll excludes it silently unless `include:` names it. Check
   `artifacts/docs/_redirects` exists after a build.
-- **`verifying-a-release.md` and `generate-a-client.md` print `docs.binacle.net` URLs in prose.** They are
-  not `vlink`s and do not move by themselves.
+- **A `docs.binacle.net` URL written in prose does not move by itself.** Measured 2026-09-12: none is left in
+  `_versions/` - `generate-a-client.md` builds its with `{{ site.url }}{% vlink … %}`, and
+  `verifying-a-release.md` prints none. Grep before the flip anyway.
 - **Breadcrumbs.** `breadcrumbs: exclude: ["version", "*.*"]` in `_config.yml` starts a versioned trail at its
   own version. A root page has no `version` segment, so its trail starts at home, which is right. Check one of
   each by eye.
@@ -296,7 +321,8 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
       `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`, and
       `ls sites/docs/collections/_common_pages/` prints `version.html` alone.
 - [ ] Every old-line link to a common page is a `vlink` into its own folder.
-      `grep -rn '_common_pages' sites/docs/collections/_versions/` returns nothing, and the build passes.
+      `grep -rn '_common_pages' sites/docs/collections/_versions/ | grep -v version.html` returns nothing, and
+      the build passes.
 - [ ] The six pages were merged from both copies, not taken from one.
       **By eye.** For each, `git diff v3.0.0 -- sites/docs/collections/_common_pages/<page>` was read and
       the session's notes say what was kept from which side. `core-concepts` names `Best` in `v3.x` and does

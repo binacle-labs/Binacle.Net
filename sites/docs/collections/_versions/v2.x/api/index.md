@@ -12,7 +12,7 @@ Two API versions are available, each suited to different requirements.
 
 ## Prerequisites
 
-- [Core Concepts]({% link _common_pages/core-concepts.md %}) - Understand the algorithms and functions used by Binacle.Net.
+- [Core Concepts]({% vlink /core-concepts.md %}) - Understand the algorithms and functions used by Binacle.Net.
 
 ---
 
