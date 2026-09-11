@@ -1,5 +1,7 @@
 ---
 title       : Welcome to Binacle.Net Docs!
+seo_title   : Open source 3D bin packing API - Binacle.Net Docs
+breadcrumbs : false
 description: >-
   Documentation for Binacle.Net: quick start, the HTTP API, configuration, Docker and Kubernetes samples,
   and the release notes.
