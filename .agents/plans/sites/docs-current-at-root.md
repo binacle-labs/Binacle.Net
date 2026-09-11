@@ -58,7 +58,9 @@ Three rules replace the old ones:
 ## The steps
 
 **One step, one commit, and the build is green after each.** The check under a step is what reviews that
-commit; the end state is checked once, under *Done when*. **C** is a coding session, which may not touch
+commit; the end state is checked once, under *Done when*. "The output diff is empty" means: build
+`sites/docs` before and after, then `diff -r -I '<lastmod>' <before> <after>` prints nothing - the sitemaps
+carry the build time, nothing else does. **C** is a coding session, which may not touch
 `sites/`. **S** is a site session, which touches only `sites/docs/`. Tick a step when its commit is in.
 
 **The order is set by one fact.** The gem's root rule and the common layer cannot coexist: with both, the
@@ -82,18 +84,18 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       `sites/docs/_data/versions.yml`. Done before step 7, so the rename needs no tooling edit.
       `just openapi check-all-copies` passes, and `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just`
       returns nothing.
-- [ ] **3 - S.** `_data/versions.yml` gains `version_tag` beside each `id` - the values the four `defaults`
+- [x] **3 - S.** `_data/versions.yml` gains `version_tag` beside each `id` - the values the four `defaults`
       blocks in `_config.yml` carry today (`3.0`, `2.1.1`, `2.0.1`, `1.3.0`). Same commit: `sites/README.md`
       names `Deploy Site` and its `site` choice, not the three workflows that no longer exist.
-      `grep -c version_tag sites/docs/_data/versions.yml` returns 4; nothing reads it yet, so
-      `diff -r` of `artifacts/docs` before and after is empty.
-- [ ] **4 - C.** The gem stamps `version` from the folder name and `version_tag` from `versions.yml`, and
+      `grep -c '^ *version_tag:' sites/docs/_data/versions.yml` returns 4; nothing reads it yet, so the output
+      diff is empty.
+- [x] **4 - C.** The gem stamps `version` from the folder name and `version_tag` from `versions.yml`, and
       no longer needs a `defaults` block per folder. Spec for both.
-      `just test rb_binacle-docs-versions_unit` passes, and `diff -r` of `artifacts/docs` before and after
-      is empty - the blocks still stamp the same values.
+      `just test rb_binacle-docs-versions_unit` passes, and the output diff is empty - the blocks still stamp the
+      same values.
 - [ ] **5 - S.** `_config.yml`: the four per-version `defaults` blocks and the comment above them go. The
       `version-current` sitemap and the two `**/swagger/**` blocks stay.
-      `grep -c 'v3\.' sites/docs/_config.yml` returns 0, and `diff -r` of `artifacts/docs` is empty.
+      `grep -c 'v3\.' sites/docs/_config.yml` returns 0, and the output diff is empty.
 - [ ] **6 - C.** Three gem additions, each with its spec. **The collision check:** a page outside `_versions/`
       and a page in the current folder claiming the same URL raises and fails the build - Jekyll only warns,
       and a warning is how the wrong page ships. **The selector data:** for the page being rendered, the URL
@@ -102,7 +104,7 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       the current one. That is the redirect list for a major - not needed for this release, needed the day
       `current` moves to `v4.x`, and cheap while the rule is fresh.
       `just test rb_binacle-docs-versions_unit` passes and `grep -c "^\s*it " ruby/binacle-docs-versions/spec/*_spec.rb`
-      grew. The build prints the list and `diff -r` of `artifacts/docs` is empty.
+      grew. The build prints the list and the output diff is empty.
 
 ### Folders - URLs move under `/version/`, every move redirected
 
@@ -181,8 +183,7 @@ Steps 9 and 10 put the content where the flip needs it. Steps 11 to 13 are the f
       the first two *Done when* boxes hold.
 - [ ] **13 - S.** The 61 hand-written `permalink:` lines go. The gem overrode them in step 12, so this commit
       changes no output.
-      `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing, and `diff -r` of
-      `artifacts/docs` before and after is empty.
+      `grep -rn '^permalink:' sites/docs/collections/_versions/` returns nothing, and the output diff is empty.
 
 ### The agent docs
 

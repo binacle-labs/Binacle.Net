@@ -7,6 +7,36 @@ V2_GUIDE = 'v2.0.x/guide.md'
 REDIRECT_PAGE = 'redirect.md'
 
 RSpec.describe Binacle::DocsVersions::VersionGenerator do
+  describe 'the version comes off the folder' do
+    it 'stamps the folder name under _versions as the version' do
+      expect(doc(build_site, V1_GUIDE).data['version']).to eq('v1.0.x')
+    end
+
+    it 'takes the first folder only, however deep the page sits' do
+      expect(doc(build_site, 'v1.0.x/deep/nested.md').data['version']).to eq('v1.0.x')
+    end
+
+    it 'leaves a document outside _versions without one' do
+      expect(doc(build_site, 'unversioned.md').data).not_to have_key('version')
+    end
+  end
+
+  describe 'the version tag comes off the versions list' do
+    it 'stamps the tag listed beside the version id' do
+      expect(doc(build_site, V1_GUIDE).data['version_tag']).to eq('1.0.3')
+      expect(doc(build_site, V2_GUIDE).data['version_tag']).to eq('2.0')
+    end
+
+    it 'never overwrites a tag the page set itself' do
+      expect(doc(build_site, 'v2.0.x/own.md').data['version_tag']).to eq('9.9')
+    end
+
+    it 'fails the build when a version folder has no tag in the list' do
+      expect { build_with_list([{ 'id' => 'v2.0.x', 'version_tag' => '2.0' }]) }
+        .to raise_error(Binacle::DocsVersions::Error, /no version_tag for v1.0.x; it has one for v2.0.x/)
+    end
+  end
+
   it 'stamps the version onto the title suffix' do
     expect(doc(build_site, V1_GUIDE).data['title_suffix']).to eq('(v1.0.x)')
   end

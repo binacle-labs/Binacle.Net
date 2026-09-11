@@ -11,7 +11,7 @@ Two pieces, both keyed on the version the page belongs to.
 
 | Surface | Does |
 |---|---|
-| the generator | stamps `title_suffix` and `robots` onto every versioned document |
+| the generator | stamps `version`, `version_tag`, `title_suffix` and `robots` onto every document under `_versions/` |
 | `{% vlink /path %}` | links to a file inside the current page's version |
 
 ## 🚀 Quick start
@@ -30,27 +30,26 @@ plugins:
   - binacle-docs-versions
 ```
 
-Two things have to be true of the site:
+One thing has to be true of the site - every folder under `_versions/` is in the list, with its tag:
 
 ```yaml
 # _data/versions.yml
 current: v3.0.x
-```
-
-```yaml
-# _config.yml, one scope per version folder
-defaults:
-  - scope:
-      path: "**/v2.1.x/**"
-      type: "versions"
-    values:
-      version: v2.1.x
+list:
+  - id: v3.0.x
+    version_tag: "3.0"
+  - id: v2.1.x
+    version_tag: "2.1.1"
 ```
 
 ## 🏷️ The stamps
 
-On every versioned document:
+On every document under `_versions/<folder>/`:
 
+- `version` - the folder name. Nothing in the folder and no config block has to say it.
+- `version_tag` - the tag listed beside that id in `_data/versions.yml`, for the pull commands on the page.
+  A folder with no tag in the list stops the build: the page would print a pull command with nothing after
+  the colon.
 - `title_suffix` - `(v2.1.x)`, for whatever writes the page title.
 - `robots` - `noindex, follow` on every version that is not `current`.
 
