@@ -101,4 +101,8 @@
        therefore answered in code, or marked Accepted on the individual finding in the SonarCloud UI, where it
        carries a reason and stays visible. Never with a blanket path ignore here. -->
 
+  <!-- `end` returns when the upload finishes; with this it blocks until SonarCloud has processed the analysis
+       and exits non-zero on a red gate. Without it the gate read straight after is the previous run's. -->
+  <Property Name="sonar.qualitygate.wait">true</Property>
+
 </SonarQubeAnalysisProperties>

@@ -19,7 +19,7 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `install-lychee.sh` | Installs lychee, the same way |
 | `create-tag.sh` | Tags a commit through the API - the three deploy markers; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
-| `sonar-summary.sh` | Waits for SonarCloud to finish, then writes its quality gate |
+| `sonar-summary.sh` | Writes the SonarCloud quality gate to the run summary |
 | `check-release-ref.sh` | Passes only if the release was dispatched on `main` |
 | `check-version.sh` | Passes only if the version is semver shaped, with no leading `v` |
 | `check-release-tag.sh` | Passes only if the tag is free, or already points at this commit |
