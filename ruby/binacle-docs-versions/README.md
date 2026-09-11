@@ -49,11 +49,12 @@ list:
 
 ## 🌐 The url
 
-Nothing in a folder says where it renders, and a `permalink` a page writes is overwritten. Every file under
-`_versions/<folder>/` renders at `/version/<url_segment>/<rest>` - a page as a folder with an index inside
-(`api/v3.md` → `/version/2.1.1/api/v3/`, `index.md` → `/version/2.1.1/`), a static file under its own name
-(`swagger/v3.json` → `/version/2.1.1/swagger/v3.json`). Static files get this through `VersionedFile`, a
-`StaticFile` whose url can be set - Jekyll's own reads the collection template and ignores data.
+Nothing in a folder says where it renders, and a `permalink` a page writes is overwritten. The folder named
+by `current` renders at the site root - `api/v3.md` → `/api/v3/`, `index.md` → `/`, `swagger/v3.json` →
+`/swagger/v3.json`. Every other folder renders at `/version/<url_segment>/<rest>` - a page as a folder with an
+index inside (`api/v3.md` → `/version/2.1.1/api/v3/`), a static file under its own name. Static files get this
+through `VersionedFile`, a `StaticFile` whose url can be set - Jekyll's own reads the collection template and
+ignores data. Moving `current` moves which folder is at the root; nothing else changes.
 
 ## 🏷️ The stamps
 
@@ -64,7 +65,9 @@ On every document under `_versions/<folder>/`:
   A folder with no tag in the list stops the build: the page would print a pull command with nothing after
   the colon.
 - `version_label` - the list entry's `label`, what the page calls its own version.
-- `title_suffix` - `(v2.1.1)`, from the label, for whatever writes the page title.
+- `title_suffix` - `(v2.1.1)`, from the label, for whatever writes the page title. Not on the current version:
+  its url carries no version, so its title carries none either. On the others it keeps `Quick Start (v2.1.1)`
+  apart from the root page `Quick Start`.
 - `version_urls` - a map from every version to the url of this same page in that version, or to that
   version's index where the page does not exist. For a version selector that lands on the same page.
 - `robots` - `noindex, follow` on every version that is not `current`.
