@@ -1,16 +1,16 @@
 <header>
     <article class="middle-align center-align secondary no-radius">
         <div>
-            <a href="{% link pages/index.md %}">
+            {%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
+            <a href="{{ current.url | relative_url }}">
                 <img class="large" src="{{ site.logo.src | relative_url }}" alt="{{ site.logo.alt }}"/>
             </a>
             <div class="max">
-                <a href="{% link pages/index.md %}">
+                <a href="{{ current.url | relative_url }}">
                     <h5>{{ site.title }}</h5>
                 </a>
             </div>
             <nav class="center-align">
-                {%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
                 <a class="button small fill" href="{{ current.url | relative_url }}">
                     <i>menu_book</i>
                     {{ site.data.sidebar.latest_version_link_text }}

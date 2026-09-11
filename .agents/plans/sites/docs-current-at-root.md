@@ -240,19 +240,27 @@ while the moves are still being checked.
 
 ### The flip
 
-- [ ] **13 - S.** The common layer goes: the five pages in `_common_pages/` other than `version.html`,
+- [x] **13 - S.** The common layer goes: the five pages in `_common_pages/` other than `version.html`,
       `version-latest.html`, and `pages/index.md`. The `v3.x` entry's `url_segment:` becomes `3.0.0` - unused
       while it is current, and where the line lands the day it closes.
       `_redirects` gains `/version/latest/*   /:splat   302`, `/version/v3.0.x/*   /:splat   302` and the two
       exact swagger lines (`/version/v3.0.x/swagger/v3.html` → `/swagger/v3/`, same for `v4`). The old root
       `/quick-start/` and `/vipaq-protocol/` need no redirect: after step 14 the same URL serves the real
       page.
+      **Also in this step, because the deleted pages were linked:** both sidebars' home links (logo, title,
+      "General Docs") pointed at `pages/index.md`; they point at the current line's index now, and the
+      versioned sidebar shows its back button only on a page that is not current. `v3.x/index.md` carries
+      `seo_title` and `breadcrumbs: false` from the deleted root page.
       `ls sites/docs/collections/_common_pages/` prints `version.html` alone, and the build passes. The site
-      has no page at `/` until step 14 - expected.
+      has no page at `/` until step 14 - expected; the breadcrumb home on `version.html` and `404.html` is the
+      one link that does not resolve until then (checked 2026-09-12: that one, nothing else). Current renders
+      under `/version/3.0.0/` for the same one commit.
 - [ ] **14 - C.** The current folder renders at the root: the rule from step 7 gives the folder named by
-      `current:` no prefix at all - `/<rest>`. **`title_suffix`:** none for `current` - `Quick Start (v3.x) -
+      `current:` no prefix at all - `/<rest>`. **`title_suffix`:** none for `current` - `Quick Start (v3.0.0) -
       Binacle.Net Docs` is noise on a URL that carries no version; keep it for the others, where it stops a
-      title colliding with the root page of the same name. Spec for both.
+      title colliding with the root page of the same name. Spec for both. **Left over from step 13, for the
+      maintainer:** `_layouts/redirect.html` and the gem's `redirect_to`/`canonical` stamps have no page left
+      to serve - `version-latest.html` was their only user. Delete both here, or keep them for the next major.
       `just test rb_binacle-docs-versions_unit` passes, and after `bundle exec jekyll build` in `sites/docs`
       the first two *Done when* boxes hold.
 

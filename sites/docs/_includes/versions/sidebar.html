@@ -32,10 +32,14 @@
                 <i>arrow_drop_down</i>
             </div>
             {% endif %}
-            <a class="button small fill" href="{% link pages/index.md %}">
+            {%- comment -%} Home is the current line's index. On a current page the header already is home. {%- endcomment -%}
+            {% if page.version != site.data.versions.current %}
+            {%- assign current = site.data.versions.list | where: 'id', site.data.versions.current | first -%}
+            <a class="button small fill" href="{{ current.url | relative_url }}">
                 <i>arrow_back</i>
-                General Docs
+                {{ site.data.sidebar.latest_version_link_text }}
             </a>
+            {% endif %}
         </div>
     </article>
 </header>

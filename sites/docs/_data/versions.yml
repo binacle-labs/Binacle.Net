@@ -27,7 +27,7 @@ current: v3.x
 
 list:
   - id: v3.x
-    url_segment: v3.0.x    # keeps the current line's urls where they are until it moves to the root
+    url_segment: 3.0.0
     label: v3.0.0
     version_tag: "3.0"
   - id: v2.x

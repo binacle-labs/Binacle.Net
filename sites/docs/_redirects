@@ -6,6 +6,10 @@
 # become 301 once every line has been checked on the deployed site.
 #
 # Exact lines before the wildcard they would otherwise fall under.
+/version/v3.0.x/swagger/v3.html   /swagger/v3/                  302
+/version/v3.0.x/swagger/v4.html   /swagger/v4/                  302
+/version/v3.0.x/*                 /:splat                       302
+/version/latest/*                 /:splat                       302
 /version/v2.1.x/swagger/v2.html   /version/2.1.1/swagger/v2/    302
 /version/v2.1.x/swagger/v3.html   /version/2.1.1/swagger/v3/    302
 /version/v2.1.x/*                 /version/2.1.1/:splat         302
