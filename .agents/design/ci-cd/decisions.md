@@ -1113,6 +1113,22 @@ already exists". `check-release-tag.sh` still reaches origin with `git ls-remote
 a public repository, and the deploy `tag` job still checks out because `deploy-summary.sh` reads the subject
 with `git log`.
 
+### D31 — the site half of the path filter names the `.github/` files a site depends on
+
+**Decided 2026-09-11.** `changed-paths.sh` used to set `site=yes` for anything under `.github/`, so a
+workflow-only pull request built all three Jekyll sites and ran the sixteen-test site suite. It now matches
+`.github/actions/` and the workflows a site build or test runs through - `pull-request.yml`,
+`shared-site-tests.yml` and `deploy-*-site.yml` - and nothing else there.
+
+**Why named files and not `.github/actions/` alone.** The narrower pattern leaves a hole: an edit to the site
+test workflow, or to the pull request workflow whose `site-build` job does the building, would not run the
+jobs it changed. Naming those files keeps the saving and closes the hole.
+
+**What it saves, honestly.** Three Jekyll builds with link checks and one test suite on a workflow-only pull
+request. The `code` half still matches every `.github/` file, so that pull request still runs the image tests,
+the image build, the lint job and Sonar. It does not become cheap; it stops doing the one thing that could
+not have found anything.
+
 ## Open
 
 ### O2 — how much the pull-request gate should prove

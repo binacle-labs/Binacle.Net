@@ -74,7 +74,8 @@ workflow never triggers, so the required check never reports. Instead:
 - **`changes`** always runs, filters nothing, and takes seconds. It calls `just ci changed-paths <base> <head>`,
   which diffs the branch against its merge base and writes **two** outputs — `code` for anything the image is
   built from, `site` for anything a built site is made of. Both are `yes` or `no`, and every `if:` below reads
-  them that way.
+  them that way. Under `.github/`, `site` fires only on the actions and on the workflows that build or test a
+  site - `pull-request.yml`, `shared-site-tests.yml`, the three deploy workflows; `code` fires on all of it.
 - **`test-suite`, `image` and `workflows`** carry `needs: changes` and an `if:` on `code`; **`site-tests` and
   `site-build`** carry the same on `site`. All five are *skipped*, not failed, when their half did not move.
 - **`gate`** carries `needs:` on all six and `if: always()`, and passes only if every one of them succeeded
