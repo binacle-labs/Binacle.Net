@@ -23,6 +23,10 @@ RSpec.describe Binacle::DocsVersions::VLinkTag do
     expect(doc(build_site, 'v2.x/links.md').output).to include('/version/2.0.4/guide/')
   end
 
+  it 'resolves a path inside another version when its id comes first' do
+    expect(doc(build_site, V1_LINKS).output).to include('other: /version/2.0.4/guide/')
+  end
+
   it 'fails the build when the file is not in that version' do
     expect { build_site({}, BROKEN_SITE) }.to raise_error(ArgumentError, /Could not find document/)
   end

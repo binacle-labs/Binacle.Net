@@ -1,7 +1,7 @@
 ---
 title: Release Notes
 description: >-
-  What changed in the Binacle.Net v3.x line, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
+  What changed in this line of Binacle.Net, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
   so read the migration guide.
 nav:
   order: 2
@@ -283,7 +283,7 @@ To upgrade to **v3.0.0**, follow these steps:
 
 2. **Switch to V3 endpoints**
    - V3 requires an algorithm to be selected, where V2 used a fixed one, and drops V2's other parameters.
-   - See the [v2.1.x documentation]({{ '/version/v2.1.x/' | relative_url }}) for the old contract, and
+   - See the [v2.x documentation]({% vlink v2.x /index.md %}) for the old contract, and
      [Version 3]({% vlink /api/v3.md %}) for the new one.
 
 3. **Regenerate all ViPaq strings**

@@ -1,7 +1,7 @@
 ---
 title: Quick Start
 description: >-
-  Run Binacle.Net v1.3.x with one Docker command, with Swagger UI and the UI Module switched on so you can try
+  Run Binacle.Net with one Docker command, with Swagger UI and the UI Module switched on so you can try
   it from a browser straight away.
 nav:
   order: 3
@@ -33,7 +33,7 @@ docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e UI_MODULE=Tr
 
 This command will:
 
-- ✔️ Pull the {{ page.version }} Binacle.Net image.
+- ✔️ Pull the {{ page.version_label }} Binacle.Net image.
 - ✔️ Start the container with the **Swagger UI** and **UI Module** enabled.
 - ✔️ Expose the API on port 8080.
 

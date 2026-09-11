@@ -330,8 +330,10 @@ nothing would noindex all 118 pages while the sitemap still lists them, and noth
 missing `current` stops the build too, for the mirror reason: it would leave every old version indexable.
 The suffix is stamped from the page's own `version` and does not read `current` at all.
 
-**`{% vlink /path %}` moved here from `sites/docs/_plugins/VLink.rb`** unchanged in behaviour, and gained a
-spec suite in the move — nothing runs a `.rb` under `sites/`. `sites/docs/_plugins/` is gone.
+**`{% vlink /path %}` moved here from `sites/docs/_plugins/VLink.rb`** and gained a spec suite in the move —
+nothing runs a `.rb` under `sites/`. `sites/docs/_plugins/` is gone. It takes an optional version id first
+(`{% vlink v2.x /index.md %}`), so a page links another line's page by file and the build fails if the file is
+not there; no page builds a `/version/` url by hand.
 
 **Deleting the include without this gem is a silent regression**: 74 pages lose their `noindex` and every
 versioned title loses its version. That is what the wiring pass measured before and after.

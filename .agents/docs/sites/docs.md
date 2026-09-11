@@ -131,6 +131,12 @@ old folder is frozen because nothing edits it, not because someone remembered to
 is exactly what failed before: four releases (v2.0.0 → v2.1.1) shipped with no snapshot, and only one folder
 was ever authored.
 
+**A description names no version.** The title carries it as the suffix the gem stamps (`V3 (v2.1.1) -
+Binacle.Net Docs`) and the URL carries it too; a description that said "Binacle.Net v3.x" would have to change
+at every release, and one that said "v3.0.0" would be wrong at the next minor. Prose that needs the version
+writes `{{ page.version_label }}`, never `{{ page.version }}` - that is the folder id. A link into another
+line is `{% vlink v2.x /path %}`, never a `/version/` url written by hand.
+
 **Never derive a folder from an API tag.** The tree at a tag is whatever was in the repo that day — maybe
 mid-edit. Copy the current folder the moment a new line opens; that is the only sound source.
 

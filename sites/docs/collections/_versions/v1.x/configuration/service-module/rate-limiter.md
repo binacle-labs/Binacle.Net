@@ -1,7 +1,7 @@
 ---
 title: Rate Limiter
 description: >-
-  Rate limiting on the calculation endpoints in Binacle.Net v1.3.x. The RateLimiter.json settings, and how
+  Rate limiting on the calculation endpoints in Binacle.Net. The RateLimiter.json settings, and how
   signed-in callers bypass it.
 nav:
   parent: Service Module

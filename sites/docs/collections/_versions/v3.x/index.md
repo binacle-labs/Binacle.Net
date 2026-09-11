@@ -1,7 +1,7 @@
 ---
 title       : Welcome to Binacle.Net Docs!
 description: >-
-  Documentation for Binacle.Net v3.x: quick start, the HTTP API, configuration, Docker and Kubernetes samples,
+  Documentation for Binacle.Net: quick start, the HTTP API, configuration, Docker and Kubernetes samples,
   and the release notes.
 menu_title  : v3.x
 nav:
@@ -24,7 +24,7 @@ see it work, start with the quick start.
 One `docker run`, then a request. Start here if you have not run it yet.
 
 ## 🛠️ [Release Notes]({% vlink release-notes.md %})
-See what's new in the {{ page.version }} version of Binacle.Net.
+See what's new in the {{ page.version_label }} version of Binacle.Net.
 
 ## 📡 [API]({% vlink /api/index.md %})
 The endpoints, the request and response shapes, and how presets differ from sending your own bins.
@@ -34,7 +34,7 @@ Two versions are documented:
 - 🧪 [V4]({% vlink /api/v4.md %}): 16 endpoints organized by the answer you want. **Experimental** - it can change at any time.
 
 **V2 was removed in this version.** If you still call it, see the
-[v2.1.x documentation]({{ '/version/v2.1.x/' | relative_url }}).
+[v2.x documentation]({% vlink v2.x /index.md %}).
 
 ## 🗜️ [ViPaq Protocol]({% vlink vipaq-protocol.md %})
 The compact format the packing endpoints return. The format changed in v3.0.0 and is stable from this release.

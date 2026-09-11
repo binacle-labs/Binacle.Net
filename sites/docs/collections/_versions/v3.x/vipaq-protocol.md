@@ -1,14 +1,14 @@
 ---
 title: ViPaq Protocol
 description: >-
-  The ViPaq wire format as Binacle.Net v3.x writes and reads it: header, body and compression. The format
+  The ViPaq wire format as Binacle.Net writes and reads it: header, body and compression. The format
   changed in v3.0.0 and has no fallback reader.
 nav:
   order: 7
   icon: 🗜️
 ---
 
-This page describes the ViPaq wire format as produced and read by Binacle.Net {{ page.version }}.
+This page describes the ViPaq wire format as produced and read by Binacle.Net {{ page.version_label }}.
 For what ViPaq is and why it exists, see [ViPaq Protocol]({% link _common_pages/vipaq-protocol.md %}).
 
 > 🚨 **The format changed in v3.0.0.** Strings produced by v2.1.1 and earlier do not decode here, and strings

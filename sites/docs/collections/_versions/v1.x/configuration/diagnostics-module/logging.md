@@ -1,7 +1,7 @@
 ---
 title: Logging
 description: >-
-  Serilog logging in Binacle.Net v1.3.x: console and daily file output, the supported settings, and where the
+  Serilog logging in Binacle.Net: console and daily file output, the supported settings, and where the
   log files are written.
 nav:
   parent: Diagnostics Module

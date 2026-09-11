@@ -1,7 +1,7 @@
 ---
 title: Docker
 description: >-
-  Docker Compose samples for Binacle.Net v1.3.x: a minimal setup, a full deployment with every module on, and
+  Docker Compose samples for Binacle.Net: a minimal setup, a full deployment with every module on, and
   one with only the UI Module.
 nav:
   order: 1

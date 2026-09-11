@@ -1,7 +1,7 @@
 ---
 title       : Welcome to Binacle.Net Docs!
 description: >-
-  Documentation for Binacle.Net v1.3.x: quick start, the V1, V2 and V3 APIs, configuration, Docker samples, and
+  Documentation for Binacle.Net: quick start, the V1, V2 and V3 APIs, configuration, Docker samples, and
   the release notes.
 menu_title  : v1.3.x
 nav:
@@ -31,7 +31,7 @@ Explore the following sections to get started and learn more about Binacle.Net:
 Get started with Binacle.Net in just a few steps! The Quick Start Guide covers the basics you need to run it quickly.
 
 ## 🛠️ [Release Notes]({% vlink release-notes.md %})
-See what's new in the {{ page.version }} version of Binacle.Net.
+See what's new in the {{ page.version_label }} version of Binacle.Net.
 
 ## 📡 [API]({% vlink /api/index.md %})
 Understand the API endpoints, including how to use presets, send custom bin and item data, and query by preset to 

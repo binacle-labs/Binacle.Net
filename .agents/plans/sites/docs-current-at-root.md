@@ -166,7 +166,7 @@ while the moves are still being checked.
       returns nothing; every internal link in `artifacts/docs` resolves to a file (checked 2026-09-12: 0
       broken). The output diff, with `v1.3.x` substituted by `1.3.0` in the old output's paths and text, shows
       only the selector, the notice and the titles of the old line - all now saying `1.3.0`.
-- [ ] **10 - S.** `v2.0.x` and `v2.1.x` become one `v2.x`, `url_segment: 2.1.1`. Diffed 2026-09-11: they differ in the
+- [x] **10 - S.** `v2.0.x` and `v2.1.x` become one `v2.x`, `url_segment: 2.1.1`. Diffed 2026-09-11: they differ in the
       version label in every description, the image tag in the sample files (`2.0.1` against `2.1.1`), and
       `swagger/` exists only in 2.1. So `v2.x` is the 2.1.x content. The 2.0.0 and 2.0.1 sections of the 2.0.x
       release notes merge into the `v2.x` release notes, newest first, and anything the diff shows as
@@ -174,9 +174,16 @@ while the moves are still being checked.
       **Read the diff; do not assume it is only those.** `_redirects` gains `/version/v2.1.x/*` and
       `/version/v2.0.x/*` to `/version/2.1.1/:splat`, and the two exact swagger lines
       (`/version/v2.1.x/swagger/v2.html` → `/version/2.1.1/swagger/v2/`, same for `v3`).
+      **Also in this step, set by the maintainer on 2026-09-12:** no description names a version - the title
+      suffix and the URL carry it - so 64 descriptions across the three folders lost their "v2.x"/"v1.3.x"/
+      "v3.x"; prose says `{{ page.version_label }}`, not `{{ page.version }}` (13 places); and `vlink` takes a
+      version id first (`{% vlink v2.x /index.md %}`) so the four cross-line links resolve a file instead of
+      writing a `/version/` url.
       `grep -c '^## v2\.' sites/docs/collections/_versions/v2.x/release-notes.md` returns 4, the swagger
-      pages say "added in 2.1.0", `test -d artifacts/docs/version/2.1.1`, and the build passes. **By eye** for
-      the rest of the diff.
+      pages say "added in 2.1.0", `test -d artifacts/docs/version/2.1.1`,
+      `grep -rh -A2 '^description' sites/docs/collections/_versions --include=*.md | grep -E '\bv[123](\.[0-9]+)?\.x\b'`
+      returns nothing, `grep -rn '{{ page.version }}' sites/docs/collections` returns nothing, and the build
+      passes. **By eye** for the rest of the diff.
 
 ### The common pages - one commit per page
 
