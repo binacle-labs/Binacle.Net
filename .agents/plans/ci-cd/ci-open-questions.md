@@ -467,6 +467,10 @@ that needed a run got it on 2026-09-11:
 **Nothing here blocks anything and nothing decays.** It is seven answers, and a no is an answer.
 
 - [ ] The Docker Hub plan question is answered - does the org have an OIDC connection available.
+      **The workflow edit landed 2026-09-12** - `grep -c 'password:' .github/workflows/release-docker-image.yml`
+      returns 2 outside comments, both GHCR. `D33`. **The maintainer creates the connection and sets
+      `DOCKERHUB_OIDC_CONNECTIONID` before the beta**; the release set carries it as a to-do. Until then every
+      dispatch fails at the Docker Hub login.
       **By eye.** Open the Docker Hub org's settings and look for GitHub OIDC connections. If yes, finding 1
       is live; if no, this file says so and the finding is struck.
 - [x] The release workflow has no tag-push step, and the tag is created by the release itself.

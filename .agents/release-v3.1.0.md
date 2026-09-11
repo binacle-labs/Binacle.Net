@@ -169,9 +169,13 @@ first stage happens on the branch and everything from the merge on happens on `m
 - [ ] **Row 5, the request panel, landed.** A session of its own, started from
       `plans/api/packing-demo-next.md` item 3. The plan's *Done when* has the two checks.
 - [ ] **The six CI findings landed** - 1, 4, 5, 8, 10 and 12 in `plans/ci-cd/ci-open-questions.md`, each
-      ticked in that plan's *Done when*. Finding 1 starts with the org's Docker Hub settings: no OIDC
-      connection, no finding 1. **What lands here is the workflow edit only** - the `publish` half is proved
-      by the beta in stage 3, not by anything on the branch.
+      ticked in that plan's *Done when*. **What lands here is the workflow edit only** - the `publish` half
+      is proved by the beta in stage 3, not by anything on the branch.
+- [ ] **To do by hand, before the beta - the maintainer's, 2026-09-12.** On the `binacle` Docker Hub org:
+      Settings, OIDC connections, a new connection for GitHub Actions scoped to `binacle-labs/Binacle.Net`.
+      Its id goes in the repository variable `DOCKERHUB_OIDC_CONNECTIONID`. **Every dispatch fails at the
+      Docker Hub login in `publish` until this is done** - the login has no password any more. Then narrow
+      `DOCKERHUB_TOKEN` to read-and-write on the repository description only; nothing pushes with it now.
 - [ ] `just test all` passes, and `just openapi check-all-copies` passes.
 
 ### Stage 2 - the changelog and the docs

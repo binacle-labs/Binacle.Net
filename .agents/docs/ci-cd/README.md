@@ -376,6 +376,7 @@ Set in GitHub repo settings, read as `${{ vars.* }}`.
 | `DONET_VERSION` | `shared-image-tests`, `sonar-analysis`, `pull-request`, `release-docker-image` | The .NET SDK version, passed into the `setup-dotnet` action. **The name is misspelled** ("DONET"). It matches the repo setting, so do not correct it in one file only. **Read in the workflow and passed as an input**, never read inside the action — the `vars` context is not dependably available there, and an empty value installs a default SDK and looks like it worked |
 | `DOCKERHUB_ORGNAME` | `release-docker-image`, `shared-dockerhub-overview` | Docker Hub org, the first half of the image name |
 | `DOCKERHUB_REPO` | `release-docker-image`, `shared-dockerhub-overview` | Docker Hub repo, the second half. Also the lever for testing the `publish` job without touching the real repo: point it at a scratch repo, tag a non-prerelease version, then point it back |
+| `DOCKERHUB_OIDC_CONNECTIONID` | `release-docker-image` — the `publish` job | The Docker Hub OIDC connection the run's token is exchanged through. Set on the `binacle` org's OIDC connections page; without it the Docker Hub login in `publish` fails |
 | `SONAR_PROJECT_KEY` | `sonar-analysis` | SonarCloud project key |
 | `SONAR_ORGANIZATION` | `sonar-analysis` | SonarCloud organisation |
 
@@ -388,7 +389,7 @@ the pre-move `src/` path after the layout change and broke the publish.
 
 | Secret | Used by |
 |---|---|
-| `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | `release-docker-image` — the `publish` job, and `shared-dockerhub-overview` which the `page` job calls. One token does both: the same registry push credential also writes the repository description, confirmed 2026-08-19. **Passed to the called workflow by name, never `secrets: inherit`**, which would hand the runner every secret the repo has |
+| `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | `shared-dockerhub-overview`, which the release's `page` job calls. It writes the repository description through the Docker Hub web API, which has no OIDC path. **The `publish` job no longer reads them** - it logs in with the run's OIDC token, `$ci-cd/decisions#D33`. **Passed to the called workflow by name, never `secrets: inherit`**, which would hand the runner every secret the repo has |
 | `SONAR_TOKEN` | `sonar-analysis` |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | `deploy-site` |
 | `GITHUB_TOKEN` | `release-docker-image` — GHCR login in `build` and `publish`, and creating the release |
