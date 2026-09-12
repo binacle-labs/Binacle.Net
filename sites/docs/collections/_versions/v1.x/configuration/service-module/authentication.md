@@ -34,7 +34,7 @@ or by using **Environment Variables**.
 - 📌 **Full Path**: `/app/Config_Files/ServiceModule/JwtAuth.Production.json`
 
 For more information on this refer to the
-[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
+[Configuration]({% vlink /configuration/index.md %}#%EF%B8%8F-overriding-configuration) page.
 
 > Environment variables take precedence over settings defined in the `JwtAuth.json` and `JwtAuth.Production.json` files.
 >

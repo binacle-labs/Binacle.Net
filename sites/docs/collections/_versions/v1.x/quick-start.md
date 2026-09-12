@@ -4,7 +4,7 @@ description: >-
   Run Binacle.Net with one Docker command, with Swagger UI and the UI Module switched on so you can try
   it from a browser straight away.
 nav:
-  order: 3
+  order: 1
   icon: 🚀
 ---
 

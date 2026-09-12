@@ -71,7 +71,7 @@ You can modify OpenTelemetry configuration using **Production Overrides** by cre
 - 📌 **Full Path**: `/app/Config_Files/DiagnosticsModule/OpenTelemetry.Production.json`
 
 For more information on overriding configurations, refer to the
-[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page.
+[Configuration]({% vlink /configuration/index.md %}#%EF%B8%8F-overriding-configuration) page.
 
 ## 🔧 Configuration Options
 

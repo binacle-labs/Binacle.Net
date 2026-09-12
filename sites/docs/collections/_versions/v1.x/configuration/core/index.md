@@ -1,51 +1,33 @@
 ---
 title: Core
 description: >-
-  The Core module in Binacle.Net: presets, Swagger UI, and the configuration files under
-  /app/Config_Files, with the defaults for each.
+  The Core module: the API, the presets, and the switches for Swagger UI. The one file it reads and its page.
 nav:
   parent: Configuration
   order: 1
   icon: 🏗️
 ---
 
+Core is Binacle.Net itself: the [API]({% vlink /api/index.md %}), the presets, and a few switches. It reads
+one file under `/app/Config_Files`.
 
-The Core module is the foundation of Binacle.Net.
+## 📂 Files
 
-It provides essential API functionality, as detailed in the [API]({% vlink /api/index.md %}) page. 
+| File | Page | What it holds |
+|---|---|---|
+| `Presets.json` | [📖 Presets]({% vlink /configuration/core/presets.md %}) | Your bin set, so a request need not carry the bins |
 
-It also supports customizable presets and includes Swagger UI, which is disabled by default.
+## 🎛️ Switches
 
-## ⚙️ Configuration
-All configuration files for Binacle.Net Core are located in the `/app/Config_Files` directory.
+Each one is an environment variable, and each is **off** unless you set it:
 
-### 📑 Directory Structure
-```text
-app
-└── Config_Files
-    └── Presets.json
-```
+| Variable | Turns on |
+|---|---|
+| `SWAGGER_UI=True` | Swagger UI at `/swagger/` - explore and call the endpoints from a browser |
+| `ASPNETCORE_HTTP_PORTS=<port>` | The port inside the container. `8080` when unset |
 
-## 🎛️ Presets
-Binacle.Net allows you to predefine bin configurations using presets, so you don't have to send them with each request.
+To run on port `80` inside the container and still reach it on `8080`:
 
-visit the [Presets]({% vlink /configuration/core/presets.md %}) page for more details.
-
-## 🔑 Swagger UI
-Swagger UI provides an interactive interface for exploring and testing the API.
-
-By default, it is **disabled**. To enable it, set the environment variable:
-
-```bash
-SWAGGER_UI=True
-```
-
-## 🔌 Changing the Internal Port
-By default, Binacle.Net runs on port `8080`.
-
-To change this inside a container, set the `ASPNETCORE_HTTP_PORTS` environment variable.
-
-Example: Run on port `80` inside the container
 ```bash
 docker run --name binacle-net \
   -e ASPNETCORE_HTTP_PORTS=80 \

@@ -3,6 +3,7 @@ title       : Welcome to Binacle.Net Docs!
 description: >-
   Documentation for Binacle.Net: quick start, the V2 and V3 APIs, configuration, Docker and Kubernetes
   samples, and the release notes.
+breadcrumbs : false
 menu_title  : v2.x
 nav:
   exclude: true
@@ -10,44 +11,32 @@ nav:
   icon: 🏠
 ---
 
+Binacle.Net answers which box an order goes in, in milliseconds. Give it your box sizes and a list of items
+and it returns the smallest box that holds them, and where every item sits. It is a free and open source 3D
+bin packing API that you run yourself, shipped as a Docker image.
 
-Binacle.Net is an API created to address the 3D Bin Packing Problem in real time.
-
-When provided with a set of bins and items, Binacle.Net quickly identifies the most suitable bin,
-if available, that can accommodate all items efficiently. 
-
-This capability is particularly valuable for websites offering locker shipping options, allowing them to present 
-this choice to customers during critical stages, such as the cart or checkout process.
-
-By employing heuristic algorithms, Binacle.Net ensures rapid responses and minimal wait times for customers. 
-E-commerce platforms can leverage this API to either base their packaging on the dimensions of the lockers themselves 
-or utilize pre-defined boxes designed to fit seamlessly within those lockers.
+These docs cover the HTTP API, configuration, deployment, and the ViPaq result format. If you just want to
+see it work, start with the quick start.
 
 ---
 
 ## 🚀 [Quick Start]({% vlink /quick-start.md %})
-Get started with Binacle.Net in just a few steps! The Quick Start Guide covers the basics you need to run it quickly.
+One `docker run`, then the URLs to open. Start here if you have not run it yet.
 
 ## 🛠️ [Release Notes]({% vlink release-notes.md %})
-See what's new in the {{ page.version_label }} version of Binacle.Net.
+What changed in each v2 release, and how to move from v1.
+
+## 🔍 [Core Concepts]({% vlink /core-concepts.md %})
+What a dimension must be, fit against pack, and what each algorithm does.
 
 ## 📡 [API]({% vlink /api/index.md %})
-Understand the API endpoints, including how to use presets, send custom bin and item data, and query by preset to
-find the most efficient packing solution.
+The endpoints and their shapes. V2 has a fixed algorithm; V3 lets you choose one.
 
-Below are the main API versions and related resources:
-- ⚖️ [V2]({% vlink /api/v2.md %}): Offers the Fitting and Packing functions with fixed algorithm.
-- 🧪 [V3]({% vlink /api/v3.md %}): Introduces algorithm selection and deprecates some V2 features.
+## 🔧 [Configuration]({% vlink /configuration/index.md %})
+The files under `/app/Config_Files`, how to override a setting, and one page per module.
 
-## 🔧 Configuration
-Customize Binacle.Net to suit your environment. Explore the following configuration modules:
+## 📦 [Samples]({% vlink /samples/index.md %})
+Docker Compose and Kubernetes setups to copy.
 
-- [🏗️ Core]({% vlink /configuration/core/index.md %}): Provides essential API functionality, including Presets customization.
-- [📊 Diagnostics Module]({% vlink /configuration/diagnostics-module/index.md %}): Configure logging, health checks, and telemetry.
-- [🛡️ Service Module]({% vlink /configuration/service-module/index.md %}): Allows Binacle.Net to run as a Service. Built for the hosted service - **no public documentation from v2.0.0 onward**.
-- [🖥️ UI Module]({% vlink /configuration/ui-module/index.md %}): Enable the visual demo interface for packing simulations.
-
----
-
-Binacle.Net Docs will guide you through every aspect of using and integrating Binacle.Net.
-Whether you're looking for a quick deployment or deep customization, all the resources you need are here!
+## 🗜️ [ViPaq Protocol]({% vlink vipaq-protocol.md %})
+The compact format the V3 packing endpoint returns. Experimental in this line.

@@ -1,97 +1,77 @@
 ---
 title: Core Concepts
 description: >-
-  The three heuristic algorithms Binacle.Net packs with, FFD, WFD and BFD, what each one trades away, and the
-  difference between fitting and packing.
+  What Binacle.Net needs from your dimensions, the two questions it answers - fit and pack - and what the
+  FFD, WFD and BFD algorithms each do.
 nav:
   order: 3
   icon: 🔍
 ---
 
+Binacle.Net answers one question: given some bins and some items, which bin holds them, and where does each
+item go. This page is what you need to know before calling it - the shape of the data, the two operations,
+and the algorithms behind them.
 
-Binacle.Net is designed to solve the 3D Bin Packing Problem efficiently using specialized 
-**heuristic algorithms** and **real-time computation techniques**. 
+## 📏 Dimensions
 
-By balancing speed and accuracy, it picks the smallest bin that holds your items, for logistics, 
-warehousing and e-commerce. The warehouse and shipping trade calls this cartonization.
+Every bin and every item is a box: a length, a width and a height. Binacle.Net knows nothing else about them.
 
----
+- **Integers, in one unit.** Centimetres are assumed, but any unit works as long as every bin and every item
+  uses the same one. Convert before you send, and round up - a value rounded down describes an item that is
+  smaller than the one in the warehouse.
+- **Box the irregular ones.** A bottle, a tube or a bag is sent as the smallest box it fits in.
+- **Weight is not a dimension.** Binacle.Net does not read it. If a carrier has a weight limit, check it in
+  your own code before or after the call.
 
+## 🧩 Fit and Pack
 
-## Contents
-Binacle.Net leverages specialized algorithms and techniques to address various aspects of the bin packing problem.
+Binacle.Net does two things, and every endpoint is one or the other.
 
-Below are the key sections detailing how the system functions:
-- [🧠 Algorithms](#-algorithms)
-- [🛠️ Functions](#️-functions)
+**Fitting** answers yes or no: do these items fit in this bin? It stops as soon as it knows, which makes it
+the cheap call - the one to make at checkout, before offering a delivery option that depends on the answer.
 
----
+**Packing** goes on to place every item and returns where each one sits. If not everything fits, it packs
+what it can and names what was left over. This is the call that draws a picture, feeds a packing station, or
+is stored as [ViPaq]({% vlink vipaq-protocol.md %}).
+
+A fit that says yes is reliable: the items were placed. A no is a no from that algorithm, not proof that no
+arrangement exists - see below.
 
 ## 🧠 Algorithms
-In order to solve the Bin Packing problem in real time Binacle.Net employs heuristic algorithms suitable for real-time use.
 
-These algorithms do not examine every possible arrangement, so the packing they find is not the best one
-that exists. What they do give you is a reliable yes: when Binacle.Net confirms a bin is suitable, all the
-items fit. 
+Binacle.Net uses heuristics: rules that place items quickly rather than searching every possible
+arrangement. They do not always find the best packing that exists, and in rare cases one misses a fit that
+another would find. That is the trade for answering in milliseconds.
 
-However, in rare cases, the algorithm might miss possible fits because of its heuristic approach,
-a trade-off favoring speed in practical scenarios.
+Every algorithm sorts the items largest first, then places them one by one. They differ in which space each
+item goes into.
 
 ### ⚖️ First Fit Decreasing (FFD)
-Binacle.Net's hybrid First Fit Decreasing (FFD) algorithm sorts items by decreasing size and places each item in the 
-first available space that fits within a bin.
+Each item goes into the first space it fits in.
 
-- ✅ Places each item as soon as a space is found, without searching for a better one
-- ⚖️ Can leave space unused, because it never compares the spaces an item would fit in
+- ✅ Fast - it never compares spaces.
+- ⚖️ Can leave room unused, because it takes the first space and not the tightest one.
 
 ### 🧊 Worst Fit Decreasing (WFD)
-Worst Fit Decreasing (WFD) is another hybrid heuristic. 
-Items are sorted by size and placed in the space leaving the most unused room in the bin.
+Each item goes into the space that leaves the most room behind.
 
-- ✅ Useful in niche situations
-- ⚖️ Tends to spread items out, which may help with distribution but not always with space usage
+- ✅ Spreads items out, which helps when the leftover space matters more than the fit.
+- ⚖️ Rarely the tightest packing.
 
 ### 📏 Best Fit Decreasing (BFD)
-Best Fit Decreasing (BFD) aims for the most snug packing, placing each item in the spot that leaves the least
-unused space in the bin.
+Each item goes into the space that leaves the least room behind.
 
-- ✅ Keeps the space left around each placement as small as it can
-- ⚖️ Examines the candidate spaces for each item rather than taking the first one that fits
+- ✅ The tightest placement it can find for each item.
+- ⚖️ Looks at every candidate space for every item, so it is the slowest of the three.
 
-
-> Only V3 lets you choose the algorithm. Check the [API]({% vlink /api/index.md %}) pages.
+> Only [V3]({% vlink /api/v3.md %}) lets you choose the algorithm. The older API versions take no algorithm parameter.
 {:.block-note }
 
-> Which algorithm is fastest, or packs tightest, depends on your data and on the Binacle.Net version you run.
-> These descriptions say what each algorithm does, not how they rank against each other. If it matters to your
-> workload, measure all three on your own bins and items.
+> Which algorithm is fastest, or packs tightest, depends on your bins and items. These descriptions say what
+> each one does, not how they rank. If it matters to your workload, measure all three on your own data.
 {:.block-note }
 
----
+## ➡️ Where to go next
 
-## 🛠️ Functions
-Binacle.Net provides two core operations.
-
-- 🧩 **Fitting**: Checks whether a set of items can fit inside a bin.
-- 📦 **Packing**: Not only determines if items fit but also calculates their exact placement within the bin.
-
-### 🧩 Fitting
-The Fitting function evaluates if a given set of items can fit into a specified bin.
-
-**Why use Fitting?**
-- ✅ Ideal for pre-checks, ensuring items fit before checkout or shipping
-- ✅ Returns results indicating which items fit and which do not
-- ✅ Provides a quick, real-time assessment of bin suitability
-
-### 📦 Packing
-The Packing function goes beyond simple fitting. It determines where each item is placed within the bin. If all items don't fit, it packs as many of them as it can.
-
-**Why use Packing?**
-- ✅ Tracks the exact position of each item within the bin
-- ✅ Shows how the bin was filled, so you can see the room that is left
-- ✅ Helps fulfillment teams by providing step-by-step instructions for packing
-
-
-Both functions are engineered for high-speed performance and precision, enabling instantaneous packing decisions for production environments.
-
-📌 For the endpoints and their shapes, see the [API]({% vlink /api/index.md %}) pages.
+- [API]({% vlink /api/index.md %}) - the endpoints, and where the algorithm is chosen.
+- [Presets]({% vlink /configuration/core/presets.md %}) - your bin set, so a request need not carry the bins.

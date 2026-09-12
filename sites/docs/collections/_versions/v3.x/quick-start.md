@@ -1,27 +1,23 @@
 ---
 title: Quick Start
 description: >-
-  Run Binacle.Net with one Docker command, with Swagger UI, Scalar UI and the web UI switched on so you
-  can try it from a browser, or deploy the same container to Azure, AWS, Google Cloud, Koyeb or Digital Ocean.
+  Run Binacle.Net with one Docker command, open Swagger UI, Scalar UI and the web UI, then send your first
+  packing request and read the answer.
 nav:
   order: 1
   icon: 🚀
 ---
 
-Getting started with Binacle.Net is simple.
+One command runs it, one request shows what it does. The setup below turns on **Swagger UI**, **Scalar UI**
+and the **UI Module** so you can also try it from a browser. All three are off by default.
 
-The setup below turns on **Swagger UI**, **Scalar UI** and the **UI Module** so you can try it out from a
-browser. All three are off by default.
-
-## 🖥️ Run Locally with Docker
+## 🖥️ Run it with Docker
 
 ##### 1️⃣ Install Docker
 
 Download and install Docker from [docker.com](https://www.docker.com/get-started).
 
 ##### 2️⃣ Launch Binacle.Net
-
-Run this command in your terminal:
 
 ```bash
 docker run -d --name binacle-net \
@@ -32,36 +28,74 @@ docker run -d --name binacle-net \
   binacle/binacle-net:{{ page.version_tag }}
 ```
 
-This starts Binacle.Net with Swagger UI, Scalar UI and the UI Module enabled on port 8080.
+The tag `{{ page.version_tag }}` follows the newest patch in this line and never a breaking change. Pin it
+rather than `latest`, which follows every release, including the next major.
 
-The tag `{{ page.version_tag }}` is the minor tag: it follows the newest patch in this line and never a
-breaking change.
-
-##### 3️⃣ Access Locally
+##### 3️⃣ Open it
 
 - Swagger UI: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
 - Scalar UI: [http://localhost:8080/scalar/](http://localhost:8080/scalar/)
-- UI Module: [http://localhost:8080/](http://localhost:8080/)
+- UI Module: [http://localhost:8080/](http://localhost:8080/) - the packing demo and the ViPaq decoder
 
-## ☁️ Run in the Cloud
+## 📦 Send a request
 
-Binacle.Net is one container, so it runs on every platform that runs one. Pick by what you already use:
+Two bins, three kinds of item. Which bin holds them, and where does each item go?
 
-| Deployment     | Best Use Case                                | Platform URL                                                                        |
-|----------------|----------------------------------------------|-------------------------------------------------------------------------------------|
-| Local (Docker) | Quick development, testing, demos            | [Docker](https://www.docker.com/)                                                   |
-| Azure          | Microsoft stack integration, scalable apps   | [Azure App Service](https://azure.microsoft.com/en-us/products/app-service/)        |
-| AWS            | Large-scale microservices, container scaling | [AWS ECS](https://aws.amazon.com/ecs/) / [Fargate](https://aws.amazon.com/fargate/) |
-| Google Cloud   | Serverless, efficient API deployment         | [Google Cloud Run](https://cloud.google.com/run)                                    |
-| Koyeb          | Simple, cost-effective small workloads       | [Koyeb](https://www.koyeb.com/)                                                     |
-| Digital Ocean  | Easy, affordable for SMB apps                | [Digital Ocean](https://www.digitalocean.com/products/app-platform/)                |
+```bash
+curl -s http://localhost:8080/api/v3/pack/by-custom \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "parameters": { "algorithm": "FFD" },
+    "bins": [
+      { "id": "small", "length": 10, "width": 40, "height": 60 },
+      { "id": "large", "length": 20, "width": 40, "height": 60 }
+    ],
+    "items": [
+      { "id": "box_1", "quantity": 2, "length": 2, "width": 5, "height": 10 },
+      { "id": "box_2", "quantity": 1, "length": 12, "width": 15, "height": 10 },
+      { "id": "box_3", "quantity": 1, "length": 12, "width": 10, "height": 15 }
+    ]
+  }'
+```
 
-Whatever the platform, pin the same tag as above and never `latest` - it follows the newest release, and a
-major release can bring breaking changes.
+The answer holds one result per bin. For each, `result` says whether everything fit, and `packedItems` says
+where each item landed - its dimensions as placed, and the corner it sits at:
+
+```json
+{
+  "result": "Success",
+  "data": [
+    {
+      "result": "FullyPacked",
+      "bin": { "id": "small", "length": 10, "width": 40, "height": 60 },
+      "packedItems": [
+        { "id": "box_2", "length": 10, "width": 12, "height": 15, "x": 0, "y": 0, "z": 0 },
+        { "id": "box_3", "length": 10, "width": 12, "height": 15, "x": 0, "y": 12, "z": 0 },
+        { "id": "box_1", "length": 2, "width": 5, "height": 10, "x": 0, "y": 0, "z": 15 },
+        { "id": "box_1", "length": 2, "width": 5, "height": 10, "x": 0, "y": 24, "z": 0 }
+      ],
+      "unpackedItems": [],
+      "packedItemsVolumePercentage": 100,
+      "packedBinVolumePercentage": 15.83
+    },
+    { "result": "FullyPacked", "bin": { "id": "large", "length": 20, "width": 40, "height": 60 }, "...": "..." }
+  ]
+}
+```
+
+Both bins hold everything; the small one is the answer. `box_2` went in as 10 x 12 x 15 although it was sent
+as 12 x 15 x 10 - items are rotated to fit.
+
+That is V3, the stable API. [V4]({% vlink /api/v4.md %}) answers the "which bin" question in one call with
+`pack/smallest-bin`, and is experimental.
 
 ## ➡️ Where to go next
 
-- [API]({% vlink /api/index.md %}) - the endpoints, for V3 and experimental V4.
-- [Presets]({% vlink /configuration/core/presets.md %}) - replace the example bins with your own.
+- [Core Concepts]({% vlink /core-concepts.md %}) - what a dimension must be, and what the algorithms do.
+- [API]({% vlink /api/index.md %}) - every endpoint, for V3 and V4.
+- [Presets]({% vlink /configuration/core/presets.md %}) - your own bins by name, so a request need not carry them.
 - [Samples]({% vlink /samples/index.md %}) - Docker Compose and Kubernetes setups to copy, including one for
   running behind your own backend.
+
+Binacle.Net is one container, so it runs on any platform that runs one. Whatever the platform, pin the same
+tag as above.

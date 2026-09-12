@@ -4,7 +4,7 @@ description: >-
   ViPaq packs one bin and its items into a single copy-pastable string. What it carries, and the wire format
   as Binacle.Net writes and reads it: header, body and compression. The format changed in v3.0.0.
 nav:
-  order: 7
+  order: 9
   icon: 🗜️
 ---
 

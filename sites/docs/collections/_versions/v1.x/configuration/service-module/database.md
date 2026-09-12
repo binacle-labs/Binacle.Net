@@ -30,7 +30,7 @@ The database is configured via the `ConnectionStrings.json` file.
 {: .block-warning}
 
 🔗 For more details on how to configure connection strings, refer to the
-[Configuration Basics > Connection String Fallbacks]({% vlink /configuration-basics.md %}#-connection-string-fallbacks) section.
+[Configuration > Connection String Fallbacks]({% vlink /configuration/index.md %}#-connection-string-fallbacks) section.
 
 ---
 

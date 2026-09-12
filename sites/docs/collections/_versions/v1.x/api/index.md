@@ -4,15 +4,13 @@ description: >-
   The three API versions in Binacle.Net: V1, fitting only and deprecated, V2, which adds packing, and V3,
   experimental.
 nav:
-  order: 5
+  order: 4
   icon: 📡
 ---
 
 Three API versions are available, each suited to different requirements.
 
-## Prerequisites
-
-- [Core Concepts]({% vlink /core-concepts.md %}) - Understand the algorithms and functions used by Binacle.Net.
+Read [Core Concepts]({% vlink /core-concepts.md %}) first - it is what fit, pack and the algorithm names mean.
 
 ---
 

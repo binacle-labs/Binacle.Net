@@ -1,40 +1,21 @@
 ---
 title: Configuration
 description: >-
-  How Binacle.Net is configured: the Config_Files layout, and what the Core, Diagnostics, Service and UI
-  modules each need.
+  How Binacle.Net is configured: the files under /app/Config_Files, environment variable overrides, which one
+  wins, and what the Core, Diagnostics, Service and UI modules each need.
 nav:
   order: 6
   icon: 🔧
 ---
 
-Binacle.Net is designed for flexibility, allowing you to enable only the features you need. Most functionality is
-provided through modules, each with its own requirements, configuration options, and dependencies.
+Binacle.Net turns on only what you ask for. Most of it is modules, each with its own files and switches.
 
-This guide covers the configuration system for {{ page.version_label }} version.
-
-Make sure to read [Configuration Basics]({% vlink /configuration-basics.md %}) first then proceed with the
-specifics for this version.
-
----
-
-## 📖 Table of Contents
-
-- [📂 Configuration Files](#-configuration-files)
-    - [📑 Directory Structure](#-directory-structure)
-- [🔧 Modules Overview](#-binaclenet-modules-overview)
-    - [🏗️ Core](#%EF%B8%8F-binaclenet-core)
-    - [📊 Diagnostics Module](#-diagnostics-module)
-    - [🛡️ Service Module](#%EF%B8%8F-service-module)
-    - [🖥️ UI Module](#%EF%B8%8F-ui-module)
-
----
+This page is the configuration system: where the files are, the ways to override a setting, and which one
+wins when two disagree. The settings themselves are on the module pages linked at the end.
 
 ## 📂 Configuration Files
 
-All configuration files are located in `/app/Config_Files`.
-
-### 📑 Directory Structure
+Every configuration file lives under `/app/Config_Files`. This is the whole tree in {{ page.version_label }}:
 
 ```text
 app
@@ -44,7 +25,7 @@ app
     │   ├── HealthChecks.json
     │   ├── OpenTelemetry.json
     │   ├── PackingLogs.json
-    │   ├── Serilog.json
+    │   └── Serilog.json
     ├── ServiceModule
     │   ├── ConnectionStrings.json
     │   ├── JwtAuth.json
@@ -54,26 +35,103 @@ app
         └── ConnectionStrings.json
 ```
 
----
+## ⚙️ Overriding Configuration
 
-## 🔧 Binacle.Net Modules Overview
+There are four ways to change a setting. Which one to use depends on what the setting is:
 
-Each module adds functionality to Binacle.Net. This section provides an overview and links to detailed configuration
-pages.
+- 🔹 **Environment variables** - highest priority. Use them for secrets and anything that differs per deployment.
+- 📝 **Production overrides** (`<filename>.Production.json`) - a file holding only the settings you change.
+- 📄 **Direct file edits** - replace the file itself with a bind mount or a volume.
+- 🔄 **Connection string fallbacks** - a dedicated environment variable for each connection string.
 
-### 🏗️ Binacle.Net Core
+The examples below use this `Settings.json`:
 
-The foundation of Binacle.Net. Provides essential API functionality, Swagger UI, and presets.
+```json
+{
+  "Settings": {
+    "Enabled": false,
+    "DataFolderPath": "/data",
+    "Logs": {
+      "FileFormat": "dd-MM-yyyy.txt",
+      "Retention": 4
+    }
+  }
+}
+```
 
-- [🔍 Core Overview]({% vlink /configuration/core/index.md %})
+### 🌍 Environment Variables
+
+An environment variable beats every file. Name it after the setting's path, with `__` between the levels:
+
+```bash
+Settings__Enabled=True
+Settings__Logs__Retention=5
+```
+
+### 📝 Production Overrides
+
+Put a `Settings.Production.json` next to `Settings.json` holding only what changes:
+
+```json
+{
+  "Settings": {
+    "Enabled": true,
+    "Logs": {
+      "Retention": 5
+    }
+  }
+}
+```
+
+The two files are merged, so the rest of `Settings.json` still applies.
+
+### 📄 Direct File Edits
+
+Replace the whole file:
+
+- **Docker**: a bind mount (`-v /host/path:/container/path`)
+- **Kubernetes**: a volume (`hostPath` or a `ConfigMap`)
+
+> The file you mount replaces every default in it, so a key you leave out is gone, not defaulted. Use this only
+> when you mean to own the whole file - which is the normal way to supply `Presets.json`.
+{: .block-warning}
+
+### 🔄 Connection String Fallbacks
+
+A connection string can also come from an environment variable named after the connection, uppercased, with
+`_CONNECTION_STRING` on the end. This is the place for a connection string that holds credentials.
+
+```bash
+DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413
+```
+
+## ⚖️ Configuration Precedence
+
+When more than one method sets the same value, the highest row wins:
+
+| Order | Method                     | Setting (`Logs.Retention`)      | Connection string (`ConnectionStrings.Database`)              |
+|-------|----------------------------|---------------------------------|---------------------------------------------------------------|
+| 1     | Environment variable       | `Settings__Logs__Retention=5`   | `ConnectionStrings__Database=endpoint=https://localhost:1413` |
+| 2     | Production override        | `Settings.Production.json`      | `ConnectionStrings.Production.json`                           |
+| 3     | Direct file edit           | `Settings.json`                 | `ConnectionStrings.json`                                      |
+| 4     | Connection string fallback | -                               | `DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413`  |
+
+## 🔧 Modules
+
+Each module adds something to Binacle.Net. Its page lists its files and switches.
+
+### 🏗️ Core
+
+The API itself, the presets, and the switch for Swagger UI.
+
+- [🔍 Core]({% vlink /configuration/core/index.md %})
 - [📖 Presets]({% vlink /configuration/core/presets.md %})
 
 ### 📊 Diagnostics Module
 
-Handles system health monitoring, logging, and telemetry. This module is always enabled, but not all of its features
-come enabled by default.
+Logging, health checks, packing logs and telemetry. Always on; only logging is enabled out of the box.
 
-- [🔍 Diagnostics Module Overview]({% vlink /configuration/diagnostics-module/index.md %})
+- [🔍 Diagnostics Module]({% vlink /configuration/diagnostics-module/index.md %})
 - [📜 Logging]({% vlink /configuration/diagnostics-module/logging.md %})
 - [❤️‍🩹 Health Checks]({% vlink /configuration/diagnostics-module/health-checks.md %})
 - [📦 Packing Logs]({% vlink /configuration/diagnostics-module/packing-logs.md %})
@@ -81,9 +139,9 @@ come enabled by default.
 
 ### 🛡️ Service Module
 
-Allows Binacle.Net to run as a managed service with authentication and rate limiting.
+Rate limiting, user management and JWT authentication, for running Binacle.Net as a public service.
 
-- [🔍 Service Module Overview]({% vlink /configuration/service-module/index.md %})
+- [🔍 Service Module]({% vlink /configuration/service-module/index.md %})
 - [🗄️ Database]({% vlink /configuration/service-module/database.md %})
 - [🔐 Authentication]({% vlink /configuration/service-module/authentication.md %})
 - [👥 Users]({% vlink /configuration/service-module/users.md %})
@@ -91,6 +149,6 @@ Allows Binacle.Net to run as a managed service with authentication and rate limi
 
 ### 🖥️ UI Module
 
-Provides a web-based UI for packing demos and protocol decoding.
+Two browser pages: the packing demo and the ViPaq decoder. Off by default.
 
-- [🔍 UI Module Overview]({% vlink /configuration/ui-module/index.md %})
+- [🔍 UI Module]({% vlink /configuration/ui-module/index.md %})

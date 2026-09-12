@@ -4,7 +4,7 @@ description: >-
   Sample configurations for running Binacle.Net with Docker Compose, or on a Kubernetes cluster you
   already have. Download a folder and edit it.
 nav:
-  order: 20
+  order: 7
   icon: 📦
 ---
 

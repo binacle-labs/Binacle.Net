@@ -12,7 +12,6 @@ nav:
   icon: 🏠
 ---
 
-
 Binacle.Net answers which box an order goes in, in milliseconds. Give it your box sizes and a list of items
 and it returns the smallest box that holds them, and where every item sits. It is a free and open source 3D
 bin packing API that you run yourself, shipped as a Docker image.
@@ -25,44 +24,26 @@ see it work, start with the quick start.
 ## 🚀 [Quick Start]({% vlink /quick-start.md %})
 One `docker run`, then a request. Start here if you have not run it yet.
 
-## 🔍 [Core Concepts]({% vlink /core-concepts.md %})
-How the algorithms work, and which one to pick.
+## 🛠️ [Release Notes]({% vlink release-notes.md %})
+What changed in {{ page.version_label }}, and how to move from the version before.
 
-## 🔧 [Configuration Basics]({% vlink /configuration-basics.md %})
-The files under `/app/Config_Files`, environment variable overrides, and which one wins.
+## 🔍 [Core Concepts]({% vlink /core-concepts.md %})
+What a dimension must be, fit against pack, and what each algorithm does.
+
+## 📡 [API]({% vlink /api/index.md %})
+The endpoints and their shapes. V3 is stable; V4 is experimental and adds the `Best` algorithm.
 
 ## 🧰 [Generate a Client]({% vlink /generate-a-client.md %})
 A typed client from the published OpenAPI documents - hey-api for TypeScript, Kiota for C#.
 
-## 🛠️ [Release Notes]({% vlink release-notes.md %})
-See what's new in the {{ page.version_label }} version of Binacle.Net.
-
-## 📡 [API]({% vlink /api/index.md %})
-The endpoints, the request and response shapes, and how presets differ from sending your own bins.
-
-Two versions are documented:
-- ✅ [V3]({% vlink /api/v3.md %}): fitting and packing with a choice of algorithm. Stable, and the recommended version.
-- 🧪 [V4]({% vlink /api/v4.md %}): 16 endpoints organized by the answer you want. **Experimental** - it can change at any time.
-
-**V2 was removed in this version.** If you still call it, see the
-[v2.x documentation]({% vlink v2.x /index.md %}).
-
-## 🗜️ [ViPaq Protocol]({% vlink vipaq-protocol.md %})
-The compact format the packing endpoints return. The format changed in v3.0.0 and is stable from this release.
-
-## 🔧 Configuration
-Customize Binacle.Net to suit your environment. Explore the following configuration modules:
-
-- [🏗️ Core]({% vlink /configuration/core/index.md %}): Provides essential API functionality, including Presets and running behind a proxy.
-- [📊 Diagnostics Module]({% vlink /configuration/diagnostics-module/index.md %}): Configure logging, health checks, and telemetry.
-- [🛡️ Service Module]({% vlink /configuration/service-module/index.md %}): Allows Binacle.Net to run as a Service. Built for the hosted service - **no public documentation from v2.0.0 onward**.
-- [🖥️ UI Module]({% vlink /configuration/ui-module/index.md %}): Turn on the browser demo - packing and the ViPaq decoder.
+## 🔧 [Configuration]({% vlink /configuration/index.md %})
+The files under `/app/Config_Files`, how to override a setting, and one page per module.
 
 ## 📦 [Samples]({% vlink /samples/index.md %})
-Docker Compose and Kubernetes setups to copy and edit, including one for running the API behind your own backend.
+Docker Compose and Kubernetes setups to copy, including one for running behind your own backend.
 
-## 🔗 [Integration Guide]({% vlink /integration-guide.md %})
-Wiring Binacle.Net into checkout: sizing products, choosing your bin set, calling the API.
+## 🗜️ [ViPaq Protocol]({% vlink vipaq-protocol.md %})
+The compact format the packing endpoints return. Stable from v3.0.0.
 
-## 📚 [Versions]({% link _common_pages/version.html %})
-Every documented line, for a reader on an older image.
+## 🔏 [Verifying a Release]({% vlink /verifying-a-release.md %})
+Check the signature and read the bill of materials of a published image.

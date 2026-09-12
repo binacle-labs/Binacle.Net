@@ -1,7 +1,7 @@
 ---
 description: The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL.
 state: ready
-waits-on: "the docs deploy - everything on the branch landed 2026-09-12; what is open needs the deployed site (the redirect curls, the selector click, the 301 flip), the release (the major tag manifest), or the maintainer's word on two questions under Open"
+waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip) or the release (the major tag manifest)"
 horizon: now
 paths:
   - "sites/docs/**"
@@ -280,20 +280,15 @@ while the moves are still being checked.
 
 ### Open - the maintainer's
 
-- [ ] **Is `version.html` still needed?** It is the one page left in `_common_pages/`, at `/version/`, listing
-      the lines - and the selector on every page lists the same lines, on every page, landing on the same page.
-      If it goes: the `common_pages` collection and its `defaults` block go with it, `pages.xml` covers
-      `404.html` alone, the `📚 Versions` entry on `v3.x/index.md` and the link on `generate-a-client.md` go, and
-      `/version/*` gets a redirect line to `/`. If it stays, nothing changes. The maintainer raised it on
-      2026-09-12; his call.
-      `ls sites/docs/collections/_common_pages/` prints nothing or `version.html`, and the plan says which.
-- [ ] **Does the sidebar still need the "Latest Version Docs" button?** Two places show it: the plain sidebar
-      (on `/version/` and `404.html`) always, and the versioned sidebar on a page of a closed line. The logo
-      and title above it already link the current line's index, and the selector's `(current)` option lands on
-      the same page in the current line - so the button is a third way to the same place. If it goes, both
-      includes lose it and `_data/sidebar.yml` loses `latest_version_link_text`. The maintainer raised it on
-      2026-09-12; his call.
-      `grep -rn latest_version_link_text sites/docs` returns nothing, or the plan says it stays.
+- [x] **2026-09-12, the maintainer said no - it has no place now.** `version.html` is gone with the
+      `common_pages` collection, its `defaults` block, `pages.xml`, the second layout, sidebar and menu, the
+      `📚 Versions` entry on the landing page and the link on `generate-a-client.md`. `/version/` redirects to
+      `/`. `design/sites/decisions.md#S12` holds it.
+      `ls sites/docs/collections/` prints `_versions` alone, and `ls sites/docs/_layouts sites/docs/_includes`
+      shows no `versions/` folder.
+- [x] **2026-09-12, the maintainer said no.** The "Latest Version Docs" button is gone from both includes.
+      `grep -rn latest_version_link_text sites/docs` returns nothing. `_data/sidebar.yml` held only that
+      key and is empty of use - delete it.
 
 ### After the first deploy
 
@@ -301,10 +296,9 @@ while the moves are still being checked.
       the `curl -sI` calls under *Done when*. Until then they are `302`, so a wrong one is not cached.
       `grep -c 302 sites/docs/_redirects` returns 0.
 
-**The sidebar order is not a step here either.** The six moved pages kept their old `nav.order`, so the
-current line's sidebar reads Quick Start, Release Notes, Core Concepts, Configuration Basics, Generate a
-Client, API, Configuration, … - the maintainer saw it on 2026-09-12 and gave it a session of its own:
-`plans/sites/docs-sidebar-order.md`.
+**The sidebar order landed 2026-09-12**, in all three folders: Quick Start, Core Concepts, API, Generate a
+Client, Configuration (Basics first inside it), Samples, Integration Guide, ViPaq Protocol, Verifying a
+Release, Release Notes. Its plan, `plans/sites/docs-sidebar-order.md`, is ticked and waits for deletion.
 
 **The 3.1.0 release notes are not a step here.** A `## v3.1.0` section at the top of `v3.x/release-notes.md`
 names a date and a link that exist only after the run is green, so on `main` before the tag they would be
@@ -352,11 +346,10 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
       lists one per folder, and so do `grep -n 'url_segment:'` and `grep -n 'label:'`, and
       `grep -n 'current_docs_version\|v3\.0' tooling/openapi.just` returns nothing.
 - [x] **2026-09-12.** Three folders, no common layer.
-      `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`, and
-      `ls sites/docs/collections/_common_pages/` prints `version.html` alone.
+      `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`, and `ls sites/docs/collections/` prints
+      `_versions` alone.
 - [x] **2026-09-12.** Every old-line link to a common page is a `vlink` into its own folder.
-      `grep -rn '_common_pages' sites/docs/collections/_versions/ | grep -v version.html` returns nothing, and
-      the build passes.
+      `grep -rn '_common_pages' sites/docs/collections/_versions/` returns nothing, and the build passes.
 - [x] **2026-09-12.** The six pages were merged from both copies, not taken from one.
       **By eye.** For each, `git diff v3.0.0 -- sites/docs/collections/_common_pages/<page>` was read and
       the session's notes say what was kept from which side. `core-concepts` names `Best` in `v3.x` and does
