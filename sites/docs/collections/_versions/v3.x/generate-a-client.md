@@ -4,7 +4,7 @@ description: >-
   Generate a typed API client from Binacle.Net's published OpenAPI documents. hey-api for TypeScript, Kiota for
   C#, two commands each.
 nav:
-  order: 4
+  order: 5
   icon: 🧰
 ---
 
@@ -22,7 +22,7 @@ generate, read and keep in your own repository.
 - V4: [`{{ site.url }}{% vlink /swagger/v4.json %}`]({% vlink /swagger/v4.json %})
 
 The [API]({% vlink /api/index.md %}) pages describe the endpoints. Another version's documents are on its own
-pages - the [Versions]({% link _common_pages/version.html %}) page lists them.
+pages - pick the version in the sidebar.
 
 > ⚠️ V4 is **experimental and can change at any time**. A client generated from `v4.json` will need
 > regenerating, and your calling code will need editing, when the contracts move. Use V3 for anything you keep.

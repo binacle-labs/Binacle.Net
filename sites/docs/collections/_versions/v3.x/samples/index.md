@@ -4,7 +4,7 @@ description: >-
   Starting points for running Binacle.Net: five Docker Compose setups and a minimal Kubernetes deployment.
   Download a folder and edit the presets.
 nav:
-  order: 20
+  order: 7
   icon: 📦
 ---
 

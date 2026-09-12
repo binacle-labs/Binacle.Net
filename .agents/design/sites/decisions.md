@@ -201,3 +201,38 @@ rather than 404.
 **What would reopen it:** a major that removes pages from the root - the gem prints the removed-page list at
 build for exactly that day - or a minor that turns out to change what an existing page says rather than add
 to it, which semver says does not happen.
+
+### S12 - the last common page went, and with it the second layout; one sidebar order in every folder
+
+**Set by the maintainer on 2026-09-12; landed the same day** in `sites/docs`. Three things, all one decision:
+every page is a `versions` document; the top level reads in one order in every folder; two pages that only
+existed to be version-free were folded into the pages that owned their facts.
+
+**`version.html` had no place once the selector existed.** It was the one page left outside the versions,
+listing the lines at `/version/` - and the selector on every page listed the same lines, on every page,
+landing on the same page in the other line. A "Latest Version Docs" button beside it was a third way to the
+current index, after the logo and the selector's `(current)` option. Both went. With the collection empty,
+`_layouts/default.html`, `_includes/sidebar.html`, `_includes/menu.html` and `_data/sidebar.yml` had nothing
+to render, so the `versions/` copies became the only ones and lost the prefix. `pages.xml` listed nothing
+after that - `404.html` is excluded - and went too. `/version/` redirects to `/`.
+
+**Release Notes is second, always.** The six pages that moved in on 2026-09-12 kept the `nav.order` they had
+had on the old root, so the current line's sidebar read Quick Start, Release Notes, Core Concepts,
+Configuration Basics, Generate a Client, API, Configuration, and the old lines read a different subset in a
+different order. One sequence now, written into every folder; the numbers are in `$sites/docs#sidebar-order`.
+
+**Configuration Basics folded into Configuration; Integration Guide left the docs.** Basics existed to be
+version-free, and there is no version-free layer; every fact in it - the `Config_Files` tree, the four
+override methods, the precedence table - is true in every folder and was already printed on the Configuration
+page beside a second copy of the tree, with a third on Core. One page now, with Basics' headings kept so the
+old anchors hold, and the two deleted pages redirect. The guide was a locker-shipping checkout story from
+2023; its two reference facts - integers in one unit, box the irregular ones; the destination's sizes or your
+own boxes as the bin set - went into Core Concepts and Presets, and the story is not documentation.
+
+**Core lists one child page per file it reads.** `Cors.json` had been a section in the middle of the Core
+page while `ForwardedHeaders.json` and `Presets.json` had pages; the switches (`SWAGGER_UI`, `SCALAR_UI`,
+`DEBUG_ENDPOINT`, the port) were sections too. Core is now an overview, a file table and a switch table, and
+CORS is the third child - the shape Diagnostics already had.
+
+**What would reopen it:** a page that is genuinely the same in every line and changes often enough that
+three copies drift - the answer then is a generated include, not a common collection.

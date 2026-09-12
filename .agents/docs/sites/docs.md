@@ -2,7 +2,7 @@
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
 verified: 2026-09-12
-check: Collections, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/ - one folder per major, named vN.x; every folder has an entry in sites/docs/_data/versions.yml carrying id, url_segment, label and version_tag, in the order the sidebar renders; collections/_common_pages/ holds version.html alone and pages/ holds 404.html and robots.txt alone; no file under collections/_versions/ carries a permalink; a built artifacts/docs renders the current folder at the root and every other under /version/<url_segment>/, has `noindex, follow` on every non-current version page and none on a root page, no sitemap listing a `noindex` URL, and a _redirects file at its root; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml still writes pages.xml and version-current.xml under /sitemap/ with an index at /sitemap.xml
+check: Collections, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/ - one folder per major, named vN.x; every folder has an entry in sites/docs/_data/versions.yml carrying id, url_segment, label and version_tag, in the order the sidebar renders; collections/ holds _versions alone, pages/ holds 404.html and robots.txt alone, and _layouts and _includes have no versions/ subfolder; no file under collections/_versions/ carries a permalink; a built artifacts/docs renders the current folder at the root and every other under /version/<url_segment>/, has `noindex, follow` on every non-current version page and none on a root page, no sitemap listing a `noindex` URL, and a _redirects file at its root; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml writes version-current.xml alone under /sitemap/ with an index at /sitemap.xml; the top-level nav.order sequence is the same in every folder with Release Notes second
 paths:
   - "sites/docs/**"
 ---
@@ -27,7 +27,6 @@ just build docs   # the same site built once, into artifacts/docs
 | Path | What it is |
 |---|---|
 | `collections/_versions/` | Every page. One folder per major line - `v1.x`, `v2.x`, `v3.x` |
-| `collections/_common_pages/` | `version.html` alone - the list of lines at `/version/` |
 | `pages/` | `404.html` and `robots.txt` |
 | `_data/versions.yml` | The one knob: which folder is current, and the four keys of every folder |
 | `_redirects` | Every old URL and where it went. Cloudflare reads it from the output root |
@@ -37,15 +36,27 @@ The current folder renders at the site root; every other folder under `/version/
 
 ### No common layer {#common-page-rule}
 
-**Every page belongs to a line.** There is no page that renders once for every version. A page that is true
+**Every page belongs to a line.** There is no page that renders once for every version, and no collection
+but `versions` - one layout (`default`, `swagger` for the embed), one sidebar, one menu. A page that is true
 for every version - what an algorithm does, how configuration files are laid out - lives in the current folder
 and is copied forward with it at the next major, like every other page. The six pages that used to sit outside
 the versions moved in on 2026-09-12; the ledger entry `$sites/decisions#S11` holds why, with what each of them
-had quietly come to say.
+had quietly come to say. The version list at `/version/` went the same day (`$sites/decisions#S12`); the
+selector in the sidebar is the list.
 
 **Two consequences for a page in a version folder.** It may name real config keys, endpoint paths, API versions
 and whether a feature is experimental - the folder says which release those hold for. And it links another page
 with `{% vlink %}`, never with `{% link %}` into some shared place, because there is none.
+
+### One sidebar order, every folder {#sidebar-order}
+
+The top level reads the same in every folder, minus the pages a line does not have: **Quick Start, Release
+Notes, Core Concepts, API, Generate a Client, Configuration, Samples, ViPaq Protocol, Verifying a Release.**
+Release Notes is always second - the maintainer's rule, 2026-09-12. `nav.order` in each page's front matter
+is the number; a new top-level page is slotted in and the numbers after it move. Under Configuration the
+Core page lists **one child page per file it reads** (`Presets.json`, `ForwardedHeaders.json`, `Cors.json`),
+the way Diagnostics already does. An in-page contents list appears only on the API reference pages; the
+sidebar is the contents for everything else.
 
 ## Page metadata
 
@@ -61,7 +72,7 @@ line because its URL carries no version. A page that sets `seo_title` gets exact
 **nothing is appended**, so a page using it writes its own suffix. `v3.x/index.md` does, for the root.
 
 **Nav labels and breadcrumbs use `menu_title` where a page sets one**, falling back to `title`
-(`_includes/versions/menu.html`, and the `title_from` list in the site's `breadcrumbs:` config). It exists
+(`_includes/menu.html`, and the `title_from` list in the site's `breadcrumbs:` config). It exists
 so a page can carry a title that is unique across the site while the sidebar keeps a short label - two
 sample pages named `Minimal` under different parents read fine in a tree and collide in a `<title>`.
 **`nav.parent` still matches on `title`, not on `menu_title`**, so renaming a page that has children breaks the tree.
@@ -110,11 +121,12 @@ Everything below reads `current`; nothing names a version.
 - **Neither value is written by a layout.** `binacle-docs-versions` stamps `robots` and `title_suffix` onto
   every page of a closed line at a high priority, and `{% page_meta %}` writes them out —
   `Quick Start (v2.1.1) - Binacle.Net Docs` — so an old page cannot collide with the same page at the root.
-  The current line gets neither. `_layouts/versions/swagger.html` calls the same tag.
+  The current line gets neither. `_layouts/swagger.html` calls the same tag.
 - **The sitemaps are generated, not written.** `jekyll-multi-sitemap` reads the `sitemaps:` block in
-  `_config.yml`: `version-current.xml` selects the `versions` collection where `version` matches
-  `site.data.versions.current` - root URLs only - and `pages.xml` covers `pages/` and `_common_pages/`, which
-  is `/version/` and `/404.html`. Both are served under `/sitemap/`, with an index over them at `/sitemap.xml`.
+  `_config.yml`: one file, `version-current.xml`, selects the `versions` collection where `version` matches
+  `site.data.versions.current` - root URLs only. It is served under `/sitemap/`, with an index over it at
+  `/sitemap.xml`. There is no `pages.xml` since 2026-09-12: `404.html` is excluded and nothing else lives
+  outside the collection, so it listed nothing.
 - Swagger pages are `noindex, nofollow` in every version, current included. A `**/swagger/**` defaults block
   in `_config.yml` sets that `robots` value in page data, where the stamp leaves it alone, and keeps them out
   of the sitemap. A submitted `noindex` URL is a Search Console error.
@@ -213,7 +225,7 @@ run in parallel into the one directory.
 
 Vendor libs the docs site loads:
 - BeerCSS — theming (`/lib/beercss/`, via `sites/docs/_data/includes.yml`)
-- Swagger UI — embedded OpenAPI explorer, loaded in the `versions/swagger.html` layout
+- Swagger UI — embedded OpenAPI explorer, loaded in the `swagger.html` layout
 
 Note: docs does **not** use Alpine.js or material-dynamic-colors (neither is referenced anywhere under
 `sites/docs/`). Don't assume they're available here.

@@ -9,15 +9,25 @@ nav:
   icon: 📖
 ---
 
-Using presets in Binacle.Net can significantly streamline your packing process,
-especially when bin configurations are consistent.
+A preset is a named bin set. Define it once in `Presets.json` and a request names the preset instead of
+carrying the bins. The shipped file holds example presets; replacing it with your own bins is the first thing
+to do, because until then every answer describes someone else's packaging.
 
-Instead of including bin definitions in every API request,
-you can define them once in the preset file and reuse them across multiple requests.
-
-> While Binacle.Net assumes the use of centimeters, you can use any measurement system as
-> long as the dimensions are integers and consistent across bins and items.
+> Centimetres are assumed, but any unit works as long as every bin and every item uses the same one, as
+> integers. [Core Concepts]({% vlink /core-concepts.md %}) has the rest of what a dimension must be.
 {: .block-caution}
+
+## 📦 Choosing Your Bin Set
+
+A preset is whatever you pack into, and there are two ways to define it:
+
+- **The destination's sizes** - the locker compartments, the shelf, the pallet. Space is used as well as it
+  can be, and the answer says directly whether an order fits where it is going. The cost is one preset per
+  carrier or destination, kept in step with what they offer.
+- **Your own boxes** - the packaging you stock. One preset, and packing stays the same whoever delivers. The
+  cost is the space a box wastes when it does not match the compartment it ends up in.
+
+Both are just bins in the file. Keep one preset per set and name it after what it is.
 
 ## 🛠️ Configuration
 Presets are stored in the `Presets.json` file.
@@ -56,10 +66,10 @@ This file contains predefined bin configurations that can be used directly in yo
 ```
 
 Although you can modify the presets using any method described in the
-[Configuration Basics]({% vlink /configuration-basics.md %}#%EF%B8%8F-overriding-configuration) page,
+[Configuration]({% vlink /configuration/index.md %}#%EF%B8%8F-overriding-configuration) page,
 it's generally recommended to replace the entire file rather than making incremental changes.
 
-Please refer to the [Configuration Basics > Direct File Edits]({% vlink /configuration-basics.md %}#-direct-file-edits)
+Please refer to the [Configuration > Direct File Edits]({% vlink /configuration/index.md %}#-direct-file-edits)
 section of the page for more information on overriding configurations.
 
 - 📁 **Location**: `/app/Config_Files`

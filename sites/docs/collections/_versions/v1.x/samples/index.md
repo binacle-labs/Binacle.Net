@@ -4,7 +4,7 @@ description: >-
   Sample configurations for running Binacle.Net with Docker Compose: a minimal setup, a full deployment,
   or the UI Module only.
 nav:
-  order: 20
+  order: 7
   icon: 📦
 ---
 

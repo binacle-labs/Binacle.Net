@@ -4,7 +4,7 @@ description: >-
   Check that a Binacle.Net image is the one the release workflow built. Two commands: cosign verify, then
   inspect the SBOM and build provenance.
 nav:
-  order: 8
+  order: 10
   icon: 🔏
 ---
 

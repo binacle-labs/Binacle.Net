@@ -36,6 +36,6 @@ This starts Binacle.Net with Swagger and Scalar UI and the UI Module enabled on 
 ##### 3️⃣ Access Locally
 
 - Swagger UI: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
-- Swagger UI: [http://localhost:8080/scalar/](http://localhost:8080/scalar/)
+- Scalar UI: [http://localhost:8080/scalar/](http://localhost:8080/scalar/)
 - UI Module: [http://localhost:8080/](http://localhost:8080/)
 

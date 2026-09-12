@@ -1,104 +1,43 @@
 ---
 title: Core
 description: >-
-  The Core module: presets, the interactive docs, CORS and forwarded headers. Where its configuration files live
-  and what each one sets.
+  The Core module: the API, the presets, the switches for Swagger UI, Scalar UI and the debug endpoint, and the
+  pages for the three files it reads.
 nav:
   parent: Configuration
   order: 1
   icon: 🏗️
 ---
 
+Core is Binacle.Net itself: the [API]({% vlink /api/index.md %}), the presets, and a few switches. It reads
+three files under `/app/Config_Files`, and each has its own page.
 
-The Core module is the foundation of Binacle.Net.
+## 📂 Files
 
-It provides essential API functionality, as detailed in the [API]({% vlink /api/index.md %}) page.
+| File | Page | What it holds |
+|---|---|---|
+| `Presets.json` | [📖 Presets]({% vlink /configuration/core/presets.md %}) | Your bin set, so a request need not carry the bins |
+| `ForwardedHeaders.json` | [🌐 Forwarded Headers]({% vlink /configuration/core/forwarded-headers.md %}) | The caller's real address when a proxy or CDN sits in front |
+| `Cors.json` | [🌍 CORS]({% vlink /configuration/core/cors.md %}) | The browser origins allowed to call the API directly |
 
-It also supports customizable presets and includes Swagger UI, which is disabled by default.
+## 🎛️ Switches
 
-## ⚙️ Configuration
-All configuration files for Binacle.Net Core are located in the `/app/Config_Files` directory.
+Each one is an environment variable, and each is **off** unless you set it:
 
-### 📑 Directory Structure
-```text
-app
-└── Config_Files
-    ├── Presets.json
-    ├── Cors.json
-    └── ForwardedHeaders.json
-```
+| Variable | Turns on |
+|---|---|
+| `SWAGGER_UI=True` | Swagger UI at `/swagger/` - explore and call the endpoints from a browser |
+| `SCALAR_UI=True` | Scalar UI at `/scalar/` - the same, in a different reader |
+| `DEBUG_ENDPOINT=True` | `/_debug`, which echoes your own request back: the address the app resolved you to and every header you sent |
+| `ASPNETCORE_HTTP_PORTS=<port>` | The port inside the container. `8080` when unset |
 
-## 🎛️ Presets
-Binacle.Net allows you to predefine bin configurations using presets, so you don't have to send them with each request.
-
-visit the [Presets]({% vlink /configuration/core/presets.md %}) page for more details.
-
-## 🌐 Running Behind a Proxy
-If a proxy, load balancer or CDN sits in front of Binacle.Net, it sees the proxy as the caller unless you tell
-it otherwise.
-
-Visit the [Forwarded Headers]({% vlink /configuration/core/forwarded-headers.md %}) page for more details.
-
-## 🔑 Swagger UI
-Swagger UI provides an interactive interface for exploring and testing the API.
-
-By default, it is **disabled**. To enable it, set the environment variable:
-
-```bash
-SWAGGER_UI=True
-```
-
-## 🖥️ Scalar UI
-Scalar UI is a web-based interface for interacting with Binacle.Net.
-It's an alternative to Swagger UI, providing a more user-friendly experience for managing bins and viewing results.
-
-By default, it is **disabled**. To enable it, set the environment variable:
-
-```bash
-SCALAR_UI=True
-```
-
-## 🧰 Debug Endpoint
-`/_debug` echoes your own request back to you: the address the app resolved you to, and every header you sent.
-It is the quickest way to see what a proxy is actually sending.
-
-By default, it is **disabled**. To enable it, set the environment variable:
-
-```bash
-DEBUG_ENDPOINT=True
-```
-
-> The endpoint needs no authentication and echoes **every** header, including `Authorization`. Turn it on to
-> read a value, then turn it off again. Do not leave it enabled where other people can reach it.
+> `/_debug` needs no authentication and echoes **every** header, including `Authorization`. It is the quickest
+> way to see what a proxy is actually sending. Turn it on to read a value, then turn it off again. Do not
+> leave it enabled where other people can reach it.
 {: .block-warning}
 
-## 🌍 CORS
-CORS only matters when a **browser** calls the API directly. Server-to-server callers are unaffected.
+To run on port `80` inside the container and still reach it on `8080`:
 
-Allowed origins are configured in `Cors.json`, which is **not** in the image - you supply it. Until you do, no
-browser origin is allowed through.
-
-```json
-{
-  "Cors": {
-    "CoreApi": {
-      "AllowedOrigins": [ "https://your-site.example" ]
-    }
-  }
-}
-```
-
-Give each origin its exact scheme, host and port.
-
-- 📁 **Location**: `/app/Config_Files`
-- 📌 **Full Path**: `/app/Config_Files/Cors.json`
-
-## 🔌 Changing the Internal Port
-By default, Binacle.Net runs on port `8080`.
-
-To change this inside a container, set the `ASPNETCORE_HTTP_PORTS` environment variable.
-
-Example: Run on port `80` inside the container
 ```bash
 docker run --name binacle-net \
   -e ASPNETCORE_HTTP_PORTS=80 \

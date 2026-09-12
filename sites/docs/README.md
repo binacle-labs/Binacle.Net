@@ -7,8 +7,7 @@ The documentation site, built with [Jekyll](https://jekyllrb.com/). It hosts the
 
 | Path | What it is |
 |---|---|
-| `collections/_versions/` | The versioned documentation, one folder per line. A closed line's folder is frozen |
-| `collections/_common_pages/` | One page: the version list at `/version/`. Every other page belongs to a line |
+| `collections/_versions/` | Every page, one folder per line. The current line renders at the root; a closed line's folder is frozen |
 | `pages/` | `404.html` and `robots.txt`. The landing page is the current line's index |
 | `_data/` | Site data. `versions.yml` is the version list: which one is current, where each renders, what docker tag each pulls |
 | `_redirects` | Old urls and where they went, one per line. Cloudflare reads it from the output root |

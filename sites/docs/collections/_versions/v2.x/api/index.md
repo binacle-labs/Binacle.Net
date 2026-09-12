@@ -4,15 +4,13 @@ description: >-
   The two API versions documented for Binacle.Net: V2, where the algorithm is fixed, and V3, where you
   choose it and can get ViPaq results.
 nav:
-  order: 5
+  order: 4
   icon: 📡
 ---
 
 Two API versions are available, each suited to different requirements.
 
-## Prerequisites
-
-- [Core Concepts]({% vlink /core-concepts.md %}) - Understand the algorithms and functions used by Binacle.Net.
+Read [Core Concepts]({% vlink /core-concepts.md %}) first - it is what fit, pack and the algorithm names mean.
 
 ---
 
