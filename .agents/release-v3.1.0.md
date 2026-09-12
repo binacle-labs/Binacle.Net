@@ -107,7 +107,7 @@ step added there is a step every release pays for.
 | Plan | The slice this release takes |
 |---|---|
 | `plans/sites/docs-current-at-root.md` | **The whole plan - the maintainer put it in on 2026-09-11. Landed on the branch 2026-09-12**, steps 1-15 of 16. One folder per major, the current one at the site root, the common layer gone, `v2.0.x` and `v2.1.x` merged into `v2.x`, closed lines at `/version/1.3.0/` and `/version/2.1.1/`. Both questions for the maintainer were answered no on 2026-09-12: `version.html` and the sidebar button are gone, the layouts collapsed to one, Configuration Basics folded into Configuration, Integration Guide left the docs, CORS got its own page, and every folder has the same sidebar order. Open in the plan: the deployed-site checks and the 302→301 flip after them. The `## v3.1.0` release-notes section and the `versions.yml` bump are in `post-release-v3.1.0.md` |
-| no plan - two lines, a site session | **`sites/README.md:40-41` names `Deploy Docs Site`, `Deploy Demo Site` and `Deploy WWW Site`**, three workflows that no longer exist - finding 5 folded them into `deploy-site.yml` with the site chosen at dispatch, 2026-09-12. A coding session may not touch `sites/`; whichever site session comes first rewrites those two lines to name `Deploy Site` and its `site` choice |
+| no plan - two lines | **`sites/README.md` names `Deploy Site` and its `site` choice. Landed 2026-09-12** - it had named three workflows that finding 5 folded into `deploy-site.yml` |
 
 **Why it rides in a UI release.** The old scheme opens a `v3.1.x` folder the day after the tag and moves every
 indexed URL with it. Doing that once more and then restructuring would move the URLs twice. Landing the plan
@@ -191,7 +191,7 @@ first stage happens on the branch and everything from the merge on happens on `m
       **By eye** - `git log --stat main..HEAD` lists the paths; each doc's `paths:` says which one owns it.
       **The docs site restructure is its own row above and can land in this stage.** Only the `## v3.1.0`
       release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
-- [ ] `sites/README.md` names `Deploy Site`, not three workflows.
+- [x] **2026-09-12.** `sites/README.md` names `Deploy Site`, not three workflows.
       `grep -c 'Deploy Docs Site\|Deploy Demo Site\|Deploy WWW Site' sites/README.md` returns 0.
 
 ### Stage 3 - the rest
