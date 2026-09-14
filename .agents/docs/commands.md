@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-09
+verified: 2026-09-14
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -268,6 +268,7 @@ The backing services for an API run from source are a different thing — that i
 just image verify 3.0.0                 # all four checks
 just image verify 3.0.0 signature       # one: tags, signature, attestations or metadata
 just image verify 3.0.0 all refs/heads/main binacle/binacle-net   # the ref and the repo, both defaulted above
+just image verify 3.1.0-beta.1 all refs/heads/main ghcr.io/binacle-labs/binacle-net   # a prerelease, where it stops
 ```
 
 Reads Docker Hub, builds nothing, **never logs in**. The version is required and never defaults — a default

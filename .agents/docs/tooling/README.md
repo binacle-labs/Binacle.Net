@@ -1,8 +1,8 @@
 ---
 id: tooling
 description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the benchmark/performance scripts, the wrangler configs, the local compose stacks, and emulator state"
-verified: 2026-09-12
-check: "Script list, tooling/agents/ holds generate-index.py and indexes.toml and the agents module calls the script, tests.just recipes and its four group recipes, coverage.just recipes, openapi.just, agents.just, regen.just, changelog.just, serve.just, build.just (the API publish/image pair and the three site builds), check.just and its lychee.toml, image.just (stacks and the four verify checks, whose certificate identity must match SECURITY.md) and smoke.just recipes, ci.just recipes and the tooling/ci/*.sh files they call, and the compose stack/file/service table match tooling/"
+verified: 2026-09-14
+check: "Script list, tooling/agents/ holds generate-index.py and indexes.toml and the agents module calls the script, tests.just recipes and its four group recipes and the three runners in tooling/tests/, coverage.just recipes, openapi.just, agents.just, regen.just, changelog.just and the two changelog.*.sh beside it, serve.just, build.just (the API publish/image pair and the three site builds), check.just and its lychee.toml, image.just as a door onto tooling/image/*.sh (the stack script and the four verify checks, whose certificate identity must match SECURITY.md) and smoke.just recipes, ci.just recipes and the tooling/ci/*.sh files they call, and the compose stack/file/service table match tooling/"
 also_update:
   - commands
   - samples
@@ -24,20 +24,20 @@ deployment starting points live in samples (`$samples`). For the quick "how do I
 | Script | What it does |
 |---|---|
 | `serve.just` | **Not a script** — the `serve` module for the root `justfile`, everything run **from source**. `just serve api [profile]` runs the API via `dotnet run -lp <profile>` (`Normal`/`WithServiceModuleOnly`/`WithUiModuleOnly`/`WithAllModules`, aliases `N/S/U/All`, default `Normal`); `just serve docs`, `just serve demo` and `just serve www` run jekyll + webpack watch together from `sites/<site>`; `just serve services-up [-d]` / `just serve services-down` bring up what the API talks to |
-| `tests.just` | **Not a script** — the `test` module for the root `justfile`. One recipe per suite, run with `just test <name>`, plus four group recipes — `image`, `sites`, `all` and `all-with-services`. The tests are `[private]`, so completion offers the four groups; a bare `just test` prints every test name. The three test lists in it are the only copy of the set of tests, and `all` is written out as the sum of the other two with nothing run twice. A group is for a laptop; CI names every test as its own step. See `$commands` for the list |
+| `tests.just` + `tests/*.sh` | **The `test` module plus the three runners** - `dotnet.sh`, `rspec.sh`, `jest.sh`, one per language, in `tooling/tests/` with the `ruby-coverage.rb` that `rspec.sh` loads. The module holds the names and the lists and every name is a door onto a runner; the runners are files so `just check scripts` reads them. One recipe per suite, run with `just test <name>`, plus four group recipes — `image`, `sites`, `all` and `all-with-services`. The tests are `[private]`, so completion offers the four groups; a bare `just test` prints every test name. The three test lists in it are the only copy of the set of tests, and `all` is written out as the sum of the other two with nothing run twice. A group is for a laptop; CI names every test as its own step. See `$commands` for the list |
 | `performance.<slice>.sh` | `dotnet run -c Release` for the slice's `PerformanceTests`. Slices `lib`, `vipaq`. Writes to gitignored `PerformanceTests.Artifacts` |
 | `benchmarks.<slice>.sh [alias]` | `dotnet run -c Release --filter <pattern>` from the slice's `Benchmarks` project. Slices `lib`, `vipaq`. No arg = all |
 | `build.just` | **Not a script** — the `build` module for the root `justfile`, **everything this repo builds**. `just build publish` runs the asset copy and the UI module's `npm run build`, then publishes the API (`-c Release -o artifacts/binacle-net --no-self-contained --runtime linux-x64`) — the bundles first, because dotnet collects static web assets at publish time; `just build image [version]` publishes then `docker build -t binacle-net:<version>` (default `local`), applying the three per-build OCI labels. `just build docs`, `just build demo` and `just build www` build the three Jekyll sites under `sites/` into gitignored `artifacts/docs`, `artifacts/demo` and `artifacts/www` — asset copy, then webpack, then `jekyll build` with `_config.yml,_config.prod.yml`; they mirror `just serve <site>` and are the build half of that pair, and the deploy workflows hand what they produce straight to the host. None starts compose and none needs `sudo`, so CI calls them as they stand — see `$ci-cd` |
 | `check.just` | **Not a script** — the `check` module for the root `justfile`. `just check links` checks the internal links in all three built sites with `lychee --offline`, `just check links <site>` one of them, `just check links-external <site>` every link including other people's servers, `just check workflows` runs actionlint over `.github/workflows`, and `just check actions` greps the `.github/actions` manifests for the `vars`/`secrets` expression actionlint cannot see, and `just check scripts` runs shellcheck over `tooling/*.sh` and `tooling/ci/*.sh`. All three list the files they were handed and end with a count, so a clean run reads differently from one that never started. Reads `artifacts/<site>`, so the site has to be built first — it stops with a pointer to `just build <site>` rather than checking nothing. `tooling/check.lychee.toml` holds the URLs it must never check and is named with `--config`, because lychee only finds a config in the working directory by itself |
 | `coverage.just` | **Not a script** — the `coverage` module for the root `justfile`. Runs the tests with the collector attached and writes to gitignored `artifacts/tests/` + `artifacts/coverage/`; see `$commands` |
-| `coverage.run.sh`, `coverage.table.sh` | The bodies behind `just coverage run` and `just coverage table`. Files rather than recipe bodies so `just check scripts` covers them. `coverage.run.sh` also merges the ten gem reports into one `ruby.json` for a `sonar` run; `coverage.table.sh` prints the per-suite table and the run's exit code. `tests.ruby-coverage.rb` beside them is what `RUBYOPT` loads to start SimpleCov |
+| `coverage.run.sh`, `coverage.table.sh` | The bodies behind `just coverage run` and `just coverage table`. Files rather than recipe bodies so `just check scripts` covers them. `coverage.run.sh` also merges the ten gem reports into one `ruby.json` for a `sonar` run; `coverage.table.sh` prints the per-suite table and the run's exit code. `tests/ruby-coverage.rb` is what `RUBYOPT` loads to start SimpleCov |
 | `openapi.just` | **Not a script** — the `openapi` module for the root `justfile`. `just openapi generate [dir]` builds the v3/v4 documents into gitignored `artifacts/openapi/`, `just openapi lint [dir]` generates then Spectral-lints them against `tooling/openapi.spectral.yaml`, named with `--ruleset` and run with `--fail-severity=warn` so a warning fails the run, `just openapi check-all-copies` generates then fails if any committed copy has drifted from the generator, and `just openapi sync-all-copies` generates then writes them. The copies are the docs site's two for the current version and the client package's `packages/binacle-net-client/spec/v4.json`; the client is v4 only so it takes no v3. The docs folder compared is the one `current:` names in `sites/docs/_data/versions.yml`, read with a `shell()` at the top of the module; the frozen folders beside it never are. **No workflow calls `sync-all-copies`** - CI only checks |
 | `agents.just` | **Not a script** — the `agents` module for the root `justfile`. `just agents all` regenerates the `_index.md` manifest for `.agents/rules`, `.agents/docs`, `.agents/design`, `.agents/plans` and `.agents/memory` (grouped by area); `just agents generate-index <name>` does one. The recipes call `agents/generate-index.py` |
 | `agents/generate-index.py` | The generator behind that module. Python, not shell: nothing in CI calls it, so it can use a real parser. Reads `indexes.toml` beside it, walks `.agents/<name>/` and writes the manifest. Sorts by byte order, so two machines produce the same file |
 | `agents/indexes.toml` | What `generate-index.py` writes — one table per manifest with its heading and blurb, the group names whose capitalisation cannot be guessed, and which front matter keys become entry fields. A directory under `.agents/` is indexed only if it has a table here |
 | `regen.just` | **Not a script** — the `regen` module for the root `justfile`. The four generators whose output is **committed**: `just regen or-lib-scenarios` (OR-Library text → `shared/data/bischoff-suite`), `just regen vipaq-packed-data` (that plus `custom-problems`, packed → `vipaq/data/packed`), `just regen vipaq-interop-vectors` (the C# and TS interop halves plus the header bytes → `vipaq/test-vectors`), `just regen demo-samples` (`shared/data/demo-samples` → the demo's sample set in `packages/binacle-net-ui`), `just regen all` in dependency order, and `just regen check` which runs `all` then fails if any generated `.json` moved. None takes an argument — each tool runs every generator in its list so it cannot half-run. **No workflow calls `check`**. This module covers data generated *into* the repository and nothing else — the committed OpenAPI copies are checked by `just openapi check-all-copies`, not here |
-| `changelog.just` | **Not a script** — the `changelog` module for the root `justfile`. Reads `CHANGELOG.md` at the repo root. `just changelog extract <version\|Unreleased>` prints one release's section, with its headings promoted from `###` back to `##` for a release body; `just changelog check <version\|Unreleased>` exits 1 if that section is missing or empty. The release workflow calls both, so CI and a laptop parse the file the same way and the exact body can be previewed before the release is dispatched — see `$ci-cd/release-pipeline` |
-| `image.just` | **Not a script** — the `image` module for the root `justfile`. Runs what `build.just` produced: `just image up [full\|volume\|bind]` (default `full`) and `just image down [name]`; extra arguments pass through to `docker compose`. `up` creates and opens the bind-mounted folders first, and every stack stops with a pointer to `just build image` if `binacle-net:local` is missing. **Two recipes are the odd ones out** — `just image verify <version> [check]` reads a *published* image off Docker Hub, and `just image dockerhub-overview <version>` renders the Docker Hub page; neither builds anything and neither logs in. See below |
+| `changelog.just` + `changelog.extract.sh`, `changelog.check.sh` | **The `changelog` module plus its two scripts**, one per recipe. Reads `CHANGELOG.md` at the repo root. `just changelog extract <version\|Unreleased>` prints one release's section, with its headings promoted from `###` back to `##` for a release body; `just changelog check <version\|Unreleased>` exits 1 if that section is missing or empty. The release workflow calls both, so CI and a laptop parse the file the same way and the exact body can be previewed before the release is dispatched — see `$ci-cd/release-pipeline` |
+| `image.just` + `image/*.sh` | **The `image` module plus one script per operation** - the same door shape as `ci.just`, for the same reason: a `.just` body can be neither run nor shellchecked, and `just check scripts` covers `tooling/image/`. Runs what `build.just` produced: `just image up [full\|volume\|bind]` (default `full`) and `just image down [name]`; extra arguments pass through to `docker compose`. `up` creates and opens the bind-mounted folders first, and every stack stops with a pointer to `just build image` if `binacle-net:local` is missing. **Two recipes are the odd ones out** — `just image verify <version> [check]` reads a *published* image off Docker Hub - or off GHCR, where a prerelease stops - and `just image dockerhub-overview <version>` renders the Docker Hub page; neither builds anything and neither logs in. See below |
 | `smoke.just` | **Not a script** — the `smoke` module for the root `justfile`. Tests the image rather than the code. `just smoke test-structure [image]` runs `container-structure-test` against `tooling/smoke/structure.yaml`; `just smoke test <profile> [image]` does up → hurl → down for one profile; `just smoke up`/`down` are the manual halves; `just smoke all [image]` builds, checks the structure once, then runs every profile. Every recipe takes the image last, default `binacle-net:local`, so a published tag can be smoked too |
 | `ci.just` + `ci/*.sh` | **The `ci` module plus one script per operation.** The shell a workflow runs, kept out of the YAML: a `.just` body can be neither run nor shellchecked on its own, and a `.sh` file is both - `just check scripts` is what actually checks them. `ci.just` is a door - two lines per recipe - and `tooling/ci/<name>.sh` is the code. Eighteen operations today: `changed-paths`, `gate`, `deploy-message`, `create-tag`, `deploy-summary`, `sonar-summary`, `check-release-ref`, `check-version`, `check-release-tag`, `changelog-section`, `moving-tags`, `copy-tags`, `github-release`, `release-summary`, `pull-image`, `smoke-summary`, `codeql-summary`, `dockerhub-version`. Four more scripts sit beside them with no recipe - `install-actionlint.sh`, `install-container-structure-test.sh`, `install-hurl.sh`, `install-lychee.sh` - each called by path from the matching composite action, because an action that installs a tool must not need `just` installed first. Every one takes its inputs as arguments and reads no `github.*` context, so all of them run on a laptop; the ones that print `key=value` are teed into `$GITHUB_OUTPUT` and the ones that write a summary fall back to `/dev/stdout`. See `$ci-cd` |
 | `cloudflare/` | **Not a script** — one wrangler config per site: `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and `www.wrangler.jsonc`, plus a `README.md`. They are the whole deployment configuration for the three sites. **Nothing here is run by hand** — the three deploy workflows call `wrangler deploy --config` against them; see `$ci-cd` |
@@ -74,10 +74,10 @@ telemetry — so postgres, azurite and the dashboard are declared once, in `serv
 | `image.local.yml` | `image` | `just image up bind` | `binacle-net-bind` | **Simple** — the same file, with `BINACLE_DATA_DIR` set by the recipe so `/app/data` is a bind at `tooling/data`. Compose then drops the volume declaration, so this stack leaves none behind |
 | `smoke/<profile>.yml` | `smoke` | `just smoke up <profile>` | `binacle-smoke-<profile>` | **Five throwaway stacks** — `minimal`, `quickstart`, `prod`, `service`, `full`, one per smoke profile, and each name is also a `samples/docker/` folder. Storage is a named volume dropped on teardown, so they need no `_prepare`. They take the image from `$BINACLE_IMAGE` (default `binacle-net:local`); `service`/`full` inline `JwtAuth.json` and raise `RateLimiter__ApiUsageAnonymous` so a second run inside the hour does not go red on 429s; `prod` mounts its own `Presets.json` so reading it back proves the config-mount path |
 
-Each file carries its own `name:` as a fallback, but `image.just` passes `-p` — two stacks share one file, so
-without it `up bind` would recreate the `volume` container. **One table in `image.just` holds the mapping** —
-the private `_stack` recipe, four columns per stack: compose file, project name, `/app/data`, and the other
-folders it bind-mounts. `_compose` and `_prepare` both read it, so `up`, `down` and the folder setup cannot
+Each file carries its own `name:` as a fallback, but `stack.sh` passes `-p` — two stacks share one file, so
+without it `up bind` would recreate the `volume` container. **One table in `tooling/image/stack.sh` holds the
+mapping** — four columns per stack: compose file, project name, `/app/data`, and the other folders it
+bind-mounts. `up` and `down` both go through it, so the two and the folder setup cannot
 disagree about what a name means, and it is the only place an unknown name is rejected. `smoke.just` gets the
 same guarantee for free, since the profile name **is** the filename.
 
@@ -120,7 +120,7 @@ because that is the one that exercises the whole image, which is what the module
   context, so the next build fails on it. The named volume is deliberate and survives every rename.
 - **Compose these together with `-f a.yml -f b.yml`.** Path resolution, above. That is the exact failure that
   got the 2026-08-07 attempt reverted.
-- **Have `image.just` call a recipe in `serve.just`, or the reverse.** The `mkdir` and `chmod` lines are
+- **Have `image/stack.sh` call a recipe in `serve.just`, or the reverse.** The `mkdir` and `chmod` lines are
   copied on purpose.
 - **Let `image.local.yml` default `BINACLE_DATA_DIR` to a path.** The recipe sets it for `bind` and unsets it
   for the other two. Inside the file, unset must stay the named volume — otherwise a bare `docker compose -f`
@@ -129,7 +129,7 @@ because that is the one that exercises the whole image, which is what the module
 
 ## Rendering the Docker Hub page
 
-`just image dockerhub-overview <version>` in `image.just`. `.github/dockerhub-overview.md` is the page Docker Hub shows,
+`just image dockerhub-overview <version>`, a door onto `tooling/image/dockerhub-overview.sh`. `.github/dockerhub-overview.md` is the page Docker Hub shows,
 and it carries `{{VERSION}}` and `{{MINOR}}` rather than a version — so it is right for every release instead
 of for the one it was written in. This recipe fills them in and prints the result; it writes nothing.
 
@@ -140,7 +140,7 @@ Two guards, both of which fail the release step rather than publishing:
 
 | Guard | Why |
 |---|---|
-| Rejects a version with a hyphen, or one that is not `x.y.z` | A prerelease moves neither the minor tag nor `latest`, so every tag the page would name is one that does not exist |
+| Rejects a version with a hyphen, or one that is not `x.y.z` | A prerelease never reaches Docker Hub, so every tag the page would name is one that does not exist |
 | Fails if any `{{...}}` survives the substitution | A raw placeholder on a public landing page is worse than a red job |
 
 **The braces in the recipe are doubled.** The page's placeholders look exactly like `just` interpolation, and
@@ -148,17 +148,21 @@ doubling is how `just` is told they are not — halve them and the substitution 
 
 ## Verifying a published image
 
-`just image verify <version> [check]` in `image.just`, with the four checks as private `_verify-*` recipes.
-Each is one question and the order matters — every one answers something the next assumes.
+`just image verify <version> [check]`, a door onto `tooling/image/verify.sh`, which runs the four checks as
+`tooling/image/verify-<check>.sh`. Each is one question and the order matters — every one answers something
+the next assumes.
 
-**Docker Hub only.** GHCR is the release workflow's staging registry and nothing outside that workflow reads
-it, so this recipe knows one repository. It carried a fifth check until 2026-08-15, `digest`, which compared
-the tag across both registries.
+**Docker Hub by default, GHCR when told.** The fourth argument is the repository; `ghcr.io/binacle-labs/binacle-net`
+is where a prerelease stops, and every check runs there the same way. The `tags` check is the one that
+differs underneath - Docker Hub's web API lists tags with digests in one call, GHCR is a plain OCI registry
+(anonymous pull token, tag list, one HEAD per tag) - so `verify-tags.sh` is two functions, `tags_hub` and `tags_ghcr`, behind one name, and on
+GHCR the `sha256-*` signature tags are skipped rather than listed as names for the image. It carried a fifth
+check until 2026-08-15, `digest`, which compared the tag across both registries.
 
 | Check | What it proves |
 |---|---|
-| `tags` | The Docker Hub tag map, from the v2 API. Rows sharing a digest are one image under several names — how you see what `latest` resolves to. The **date** is the trap: it moves for reasons that are not a retag, so it is printed and never compared |
-| `signature` | `cosign verify` against the Docker Hub tag. A signature is a referrer stored beside the image, not inside the index, so it does not survive `imagetools create` and the pipeline signs after the copy as well as before it. Needs `cosign`; fails with a pointer when it is missing |
+| `tags` | The tag map. Rows sharing a digest are one image under several names — how you see what `latest` resolves to. On Docker Hub the **date** is the trap: it moves for reasons that are not a retag, so it is printed and never compared; GHCR has no date and no size to print |
+| `signature` | `cosign verify` against the tag. A signature is a referrer stored beside the image, not inside the index, so it does not survive `imagetools create` and the pipeline signs after the copy as well as before it. Needs `cosign`; fails with a pointer when it is missing |
 | `attestations` | The SPDX SBOM package count and the SLSA provenance builder id. Both are manifests **inside** the index, so the index digest hashes them and the one signature already covers them — nothing extra to verify, this only reports what is attached |
 | `metadata` | The three OCI labels, then a throwaway run: `BINACLE_VERSION`, the uid, `/app/data`'s owner, and the `System.*.dll` count in `/app`. That count is the **framework-dependent proof** — 4 on a framework-dependent build, ~170 on a self-contained one |
 
@@ -167,14 +171,10 @@ the tag across both registries.
 credential is not checking a public artifact. The aggregate does **not** use `set -e`: it runs all four, ORs
 the exit codes and fails at the end, because the first failure otherwise hides the three answers explaining it.
 
-**Two just traps live in this recipe** and both cost real time:
-
-- **A Go template needs four braces open, two closed** — `{{{{ json .SBOM }}`. Two opening braces are just's
-  own interpolation. Four closing braces emit a literal `}}` on the end of every value, which still looks
-  right: piping into `jq` gives `parse error: Unmatched '}'` under a correct-looking answer.
-- **A backtick in a recipe-body comment is executed by just**, before the shell ever sees the line. Found
-  2026-08-15 by writing the brace explanation with backticks around the braces; the recipe died on
-  `Backtick failed with exit code 2`. Explain punctuation in words down there, not in code spans.
+**Two just traps used to live in this recipe and are the reason it is scripts now** - moved out on
+2026-09-14. A Go template in a recipe body needed four braces open and two closed, because two opening braces
+are just's own interpolation; and a backtick in a recipe-body comment is executed by just before the shell
+sees the line. Neither exists in a `.sh` file, and shellcheck reads it.
 
 **Only `3.0.0-beta.3` and later can pass.** The recipe matches the signature against the `binacle-labs`
 certificate identity, so it accepts only images signed after the repository moved. `3.0.0-beta.2` **is**

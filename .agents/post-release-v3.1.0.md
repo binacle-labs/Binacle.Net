@@ -29,7 +29,13 @@ two lists are clear** - the third is plans, and plans outlive it.
 - [ ] `3.1.0`, `3.1`, `3` and `latest` are one image, and `3.0` did not move.
       `docker buildx imagetools inspect` on all five; the first four share a digest and `3.0` still reports
       the `3.0.0` digest. **`3.1` and `3` are created for the first time by this release**, and `latest`
-      moving off `3.0.0` is the one thing no local run rehearsed.
+      moving off `3.0.0` is the one thing no local run rehearsed. **This also closes the last box of
+      `plans/sites/docs-current-at-root.md`** - `docker manifest inspect binacle/binacle-net:3` succeeds -
+      so tick it there in the same sitting.
+- [ ] No prerelease reached Docker Hub.
+      `curl -s "https://hub.docker.com/v2/repositories/binacle/binacle-net/tags?page_size=100" | jq -r '.results[].name'`
+      lists no `3.1.0-beta.*`. **The first release under the prerelease stop** - `D3` in the CI/CD ledger -
+      and the tag list is the proof it held.
 - [ ] `just image verify 3.1.0` - PASS. Signed on `refs/heads/main` by the release workflow, SBOM and
       provenance present. The identity is the whole value; anyone can sign anything.
 - [ ] The Docker Hub page names `3.1.0`, and nowhere names `3.0.0` except where a version history should.
@@ -70,6 +76,10 @@ two lists are clear** - the third is plans, and plans outlive it.
 - [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Site` is dispatched with `docs` and green.
       `docs.binacle.net/release-notes/` shows 3.1.0 at the top, and `docs.binacle.net/version/v3.0.x/` answers
       `301` to `/`.
+- [ ] The two deploy-only boxes in `plans/sites/docs-current-at-root.md` are ticked from the live site -
+      every old URL redirects, and the selector lands on the same page - and the 302 to 301 flip is done.
+      **By eye**, with the checks written under each box in that plan. They straddled the tag and would
+      otherwise be lost the way the v3.0.0 post-release boxes were.
 
 **Why this is after the tag, not before.** The page names a release date and a release link that do not
 exist until the run is green. On `main` before that they would be lies for the length of the gap.
@@ -123,15 +133,14 @@ maintainer took.
 
 ## Plans that stop being stuck
 
-**None.** Nothing was held back for the tag: row 5 and the six CI findings ship in it, and the release
-`publish` changes were proved by `3.1.0-beta.1` before it. The one plan the release touches without closing
+**None.** Nothing was held back for the tag: row 5 and the six CI findings ship in it, everything up to the
+smoke was proved by the betas from the branch, and the release `publish` changes by the `3.1.0` run itself. The one plan the release touches without closing
 is `plans/api/integration-tests-cover-shipped-modules.md`, whose optional-modules half was never tied to a
 version.
 
-**One thing the beta leaves behind.** `binacle/binacle-net:3.1.0-beta.1` (and any `beta.2`) stays on Docker
-Hub - `D27`. The plan that would have sent it elsewhere is
-`plans/ci-cd/prerelease-staging-repository.md`, still an idea. **If that plan is ever picked up, this
-release is the second time a beta sat beside the release it rehearsed**, which is the argument for it.
+**What the beta leaves behind.** `ghcr.io/binacle-labs/binacle-net:3.1.0-beta.1` (and any `beta.2`) stays
+on GHCR - a prerelease stops there since 2026-09-14, `D3`, and nothing names it. Whether staging images are
+ever deleted is the open half of `plans/ci-cd/prerelease-staging-repository.md`, with branch builds.
 
 **Delete this file once the first two lists are clear.** What outlives it goes to the docs and the decision
 ledgers, not here.

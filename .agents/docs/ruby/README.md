@@ -381,7 +381,7 @@ was the only thing pretending otherwise.
 ## Coverage
 
 **Every gem reports coverage**, through simplecov, and **no gem file was touched to get it.** The setup lives
-in `tooling/tests.ruby-coverage.rb` and the rspec recipe loads it through `RUBYOPT`, so it runs before the gem is
+in `tooling/tests/ruby-coverage.rb` and `tooling/tests/rspec.sh` loads it through `RUBYOPT`, so it runs before the gem is
 required — which is the whole requirement, since SimpleCov measures nothing that was already loaded.
 
 **RUBYOPT rather than a require in each `spec_helper`, and that is the point.** A gem installed from a package

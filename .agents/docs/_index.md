@@ -91,7 +91,7 @@ table of [README.md](README.md).
   description: "Branch names — the two kinds in use, the snake_case subject, and the one constraint that is mechanical today: Sonar analyses main and pull requests targeting main, and nothing else"
   paths: [".github/workflows/**"]
 - file: ci-cd/release-pipeline.md
-  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
+  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease stops before, the CHANGELOG.md release body, and the Docker Hub page written last"
   paths: [".github/workflows/**"]
 ```
 

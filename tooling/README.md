@@ -45,8 +45,8 @@ one `-v` in either place that empties it.
 ---
 
 ## 🧪 Tests
-`tests.just`, loaded as the `test` module. One recipe per suite, and CI calls the same recipes a maintainer
-does.
+`tests.just`, loaded as the `test` module, and the three runners - one per language - in
+[`tests/`](tests/README.md). One recipe per suite, and CI calls the same recipes a maintainer does.
 
 A test name is derived, never chosen - `<lang>_<project>_<kind>`, where the project segment is the assembly,
 package or gem name lowercased with dots turned to dashes. The single tests are private, so completion offers
@@ -157,7 +157,8 @@ Neither recipe touches the container data folders, and neither needs `sudo`, so 
 ---
 
 ## 🐳 Image stacks
-`image.just`, loaded as the `image` module. Runs the image `just build image` produced, three ways - all
+`image.just`, loaded as the `image` module, and one file per operation in [`image/`](image/README.md) - the
+module is a door, like `ci.just`. Runs the image `just build image` produced, three ways - all
 `binacle-net:local`, differing in what runs beside it and where `/app/data` goes.
 
 ```bash
@@ -172,7 +173,7 @@ Extra arguments go straight through to `docker compose`. The name is positional,
 a flag - `just image up -d` reads `-d` as the stack name and is rejected.
 
 Two files, three stacks. `volume` and `bind` are one container differing only in where `/app/data` goes, so
-they share `image.local.yml`; `_compose` gives each its own project name and sets `BINACLE_DATA_DIR` for
+they share `image.local.yml`; `stack.sh` gives each its own project name and sets `BINACLE_DATA_DIR` for
 `bind` alone. `full` is `image.full.yml`, which `include:`s that file and `serve.services.yml` and overrides
 the app's storage and telemetry - about twenty lines, and nothing declared twice. It publishes the same 5432
 as `serve services-up`, so those two cannot run at once.
@@ -182,7 +183,7 @@ that check compose falls back to pulling from Docker Hub and reports "pull acces
 credentials problem rather than the missing local build it is. `serve services-up` needs no such check - it
 runs no binacle-net.
 
-The folder setup is written out in both `serve.just` and `image.just` rather than shared. A module that
+The folder setup is written out in both `serve.just` and `image/stack.sh` rather than shared. A module that
 reaches into another one puts back the coupling that splitting them removed, and it is a few lines of `mkdir`
 and `chmod`.
 
@@ -191,13 +192,15 @@ and `chmod`.
 ```bash
 just image verify 3.0.0            # all four checks
 just image verify 3.0.0 signature  # one of them
+just image verify 3.1.0-beta.1 all refs/heads/main ghcr.io/binacle-labs/binacle-net   # a prerelease, on GHCR
 ```
 
-The odd one out in this module: it reads a published image off Docker Hub, builds nothing, and never logs in.
-Four checks, each answering something the next assumes - which Docker Hub tags share the digest, the
-signature, the SBOM and provenance, and the labels plus what the container says about itself when you run it.
+The odd one out in this module: it reads a published image, builds nothing, and never logs in. Four checks,
+each answering something the next assumes - which tags share the digest, the signature, the SBOM and
+provenance, and the labels plus what the container says about itself when you run it.
 
-**Docker Hub only.** The staging registry is the release workflow's business and nothing else reads it.
+**Docker Hub by default, GHCR when told.** The repository is the fourth argument. A prerelease stops on GHCR
+after the smoke and is checked there with the same command.
 
 **The version is required and has no default**, because a default rots into a tag nobody meant to check. All
 four run even when one fails, so a failure comes with the three answers that explain it; the exit code is 1 if

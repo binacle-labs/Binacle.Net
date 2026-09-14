@@ -103,8 +103,7 @@ repo-wide - once set, every test project must be an MTP one.
 Two consequences for anything that shells out to `dotnet test`:
 
 - The project comes from `--project`, never a bare path. A bare directory is now an error.
-- Runner options go straight on the command line, **not** after a `--`. See `_dotnet_test` in
-  `tooling/tests.just`.
+- Runner options go straight on the command line, **not** after a `--`. See `tooling/tests/dotnet.sh`.
 
 The xunit reference is `xunit.v3.mtp-v2`, not plain `xunit.v3`. Same xunit version, different platform adapter:
 `xunit.v3` pins `xunit.v3.mtp-v1`, which is MTP 1.x. `Microsoft.Testing.Extensions.CodeCoverage` moved to MTP 2.x

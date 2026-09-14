@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Coverage for the gem specs, loaded through RUBYOPT by the rspec recipe in tests.just - never by a gem.
+# Coverage for the gem specs, loaded through RUBYOPT by rspec.sh beside it - never by a gem.
 #
 # RUBYOPT, not a require in each spec_helper: a gem installed from a package index has no parent directory to
 # require, so a shared helper above the gem folders would break the rule that a gem drops into an unrelated

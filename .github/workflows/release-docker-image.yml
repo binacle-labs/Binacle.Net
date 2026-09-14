@@ -1,6 +1,7 @@
 # Seven jobs, cheapest check first:
 #
-#   dispatch 3.0.0 -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> release -> page
+#   dispatch 3.0.0        -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> release -> page
+#   dispatch 3.1.0-beta.1 -> gate -> test -> build+push GHCR -> smoke   and stops there - from main or release/*
 
 name: Build and Release Docker Image
 
@@ -53,10 +54,11 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      - name: Check the dispatch is on main
+      # A release from main only. A prerelease from main or a release/* branch, because it stops at staging.
+      - name: Check the dispatch is on a ref this version may run from
         env:
           REF: ${{ github.ref }}
-        run: just ci check-release-ref "$REF"
+        run: just ci check-release-ref "$REF" "$VERSION"
 
       - name: Check the version is semver
         run: just ci check-version "$VERSION"
@@ -199,9 +201,13 @@ jobs:
     with:
       image: ${{ needs.build.outputs.staging }}
 
+  # A prerelease stops at staging. This is the only prerelease condition in the file: `release` and `page`
+  # need this job, so they skip with it. A beta leaves one thing behind - the smoked image on GHCR - and no
+  # tag, no GitHub release and nothing on Docker Hub.
   publish:
     name: Copy to Docker Hub
     needs: [ build, smoke ]
+    if: ${{ !contains(inputs.version, '-') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -339,11 +345,9 @@ jobs:
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
         run: just ci release-summary "$VERSION" "$DIGEST" "$TAG" "$RELEASE_URL" "$TAGS"
 
-  # The one job with its own prerelease condition: a beta must not rewrite a page describing the stable line.
   page:
     name: Docker Hub page
     needs: [ build, publish, release ]
-    if: ${{ !contains(inputs.version, '-') }}
     uses: ./.github/workflows/shared-dockerhub-overview.yml
     permissions:
       contents: read

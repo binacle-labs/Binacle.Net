@@ -6,8 +6,9 @@ description: Release - Binacle.Net v3.1.0. The demo UI release - the shipped cli
 
 **Status:** scope narrowed by the maintainer on 2026-09-07. **Two rows of work are left** - row 5, and the
 six CI answers - and the maintainer set the order on 2026-09-11: **features first, then the changelog and
-the docs, then the rest.** Branch `release/v3-1-0`. A `3.1.0-beta.1` from `main` proves the CI changes
-before the real tag. **The steps from here to the tag are under *Before the tag*, and what happens after it
+the docs, then the rest.** Branch `release/v3-1-0`. **Every beta is dispatched from this branch and stops at
+GHCR** - decided 2026-09-14 - so nothing merges to `main` until the last beta is clean, and the changed
+`publish` job is first run by the real tag. **The steps from here to the tag are under *Before the tag*, and what happens after it
 is `post-release-v3.1.0.md`.**
 
 **What this release is.** The shipped UI still calls v3, and the demo has two faults nobody outside would
@@ -86,7 +87,8 @@ release of their own. *(chosen by an agent)*
 | Plan | The slice this release takes |
 |---|---|
 | `plans/api/integration-tests-cover-shipped-modules.md` | **the CORS assertion. Landed 2026-09-10** in `api/test/Binacle.Net.IntegrationTests` - four tests: preflight and simple request from a configured origin carry the header, an unconfigured origin does not, and with no `Cors.json` no origin is allowed. Proven by breaking `app.UseCors()` and watching the right two fail. **Turning the optional modules on is the larger half and is still open** |
-| `plans/ci-cd/ci-open-questions.md` | **the six findings he approved on 2026-09-11 - 1, 4, 5, 8, 10 and 12; 7 is rejected, `D29`.** The plan's answer table says what each yes takes. Two of them, 1 and 8, edit the release `publish` job, and **only a run proves that job**: after the merge, `3.1.0-beta.1` is dispatched from `main` and its run is the proof. Finding 1 first needs the org checked for an OIDC connection - a login-only fact |
+| `plans/ci-cd/ci-open-questions.md` | **the six findings he approved on 2026-09-11 - 1, 4, 5, 8, 10 and 12; 7 is rejected, `D29`.** The plan's answer table says what each yes takes. Two of them, 1 and 8, edit the release `publish` job, and **only a run proves that job** - and since the row below, only the `3.1.0` run itself reaches it. Finding 1 first needs the OIDC connection created on the Docker Hub org - the hand step under *Before the tag* |
+| no plan - the maintainer decided it on 2026-09-14 | **A prerelease stops at staging. Landed 2026-09-14.** `publish` carries the one prerelease condition in the file, and `release` and `page` skip with it through `needs`, so a beta leaves a smoked image on GHCR and nothing on Docker Hub, no tag and no release. `D3` has the reasoning and the cost: `publish`, `release` and `page` are first run by the real tag |
 
 **Why CORS is the one to take even if the rest slips.** `Program.cs` always registers the policy and every
 core endpoint requires it, the origins come from an optional `Cors.json`, and with none present the fallback
@@ -140,10 +142,10 @@ versus short-circuit question is a one-way door** - whatever ships is the respon
 to reshape - so it wants a release where it is the subject, not a row at the end of a UI release.
 *(reasoning chosen by an agent - strike it)*
 
-**`plans/ci-cd/prerelease-staging-repository.md`.** It has to land before the first prerelease or it has
-missed the thing it exists for, and it is still an idea with two unanswered questions, one of which has
-already bitten: anything built from a branch signs under that branch's ref and fails the command printed in
-`SECURITY.md`. Gating a UI release behind it buys nothing.
+**`plans/ci-cd/prerelease-staging-repository.md`, what is left of it.** Its prerelease half landed in this
+release - the row under *Maintenance riding along*. What remains is branch builds, still an idea with the
+signing question open: anything built from a branch signs under that branch's ref and fails the command
+printed in `SECURITY.md`. Gating a UI release behind it buys nothing.
 
 **`plans/api/packing-only-image.md` and `plans/api/servicemodule.md`.** Both answered 2026-08-31 and both
 `proposed`. The image split changes what a self-hoster pulls, which a minor version may not do. They are the
@@ -161,8 +163,11 @@ pull request, so the only thing left in it was this same half, and it now lives 
 ## Before the tag
 
 **Three stages, in the order the maintainer set on 2026-09-11: finish the features, then the changelog and
-the docs, then the rest.** Each step needs the one above it. The release dispatches from `main` only, so the
-first stage happens on the branch and everything from the merge on happens on `main`.
+the docs, then the rest.** Each step needs the one above it. A beta dispatches from this branch and a
+release from `main` only, so everything up to and including the last beta happens here, and everything from
+the merge on happens on `main`. **A beta can be dispatched at any point on the branch** - the run uses the
+branch's own workflow file, so it is the cheap way to see a CI change or a feature on a real image before it
+is finished; only the last one has to be clean.
 
 ### Stage 1 - the features
 
@@ -170,12 +175,13 @@ first stage happens on the branch and everything from the merge on happens on `m
       `plans/api/packing-demo-next.md`, which now holds nothing else. Its *Done when* has the two checks.
 - [ ] **The six CI findings landed** - 1, 4, 5, 8, 10 and 12 in `plans/ci-cd/ci-open-questions.md`, each
       ticked in that plan's *Done when*. **What lands here is the workflow edit only** - the `publish` half
-      is proved by the beta in stage 3, not by anything on the branch.
-- [ ] **To do by hand, before the beta - the maintainer's, 2026-09-12.** On the `binacle` Docker Hub org:
-      Settings, OIDC connections, a new connection for GitHub Actions scoped to `binacle-labs/Binacle.Net`.
-      Its id goes in the repository variable `DOCKERHUB_OIDC_CONNECTIONID`. **Every dispatch fails at the
-      Docker Hub login in `publish` until this is done** - the login has no password any more. Then narrow
-      `DOCKERHUB_TOKEN` to read-and-write on the repository description only; nothing pushes with it now.
+      is proved by the `3.1.0` run in stage 3, not by the beta and not by anything on the branch.
+- [x] **2026-09-14, the maintainer's hand.** The OIDC connection exists on the `binacle` Docker Hub org
+      with two rulesets on `binacle/binacle-net`, one per subject form - the immutable
+      `repo:binacle-labs@189874141/Binacle.Net@607841255:ref:refs/heads/main` and the plain
+      `repo:binacle-labs/Binacle.Net:ref:refs/heads/main` - and `DOCKERHUB_OIDC_CONNECTIONID` is set. The
+      shape and why are `D33`. **Unproved until the `3.1.0` dispatch** - a prerelease stops before the
+      login. `DOCKERHUB_TOKEN` stays as it is: the token screen offers no repository scoping.
 - [ ] `just test all` passes, and `just openapi check-all-copies` passes.
 
 ### Stage 2 - the changelog and the docs
@@ -191,6 +197,12 @@ first stage happens on the branch and everything from the merge on happens on `m
       **By eye** - `git log --stat main..HEAD` lists the paths; each doc's `paths:` says which one owns it.
       **The docs site restructure is its own row above and can land in this stage.** Only the `## v3.1.0`
       release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
+- [ ] *(chosen by an agent - strike it)* `.github/dockerhub-overview.md` describes the `3` tag. The `page`
+      job rewrites the Docker Hub page from it on the `3.1.0` run, its tag table names `{{VERSION}}`,
+      `{{MINOR}}` and `latest` only, and the post-release pin move sends every reader to `3`. A reader
+      following the samples would pull a tag the page does not list. `just image dockerhub-overview` fills
+      `{{VERSION}}` and `{{MINOR}}` and would need a `{{MAJOR}}`.
+      `just image dockerhub-overview 3.1.0 | grep -c '^| \`3\` |'` returns 1.
 - [x] **2026-09-12.** `sites/README.md` names `Deploy Site`, not three workflows.
       `grep -c 'Deploy Docs Site\|Deploy Demo Site\|Deploy WWW Site' sites/README.md` returns 0.
 
@@ -199,20 +211,23 @@ first stage happens on the branch and everything from the merge on happens on `m
 - [ ] Both bundles are rebuilt from the current sources and the rebuilt output is in the tree.
       `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, then
       `git status` shows nothing new under `api/src/Binacle.Net.UIModule/wwwroot/`.
+- [ ] **`3.1.0-beta.<n>` dispatched from `release/v3-1-0`, run green - `gate`, `test`, `build` and `smoke`;
+      `publish`, `release` and `page` show as skipped.** It proves the branch builds, signs on
+      `refs/heads/release/v3-1-0` and passes the smoke; it does not touch Docker Hub, and it makes no tag.
+      Then, against the staged image - it is public, no login:
+      `just image verify 3.1.0-beta.<n> all refs/heads/release/v3-1-0 ghcr.io/binacle-labs/binacle-net` passes,
+      `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` is green, and the four UI pages open
+      from `docker run ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` with `UI_MODULE=True` - on `/packing`:
+      pick `Best`, read the winner off the row, randomize to `02-packs-nowhere` and open the unpacked list,
+      and the request panel prints a call that answers when pasted. **A red run here is the cheap place to
+      find out** - fix on the branch, dispatch the next number. **What a beta cannot prove is findings 1 and
+      8** - the Docker Hub login and the buildx-less copy run for the first time on the `3.1.0` dispatch
+      below. A red `publish` there leaves Docker Hub untouched and no tag; fix on `main` and dispatch `3.1.0`
+      again.
 - [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
       first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
       red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.
-- [ ] Merged.
-- [ ] **`3.1.0-beta.1` dispatched from `main`, run green.** This is what proves findings 1 and 8 - the
-      changed `publish` job runs for real, signs on `refs/heads/main`, and copies to Docker Hub under its own
-      immutable tag. The `page` job skips on the hyphen. Then, against the published beta:
-      `just image verify 3.1.0-beta.1` passes, `just smoke all binacle/binacle-net:3.1.0-beta.1` is green,
-      and the four UI pages open from it with `UI_MODULE=True` - on `/packing`: pick `Best`, read the winner
-      off the row, randomize to `02-packs-nowhere` and open the unpacked list, and the request panel prints
-      a call that answers when pasted. **A red run here is the cheap place to find out** - fix on `main`,
-      dispatch `beta.2`.
-      **The beta lands in `binacle/binacle-net` and stays** - `D27` says a published version is never
-      deleted, and the staging repository that would take it instead is still an idea.
+- [ ] Merged. `main` is now the commit the last clean beta was built from, plus the merge.
 - [ ] `Deploy Site` dispatched from `main` with `demo`, green, and `demo.binacle.net/packing` packs with `Best`.
       **This is also the first run of `deploy-site.yml` and of `create-tag.sh`** - the fold and the API tag
       are both unproved until it.

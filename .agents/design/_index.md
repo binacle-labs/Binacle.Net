@@ -33,8 +33,8 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: ci-cd/decisions.md
-  description: "CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why the prerelease guard is metadata-action's rather than a job-level skip, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, why no job holds a git credential after checkout, why the site half of the path filter names the files a site depends on, why the three site deploys are one workflow with the site chosen at dispatch, why the release logs into Docker Hub with the run's OIDC token, and the open questions about the PR gate and supply-chain attestation."
-  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
+  description: "CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why a prerelease stops at staging and the one job-level skip that does it, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, why no job holds a git credential after checkout, why the site half of the path filter names the files a site depends on, why the three site deploys are one workflow with the site chosen at dispatch, why the release logs into Docker Hub with the run's OIDC token, and the open questions about the PR gate and supply-chain attestation."
+  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just", "tooling/image/**"]
 - file: ci-cd/github-surface.md
   description: "What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly"
   paths: [".github/**"]
@@ -71,7 +71,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: sites/decisions.md
-  description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate."
+  description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate."
   paths: ["sites/demo/**", "sites/docs/**"]
 - file: sites/demo-and-image-boundary.md
   description: "The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is"

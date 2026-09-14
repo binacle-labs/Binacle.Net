@@ -1,7 +1,7 @@
 ---
 id: ci-cd
 description: CI/CD — the nine GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need
-verified: 2026-09-12
+verified: 2026-09-14
 check: The workflow table matches the files in .github/workflows and the action table matches .github/actions; the vars/secrets tables match every ${{ vars.* }} and ${{ secrets.* }} reference in them; the pinned just version and runner labels still match; the SHAs named as living only in .github/actions still appear in no workflow file; every .github/actions folder holding an outside SHA pin has its own entry in .github/dependabot.yml
 also_update:
   - ci-cd/release-pipeline
@@ -43,7 +43,7 @@ described in `$tooling`. Nothing about a recipe's behaviour is repeated here.
 | `shared-site-tests.yml` | `workflow_dispatch`, `workflow_call` | The fifteen tests that end up in a Jekyll site — the ten gems and the five javascript packages a site bundles. No .NET, no service containers, no OpenAPI lint. Called by the pull request gate and by all three deploys |
 | `sonar-analysis.yml` | `workflow_dispatch` | Build plus `just coverage all sonar all-with-services` between `Sonar begin`/`Sonar end`, published to SonarCloud. **`Sonar end` goes red on a failed quality gate.** Runs Postgres and Azurite service containers, so the ServiceModule suite covers all three backends. **By hand, and never on a schedule** — a nightly run re-analyses a commit nothing changed and reports the same numbers |
 | `codeql-analysis.yml` | `push` on `main`, weekly `schedule`, `workflow_dispatch` | CodeQL over four languages — `actions`, `csharp`, `javascript-typescript`, `ruby` — one matrix job each, all buildless. Findings land in the Security tab, not on a check. **On a schedule as well as on merge** — the query packs change, so an untouched commit reports new findings later. That is the one analysis a schedule earns |
-| `release-docker-image.yml` | `workflow_dispatch`, input `version` | The release pipeline — gate the version, run the suite, build and push to GHCR, smoke it there, copy to Docker Hub, **create the git tag and then the GitHub release**, write the Docker Hub page. The tag is made last, so a red run leaves nothing to delete. See `$ci-cd/release-pipeline` |
+| `release-docker-image.yml` | `workflow_dispatch`, input `version` | The release pipeline — gate the version, run the suite, build and push to GHCR, smoke it there, then for a release copy to Docker Hub, **create the git tag and then the GitHub release**, write the Docker Hub page. A prerelease stops after the smoke. The tag is made last, so a red run leaves nothing to delete. See `$ci-cd/release-pipeline` |
 | `shared-dockerhub-overview.yml` | `workflow_dispatch`, `workflow_call` | Renders `.github/dockerhub-overview.md` with `just image dockerhub-overview <version>` and PATCHes it onto the Docker Hub repository page. Called by the release pipeline as its last job, or run by hand for a wording fix — an empty version input takes the latest release, so a typo fix needs nothing typed |
 | `shared-smoke-image.yml` | `workflow_dispatch`, `workflow_call` | Pulls a published image and runs the structure check plus all five smoke profiles. Called by the release pipeline as its gate, or run by hand against any tag |
 | `deploy-site.yml` | `workflow_dispatch`, with `site` chosen from `docs`, `demo`, `www` | Three jobs — run the site tests, then build `sites/<site>/` (`$sites/docs`, `$sites/demo`, `$sites/www`), check its links and hand the built directory to the host, then tag the commit `<site>-<run>`. The environment, the URL, the wrangler config and the tag are all derived from the choice |
@@ -401,11 +401,11 @@ certificate — so there is no signing key in the repo and none to rotate. That 
 expires with it, so the staging registry has no stored credential to rotate and no classic personal access
 token to depend on.
 
-**The staging package is private.** A package created under an organization starts private even when the repo
-is public, and this one was created fresh when the repo moved to `binacle-labs`. Nothing outside the release
-workflow reads it — `just image verify` reads Docker Hub alone — and all three jobs that touch it log in with
-`GITHUB_TOKEN`, so private costs nothing. **Docker Hub is the only registry named on any surface a user
-reads**, and every tag the pipeline publishes lands there.
+**The staging package is public** - an anonymous pull answers, checked 2026-09-14 - and a prerelease lives
+there and nowhere else, so whoever checks a beta pulls it from GHCR by hand with no login. Nothing published
+names it: `just image verify` reads Docker Hub unless handed the GHCR repository, and all three jobs that touch it log in with
+`GITHUB_TOKEN`. **Docker Hub is the only registry named on any surface a user reads**, and it carries
+released versions only. `$ci-cd/decisions#D3` and `#D14`.
 
 ## Environments
 
