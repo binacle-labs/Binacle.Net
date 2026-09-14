@@ -3,6 +3,7 @@ import type { Alpine as AlpineType } from 'alpinejs';
 import {defineComponent} from "../../shared/defineComponent";
 import {ViPaqSerializer} from "binacle-vipaq";
 import DecodedPackingResult from "./decodedPackingResult";
+import {sampleData, SampleData} from "./sampleData";
 
 const SAVED_RESULTS_KEY = 'ProtocolDecoderSavedResults';
 
@@ -25,6 +26,7 @@ export const protocolDecoderApp = defineComponent(() => ({
 	},
 	results: [] as DecodedPackingResult[],
 	selectedResult: null as DecodedPackingResult | null,
+	samples: sampleData as SampleData[],
 	init(){
 		this.loadSavedResults().forEach(encodedResult => {
 			const data = Uint8Array.from(atob(encodedResult), x => x.charCodeAt(0));

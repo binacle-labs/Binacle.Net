@@ -167,7 +167,9 @@ anchored on `main`, does not cover it and nothing published names it.
 `## [Unreleased]` exists and is not empty. The section check is worth keeping even though nothing publishes
 it: it fails in seconds when the changelog is not in shape, which is the cheapest place to learn that.
 
-No `{{major}}` tag is emitted on purpose — a bare `3` would cross minor lines.
+**The staging push carries the immutable tag only.** The moving tags - `3.1`, `3` and `latest` - are computed
+in `publish`, the job that creates them, and `3` exists since 2026-09-12 so the samples and the docs can pin a
+line that follows every minor; `$sites/decisions#S11` has why.
 
 ### D14 — GHCR is staging, and only the release workflow touches it
 
@@ -1035,8 +1037,8 @@ at GHCR (D3), so nothing ever lands in `binacle/binacle-net` that is not a relea
 delete afterwards. A second public Docker Hub repository for prereleases was the direction until then; GHCR
 already does that job, is public, and needs no new credential, so it is the staging repository. **Nothing
 about prerelease lifetime goes on the Docker Hub page** - the page describes the repository users pull from,
-and prereleases are no longer in it. What happens to old prerelease tags on GHCR is undecided and costs
-nothing while it stays so.
+and prereleases are no longer in it. **Old prerelease tags on GHCR stay** - decided by the maintainer on
+2026-09-14. Nothing deletes a staging image.
 
 **Docker Hub has no lifecycle rules**, so no cleanup happens on its own. Deleting is the Hub API,
 `DELETE /v2/repositories/{repo}/tags/{tag}/` with a JWT - the sibling of the tag list `tooling/image/verify-tags.sh`

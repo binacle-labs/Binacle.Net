@@ -8,8 +8,10 @@
 
 <p>@Model.Applet.Description</p>
 
+@* `samples_panel` is registered in _js/protocol_decoder.js and nests under the decoder's scope, so it reads
+   `samples`. *@
 <div class="grid" x-data="protocol_decoder_app">
-	<article class="no-padding s12 m5 l3 result-container" @@keyup.enter.prevent.stop="addResult">
+	<article class="no-padding s12 m5 l3 result-container" x-data="samples_panel" @@keyup.enter.prevent.stop="addResult">
 		<article class="medium transparent result-input-container">
 			<div class="field label textarea border max-height">
 				<textarea name="result" id="result" x-model="model.result" class="word-wrap" placeholder=""></textarea>
@@ -17,12 +19,43 @@
 			</div>
 		</article>
 		<div>
-			<nav class="no-space padding">
+			<nav class="no-space left-padding right-padding">
 				<button type="button" class="border surface-container max" @@click.prevent.stop="addResult">
 					<i>library_add</i>
 				</button>
 			</nav>
+			<nav class="no-space left-padding right-padding bottom-padding">
+				<button type="button" class="border surface-container max" @@click.prevent.stop="show()">
+					<i>folder_open</i>
+					<span>Samples</span>
+				</button>
+			</nav>
 		</div>
+
+		@* Known-good strings to copy into the input. No add button on purpose: the point is the string itself.
+		   Same overlay-and-dialog shape as _ErrorsDialog. *@
+		<div class="overlay" :class="open ? 'active' : ''" @@click.prevent.stop="hide()"></div>
+		<dialog class="right medium" :class="open ? 'active' : ''">
+			<h5>Samples</h5>
+			<p>Each is the ViPaq string of a packed bin. Copy one and paste it into the input.</p>
+			<template x-for="sample in samples" :key="sample.name">
+				<article class="surface-container">
+					<h6 class="small" x-text="sample.name"></h6>
+					<pre class="small-text" style="white-space:pre-wrap;overflow-wrap:anywhere" x-text="sample.encoded"></pre>
+					<nav class="right-align no-space">
+						<button class="border surface-container" type="button" x-show="canCopy()" @@click.prevent.stop="copy(sample)">
+							<i>content_copy</i>
+							<span>Copy</span>
+						</button>
+					</nav>
+				</article>
+			</template>
+			<nav class="right-align no-space">
+				<button class="border surface-container" type="button" @@click.prevent.stop="hide()">
+					<span>Close</span>
+				</button>
+			</nav>
+		</dialog>
 	</article>
 
 	<div class="s12 m7 l9">

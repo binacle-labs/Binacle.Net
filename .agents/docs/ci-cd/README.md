@@ -155,8 +155,10 @@ instead.
 **`github.ref` is what makes the key specific** and it differs per event: `refs/pull/<n>/merge` on a pull
 request, `refs/heads/main` on a merge. **The release and the site deploy leave it out on purpose.** The
 deploy is `workflow_dispatch` from any branch, and two deploys of the same site must not run at once
-whichever branch fired them - its group carries the site instead, so two different sites can; the release only ever runs on `main`, so the ref would split nothing, and two
-versions racing for `latest` is what the group exists to prevent. **`sonar-analysis.yml` is
+whichever branch fired them - its group carries the site instead, so two different sites can; the release
+runs on `main` and a prerelease on `main` or a `release/*` branch, and no two of them may run at once - two
+versions racing for `latest` is what the group exists to prevent, and a ref in the key would let a beta on a
+branch race a release on `main`. **`sonar-analysis.yml` is
 `workflow_dispatch` too and keeps `github.ref` anyway**, because SonarCloud tracks a branch at a time: two
 branches analysing at once is fine, the same branch twice is not.
 

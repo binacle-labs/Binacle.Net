@@ -55,7 +55,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: packages/decisions.md
-  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, and why the visualizer owns its own internals instead of sharing a utils folder."
+  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, why the visualizer owns its own internals instead of sharing a utils folder, and why the request panel is the UI module's and the component only hands over the request."
   paths: ["packages/**"]
 ```
 

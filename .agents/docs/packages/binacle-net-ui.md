@@ -1,7 +1,7 @@
 ---
 id: packages/binacle-net-ui
 description: packages/binacle-net-ui — Alpine.js apps and components plus a Three.js visualizer for the packing demo. The apps/components/shared split, the plugins, and the window.binacle global.
-verified: 2026-09-10
+verified: 2026-09-15
 check: Every Alpine.data name under src/apps/ and src/components/ appears in the table and vice versa; the two plugins register exactly what is listed; the apps/components/shared split matches src/ and no utils/ or core/ folder exists; apps/packingDemo/sampleData.ts still carries its generated-do-not-edit line and randomize still steps a sampleIndex rather than rolling; packingDemo.ts still reaches the API only through binacle-net-client; the suite/test/coverage figures still match `npx jest --selectProjects binacle-net-ui --coverage`
 also_update:
   - packages
@@ -49,8 +49,8 @@ A host page imports a plugin, calls `Alpine.plugin(...)`, then `Alpine.start()`,
 
 | `x-data` name | Factory | Params | What it does |
 |---|---|---|---|
-| `packing_demo_app` | `packingDemoApp` | `({ baseUrl })` | Form model (bins/items/algorithm), validation, and the sample set. On submit calls **`pack/compare-bins`** through `binacle-net-client`; dispatches `update-scene` / `error-occurred`. Algorithms: FFD/BFD/WFD/Best |
-| `protocol_decoder_app` | `protocolDecoderApp` | none | Decodes base64 ViPaq via `binacle-vipaq`'s `ViPaqSerializer.deserialize`; saves to `localStorage` key `ProtocolDecoderSavedResults` |
+| `packing_demo_app` | `packingDemoApp` | `({ baseUrl })` | Form model (bins/items/algorithm), validation, and the sample set. On submit calls **`pack/compare-bins`** through `binacle-net-client`; dispatches `update-scene` / `error-occurred`; sets `lastRequest` (method, relative path, body) for a host that shows the call. Algorithms: Best/FFD/BFD/WFD, in that order - the first is what the page opens on |
+| `protocol_decoder_app` | `protocolDecoderApp` | none | Decodes base64 ViPaq via `binacle-vipaq`'s `ViPaqSerializer.deserialize`; saves to `localStorage` key `ProtocolDecoderSavedResults`. `samples` is the five known-good strings in `apps/protocolDecoder/sampleData.ts`; the host page shows and copies them |
 | `packing_visualizer` | `packingVisualizer` | none | The Three.js scene. Listens for `update-scene`; sets up the scene in `init()` and stores it on `window.binacle`. Playback controls drive items in/out |
 | `errors_dialog` | `errorsDialog` | `(default_title)` | Error dialog; `onErrorOccurred(detail)` handles a `string[]` or an `Error` view-model |
 
@@ -103,7 +103,10 @@ at load.
 **Both host webpack configs cache to the filesystem, and the cache hides type errors.** Before measuring one,
 delete `<host>/node_modules/.cache/webpack` - a warm cache reports success on source that fails cold.
 
-`onSubmit` maps the app's classes into the client's plain request object before the call. **The Three.js scene
+`onSubmit` maps the app's classes into the client's plain request object before the call, and hands the same
+object out as `lastRequest` with the method and the relative path. **That is the whole seam for a host that
+prints the call** - the host is the page's to name, so the path stays relative whatever `baseUrl` was, and
+the UI module is the one host that renders it. **The Three.js scene
 helpers are private to the visualizer** - `redrawScene`, `createBin`/`createItem`,
 `addItemToScene`/`removeItemFromScene`, the camera helpers, `containerAspectRatio`, `getThemeColors`,
 `itemMaterial` - and live inside `src/components/visualizer/` rather than anywhere an app can reach.
@@ -137,7 +140,7 @@ pick the same one, is in the packing-demo design record (`$sites/packing-demo-se
 ## Tests
 
 `just test ts_binacle-net-ui_unit`. jsdom, because the components read `document` and `window` even where the
-logic under test does not. **20 suites, 350 tests, 70.62% of lines** — measured 2026-09-04.
+logic under test does not. **21 suites, 384 tests, 72.19% of lines** — measured 2026-09-15.
 
 `tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is
 the Alpine half: each component factory is a plain object, so a test calls it directly with a stub `$dispatch`
