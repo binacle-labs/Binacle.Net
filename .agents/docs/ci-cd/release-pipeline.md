@@ -1,8 +1,8 @@
 ---
 id: ci-cd/release-pipeline
-description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-09-12
-check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; the signature retry is the only inline run: | block in the file; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the release job makes the tag through gh release create --target and pushes none of its own; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `page` is still the only job carrying a prerelease condition and still the only one nothing needs, so no job above it is conditional; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
+description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease stops before, the CHANGELOG.md release body, and the Docker Hub page written last"
+verified: 2026-09-14
+check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; the signature retry is the only inline run: | block in the file; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the release job makes the tag through gh release create --target and pushes none of its own; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `publish` carries the only prerelease condition in the file and `release` and `page` carry none, so both skip through needs; `page` is still the only job nothing needs; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
   - tooling
@@ -26,32 +26,34 @@ again.
 Actions -> Build and Release Docker Image -> Run workflow -> version: 3.0.0
   |
   v  on: workflow_dispatch
-gate      on main, semver, the tag is free, and the CHANGELOG.md section exists   (seconds)
+gate      a release on main or a prerelease on main or release/*, semver, the tag is free, the CHANGELOG.md section exists
 test      every test the image ships plus the OpenAPI lint, by calling shared-image-tests.yml  (minutes)
 build     just build publish, push the immutable tag to GHCR, capture the digest
 smoke     pull that digest back from GHCR, structure check + all five profiles
-publish   imagetools copy to Docker Hub - a prerelease gets its immutable tag only
+publish   imagetools copy to Docker Hub                                       (releases only - a prerelease stops above)
 release   gh release create, which makes the tag v3.0.0 on this run's commit, body from CHANGELOG.md
-page      render .github/dockerhub-overview.md and write it to the Docker Hub page  (real releases only)
+page      render .github/dockerhub-overview.md and write it to the Docker Hub page
 ```
 
 Each job `needs:` the ones before it, so a red anywhere leaves Docker Hub untouched and creates no release.
 **`page` is the exception at the end**: nothing needs it, so it can go red on its own without holding anything
-back, and it is skipped entirely for a prerelease.
+back. **A prerelease stops after `smoke`**: `publish` carries `if: ${{ !contains(inputs.version, '-') }}`, and
+`release` and `page` skip with it through `needs`.
 
 **A release run is never cancelled.** The workflow declares `concurrency` grouped on
 `${{ github.workflow }}` with **`cancel-in-progress: false`**. A stop between `build` and `publish` would
 strand a staged image on GHCR or half-move the Docker Hub tags, so a second run queues behind the first rather
-than replacing it. **The group is the workflow alone**: every dispatch is on `main`, so adding the ref would
-split nothing, and two versions racing for `latest` is exactly what the group exists to prevent.
+than replacing it. **The group is the workflow alone**: adding the ref would let a beta from a branch and a
+release from `main` run at once, and two runs racing for the same registry is exactly what the group exists
+to prevent.
 
 ## The rule the shape exists to enforce
 
 **Nothing unsmoked reaches Docker Hub.**
 
 That comes from job ordering, not from the registry split: `smoke` runs against the staging copy and only a
-digest that passed is ever copied across. GHCR is staging; Docker Hub is what users pull, and it carries every
-tag the pipeline publishes — betas included, with the immutable tag only.
+digest that passed is ever copied across. GHCR is staging; Docker Hub is what users pull, and it carries
+released versions only — a prerelease stays on GHCR.
 
 ## The seven jobs
 
@@ -61,7 +63,7 @@ Docker Hub and `latest` already moved.
 
 | Step | Passes when |
 |---|---|
-| Check the dispatch is on main | `github.ref` is `refs/heads/main` |
+| Check the dispatch is on a ref this version may run from | a release: `github.ref` is `refs/heads/main`. A prerelease: `refs/heads/main` or `refs/heads/release/*`. Anything else, a tag included, is refused |
 | Check the version is semver | `3.0.0` or `3.0.0-beta.1` — no leading `v`, no `+` build metadata, which a Docker tag cannot carry |
 | Check the tag is free | `v<version>` exists on neither the local clone nor origin, **or already points at this run's commit** |
 | Check the section exists | `just changelog check <section>` finds it and it is not empty |
@@ -111,7 +113,7 @@ signature in between**:
 | `Copy the smoked digest to Docker Hub` | `just ci copy-tags` moves the manifest **by digest** under the version tag alone |
 | `Sign the published image` | cosign, against the digest |
 | `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes. Retried five times, 15s apart, in the one inline `run:` block in the file: Docker Hub's referrers index is eventually consistent and this reads it seconds after the sign. The recipe itself stays one shot, because a reader running it wants an answer rather than a wait |
-| `Move the tags that move` | `just ci copy-tags` again, for `3.0`, `3` and `latest`. Skipped on a prerelease, which has none |
+| `Move the tags that move` | `just ci copy-tags` again, for `3.0`, `3` and `latest`. Conditional on the list being non-empty, which a release always is |
 
 **Why in halves.** All three tags used to be written before anything was signed, so a failed `cosign sign` left
 `latest` on an unsigned image with the run red and nothing saying so. **Why the split and not simply copying
@@ -150,9 +152,8 @@ two Docker Hub secrets passed by name. That workflow renders `.github/dockerhub-
 that failed to update is one red job on a release that shipped a correct image — never a release held up by a
 paragraph.
 
-**The one job with a prerelease condition**, `if: ${{ !contains(inputs.version, '-') }}`. The page describes
-the stable line, and a beta moves neither the minor tag nor `latest`, so every tag the page names would be one
-a beta did not create. Because nothing needs this job, the condition skips it alone and nothing downstream.
+**It carries no condition of its own.** It skips for a prerelease because `publish` does, and it needs
+`publish`. The page describes the stable line, which a prerelease never touches.
 
 ## Copy, never rebuild
 
@@ -210,40 +211,49 @@ branch. `$ci-cd/decisions#D3` has the reversal and what it costs.
 
 ## How a prerelease differs
 
-A hyphen in the version is the prerelease marker. Every job runs either way; what changes is the tag set.
+A hyphen in the version is the prerelease marker. A prerelease runs the first four jobs and stops, and it
+may be dispatched from `main` or from a `release/*` branch - the workflow file that runs is the branch's own,
+so a release branch's CI changes are exercised by its betas before they reach `main`.
 
-| | `3.0.0` | `3.0.0-beta.3` |
+| | `3.1.0` | `3.1.0-beta.1` |
 |---|---|---|
-| Section the `gate` job checks | `3.0.0` | `Unreleased` |
-| Pushed to GHCR | `3.0.0` | `3.0.0-beta.3` |
-| `publish` job | runs | runs |
-| Docker Hub tags | `3.0.0`, `3.0`, `3`, `latest` | `3.0.0-beta.3` only |
-| `Move the tags that move` | runs | **skipped** - nothing moves |
-| Git tag created | `v3.0.0` | `v3.0.0-beta.3` |
-| GitHub release | normal | marked `--prerelease` |
-| `page` job | runs | **skipped** |
+| Dispatched from | `main` only | `main` or `release/*` |
+| Section the `gate` job checks | `3.1.0` | `Unreleased` |
+| Pushed to GHCR, smoked, signed | `3.1.0`, on `refs/heads/main` | `3.1.0-beta.1`, on the branch's own ref |
+| `publish` job | runs | **skipped** - the one job condition in the file |
+| Docker Hub tags | `3.1.0`, `3.1`, `3`, `latest` | none |
+| `release` and `page` | run | **skipped**, through `needs` |
+| Git tag and GitHub release | `v3.1.0` | none |
 
-**One job is conditional, and it is the last one.** For the six that build and publish, the narrowing is
-entirely `metadata-action`'s: it withholds `{{major}}.{{minor}}`, `{{major}}` and `latest` for a prerelease, so a beta can
-never move a tag anyone is following. `page` is the exception — it does not go through `metadata-action`, so
-its skip is a job condition. That is safe only because nothing needs it; a condition on any job above would
-skip everything downstream of it.
+**One job is conditional, and everything after it follows.** `publish` carries
+`if: ${{ !contains(inputs.version, '-') }}`; `release` and `page` need it and skip with it. A beta leaves one
+thing behind: the smoked image on `ghcr.io/binacle-labs/binacle-net` under its immutable tag, signed on
+the ref it was dispatched from. The `smoke` job's run summary prints the reference and the digest; there is
+no release page.
 
-**The consequence for testing:** a prerelease exercises every job, `publish` included. What it does not cover
-is the *moving-tag* half — creating `3.1`, `3` and `latest` — since a beta produces none, so
-`Move the tags that move` skips itself on the empty list. **That half was first proven on the v3.0.0 run,
-2026-09-01**, which wrote `3.0.0`, `3.0` and `latest` after a green verify onto one digest. The design record is D25.
+**Checking a beta** is done against GHCR by hand -
+`just image verify <version> all refs/heads/<branch> ghcr.io/binacle-labs/binacle-net`,
+`just smoke all ghcr.io/binacle-labs/binacle-net:<version>` and `docker run` on the same reference. The
+package is public, so no login is needed. **The ref is the branch's**, so the published verify command -
+anchored on `main` - does not cover a branch beta; nothing published names one.
 
-**It has still never moved a name off an existing image.** 3.0.0 created `3.0` and `latest`; the next release
-is the first run that repoints `latest`, and the first to write `{{major}}` at all.
+**The consequence for testing:** a prerelease proves `gate`, `test`, `build` and `smoke` against the exact
+commit. It does not run `publish`, `release` or `page`, so a change to any of those is first exercised by the
+real release. A red `publish` leaves Docker Hub untouched and makes no tag, and the same version can be
+dispatched again once fixed. The reasoning and the history are `$ci-cd/decisions#D3`.
+
+**The moving-tag half was first proven on the v3.0.0 run, 2026-09-01**, which wrote `3.0.0`, `3.0` and
+`latest` after a green verify onto one digest. The design record is D25. **It has still never moved a name off
+an existing image.** 3.0.0 created `3.0` and `latest`; the next release is the first run that repoints
+`latest`, and the first to write `{{major}}` at all.
 
 ## Where the release body comes from
 
 `CHANGELOG.md` at the repo root, newest version first, Keep a Changelog shape. One section accumulates per
-cycle: betas publish `## [Unreleased]`, and renaming that heading to the version is the last edit before the
-real release.
+cycle: a beta's gate checks that `## [Unreleased]` exists, and renaming that heading to the version is the last
+edit before the real release.
 
-The parsing lives in `tooling/changelog.just`, not in the workflow, so CI and a laptop read the file the same
+The parsing lives in `tooling/changelog.extract.sh`, behind `just changelog`, not in the workflow, so CI and a laptop read the file the same
 way and the exact body can be previewed before the release is dispatched. See `$tooling` for the module.
 
 Inside the file a release is `##` and its own sections are `###`, nesting under the single `# Changelog`.
@@ -273,11 +283,11 @@ image carries the same metadata shape a pushed one does.
 ## What still happens by hand
 
 - **Deciding the version and pressing the button.** *Actions → Build and Release Docker Image → Run workflow*,
-  on `main`, with the version typed in and no leading `v`. That is the only entry point.
+  on `main` for a release and on the branch for a beta, with the version typed in and no leading `v`. That is
+  the only entry point.
 - **Writing the `[Unreleased]` section of `CHANGELOG.md`** as the work lands, and renaming that heading to the
   version before the real release.
-- **The moving-tag check on a scratch repository.** A prerelease reaches the `publish` job but produces only
-  its immutable tag, so the minor tag, the major tag and `latest` are first created on a real release.
+- **Checking a beta.** It stops on GHCR, so pulling it, smoking it and opening its pages is a person's job.
 - **Deploying the docs site**, which is its own `workflow_dispatch` workflow and is not chained to a release.
 
 **What no longer happens by hand: the tag.** `git tag v3.0.0 && git push origin v3.0.0` builds nothing now, and

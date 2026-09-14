@@ -84,7 +84,7 @@ The browser demo is for you, not for your customers. Binacle.Net has no storefro
 
 `latest` will cross a major version and can break your integration. **Pin `{{MINOR}}` for anything you keep.**
 
-Prereleases publish their exact version only - they never move `{{MINOR}}` or `latest`.
+Prereleases are not published here. Every tag in this repository is a release.
 
 Every tag is on the Tags tab. What changed in each is in the
 [changelog](https://github.com/binacle-labs/Binacle.Net/blob/main/CHANGELOG.md).

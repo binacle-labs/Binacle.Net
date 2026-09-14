@@ -12,7 +12,7 @@ paths:
 `agents.just`.
 
 **A file a module reads is named after that module.** `<module>.<name>.<ext>` - `check.lychee.toml`,
-`serve.services.yml`, `openapi.spectral.yaml`, `tests.ruby-coverage.rb`. The prefix says who owns it, so a
+`serve.services.yml`, `openapi.spectral.yaml`, `changelog.extract.sh`. The prefix says who owns it, so a
 reader never has to open a file to find out which recipe uses it.
 
 **Count the files a module needs, and that decides where they go:**
@@ -23,7 +23,7 @@ reader never has to open a file to find out which recipe uses it.
 | two | judgement - keep them at the root unless they are clearly a set |
 | three or more | a folder named after the module |
 
-`tooling/smoke/`, `tooling/ci/`, `tooling/agents/` are folders because each holds three or more.
+`tooling/smoke/`, `tooling/ci/`, `tooling/agents/`, `tooling/image/`, `tooling/tests/` are folders because each holds three or more.
 
 **Inside a folder, a name does not repeat the folder.** `tooling/agents/indexes.toml`, not
 `agents-indexes.toml`. `tooling/smoke/structure.yaml`, not `smoke-structure.yaml`.

@@ -20,7 +20,7 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `create-tag.sh` | Tags a commit through the API - the deploy marker; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
 | `sonar-summary.sh` | Writes the SonarCloud quality gate to the run summary |
-| `check-release-ref.sh` | Passes only if the release was dispatched on `main` |
+| `check-release-ref.sh` | Passes only if a release was dispatched on `main`, or a prerelease on `main` or a `release/*` branch |
 | `check-version.sh` | Passes only if the version is semver shaped, with no leading `v` |
 | `check-release-tag.sh` | Passes only if the tag is free, or already points at this commit |
 | `changelog-section.sh` | Which `CHANGELOG.md` section a version publishes. Prints `name=...` |

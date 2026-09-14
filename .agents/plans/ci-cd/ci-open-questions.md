@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: ready
-waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first beta from main, which proves the publish job. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
+waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first release run from main, which is the first to run the changed publish job now that a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"
@@ -27,10 +27,10 @@ Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine compo
 | 12 | **yes, narrowed** | not `^\.github/actions/` alone - also `shared-site-tests.yml` and the site deploy workflow, so a change to a site workflow still runs the site tests |
 
 **How the release-path changes get proved.** Findings 1 and 8 both edit the `publish` job, and nothing short
-of a run proves that job. The proof is a prerelease dispatched from `main` after the changes merge - the
-workflow that runs is the changed one and the signature is on the right ref. **Not from a branch**: `gate`
-refuses any other ref, a branch-built image signs under the branch and fails the published verify command,
-and the direction is that a prerelease never lands where users pull from. The release set says when.
+of a run proves that job. **Since 2026-09-14 a prerelease stops after `smoke` and never reaches `publish`**,
+so the proof is the first real release dispatched from `main` after the changes merge. A red there leaves
+Docker Hub untouched and makes no tag, and the same version is dispatched again once fixed. Everything up to
+`smoke` is proved earlier by a beta dispatched from the branch itself. The release set says when.
 
 **Every open finding was re-checked on 2026-09-11** and each carries a dated verdict line. Where a number in
 this file was measured and found wrong it has been corrected in place. One of those: `tooling/ci/` holds
@@ -263,7 +263,7 @@ and about fifteen seconds off every release. Fewer moving parts in the job where
 `sbom: true`, which need the container driver the action sets up. This finding is about `publish` only.
 
 **Cost and risk:** if `imagetools` turns out to want a configured builder for registry auth, the release fails
-at the copy step - late, and on a real release. A prerelease dispatch is still the cheapest place to find out.
+at the copy step - late, and on a real release. There is no cheaper place: a prerelease stops before `publish`.
 
 **Confidence:** high. See the verdict below - it is no longer a reading.
 
@@ -280,7 +280,7 @@ at the copy step - late, and on a real release. A prerelease dispatch is still t
   `ghcr.io` image. That step ran green on the v3.0.0 release. Auth for `imagetools` comes from the docker
   config that the login action writes, which `setup-buildx-action` has nothing to do with.
 
-What a prerelease dispatch would still prove is the release path end to end, not whether `imagetools` needs a
+What the release run still proves is the release path end to end, not whether `imagetools` needs a
 builder. That question is answered.
 
 ## 9. A step that prints `just --version` and nothing reads it
@@ -460,7 +460,7 @@ that needed a run got it on 2026-09-11:
 | 4, `persist-credentials` | a yes or a no. Yes is fifteen lines across every checkout; no is one line in the ledger |
 | 5, one deploy workflow | a yes or a no. **This one is taste, not mechanics** - where you want to read the host name |
 | 7, scope the credential | a yes or a no. Yes is a GitHub environment and moving two secrets into it |
-| 8, drop `setup-buildx-action` | a yes or a no. The mechanics were proved on 2026-09-11; a prerelease dispatch now only proves the release path |
+| 8, drop `setup-buildx-action` | a yes or a no. The mechanics were proved on 2026-09-11; the release run only proves the path |
 | 10, the Sonar wait | a yes or a no. Yes paints the Sonar run red every time until coverage passes, and that is the whole decision |
 | 12, the path filter | a yes or a no, and *low confidence it is worth doing* is already written into it |
 
@@ -469,8 +469,8 @@ that needed a run got it on 2026-09-11:
 - [ ] The Docker Hub plan question is answered - does the org have an OIDC connection available.
       **The workflow edit landed 2026-09-12** - `grep -c 'password:' .github/workflows/release-docker-image.yml`
       returns 2 outside comments, both GHCR. `D33`. **The maintainer creates the connection and sets
-      `DOCKERHUB_OIDC_CONNECTIONID` before the beta**; the release set carries it as a to-do. Until then every
-      dispatch fails at the Docker Hub login.
+      `DOCKERHUB_OIDC_CONNECTIONID` before the release**; the release set carries it as a to-do. Until then
+      every release dispatch fails at the Docker Hub login; a prerelease never reaches it.
       **By eye.** Open the Docker Hub org's settings and look for GitHub OIDC connections. If yes, finding 1
       is live; if no, this file says so and the finding is struck.
 - [x] The release workflow has no tag-push step, and the tag is created by the release itself.
@@ -481,7 +481,8 @@ that needed a run got it on 2026-09-11:
 - [x] `push-tag.sh` sets no git identity.
       Done 2026-08-28. The three deploy marker tags still use it.
 - [x] **2026-09-11.** The `persist-credentials` question is answered either way.
-      `grep -c 'persist-credentials: false' .github/workflows/*.yml` sums to 22, one per checkout, and
+      `grep -c 'persist-credentials: false' .github/workflows/*.yml` sums to 18, one per checkout - it was 22
+      before the three deploy workflows became one - and
       `grep -rn 'git push' tooling/ci` returns nothing - the marker tag is `create-tag.sh`, through `gh api`.
       `D30`. **The API call is unproved until a site deploys** - the demo deploy in the release set is the
       first.
@@ -494,10 +495,10 @@ that needed a run got it on 2026-09-11:
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.
 - [x] **2026-09-11.** The Docker Hub credential is scoped, or the decision not to is recorded.
       Not scoped; the decision is `D29` in the CI/CD decisions ledger.
-- [ ] `docker/setup-buildx-action` is gone from `publish`, proved by a prerelease dispatched from `main`.
+- [ ] `docker/setup-buildx-action` is gone from `publish`, proved by the first release run from `main`.
       **The step was deleted 2026-09-11** - `grep -c setup-buildx .github/workflows/release-docker-image.yml`
-      returns 1, the `build` job's. The box closes on the beta run.
-      **By eye.** A prerelease run whose copy step is green with no buildx setup above it. If it fails, the
+      returns 1, the `build` job's. The box closes on the release run; a prerelease stops before `publish`.
+      **By eye.** A release run whose copy step is green with no buildx setup above it. If it fails, the
       action goes back and a line here says so.
 - [x] `setup-just` prints its version and the smoke workflow's bare version step is gone.
       Done 2026-08-28. Sixteen jobs get the line now instead of one.

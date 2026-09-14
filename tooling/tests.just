@@ -1,5 +1,8 @@
 # Runs the tests. One recipe per test project, so one failure names one project.
 #
+# The three runners - one per language - are scripts in tooling/tests/, because a `.just` body is invisible
+# to shellcheck and cannot be run on its own. The recipes here are the names and the lists.
+#
 #   just test                            the list
 #   just test all                        every project
 #   just test all-with-services          the same, plus the backends that need services running
@@ -19,12 +22,10 @@ set working-directory := '..'
 # still gets through, so CI still fails.
 set no-exit-message := true
 
-# Extra flags for `dotnet test`. CI builds the solution once and passes --no-build; on a laptop you want
-# none. An environment variable and not a just variable, because just cannot set a module variable from the
-# command line and would ignore it without saying so.
+# Extra flags for `dotnet test` go in DOTNET_TEST_ARGS, read by tooling/tests/dotnet.sh. CI builds the
+# solution once and passes --no-build; on a laptop you want none.
 #
 #   DOTNET_TEST_ARGS="--configuration Release --no-build" just test all
-dotnet_test_args := env('DOTNET_TEST_ARGS', '')
 
 # List the recipes
 default:
@@ -222,147 +223,17 @@ rb_jekyll-structured-data_unit: (_rspec_test 'jekyll-structured-data')
 [private]
 rb_jekyll-webmanifest_unit: (_rspec_test 'jekyll-webmanifest')
 
-# Runs one C# test project. Every C# test goes through here, so the flags sit in one place.
-#
-# With COVERAGE_FORMAT unset this is a plain `dotnet test`. With it set, the same run also writes a test
-# report and a coverage file under artifacts/. `just coverage all` is what sets it.
-#
-# The label goes on both file names. Without it a project run twice overwrites its own first run.
-
+# One C# test project, with a label for a project run more than once
 [private]
 _dotnet_test project label="":
-    #!/usr/bin/env bash
-    set -euo pipefail
+    @tooling/tests/dotnet.sh {{ quote(project) }} {{ quote(label) }}
 
-    if [ -z "${COVERAGE_FORMAT:-}" ]; then
-        dotnet test --project {{ project }} {{ dotnet_test_args }}
-        exit 0
-    fi
-
-    # The format name says who reads the file, not what the file is.
-    case "$COVERAGE_FORMAT" in
-        cobertura) output_format=cobertura ;;
-        sonar)     output_format=xml ;;  # Visual Studio coverage, the only C# format Sonar reads
-        *) echo "Unknown COVERAGE_FORMAT '$COVERAGE_FORMAT'. Use cobertura or sonar." >&2; exit 1 ;;
-    esac
-
-    name=$(basename {{ project }})
-    if [ -n '{{ label }}' ]; then
-        name="$name.{{ label }}"
-    fi
-
-    results="$(pwd)/artifacts/tests"
-    coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
-    mkdir -p "$results" "$coverage"
-
-    # Written before the run, so `just coverage table` can tell "wrote no report" from "never ran".
-    echo "$name" >> "$results/expected.txt"
-
-    # Both paths are absolute. A relative coverage path lands inside the project's own bin folder.
-    #
-    # No `--` in front of these options. `dotnet test` hands anything it does not recognise to the test app
-    # itself, and a `--` makes it read the project path as junk.
-    dotnet test --project {{ project }} {{ dotnet_test_args }} \
-        --results-directory "$results" \
-        --report-ctrf --report-ctrf-filename "$name.ctrf.json" \
-        --coverage --coverage-output-format "$output_format" \
-        --coverage-output "$coverage/$name.xml"
-
-# Runs one gem's tests. Bundler walks up from the gem folder and finds ruby/Gemfile, so every gem runs
-# against the same Jekyll the sites are locked to.
-#
-# Starting from ruby/ itself does not work. rspec has to start inside the gem for its spec_helper to be
-# found.
-
+# One gem's specs
 [private]
 _rspec_test gem:
-    #!/usr/bin/env bash
-    # No -e. The exit code is kept below, so the coverage file still gets moved out of a failed run.
-    set -uo pipefail
+    @tooling/tests/rspec.sh {{ quote(gem) }}
 
-    if [ -z "${COVERAGE_FORMAT:-}" ]; then
-        cd ruby/{{ gem }} && exec bundle exec rspec
-    fi
-
-    # SimpleCov names its file after the formatter, so the extension is what tells them apart.
-    case "$COVERAGE_FORMAT" in
-        cobertura) produced=coverage.xml ;;
-        sonar)     produced=coverage.json ;;  # what Sonar reads for Ruby
-        *) echo "Unknown COVERAGE_FORMAT '$COVERAGE_FORMAT'. Use cobertura or sonar." >&2; exit 1 ;;
-    esac
-
-    results="$(pwd)/artifacts/tests"
-    coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
-    mkdir -p "$results" "$coverage"
-    echo '{{ gem }}' >> "$results/expected.txt"
-
-    # Both absolute, because rspec runs from inside the gem folder.
-    #
-    # RUBYOPT and not a require in each spec_helper, because a gem must not reach above its own folder.
-    # The file requires bundler/setup itself - CI vendors the bundle, so nothing is on the load path until
-    # bundler puts it there.
-    export COVERAGE_DIR="$coverage/{{ gem }}"
-    export RUBYOPT="-r$(pwd)/tooling/tests.ruby-coverage.rb ${RUBYOPT:-}"
-
-    cd ruby/{{ gem }}
-    bundle exec rspec --format progress --format json --out "$results/{{ gem }}.rspec.json"
-    rc=$?
-
-    # SimpleCov buries the file in a folder. Lift it out, named after the gem, so the folder holds one flat
-    # file per project. Not fatal on its own - a failed run reports through rc.
-    if [ -f "$COVERAGE_DIR/$produced" ]; then
-        mv "$COVERAGE_DIR/$produced" "$coverage/{{ gem }}.${produced##*.}"
-    fi
-    rm -rf "$COVERAGE_DIR"
-
-    exit $rc
-
-# Runs one TypeScript package. The jest half of _dotnet_test, with the same two modes.
-#
-# --selectProjects and not --projects <path>, because the root jest.config.js keeps the workspace folder in
-# the recorded paths, and its collectCoverageFrom is ignored when a package's own config drives the run.
-#
-# Paths are absolute. jest resolves a relative one against the package, not against artifacts/.
-
+# One TypeScript package, by its jest displayName
 [private]
 _jest_test package:
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    if [ -z "${COVERAGE_FORMAT:-}" ]; then
-        npx jest --selectProjects {{ package }}
-        exit 0
-    fi
-
-    # The same two format names as _dotnet_test, in what jest calls them. Sonar reads javascript coverage as
-    # lcov, not the Visual Studio xml it wants for C#.
-    case "$COVERAGE_FORMAT" in
-        cobertura) reporter=cobertura ;;
-        sonar)     reporter=lcovonly ;;
-        *) echo "Unknown COVERAGE_FORMAT '$COVERAGE_FORMAT'. Use cobertura or sonar." >&2; exit 1 ;;
-    esac
-
-    results="$(pwd)/artifacts/tests"
-    coverage="$(pwd)/artifacts/coverage/$COVERAGE_FORMAT"
-    mkdir -p "$results" "$coverage"
-    echo '{{ package }}' >> "$results/expected.txt"
-
-    npx jest --selectProjects {{ package }} \
-        --coverage --coverageReporters="$reporter" --coverageDirectory="$coverage/{{ package }}" \
-        --json --outputFile="$results/{{ package }}.jest.json"
-
-    # jest names the file after its reporter and buries it in a folder. Lift it out, named after the package,
-    # so the folder holds one flat file per project.
-    for produced in "$coverage/{{ package }}"/*; do
-        [ -f "$produced" ] || continue
-        mv "$produced" "$coverage/{{ package }}.${produced##*.}"
-    done
-    rmdir "$coverage/{{ package }}"
-
-    # jest names its cobertura packages after the folders inside the package - "main", "src", "src.core" -
-    # and three of ours are called "main". The merged report adds same-named packages together, so cookies,
-    # theme-switcher and binacle-compact-notation came out as one row. Overwrite them all with the package
-    # name, which is what the C# and ruby files already carry.
-    if [ "$reporter" = cobertura ]; then
-        sed -i 's|<package name="[^"]*"|<package name="{{ package }}"|g' "$coverage/{{ package }}.xml"
-    fi
+    @tooling/tests/jest.sh {{ quote(package) }}

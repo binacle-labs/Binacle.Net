@@ -78,7 +78,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/ci-open-questions.md
   description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
   state: ready
-  waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first beta from main, which proves the publish job. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
+  waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first release run from main, which is the first to run the changed publish job now that a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
@@ -87,11 +87,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   horizon: on-demand
   paths: [".github/workflows/**"]
 - file: ci-cd/prerelease-staging-repository.md
-  description: "Prereleases and branch builds go to a public staging repository, so the repository users pull from only ever receives a final release"
+  description: "Branch builds go to the staging registry on dispatch, the way a prerelease now does - so an image from a branch can be tried without ever reaching the repository users pull from"
   state: idea
-  waits-on: "whether this replaces the GHCR staging step, and what the published verify command covers. horizon: undecided - chosen by an agent, strike it if wrong"
+  waits-on: "the signing story for a branch-built image, and whether staging images are ever deleted. horizon: undecided - chosen by an agent, strike it if wrong"
   horizon: undecided
-  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just"]
+  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just", "tooling/image/**"]
 ```
 
 ## Shared
@@ -122,7 +122,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: sites/docs-current-at-root.md
   description: "The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL."
   state: ready
-  waits-on: "nothing - the maintainer said yes on 2026-09-11 and put it in the v3.1.0 release set"
+  waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip) or the release (the major tag manifest)"
   horizon: now
   paths: ["sites/docs/**", "ruby/binacle-docs-versions/**", "tooling/openapi.just", ".github/workflows/release-docker-image.yml"]
 ```

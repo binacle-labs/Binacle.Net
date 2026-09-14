@@ -43,9 +43,9 @@ deploy-summary commit tag url:
 sonar-summary report commit branch:
     @tooling/ci/sonar-summary.sh {{ quote(report) }} {{ quote(commit) }} {{ quote(branch) }}
 
-# Only main may release
-check-release-ref ref:
-    @tooling/ci/check-release-ref.sh {{ quote(ref) }}
+# A release from main only; a prerelease from main or a release/* branch
+check-release-ref ref version:
+    @tooling/ci/check-release-ref.sh {{ quote(ref) }} {{ quote(version) }}
 
 # The version is semver shaped, with no leading v
 check-version version:
