@@ -1,8 +1,8 @@
 ---
 id: ci-cd/branches
-description: "Branch names — the two kinds in use, the snake_case subject, and the one constraint that is mechanical today: Sonar analyses main and pull requests targeting main, and nothing else"
-verified: 2026-09-05
-check: "The kinds here match the branches on the remote and the merge commits in git log; pull-request.yml still triggers on pull_request with no branches: filter; sonar-analysis.yml is still workflow_dispatch only; codeql-analysis.yml's branches: list still names main alone"
+description: "Branch names — the three kinds in use, the snake_case subject, and the two constraints that are mechanical: Sonar analyses main and pull requests targeting main, and only main or a release/* branch may dispatch the release workflow"
+verified: 2026-09-14
+check: "The kinds here match the branches on the remote and the merge commits in git log; pull-request.yml still triggers on pull_request with no branches: filter and calls sonar-analysis.yml; tooling/ci/check-release-ref.sh still admits refs/heads/main and refs/heads/release/* and nothing else; codeql-analysis.yml's branches: list still names main alone"
 also_update:
   - ci-cd
 paths:
@@ -16,17 +16,21 @@ paths:
 ```
 <kind>/<subject>        features/post_release_v3
                         fixes/sonar_fixes
+                        release/v3-1-0
 ```
 
-**Two kinds, and there is no third.** `features/` for new work, `fixes/` for corrections. Documentation and
-tooling work rides under `features/` - `features/docs_work` is the precedent.
+**Three kinds.** `features/` for new work, `fixes/` for corrections, `release/` for the branch a version's
+betas are dispatched from. Documentation and tooling work rides under `features/` - `features/docs_work` is
+the precedent.
 
 **The subject is `snake_case`**, lowercase, no second `/`, and short. Around forty characters is the practical
-ceiling.
+ceiling. A `release/` subject is the version with dots as hyphens - `release/v3-1-0` - so it reads as the
+version it is.
 
-**A `release/` kind was considered on 2026-09-05 and not adopted.** It would have been legibility only:
-release-prep branches have used `features/release_*` and nothing matches on the prefix, so a third kind buys a
-tidier `git branch` listing and nothing else.
+**`release/` is the one kind a workflow matches on.** `tooling/ci/check-release-ref.sh` lets a prerelease
+dispatch from `refs/heads/main` or `refs/heads/release/*` and a release from `main` only; a dispatch on any
+other ref fails in the `gate` job. The kind was considered on 2026-09-05 and not adopted, because it was
+legibility only; it was adopted on 2026-09-14 when the prerelease rule gave it a mechanical meaning.
 
 ## The one constraint that is not taste
 
@@ -34,10 +38,9 @@ tidier `git branch` listing and nothing else.
 analyses a pull request *only if its target branch is `main`*. A branch opened against another branch would
 get nothing.
 
-**Today that costs nothing, because no pull request is analysed at all** - `sonar-analysis.yml` is
-`workflow_dispatch` only. It becomes real the moment that trigger lands, and `pull-request.yml` triggers on
-`pull_request` with no `branches:` filter, so a run against the wrong target would still go green with the
-Sonar half quietly missing.
+**This is mechanical since 2026-09-10** - `pull-request.yml` calls `sonar-analysis.yml` on every pull request
+that touches code. It triggers on `pull_request` with no `branches:` filter, so a pull request against the
+wrong target would still go green with the Sonar half quietly missing.
 
 That is why the arrangement is one long-lived branch rather than a develop-and-main pair. It is a consequence
 of the plan the project is on, not a preference.

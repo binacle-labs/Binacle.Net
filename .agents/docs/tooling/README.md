@@ -130,7 +130,7 @@ because that is the one that exercises the whole image, which is what the module
 ## Rendering the Docker Hub page
 
 `just image dockerhub-overview <version>`, a door onto `tooling/image/dockerhub-overview.sh`. `.github/dockerhub-overview.md` is the page Docker Hub shows,
-and it carries `{{VERSION}}` and `{{MINOR}}` rather than a version — so it is right for every release instead
+and it carries `{{VERSION}}`, `{{MINOR}}` and `{{MAJOR}}` rather than a version — so it is right for every release instead
 of for the one it was written in. This recipe fills them in and prints the result; it writes nothing.
 
 **Here for the same reason `changelog extract` is.** The release workflow calls it and pipes the output to the

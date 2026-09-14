@@ -1,8 +1,8 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-09-10
-check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds
+verified: 2026-09-15
+check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds; `_js/packing_demo.js` still registers `request_panel` and Pages/Packing.cshtml still nests it inside the demo's x-data and reads `lastRequest`
 also_update:
   - packages
   - api/configuration
@@ -37,8 +37,8 @@ internal types. `Applet`, `AppletsService`, `UIModuleOptions` and every PageMode
 | Route | Page | What it does |
 |---|---|---|
 | `/` | `Index` | Three cards, one per applet. The whole card is the link; the page has no button |
-| `/packing` | `Packing` | The packing demo. Calls the pack API from the browser |
-| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. Calls nothing |
+| `/packing` | `Packing` | The packing demo. Calls the pack API from the browser, and prints the call it made as a `curl` line |
+| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. A `Samples` panel lists five known-good strings to copy. Calls nothing |
 | `/instance` | `Instance` | Version, the switch list, the presets this instance loaded, and a link to GitHub Discussions |
 | `/error/{errorCode?}` | `Error` | The error page, and the `UseStatusCodePagesWithReExecute` target |
 
@@ -64,7 +64,7 @@ escaping.
 |---|---|---|
 | `just assets` (gulp) | `lib/`, `media/`, the root icons | repo-root `assets/` |
 | `npm run build:css` (dart-sass) | `css/main.css` | `_sass/main.scss` |
-| `npm run build:js` (webpack) | `js/` | `_js/` — four entries |
+| `npm run build:js` (webpack) | `js/` | `_js/` — three entries |
 
 `just build publish` runs all three before `dotnet publish`, because static web assets are collected at
 publish time. **A missing bundle fails nothing** — the image ships pages that return 200 and do nothing —
@@ -76,6 +76,14 @@ are asserted separately from the entries** — a demo entry is 227 bytes and eve
 The webpack entries are `main`, `packing_demo` and `protocol_decoder`. The chunk names and priorities match
 `sites/demo/webpack.config.js`; both compile the same package source, so there is one implementation and only
 the config is duplicated.
+
+**The request panel is this host's, not the package's.** `_js/packing_demo.js` registers a second Alpine
+component, `request_panel`, beside the plugin: it turns the demo's `lastRequest` - method, path, body, set by
+`packing_demo_app` on every valid submit - into one `curl` line against `window.location.origin`, and copies
+it where the clipboard API exists. `Pages/Packing.cshtml` wraps the results card in it: a `Request` button,
+shown once a call has gone out, opens a beercss right `dialog` - the same overlay-and-dialog shape as
+`_ErrorsDialog` - holding the line and a Copy button. The demo site has no panel; the reasoning is
+`$packages/decisions#P3`.
 
 **The instance page has no entry of its own.** It renders server-side and loads `runtime` + `main` only —
 none of `vendors`, `three` or the two package chunks.

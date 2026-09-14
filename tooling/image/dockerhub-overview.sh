@@ -14,7 +14,8 @@ case "$version" in
     *)     echo "Expected a full version like 3.0.0, got '$version'." >&2; exit 1 ;;
 esac
 
-out="$(sed -e "s/{{VERSION}}/$version/g" -e "s/{{MINOR}}/${version%.*}/g" "$page")"
+minor="${version%.*}"
+out="$(sed -e "s/{{VERSION}}/$version/g" -e "s/{{MINOR}}/$minor/g" -e "s/{{MAJOR}}/${minor%.*}/g" "$page")"
 
 if grep -n '{{' <<<"$out" >&2; then
     echo "^ unsubstituted placeholder in $page" >&2

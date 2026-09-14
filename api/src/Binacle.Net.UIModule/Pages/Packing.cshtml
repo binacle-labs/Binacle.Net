@@ -184,7 +184,9 @@
     </div>
   </div>
 
-  <div class="grid">
+  @* `request_panel` is registered in _js/packing_demo.js and nests under the demo's scope, so it reads
+     `lastRequest`. The dialog is fixed, so it can sit inside the results card. *@
+  <div class="grid" x-data="request_panel">
     <div class="s12">
       <article class="surface-variant">
         <fieldset>
@@ -252,7 +254,30 @@
             </a>
           </template>
         </fieldset>
+        <nav class="right-align no-space" x-show="lastRequest">
+          <button class="border surface-container" type="button" x-on:click.prevent.stop="show()">
+            <i>code</i>
+            <span>Request</span>
+          </button>
+        </nav>
       </article>
+
+      @* The call that was just made, for the reader to paste. Same overlay-and-dialog shape as _ErrorsDialog. *@
+      <div class="overlay" :class="open ? 'active' : ''" x-on:click.prevent.stop="hide()"></div>
+      <dialog class="right medium" :class="open ? 'active' : ''">
+        <h5>Request</h5>
+        <p>The call this page just made, against the instance serving it.</p>
+        <pre style="white-space:pre-wrap" x-text="curl(lastRequest)"></pre>
+        <nav class="right-align">
+          <button class="border surface-container" type="button" x-show="canCopy()" x-on:click.prevent.stop="copy(lastRequest)">
+            <i>content_copy</i>
+            <span>Copy</span>
+          </button>
+          <button class="border surface-container" type="button" x-on:click.prevent.stop="hide()">
+            <span>Close</span>
+          </button>
+        </nav>
+      </dialog>
     </div>
   </div>
 

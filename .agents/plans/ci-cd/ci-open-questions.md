@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: ready
-waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first release run from main, which is the first to run the changed publish job now that a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
+waits-on: "the first release run from main - it is the first to run the changed publish job, since a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12, the OIDC connection exists since 2026-09-14, and 7 is rejected"
 paths:
   - ".github/workflows/**"
   - ".github/actions/**"
@@ -466,13 +466,11 @@ that needed a run got it on 2026-09-11:
 
 **Nothing here blocks anything and nothing decays.** It is seven answers, and a no is an answer.
 
-- [ ] The Docker Hub plan question is answered - does the org have an OIDC connection available.
+- [x] **2026-09-14.** The Docker Hub plan question is answered - the org has an OIDC connection, and it exists.
       **The workflow edit landed 2026-09-12** - `grep -c 'password:' .github/workflows/release-docker-image.yml`
-      returns 2 outside comments, both GHCR. `D33`. **The maintainer creates the connection and sets
-      `DOCKERHUB_OIDC_CONNECTIONID` before the release**; the release set carries it as a to-do. Until then
-      every release dispatch fails at the Docker Hub login; a prerelease never reaches it.
-      **By eye.** Open the Docker Hub org's settings and look for GitHub OIDC connections. If yes, finding 1
-      is live; if no, this file says so and the finding is struck.
+      returns 2 outside comments, both GHCR. `D33`. **The maintainer created the connection and set
+      `DOCKERHUB_OIDC_CONNECTIONID` on 2026-09-14**; the release set records the shape. **The login is
+      unproved until the first release run** - a prerelease never reaches it.
 - [x] The release workflow has no tag-push step, and the tag is created by the release itself.
       Done 2026-08-28. `github-release.sh` takes the commit and passes `--target`; the tag-push step is gone.
       D1 amended. **Only a real release proves it.**

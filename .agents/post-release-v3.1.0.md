@@ -89,17 +89,23 @@ the current one at the root. A minor is this section and nothing else.
 
 ### 2. Move the pins to `3` - a coding session
 
-**`3`, not `3.1` - the maintainer decided on 2026-09-11.** The major tag follows every minor and patch in
-the line, so this move happens once and no later minor repeats it. The release workflow publishes `3` for the
-first time with this release, which is why the move still waits for the run.
+**`3`, not `3.1` - the maintainer decided on 2026-09-11 and confirmed on 2026-09-15.** The major tag follows
+every minor and patch in the line, so this move happens once and no later minor repeats it. An old minor tag
+gets no patches - `3.0` stays at `3.0.0` - so a sample pinned to a minor is a sample that stops getting fixes
+the day the next minor ships. **One exception, decided 2026-09-15: the `service` sample pins `3.1`**, because
+the Service Module is the one thing a minor may break, and that sample is for people who turned it on. It moves
+by hand at each minor. The release workflow publishes `3` for the first time with this release, which is why
+the move still waits for the run.
 
-- [ ] The six samples pin `binacle/binacle-net:3`.
-      `grep -rln 'binacle-net:3\.' samples/` returns nothing. That is `samples/docker/*/docker-compose.yml`
-      (five) and `samples/kubernetes/minimal/binacle-deployment.yaml`.
+- [ ] Five samples pin `binacle/binacle-net:3`, and `samples/docker/service/docker-compose.yml` pins `3.1`.
+      `grep -rln 'binacle-net:3\.' samples/` returns only the service compose file, and that file says `3.1`.
+      The five are `samples/docker/{minimal,quickstart,prod,full}/docker-compose.yml` and
+      `samples/kubernetes/minimal/binacle-deployment.yaml`.
 - [ ] The three files that carry the tag in prose moved with them: `README.md:21`, `samples/README.md:28`,
-      `samples/docker/README.md:36`. The two that name it only as an example, `tooling/README.md` and
-      `tooling/smoke.just`, may stay.
-      `grep -rn 'binacle-net:3\.[0-9]' README.md samples/` returns nothing.
+      `samples/docker/README.md:36` - each says `3`, and the two sample READMEs say why `service` is the
+      exception. The two that name it only as an example, `tooling/README.md` and `tooling/smoke.just`, may
+      stay.
+      `grep -rn 'binacle-net:3\.[0-9]' README.md samples/README.md samples/docker/README.md` returns nothing.
 - [ ] `.agents/docs/samples/README.md` still says "read the value out of the sample files" and names no
       version of its own. **By eye.** If it names `3.0` anywhere, that sentence was not honoured.
 - [ ] The docs site's copies of the six sample files match `samples/` again - a site session, since
@@ -139,8 +145,9 @@ is `plans/api/integration-tests-cover-shipped-modules.md`, whose optional-module
 version.
 
 **What the beta leaves behind.** `ghcr.io/binacle-labs/binacle-net:3.1.0-beta.1` (and any `beta.2`) stays
-on GHCR - a prerelease stops there since 2026-09-14, `D3`, and nothing names it. Whether staging images are
-ever deleted is the open half of `plans/ci-cd/prerelease-staging-repository.md`, with branch builds.
+on GHCR - a prerelease stops there since 2026-09-14, `D3`, and nothing names it. **It stays there** - the
+maintainer said so on 2026-09-14; nothing deletes a staging image. Branch builds are what is left of
+`plans/ci-cd/prerelease-staging-repository.md`.
 
 **Delete this file once the first two lists are clear.** What outlives it goes to the docs and the decision
 ledgers, not here.

@@ -9,6 +9,7 @@ import {
 	ApiFailure,
 	BinacleClient,
 	hasValidationErrors,
+	packCompareBinsPath,
 	PackBinResponse,
 	PackCompareResponse,
 	PackCustomRequest,
@@ -16,6 +17,14 @@ import {
 	Bin as ApiBin,
 	UnpackedBox
 } from "binacle-net-client";
+
+// The call as it went over the wire, for a host that shows it. The path is relative: the host is the page's
+// to name.
+export interface SentRequest {
+	method: 'POST';
+	path: string;
+	body: PackCustomRequest;
+}
 
 // The API's BinPackResultStatus, in the words a visitor reads.
 const resultStatusTexts: Record<string, string> = {
@@ -26,12 +35,12 @@ const resultStatusTexts: Record<string, string> = {
 };
 
 // The API's Algorithm values, in the words a visitor reads. The dropdown and the result row read this one
-// table, so the two can never disagree.
+// table, so the two can never disagree. Best is first because it is what the page opens on.
 const algorithmTexts: Record<string, string> = {
+	Best: 'Try all, keep the best',
 	FFD: 'First Fit Decreasing',
 	BFD: 'Best Fit Decreasing',
 	WFD: 'Worst Fit Decreasing',
-	Best: 'Try all, keep the best',
 };
 
 export function packingDemoAppPlugin(Alpine: AlpineType) {
@@ -58,6 +67,8 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	sampleIndex: 0,
 	submitting: false,
 	submitStatus: '',
+	// Set the moment a valid submit goes out, and left standing whatever the answer was.
+	lastRequest: null as SentRequest | null,
 	init() {
 		// Sample zero, never a roll: the page opens on the same readable set every time.
 		this.showSample(0);
@@ -212,6 +223,8 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 				quantity: Number(x.quantity)
 			}))
 		} as PackCustomRequest;
+
+		this.lastRequest = {method: 'POST', path: packCompareBinsPath, body: request};
 
 		let scene: {bin: ApiBin | undefined; items: PackedBox[]} | null = null;
 		try {

@@ -1,12 +1,13 @@
 # Demo Samples
 
 The demo site's sample set, converted to the tests-kernel compact scenario format. One entry per bin per
-sample: 20 files, 51 entries. Read by the **tests kernel**, and by ViPaq, which packs them into placed
+sample: 21 files, 53 entries. Read by the **tests kernel**, and by ViPaq, which packs them into placed
 results under `vipaq/data/packed/demo-samples/`.
 
 **This folder is the source. The demo reads from it, not the other way round.** Each file is one sample: its
 entries are that sample's bins, and every entry repeats the same items. The file name carries the order, and
-`01-opening-set.json` is the one the demo page opens on.
+`00-two-winners.json` is the one the demo page opens on - numbered `00` so it sorts first without renaming the
+rest.
 
 `just regen demo-samples` reassembles these files into `packages/binacle-net-ui/src/utils/sampleData.ts`,
 which the demo imports. A file whose entries disagree on their items fails that run rather than being taken

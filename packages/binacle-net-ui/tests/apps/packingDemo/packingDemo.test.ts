@@ -142,12 +142,12 @@ describe("init", () => {
 		expect(app.model.items.length).toBeGreaterThan(0);
 	});
 
-	test("picks the first algorithm", () => {
+	test("opens on Best", () => {
 		const {app} = createApp();
 
 		app.init();
 
-		expect(app.model.algorithm).toBe("FFD");
+		expect(app.model.algorithm).toBe("Best");
 	});
 
 	test("the seeded model is submittable", () => {
@@ -196,7 +196,14 @@ describe("the algorithm dropdown", () => {
 	test("offers every algorithm the api takes", () => {
 		const {app} = createApp();
 
-		expect(app.algorithms.map(x => x.value)).toEqual(["FFD", "BFD", "WFD", "Best"]);
+		expect(app.algorithms.map(x => x.value)).toEqual(["Best", "FFD", "BFD", "WFD"]);
+	});
+
+	// The page opens on it and the dropdown reads top down, so the default is the first entry.
+	test("Best is first", () => {
+		const {app} = createApp();
+
+		expect(app.algorithms[0].value).toBe("Best");
 	});
 
 	// Two entries reading as a Best would leave a visitor no way to tell them apart.
@@ -908,6 +915,61 @@ describe("the request", () => {
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items).toEqual([
 			{id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5},
 		]);
+	});
+});
+
+describe("the request a host can show", () => {
+	test("nothing has been sent before a submit", () => {
+		const {app} = createApp();
+
+		expect(app.lastRequest).toBeNull();
+	});
+
+	test("an invalid submit sends nothing and shows nothing", () => {
+		const {app} = createApp();
+		app.model.bins = [];
+		app.model.items = [];
+
+		app.onSubmit();
+
+		expect(app.lastRequest).toBeNull();
+	});
+
+	test("a submit exposes the method, the path and the body that went over the wire", async () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 3, 4, 5)];
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await app.onSubmit();
+
+		expect(app.lastRequest).toEqual({
+			method: fetchMock.mock.calls[0][1].method,
+			path: packEndpoint,
+			body: JSON.parse(fetchMock.mock.calls[0][1].body),
+		});
+	});
+
+	test("the path is relative even when a baseUrl is set", async () => {
+		const {app} = createApp({baseUrl: "https://api.example.com"});
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		mockFetch(stubResponse(200, packingResponse([])));
+
+		await app.onSubmit();
+
+		expect(app.lastRequest?.path).toBe(packEndpoint);
+	});
+
+	test("a failed request still shows what was sent", async () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+		mockFetch(stubResponse(500));
+
+		await app.onSubmit();
+
+		expect(app.lastRequest?.body.bins).toEqual([{id: "10x10x10", length: 10, width: 10, height: 10}]);
 	});
 });
 

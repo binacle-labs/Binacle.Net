@@ -99,6 +99,7 @@ His word was *"agreed"* on splitting the investigation from the build.
 - **Whatever runs the all-modules suite must not be added to `shared-image-tests.yml`.** The release calls
   that file whole and takes no inputs, so a step added there is a step every release pays for. It belongs in
   `pull-request.yml`. This is the one trap the deleted pull-request plan carried that was not already here.
-- **The Azure Storage provider is a hole in every layer of coverage.** Since `service-azure` was folded into
-  `service` it has no dedicated sample, no CI coverage and no smoke profile, and nobody has written down
-  whether it stays or goes.
+- **The Azure Storage provider has in-process coverage and nothing else.** `shared-image-tests.yml` runs the
+  Service Module integration suite against Azurite, checked 2026-09-14. What it lacks: no smoke profile, and
+  the sample carries it only as a commented block in `samples/docker/service/docker-compose.yml`. The
+  ServiceModule plan says it goes.

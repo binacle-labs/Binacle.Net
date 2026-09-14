@@ -6,6 +6,8 @@
 - **The demo now calls V4.** Both the demo site and the UI module inside the image moved off V3.  
 - **The demo gained the `Best` algorithm**, which was never reachable from V3, and now shows which algorithm won.  
 - V3 endpoints are unchanged and remain stable. V4 remains experimental.  
+- **A major tag, `3`, is published beside `3.1` and `3.1.0`.** It follows every minor and patch in the 3 line.  
+- **The documentation site keeps one folder per major line**, and the current line is served at the site root. A minor release no longer moves every documentation URL.  
 
 ### 🎨 UI Module
 - **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin you give it and still lets you click between the results — the endpoint with the same shape, on the newer version. Nothing about the page's behaviour changed with it.  
@@ -17,6 +19,10 @@
 - **The Get results button can no longer stick.** It came back only once something had drawn the packed bin, so a page showing the form without the 3D view could leave it disabled. It now comes back as soon as the answer arrives.  
 - **The instance page no longer calls the API to list its presets.** It renders them with the rest of the page, so the list still appears behind a proxy, an auth layer or a CORS rule - which is usually when you are looking at that page. A change to `Presets.json` shows up there after a restart.  
 - **The demo site shows unpacked items too.** The tooltip that landed on the packing page inside the image is now on the public demo as well.  
+- **The packing page shows the request it just made.** After a run, a `Request` button on the results opens a panel on the right with the call as one `curl` line against the instance serving the page - method, path and the JSON body - with a Copy button where the browser allows it. Paste it into a terminal and it answers. The public demo site does not have it, because the only host it could print is one nobody calls from their own code.  
+- **`Try all, keep the best` is now first in the algorithm list and selected when the page opens.** It is the reason the demo moved to V4, so it is what you see first.  
+- **A new worked example opens the page: two bins, one item set, two different winners.** First Fit Decreasing fills the first bin where Best Fit Decreasing cannot, and Best Fit Decreasing fills the second where First Fit cannot, so the first thing the page shows is why `Try all, keep the best` exists. The twenty earlier examples are still there under Randomize.  
+- **The ViPaq Decoder offers five sample strings.** A Samples button opens a panel of known-good strings, each with a Copy button. Paste one into the decoder to see what a decoded pack looks like before you have a response of your own. Each is a packed result from one of the demo's own worked examples.  
 
 ### 🏗️ Internal Work
 
@@ -25,8 +31,22 @@
 - **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync — a person runs it and commits what it writes.  
 - **Added an integration test for CORS.** Nothing asserted `Access-Control-Allow-Origin` before. A preflight from an allowed origin now has a test that fails the way the 2026-09-01 break did, and a second proves that with no `Cors.json` present no origin is allowed at all.  
 - **A prerelease stops at the staging registry.** A beta is built, signed and smoke tested on GHCR and goes no further - no copy to Docker Hub, no git tag, no GitHub release. `binacle/binacle-net` now only ever receives a released version, and nothing sits beside a release waiting to be deleted.  
+- **A prerelease can be dispatched from a `release/*` branch.** A release still runs from `main` only. The betas of a version come from its branch, so a change to the workflow is proved by a beta before it reaches `main`.  
+- **The release logs into Docker Hub with the run's own identity token.** No long-lived registry token is stored for the job that pushes the image; the token is minted per run and expires with it. The Docker Hub page is the one job that still uses a stored token, because the page is written through a different API.  
+- **No job holds a git credential after checkout.** The one tag CI pushed, the site deploy marker, is now created through the GitHub API, so every checkout runs with `persist-credentials: false`.  
+- **The three site deploy workflows are one**, with the site chosen at dispatch. Deploys are still by hand.  
+- **Sonar waits for its own result** through the scanner's quality gate flag instead of a polling loop, and a workflow-only pull request no longer builds all three documentation sites.  
 - **Sonar analysis now runs on every pull request that can carry the token**, in parallel with the existing checks rather than only by hand. It reports and does not block a merge; a pull request from a fork or from Dependabot skips it rather than failing.  
-- **Added a `Instance` slice to the Kernel** holding what a running instance reports about itself. The feature list moved into it and its values became a small closed set of types, so the presets the instance loaded can sit beside the switched-on features without being mistaken for one - the health check payload lists features by type now, not by key. The instance page's javascript is gone with it.  
+- **Added an `Instance` slice to the Kernel** holding what a running instance reports about itself. The feature list moved into it and its values became a small closed set of types, so the presets the instance loaded can sit beside the switched-on features without being mistaken for one. The instance page's javascript is gone with it.  
+
+### 📚 Versioned Docs
+
+Work on the documentation site. Nothing here changes the image you pull.
+
+- **One folder per major line, the current line at the root.** `docs.binacle.net/quick-start/` is the current page; older lines live under `/version/2.1.1/` and `/version/1.3.0/`. A minor release adds to the current folder instead of opening a new one, so URLs stop moving.  
+- **Every old URL redirects.** `/version/v3.0.x/...`, `/version/v2.1.x/...`, `/version/v2.0.x/...`, `/version/v1.3.x/...` and `/version/latest/` all land on the page that replaced them.  
+- **The `v2.0.x` and `v2.1.x` folders are one `v2.x`**, carrying the whole v2 line, with a note where 2.1.0 added something.  
+- **Configuration Basics folded into Configuration, CORS got its own page, and the Integration Guide left the docs.**  
 
 ## [3.0.0] - 2026-09-01
 

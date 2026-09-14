@@ -11,7 +11,7 @@ they pay.
 ```bash
 docker run -d --name binacle-net -p 8080:8080 \
   -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True \
-  binacle/binacle-net:{{MINOR}}
+  binacle/binacle-net:{{MAJOR}}
 ```
 
 Then ask it which of two lockers a two-item order goes in:
@@ -79,10 +79,11 @@ The browser demo is for you, not for your customers. Binacle.Net has no storefro
 | Tag | Moves | Use it for |
 |---|---|---|
 | `{{VERSION}}` | never | pinning an exact build |
-| `{{MINOR}}` | on each patch in the {{MINOR}} line | production - fixes, no behaviour changes |
+| `{{MINOR}}` | on each patch in the {{MINOR}} line | the Service Module - a minor may break it, so you move this tag yourself |
+| `{{MAJOR}}` | on every minor and patch in the {{MAJOR}} line | production - every fix and every new endpoint, and the API contract does not move |
 | `latest` | on every release, major ones included | trying Binacle.Net out |
 
-`latest` will cross a major version and can break your integration. **Pin `{{MINOR}}` for anything you keep.**
+`latest` will cross a major version and can break your integration. **Pin `{{MAJOR}}` for anything you keep.**
 
 Prereleases are not published here. Every tag in this repository is a release.
 
@@ -105,15 +106,15 @@ Logs are written to `/app/data` - mount a volume there if you want to keep them.
 ## 🔒 Verifying what you pulled
 
 Every published image is signed with cosign - keyless, against the digest, so one signature covers
-`{{VERSION}}`, `{{MINOR}}` and `latest` alike - and carries an SPDX software bill of materials and SLSA build
+`{{VERSION}}`, `{{MINOR}}`, `{{MAJOR}}` and `latest` alike - and carries an SPDX software bill of materials and SLSA build
 provenance.
 
 ```bash
-cosign verify binacle/binacle-net:{{MINOR}} \
+cosign verify binacle/binacle-net:{{MAJOR}} \
   --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
-docker buildx imagetools inspect binacle/binacle-net:{{MINOR}}
+docker buildx imagetools inspect binacle/binacle-net:{{MAJOR}}
 ```
 
 Both flags matter. Without the identity you are only asking whether *anyone* signed the image, and anyone can.

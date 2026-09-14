@@ -9,6 +9,11 @@ export interface SampleData {
 
 export const sampleData: SampleData[] = [
 	{
+		name: "00-two-winners",
+		bins: [[45, 30, 25], [40, 30, 30]],
+		items: [[12, 10, 15, 5], [18, 10, 12, 4], [8, 15, 12, 4]]
+	},
+	{
 		name: "01-opening-set",
 		bins: [[50, 40, 40], [40, 30, 30], [30, 20, 20]],
 		items: [[20, 20, 20, 2], [10, 10, 10, 4]]

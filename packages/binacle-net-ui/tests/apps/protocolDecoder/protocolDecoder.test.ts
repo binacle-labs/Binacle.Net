@@ -444,6 +444,26 @@ describe("result labels", () => {
 	});
 });
 
+describe("the samples", () => {
+	test("the samples are offered in the component", () => {
+		const {decoder} = createDecoder();
+
+		const names = decoder.samples.map(s => s.name);
+
+		expect(names.length).toBeGreaterThan(0);
+	});
+
+	test("a sample pasted into the input decodes like any other string", async () => {
+		const {decoder} = createDecoder();
+		decoder.model.result = decoder.samples[0].encoded;
+
+		decoder.addResult();
+		await settle();
+
+		expect(decoder.results.map(r => r.encodedResult)).toEqual([decoder.samples[0].encoded]);
+	});
+});
+
 describe("the plugin", () => {
 	test("registers the factory under its x-data name", () => {
 		const registered: Record<string, unknown> = {};

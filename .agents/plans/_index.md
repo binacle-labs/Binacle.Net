@@ -49,11 +49,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea"
   horizon: next-release
   paths: ["api/**"]
-- file: api/packing-demo-next.md
-  description: "The packing demo shows the visitor the HTTP call that was just made - a panel beside the results with the exact request, ready to copy"
-  state: ready
-  waits-on: "a session of its own - the maintainer put it in v3.1.0 on 2026-09-11. One question is answered first in that session: inside the shared component or in the Razor page around it"
-  paths: ["api/src/Binacle.Net.UIModule/**", "packages/binacle-net-ui/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "The public image becomes packing-only and the Service Module moves to its own image"
   state: proposed
@@ -78,7 +73,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/ci-open-questions.md
   description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
   state: ready
-  waits-on: "two things, neither code. The maintainer creating the Docker Hub OIDC connection and setting DOCKERHUB_OIDC_CONNECTIONID - every release dispatch fails at the login until then - and the first release run from main, which is the first to run the changed publish job now that a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12; 7 is rejected"
+  waits-on: "the first release run from main - it is the first to run the changed publish job, since a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12, the OIDC connection exists since 2026-09-14, and 7 is rejected"
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
@@ -89,7 +84,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/prerelease-staging-repository.md
   description: "Branch builds go to the staging registry on dispatch, the way a prerelease now does - so an image from a branch can be tried without ever reaching the repository users pull from"
   state: idea
-  waits-on: "the signing story for a branch-built image, and whether staging images are ever deleted. horizon: undecided - chosen by an agent, strike it if wrong"
+  waits-on: "the signing story for a branch-built image. horizon: undecided - chosen by an agent, strike it if wrong"
   horizon: undecided
   paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just", "tooling/image/**"]
 ```
