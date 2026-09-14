@@ -212,7 +212,11 @@ is finished; only the last one has to be clean.
       `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, then
       `git status` shows nothing new under `api/src/Binacle.Net.UIModule/wwwroot/`.
 - [ ] **`3.1.0-beta.<n>` dispatched from `release/v3-1-0`, run green - `gate`, `test`, `build` and `smoke`;
-      `publish`, `release` and `page` show as skipped.** It proves the branch builds, signs on
+      `publish`, `release` and `page` show as skipped.** **`beta.1` ran green on 2026-09-14** from `c0355b26`
+      - the branch's own workflow, signed on the branch ref, nothing on Docker Hub. Against it: verify PASS on
+      all four checks, all five smoke profiles green, the four pages answer 200 with `UI_MODULE=True`, and the
+      bundle carries `compare-bins`, `Try all, keep the best` and `algorithmUsed`. **The box stays open** -
+      row 5 is not in it, and the last beta is the one that has to be clean. It proves the branch builds, signs on
       `refs/heads/release/v3-1-0` and passes the smoke; it does not touch Docker Hub, and it makes no tag.
       Then, against the staged image - it is public, no login:
       `just image verify 3.1.0-beta.<n> all refs/heads/release/v3-1-0 ghcr.io/binacle-labs/binacle-net` passes,
