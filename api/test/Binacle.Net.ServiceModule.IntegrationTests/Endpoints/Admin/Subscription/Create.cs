@@ -176,6 +176,31 @@ public class Create : AdminEndpointsTestsBase
 		response.StatusCode.ShouldBe(HttpStatusCode.Created);
 	}
 
+	// Regression cover: on Azure Tables the account update ran as a Merge, which skips a null, so the removed
+	// subscription id stayed on the row and the second create answered 409.
+	[Fact(DisplayName = $"POST {routePath}. After Deleting The Subscription Returns 201 Created")]
+	public async Task Post_AfterDeletingTheSubscription_Returns_201Created()
+	{
+		await using var scope = this.Sut.StartAuthenticationScope(this.Client, this.Sut.Admin);
+
+		var url = routePath.Replace("{id}", this.accountCredentialsWithSubscriptionUnderTest.Id.ToString());
+
+		var deleteResponse = await this.Client.DeleteAsync(url, TestContext.Current.CancellationToken);
+		deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+		var request = new SubscriptionCreateRequest()
+		{
+			Type = SubscriptionType.Normal
+		};
+		var response = await this.Client.PostAsJsonAsync(
+			url,
+			request,
+			this.Sut.JsonSerializerOptions, 
+			TestContext.Current.CancellationToken
+		);
+		response.StatusCode.ShouldBe(HttpStatusCode.Created);
+	}
+
 	#endregion
 
 	#region 404 Not Found

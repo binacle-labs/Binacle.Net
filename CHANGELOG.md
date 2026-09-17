@@ -8,6 +8,7 @@
 - V3 endpoints are unchanged and remain stable. V4 remains experimental.  
 - **A major tag, `3`, is published beside `3.1` and `3.1.0`.** It follows every minor and patch in the 3 line.  
 - **The documentation site keeps one folder per major line**, and the current line is served at the site root. A minor release no longer moves every documentation URL.  
+- **The ServiceModule's routes can be called from a browser.** A `ServiceApi` CORS policy covers the token and admin routes, configured beside the existing `CoreApi` one. Nothing is allowed until you list an origin.  
 
 ### 🎨 UI Module
 - **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin you give it and still lets you click between the results — the endpoint with the same shape, on the newer version. Nothing about the page's behaviour changed with it.  
@@ -24,6 +25,11 @@
 - **A new worked example opens the page: two bins, one item set, two different winners.** First Fit Decreasing fills the first bin where Best Fit Decreasing cannot, and Best Fit Decreasing fills the second where First Fit cannot, so the first thing the page shows is why `Try all, keep the best` exists. The twenty earlier examples are still there under Randomize.  
 - **The ViPaq Decoder offers five sample strings.** A Samples button opens a panel of known-good strings, each with a Copy button. Paste one into the decoder to see what a decoded pack looks like before you have a response of your own. Each is a packed result from one of the demo's own worked examples.  
 
+### 🔌 Service Module
+
+- **The token and admin routes carry a CORS policy of their own, `ServiceApi`.** Until now only the packing routes had one, so a browser page could log in against this module only through a proxy. The origins go under a `ServiceApi` key - in `Config_Files/ServiceModule/Cors.json`, or beside `CoreApi` in the one `Cors.json`, since both feed the same section. Absent means closed, as before.  
+- **Deleting a subscription and creating a new one for the same account no longer answers 409 on Azure Table Storage.** The account update ran as a merge, which skips a null, so the removed subscription id stayed on the row. It now replaces the row. SQLite and Postgres were not affected.  
+
 ### 🏗️ Internal Work
 
 - **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy — so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
@@ -38,6 +44,9 @@
 - **The three site deploy workflows are one**, with the site chosen at dispatch. Deploys are still by hand.  
 - **Sonar waits for its own result** through the scanner's quality gate flag instead of a polling loop, and a workflow-only pull request no longer builds all three documentation sites.  
 - **Sonar analysis now runs on every pull request that can carry the token**, in parallel with the existing checks rather than only by hand. It reports and does not block a merge; a pull request from a fork or from Dependabot skips it rather than failing.  
+- **CORS moved into the Kernel.** One `Cors` section, one entry per policy name; the core and each module add their own file and name the policy they need, and the Kernel binds the section once, builds the policies from it and validates the registered keys on start. Neither owner holds an options class or a validator any more.  
+- **The ServiceModule's OpenAPI document can be exported.** `just openapi generate-service` builds with the module on into its own folder, because that run also changes the v3 and v4 documents, and the copy recipes gained a line for it.  
+- **Added `binacle-net-service-client` and `sites/admin`, both experimental and local only.** A hand-written TypeScript client for the token and admin routes, kept honest by the same contract test as the v4 client, and a small Jekyll page that uses it against a local instance. Neither is built, published or deployed by anything.  
 - **Added an `Instance` slice to the Kernel** holding what a running instance reports about itself. The feature list moved into it and its values became a small closed set of types, so the presets the instance loaded can sit beside the switched-on features without being mistaken for one. The instance page's javascript is gone with it.  
 
 ### 📚 Versioned Docs

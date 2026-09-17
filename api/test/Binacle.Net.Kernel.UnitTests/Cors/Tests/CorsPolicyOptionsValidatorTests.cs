@@ -1,23 +1,22 @@
-using Binacle.Net.Configuration;
+using Binacle.Net.Kernel.Cors;
 
-namespace Binacle.Net.UnitTests;
+namespace Binacle.Net.Kernel.UnitTests.Cors;
 
-// A bad origin never fails here at runtime. The app starts, and the browser silently blocks the request in
+// A bad origin never fails at runtime. The app starts, and the browser silently blocks the request in
 // someone else's console. Startup is the only place an operator finds out.
-[Trait("Behavioral Tests", "Ensures CORS configuration is validated as expected")]
-public class CorsOptionsValidatorTests
+[Trait("Behavioral Tests", "Ensures a CORS policy's origins are validated as expected")]
+public class CorsPolicyOptionsValidatorTests
 {
-	private readonly CorsOptionsOptionsValidator validator = new();
+	private readonly CorsPolicyOptionsValidator validator = new();
 
-	private static CorsOptions OptionsWith(params string[]? allowedOrigins)
-		=> new() { CoreApi = new CorsPolicyOptions { AllowedOrigins = allowedOrigins } };
+	private static CorsPolicyOptions OptionsWith(params string[]? allowedOrigins)
+		=> new() { AllowedOrigins = allowedOrigins };
 
-	// The section is optional and a closed policy is a valid choice, so absent and empty both stay valid.
+	// A closed policy is a valid choice, so absent and empty both stay valid.
 	[Fact]
-	public void An_Absent_Or_Empty_Section_Is_Valid()
+	public void Absent_Or_Empty_Origins_Are_Valid()
 	{
-		this.validator.Validate(new CorsOptions()).IsValid.ShouldBeTrue();
-		this.validator.Validate(new CorsOptions { CoreApi = new CorsPolicyOptions() }).IsValid.ShouldBeTrue();
+		this.validator.Validate(new CorsPolicyOptions()).IsValid.ShouldBeTrue();
 		this.validator.Validate(OptionsWith()).IsValid.ShouldBeTrue();
 	}
 
@@ -28,8 +27,7 @@ public class CorsOptionsValidatorTests
 	[InlineData("*")]
 	public void A_Matchable_Origin_Is_Accepted(string origin)
 	{
-		var options = OptionsWith(origin);
-		this.validator.Validate(options).IsValid.ShouldBeTrue();
+		this.validator.Validate(OptionsWith(origin)).IsValid.ShouldBeTrue();
 	}
 
 	// Each of these is something a browser compares against and never matches, so the request is blocked with no
@@ -44,15 +42,13 @@ public class CorsOptionsValidatorTests
 	[InlineData("   ")]
 	public void An_Unmatchable_Origin_Fails_Validation(string origin)
 	{
-		var options = OptionsWith(origin);
-		this.validator.Validate(options).IsValid.ShouldBeFalse();
+		this.validator.Validate(OptionsWith(origin)).IsValid.ShouldBeFalse();
 	}
 
 	[Fact]
 	public void An_Unmatchable_Origin_Message_Names_The_Entry_And_Shows_A_Working_One()
 	{
-		var options = OptionsWith("https://example.com/");
-		var result = this.validator.Validate(options);
+		var result = this.validator.Validate(OptionsWith("https://example.com/"));
 
 		var message = result.Errors.Single().ErrorMessage;
 		message.ShouldContain("https://example.com/");
@@ -62,8 +58,7 @@ public class CorsOptionsValidatorTests
 	[Fact]
 	public void Only_The_Bad_Entry_Is_Reported()
 	{
-		var options = OptionsWith("https://good.example.com", "https://bad.example.com/");
-		var result = this.validator.Validate(options);
+		var result = this.validator.Validate(OptionsWith("https://good.example.com", "https://bad.example.com/"));
 
 		result.Errors.Count.ShouldBe(1);
 		result.Errors.Single().ErrorMessage.ShouldContain("bad.example.com");

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Binacle.Net.Configuration;
 using Binacle.Net.DiagnosticsModule;
 using Binacle.Net.ExtensionMethods;
+using Binacle.Net.Kernel.Cors;
 using Binacle.Net.Kernel.Features;
 using Binacle.Net.Kernel.Instance;
 using Binacle.Net.Kernel.OpenApi.ExtensionsMethods;
@@ -47,7 +48,7 @@ public static class Program
 		Log.Information("{ModuleName} module. Status {Status}", "Core", "Initializing");
 
 		builder.AddValidatableJsonConfigurationOptions<BinPresetOptions>();
-		builder.AddValidatableJsonConfigurationOptions<CorsOptions>();
+		builder.AddCorsFile("Cors.json");
 		builder.AddValidatableJsonConfigurationOptions<ForwardedHeadersConfigurationOptions>();
 
 		// Feature Management
@@ -106,21 +107,7 @@ public static class Program
 			};
 		});
 
-		var corsOptions = builder.Configuration
-			.GetSection(CorsOptions.SectionName)
-			.Get<CorsOptions>();
-
-
-		builder.Services.AddCors(options =>
-		{
-			options.AddPolicy(CorsPolicy.CoreApi, policy =>
-			{
-				policy.WithOrigins(corsOptions?.CoreApi?.AllowedOrigins ?? [])
-					.AllowAnyHeader()
-					.AllowAnyMethod();
-			});
-		});
-
+		builder.Services.AddCorsPolicy(CorsPolicy.CoreApi);
 
 		builder.ConfigureForwardedHeaders();
 

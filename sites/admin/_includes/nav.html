@@ -1,0 +1,12 @@
+<nav>
+	<strong>{{ site.display_title }}</strong>
+	<a href="/accounts/">Accounts</a>
+	<a href="/subscriptions/">Subscriptions</a>
+	<span class="spacer"></span>
+	<template x-if="loggedIn">
+		<button type="button" @click="logout">Log out</button>
+	</template>
+	<template x-if="!loggedIn">
+		<a href="/">Log in</a>
+	</template>
+</nav>

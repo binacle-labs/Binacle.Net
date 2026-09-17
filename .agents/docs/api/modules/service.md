@@ -1,7 +1,7 @@
 ---
 id: api/modules/service
 description: ServiceModule — JWT auth, rate limiting, account/subscription management. Three projects using clean architecture.
-verified: 2026-09-04
+verified: 2026-09-18
 check: Routes, config file names, connection string name, the project reference direction in the three csproj files, every domain enum's values (AccountRole, AccountStatus, SubscriptionType, SubscriptionStatus), the entity base classes, the list endpoints' paging parameters, and the token endpoint's account-state codes match ServiceModule source
 also_update:
   - api/configuration
@@ -40,7 +40,9 @@ if (Feature.IsEnabled("SERVICE_MODULE")) {
 }
 ```
 
-`AddServiceModule()` internally calls `builder.AddInfrastructure()` which picks the DB backend.
+`AddServiceModule()` internally calls `builder.AddInfrastructure()` which picks the DB backend. It also adds
+`ServiceModule/Cors.json` and registers the module's CORS policy, `ServiceApi` (`ServiceModuleCorsPolicy.cs`),
+through the Kernel; the token route and the admin group require it.
 
 ## Endpoints (v0)
 
@@ -154,6 +156,7 @@ Each provider registers its own `IAccountRepository`, `ISubscriptionRepository`,
 | `Config_Files/ServiceModule/ConnectionStrings.json` | optional | DB connection strings (AzureStorage, Postgres, Sqlite) |
 | `Config_Files/ServiceModule/RateLimiter.json` | required when SERVICE_MODULE=True | Rate limiter rules (sliding window configs) |
 | `Config_Files/ServiceModule/JwtAuth.json` | optional | JWT issuer, audience, and secret (`JwtAuthOptions`) |
+| `Config_Files/ServiceModule/Cors.json` | optional | Key `ServiceApi`: origins allowed to call this module's routes from a browser. Feeds the same `Cors` section as the core's file |
 
 In Development, `dotnet user-secrets` is also loaded for the `IModuleMarker` assembly (useful for JWT secrets).
 
@@ -167,4 +170,5 @@ See `$api/v4/add-endpoint` for the template — ServiceModule endpoints use `IGr
 
 `api/test/Binacle.Net.ServiceModule.IntegrationTests` (run with `just test cs_binacle-net-service-module_integration
 [Sqlite|Postgres|AzureStorage]`) — covers the auth token endpoint and the Admin account and subscription
-endpoints, including the two list endpoints and the subscription Get.
+endpoints, including the two list endpoints and the subscription Get, and `Endpoints/CorsTests.cs` for the
+`ServiceApi` policy.

@@ -10,6 +10,7 @@ built with webpack and TypeScript beside them.
 | [`docs/`](docs) | The documentation site - versioned API reference and guides |
 | [`demo/`](demo) | The demo site - the packing demo, the ViPaq decoder, and the pages around them |
 | [`www/`](www) | The marketing site - what Binacle.Net does, and who it is for |
+| [`admin/`](admin) | **Experimental, local only - not published.** A page to manage a local ServiceModule's accounts. No build recipe, no assets copy, no workflow names it |
 
 Each has its own `README.md`, `Gemfile` and `package.json`. **All three `package.json` files are root npm
 workspace members**, so one `npm install` at the root covers them and none has a lock file of its own. Ruby is

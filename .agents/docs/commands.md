@@ -47,6 +47,7 @@ just serve api [N|S|U|All]             # the API
 just serve docs                        # docs site: jekyll serve + webpack watch, one terminal
 just serve demo                        # demo site: same
 just serve www                         # marketing site: jekyll serve + sass and webpack watches
+just serve admin                       # admin site, experimental and local only: jekyll serve + webpack watch
 just serve services-up [-d]            # what the API talks to: aspire-dashboard, azurite, postgres
 just serve services-down [-v]          # only needed after -d; Ctrl-C is enough otherwise
 ```

@@ -20,7 +20,8 @@
     "api/src/Binacle.Net.UIModule",
     "sites/docs",
     "sites/demo",
-    "sites/www"
+    "sites/www",
+    "sites/admin"
   ],
   "devDependencies": {
     "concurrently": "^10.0.3",

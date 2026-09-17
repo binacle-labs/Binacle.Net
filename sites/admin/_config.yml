@@ -1,0 +1,155 @@
+################################################################
+# Site settings
+################################################################
+title                   : "Binacle.Net"
+# What the header calls this host. site.title stays the brand, for <title>.
+display_title           : "Binacle.Net Admin"
+# Experimental, local only. Never built for deployment - no workflow names this folder.
+description             : >-
+  A local page to manage the accounts and subscriptions of a Binacle.Net running with the ServiceModule on.
+
+author:
+  name                  : "Chris Mavrommatis"
+  url                   : "https://github.com/ChrisMavrommatis"
+
+url                     : "http://localhost:7198"
+api_url                 : "https://localhost:7194"
+
+################################################################
+# Where things are
+################################################################
+source              : ./
+destination         : ../../artifacts/admin
+collections_dir     : collections
+plugins_dir         : _plugins       # takes an array of strings and loads plugins in that order
+layouts_dir         : _layouts
+includes_dir        : _includes
+data_dir            : _data
+
+################################################################
+# Handling Reading
+################################################################
+safe                : false
+include             :
+  - ".htaccess"
+exclude             :
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "node_modules"
+  - "vendor/bundle/"
+  - "vendor/cache/"
+  - "vendor/gems/"
+  - "vendor/ruby/"
+  - "*.proj"
+  - "obj/*"
+  - "bin/*"
+  - "README.md"
+  - "_js"
+  - "package.json"
+  - "package-lock.json"
+  - "webpack.config.js"
+  - "tsconfig.json"
+keep_files          : [".git", ".svn"]
+encoding            : "utf-8"
+markdown_ext        : "markdown,mkdown,mkdn,mkd,md"
+strict_front_matter : false
+################################################################
+# Filtering Content
+################################################################
+show_drafts         : false
+limit_posts         : 0
+future              : false
+unpublished         : false
+
+################################################################
+# Serving
+################################################################
+detach              : false
+port                : 7198
+host                : 127.0.0.1
+baseurl             : ""    # does not include hostname
+show_dir_listing    : false
+disable_disk_cache  : true
+
+################################################################
+# Conversion
+################################################################
+markdown            : kramdown
+highlighter         : rouge
+lsi                 : false
+excerpt_separator   : "\n\n"
+incremental         : false
+
+################################################################
+# Outputting
+################################################################
+permalink           : date        #pretty
+paginate_path       : /page:num
+timezone            : "Europe/Athens"
+quiet               : false
+verbose             : false
+liquid:
+  error_mode        : warn
+  strict_filters    : false
+  strict_variables  : false
+
+################################################################
+# Markdown Processors
+################################################################
+kramdown:
+  auto_ids          : true
+  entity_output     : as_char
+  toc_levels        : '1..6'
+  smart_quotes      : lsquo,rsquo,ldquo,rdquo
+  input             : GFM
+  hard_wrap         : false
+  footnote_nr       : 1
+  show_warnings     : false
+  parse_block_html  : true
+
+################################################################
+# Plugins
+################################################################
+whitelist           : []
+plugins             :
+  - jekyll-tidy
+  - jekyll-filters
+  - jekyll-resource-tags
+  - jekyll-page-meta
+
+################################################################
+# Front Matter Defaults
+################################################################
+defaults:
+  - scope:
+      path           : "pages/**"
+      type           : "pages"
+    values:
+      layout          : "default"
+      locale          : "en_US"
+      hreflang        : "en"
+      # Every page says so itself, and robots.txt says it again. No gtm, no sitemap, no structured data.
+      robots          : "noindex, nofollow"
+
+
+################################################################
+################### END OF BASE CONFIG #####################
+################################################################
+
+
+################################################################
+# jekyll-tidy
+################################################################
+jekyll_tidy:
+  exclude:                 # an array of files to exclude from tidying.
+    - "**/*.txt"
+    - "**/*.json"
+    - "*.xml"
+  ignore_env    : null     # a JEKYLL_ENV string on which to skip tidying entirely.
+  compress_html : false    # a flag for whether or not to compress the HTML output
+
+################################################################
+# jekyll-page-meta
+################################################################
+page_meta:
+  title_separator: " - "

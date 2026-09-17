@@ -1,0 +1,24 @@
+/* Just enough to read. Unpainted on purpose. */
+:root { color-scheme: light dark; }
+body { margin: 0; font: 15px/1.4 system-ui, sans-serif; }
+nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; border-bottom: 1px solid #8884; }
+nav .spacer { flex: 1; }
+main { max-width: 64rem; margin: 0 auto; padding: 1rem; }
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid #8884; white-space: nowrap; }
+tr[data-href] { cursor: pointer; }
+tr[data-href]:hover { background: #8882; }
+form { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1rem; align-items: center; max-width: 32rem; margin: 1rem 0; }
+form .actions { grid-column: 1 / -1; display: flex; gap: .5rem; }
+form h2 { grid-column: 1 / -1; margin: 0; }
+input, select, button { font: inherit; padding: .3rem .5rem; }
+button.danger { color: #c33; }
+.paging { display: flex; gap: .5rem; align-items: center; }
+.message { padding: .6rem .8rem; margin: 1rem 0; border: 1px solid; border-radius: 4px; }
+.message.error { border-color: #c33; color: #c33; }
+.message.ok { border-color: #393; color: #393; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; }
+dt { color: #888; }
+dd { margin: 0; font-family: monospace; }

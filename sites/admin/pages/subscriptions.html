@@ -1,0 +1,30 @@
+---
+title: Subscriptions
+permalink: /subscriptions/
+---
+<div x-data="subscriptions('{{ site.api_url }}')">
+	<template x-if="error"><p class="message error" x-text="error"></p></template>
+
+	{% include paging.html %}
+
+	<table>
+		<thead>
+			<tr><th>Id</th><th>Account</th><th>Type</th><th>Status</th><th>Created</th><th>Deleted</th></tr>
+		</thead>
+		<tbody>
+			<template x-for="row in rows" :key="row.id">
+				<tr data-href @click="open(row)">
+					<td x-text="row.id"></td>
+					<td x-text="row.accountId"></td>
+					<td x-text="row.type"></td>
+					<td x-text="row.status"></td>
+					<td x-text="row.createdAtUtc.slice(0, 19)"></td>
+					<td x-text="row.isDeleted ? row.deletedAtUtc?.slice(0, 19) : '-'"></td>
+				</tr>
+			</template>
+			<template x-if="rows.length === 0 && !error">
+				<tr><td colspan="6">No subscriptions.</td></tr>
+			</template>
+		</tbody>
+	</table>
+</div>

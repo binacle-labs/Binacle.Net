@@ -83,6 +83,10 @@ sites/demo/*.png
 
 
 
+## Admin site - experimental, local only. Nothing deploys artifacts/admin.
+artifacts/admin
+sites/admin/js
+
 ## Marketing site - css/ joins js/ here, unlike the other two sites. Jekyll compiles no sass on www; the
 ## sass CLI writes css/main.css from _sass/, so it is build output like the bundle.
 artifacts/www

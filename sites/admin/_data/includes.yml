@@ -1,0 +1,8 @@
+links:
+  - type: 'text/css'
+    rel: 'stylesheet'
+    href: '/css/admin.css'
+
+scripts_body_end:
+  - type: 'text/javascript'
+    src: '/js/main.js'

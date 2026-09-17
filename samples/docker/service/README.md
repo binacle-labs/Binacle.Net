@@ -47,7 +47,9 @@ container itself
 
 Only needed when a **browser** calls this API directly. `Cors.json` is not in the image - you supply it, and
 nothing is allowed through until you do, which is a valid closed default. Uncomment the mount and list your
-origins with exact scheme, host and port.
+origins with exact scheme, host and port. `CoreApi` covers the packing routes; `ServiceApi` covers the token
+and admin routes this module adds. Leave either one out to keep those routes closed to browsers. Both keys
+sit in the one file here; `ServiceApi` may also live in its own `Config_Files/ServiceModule/Cors.json`.
 
 ## 🌐 Behind a proxy
 

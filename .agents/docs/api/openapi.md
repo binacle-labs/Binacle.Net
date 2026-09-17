@@ -1,7 +1,7 @@
 ---
 id: api/openapi
 description: OpenAPI wiring — IOpenApiDocument, the Kernel transformers (JWT, 429, response descriptions, enum-as-string), what endpoint groups auto-wire, and the external OpenApiExamples package
-verified: 2026-09-04
+verified: 2026-09-18
 check: IOpenApiDocument, transformers, and OpenApiOptions extensions match api/src/Binacle.Net.Kernel/OpenApi/; group 500 wiring matches v4/ApiV4EndpointGroup.cs; RateLimiterResponseOperationTransformer checks the endpoint metadata only, and RateLimitedEndpointConvention in the ServiceModule is the only thing that attaches it
 also_update:
   - api/v4/add-endpoint
@@ -65,7 +65,9 @@ The core endpoints name no policy, so there is no inert `[EnableRateLimiting]` t
 This matters most for the **generated** documents. `just openapi generate` builds them from a host with no launch
 profile, so ServiceModule is off — that document already has no `v0` ServiceModule paths and no
 `/api/auth/token`, and it must have no `429` either, or it describes a shape that exists nowhere. A live instance
-running with the module on serves a document that does carry the `429`, correctly.
+running with the module on serves a document that does carry the `429`, correctly. `just openapi
+generate-service` is the one build with the module on; it writes to its own folder so those two never reach
+`artifacts/openapi/` (`$commands`).
 
 Helpers in Kernel (`OpenApi/Helpers`, `OpenApi/Models`, `OpenApi/Attributes`): `ResponseDescription.Format`,
 `HttpStatusDescriptions` (int -> status name map), `OpenApiValidationProblemExample`,

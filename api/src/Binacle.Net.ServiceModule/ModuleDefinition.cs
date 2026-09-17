@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using Binacle.Net.Kernel.Cors;
 using Binacle.Net.Kernel.Endpoints;
 using Binacle.Net.Kernel.Instance;
 using Binacle.Net.Kernel.OpenApi.ExtensionsMethods;
@@ -94,6 +95,9 @@ public static class ModuleDefinition
 				policyBuilder.RequireClaim(ClaimTypes.Role, nameof(AccountRole.Admin));
 			});
 		});
+
+		builder.AddCorsFile("ServiceModule/Cors.json");
+		builder.Services.AddCorsPolicy(ServiceModuleCorsPolicy.Name);
 
 		var defaultAdminCredentials = Environment.GetEnvironmentVariable("BINACLE_ADMIN_CREDENTIALS");
 		if (!string.IsNullOrWhiteSpace(defaultAdminCredentials))

@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-09-04
+verified: 2026-09-18
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -180,8 +180,27 @@ Config is loaded relative to `Config_Files/` (set as base path in `Program.cs`).
 Register a validated options class with `services.AddValidatableJsonConfigurationOptions<TOptions>()`
 (`Configuration/ExtensionsMethods/ConfigurationExtensions.cs`): it adds the JSON file + env override + env vars,
 binds the section, and runs FluentValidation at startup (`ValidateFluently().ValidateOnStart()`). Used in
-`Program.cs` for `BinPresetOptions`, `CorsOptions`, and `ForwardedHeadersConfigurationOptions`, and by each
-module's `ModuleDefinition`.
+`Program.cs` for `BinPresetOptions` and `ForwardedHeadersConfigurationOptions`, and by each module's
+`ModuleDefinition`. CORS does not use it - see below.
+
+## Cors
+
+`Kernel/Cors/` owns CORS for every owner - the core and any module - so none of them holds a policy class.
+
+- **`CorsOptions`** - the `Cors` section as one dictionary, policy name to `CorsPolicyOptions`
+  (`AllowedOrigins`). Every CORS file, environment variable and test value feeds this one section, so an
+  owner's keys sit beside the others'.
+- **`AddCorsFile(path)`** on the host builder - adds a file and its `{Environment}` variant, both optional.
+- **`AddCorsPolicy(name)`** on the services - registers a named policy built from the section when first used.
+  A missing key is a policy that allows nothing. The first call binds the section and wires
+  `ValidateFluently().ValidateOnStart()`; later calls only add their name.
+- **`CorsOptionsValidator`** - runs on start, once, after every owner has registered
+  (`CorsRegisteredPolicies` collects the names). Looks only at registered keys: present with origins, each
+  must be one a browser can match (`CorsPolicyOptionsValidator`); absent or empty is a closed policy and
+  valid. A key nobody registered is ignored. A failure names the key.
+
+An owner is two lines: `builder.AddCorsFile("Cors.json")` and `builder.Services.AddCorsPolicy(CorsPolicy.CoreApi)`,
+plus `.RequireCors(name)` on its endpoints. Tested in `api/test/Binacle.Net.Kernel.UnitTests/Cors/`.
 
 ## Validation
 

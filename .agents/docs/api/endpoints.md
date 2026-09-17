@@ -1,7 +1,7 @@
 ---
 id: api/endpoints
 description: Endpoint pattern, registration, request validation flow, and route groups for v3 and v4
-verified: 2026-09-04
+verified: 2026-09-18
 check: IGroupedEndpoint hierarchy matches api/src/Binacle.Net.Kernel/Endpoints/
 also_update:
   - api/kernel
@@ -117,7 +117,8 @@ the marker and no limiter exists.
 
 `.RequireCors(CorsPolicy.CoreApi)` is a different thing: the `CoreApi` policy is registered by the core in
 `Program.cs`, not by a module, so it applies whether or not the ServiceModule is loaded. Every v3 and v4
-endpoint calls it.
+endpoint calls it. The ServiceModule's routes require their own `ServiceApi` policy, registered by the module
+from its own `ServiceModule/Cors.json` - see `$api/configuration`.
 
 ## Contracts Location
 

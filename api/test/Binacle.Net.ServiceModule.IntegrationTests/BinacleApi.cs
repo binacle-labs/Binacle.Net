@@ -26,6 +26,7 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>, IAsyncLifeti
 	public Domain.Accounts.Entities.Account User { get; private set; } = null!;
 	public AccountCredentials ExistingAccountCredentials { get; private set; } = null!;
 	public readonly Guid NonExistentId;
+	public const string AllowedCorsOrigin = "https://allowed.example.com";
 
 	public BinacleApi()
 	{
@@ -54,7 +55,8 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>, IAsyncLifeti
 			{ "JwtAuth:Issuer", "ForTestsOnly"},
 			{ "JwtAuth:Audience", "ForTestsOnly" },	
 			{ "JwtAuth:TokenSecret", "SecretKeyForTestsOnly_paddedTo70Plus_paddedTo70Plus_paddedTo70Plus_paddedTo70Plus"},
-			{ "JwtAuth:ExpirationInSeconds", "3600"}
+			{ "JwtAuth:ExpirationInSeconds", "3600"},
+			{ "Cors:ServiceApi:AllowedOrigins:0", AllowedCorsOrigin }
 		};
 
 		var configuration = new ConfigurationBuilder()

@@ -1,0 +1,19 @@
+---
+title: Log in
+permalink: /
+---
+<div x-data="login('{{ site.api_url }}')">
+	<p>Admin account on <code>{{ site.api_url }}</code>.</p>
+
+	<template x-if="error"><p class="message error" x-text="error"></p></template>
+
+	<form @submit.prevent="submit">
+		<label for="username">Username</label>
+		<input id="username" x-model="username" autocomplete="username" required>
+		<label for="password">Password</label>
+		<input id="password" type="password" x-model="password" autocomplete="current-password" required>
+		<div class="actions">
+			<button type="submit" :disabled="busy">Log in</button>
+		</div>
+	</form>
+</div>
