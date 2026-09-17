@@ -20,9 +20,6 @@ break lives: a core endpoint keeps passing in the harness and fails in the image
       `grep -rn "Run the tests with all modules enabled" api/test` returns nothing.
 - [ ] One run with everything on, or a matrix over the combinations that ship, is decided and written here.
       **By eye.** The answer is in this file, not in someone's head.
-- [x] **2026-09-11.** CORS is asserted: a configured origin comes back in `Access-Control-Allow-Origin`, an unconfigured one
-      does not.
-      `grep -rn "Access-Control-Allow-Origin" api/test` matches.
 
 ## Research
 
@@ -40,11 +37,6 @@ are all off.
 **Rate limiting is the worked example of the shape.** A core behaviour that exists only because an optional
 module registered something. `api/test/Binacle.Net.ServiceModule.IntegrationTests/RateLimiting/` answers in
 code what this file asks in prose.
-
-**CORS is exercised nowhere.** `Program.cs` always registers the `CoreApi` policy and every core endpoint
-carries `.RequireCors(CorsPolicy.CoreApi)`. The origins come from an optional `Cors.json`; with none present
-`AllowedOrigins` falls back to an empty array, a closed default the validator's own comment says is intended.
-Nothing asserts that a configured origin is echoed back, or that an unconfigured one is not.
 
 **The shipped presets are replaced.** Both core harnesses swap in three test-only presets, so no in-process
 test ever reads `Config_Files/Presets.json`. Leave that alone - proving the shipped presets load is the

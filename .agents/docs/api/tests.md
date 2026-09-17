@@ -16,7 +16,7 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 
 | Project | Covers | Run |
 |---|---|---|
-| `Binacle.Net.IntegrationTests` | v3 + v4 HTTP endpoints (fit, pack, presets) | `just test cs_binacle-net_integration` |
+| `Binacle.Net.IntegrationTests` | v3 + v4 HTTP endpoints (fit, pack, presets), and the CORS policy | `just test cs_binacle-net_integration` |
 | `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test cs_binacle-net-service-module_integration` |
 | `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
 | `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
@@ -122,6 +122,12 @@ Each endpoint has up to two files. **Behavior** covers status codes, validation,
 **The three `Presets` endpoints have a behavior file only** — `v3 Presets/List`, `v4 Presets/List` and
 `v4 Presets/Get`. They run no algorithm, so there is nothing for a scenario to assert, and they are the only
 three folders in the tree with one file.
+
+**Two files sit at the root of `Tests/`, outside the version folders.** `SanityTests.cs`, and
+`CorsTests.cs` - four tests over the `CoreApi` policy: a preflight and a simple GET from a configured origin
+both come back with `Access-Control-Allow-Origin`, an unconfigured origin does not, and with no `Cors.json`
+present no origin is allowed. The policy is registered unconditionally in `Program.cs`, so these need no
+optional module switched on.
 
 **Namespaces track the folders**, with `Tests/` elided:
 `Tests/v4/Endpoints/Fit/CustomBin/` → `Binacle.Net.IntegrationTests.v4.Endpoints.Fit.CustomBin`. `Abstractions/`
