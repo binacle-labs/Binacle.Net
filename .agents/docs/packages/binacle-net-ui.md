@@ -140,7 +140,7 @@ pick the same one, is in the packing-demo design record (`$sites/packing-demo-se
 ## Tests
 
 `just test ts_binacle-net-ui_unit`. jsdom, because the components read `document` and `window` even where the
-logic under test does not. **21 suites, 384 tests, 72.19% of lines** — measured 2026-09-15.
+logic under test does not. **21 suites, 387 tests, 72.03% of lines** — measured 2026-09-16.
 
 `tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is
 the Alpine half: each component factory is a plain object, so a test calls it directly with a stub `$dispatch`

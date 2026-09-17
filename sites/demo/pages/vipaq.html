@@ -24,7 +24,7 @@ excerpt: |
 </p>
 
 <div class="grid" x-data="protocol_decoder_app">
-  <article class="no-padding s12 m5 l3 result-container" @keyup.enter.prevent.stop="addResult">
+  <article class="no-padding s12 m5 l3 result-container" x-data="samples_panel" @keyup.enter.prevent.stop="addResult">
     <article class="medium transparent result-input-container">
       <div class="field label textarea border max-height ">
         <textarea name="result" id="result" x-model="model.result" class="word-wrap" placeholder=""></textarea>
@@ -32,12 +32,41 @@ excerpt: |
       </div>
     </article>
     <div>
-      <nav class="no-space padding">
+      <nav class="no-space left-padding right-padding">
         <button type="button" class="border surface-container max" @click.prevent.stop="addResult">
           <i>library_add</i>
         </button>
       </nav>
+      <nav class="no-space left-padding right-padding bottom-padding">
+        <button type="button" class="border surface-container max" @click.prevent.stop="show()">
+          <i>folder_open</i>
+          <span>Samples</span>
+        </button>
+      </nav>
     </div>
+
+    <div class="overlay" :class="open ? 'active' : ''" @click.prevent.stop="hide()"></div>
+    <dialog class="right medium" :class="open ? 'active' : ''">
+      <h5>Samples</h5>
+      <p>Each is the ViPaq string of a packed bin. Copy one and paste it into the input.</p>
+      <template x-for="sample in samples" :key="sample.name">
+        <article class="surface-container">
+          <h6 class="small" x-text="sample.name"></h6>
+          <pre class="small-text" style="white-space:pre-wrap;overflow-wrap:anywhere" x-text="sample.encoded"></pre>
+          <nav class="right-align no-space">
+            <button type="button" class="border surface-container" x-show="canCopy()" @click.prevent.stop="copy(sample)">
+              <i>content_copy</i>
+              <span>Copy</span>
+            </button>
+          </nav>
+        </article>
+      </template>
+      <nav class="right-align no-space">
+        <button type="button" class="border surface-container" @click.prevent.stop="hide()">
+          <span>Close</span>
+        </button>
+      </nav>
+    </dialog>
 
   </article>
 

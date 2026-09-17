@@ -159,6 +159,52 @@ uncompressed. Both header bytes are therefore `0x00`:
    ^byte1
 ```
 
+## 🖥️ Try it
+
+Five known-good strings, ready to paste. Each is the `viPaqData` field of a `pack` response for one of
+the demo's own worked examples, packed with First Fit Decreasing. Paste one into the
+[ViPaq Decoder]({% vlink /configuration/ui-module/index.md %}) and it draws the bin with the items in it.
+
+##### Five boxes, packed full
+
+Bin `30x20x20`, holding one `20x20x20` and four `10x10x10`. 100% full.
+
+```text
+AAAFAB4UFBQUFAAAAAoKChQAAAoKChQKAAoKChQACgoKChQKCg==
+```
+
+##### Ten boxes, two sizes
+
+Bin `60x35x25`, holding six `25x8x25`, two `16x10x25` and two `10x16x25`. 88% full.
+
+```text
+AAAKADwjGRkIGQAAABkIGRkAABkIGQAIABkIGRkIABkIGQAQABkIGRkQABAKGQAYABAKGRkYAAoQGTIAAAoQGTIQAA==
+```
+
+##### Twenty-four cubes
+
+Bin `40x30x25`, holding twenty-four `10x10x10`. 80% full.
+
+```text
+AAAYACgeGQoKCgAAAAoKCgoAAAoKCgAKAAoKCgAACgoKChQAAAoKCgoKAAoKCgoACgoKCgAUAAoKCgAKCgoKCh4AAAoKChQKAAoKChQACgoKCgoUAAoKCgoKCgoKCgAUCgoKCh4KAAoKCh4ACgoKChQUAAoKChQKCgoKCgoUCgoKCh4UAAoKCh4KCgoKChQUCgoKCh4UCg==
+```
+
+##### Thirteen boxes, mixed sizes
+
+Bin `35x30x25`, holding one `20x18x16`, four `15x15x10` and eight `10x10x8`. 81% full.
+
+```text
+AAANACMeGRQSEAAAAA8PChQAAA8PChQPAA8PChQACg8PChQPCgoKCAASAAoKCAAAEAoKCAoSAAoKCAASCAoKCAoAEAoKCAoSCAoKCAASEAoKCAoSEA==
+```
+
+##### Eight flat items
+
+Bin `50x50x12`, holding eight `24x24x5`. 77% full.
+
+```text
+AAAIADIyDBgYBQAAABgYBRgAABgYBQAYABgYBQAABRgYBRgYABgYBRgABRgYBQAYBRgYBRgYBQ==
+```
+
 ## 📖 Full Specification
 
 The normative wire specification, including the decoding order, everything a decoder must reject, and further

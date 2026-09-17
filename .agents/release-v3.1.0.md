@@ -5,8 +5,10 @@ description: Release - Binacle.Net v3.1.0. The demo UI release - the shipped cli
 # Release - Binacle.Net v3.1.0
 
 **Status:** scope narrowed by the maintainer on 2026-09-07, three rows added on 2026-09-15. **Every row of
-work has landed** - rows 5 to 8 on 2026-09-15. What is left before stage 2: `just regen vipaq-packed-data`,
-both bundles rebuilt into the tree, and the by-eye boxes under *Done when*. The six CI edits landed on
+work has landed** - rows 5 to 8 on 2026-09-15. **Stage 1 and stage 2 closed on 2026-09-16**: the generator
+run, both bundles rebuilt, `just test all` green across 28 suites, and the changelog read against every row.
+**Every by-eye box passed on 2026-09-17** - rows 5, 6, 7 and 8 - **and row 8's two site halves landed the
+same day.** What is left is stage 3. The six CI edits landed on
 2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
 2026-09-11: **features first, then the changelog and the docs, then the rest.** Branch
 `release/v3-1-0`. **Every beta is dispatched from this branch and stops at GHCR** - decided 2026-09-14 - so
@@ -67,10 +69,10 @@ written before the clients have moved.
 | 2 | no plan - release paperwork | **The `Best` algorithm, and the algorithm each result used.** `Best` is in the v4 enum and was unreachable from v3, so row 1 is what makes it offerable; `algorithmUsed` is on every v4 result and is rendered nowhere. **One feature, not two** - `Best` runs several heuristics and returns the winner, so without the display the visitor cannot tell what won. Both hosts' result rows. **Landed `a8050583`**, verified with the rebuild on 2026-09-10 |
 | 3 | plan trimmed - the ledger has the reasoning | **The unpacked-items tooltip. Landed on both hosts - UI module 2026-09-10, demo site 2026-09-11.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away |
 | 4 | plan landed and deleted - the reasoning is `D6` in the API decisions ledger | **The whole plan. Landed 2026-09-10.** A `Kernel/Instance/` slice now holds what the instance reports about itself; `FeatureOptions` moved in as `InstanceOptions` with a closed value hierarchy, so the presets sit beside the switched-on features without being counted as one. `_js/instance.js`, its webpack entry and its script tag are gone, and with them the last v4 call made from a browser inside the image |
-| 5 | plan landed and deleted - the reasoning is `P3` in the packages decisions ledger | **The request panel. Landed 2026-09-15, UI module only - the maintainer's call on 2026-09-14, reworked the next day to a panel on the right.** A `Request` button on the results card opens a right-side dialog with one `curl` line against the page's own origin and a Copy button where the clipboard API exists. The component exposes `lastRequest` and nothing else changed in the shared package; the dialog and the formatting are the module's own `_js/packing_demo.js`. **The rebuild and the by-eye paste are still the maintainer's** |
+| 5 | plan landed and deleted - the reasoning is `P3` in the packages decisions ledger | **The request panel. Landed 2026-09-15, UI module only - the maintainer's call on 2026-09-14, reworked the next day to a panel on the right.** A `Request` button on the results card opens a right-side dialog with one `curl` line against the page's own origin and a Copy button where the clipboard API exists. The component exposes `lastRequest` and nothing else changed in the shared package; the dialog and the formatting are the module's own `_js/packing_demo.js`. **Rebuilt into both bundles 2026-09-16; the by-eye paste is still the maintainer's** |
 
-| 6 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **`Best` is the first algorithm in the list and the one selected on load**, both hosts. The UI moved to v4 for it, so it is what a visitor sees first. **Landed 2026-09-15** - the one table in `packingDemo.ts` reordered, two tests changed, 369 green |
-| 7 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **One more worked example, and it loads first. Source landed 2026-09-15** as `shared/data/demo-samples/00-two-winners.json` - `00` so it sorts first without renaming the other twenty. Two bins, one item set: `Best` picks FFD on `45x30x25` and BFD on `40x30x30`, each fully packed where the other heuristic is not, measured on the API. WFD cannot win on `compare-bins` - `Best` runs FFD and BFD only there. **`just regen demo-samples` is the maintainer's**, and until it runs the demo still opens on `01-opening-set` |
+| 6 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **`Best` is the first algorithm in the list and the one selected on load**, both hosts. The UI moved to v4 for it, so it is what a visitor sees first. **Landed 2026-09-15** - the one table in `packingDemo.ts` reordered, two tests changed. **A third test was missed** and left `just test all` red until 2026-09-16; the suite is 387 green now |
+| 7 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **One more worked example, and it loads first. Source landed 2026-09-15** as `shared/data/demo-samples/00-two-winners.json` - `00` so it sorts first without renaming the other twenty. Two bins, one item set: `Best` picks FFD on `45x30x25` and BFD on `40x30x30`, each fully packed where the other heuristic is not, measured on the API. WFD cannot win on `compare-bins` - `Best` runs FFD and BFD only there. **Both generators have run** - `demo-samples` 2026-09-15, `vipaq-packed-data` 2026-09-16 - and both bundles carry it |
 | 8 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **Known-good sample strings on the ViPaq decoder. The component landed 2026-09-15**, the UI module page with it; the reasoning is `P4` in the packages decisions ledger. Five strings in `packages/binacle-net-ui/src/apps/protocolDecoder/sampleData.ts`, each a packed bin out of `vipaq/data/packed/demo-samples` and held to it by a test; every bin is at least three quarters full and no side is over 60. The component exposes `samples` and nothing else; on `Vipaq.cshtml` a full-width `Samples` button under the add button opens a right-side panel listing each name, its string and a Copy button - no add, on purpose: the visitor copies and pastes. **Chips, then a menu that decoded on click, then a menu that filled the input were each rejected the same day.** **Two halves are site sessions**: the demo site's `vipaq.html` needs the same button and panel, and the docs site's ViPaq protocol page carries the strings below with what each decodes to |
 
 **Row 4 deleted `_js/instance.js`.** The warning that used to stand here - not to edit its v4 call on the
@@ -202,17 +204,29 @@ is finished; only the last one has to be clean.
 
 - [x] **2026-09-15. Row 5, the request panel, landed** - code, tests, docs, ledger `P3` and the changelog line,
       reworked the same day to a right-side dialog. The plan file is deleted. **The by-eye check is the
-      *Done when* box below and waits on the rebuild.**
-- [x] **2026-09-15. Row 6, `Best` first**, landed in the shared package; both bundles wait on the rebuild.
+      *Done when* box below.**
+- [x] **2026-09-15. Row 6, `Best` first**, landed in the shared package; both bundles carry it since 2026-09-16.
 - [x] **2026-09-15. Row 7, the first worked example.** Source landed and `just regen demo-samples` run:
       `head -13 packages/binacle-net-ui/src/apps/packingDemo/sampleData.ts | grep -c 00-two-winners` returns 1.
-      **Still owed: `just regen vipaq-packed-data`** - `vipaq/data/packed/demo-samples/` is generated from the
-      same folder and `ls vipaq/data/packed/demo-samples | grep -c '^00-'` returns 0 until it runs.
+      **`just regen vipaq-packed-data` run 2026-09-16** - `ls vipaq/data/packed/demo-samples | grep -c '^00-'`
+      returns 3, one per algorithm, and the other 60 packed files came back byte-identical.
+      **It needed a fix first.** The generator's demo-sample list is hardcoded in
+      `vipaq/tools/Binacle.ViPaq.PackedDataGenerator/Program.cs`, and the new file was not in it.
 - [x] **2026-09-15. Row 8, the ViPaq samples**, landed in the shared package and the module page; ledger `P4`.
-      The by-eye check is the *Done when* box below and waits on the rebuild.
-- [ ] Both bundles rebuilt into the tree. `git diff --stat HEAD -- api/src/Binacle.Net.UIModule/wwwroot sites/demo/js`
-      shows changes; on 2026-09-15 it showed none. Rows 5 to 8 are in the sources and not in the bundles until
-      this runs. The same box is under stage 3 - it has to hold at both points.
+      The by-eye check is the *Done when* box below.
+- [x] **2026-09-16.** Both bundles rebuilt. **Git cannot see this.** Both output folders are gitignored -
+      `.gitignore:73` for `api/src/Binacle.Net.UIModule/wwwroot` and `.gitignore:77` for `sites/demo/js` - so a
+      `git diff` or `git status` over them is always empty and proves nothing either way. That is what the
+      earlier reading of "no rebuild" was: the check, not the bundles.
+      **Grep the built file instead.** `lastRequest`, `00-two-winners` and `Five boxes, packed full` each match
+      once in `api/src/Binacle.Net.UIModule/wwwroot/js/binacle-net-ui.js` and once in
+      `sites/demo/js/binacle-net-ui.js`. **All three are in both** - the two hosts build the shared package
+      from the same source, so `lastRequest` ships in the demo chunk too. What is UI module only is the page
+      markup that mounts the panel, not the code.
+      Commands: `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, and
+      `npm run build` inside `sites/demo`. The demo bundle was three features behind - built 2026-09-10,
+      before rows 7 and 8.
+      The same box is under stage 3 - it has to hold at both points.
 - [x] **2026-09-12. The six CI findings landed** - 1, 4, 5, 8, 10 and 12 in `plans/ci-cd/ci-open-questions.md`.
       `grep -c '^- \[x\]'` on that plan returns 12; the one open box, finding 8, closes on the `3.1.0` run.
       **What landed is the workflow edit** - the `publish` half is proved by the `3.1.0` run in stage 3, not
@@ -223,21 +237,37 @@ is finished; only the last one has to be clean.
       `repo:binacle-labs/Binacle.Net:ref:refs/heads/main` - and `DOCKERHUB_OIDC_CONNECTIONID` is set. The
       shape and why are `D33`. **Unproved until the `3.1.0` dispatch** - a prerelease stops before the
       login. `DOCKERHUB_TOKEN` stays as it is: the token screen offers no repository scoping.
-- [ ] `just test all` passes, and `just openapi check-all-copies` passes.
-      `check-all-copies` passed on 2026-09-14; `test all` has not been run since the beta.
+- [x] **2026-09-16.** `just test all` passes - 28 suites, every one green - and `just openapi check-all-copies`
+      passes.
+      **It did not pass before that day, and the failure was rows 6 and 7's.**
+      `tests/apps/packingDemo/samples.test.ts` still asserted `01-opening-set` as the first sample after
+      `00-two-winners` took that place. The recipe stops on the first failure, so the 16 suites after it -
+      every .NET integration suite and all ten Ruby ones - had not run at all since the beta. They run clean now.
+      **A second thing was wrong and nothing had caught it:** the packed-data generator carries its
+      demo-sample file list by hand, and `00-two-winners.json` was not in it, so `just regen vipaq-packed-data`
+      would have written nothing however often it ran. Both fixed 2026-09-16.
 
 ### Stage 2 - the changelog and the docs
 
-- [ ] The `## [Unreleased]` section describes the whole release and nothing that did not ship - row 5 and
-      the CI work included. **By eye.** Read it top to bottom against the rows above.
+- [x] **2026-09-16.** The `## [Unreleased]` section describes the whole release and nothing that did not ship -
+      row 5 and the CI work included. **By eye**, read top to bottom against every row above. All eight UI
+      rows, both fixes, the CORS test, the five CI findings that were already in it, the `3` tag and the docs
+      restructure are all there, and nothing in it names something that did not ship.
+      **One line was missing and was added the same day:** finding 8, the builder setup dropped from the
+      `publish` job. It is the last of the six CI findings to reach the changelog.
 - [x] **2026-09-14.** No line reads as a contract change. *(chosen by an agent - strike it)* The Internal
       Work clause saying the health check payload "lists features by type now, not by key" read as one and is
       cut: the `Features` array is the same list of names it was, and the type filter is internal to
       `InstanceOptions`. The CI rows, the `3` tag and the docs restructure were logged the same day - they had
       landed without an entry.
-- [ ] `.agents/docs/` says what the tree now does. The `verified:` and `check:` of every doc whose paths the
-      release touched are current: `docs/api/modules/ui.md`, `docs/ci-cd/*.md`, `docs/packages/*.md`.
-      **By eye** - `git log --stat main..HEAD` lists the paths; each doc's `paths:` says which one owns it.
+- [x] **2026-09-16.** `.agents/docs/` says what the tree now does. The `verified:` and `check:` of every doc
+      whose paths the release touched are current: `docs/api/modules/ui.md` and `docs/packages/binacle-net-ui.md`
+      at 2026-09-15, the three `docs/ci-cd/*.md` and `docs/packages/binacle-net-client.md` at 2026-09-14.
+      **By eye** against `git log --stat main..HEAD`. Row 5 is in `ui.md`'s `check:` and in the
+      `packing_demo_app` row of `binacle-net-ui.md`; row 8 is in the `/vipaq` route row and the
+      `protocol_decoder_app` row.
+      **One number was stale and was fixed the same day:** `binacle-net-ui.md` said 384 tests; the suite is
+      387, 72.03% of lines. The `verified:` date was left alone - only that one claim was re-measured.
       **The docs site restructure is its own row above and can land in this stage.** Only the `## v3.1.0`
       release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
 - [x] **2026-09-14.** *(chosen by an agent - strike it)* `.github/dockerhub-overview.md` describes the `3`
@@ -250,9 +280,10 @@ is finished; only the last one has to be clean.
 
 ### Stage 3 - the rest
 
-- [ ] Both bundles are rebuilt from the current sources and the rebuilt output is in the tree.
-      `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, then
-      `git status` shows nothing new under `api/src/Binacle.Net.UIModule/wwwroot/`.
+- [ ] Both bundles are rebuilt from the current sources, after the last source edit on the branch.
+      `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, and the demo
+      site's own build for `sites/demo/js`. **Check it with the greps under stage 1, not with git** - both
+      output folders are gitignored, so `git status` stays silent whether the build ran or not.
 - [ ] **`3.1.0-beta.<n>` dispatched from `release/v3-1-0`, run green - `gate`, `test`, `build` and `smoke`;
       `publish`, `release` and `page` show as skipped.** **`beta.1` ran green on 2026-09-14** from `c0355b26`
       - the branch's own workflow, signed on the branch ref, nothing on Docker Hub. Against it: verify PASS on
@@ -296,30 +327,44 @@ already exists, so the pin follows the publish and never precedes it.
 
 ## Done when
 
-- [ ] `CHANGELOG.md` has an `## [Unreleased]` section describing this release.
-      `just changelog check Unreleased` passes - it does today, and this box stays open until the last row
-      below is in it, because the section has to describe the whole release and not the part that landed first.
+- [x] **2026-09-16.** `CHANGELOG.md` has an `## [Unreleased]` section describing this release.
+      `just changelog check Unreleased` passes - 47 lines - and the section now covers every row, rows 5 to 8
+      and all six CI findings included. **The read against the rows is the stage 2 box**, which holds the
+      detail; this box is the command.
+      **It fails by design after the rename to `## [3.1.0]`** - that is the last edit before the tag, under
+      stage 3.
 - [ ] Every row above is either ticked with a date, or moved out of this file with a reason.
       **By eye.** A row that is neither is the state this file exists to refuse.
 - [ ] Every box under *Before the tag* is ticked, in order, and the `3.1.0` run is green.
       **By eye**, and the release page at `github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0` exists.
-- [ ] Row 8 is in: the ViPaq decoder offers samples, and each one draws.
-      `just test ts_binacle-net-ui_unit` passes the `sampleData` suite, and **by eye** on `/vipaq` in a running
-      container: press `Samples`, the panel opens on the right with five strings, Copy one, paste it into the
-      input, press add, the bin draws full. **The component
-      and the module page landed 2026-09-15**; the by-eye half waits on the rebuild, and the demo site's menu
-      on a site session.
-- [ ] Row 5 is in: the request panel prints the call that was sent, against the host the page is served from.
-      **By eye.** Open the packing page on a running container, submit, press `Request` on the results card,
-      paste what the right-side panel prints into a terminal. It answers. **Code landed 2026-09-15**; the
-      formatter's output was parsed by `bash -n` and the bundle compiled to a scratch folder, but the committed
-      bundle is not rebuilt and no browser has shown it.
-- [ ] Rows 6 and 7 are in: the page opens on `Try all, keep the best` with two result rows naming two winners.
-      **By eye** on both hosts after the rebuild: the dropdown reads `Best` first, and the two rows say
-      `Winner: First Fit Decreasing` and `Winner: Best Fit Decreasing`.
-- [ ] The docs site renders the current line at the root, with no `v3.1.x` folder opened.
-      Every box in `plans/sites/docs-current-at-root.md` *Done when* is ticked,
-      and `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`.
+- [x] **2026-09-17, confirmed by the maintainer.** Row 8 is in on the UI module: the ViPaq decoder offers
+      samples, and each one draws. **By eye** on `/vipaq` - press `Samples`, Copy a string, paste it into the
+      input, add, the bin draws. `just test ts_binacle-net-ui_unit` passes the `sampleData` suite inside the
+      387-test suite. The demo site's own panel is the box below.
+- [x] **2026-09-17.** Row 8's two site halves are in, one site session each.
+      `grep -c Samples sites/demo/pages/vipaq.html` returns 2 and
+      `grep -c 'Five boxes, packed full' sites/docs/collections/_versions/v3.x/vipaq-protocol.md` returns 1;
+      both returned 0 the day before. **No string was retyped on either page** - the demo page loops `samples`
+      off the component and holds no base64 of its own, and all five strings on the docs page byte-match
+      `sampleData.ts`, checked pair by pair.
+      The demo page copies `Vipaq.cshtml` including the nesting - `samples_panel` sits inside
+      `protocol_decoder_app`'s scope, which is how `samples` resolves - and its own `_js/protocol_decoder.js`
+      holds the open state and the copy. The docs page gained a `## Try it` section between *Example* and
+      *Full Specification*: five blocks of name, bin, items and fill, each string in a `text` fence, and a line
+      saying each is the `viPaqData` of an FFD `pack` response for one of the demo's worked examples.
+      `npm run build` in `sites/demo` and `bundle exec jekyll build` in `sites/docs` both pass.
+      **Neither page has been opened in a browser** - the demo panel is the same component and markup the
+      module page already passed by eye.
+- [x] **2026-09-17, confirmed by the maintainer.** Row 5 is in: the request panel prints the call that was
+      sent, against the host the page is served from. **By eye** on the UI module's packing page.
+- [x] **2026-09-17, confirmed by the maintainer.** Rows 6 and 7 are in: the page opens on
+      `Try all, keep the best` with two result rows naming two winners. **By eye.**
+- [x] **2026-09-16.** The docs site renders the current line at the root, with no `v3.1.x` folder opened.
+      `ls sites/docs/collections/_versions/` prints `v1.x v2.x v3.x`.
+      **The deployed-site half is not a box here.** The three that are still open in
+      `plans/sites/docs-current-at-root.md` *Done when* - the redirect checks, the selector click and the
+      major-tag manifest - each need the site deployed or the `3` tag published, so none of them can be
+      ticked before the tag. `post-release-v3.1.0.md` owns all three.
 - [ ] The six CI findings are in and the seventh is recorded.
       `grep -c '^- \[x\]' .agents/plans/ci-cd/ci-open-questions.md` returns 13 - every box in that plan.
 - [x] **2026-09-10.** The demo bundles the client, and no chunk is published that nothing loads.

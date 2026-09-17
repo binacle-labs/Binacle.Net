@@ -32,10 +32,11 @@ internal class Program
 			DestinationFolder: "demo-samples",
 			Files:
 			[
-				"01-opening-set.json", "02-packs-nowhere.json", "03-three-answers.json", "04-bfd-loses.json",
-				"05-one-of-each.json", "06-long-items.json", "07-tall-items.json", "08-cube-bin.json",
-				"09-bfd-fits-more.json", "10-six-types.json", "11-seven-types.json", "12-middle-bin-wins.json",
-				"13-twenty-four-cubes.json", "14-flat-items.json", "15-same-volume-different-shape.json",
+				"00-two-winners.json", "01-opening-set.json", "02-packs-nowhere.json", "03-three-answers.json",
+				"04-bfd-loses.json", "05-one-of-each.json", "06-long-items.json", "07-tall-items.json",
+				"08-cube-bin.json", "09-bfd-fits-more.json", "10-six-types.json", "11-seven-types.json",
+				"12-middle-bin-wins.json", "13-twenty-four-cubes.json", "14-flat-items.json",
+				"15-same-volume-different-shape.json",
 				"16-only-bfd-fully-packs.json", "17-four-bins-bfd-ahead.json", "18-four-bins-bfd-fully-packs.json",
 				"19-five-bins.json", "20-wfd-wins.json",
 			]),

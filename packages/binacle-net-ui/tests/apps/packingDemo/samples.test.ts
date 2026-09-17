@@ -94,7 +94,7 @@ describe("the sample set", () => {
 		const names = sampleData.map(sample => sample.name);
 
 		expect(names).toEqual([...names].sort());
-		expect(names[0]).toBe("01-opening-set");
+		expect(names[0]).toBe("00-two-winners");
 	});
 
 	test("every sample has at least one bin", () => {

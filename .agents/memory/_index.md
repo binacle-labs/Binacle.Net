@@ -10,6 +10,10 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 ## General
 
 ```yaml
+- file: a-new-demo-sample-needs-two-edits.md
+  description: "A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data only if you also add it to the generator's hardcoded list - which fails silently"
+  when: "adding or renaming a file in shared/data/demo-samples"
+  paths: ["shared/data/demo-samples/**", "vipaq/tools/Binacle.ViPaq.PackedDataGenerator/**", "vipaq/data/packed/**"]
 - file: algorithm-identifier-is-a-format.md
   description: "The FFD_v2 / BFD_v1 string is a parsed data format, not a naming style - never tidy the underscore out of it"
   when: "renaming an algorithm class, enum member or identifier string"
@@ -17,6 +21,10 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 - file: bulk-rename-traps.md
   description: "Four traps when sweeping a namespace or type rename across this repo — spaces in Algorithms/ folder names, unstaged files and git mv, global usings that collide, and fully-qualified names"
   when: "sweeping a namespace or type rename across the repo"
+- file: image-source-label-has-two-copies.md
+  description: "The image-source URL is written as a literal in two files and nothing links them - change one and the smoke step goes red with a message that does not name the cause"
+  when: "changing the repository URL, moving the repository, or editing the Dockerfile label block"
+  paths: ["Dockerfile", "tooling/smoke/**"]
 - file: migration-no-silent-deletions.md
   description: "Migrations land as small reviewable diffs — every removed test needs a visible successor, never a silent delete"
   when: "deleting or replacing a test during a migration"
@@ -33,6 +41,10 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/ci/sonar-analysis.xml"
   when: "answering a Sonar finding"
   paths: ["tooling/ci/sonar-analysis.xml", "Directory.Build.props"]
+- file: oidc-subject-is-the-immutable-form.md
+  description: "This repository's OIDC token carries GitHub's immutable subject claim, which breaks nothing today but is what a cloud trust policy keyed on `sub` would have to match"
+  when: "wiring OIDC trust to a cloud provider, or debugging a trust policy that will not match"
+  paths: [".github/workflows/**"]
 - file: results-curated.md
   description: "results/ is a hand-curated vault — harnesses write to gitignored scratch, never straight into results/"
   when: "writing anything into results/"
