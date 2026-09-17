@@ -7,8 +7,9 @@ description: Release - Binacle.Net v3.1.0. The demo UI release - the shipped cli
 **Status:** scope narrowed by the maintainer on 2026-09-07, three rows added on 2026-09-15. **Every row of
 work has landed** - rows 5 to 8 on 2026-09-15. **Stage 1 and stage 2 closed on 2026-09-16**: the generator
 run, both bundles rebuilt, `just test all` green across 28 suites, and the changelog read against every row.
-**Every by-eye box passed on 2026-09-17** - rows 5, 6, 7 and 8 - **and row 8's two site halves landed the
-same day.** What is left is stage 3. The six CI edits landed on
+**Every by-eye box passed on 2026-09-17** - rows 5, 6, 7 and 8 - **row 8's two site halves landed the same
+day, and `3.1.0-beta.2` verified clean from the branch tip.** What is left is the five steps from the pull
+request to the `3.1.0` dispatch, and every one of them is the maintainer's hand. The six CI edits landed on
 2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
 2026-09-11: **features first, then the changelog and the docs, then the rest.** Branch
 `release/v3-1-0`. **Every beta is dispatched from this branch and stops at GHCR** - decided 2026-09-14 - so
@@ -280,27 +281,34 @@ is finished; only the last one has to be clean.
 
 ### Stage 3 - the rest
 
-- [ ] Both bundles are rebuilt from the current sources, after the last source edit on the branch.
-      `npm run copy-assets-to-uimodule && (cd api/src/Binacle.Net.UIModule && npm run build)`, and the demo
-      site's own build for `sites/demo/js`. **Check it with the greps under stage 1, not with git** - both
-      output folders are gitignored, so `git status` stays silent whether the build ran or not.
-- [ ] **`3.1.0-beta.<n>` dispatched from `release/v3-1-0`, run green - `gate`, `test`, `build` and `smoke`;
-      `publish`, `release` and `page` show as skipped.** **`beta.1` ran green on 2026-09-14** from `c0355b26`
-      - the branch's own workflow, signed on the branch ref, nothing on Docker Hub. Against it: verify PASS on
-      all four checks, all five smoke profiles green, the four pages answer 200 with `UI_MODULE=True`, and the
-      bundle carries `compare-bins`, `Try all, keep the best` and `algorithmUsed`. **The box stays open** -
-      row 5 is not in it, and the last beta is the one that has to be clean. It proves the branch builds, signs on
-      `refs/heads/release/v3-1-0` and passes the smoke; it does not touch Docker Hub, and it makes no tag.
-      Then, against the staged image - it is public, no login:
-      `just image verify 3.1.0-beta.<n> all refs/heads/release/v3-1-0 ghcr.io/binacle-labs/binacle-net` passes,
-      `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` is green, and the four UI pages open
-      from `docker run ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` with `UI_MODULE=True` - on `/packing`:
-      pick `Best`, read the winner off the row, randomize to `02-packs-nowhere` and open the unpacked list,
-      and the request panel prints a call that answers when pasted. **A red run here is the cheap place to
-      find out** - fix on the branch, dispatch the next number. **What a beta cannot prove is findings 1 and
-      8** - the Docker Hub login and the buildx-less copy run for the first time on the `3.1.0` dispatch
-      below. A red `publish` there leaves Docker Hub untouched and no tag; fix on `main` and dispatch `3.1.0`
-      again.
+- [x] **2026-09-17.** Both bundles are rebuilt from the current sources, after the last source edit on the
+      branch. The last source edit was `sites/demo/_js/protocol_decoder.js`; both bundles are newer than it.
+      `lastRequest`, `00-two-winners` and `Five boxes, packed full` all match in each, and `samples_panel`
+      matches in the demo's built `protocol_decoder.js`. **Checked with greps, not with git** - both output
+      folders are gitignored, so `git status` stays silent whether the build ran or not.
+      **These two only matter for looking at it locally.** CI builds its own: the release job runs
+      `just build publish` before the image build, and `Deploy Site` builds the demo site's.
+- [x] **2026-09-17. `3.1.0-beta.2` dispatched from `release/v3-1-0` and verified.** Built from `91dd5762`,
+      which is the branch tip, with a clean working tree - so the image carries every row including 5 to 8.
+      Nothing reached Docker Hub: its tag list is `1.1.1` to `3.0.0`, `3.0` and `latest`, with no `beta` on it,
+      which is `D3` holding on a real run.
+      **Measured against the staged image**, public, no login:
+      `just image verify 3.1.0-beta.2 all refs/heads/release/v3-1-0 ghcr.io/binacle-labs/binacle-net` -
+      **PASS**, signed by the release workflow on `refs/heads/release/v3-1-0`, SBOM 166 packages, provenance
+      present, runs as `app (1654)`.
+      `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.2` - **all five profiles green.**
+      `/`, `/packing`, `/vipaq` and `/instance` each answer **200** with `UI_MODULE=True`.
+      The shipped bundle carries all six features - `lastRequest`, `00-two-winners`, `Five boxes, packed full`,
+      `Try all, keep the best`, `algorithmUsed` and `compare-bins` each match once in
+      `/_content/Binacle.Net.UIModule/js/binacle-net-ui.js` - and both pages mount their panels.
+      **The bundle is served under `/_content/Binacle.Net.UIModule/js/`, not `/js/`.** A grep against `/js/`
+      downloads the 404 page and reports zero for everything, which reads exactly like a bundle with no
+      features in it.
+      **What was not done against this image: the by-eye pass in a browser.** The maintainer confirmed rows 5
+      to 8 on the UI module on 2026-09-17, and the same code is proved present here, but nobody has clicked
+      through the container itself. **What a beta cannot prove is findings 1 and 8** - the Docker Hub login and
+      the buildx-less copy run for the first time on the `3.1.0` dispatch below. A red `publish` there leaves
+      Docker Hub untouched and no tag; fix on `main` and dispatch `3.1.0` again.
 - [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
       first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
       red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.

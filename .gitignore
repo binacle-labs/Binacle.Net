@@ -26,6 +26,7 @@ node_modules
 # Build-time OpenAPI documents (emitted by OpenApiGenerateDocumentsOnBuild); the frozen per-version specs
 # under sites/docs/collections/_versions/**/swagger/ stay the committed source of truth.
 artifacts/openapi/
+artifacts/openapi-service/
 data/logs/
 data/pack-logs/
 packing-logs/

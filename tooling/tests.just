@@ -84,6 +84,7 @@ all:
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
     just test ts_binacle-net-client_unit
+    just test ts_binacle-net-service-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
@@ -181,6 +182,9 @@ ts_binacle-vipaq_unit: (_jest_test 'binacle-vipaq')
 
 [private]
 ts_binacle-net-client_unit: (_jest_test 'binacle-net-client')
+
+[private]
+ts_binacle-net-service-client_unit: (_jest_test 'binacle-net-service-client')
 
 [private]
 ts_binacle-net-ui_unit: (_jest_test 'binacle-net-ui')

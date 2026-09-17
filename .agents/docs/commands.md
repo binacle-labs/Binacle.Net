@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-14
+verified: 2026-09-17
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -193,25 +193,33 @@ name into `expected.txt` before it runs, which is the only thing separating "the
 ```bash
 just openapi generate                  # artifacts/openapi/Binacle.Net_v3.json + _v4.json
 just openapi generate <dir>            # write them somewhere else (pass an absolute path)
+just openapi generate-service          # artifacts/openapi-service/Binacle.Net_service.json, with ServiceModule on
 just openapi lint [<dir>]              # generate, then lint with Spectral against tooling/openapi.spectral.yaml
 just openapi check-all-copies          # generate, then fail if any committed copy has drifted
 just openapi sync-all-copies           # generate, then write every committed copy
 ```
 
-`check-all-copies` diffs the generated documents against the three committed copies:
-`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`, and
-`packages/binacle-net-client/spec/v4.json`. The client package is v4 only, so it takes no copy of v3. The
-current docs version is a variable at the top of `openapi.just` and moves with each minor; the frozen version
-folders below it are records of what those releases documented and are never compared.
-`shared-image-tests.yml` runs the check beside the lint.
+`check-all-copies` diffs the generated documents against the four committed copies:
+`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`,
+`packages/binacle-net-client/spec/v4.json`, and `packages/binacle-net-service-client/spec/service.json`. The
+v4 client takes no copy of v3, and the service client takes only the service document. The current docs
+version is a variable at the top of `openapi.just` and moves with each minor; the frozen version folders below
+it are records of what those releases documented and are never compared. `shared-image-tests.yml` runs the
+check beside the lint.
 
-`sync-all-copies` writes those three. **No workflow calls it** - CI only ever checks, and a human runs the
+`sync-all-copies` writes those four. **No workflow calls it** - CI only ever checks, and a human runs the
 sync and commits what it writes.
 
 Nothing needs to be brought up — the documents come out of the build, not out of a running server:
 `Microsoft.Extensions.ApiDescription.Server` starts the app host itself and dumps every registered
 `IOpenApiDocument` (`$api/openapi`). The host it starts has no launch profile, so **ServiceModule is off** and
 the documents carry no `/api/auth/token` path — the shape the committed specs assume.
+
+`generate-service` is the one run with the module on. The service document only exists then, but so does a
+different v3 and v4: `/api/auth/token` appears in both and every rate-limited endpoint gains a `429`. So it
+writes to its own folder, `artifacts/openapi-service/`, and only the service file is copied out. The module
+will not start without a store and JWT settings, so the recipe passes throwaway ones by environment variable
+(a sqlite file beside the output; `Development` is not used because it picks Azurite first).
 
 Generation is off by default (`-p:GenerateOpenApi=true`, set by the recipe) so an ordinary build doesn't start
 the app host. The destination is `-p:OpenApiDir`; MSBuild resolves a relative one against the **project**
