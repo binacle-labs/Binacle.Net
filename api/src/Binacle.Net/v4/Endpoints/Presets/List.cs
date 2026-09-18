@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using System.Net.Mime;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Binacle.Net.Kernel.Endpoints;
 using Binacle.Net.v4.Contracts.Presets;
 using Binacle.Net.v4.Contracts;

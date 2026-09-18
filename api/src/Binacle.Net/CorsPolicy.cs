@@ -1,4 +1,4 @@
-namespace Binacle.Net.Configuration;
+namespace Binacle.Net;
 
 // The core's one policy. Its origins are the CoreApi key of Config_Files/Cors.json, read through the Kernel.
 internal static class CorsPolicy

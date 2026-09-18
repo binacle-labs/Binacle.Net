@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Binacle.Net.DiagnosticsModule;
 using Binacle.Net.ExtensionMethods;
 using Binacle.Net.Kernel.Cors;

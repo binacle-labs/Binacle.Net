@@ -1,4 +1,4 @@
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Binacle.Net.Kernel.Instance.Models;
 
 namespace Binacle.Net.ExtensionMethods;
