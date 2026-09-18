@@ -1,8 +1,8 @@
 ---
 id: sites
-description: Every published site lives under sites/, one directory each. What the three share, and what is per-site.
-verified: 2026-09-04
-check: The directory list matches sites/; all three sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
+description: Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site.
+verified: 2026-09-18
+check: The directory list matches sites/, admin included; the three published sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
 also_update:
   - commands
   - ci-cd
@@ -22,6 +22,7 @@ Every site this repo publishes, one directory each.
 | `sites/docs/` | the documentation site | `$sites/docs` |
 | `sites/demo/` | the demo site | `$sites/demo` |
 | `sites/www/` | the marketing site | `$sites/www` |
+| `sites/admin/` | **experimental, local only** - a page over the ServiceModule's admin routes through `binacle-net-service-client`. Nothing builds or deploys it | none |
 
 **All of it is off limits from a coding session.** Each site is written in its own session; see
 `.agents/README.md` for the rule and its one carve-out.

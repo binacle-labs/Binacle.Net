@@ -85,13 +85,13 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ci-cd/README.md
-  description: "CI/CD — the nine GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
+  description: "CI/CD — the GitHub Actions workflows in .github/workflows and the shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
   paths: [".github/workflows/**", ".github/actions/**"]
 - file: ci-cd/branches.md
-  description: "Branch names — the three kinds in use, the snake_case subject, and the two constraints that are mechanical: Sonar analyses main and pull requests targeting main, and only main or a release/* branch may dispatch the release workflow"
+  description: "Branch names — the three kinds in use, the snake_case subject, and the two constraints that are mechanical: Sonar analyses main and pull requests targeting main, and only main or the release/v<x>-<y>-<z> branch named after the version may dispatch the release workflow"
   paths: [".github/workflows/**"]
 - file: ci-cd/release-pipeline.md
-  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease stops before, the CHANGELOG.md release body, and the Docker Hub page written last"
+  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease skips on its way to a GitHub prerelease, the CHANGELOG.md release body, and the Docker Hub page written last"
   paths: [".github/workflows/**"]
 ```
 
@@ -131,7 +131,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: packages/README.md
-  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, compact-notation mirror, cookie utilities, and theme switching."
+  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching."
   paths: ["packages/**"]
 - file: packages/binacle-net-client.md
   description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
@@ -175,7 +175,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: sites/README.md
-  description: "Every published site lives under sites/, one directory each. What the three share, and what is per-site."
+  description: "Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site."
   paths: ["sites/**"]
 - file: sites/demo.md
   description: "The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/."

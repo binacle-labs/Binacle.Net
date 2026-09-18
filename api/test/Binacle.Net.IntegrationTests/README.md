@@ -15,7 +15,7 @@ just test cs_binacle-net_integration   # from the repo root
 api/src/Binacle.Net/v4/Endpoints/Fit/CustomBin.cs  ->  Tests/v4/Endpoints/Fit/CustomBin/
 ```
 
-Each of those folders holds the same **two** files, and the split is the point:
+Each of those folders holds up to **two** files, and the split is the point (a preset lookup has nothing to pack, so it has only the first):
 
 | File | What it covers | Marked with |
 |---|---|---|

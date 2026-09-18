@@ -143,5 +143,5 @@ to nothing fails the build rather than writing a link to a 404.
 bundle exec rspec
 ```
 
-The specs build two real Jekyll sites from `spec/fixtures` - one with two versions, one whose only page
-links at a file that is not there.
+The specs build real Jekyll sites from `spec/fixtures` - one with two versions, one whose only page
+links at a file that is not there, one with no index page, and one where two pages collide.

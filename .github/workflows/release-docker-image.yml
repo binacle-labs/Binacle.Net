@@ -1,7 +1,7 @@
 # Seven jobs, cheapest check first:
 #
 #   dispatch 3.0.0        -> gate -> test -> build+push GHCR -> smoke -> copy to Docker Hub -> release -> page
-#   dispatch 3.1.0-beta.1 -> gate -> test -> build+push GHCR -> smoke   and stops there - from main or release/*
+#   dispatch 3.1.0-beta.1 -> gate -> test -> build+push GHCR -> smoke -> release (prerelease)  - from main or release/*
 
 name: Build and Release Docker Image
 
@@ -54,7 +54,7 @@ jobs:
       - name: Setup - just
         uses: ./.github/actions/setup-just
 
-      # A release from main only. A prerelease from main or a release/* branch, because it stops at staging.
+      # A release from main only. A prerelease from main or a release/* branch, because it never reaches Docker Hub.
       - name: Check the dispatch is on a ref this version may run from
         env:
           REF: ${{ github.ref }}
@@ -201,9 +201,8 @@ jobs:
     with:
       image: ${{ needs.build.outputs.staging }}
 
-  # A prerelease stops at staging. This is the only prerelease condition in the file: `release` and `page`
-  # need this job, so they skip with it. A beta leaves one thing behind - the smoked image on GHCR - and no
-  # tag, no GitHub release and nothing on Docker Hub.
+  # A prerelease never reaches Docker Hub. `page` needs this job, so it skips with it; `release` runs past the
+  # skip and makes the tag and a GitHub prerelease for the GHCR image.
   publish:
     name: Copy to Docker Hub
     needs: [ build, smoke ]
@@ -308,6 +307,8 @@ jobs:
   release:
     name: Create the release
     needs: [ gate, test, build, smoke, publish ]
+    # Runs when `publish` was skipped, not only when it passed. Without this a prerelease gets no tag.
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -337,13 +338,15 @@ jobs:
         run: just ci github-release "$TAG" "$SECTION" "$COMMIT"
 
       # In this job rather than `publish` because the release URL only exists once the step above has run.
+      # A prerelease has no Docker Hub tags, so the staging reference stands in as the one tag it has.
       - name: Summarise what was published
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
           VERSION: ${{ needs.build.outputs.version }}
-          TAGS: ${{ needs.publish.outputs.tags }}
+          TAGS: ${{ needs.publish.outputs.tags || needs.build.outputs.staging }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
-        run: just ci release-summary "$VERSION" "$DIGEST" "$TAG" "$RELEASE_URL" "$TAGS"
+          REF: ${{ github.ref }}
+        run: just ci release-summary "$VERSION" "$DIGEST" "$TAG" "$RELEASE_URL" "$TAGS" "$REF"
 
   page:
     name: Docker Hub page

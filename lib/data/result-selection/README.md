@@ -11,7 +11,7 @@ of already-computed results and the one the selector is expected to choose. One 
 - `BestBin/` - pick the best bin.
 - `SmallestBin/` - pick the smallest bin that still fits.
 
-Each folder has a single `baseline.json` today (thin coverage, see the extraction plan for growth notes).
+Each folder has a single `baseline.json` today, so coverage is thin; a new JSON file dropped in is picked up without registration.
 
 ## 🧾 Format
 

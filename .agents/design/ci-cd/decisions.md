@@ -1,8 +1,8 @@
 ---
 id: ci-cd/decisions
-description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why a prerelease stops at staging and the one job-level skip that does it, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, why no job holds a git credential after checkout, why the site half of the path filter names the files a site depends on, why the three site deploys are one workflow with the site chosen at dispatch, why the release logs into Docker Hub with the run's OIDC token, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-09-14
-check: Decisions still match .github/workflows/*.yml and tooling/build.just; D32 against deploy-site.yml, whose dispatch must take a site choice of docs, demo and www and whose concurrency group must carry inputs.site; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry the file's only prerelease condition - `if: ${{ !contains(inputs.version, '-') }}` - with none on `release` or `page`, D33 against the same job's Docker Hub login, which must carry no password: and must read vars.DOCKERHUB_OIDC_CONNECTIONID, D7 against tooling/changelog.just and the two changelog.*.sh it calls, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and deploy-site.yml's link-check step, D17 against deploy-site.yml's trigger, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against deploy-site.yml's first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just and tooling/image/verify*.sh, whose verify recipe must take a version with no default and whose scripts reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
+description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why a prerelease stays on GHCR but still gets its tag and a GitHub prerelease, and the two job conditions that do it, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, why no job holds a git credential after checkout, why the site half of the path filter names the files a site depends on, why the three site deploys are one workflow with the site chosen at dispatch, why the release logs into Docker Hub with the run's OIDC token, and the open questions about the PR gate and supply-chain attestation.
+verified: 2026-09-18
+check: Decisions still match .github/workflows/*.yml and tooling/build.just; D32 against deploy-site.yml, whose dispatch must take a site choice of docs, demo and www and whose concurrency group must carry inputs.site; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry `if: ${{ !contains(inputs.version, '-') }}`, and its release job, which must carry `if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}` and keep `publish` in its needs, with no condition on `page`; D33 against the same job's Docker Hub login, which must carry no password: and must read vars.DOCKERHUB_OIDC_CONNECTIONID, D7 against tooling/changelog.just and the two changelog.*.sh it calls, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and deploy-site.yml's link-check step, D17 against deploy-site.yml's trigger, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against deploy-site.yml's first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just and tooling/image/verify*.sh, whose verify recipe must take a version with no default and whose scripts reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
 paths:
   - ".github/workflows/**"
   - "tooling/ci/**"
@@ -77,10 +77,10 @@ publish* now builds nothing, silently. The release job's create-or-edit branch i
 nothing and still covers a tag made by hand.
 
 **No `dry_run` input.** The other repository that releases this way has one, because its release commits to
-`main` and there is no cheaper rehearsal. Here a prerelease is the rehearsal: it runs `gate`, `test`, `build`
-and `smoke` and stops (D3), and a dry run would duplicate that. What a prerelease does not rehearse is
-`publish`, `release` and `page` - a real release is their first run, and a red there leaves Docker Hub
-untouched and no tag, so the same version can be dispatched again.
+`main` and there is no cheaper rehearsal. Here a prerelease is the rehearsal: it runs `gate`, `test`, `build`,
+`smoke` and `release` and skips the Docker Hub jobs (D3), and a dry run would duplicate that. What a
+prerelease does not rehearse is `publish` and `page` - a real release is their first run, and a red there
+leaves Docker Hub untouched and no tag, so the same version can be dispatched again.
 
 **Superseded 2026-08-28 — what changed and what did not.** This ran on `on: push: tags: 'v[0-9]*'` from the
 rebuild until then. Everything above about `release: published` and about creating the release last is the
@@ -119,26 +119,39 @@ pull from. It was argued as acceptable because nobody follows an exact pin on re
 free. The copy command did not change - `imagetools create` handles a cross-registry source as readily as a
 local one, which is what kept a third-party tool out of the job that moves the artifact users pull.
 
-### D3 — a prerelease stops at staging
+### D3 — a prerelease stays on GHCR, and still gets its tag and a GitHub prerelease
 
-**Decided 2026-09-14 by the maintainer.** `publish` carries `if: ${{ !contains(inputs.version, '-') }}`, and
-it is the only prerelease condition in the file: `release` and `page` need `publish`, so they skip with it
-through plain `needs`. A beta runs `gate`, `test`, `build` and `smoke` and leaves exactly one thing behind -
-the smoked, signed image on `ghcr.io/binacle-labs/binacle-net` under its immutable tag. No Docker Hub copy,
-no git tag, no GitHub release.
+**Decided 2026-09-18 by the maintainer, amending the 2026-09-14 rule.** `publish` carries
+`if: ${{ !contains(inputs.version, '-') }}` and `page` skips with it through plain `needs`. `release` carries
+`if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}`, so it runs past the skipped `publish` and
+stops on a failed one. A beta runs `gate`, `test`, `build`, `smoke` and `release`, and leaves three things
+behind: the smoked, signed image on `ghcr.io/binacle-labs/binacle-net` under its immutable tag, the git tag
+on the run's commit, and a GitHub release flagged prerelease with the `[Unreleased]` section as its body. No
+Docker Hub copy, no Docker Hub page.
+
+**Why the tag and the release came back.** Four days under the 2026-09-14 rule produced `3.1.0-beta.1` and
+`beta.2` with nothing in git naming them: no tag to check out, no diff between them for the notes, no
+notification to anyone watching the repository, and the maintainer looking for tags that were never made.
+Every `3.0.0-beta.*` had a prerelease page, so the convention was already what readers expected. The
+plumbing was already there - `github-release.sh` flags a hyphenated tag `--prerelease` and
+`changelog-section.sh` maps one to `Unreleased` - and only the `needs` edge stopped it running.
+
+**The cost, and it is permanent.** D24's ruleset blocks deleting any `v*` tag, so every beta tag stays for
+good, eight of them for the 3.0 line's worth. That is accepted: a tag that names what a run built is the
+record, and the ruleset is what makes it trustworthy.
 
 **What a beta is for under this shape.** It proves the build and the smoke against the exact commit, and it
 gives a person an image to pull and click through before the real dispatch. Whoever checks it pulls from GHCR:
 `just smoke all ghcr.io/binacle-labs/binacle-net:<version>` and `docker run` against the same reference. The
-`smoke` job's run summary prints the reference and the digest, so the run page is the record of the beta;
-there is no release page for it.
+`release` job's run summary prints the reference, the digest, the release link and the GHCR form of the verify
+command.
 
-**What it does not prove, and the cost accepted with it.** `publish`, `release` and `page` never run for a
-prerelease, so the first run of any change to them is the real release. That is survivable by design: a red
-`publish` leaves Docker Hub untouched and creates no tag, and the tag check in `gate` lets the same version be
+**What it does not prove, and the cost accepted with it.** `publish` and `page` never run for a prerelease,
+so the first run of any change to them is the real release. That is survivable by design: a red `publish`
+leaves Docker Hub untouched and creates no tag, and the tag check in `gate` lets the same version be
 dispatched again once fixed. The cost is a red release run rather than a red beta.
 
-**History - this is the third answer to the same question.** The skip was introduced on 2026-08-11 and
+**History - this is the fourth answer to the same question.** The skip was introduced on 2026-08-11 and
 reversed the same day, on two arguments: it was never a safety rule, because *nothing unsmoked reaches Docker
 Hub* comes from `smoke` running before `publish` and holds either way; and it cost deployability, because a
 host that cannot route to GitHub's AS36459 could not pull a beta from GHCR. Between then and 2026-09-05 the
@@ -147,18 +160,30 @@ guard was metadata-action's alone - a prerelease reached Docker Hub with its imm
 2026-08-06 after `v3.0.0-beta.1`. **What the reversal underrated was the tag list**: eight `3.0.0-beta.*`
 tags sat beside the release until they were deleted by hand (D27), betas 1 to 4 failed the published verify
 command for anyone who tried it, and every beta was a second answer to "which image do I pull". The
-deployability argument still holds and is the price: a beta is pullable from GHCR only.
+deployability argument still holds and is the price: a beta is pullable from GHCR only. **The 2026-09-14
+answer** went one step further and dropped the git tag and the release too, on plain `needs`; that is the
+step undone here.
 
-**The trap the 2026-08-11 reversal warned about does not apply.** It said a conditional job above `release`
-needs `if: ${{ !failure() && !cancelled() }}` on `release` or a beta silently gets no GitHub release. Here a
-beta getting no release is the intent, so plain `needs` is the right shape and the warning is spent.
+**The trap the 2026-08-11 reversal warned about now applies, and is handled.** It said a conditional job
+above `release` needs a status condition on `release` or a beta silently gets no GitHub release. That is
+exactly the `if:` `release` carries. `!cancelled()` rather than `always()` so a cancelled run does not tag,
+and `!contains(needs.*.result, 'failure')` rather than a check on `publish` alone so a red job anywhere above
+holds it.
 
 **A prerelease may be dispatched from a `release/*` branch - decided 2026-09-14, the same day.** The rule
 in full: `main` may dispatch a release or a prerelease; a `release/*` branch may dispatch a prerelease only;
 nothing else may dispatch anything. The release branch is where the betas of a version come from, and
 nothing merges to `main` until the last one is clean. Because a dispatch runs the workflow file at its own
 ref, the branch's CI changes are proved by its betas before they reach `main`. `check-release-ref.sh` takes
-the version and is the whole check. "For now" on the branch half - a release from a branch is not ruled out
+the version and is the whole check. **Since 2026-09-18 the branch must be named after the version** -
+`release/v3-1-0` may dispatch `3.1.0-*` and nothing else, so a beta of one version cannot be built from
+another version's branch, and a branch that is not `release/v<x>-<y>-<z>` is refused outright. Decided by
+the maintainer, who wanted the rule mechanical rather than a naming convention.
+
+**Branch builds with no version are not wanted - closed 2026-09-18.** The idea was an image from any branch
+under a slug-and-sha tag. A beta from the version's own `release/` branch is the way to try an image, and it
+comes with a version, a tag and a verify command that passes. A branch build would sign under a ref no
+published command names and leave an image on GHCR forever; the plan that held it was deleted the same day. "For now" on the branch half - a release from a branch is not ruled out
 forever, only not today. The image signs under the branch's ref, so
 checking it is `just image verify <version> all refs/heads/<branch> ghcr.io/...`; the published command,
 anchored on `main`, does not cover it and nothing published names it.
@@ -377,10 +402,10 @@ it lived: `.agents/` deletes a release's companions once the version ships, so t
 own contract guaranteed it would disappear. A published release body is a permanent record, and it belongs in a
 permanent file at the repo root where users read it.
 
-**Why one section accumulates per cycle.** A beta checks that `## [Unreleased]` exists and publishes nothing
-(D3); renaming that heading to the version is the last edit before the real tag. A beta's notes are the
-in-progress notes at that moment, not a version of their own, which is why prereleases are excluded from the
-file.
+**Why one section accumulates per cycle.** A beta checks that `## [Unreleased]` exists and publishes it as
+the body of its prerelease (D3); renaming that heading to the version is the last edit before the real tag.
+A beta's notes are the in-progress notes at that moment, not a version of their own, which is why prereleases
+are excluded from the file.
 
 **Why no fallback.** The old `--generate-notes` fallback existed because a prerelease normally had no written
 body. Under the current shape a prerelease checks `[Unreleased]`, which always exists mid-cycle, so the
@@ -771,7 +796,8 @@ first seen half way through a deploy.
 **The cut is one rule, not a judgement per test: the image gets the .NET tests plus the javascript tests, and
 a site gets everything that is not .NET.** Checked against the manifests on 2026-08-27 — every site pulls all
 five javascript packages, `demo` through `binacle-net-ui` to `binacle-vipaq` to `binacle-compact-notation`, all
-three through `theme-switcher` to `cookies`.
+three through `theme-switcher` to `cookies`. **`binacle-net-service-client` is the one on the site side only** -
+added 2026-09-18, bundled by `sites/admin` alone, which is local only; the image never carries it.
 
 **Five tests are in both files, and that is not duplication to remove.** They ship in the image and they ship
 in the sites, so both sides prove them. 17 plus 15 less the 5 shared is 27, the whole list - recounted
@@ -852,7 +878,7 @@ against a published image: tags, signature, attestations, metadata. **Scripts si
 check under `tooling/image/`, for the reason D4 gives - a recipe body can be neither run alone nor
 shellchecked - and `image.just` is a door the way `ci.just` is.
 
-**It runs against GHCR too - added 2026-09-14, the day a prerelease started stopping there (D3).** A beta is
+**It runs against GHCR too - added 2026-09-14, the day a prerelease's image started stopping there (D3).** A beta is
 an image a person is asked to try, so it gets the same command a release does; the repository is the fourth
 argument. Three checks were registry-neutral already. `tags` was Docker Hub's web API and gained a GHCR path
 through the OCI registry API - anonymous pull token, tag list, a HEAD per tag - which keeps the no-login rule
@@ -1032,8 +1058,8 @@ beta in the tag list and `docker buildx imagetools inspect` failing on `beta.1`,
 reasons they went: betas 1 to 4 fail the published verify command, so anyone following `SECURITY.md` against
 one sees what reads as tampering, and a test build kept forever is a second answer to "which image do I pull".
 
-**That was a one-off cleanup, not a policy - and since 2026-09-14 the policy exists.** A prerelease stops
-at GHCR (D3), so nothing ever lands in `binacle/binacle-net` that is not a release, and there is nothing to
+**That was a one-off cleanup, not a policy - and since 2026-09-14 the policy exists.** A prerelease's image
+stops at GHCR (D3), so nothing ever lands in `binacle/binacle-net` that is not a release, and there is nothing to
 delete afterwards. A second public Docker Hub repository for prereleases was the direction until then; GHCR
 already does that job, is public, and needs no new credential, so it is the staging repository. **Nothing
 about prerelease lifetime goes on the Docker Hub page** - the page describes the repository users pull from,

@@ -15,7 +15,7 @@ honest** - see [`../../test-vectors/README.md`](../../test-vectors/README.md).
 | `src/Protocol{Reader,Writer,Encoder}.ts` | The bit-level reader and writer the serializer sits on |
 | `src/models/` | Header, bin, item, dimensions, coordinates, layout, version, width |
 | `src/layouts/` | The two body layouts - row-major and columnar - behind a small factory |
-| `src/compression/` | The codecs - none, deflate, gzip - and `resolveCodec` picking between them |
+| `src/compression/` | The codecs - none, deflate, gzip. `src/resolveCodec.ts` picks between them |
 | `src/utils/` | Header build and byte conversion, width selection, body length, the format error type |
 | `tests/` | The jest suites, with their cases in `tests/providers/` and vector reading in `tests/support/` |
 | `tools/` | `generateVectors.ts`, the TS half of the interop vector generator |

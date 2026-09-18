@@ -61,6 +61,7 @@ sites:
     just test ts_binacle-compact-notation_unit
     just test ts_binacle-vipaq_unit
     just test ts_binacle-net-client_unit
+    just test ts_binacle-net-service-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit

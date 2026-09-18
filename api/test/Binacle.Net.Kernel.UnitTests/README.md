@@ -5,9 +5,10 @@ module, so a feature's tests stay next to that feature and nothing reaches acros
 
 | Folder | Covers |
 |---|---|
-| `Cors/` | `CorsPolicyOptionsValidator` - which origin spellings a browser can match, and which it silently cannot |
+| `Cors/` | `CorsPolicyOptionsValidator` - which origin spellings a browser can match, and which it silently cannot - and the `Cors` section extensions that read a policy file |
+| `Instance/` | `InstanceOptions` - what a running instance reports about itself |
 | `Logs/` | `LogsProcessor` and `LogsRetentionProcessor` - what reaches disk, and what retention will and will not delete |
 | `Network/` | `IPEntry` - how a configured IP entry is read, and what each spelling admits |
-| `OpenApi/` | The eleven document, operation and schema transformers - what each one writes into the generated document |
+| `OpenApi/` | The document, operation and schema transformers - what each one writes into the generated document |
 | `Paths/` | `ReservedPathOptions` - which paths modules reserve, and what each prefix matches |
 | `Serialization/` | `JsonStringNullableEnumConverter` - how a request enum value is read, and what an unknown one does |

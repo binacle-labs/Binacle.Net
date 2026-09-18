@@ -8,13 +8,15 @@ description: Release - Binacle.Net v3.1.0. The demo UI release - the shipped cli
 work has landed** - rows 5 to 8 on 2026-09-15. **Stage 1 and stage 2 closed on 2026-09-16**: the generator
 run, both bundles rebuilt, `just test all` green across 28 suites, and the changelog read against every row.
 **Every by-eye box passed on 2026-09-17** - rows 5, 6, 7 and 8 - **row 8's two site halves landed the same
-day, and `3.1.0-beta.2` verified clean from the branch tip.** What is left is the five steps from the pull
-request to the `3.1.0` dispatch, and every one of them is the maintainer's hand. The six CI edits landed on
+day, and `3.1.0-beta.2` verified clean from the branch tip of that day.** Three commits landed after it, on
+2026-09-17 and 2026-09-18 - the ServiceModule CORS policy, the Kernel `Cors` section, the service client and
+the admin site - **so the last clean beta is behind the branch, and a `beta.3` from the tip is the open box
+under stage 3.** `just test all` was green again on 2026-09-18, after those commits. The six CI edits landed on
 2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
 2026-09-11: **features first, then the changelog and the docs, then the rest.** Branch
-`release/v3-1-0`. **Every beta is dispatched from this branch and stops at GHCR** - decided 2026-09-14 - so
-nothing merges to `main` until the last beta is clean, and the changed `publish` job is first run by the real
-tag. **The steps from here to the tag are under *Before the tag*, and what happens after it is
+`release/v3-1-0`. **Every beta is dispatched from this branch and its image stops at GHCR** - decided
+2026-09-14; since 2026-09-18 a beta also gets its git tag and a GitHub prerelease - so nothing merges to
+`main` until the last beta is clean, and the changed `publish` job is first run by the real tag. **The steps from here to the tag are under *Before the tag*, and what happens after it is
 `post-release-v3.1.0.md`.**
 
 **What this release is.** The shipped UI still calls v3, and the demo has two faults nobody outside would
@@ -120,7 +122,8 @@ release of their own. *(chosen by an agent)*
 |---|---|
 | `plans/api/integration-tests-cover-shipped-modules.md` | **the CORS assertion. Landed 2026-09-10** in `api/test/Binacle.Net.IntegrationTests` - four tests: preflight and simple request from a configured origin carry the header, an unconfigured origin does not, and with no `Cors.json` no origin is allowed. Proven by breaking `app.UseCors()` and watching the right two fail. **Turning the optional modules on is the larger half and is still open** |
 | `plans/ci-cd/ci-open-questions.md` | **the six findings he approved on 2026-09-11 - 1, 4, 5, 8, 10 and 12; 7 is rejected, `D29`.** The plan's answer table says what each yes takes. Two of them, 1 and 8, edit the release `publish` job, and **only a run proves that job** - and since the row below, only the `3.1.0` run itself reaches it. Finding 1 first needs the OIDC connection created on the Docker Hub org - the hand step under *Before the tag* |
-| no plan - the maintainer decided it on 2026-09-14 | **A prerelease stops at staging. Landed 2026-09-14.** `publish` carries the one prerelease condition in the file, and `release` and `page` skip with it through `needs`, so a beta leaves a smoked image on GHCR and nothing on Docker Hub, no tag and no release. `D3` has the reasoning and the cost: `publish`, `release` and `page` are first run by the real tag |
+| no plan - the maintainer decided it on 2026-09-14, amended 2026-09-18 | **A prerelease never reaches Docker Hub, and gets its tag and a GitHub prerelease. Landed 2026-09-14, amended 2026-09-18.** `publish` skips on a hyphen and `page` skips with it; `release` carries its own condition and runs past the skip, so a beta leaves a smoked image on GHCR, the tag on its commit and a prerelease page - nothing on Docker Hub. `D3` has the reasoning and the cost, including that a beta tag is permanent under `D24`. `publish` and `page` are first run by the real tag; `release` is proved by `beta.3` |
+| no plan - the maintainer did it on 2026-09-17 and 2026-09-18 | **The ServiceModule CORS policy, `Cors` in the Kernel, `binacle-net-service-client` and `sites/admin`.** *(row added by an agent on 2026-09-18 - strike it if this is not release work)* Three commits after `beta.2`: the token and admin routes carry a `ServiceApi` policy, one `Cors` section in the Kernel with one file per module, and an experimental client plus a local-only admin page that nothing builds or deploys. The changelog carries all three under Overview, Service Module and Internal Work. Not in any beta yet |
 
 **Why CORS is the one to take even if the rest slips.** `Program.cs` always registers the policy and every
 core endpoint requires it, the origins come from an optional `Cors.json`, and with none present the fallback
@@ -173,11 +176,6 @@ v4 that reshapes no existing contract, and `pack/first-bin` is the only one cost
 versus short-circuit question is a one-way door** - whatever ships is the response shape v4 then promises not
 to reshape - so it wants a release where it is the subject, not a row at the end of a UI release.
 *(reasoning chosen by an agent - strike it)*
-
-**`plans/ci-cd/prerelease-staging-repository.md`, what is left of it.** Its prerelease half landed in this
-release - the row under *Maintenance riding along*. What remains is branch builds, still an idea with the
-signing question open: anything built from a branch signs under that branch's ref and fails the command
-printed in `SECURITY.md`. Gating a UI release behind it buys nothing.
 
 **`plans/api/packing-only-image.md` and `plans/api/servicemodule.md`.** Both answered 2026-08-31 and both
 `proposed`. The image split changes what a self-hoster pulls, which a minor version may not do. They are the
@@ -238,8 +236,8 @@ is finished; only the last one has to be clean.
       `repo:binacle-labs/Binacle.Net:ref:refs/heads/main` - and `DOCKERHUB_OIDC_CONNECTIONID` is set. The
       shape and why are `D33`. **Unproved until the `3.1.0` dispatch** - a prerelease stops before the
       login. `DOCKERHUB_TOKEN` stays as it is: the token screen offers no repository scoping.
-- [x] **2026-09-16.** `just test all` passes - 28 suites, every one green - and `just openapi check-all-copies`
-      passes.
+- [x] **2026-09-16, and again 2026-09-18 after the CORS and service-client commits.** `just test all` passes -
+      28 suites, every one green - and `just openapi check-all-copies` passes.
       **It did not pass before that day, and the failure was rows 6 and 7's.**
       `tests/apps/packingDemo/samples.test.ts` still asserted `01-opening-set` as the first sample after
       `00-two-winners` took that place. The recipe stops on the first failure, so the 16 suites after it -
@@ -288,8 +286,10 @@ is finished; only the last one has to be clean.
       folders are gitignored, so `git status` stays silent whether the build ran or not.
       **These two only matter for looking at it locally.** CI builds its own: the release job runs
       `just build publish` before the image build, and `Deploy Site` builds the demo site's.
-- [x] **2026-09-17. `3.1.0-beta.2` dispatched from `release/v3-1-0` and verified.** Built from `91dd5762`,
-      which is the branch tip, with a clean working tree - so the image carries every row including 5 to 8.
+- [x] **2026-09-17. `3.1.0-beta.2` dispatched from `release/v3-1-0` and verified.** Built from `91dd5762` -
+      the branch tip that day, now `3dd9c908` after the branch was rebased onto `main` on 2026-09-18; the
+      image's revision label still carries the old hash - with a clean working tree, so the image carries every
+      row including 5 to 8. **It does not carry the three commits after it** - see the `beta.3` box below.
       Nothing reached Docker Hub: its tag list is `1.1.1` to `3.0.0`, `3.0` and `latest`, with no `beta` on it,
       which is `D3` holding on a real run.
       **Measured against the staged image**, public, no login:
@@ -309,6 +309,17 @@ is finished; only the last one has to be clean.
       through the container itself. **What a beta cannot prove is findings 1 and 8** - the Docker Hub login and
       the buildx-less copy run for the first time on the `3.1.0` dispatch below. A red `publish` there leaves
       Docker Hub untouched and no tag; fix on `main` and dispatch `3.1.0` again.
+- [ ] **`3.1.0-beta.3` dispatched from the branch tip, run green, and verified the same way.** *(the number
+      is an agent's guess - it is the next free one)* The tip carries the ServiceModule CORS policy, the Kernel
+      `Cors` move, the service client, the admin site, the `release` job change and the branch-name check in
+      `check-release-ref.sh` - `release/v3-1-0` may dispatch `3.1.0-*` only - all of 2026-09-18, none of which
+      `beta.2` had. **This is the first beta that runs `release`**: `publish` shows skipped, `release` green,
+      `page` skipped, and afterwards `v3.1.0-beta.3` exists as a tag on the run's commit and as a release marked
+      prerelease with the `[Unreleased]` section as its body - the first tag made from a workflow under the
+      `D24` ruleset. Against the image: `just image verify 3.1.0-beta.3 all refs/heads/release/v3-1-0
+      ghcr.io/binacle-labs/binacle-net` passes, `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.3`
+      is green, the four UI pages answer 200 with `UI_MODULE=True`, and the six bundle greps from the `beta.2`
+      box match. Docker Hub's tag list still has no `beta`.
 - [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
       first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
       red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.

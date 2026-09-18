@@ -288,8 +288,8 @@ anyone who pulled one got a failure with nothing anywhere to explain it.
 **All eight `3.0.0-beta.*` tags were deleted, read off the registry on 2026-09-05.** Nothing is left to
 explain.
 
-**It was a one-off cleanup, and since 2026-09-14 the policy exists.** A prerelease stops at GHCR after the
-smoke and never reaches Docker Hub - `$ci-cd/decisions#D3`. Nothing needs cleaning up after the next release.
+**It was a one-off cleanup, and since 2026-09-14 the policy exists.** A prerelease's image stops at GHCR
+after the smoke and never reaches Docker Hub - `$ci-cd/decisions#D3`. Nothing needs cleaning up after the next release.
 
 **Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no on
 2026-09-04 and the switch stays off; the reversal condition is in the CI/CD ledger under D26.

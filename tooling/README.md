@@ -13,7 +13,7 @@ This is **not** a deployment template - `samples/` holds the user-facing startin
 Root `justfile`, not a module. Run once on a fresh clone.
 
 ```bash
-just install                     # npm workspaces, both jekyll sites' gems, then the asset copy
+just install                     # npm workspaces, every jekyll site's gems and ruby/, then the asset copy
 just assets                      # only the asset copy - after changing anything under assets/
 ```
 
@@ -30,6 +30,8 @@ the only place that lives; nothing here repeats it.
 just serve api [N|S|U|All]       # Normal, WithServiceModuleOnly, WithUiModuleOnly, WithAllModules
 just serve docs                  # jekyll serve + webpack watch, one Ctrl-C stops both
 just serve demo
+just serve www
+just serve admin
 just serve services-up [-d]      # what the API talks to: aspire dashboard, azurite, postgres. No binacle-net
 just serve services-down [-v]    # only needed after -d; Ctrl-C is enough otherwise
 ```
@@ -50,10 +52,10 @@ one `-v` in either place that empties it.
 
 A test name is derived, never chosen - `<lang>_<project>_<kind>`, where the project segment is the assembly,
 package or gem name lowercased with dots turned to dashes. The single tests are private, so completion offers
-the three groups; `just test` with no argument prints every name.
+the groups only; `just test` with no argument lists them, and `tooling/tests.just` has every single name.
 
 ```bash
-just test                        # the three groups, then every name
+just test                        # list the groups
 just test all                    # everything that needs nothing brought up
 just test image                  # the ones the Docker image ships
 just test sites                  # the ones a Jekyll site ships
@@ -100,7 +102,10 @@ the detail**.
 
 ```bash
 just openapi generate [dir]      # write artifacts/openapi/Binacle.Net_v3.json and _v4.json
+just openapi generate-service    # the ServiceModule's document, into artifacts/openapi-service/
 just openapi lint [dir]          # generate, then Spectral them against openapi.spectral.yaml
+just openapi check-all-copies    # every committed copy of a document matches a fresh generate
+just openapi sync-all-copies     # rewrite the copies from a fresh generate
 just agents all                  # rewrite every .agents/**/_index.md
 ```
 
@@ -240,9 +245,9 @@ would tag `binacle-net:local` while the stacks went on using the image you asked
 
 Two halves. `tooling/smoke/structure.yaml` is read straight from the image - the shipped config files,
 `/app/data` ownership, the OCI labels. It has nothing to do with which stack is up, so `all` runs it once rather
-than once per profile. The other half is one `.hurl` per profile, run against a running stack. The four profiles
-- `minimal`, `quickstart`, `prod`, `service`, `full` - are declared in the `profiles` variable at the top of
-`smoke.just`, and each one is also a folder name under `samples/docker/`.
+than once per profile. The other half is one `.hurl` per profile, run against a running stack. The profiles are
+declared in the `profiles` variable at the top of `smoke.just`, and each one is also a folder name under
+`samples/docker/`.
 
 Editing a `.hurl` is the one case for the private recipe: `just smoke up prod`, then
 `just smoke::_test_profile prod` as many times as you need, then `just smoke down prod -v`.
@@ -298,9 +303,9 @@ ones that write a run summary fall back to the screen. **[`ci/README.md`](ci/REA
 ## ☁️ Cloudflare
 
 `cloudflare/` holds one wrangler config per site - `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and
-`www.wrangler.jsonc`. They are **not** run from here: the three `Deploy ... Site` workflows call
-`wrangler deploy --config` against them, all manual (`workflow_dispatch`) and all tagging the commit they
-published.
+`www.wrangler.jsonc`. They are **not** run from here: the `Deploy Site` workflow, with the site chosen at
+dispatch, calls `wrangler deploy --config` against the matching one, by hand only (`workflow_dispatch`) and
+tagging the commit it published.
 
 Each config points at the folder the build already wrote - `artifacts/docs`, `artifacts/demo`,
 `artifacts/www` - so a deploy uploads whatever `just build docs` last produced. That path is relative to the config file and has to match

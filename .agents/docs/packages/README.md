@@ -1,7 +1,7 @@
 ---
 id: packages
-description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-09-10
+description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching.
+verified: 2026-09-18
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
@@ -14,15 +14,17 @@ paths:
 
 # Packages
 
-npm workspaces at the repo root. All five are `private: true` — none is published to npm, and all five are
-TypeScript with no build step of their own: `main` points at a `.ts` entry and each host compiles the source
-with its own webpack + ts-loader. `binacle-compact-notation` and `binacle-net-client` put that entry at
-`src/index.ts`; the other three keep an `index.ts` barrel at the package root.
+npm workspaces at the repo root. Every one is `private: true` — none is published to npm, and every one is
+TypeScript with no build step of its own: `main` points at a `.ts` entry and each host compiles the source
+with its own webpack + ts-loader. `binacle-compact-notation`, `binacle-net-client` and
+`binacle-net-service-client` put that entry at `src/index.ts`; the other three keep an `index.ts` barrel at
+the package root.
 
 | Package | Description |
 |---|---|
 | `binacle-net-ui` | Alpine.js + Three.js frontend for the packing demo and ViPaq decoder — see `$packages/binacle-net-ui` |
 | `binacle-net-client` | Hand-written TypeScript client for the v4 API, with a committed copy of the OpenAPI document and a contract test against it — see `$packages/binacle-net-client` |
+| `binacle-net-service-client` | **Experimental, local only.** The same shape as `binacle-net-client`, for the ServiceModule's token and admin routes, with its own committed document and contract test. Its one host is `sites/admin`, which nothing builds or deploys |
 | `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) and `binacle-net-ui` (its sample generator) |
 | `cookies` | Cookie read/write utility (based on js-cookie v3.0.5, MIT) |
 | `theme-switcher` | Light/dark theme switching — the custom element and the pre-paint read |
@@ -126,12 +128,14 @@ the server and the browser cannot disagree.
 |---|---|---|
 | `packages/binacle-compact-notation` | the notation parser/formatter, `tests/compactNotation.test.ts` | `just test ts_binacle-compact-notation_unit` |
 | `packages/binacle-net-ui` | the randomizer, the view models and every Alpine component bar the visualizer | `just test ts_binacle-net-ui_unit` |
+| `packages/binacle-net-client` | the contract test against the committed v4 document | `just test ts_binacle-net-client_unit` |
+| `packages/binacle-net-service-client` | the contract test against the committed service document | `just test ts_binacle-net-service-client_unit` |
 | `packages/cookies` | the converter round trip, get/set/remove, attribute stringifying | `just test ts_cookies_unit` |
 | `packages/theme-switcher` | connect, click, the control and its labels, `system`, the swap, the host settings, the pre-paint read, and the cookie over plain http | `just test ts_theme-switcher_unit` |
 | `vipaq/packages/binacle-vipaq` | the ViPaq TS mirror, including the shared cross-language vectors | `just test ts_binacle-vipaq_unit` |
 
 The compact-notation alias is filed under **shared**, not packages, because that package mirrors a
-`shared/src` C# project; the other three are named after the folder they live in.
+`shared/src` C# project; the others are named after the folder they live in.
 
 **All three new suites run on jsdom**, so their configs add `jest-environment-jsdom` (jest 29 does not
 bundle it). `cookies` and `theme-switcher` also point jsdom at an `https` URL, because the cookies defaults

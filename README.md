@@ -59,9 +59,11 @@ searches for 3D bin packing, so that is the term used here.
 ├── /shared       # Shared test kernel and benchmark data
 ├── /packages     # JavaScript/TypeScript packages (npm workspaces)
 ├── /ruby         # Ruby gems - Jekyll plugins for the sites
-├── /sites        # Every published site (Jekyll)
+├── /sites        # Every site (Jekyll)
+│   ├── /www      # binacle.net
 │   ├── /docs     # Documentation site
-│   └── /demo     # Binacle.Net demo site
+│   ├── /demo     # Binacle.Net demo site
+│   └── /admin    # Experimental, local only - never deployed
 ├── /samples      # Docker Compose and Kubernetes deployment samples
 ├── /tooling      # Every task the repo can run - just modules, scripts, local compose
 ├── /assets       # Shared static assets copied into the sites at build time

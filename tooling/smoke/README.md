@@ -22,7 +22,7 @@ port or runtime. All packaging and wiring, none of it C# logic, which is why the
 
 | File | Read by | What it is |
 |---|---|---|
-| `structure.yaml` | `container-structure-test` | The image's static content - shipped files, absent files, permissions, metadata, OCI labels. 31 assertions |
+| `structure.yaml` | `container-structure-test` | The image's static content - shipped files, absent files, permissions, metadata, OCI labels |
 | `<profile>.hurl` | `hurl` | The HTTP surface for one profile, run against a running stack |
 | `<profile>.yml` | `docker compose` | The stack for one profile - the image plus the env that defines it |
 
@@ -116,7 +116,7 @@ nothing, or a red that reads as a flake.
   case-insensitive; feature flags are not.
 - **Redirects are off** (hurl's default), so request the real pages: `/swagger/` 301s to `index.html`, and
   `/scalar` 302s to `/scalar/`. A stray HTTPS redirect surfaces as a 307 rather than a connection error.
-- **`prod` and `full` raise `RateLimiter__ApiUsageAnonymous`.** The shipped anonymous limit is 60 requests an
+- **`service` and `full` raise `RateLimiter__ApiUsageAnonymous`.** The shipped anonymous limit is 60 requests an
   hour in a bucket that decays, so two runs ten minutes apart would go red on 429s. Presence of the setting is
   packaging; the number is behaviour, and behaviour belongs to the integration suite.
 - **Use a real GUID for the admin 401 check.** `Guid.Empty` is rejected as invalid (422) before the lookup ever

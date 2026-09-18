@@ -4,7 +4,7 @@ Measured evidence for the project: benchmark output, packing-efficiency analysis
 Kept in the repo so a change can be diffed against a known baseline, and so there is one place to point at when
 showing how a result was reached. These are **records, not source**. Nothing reads them at build time.
 
-Organized by slice, the same way `docs/` is:
+Organized by slice, the same way the repo root is:
 
 | Folder | What |
 |---|---|

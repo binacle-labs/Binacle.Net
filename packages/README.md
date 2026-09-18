@@ -31,9 +31,10 @@ between them. Its leaf is named after `shared` for that reason, not after this f
 
 ## 🌐 Who imports them
 
-The two sites and the API's UI module pull them in by package name and webpack bundles them:
+The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
-the packing demo and the ViPaq decoder, and all three use `theme-switcher`. Nothing is copied: the import
+the packing demo and the ViPaq decoder, those two and [`sites/www`](../sites/www) use `theme-switcher`, and
+the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`. Nothing is copied: the import
 resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 

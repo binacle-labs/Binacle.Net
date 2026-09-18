@@ -72,8 +72,8 @@ github-release tag section commit:
     @tooling/ci/github-release.sh {{ quote(tag) }} {{ quote(section) }} {{ quote(commit) }}
 
 # Write the release's run summary: version, digest, public tags
-release-summary version digest tag url tags:
-    @tooling/ci/release-summary.sh {{ quote(version) }} {{ quote(digest) }} {{ quote(tag) }} {{ quote(url) }} {{ quote(tags) }}
+release-summary version digest tag url tags ref:
+    @tooling/ci/release-summary.sh {{ quote(version) }} {{ quote(digest) }} {{ quote(tag) }} {{ quote(url) }} {{ quote(tags) }} {{ quote(ref) }}
 
 # Pull a published image - prints digest=sha256:...
 pull-image image:

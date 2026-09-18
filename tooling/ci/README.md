@@ -20,14 +20,14 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `create-tag.sh` | Tags a commit through the API - the deploy marker; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
 | `sonar-summary.sh` | Writes the SonarCloud quality gate to the run summary |
-| `check-release-ref.sh` | Passes only if a release was dispatched on `main`, or a prerelease on `main` or a `release/*` branch |
+| `check-release-ref.sh` | Passes only if a release was dispatched on `main`, or a prerelease on `main` or on the `release/v<x>-<y>-<z>` branch named after its version |
 | `check-version.sh` | Passes only if the version is semver shaped, with no leading `v` |
 | `check-release-tag.sh` | Passes only if the tag is free, or already points at this commit |
 | `changelog-section.sh` | Which `CHANGELOG.md` section a version publishes. Prints `name=...` |
 | `moving-tags.sh` | Which public tags move, given the one that never does. Prints `moving=...` |
 | `copy-tags.sh` | Copies one image to one or more tags by digest, then proves each reads back as it |
 | `github-release.sh` | Creates the release, making the tag on the commit, or replaces the body of one that exists |
-| `release-summary.sh` | The release's run summary: version, digest, public tags |
+| `release-summary.sh` | The release's run summary: version, digest, public tags, the release link and the verify command - the GHCR form for a prerelease |
 | `pull-image.sh` | Pulls a published image. Prints `digest=sha256:...` |
 | `smoke-summary.sh` | The smoke's run summary: image, digest, each check |
 | `codeql-summary.sh` | Counts the open code scanning alerts by severity |

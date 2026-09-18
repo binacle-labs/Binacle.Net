@@ -18,7 +18,7 @@ feature check, so with the flag off none of this is registered and nothing here 
 | `Pages/` | Every page - `Index`, `Packing`, `Vipaq`, `Instance`, `Error` - and the chrome under `Pages/Shared/` |
 | `Models/`, `Services/` | The applet list the cards and the navigation are built from, and the instance page's switch list |
 | `_sass/` | The stylesheet source, compiled to `wwwroot/css/main.css` |
-| `_js/` | The four webpack entries, bundled into `wwwroot/js/` |
+| `_js/` | The webpack entries, one per page, bundled into `wwwroot/js/` |
 | `wwwroot/` | Generated. Never edit anything in here |
 
 | Route | What it serves |

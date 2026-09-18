@@ -54,6 +54,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-net-client_unit
 
+      # Bundled by sites/admin alone, which is local only - but a site is what bundles it, so it runs here.
+      - name: Test - binacle-net-service-client
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-net-service-client_unit
+
       - name: Test - binacle-net-ui
         if: ${{ !cancelled() }}
         run: just test ts_binacle-net-ui_unit

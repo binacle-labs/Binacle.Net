@@ -18,7 +18,7 @@ handed to shellcheck. A `.sh` file is both.
 ## 🚀 How you run one
 
 Through the `test` module: `just test cs_binacle-lib_unit`, `just test rb_jekyll-filters_unit`,
-`just test ts_cookies_unit`. `just test` with no argument prints every name.
+`just test ts_cookies_unit`. `just test` with no argument lists the groups; the single names are in `tooling/tests.just`.
 
 Each runner has two modes. With `COVERAGE_FORMAT` unset it runs the tests and nothing else. With it set to
 `cobertura` or `sonar` the same run also writes a test report to `artifacts/tests/` and a coverage file to

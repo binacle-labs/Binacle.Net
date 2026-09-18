@@ -28,7 +28,7 @@ Split by source family, mirroring `shared/data`:
 
 - `custom-problems/` - `baseline`, `complex`, `simple`.
 - `bischoff-suite/` - `orlib_thpack1` .. `orlib_thpack7` (BR1-BR7).
-- `demo-samples/` - the demo site's sample set, `01-opening-set` .. `20-wfd-wins`.
+- `demo-samples/` - the demo site's sample set, one per file under `shared/data/demo-samples/`.
 
 The **algorithm** rides on the file name as a `.<algo>` suffix, not a folder, e.g. `orlib_thpack1.ffd.json`.
 Every algorithm the packer offers is generated: `.ffd.json`, `.wfd.json` and `.bfd.json`, side by side in the

@@ -12,9 +12,9 @@ paths:
 
 # Branch builds go to the staging registry
 
-**The prerelease half of this plan landed on 2026-09-14.** A prerelease now stops at `ghcr.io/binacle-labs/binacle-net`
-after the smoke - no Docker Hub copy, no tag, no GitHub release - and the reasoning is in the CI/CD decisions
-ledger. GHCR is the staging repository; the second public Docker Hub repository this plan used to propose is
+**The prerelease half of this plan landed on 2026-09-14.** A prerelease's image now stops at
+`ghcr.io/binacle-labs/binacle-net` after the smoke - no Docker Hub copy - and since 2026-09-18 it still gets
+its git tag and a GitHub prerelease; the reasoning is in the CI/CD decisions ledger. GHCR is the staging repository; the second public Docker Hub repository this plan used to propose is
 not needed, because GHCR is already public and needs no new credential. **What is left is branch builds.**
 
 **The rule worth having, and it is simpler than a retention policy:** a tag in the release repository is a

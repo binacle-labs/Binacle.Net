@@ -14,10 +14,10 @@ one** - most of what looks odd here was deliberate.
 
 | Workflow | Fires on | What it does |
 |---|---|---|
-| `pull-request.yml` | Every pull request | Works out what changed, then runs the image tests, an image build, the site tests, the three site builds and the workflow lint. Its `gate` job is the only name branch protection holds |
-| `release-docker-image.yml` | By hand, with the version typed in | The release: gate the version, tests, build and push to GHCR, smoke, copy to Docker Hub by digest, then the git tag, the GitHub release and the Docker Hub page |
+| `pull-request.yml` | Every pull request | Works out what changed, then runs the image tests, an image build, the site tests, the site builds with an offline link check, and the workflow lint. Sonar runs beside them and reports only. Its `gate` job is the only name branch protection holds |
+| `release-docker-image.yml` | By hand, with the version typed in | The release: gate the version, tests, build and push to GHCR, smoke, copy to Docker Hub by digest, then the git tag, the GitHub release and the Docker Hub page. A prerelease version, from `main` or its `release/` branch, stops on GHCR: tag and a GitHub prerelease, nothing on Docker Hub |
 | `deploy-site.yml` | By hand, choosing `docs`, `demo` or `www` | Runs the site tests, builds the chosen site, checks its links offline, deploys to Cloudflare, tags the commit it published |
-| `sonar-analysis.yml` | By hand | Coverage to SonarCloud. Keep Automatic Analysis off in the Sonar UI - the two fight |
+| `sonar-analysis.yml` | By hand, and from every pull request that touches code | Coverage to SonarCloud. Keep Automatic Analysis off in the Sonar UI - the two fight |
 | `codeql-analysis.yml` | Merge to `main`, weekly, by hand | Code scanning. Findings land in the Security tab, not on a check |
 
 ## 🔄 The `shared-` files

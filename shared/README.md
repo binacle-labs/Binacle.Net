@@ -36,7 +36,7 @@ depend on.
 
 | Folder | What it provides |
 |---|---|
-| `Models/` | `TestBin`, `TestItem`, `TestOperationParameters`, `Dimensions` - concrete types implementing the `IWith*` interfaces for use in tests |
+| `Models/` | `TestBin`, `TestItem`, `TestOperationParameters` - concrete types implementing the `IWith*` interfaces for use in tests |
 | `Algorithms/` | `ScenarioCollectionsProvider`, `MultipleScenarioCollectionsProvider`, `ScenarioReader`, `CollectionKeys` - load and expose the JSON scenario data as xUnit `[MemberData]` |
 | `Files/` | `EmbeddedResourceFile`, `EmbeddedResourceFileProvider` - read embedded JSON scenario files from the assembly |
 | `TestAlgorithmFactory.cs` | Delegate-based factory for constructing algorithm instances directly in unit tests |
@@ -64,8 +64,8 @@ Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Ru
 
 The markdown report writer behind the performance suites. Register `ITest` implementations and an
 `IFileWriter` in DI, and `TestRunner` runs each test, logs it, and groups the results into one file per report.
-Used by `lib/test/Binacle.Lib.PerformanceTests`, `vipaq/test/Binacle.ViPaq.PerformanceTests` and both data
-generators. The reports it writes are the ones committed under [`results/`](../results).
+Used by `lib/test/Binacle.Lib.PerformanceTests`, `vipaq/test/Binacle.ViPaq.PerformanceTests` and every data
+generator under `shared/tools/` and `vipaq/tools/`. The reports it writes are the ones committed under [`results/`](../results).
 
 ### 🔤 `Binacle.CompactNotation.UnitTests`
 
