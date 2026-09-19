@@ -1,8 +1,8 @@
 ---
 id: lib/decisions
 description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two tests kernels, and the open parallelization question.
-verified: 2026-08-27
-check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by Binacle.TestsKernel.csproj match the key sets in Algorithms/CollectionKeys.cs
+verified: 2026-09-19
+check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/Scenarios.cs and CustomProblems/Scenarios.cs
 also_update:
   - lib/findings
 paths:
@@ -71,31 +71,32 @@ with no reference of its own. Removing it surfaced an undeclared dependency rath
 in this project names the assembly" proves the reference is unused by that project, not that it is unused; only
 a build after removal proves that.
 
-### D3 — two tests kernels, split by who reads the fixtures
+### D3 — two data hubs, split by who reads the fixtures
 
-Split on 2026-08-13. `shared/test/Binacle.TestsKernel` keeps the algorithm fixtures, which the api integration
-suite reads in 25 files as well as the lib tests. `lib/test/Binacle.Lib.TestsKernel` holds result selection,
+Split on 2026-08-13. `shared/data/Binacle.Data` (the shared tests kernel until 2026-09-19) keeps
+the algorithm fixtures, which the api integration suite reads in 25 files as well as the lib tests. `lib/test/Binacle.Lib.TestsKernel` holds result selection,
 which **nothing outside the lib slice reads**, so its fixtures live in `lib/data` rather than `shared/data`.
 
 **The rule that falls out:** a fixture set lives in `shared/data` when more than one slice reads it, and in the
-slice otherwise. Bischoff and custom-problems qualify twice over — two slices read them through the kernel, and
+slice otherwise. Bischoff and custom-problems qualify twice over — two slices read them through it, and
 the ViPaq packed-data generator reads the same files by path at run time — so they stay put. ViPaq had already
 settled this shape with its own `vipaq/data/packed`.
 
 **`shared/data/demo-samples/` was added under the same rule and is the awkward case.** Three consumers, and
-none of them is a C# test through this kernel: the demo component generates its sample set from it, the ViPaq
-packed-data generator packs it, and the shared kernel embeds it but names no collection key for it, so
-`AllScenariosProvider` does not include it. **The embed is currently reachable and unread** — the files land
-in `ScenarioCollectionsProvider.Collections` under `demosamples/<name>` and nothing asks for them.
+none of them is a C# test through `Binacle.Data`: the demo component generates its sample set from it, the
+ViPaq packed-data generator packs it, and `Binacle.Data` embeds it but names no key set for it, so `All` does
+not include it. **The embed is currently reachable and unread** — the files land in
+`ScenarioCollectionsProvider.Collections` under `demosamples/<name>` and nothing asks for them.
 
 **The friend grant is preferred to a shared bin model.** `OperationResultHelper` bridges through Packing's
 internal `Dimensions` rather than taking a bin type from the shared algorithm kernel. Reaching for that kernel
-would give the lib fixture hub a dependency on fixtures it never reads, to borrow one type (`TestBin`).
+would give the lib fixture hub a dependency on fixtures it never reads, to borrow one type (`ScenarioBin`).
 
-**Each kernel owns its own embedded-resource reader.** `Assembly.GetExecutingAssembly()` resolves to the
-assembly holding the data, so one shared reader would look in the wrong assembly and find nothing. The three
-kernels' `IFile` shapes have diverged for the same reason, which is why a "common test library" for file access
-is the wrong move rather than a missing one.
+**One embedded-resource reader, and the caller names the assembly. Superseded 2026-09-19.** Until then each
+kernel owned a copy, because `Assembly.GetExecutingAssembly()` inside a shared reader resolves to the shared
+assembly, which embeds nothing. `Binacle.Data`'s `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)`
+takes the assembly instead, so that failure cannot happen, and hands the manifest name back unsplit so each
+data project keeps its own name shape. The lib kernel's copy goes when it moves to that reader.
 
 **The manifest prefix names the purpose, not the assembly.** `ResultSelection.<case>.<file>`, following ViPaq's
 `PackedData.<family>.<file>`, so an assembly rename cannot silently break the manifest. A broken manifest name

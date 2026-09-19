@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection tests kernel, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-08-27
+verified: 2026-09-19
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -27,9 +27,9 @@ Binacle.Packing ─────────────────────�
    │      ▲   [IVT → UnitTests, Benchmarks, PerformanceTests]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
-   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, TestsKernel, Lib.TestsKernel
-   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, TestsKernel, Lib.TestsKernel
-   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, TestsKernel, TestReporting
+   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Binacle.Data, Lib.TestsKernel
+   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Binacle.Data, Lib.TestsKernel
+   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Binacle.Data, TestReporting
    │
    └── Binacle.Lib.TestsKernel ──────────┘   result-selection fixture hub (lib/test)
           refs: Binacle.Packing, Binacle.CompactNotation
@@ -42,11 +42,11 @@ Binacle.Packing ─────────────────────�
 |---|---|---|---|---|
 | `Binacle.Lib` | library | Packing | grants IVT to its three test projects | the algorithms, processors, result selection |
 | `Binacle.Lib.TestsKernel` | library | Packing, CompactNotation | sees Packing's | result-selection fixtures + providers |
-| `Binacle.Lib.UnitTests` | xUnit exe | Lib, TestsKernel, Lib.TestsKernel | yes | algorithm/result unit tests |
-| `Binacle.Lib.Benchmarks` | exe | Lib, TestsKernel, Lib.TestsKernel | yes | BenchmarkDotNet timings |
-| `Binacle.Lib.PerformanceTests` | exe | Lib, TestsKernel, TestReporting | yes | markdown perf reports |
+| `Binacle.Lib.UnitTests` | xUnit exe | Lib, Binacle.Data, Lib.TestsKernel | yes | algorithm/result unit tests |
+| `Binacle.Lib.Benchmarks` | exe | Lib, Binacle.Data, Lib.TestsKernel | yes | BenchmarkDotNet timings |
+| `Binacle.Lib.PerformanceTests` | exe | Lib, Binacle.Data, TestReporting | yes | markdown perf reports |
 
-`TestsKernel` above is the shared algorithm kernel in `shared/test`; `Lib.TestsKernel` is this slice's own.
+`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.TestsKernel` is this slice's own.
 
 ## Notes
 
@@ -60,10 +60,11 @@ Binacle.Packing ─────────────────────�
    `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`, which is a generator run by hand rather than anything
    that ships.
 
-2. **Two tests kernels, split by audience.** The shared `Binacle.TestsKernel` holds the algorithm fixtures, which
-   the api integration suite reads too. `Binacle.Lib.TestsKernel` holds result selection, which nothing outside
-   this slice reads — so its fixtures live in `lib/data` and it embeds them itself. Each kernel owns its own
-   embedded-resource reader because `Assembly.GetExecutingAssembly()` resolves to the assembly holding the data.
+2. **Two data hubs, split by audience.** The shared `Binacle.Data` holds the algorithm scenarios, which the
+   api integration suite reads too. `Binacle.Lib.TestsKernel` holds result selection, which nothing outside
+   this slice reads — so its fixtures live in `lib/data` and it embeds them itself. The embedded-resource
+   reader is `Binacle.Data`'s and takes the assembly to read from; the lib kernel still carries a copy until
+   it moves to that one.
 
 3. **The friend grant is what lets the kernel fabricate results.** `Binacle.Packing`'s result models have internal
    constructors; `Binacle.Lib.TestsKernel` builds them from compact strings, and uses Packing's internal

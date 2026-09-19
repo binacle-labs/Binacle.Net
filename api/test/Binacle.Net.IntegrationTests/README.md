@@ -23,7 +23,7 @@ Each of those folders holds up to **two** files, and the split is the point (a p
 | `...Scenario.cs` | What the packer actually returns, run against the shared fixture corpus | `[Trait("Scenario Tests", ...)]` |
 
 Behaviour tests build their request inline and assert the response code. Scenario tests take their cases from
-the shared test kernel in [`shared/test/Binacle.TestsKernel`](../../../shared/test/Binacle.TestsKernel) as
+the shared scenario project in [`shared/data/Binacle.Data`](../../../shared/data/Binacle.Data) as
 xUnit `[MemberData]`, so the API and the lib are graded against the same problems.
 
 The shared behaviour assertions - `Request_Returns_200Ok`, `Request_Returns_422UnprocessableContent` and the

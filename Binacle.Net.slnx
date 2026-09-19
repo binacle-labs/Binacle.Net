@@ -85,6 +85,9 @@
     <Project Path="vipaq/tools/Binacle.ViPaq.VectorGenerators/Binacle.ViPaq.VectorGenerators.csproj" />
     <Project Path="vipaq/tools/Binacle.ViPaq.PackedDataGenerator/Binacle.ViPaq.PackedDataGenerator.csproj" />
   </Folder>
+  <Folder Name="/shared/data/">
+    <Project Path="shared/data/Binacle.Data/Binacle.Data.csproj" />
+  </Folder>
   <Folder Name="/shared/src/">
     <Project Path="shared/src/Binacle.CompactNotation/Binacle.CompactNotation.csproj" />
     <Project Path="shared/src/Binacle.FluxResults/Binacle.FluxResults.csproj" />
@@ -95,7 +98,6 @@
     <Project Path="shared/test/Binacle.CompactNotation.UnitTests/Binacle.CompactNotation.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.FluxResults.UnitTests/Binacle.FluxResults.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.TestReporting/Binacle.TestReporting.csproj" />
-    <Project Path="shared/test/Binacle.TestsKernel/Binacle.TestsKernel.csproj" />
   </Folder>
   <Folder Name="/shared/tools/">
     <Project Path="shared/tools/Binacle.OrLibrary.Converter/Binacle.OrLibrary.Converter.csproj" />

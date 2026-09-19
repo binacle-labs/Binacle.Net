@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-08-27
+verified: 2026-09-19
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -142,7 +142,13 @@ The two things we measure depend on different properties of the data.
 
 The contrast itself (synthetic inflates, real saves 45–68%) is a keep-it finding, not a bug.
 
-### D10 — ViPaq test kernel owns its file plumbing; no shared TestFiles (CONFIRMED 2026-07-09)
+### D10 — ViPaq test kernel owns its file plumbing; no shared TestFiles (CONFIRMED 2026-07-09, SUPERSEDED 2026-09-19)
+**Superseded.** `shared/data/Binacle.Data` now holds one reader, `EmbeddedResourceFileProvider.ByPrefix(assembly,
+prefix)`, that takes the assembly to read from and hands the manifest name back unsplit. That is the shape this
+decision asked for - share the enumeration, not the parse - with the wrong-assembly failure removed at the
+call. The ViPaq kernel keeps its copy until it moves to that reader. The record below is why the earlier
+shared copy was reverted.
+
 An earlier session extracted the embedded-file plumbing into a shared `shared/test/Binacle.TestFiles` so both the
 shared kernel and the ViPaq kernel could use it. **Reverted.** The only genuinely shared part is ~15 lines of
 "enumerate manifest resources by prefix"; the *parse* differs — ViPaq's name is `<family>.<name>.<algorithm>`, the

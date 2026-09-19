@@ -30,7 +30,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Binacle.Net\Binacle.Net.csproj" />
 		<ProjectReference Include="..\..\..\shared\src\Binacle.Packing\Binacle.Packing.csproj" />
-		<ProjectReference Include="..\..\..\shared\test\Binacle.TestsKernel\Binacle.TestsKernel.csproj" />
+		<ProjectReference Include="..\..\..\shared\data\Binacle.Data\Binacle.Data.csproj" />
 	</ItemGroup>
 
 </Project>

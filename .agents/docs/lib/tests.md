@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-04
+verified: 2026-09-19
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
 also_update:
   - shared
@@ -15,7 +15,7 @@ paths:
 # Lib Tests
 
 Four projects under `lib/test/`, one of them a fixture kernel rather than a suite. Algorithm scenario data and
-the `TestAlgorithmFactory<>` delegate come from the shared kernel — see shared (`$shared`). The
+the `TestAlgorithmFactory<>` delegate come from the shared `Binacle.Data` project — see shared (`$shared`). The
 **result-selection** fixtures come from this slice's own `Binacle.Lib.TestsKernel`, which embeds
 `lib/data/result-selection` under the manifest prefix `ResultSelection.` — it is here rather than in `shared`
 because nothing outside this slice reads it (`$lib/dependencies`).
@@ -31,7 +31,7 @@ because nothing outside this slice reads it (`$lib/dependencies`).
 
 `AlgorithmFactories.cs` (in this project) defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics —
 `FFD_v1/_v2`, `WFD_v1/_v2`, `BFD_v1/_v2` — each constructing the algorithm directly
-(`new FirstFitDecreasing_v2<TestBin, TestItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
+(`new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
 This keeps every version (including v1) under test without coupling it to the production factory.
 
 Both fixtures split arrange, act and assert into separate members, so a test body shows all three steps
@@ -45,7 +45,7 @@ OperationResult Run(TestAlgorithmFactory<IPackingAlgorithm> factory, Scenario sc
 void AssertResult(Scenario scenario, OperationResult result)
 ```
 
-`GetScenarioByName` resolves from the kernel's `Algorithms` `AllScenariosProvider`. `Run` builds the algorithm
+`GetScenarioByName` resolves from `Binacle.Data.All`. `Run` builds the algorithm
 and calls `Execute(parameters)`, checking nothing. `AssertResult` does both checks — `Metrics` pins how the
 algorithm got there, `Result` pins where it landed — and is marked `[AssertionMethod]` so the analyser knows
 where the assertion lives:

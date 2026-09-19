@@ -1,6 +1,7 @@
 # Custom Problems
 
-Hand-authored packing problems, for the **tests kernel** (lib algorithm tests). Not used by ViPaq.
+Hand-authored packing problems, read through `Binacle.Data` by the lib algorithm tests and the api integration
+tests. Not used by ViPaq.
 
 Unlike the Bischoff suite these have no OR-Library origin. They are small, deliberately-shaped cases we
 wrote to cover specific behaviours (a box that just fits, a tight multi-item pack, and so on). Grouped into:
@@ -11,7 +12,7 @@ wrote to cover specific behaviours (a box that just fits, a tight multi-item pac
 
 ## 🧾 Format
 
-Same tests-kernel compact scenario format as the [Bischoff suite](../bischoff-suite/README.md):
+Same compact scenario format as the [Bischoff suite](../bischoff-suite/README.md):
 
 ```json
 {
@@ -35,5 +36,5 @@ Same tests-kernel compact scenario format as the [Bischoff suite](../bischoff-su
 hand-set per case (these problems are authored, not converted from a source). Every problem here is small
 enough that all three algorithms land on the same answer, so each names the same pair three times. This folder
 is the single source:
-the tests kernel embeds these files directly (via `Link`/`LogicalName` in `Binacle.TestsKernel.csproj`) under the
-manifest name `Binacle.TestsKernel.Algorithms.Data.CustomProblems.<file>`, so there is no separate kernel copy.
+`Binacle.Data` embeds these files directly (via `Link`/`LogicalName` in `Binacle.Data.csproj`) under the
+manifest name `Binacle.Data.CustomProblems.<file>`, so there is no separate copy.

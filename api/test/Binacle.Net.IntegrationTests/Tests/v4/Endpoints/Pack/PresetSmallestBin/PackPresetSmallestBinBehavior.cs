@@ -2,7 +2,8 @@ using System.Text.Json.Nodes;
 using Binacle.Net.IntegrationTests.v4.Abstractions;
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Pack;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.CustomProblems;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetSmallestBin;
 
@@ -91,7 +92,7 @@ public class PackPresetSmallestBinBehavior : BehaviourTestsBase
 	[Fact(DisplayName = $"POST {routePath}. Returns A Single Bin From The Preset")]
 	public Task Post_ReturnsSingleBinFromPreset()
 		=> base.PackRequest_Validate(UrlFor(PresetKeys.CustomProblems), this.sampleRequest,
-			result => CustomProblemsScenarioProvider.GetDistinctBinIds().ShouldContain(result.Bin.ID));
+			result => Scenarios.GetDistinctBinIds().ShouldContain(result.Bin.ID));
 
 	[Fact(DisplayName = $"POST {routePath}. With Algorithm FFD, Returns AlgorithmUsed FFD")]
 	public async Task Post_WithAlgorithmFFD_ReturnsAlgorithmUsedFFD()
@@ -116,7 +117,7 @@ public class PackPresetSmallestBinBehavior : BehaviourTestsBase
 		};
 		await base.PackRequest_Validate(UrlFor(PresetKeys.CustomProblems), request, result =>
 		{
-			result.Bin.ID.ShouldBe(CustomProblemsScenarioProvider.GetSmallestBin().ID);
+			result.Bin.ID.ShouldBe(Scenarios.GetSmallestBin().ID);
 			result.Status.ShouldBe(BinPackResultStatus.FullyPacked);
 		});
 	}

@@ -5,7 +5,7 @@ waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike 
 horizon: future
 paths:
   - "shared/data/**"
-  - "shared/test/Binacle.TestsKernel/**"
+  - "shared/data/Binacle.Data/**"
 ---
 
 # Fixtures record status, not how full the bin got

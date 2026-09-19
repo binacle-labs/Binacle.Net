@@ -3,7 +3,7 @@ using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
 using Binacle.Lib.Benchmarks.Order;
 using Binacle.Lib.Benchmarks.Providers;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
 
@@ -21,8 +21,8 @@ public abstract class AlgorithmParallelizationThresholdBenchmarkBase
     [Params(3, 7, 13, 17, 23, 29, 37, 47, 59, 67, 79)]
     public int ItemCount { get; set; }
     
-    public TestBin Bin { get; set; } = null!;
-    public List<TestItem> Items { get; set; } = null!;
+    public ScenarioBin Bin { get; set; } = null!;
+    public List<ScenarioItem> Items { get; set; } = null!;
 	
     protected abstract AlgorithmOperation AlgorithmOperation { get; }
     protected abstract IAlgorithmFactory AlgorithmFactory { get; }
@@ -33,7 +33,7 @@ public abstract class AlgorithmParallelizationThresholdBenchmarkBase
         var algorithms = this.Algorithms.Split(',').Select(Enum.Parse<Algorithm>).ToArray();
         this.loopAlgorithmProcessor = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
         this.parallelAlgorithmProcessor = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory, this.ProcessorCount);
-        this.Bin = TestBin.FromCompactString(SpecializedScalingProblemsProvider.MaxSizeBin);
+        this.Bin = ScenarioBin.FromCompactString(SpecializedScalingProblemsProvider.MaxSizeBin);
         this.Items = SpecializedScalingProblemsProvider.GetItems(this.ItemCount);
     }
 	

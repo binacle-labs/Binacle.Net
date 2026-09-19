@@ -1,7 +1,7 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-09-04
+verified: 2026-09-19
 check: Project list and test aliases match the solution
 also_update:
   - lib/tests
@@ -50,7 +50,7 @@ scenario data format and providers.
 
 ## Dependencies
 
-The composition-root rule (only `Binacle.Net` references the packer) and the two tests kernels are in
+The composition-root rule (only `Binacle.Net` references the packer) and the two data hubs are in
 `$lib/dependencies`.
 
 ## Concepts

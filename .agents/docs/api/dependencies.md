@@ -1,7 +1,7 @@
 ---
 id: api/dependencies
 description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals.
-verified: 2026-09-04
+verified: 2026-09-19
 check: ProjectReference and InternalsVisibleTo entries in api/**/*.csproj match the graph, the table and the walls below, including every test project and the entry point's Using Include items
 paths:
   - "api/**"
@@ -38,7 +38,7 @@ Kernel  → Binacle.CompactNotation                                shared API fl
 
 Tests  (all xUnit v3, all OutputType Exe)
    UnitTests                       → Binacle.Net
-   IntegrationTests                → Binacle.Net, Binacle.Packing, Binacle.TestsKernel
+   IntegrationTests                → Binacle.Net, Binacle.Packing, Binacle.Data
    Kernel.UnitTests                → Kernel
    DiagnosticsModule.UnitTests     → DiagnosticsModule
    ServiceModule.UnitTests         → ServiceModule
@@ -59,7 +59,7 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.ServiceModule.Infrastructure` | library | Kernel, Domain | — | DB providers |
 | `Binacle.Net.UIModule` | Razor library | Kernel | — | Razor Pages demo host |
 | `Binacle.Net.UnitTests` | xUnit exe | Binacle.Net | Binacle.Net | entry-point units |
-| `Binacle.Net.IntegrationTests` | xUnit exe | Binacle.Net, Packing, TestsKernel | Binacle.Net | v3/v4 HTTP tests |
+| `Binacle.Net.IntegrationTests` | xUnit exe | Binacle.Net, Packing, Binacle.Data | Binacle.Net | v3/v4 HTTP tests |
 | `Binacle.Net.Kernel.UnitTests` | xUnit exe | Kernel | Kernel | Kernel units |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | xUnit exe | DiagnosticsModule | DiagnosticsModule | log/telemetry units |
 | `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule | auth/accounts units |

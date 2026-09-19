@@ -35,9 +35,12 @@ Support projects go first because the bench split in step 12 multiplies every co
 
 ## How a session works this plan
 
-- **One step per session; the maintainer commits between steps.** No session commits. A step is sized to be
-  one reviewable commit - a rename, a move, a split, a harness - never a line in three files and never two
-  ideas. Where a step says it is small, the maintainer may take it with the one before.
+- **A session takes one step or several; the maintainer commits between steps.** No session commits. A step
+  is sized to be one reviewable commit - a rename, a move, a split, a harness - never a line in three files
+  and never two ideas. Where a step says it is small, the maintainer may take it with the one before.
+- **A session says when it should stop.** Its judgement, not a count of steps: when its context is heavy, or
+  when the next step deserves a cold read. It says so at a step boundary, never in the middle of one, and
+  names the step a fresh session picks up. The maintainer decides whether to start a new session or go on.
 - **Pick up cold by running the gates.** Every row below has a gate: one command that is true once the step
   landed. Run them top to bottom; the first that fails is the next step. There is no progress table - the
   tree is the state, and a tick nobody verified is a claim.

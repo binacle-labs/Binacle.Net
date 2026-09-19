@@ -1,5 +1,5 @@
 ---
-description: TestsKernel - grow the shared fixture cases
+description: Binacle.Data - grow the shared fixture cases
 state: idea
 waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
 horizon: future
@@ -7,7 +7,7 @@ paths:
   - "shared/**"
 ---
 
-# TestsKernel - grow the shared fixture cases
+# Binacle.Data - grow the shared fixture cases
 
 The data move is done and the fixtures are split by consumer. What is left is growing the cases: result
 selection has the thinnest coverage in the repository, a single `baseline.json` per case, and `custom-problems`

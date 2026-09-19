@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+    <!--
+        Sourced from the sibling data folders, not from copies. LogicalName is the manifest name the reader
+        splits: "Binacle.Data.<Set>.<name>.json". Link keeps the out-of-project files under a virtual folder
+        in the IDE.
+        One flat entry per folder, never a ** wildcard: %(RecursiveDir) injects a backslash into LogicalName
+        and corrupts the manifest name.
+    -->
+    <ItemGroup>
+        <EmbeddedResource Include="..\bischoff-suite\*.json">
+            <Link>BischoffSuite\%(Filename)%(Extension)</Link>
+            <LogicalName>Binacle.Data.BischoffSuite.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="..\custom-problems\*.json">
+            <Link>CustomProblems\%(Filename)%(Extension)</Link>
+            <LogicalName>Binacle.Data.CustomProblems.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="..\demo-samples\*.json">
+            <Link>DemoSamples\%(Filename)%(Extension)</Link>
+            <LogicalName>Binacle.Data.DemoSamples.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Binacle.Packing\Binacle.Packing.csproj" />
+        <ProjectReference Include="..\..\src\Binacle.CompactNotation\Binacle.CompactNotation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Binacle.Geometry" />
+        <Using Include="Binacle.Packing" />
+    </ItemGroup>
+
+</Project>

@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Fit;
-using Binacle.TestsKernel;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.CustomProblems;
 using Binacle.Net.IntegrationTests.v4.ExtensionMethods;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Fit.CustomSmallestBin;
@@ -23,13 +23,13 @@ public class FitCustomSmallestBinScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 
 	private async Task RunTest(string scenarioName)
 	{
-		var scenario = AllScenariosProvider.GetScenarioByName(scenarioName);
+		var scenario = All.GetScenarioByName(scenarioName);
 
 		var request = new FitCustomSmallestBinRequest
 		{

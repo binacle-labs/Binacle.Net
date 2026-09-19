@@ -1,8 +1,6 @@
 using Binacle.Lib.Abstractions.Algorithms;
 using Binacle.Lib.PerformanceTests.Results;
-using Binacle.TestsKernel;
-using Binacle.TestsKernel.Models;
-using Binacle.TestsKernel.Algorithms;
+using Binacle.Data;
 using Microsoft.Extensions.Logging;
 
 namespace Binacle.Lib.PerformanceTests.Tests.BischoffSuite;
@@ -30,7 +28,7 @@ internal class EfficiencyStatisticsTests : ITest
 		this.File = file;
 		this.algorithmUnderTest = algorithmUnderTest;
 		this.logger = logger;
-		this.collectionKeys = CollectionKeys.BischoffSuite.ToArray();
+		this.collectionKeys = Binacle.Data.BischoffSuite.Scenarios.Keys;
 	}
 
 	public TestResult Run()

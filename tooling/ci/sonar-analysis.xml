@@ -77,8 +77,8 @@
        debt and stays visible. -->
   <Property Name="sonar.cpd.exclusions">lib/src/Binacle.Lib/Algorithms/**,api/src/Binacle.Net/v3/**</Property>
 
-  <!-- Build tooling, not shipped code. The .NET support projects (benchmarks, performance suites, tools and
-       the two test kernels) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
+  <!-- Build tooling, not shipped code. The .NET support projects (data, benchmarks, performance suites,
+       tools and the test support libraries) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
        that takes them out of the coverage denominator and off the product rule set in one move.
 
        SonarQubeTestProject only reaches MSBuild projects, so the five globs below do the same job for

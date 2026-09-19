@@ -1,4 +1,4 @@
-using Binacle.TestsKernel.Algorithms.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Providers;
 

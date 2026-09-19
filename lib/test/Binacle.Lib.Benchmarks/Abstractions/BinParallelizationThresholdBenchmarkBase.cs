@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.Benchmarks.Order;
 using Binacle.Lib.Benchmarks.Providers;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
 
@@ -23,8 +23,8 @@ public abstract class BinParallelizationThresholdBenchmarkBase
     [ParamsSource(typeof(ConcurrencyProvider), nameof(ConcurrencyProvider.GetProcessorCount))]
     public int ProcessorCount { get; set; }
 
-    public List<TestBin> Bins { get; set; } = null!;
-    public List<TestItem> Items { get; set; } = null!;
+    public List<ScenarioBin> Bins { get; set; } = null!;
+    public List<ScenarioItem> Items { get; set; } = null!;
 
     [GlobalSetup]
     public void GlobalSetup()

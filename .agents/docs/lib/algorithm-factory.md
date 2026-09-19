@@ -1,7 +1,7 @@
 ---
 id: lib/algorithm-factory
 description: IAlgorithmFactory — how algorithm instances are created, DI registration, and how tests construct algorithms directly
-verified: 2026-09-04
+verified: 2026-09-19
 check: The signature, constraints and switch arms match lib/src/Binacle.Lib/AlgorithmFactory.cs and both files under AlgorithmFactories/; DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; a grep for AlgorithmFactory_v1 and AlgorithmFactory_v2 over lib/ lands only in the benchmarks
 also_update:
   - lib/algorithms
@@ -59,7 +59,7 @@ services.AddSingleton<IAlgorithmFactory, AlgorithmFactory>();
 Unit tests do **not** go through `IAlgorithmFactory`. They construct algorithm instances directly via `TestAlgorithmFactory<IPackingAlgorithm>` delegates in `AlgorithmFactories.cs`:
 
 ```csharp
-AlgorithmFactories.FFD_v2 = (bin, items) => new FirstFitDecreasing_v2<TestBin, TestItem>(bin, items);
+AlgorithmFactories.FFD_v2 = (bin, items) => new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items);
 ```
 
 `CommonTestingFixture` runs all six versions (FFD/WFD/BFD × v1/v2) against every scenario.

@@ -1,5 +1,4 @@
-using Binacle.TestsKernel.Algorithms.Models;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Providers;
 
@@ -44,13 +43,13 @@ public static class SpecializedScalingProblemsProvider
         {7, ["60x40x10", "60x40x15", "60x40x20", "60x40x25", "60x40x30", "60x40x35", "60x40x40"]}
     };
     
-    public static List<TestBin> GetBins(int binCount)
+    public static List<ScenarioBin> GetBins(int binCount)
 	{
 		if (!binsByQuantity.TryGetValue(binCount, out var bins))
 		{
 			throw new ArgumentException($"Invalid bin count. Value {binCount} should be between 1 and 7.");
 		}
-		return bins.Select(TestBin.FromCompactString).ToList();
+		return bins.Select(ScenarioBin.FromCompactString).ToList();
 	}
 
     // Keyed by the running item count - each entry is the one before it plus the next item type,
@@ -84,13 +83,13 @@ public static class SpecializedScalingProblemsProvider
 	    { 79, ["2x5x10 [3]", "12x15x10 [4]", "8x8x8 [6]", "5x5x15 [4]", "10x8x8 [6]", "4x4x4 [6]", "2x15x5 [8]", "10x9x1 [10]", "10x10x10 [12]", "17x15x15 [8]", "16x10x7 [12]"] },
     };
     
-    public static List<TestItem> GetItems(int itemCount)
+    public static List<ScenarioItem> GetItems(int itemCount)
 	{
 	    if (!itemsByQuantity.TryGetValue(itemCount, out var items))
 	    {
 		    throw new ArgumentException($"Invalid item count. Value {itemCount} should be between 3 and 79.");
 	    }
-	    return items.Select(TestItem.FromCompactString).ToList();
+	    return items.Select(ScenarioItem.FromCompactString).ToList();
 	}
 
 }

@@ -1,9 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Abstractions.Algorithms;
 using Binacle.Lib.Benchmarks.Order;
-using Binacle.TestsKernel;
-using Binacle.TestsKernel.Algorithms.Models;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
 

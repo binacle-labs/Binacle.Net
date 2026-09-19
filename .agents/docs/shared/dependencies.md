@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
-description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-09-04
+description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
+verified: 2026-09-19
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"
@@ -27,7 +27,7 @@ Binacle.Geometry                 leaf — BCL only, no Binacle deps
    │
    └── Binacle.Packing ──────────┘   the packing vocabulary: results, identity, status enums
           [IVT → Binacle.Lib, Binacle.Lib.TestsKernel]
-          consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.TestsKernel,
+          consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.Data,
                      Binacle.Lib.TestsKernel, OrLibrary.Converter, ViPaq.PackedDataGenerator
                      (Binacle.Net reaches it transitively and imports it globally - $api/dependencies)
 
@@ -37,8 +37,8 @@ Binacle.FluxResults              leaf — BCL only, no Binacle deps
    │                             SM.IntegrationTests reach it transitively and import it globally
    └── Binacle.FluxResults.UnitTests   xUnit
 
-Binacle.TestsKernel              algorithm fixture hub — Bischoff + custom-problems scenarios
-   refs: Binacle.Packing, Binacle.CompactNotation
+shared/data/Binacle.Data         algorithm scenario hub — Bischoff + custom-problems scenarios, the one
+   refs: Binacle.Packing, Binacle.CompactNotation                      embedded-resource reader
    consumers: api IntegrationTests, Binacle.Lib.UnitTests/Benchmarks/PerformanceTests
 
 Binacle.TestReporting            leaf — markdown report writer, no Binacle deps
@@ -59,7 +59,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
-| `Binacle.TestsKernel` | library | Packing, CompactNotation | — | algorithm fixtures + providers (see note 3) |
+| `Binacle.Data` | library | Packing, CompactNotation | — | algorithm scenarios + set classes + the reader (see notes 3, 4) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
 
 ## Notes
@@ -72,15 +72,17 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    algorithms live in `Binacle.Lib`, one slice up. The split is what lets the api integration suite and both
    tests kernels assert on results without referencing the packer.
 
-3. **`Binacle.TestsKernel` holds the algorithm fixtures only.** Bischoff suite and custom-problems, embedded by
-   link from `shared/data`. It is here rather than in a slice because two slices read it: the api integration
-   suite and the lib tests. The result-selection fixtures went the other way — one consumer, so they live in
-   `lib/data` and are embedded by `Binacle.Lib.TestsKernel` (see `$lib/dependencies`). Not to be confused with
-   `Binacle.ViPaq.TestsKernel`, a separate ViPaq-only hub — see `$vipaq/dependencies`.
+3. **`Binacle.Data` holds the algorithm scenarios only.** Bischoff suite and custom-problems, embedded by
+   link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
+   read it: the api integration suite and the lib tests. The result-selection fixtures went the other way —
+   one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.TestsKernel` (see
+   `$lib/dependencies`). Not to be confused with `Binacle.ViPaq.TestsKernel`, a separate ViPaq-only hub — see
+   `$vipaq/dependencies`.
 
-4. **Each tests kernel owns its own embedded-resource reader.** `Assembly.GetExecutingAssembly()` resolves to
-   the assembly holding the data, so a shared reader would look in the wrong assembly and find nothing. The
-   three kernels have deliberately divergent `IFile` shapes for the same reason.
+4. **`Binacle.Data` owns the one embedded-resource reader, and the caller names the assembly.**
+   `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)` reads from the assembly it is given, so any data
+   project can use it by passing its own. It hands the manifest name back unsplit; how the name is shaped is
+   each project's to know. The lib and ViPaq kernels still carry a copy each until they move to this one.
 
 5. **An `InternalsVisibleTo` grant is not a dependency edge.** It annotates one the grantee's `ProjectReference`
    already declares — `Binacle.Packing` granting to `Binacle.Lib.TestsKernel` records that the kernel leans on

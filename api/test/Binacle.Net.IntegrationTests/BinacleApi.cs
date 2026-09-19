@@ -2,8 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Binacle.Net;
 using Binacle.Net.IntegrationTests;
-using Binacle.TestsKernel.Algorithms.Providers;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -62,12 +61,12 @@ public class BinacleApi : WebApplicationFactory<IApiMarker>
 				
 				options.Presets.Add(PresetKeys.CustomProblems, new BinPresetOption()
 				{
-					Bins = ToBinOptions(CustomProblemsScenarioProvider.GetDistinctBins())
+					Bins = ToBinOptions(Binacle.Data.CustomProblems.Scenarios.GetDistinctBins())
 				});
 
 				options.Presets.Add(PresetKeys.BiscoffSuite, new BinPresetOption()
 				{
-					Bins = ToBinOptions(BischoffSuiteScenarioProvider.GetDistinctBins())
+					Bins = ToBinOptions(Binacle.Data.BischoffSuite.Scenarios.GetDistinctBins())
 				});
 
 				options.Presets.Add(PresetKeys.SpecialSet, new BinPresetOption()
@@ -100,7 +99,7 @@ public class BinacleApi : WebApplicationFactory<IApiMarker>
 		});
 	}
 
-	private static List<BinOption> ToBinOptions(IReadOnlyList<TestBin> bins)
+	private static List<BinOption> ToBinOptions(IReadOnlyList<ScenarioBin> bins)
 		=> bins.Select(bin => new BinOption
 		{
 			ID = bin.ID,

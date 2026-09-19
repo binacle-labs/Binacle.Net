@@ -3,9 +3,8 @@ using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
 using Binacle.Lib.Benchmarks.Order;
 using Binacle.Lib.Benchmarks.Providers;
-using Binacle.TestsKernel.Models;
-using Binacle.TestsKernel.Algorithms.Models;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.BischoffSuite;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
 
@@ -32,7 +31,7 @@ public abstract class AlgorithmRacingBenchmarksBase
 		this.loopAlgorithmProcessor = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
 		this.parallelAlgorithmProcessor = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory, this.ProcessorCount);
 		var scenarioName = BischoffCuratedProblemsProvider.ScenarioDescriptions[this.Description!];
-		this.Scenario = BischoffSuiteScenarioProvider.GetScenarioByName(scenarioName);
+		this.Scenario = Scenarios.GetScenarioByName(scenarioName);
 	}
 	
 	

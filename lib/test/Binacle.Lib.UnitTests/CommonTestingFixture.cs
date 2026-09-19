@@ -1,9 +1,6 @@
 using Binacle.Lib.Abstractions.Algorithms;
-using Binacle.TestsKernel;
-using Binacle.TestsKernel.Algorithms.ExtensionMethods;
-using Binacle.TestsKernel.Models;
-using Binacle.TestsKernel.Algorithms.Models;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.ExtensionMethods;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -31,7 +28,7 @@ public sealed class CommonTestingFixture : IDisposable
 
 	// Arrange. The scenario carries both the input and what the result is measured against.
 	public Scenario GetScenarioByName(string scenarioName)
-		=> AllScenariosProvider.GetScenarioByName(scenarioName);
+		=> All.GetScenarioByName(scenarioName);
 
 	// Act. No checking, so a failure here is a broken run, not a failed expectation.
 	public OperationResult Run(

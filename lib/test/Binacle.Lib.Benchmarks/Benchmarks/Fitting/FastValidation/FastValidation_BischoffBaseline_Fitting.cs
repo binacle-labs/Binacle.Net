@@ -1,8 +1,8 @@
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Benchmarks.Abstractions;
 using Binacle.Lib.Benchmarks.Providers;
-using Binacle.TestsKernel.Algorithms.Models;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.BischoffSuite;
 
 namespace Binacle.Lib.Benchmarks.FastValidation;
 
@@ -10,7 +10,7 @@ namespace Binacle.Lib.Benchmarks.FastValidation;
 public class FastValidation_BischoffBaseline_Fitting : FastValidationBenchmarkBase
 {
 	protected override Scenario? GetScenario() =>
-		BischoffSuiteScenarioProvider.GetScenarioByName(
+		Scenarios.GetScenarioByName(
 			BischoffCuratedProblemsProvider.ScenarioDescriptions["Baseline"]
 		);
 

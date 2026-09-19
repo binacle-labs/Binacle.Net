@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-09-04
+verified: 2026-09-19
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -43,7 +43,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/src/Binacle.Geometry` | Shared geometry leaf — generic `IWith*` interfaces + concrete `Dimensions<T>`/`Coordinates<T>` (BCL-only, referenced by lib, ViPaq, CompactNotation) |
 | `shared/src/Binacle.CompactNotation` | Shared compact-string parser/formatter (`LxWxH (X,Y,Z) [Q]`) |
 | `shared/src/Binacle.FluxResults` | Result and union types the service module returns instead of throwing |
-| `shared/test/Binacle.TestsKernel` | Shared test fixtures and scenario data |
+| `shared/data/Binacle.Data` | Shared scenario data and the code that reads it |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
 | `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
 | `shared/test/Binacle.TestReporting` | The report runner and markdown/console writers the performance runs and the converter tools share |
@@ -100,7 +100,7 @@ benchmarks, and build the Docker image.
 - API (`$api`) — endpoints, contracts, service, kernel, modules (Diagnostics, ServiceModule, UIModule)
 - Configuration (`$api/configuration`) — config file layout, env-var conventions, feature flags
 - Lib (`$lib`) — algorithms, processors, result building and selection; lib tests
-- Shared (`$shared`) — Binacle.TestsKernel scenario data & compact formats; OR-Library data
+- Shared (`$shared`) — Binacle.Data scenario data & compact formats; OR-Library data
 - ViPaq (`$vipaq`) — `Binacle.ViPaq` binary format and TypeScript mirror
 - Packages (`$packages`) — TypeScript npm packages
 - Ruby (`$ruby`) — Ruby/Jekyll plugins

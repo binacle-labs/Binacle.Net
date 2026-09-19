@@ -1,7 +1,7 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-09-04
+verified: 2026-09-19
 check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
@@ -139,7 +139,7 @@ Two consequences worth knowing:
   they still resolve with no `using`.
 - `ScenarioResultExtensions` does **not** — it sits in `v{3,4}.ExtensionMethods`, a sibling. Every scenario
   test needs `using Binacle.Net.IntegrationTests.v{3,4}.ExtensionMethods;` for `EvaluateResult`. **It is a
-  different extension from the shared kernel's**: this one takes the request parameters as well, because the
+  different extension from `Binacle.Data`'s**: this one takes the request parameters as well, because the
   scenario's expected result is a map keyed by algorithm and the parameters say which algorithm ran
   (`$shared`). A test that needs the entry itself reaches it as
   `scenario.Result.For(request.Parameters.GetAlgorithm()!.Value)`.
@@ -166,10 +166,10 @@ scenario introduces a new bin, so the providers answer for it:
 
 | Call | Gives |
 |---|---|
-| `CustomProblemsScenarioProvider.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
-| `CustomProblemsScenarioProvider.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
-| `CustomProblemsScenarioProvider.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
-| `BischoffSuiteScenarioProvider.GetDistinctBins()` | Same, for `biscoff-suite` |
+| `CustomProblems.Scenarios.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
+| `CustomProblems.Scenarios.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
+| `CustomProblems.Scenarios.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
+| `BischoffSuite.Scenarios.GetDistinctBins()` | Same, for `biscoff-suite` |
 
 `BinacleApi` builds both presets from `GetDistinctBins()`, so a test asserting on a preset reads the same
 source it was registered from and the two cannot drift.
@@ -258,8 +258,8 @@ covered the day it is added; nobody has to remember.
 ## Test host config
 
 - `BinacleApi.cs` — `ConfigureTestServices` clears `BinPresetOptions.Presets`, then registers `custom-problems`
-  (bins from `CustomProblemsScenarioProvider`), `biscoff-suite` (from `BischoffSuiteScenarioProvider`), and
-  `special` (the three special bins). Presets come from the shared kernel — see shared (`$shared`).
+  (bins from `Binacle.Data.CustomProblems.Scenarios`), `biscoff-suite` (from `Binacle.Data.BischoffSuite.Scenarios`),
+  and `special` (the three special bins). Presets come from `Binacle.Data` — see shared (`$shared`).
   Runs with default modules (ServiceModule off), carrying a `// TODO: Run the tests with all modules enabled`.
 - `BinacleApiWithoutPresets.cs` — same shape but only clears presets (no registration); tests the no-presets path.
 - `Binacle.Net.ServiceModule.IntegrationTests/BinacleApi.cs` — `IAsyncLifetime`; enables ServiceModule via

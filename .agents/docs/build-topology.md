@@ -1,7 +1,7 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-09-04
+verified: 2026-09-19
 check: Every solution folder and project count matches Binacle.Net.slnx (49 projects); the cross-slice edges against the three site Gemfiles, the four webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
@@ -27,7 +27,7 @@ grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/test/` — `Binacle.Lib` (the only src project) + four lib test projects, one of them `Binacle.Lib.TestsKernel`
 - `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), three integration-test projects and five unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`)
-- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.TestsKernel`, `Binacle.TestReporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
+- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.TestReporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects
 - `/samples/`, `/samples/docker/` (5 `.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
 - `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`
@@ -58,13 +58,13 @@ A fifth property is set **conditionally**: any project whose directory path cont
 `MSBuildProjectDirectory` is separator-native and the match would miss on Linux otherwise.
 
 The Scanner for .NET identifies a test project by its `Microsoft.NET.Test.Sdk` reference. That finds the xunit
-suites but **not** the eleven support projects that have no such reference — all three test kernels,
-`TestReporting`, the two benchmark projects, the two performance suites, and the three generator/converter
-tools. Without the property the scanner reads all eleven as product code, which put 1203 lines into the coverage
-denominator that no test will ever cover (measured when there were ten, before `Binacle.Lib.TestsKernel` was
-split out, so the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class names, `S2223` on the
-TestsKernel key holders). Deriving it from the folder means a new support project is classified by where it
-lives, with nothing to remember.
+suites but **not** the eleven support projects that have no such reference — `Binacle.Data`, the two
+remaining kernels, `TestReporting`, the two benchmark projects, the two performance suites, and the three
+generator/converter tools. Without the property the scanner reads all eleven as product code, which put 1203
+lines into the coverage denominator that no test will ever cover (measured when there were ten projects, so
+the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class
+names, `S2223` on the scenario key holders). Deriving it from the folder — `data/`, `test/` or `tools/` —
+means a new support project is classified by where it lives, with nothing to remember.
 
 The property is read only by the scanner's own targets, which are injected during a Sonar run and absent
 otherwise, so a normal `dotnet build` never sees it. Sonar still applies **test-scope** rules to these files —

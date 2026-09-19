@@ -56,7 +56,7 @@ searches for 3D bin packing, so that is the term used here.
 ├── /api          # HTTP API - ASP.NET Core minimal APIs (v3, v4) and modules
 ├── /lib          # Core 3D bin-packing engine (Binacle.Lib)
 ├── /vipaq        # ViPaq - compact binary format for packing results
-├── /shared       # Shared test kernel and benchmark data
+├── /shared       # Shared libraries, scenario data and the code that reads it
 ├── /packages     # JavaScript/TypeScript packages (npm workspaces)
 ├── /ruby         # Ruby gems - Jekyll plugins for the sites
 ├── /sites        # Every site (Jekyll)

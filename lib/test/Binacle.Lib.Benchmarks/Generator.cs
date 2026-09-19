@@ -1,4 +1,4 @@
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks;
 
@@ -11,12 +11,12 @@ public class Generator
 		this.random = new Random(seed);
 		
 	}
-	public static List<TestBin> GenerateBins(int count, int length, int width, int height)
+	public static List<ScenarioBin> GenerateBins(int count, int length, int width, int height)
 	{
-		var bins = new List<TestBin>(count);
+		var bins = new List<ScenarioBin>(count);
 		for (int i = 0; i < count; i++)
 		{
-			bins.Add(new TestBin
+			bins.Add(new ScenarioBin
 			{
 				ID = $"{length}x{width}x{height}",
 				Length = length,
@@ -27,15 +27,15 @@ public class Generator
 		return bins;
 	}
 	
-	public List<TestBin> GenerateBins(int count, int minSize, int maxSize)
+	public List<ScenarioBin> GenerateBins(int count, int minSize, int maxSize)
 	{
-		var bins = new List<TestBin>(count);
+		var bins = new List<ScenarioBin>(count);
 		for (int i = 0; i < count; i++)
 		{
 			var length = this.random.Next(minSize, maxSize + 1);
 			var width = this.random.Next(minSize, maxSize + 1);
 			var height = this.random.Next(minSize, maxSize + 1);
-			bins.Add(new TestBin
+			bins.Add(new ScenarioBin
 			{
 				ID = $"{length}x{width}x{height}",
 				Length = length,
@@ -48,9 +48,9 @@ public class Generator
 		return bins;
 	}
 	
-	public List<TestItem> GenerateItems(int count, int minSize, int maxSize)
+	public List<ScenarioItem> GenerateItems(int count, int minSize, int maxSize)
 	{
-		var items = new List<TestItem>();
+		var items = new List<ScenarioItem>();
 		var itemsGenerated = 0;
 		while (itemsGenerated < count)
 		{
@@ -60,7 +60,7 @@ public class Generator
 			var length = this.random.Next(minSize, maxSize + 1);
 			var width = this.random.Next(minSize, maxSize + 1);
 			var height = this.random.Next(minSize, maxSize + 1);
-			items.Add(new TestItem
+			items.Add(new ScenarioItem
 			{
 				ID = $"{length}x{width}x{height}-{quantity}",
 				Length = length,

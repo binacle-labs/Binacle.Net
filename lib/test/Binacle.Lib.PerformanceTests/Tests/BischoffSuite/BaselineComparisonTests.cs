@@ -1,8 +1,7 @@
 using Binacle.Lib.Abstractions.Algorithms;
 using Binacle.Lib.PerformanceTests.Results;
-using Binacle.TestsKernel;
-using Binacle.TestsKernel.Models;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using Binacle.Data.BischoffSuite;
 using Microsoft.Extensions.Logging;
 
 namespace Binacle.Lib.PerformanceTests.Tests.BischoffSuite;
@@ -37,7 +36,7 @@ internal class BaselineComparisonTests : ITest
 	public TestResult Run()
 	{
 		var scenarioCollectionResults = new ScenarioCollectionResult<double>("Scenario Name");
-		foreach (var scenario in BischoffSuiteScenarioProvider.GetScenarios())
+		foreach (var scenario in Scenarios.GetScenarios())
 		{
 			var algorithmResults = new AlgorithmResult<double>();
 			var baselineAlgorithmInstance = this.baselineAlgorithm(scenario.Bin, scenario.Items);
