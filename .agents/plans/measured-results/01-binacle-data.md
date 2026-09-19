@@ -32,8 +32,9 @@ each failure is a finding for the maintainer.
   `tooling/ci/sonar-analysis.xml` line 80 says "the two test kernels".
 - Docs: the `shared/data` README gains a row and its three set READMEs say "tests kernel"; the shared
   dependency doc and README; the api dependency doc; the root README; the api integration-tests README;
-  lib D3's reader paragraph and vipaq D10 are marked superseded in place; a README in the new folder. The
-  gate is the list - grep before starting.
+  lib D3's reader paragraph and vipaq D10 are marked superseded in place; the memory about Sonar issue
+  ignores names `shared/test/Binacle.TestsKernel/AssertionMethodAttribute.cs`; one other plan's `paths:`
+  names the kernel folder; a README in the new folder. The gate is the list - grep before starting.
 
 ## Commit 2 - demo-samples
 

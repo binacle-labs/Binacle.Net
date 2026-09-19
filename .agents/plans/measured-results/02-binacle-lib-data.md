@@ -21,7 +21,9 @@ Shape: [support-projects.md](support-projects.md). Protocol: the orchestrator be
 - Docs: the lib dependency doc, the lib tests doc, the result-selection doc, `docs/build-topology.md`, lib
   D3 (superseded in place), `Directory.Build.props`'s comment; one other plan file names the old path -
   `grep -rl "Lib.TestsKernel" .agents/plans` finds it; a README in the new folder; the
-  `lib/data/result-selection` README says "lib tests kernel". The gate is the list - grep before starting.
+  `lib/data/result-selection` README says "lib tests kernel". One plan file is *named* for the kernel
+  (`ls .agents/plans/shared/ | grep -i kernel`); hand the maintainer a `git mv` to a name that says what it
+  is about - growing the fixture cases - and fix its title. The gate is the list - grep before starting.
 
 ## Open before starting
 
@@ -36,5 +38,6 @@ Shape: [support-projects.md](support-projects.md). Protocol: the orchestrator be
       not the kernel.
 - [ ] `grep -rn "Lib.TestsKernel" --include=*.cs --include=*.csproj --include=*.slnx --include=*.props --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites"`
       is empty.
+- [ ] `ls .agents/plans/shared/ | grep -i kernel` is empty.
 - [ ] `dotnet build lib/test/Binacle.Lib.UnitTests` and `dotnet build lib/test/Binacle.Lib.Benchmarks` succeed;
       `just test cs_binacle-lib_unit` passes.

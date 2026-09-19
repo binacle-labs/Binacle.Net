@@ -23,7 +23,8 @@ Shape: [results.md](results.md), the `Binacle.ViPaq.EncodedSize` bullets. Protoc
   unit tests never reference, so it stays where it is: the measure project's startup, one sentence before
   the report.
 - The vipaq dependency doc's "UnitTests never references the kernel" becomes "references `ViPaq.Data`,
-  never `ViPaq.Testing`", with the reason: the spec gate must not lean on the harness's rival encoder.
+  never `ViPaq.Testing`", with the reason: the spec gate must not lean on the harness's rival encoder. The
+  memory about Sonar issue ignores repeats the old sentence; same fix.
 
 ## Open before starting
 
@@ -38,5 +39,6 @@ Shape: [results.md](results.md), the `Binacle.ViPaq.EncodedSize` bullets. Protoc
 - [ ] `grep -o 'Include="[^"]*csproj"' vipaq/test/Binacle.ViPaq.UnitTests/*.csproj` names `Binacle.ViPaq.Data`
       and not `Binacle.ViPaq.Testing`.
 - [ ] `grep -rln "Binacle.ViPaq.Data" vipaq/test/Binacle.ViPaq.UnitTests --include=*.cs` names the theory file.
-- [ ] `grep -n "UnitTests never" .agents/docs/vipaq/dependencies.md` is empty; the note says data yes, Testing no.
+- [ ] `grep -rn "not reference TestsKernel\|UnitTests never" .agents/docs .agents/memory` is empty; the note
+      says data yes, Testing no.
 - [ ] `just test cs_binacle-vipaq_unit` passes and its output counts the pack theories.
