@@ -247,7 +247,7 @@ The unit tests are the spec gate. They prove the code obeys `PROTOCOL.md` throug
 own curated inputs, and they must not lean on the harness's rival encoder. The repo-wide folder rule
 (`$decisions#D9`) lets a unit suite reference its slice's `data/` and any `test/` support library; this
 sentence closes that door for one library. `Binacle.ViPaq.Data` is open - the packs are inputs, not an encoder
-- but the suite does not reference it today.
+- and since 2026-09-20 the suite reads it to round-trip every real pack.
 
 Before 2026-09-20 the doc said "UnitTests never references the kernel", which also shut out the data, because
 the packs and the encoders were one project.

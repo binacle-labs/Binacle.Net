@@ -2,7 +2,7 @@
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
 verified: 2026-09-20
-check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
+check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects, the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ and the gate in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
 also_update:
   - vipaq/typescript
   - vipaq/cross-language-testing
@@ -71,8 +71,8 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 
 | Project | Covers |
 |---|---|
-| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
-| `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gates — all 2,316 real packs × every codec × both layouts × natural/forced-16-bit widths, header + decode-to-input, run before the size reports |
+| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, and all 2,316 real packs round-tripped in every public mode and at forced 16-bit widths; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
+| `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gate — every curated benchmark pick still names a real scenario, run before the size reports |
 | `vipaq/test/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings over the curated picks and the synthetic sets |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
@@ -82,5 +82,5 @@ measure and benchmark projects are run on demand (`just measure vipaq`, `./tooli
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract
 for compressed payloads — is in `$vipaq/cross-language-testing`.
 
-How the projects reference each other, who can see internals, and the walls between them (UnitTests never touches
-`Binacle.ViPaq.Testing`) are in `$vipaq/dependencies`.
+How the projects reference each other, who can see internals, and the walls between them (UnitTests reads
+`Binacle.ViPaq.Data`, never `Binacle.ViPaq.Testing`) are in `$vipaq/dependencies`.

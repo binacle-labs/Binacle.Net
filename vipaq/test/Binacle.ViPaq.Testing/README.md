@@ -11,7 +11,6 @@ The unit tests never reference it - they are the spec gate and must not lean on 
 | `ViPaq/` | `ViPaqEncoder` and `ViPaqHeader` - the door into ViPaq's internal encoder, so every codec and layout can be forced |
 | `Protobuf/` | `ProtobufEncoder` and `packing.proto` - the rival the size reports compare against |
 | `EncoderInfo.cs` | Which layout to encode with, handed out as two ready-made instances |
-| `ScenarioComparison.cs` | Does a decoded bin and items equal the scenario they came from |
 | `Providers/` | The curated picks per family, the merged curated set, and the synthetic scenarios for the speed benchmarks |
 
 The packs themselves are in `Binacle.ViPaq.Data`; the curated providers resolve their picks by name there.

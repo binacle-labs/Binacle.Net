@@ -44,4 +44,4 @@ Settled 2026-09-20: one runner, one bag, one reporter class per file; the wins a
 - [x] `grep -rn "Serilog" lib/measure/*/*.csproj` is empty.
 - [x] `grep -rn "Execute(" lib/measure/Binacle.Lib.PackingEfficiency --include=*.cs` hits one file,
       `PackingRunner.cs` - one pass over the scenarios, not four.
-- [ ] A second run changes nothing: run, then `git status --short lib/results` is empty.
+- [x] A second run changes nothing: run, then `git status --short lib/results` is empty.

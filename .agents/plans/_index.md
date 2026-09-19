@@ -134,7 +134,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "step 6's gate"
   horizon: next-release
 - file: measured-results/08-lib-packing-efficiency.md
-  description: "Step 8 - one run, many views - the lib runner packs every scenario once, a builder writes the four files, the README holds the summaries"
+  description: "Step 8 - one run, many views - the lib runner packs every scenario once into a bag, one reporter per file writes the three files, the README holds the summaries"
   state: ready
   waits-on: "step 7's gate"
   horizon: next-release

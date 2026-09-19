@@ -35,10 +35,10 @@ Shape: [results.md](results.md), the `Binacle.ViPaq.EncodedSize` bullets. Protoc
 
 ## Done when
 
-- [ ] `ls vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/` lists the curated check only.
-- [ ] `grep -o 'Include="[^"]*csproj"' vipaq/test/Binacle.ViPaq.UnitTests/*.csproj` names `Binacle.ViPaq.Data`
+- [x] `ls vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/` lists the curated check only.
+- [x] `grep -o 'Include="[^"]*csproj"' vipaq/test/Binacle.ViPaq.UnitTests/*.csproj` names `Binacle.ViPaq.Data`
       and not `Binacle.ViPaq.Testing`.
-- [ ] `grep -rln "Binacle.ViPaq.Data" vipaq/test/Binacle.ViPaq.UnitTests --include=*.cs` names the theory file.
-- [ ] `grep -rn "not reference TestsKernel\|UnitTests never" .agents/docs .agents/memory` is empty; the note
-      says data yes, Testing no.
-- [ ] `just test cs_binacle-vipaq_unit` passes and its output counts the pack theories.
+- [x] `grep -rln "Binacle.ViPaq.Data" vipaq/test/Binacle.ViPaq.UnitTests --include=*.cs` names the theory file.
+- [x] `grep -rn "but does not yet\|does not reference it today\|UnitTests never touches" .agents/docs .agents/design .agents/memory` is empty;
+      the wall says data yes, Testing no.
+- [x] `just test cs_binacle-vipaq_unit` passes and its output counts the pack theories.

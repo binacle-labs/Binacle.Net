@@ -209,7 +209,7 @@ table of [README.md](README.md).
   description: "ViPaq cross-language wire testing — the C#/TS shared-vector apparatus, its inventory, and the decode-to-input contract"
   paths: ["vipaq/**"]
 - file: vipaq/dependencies.md
-  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references Testing; no test project references a generator)."
+  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator)."
   paths: ["vipaq/**"]
 - file: vipaq/typescript.md
   description: "Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library"
