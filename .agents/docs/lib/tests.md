@@ -67,7 +67,7 @@ this.Fixture.AssertResult(testScenario, result);
 ```
 
 Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `PackingBischoffSuiteTests`,
-`PackingCustomProblemsTests` (each a `[Theory]` × `[MemberData]` over all six versions), plus `CreationTests`,
+`PackingCustomProblemsTests`, `PackingDemoSamplesTests` (each a `[Theory]` × `[MemberData]` over all six versions), plus `CreationTests`,
 `SanityTests`, `ResultSelectionTests`, `BinProcessingCancellationTests`.
 
 `ResultSelectionTestingFixture`:

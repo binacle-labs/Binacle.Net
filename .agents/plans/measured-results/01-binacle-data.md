@@ -54,13 +54,13 @@ scenario that fails is reported to the maintainer as a finding, not dropped.
 
 ## Done when
 
-- [ ] `test -d shared/data/Binacle.Data && test ! -d shared/test/Binacle.TestsKernel`
-- [ ] `grep -rn "Binacle\.TestsKernel" --include=*.cs --include=*.csproj --include=*.slnx --include=*.props --include=*.xml --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites\|^./results"`
+- [x] `test -d shared/data/Binacle.Data && test ! -d shared/test/Binacle.TestsKernel`
+- [x] `grep -rn "Binacle\.TestsKernel" --include=*.cs --include=*.csproj --include=*.slnx --include=*.props --include=*.xml --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites\|^./results"`
       is empty.
-- [ ] `grep -n "Contains('/data/')" Directory.Build.props` hits.
-- [ ] `grep -n "Data;" .netconfig` hits and `grep -n "\*.Data" .agents/design/ci-cd/decisions.md` hits.
-- [ ] `grep -rn "GetExecutingAssembly" shared/data/Binacle.Data` is empty.
-- [ ] `grep -rl "DemoSamples" lib/test/Binacle.Lib.UnitTests/Tests` is not empty.
-- [ ] `dotnet build api/test/Binacle.Net.IntegrationTests` and `dotnet build lib/test/Binacle.Lib.UnitTests` succeed;
+- [x] `grep -n "Contains('/data/')" Directory.Build.props` hits.
+- [x] `grep -n "Data;" .netconfig` hits and `grep -n "\*.Data" .agents/design/ci-cd/decisions.md` hits.
+- [x] `grep -rn "GetExecutingAssembly" shared/data/Binacle.Data` is empty.
+- [x] `grep -rl "DemoSamples" lib/test/Binacle.Lib.UnitTests/Tests` is not empty.
+- [x] `dotnet build api/test/Binacle.Net.IntegrationTests` and `dotnet build lib/test/Binacle.Lib.UnitTests` succeed;
       `just test cs_binacle-lib_unit` runs the demo-samples class.
-- [ ] `test -f shared/data/Binacle.Data/README.md`
+- [x] `test -f shared/data/Binacle.Data/README.md`

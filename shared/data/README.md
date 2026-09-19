@@ -9,7 +9,7 @@ packed data in `vipaq/data`). Four data folders and the project that reads them:
 | [`or-library/`](or-library/README.md) | Raw OR-Library container-loading text, exactly as published. Untouched source. | The converter (produces `bischoff-suite`). |
 | [`bischoff-suite/`](bischoff-suite/README.md) | Converted Bischoff & Ratcliff (BR) instances, `thpack1-7` only, in the scenario format. | `Binacle.Data` (lib algorithm tests, api integration tests). |
 | [`custom-problems/`](custom-problems/README.md) | Hand-authored problems (baseline / complex / simple), same format. | `Binacle.Data`. |
-| [`demo-samples/`](demo-samples/README.md) | The demo site's sample set, same format. Regenerated from the packer, so a regression baseline rather than an independent check. | `Binacle.Data`, and ViPaq. |
+| [`demo-samples/`](demo-samples/README.md) | The demo site's sample set, same format. Regenerated from the packer, so a regression baseline rather than an independent check. | `Binacle.Data` (lib packing tests), the demo site, and ViPaq. |
 | [`Binacle.Data/`](Binacle.Data/README.md) | The C# project that embeds the three scenario sets and reads them into models. | The lib tests and benchmarks, the api integration tests. |
 
 The three scenario sets share one **scenario compact format**: a JSON array where each entry is `Name`, `Bin`

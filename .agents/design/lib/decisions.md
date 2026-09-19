@@ -82,11 +82,11 @@ slice otherwise. Bischoff and custom-problems qualify twice over — two slices 
 the ViPaq packed-data generator reads the same files by path at run time — so they stay put. ViPaq had already
 settled this shape with its own `vipaq/data/packed`.
 
-**`shared/data/demo-samples/` was added under the same rule and is the awkward case.** Three consumers, and
-none of them is a C# test through `Binacle.Data`: the demo component generates its sample set from it, the
-ViPaq packed-data generator packs it, and `Binacle.Data` embeds it but names no key set for it, so `All` does
-not include it. **The embed is currently reachable and unread** — the files land in
-`ScenarioCollectionsProvider.Collections` under `demosamples/<name>` and nothing asks for them.
+**`shared/data/demo-samples/` was added under the same rule.** The demo component generates its sample set
+from it and the ViPaq packed-data generator packs it. Until 2026-09-20 `Binacle.Data` embedded it with no key
+set, so nothing read the embed; it now has `DemoSamples.Scenarios`, is in `All`, and `PackingDemoSamplesTests`
+runs every version of every algorithm over it. Its `Result` came from the packer, so that class is a
+regression baseline, not an independent check.
 
 **The friend grant is preferred to a shared bin model.** `OperationResultHelper` bridges through Packing's
 internal `Dimensions` rather than taking a bin type from the shared algorithm kernel. Reaching for that kernel

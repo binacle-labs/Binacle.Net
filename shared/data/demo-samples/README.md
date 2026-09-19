@@ -1,7 +1,7 @@
 # Demo Samples
 
 The demo site's sample set, converted to the compact scenario format. One entry per bin per
-sample: 21 files, 53 entries. Embedded by `Binacle.Data`, and read by ViPaq, which packs them into placed
+sample: 21 files, 53 entries. Read by the lib packing tests through `Binacle.Data`, and by ViPaq, which packs them into placed
 results under `vipaq/data/packed/demo-samples/`.
 
 **This folder is the source. The demo reads from it, not the other way round.** Each file is one sample: its

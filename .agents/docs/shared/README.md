@@ -2,7 +2,7 @@
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
 verified: 2026-09-19
-check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in BischoffSuite/Scenarios.cs and CustomProblems/Scenarios.cs; OR-Library files match shared/data
+check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
   - api/tests
@@ -47,25 +47,28 @@ One namespace per set, one static `Scenarios` class in each, and the set's keys 
 |---|---|---|
 | `Binacle.Data.BischoffSuite.Scenarios` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` | 7 |
 | `Binacle.Data.CustomProblems.Scenarios` | `CustomProblems/baseline`, `/simple`, `/complex` | 3 |
+| `Binacle.Data.DemoSamples.Scenarios` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file | 21 |
 
 Data is embedded JSON, loaded by resource prefix. The manifest name is `Binacle.Data.<Set>.<name>.json`, and
 `ScenarioCollectionsProvider` splits it into the collection key `<set>/<name>` lowercased.
 
-**A third folder is embedded and has no key set.** `shared/data/demo-samples/` comes in under
-`Binacle.Data.DemoSamples.`, so `ScenarioCollectionsProvider.Collections` holds it under keys like
-`demosamples/01-opening-set` — but no `Scenarios` class names it and `All` does not include it, so no C# test
-reads it today. Its consumers are the demo component in `packages/binacle-net-ui/` and ViPaq, which reads the
-*packed* form from `vipaq/data/packed/demo-samples/` through its own kernel.
+**Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
+packer, so `PackingDemoSamplesTests` proves the algorithms still land where they did, not that they are
+right. A new file under `shared/data/demo-samples/` is embedded on its own but is not read until its key is
+added to `DemoSamples.Scenarios.Keys`. The set is also read by the demo component in
+`packages/binacle-net-ui/` and by ViPaq, which reads the *packed* form from `vipaq/data/packed/demo-samples/`
+through its own kernel.
 
 **The set folders in the IDE are not on disk.** Every scenario JSON lives under `shared/data/` and is pulled in
 as an `EmbeddedResource` with a `<Link>`, so it only *looks* like `BischoffSuite/…` in the IDE. To edit a
 scenario, open `shared/data/bischoff-suite/` or `shared/data/custom-problems/`. The csproj sets `LogicalName` so
 the manifest name stays what the reader expects, one flat entry per folder — a `**` wildcard corrupts that name.
 
-**Why these two sets are here and result-selection is not.** A fixture set lives in `shared/data` when more than
-one slice reads it. Bischoff and custom-problems qualify twice over: the api integration suite and the lib tests
-both read them through this project, and the ViPaq packed-data generator reads the same files by path at run
-time. Result-selection had one consumer, so it lives in `lib/data`.
+**Why these three sets are here and result-selection is not.** A fixture set lives in `shared/data` when more
+than one slice reads it. Bischoff and custom-problems qualify twice over: the api integration suite and the lib
+tests both read them through this project, and the ViPaq packed-data generator reads the same files by path at
+run time. Demo-samples is read by the lib tests, the demo component and ViPaq. Result-selection had one
+consumer, so it lives in `lib/data`.
 
 ## The embedded-resource reader
 
@@ -108,15 +111,15 @@ the actual `PackedBinVolumePercentage` must be ≤ expected, within a 0.1% toler
 Static, lazily built, keyed by scenario `Name`. Each exposes `GetScenarioNames()`, `ScenarioNames`
 (`IEnumerable<object[]>` for xUnit `[MemberData]`), `GetScenarios()`, `GetScenarioByName(name)`.
 
-- `Binacle.Data.All` (Bischoff + Custom, the by-name lookup), `Binacle.Data.BischoffSuite.Scenarios`,
-  `Binacle.Data.CustomProblems.Scenarios`
+- `Binacle.Data.All` (every set, the by-name lookup), `Binacle.Data.BischoffSuite.Scenarios`,
+  `Binacle.Data.CustomProblems.Scenarios`, `Binacle.Data.DemoSamples.Scenarios`
 
 A file that reads one set imports its namespace and writes `Scenarios`; a file that reads two writes the full
 name. The result-selection providers in `lib/test/Binacle.Lib.TestsKernel` follow the same shape.
 
 ### The bins a set runs against
 
-The two set classes also answer for their **bins**, because the API tests register exactly those as a preset
+The Bischoff and custom-problems classes also answer for their **bins**, because the API tests register exactly those as a preset
 and must not restate the list (see `$api/tests`):
 
 - `BischoffSuite.Scenarios.GetDistinctBins()` and `CustomProblems.Scenarios.GetDistinctBins()` — one

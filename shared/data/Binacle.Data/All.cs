@@ -9,7 +9,8 @@ public static class All
 		MultipleScenarioCollectionsProvider[] dataProviders =
 		[
 			new MultipleScenarioCollectionsProvider(BischoffSuite.Scenarios.Keys),
-			new MultipleScenarioCollectionsProvider(CustomProblems.Scenarios.Keys)
+			new MultipleScenarioCollectionsProvider(CustomProblems.Scenarios.Keys),
+			new MultipleScenarioCollectionsProvider(DemoSamples.Scenarios.Keys)
 		];
 		scenarios = new Dictionary<string, Scenario>();
 		foreach (var dataProvider in dataProviders)
