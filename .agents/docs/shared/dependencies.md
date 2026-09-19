@@ -1,6 +1,6 @@
 ---
 id: shared/dependencies
-description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
+description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
 verified: 2026-09-20
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
@@ -41,11 +41,11 @@ shared/data/Binacle.Data         algorithm scenario hub — Bischoff + custom-pr
    refs: Binacle.Packing, Binacle.CompactNotation                      embedded-resource reader
    consumers: api IntegrationTests, Binacle.Lib.UnitTests/Benchmarks/PerformanceTests
 
-Binacle.TestReporting            leaf — markdown report writer, no Binacle deps
+Binacle.Reporting            leaf — markdown report writer, no Binacle deps
    consumers: Binacle.Lib.PerformanceTests, ViPaq.PerformanceTests, both ViPaq generators, OrLibrary.Converter
 
 shared/tools/Binacle.OrLibrary.Converter   exe tool
-   refs: Binacle.CompactNotation, Binacle.Packing, Binacle.TestReporting
+   refs: Binacle.CompactNotation, Binacle.Packing, Binacle.Reporting
 ```
 
 ## Projects at a glance
@@ -58,9 +58,9 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.Data` | packing result models, identity, status enums |
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
-| `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
+| `Binacle.Reporting` | library | — | — | markdown report writer for the perf harnesses |
 | `Binacle.Data` | library | Packing, CompactNotation | — | algorithm scenarios + set classes + the reader; no harness code (see notes 3, 4) |
-| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
+| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, Reporting | — | converts OR-Library benchmark data |
 
 ## Notes
 
@@ -88,7 +88,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    already declares — `Binacle.Packing` granting to `Binacle.Lib.Data` records that the data project leans on
    Packing's internals, not that Packing leans on the kernel.
 
-6. **`Binacle.TestReporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
+6. **`Binacle.Reporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
    `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.
 
 7. **`Binacle.FluxResults` came in from the retired FluxResults NuGet package**, v1.0.0. Same copyright

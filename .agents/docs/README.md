@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-09-19
+verified: 2026-09-20
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -46,7 +46,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/Binacle.Data` | Shared scenario data and the code that reads it |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
 | `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
-| `shared/test/Binacle.TestReporting` | The report runner and markdown/console writers the performance runs and the converter tools share |
+| `shared/test/Binacle.Reporting` | The report runner and markdown/console writers the performance runs and the converter tools share |
 | `packages/` | TypeScript packages (npm workspaces) |
 | `ruby/` | Ruby gems (Jekyll plugins) |
 | `sites/` | Every published site, one directory each (`$sites`) |

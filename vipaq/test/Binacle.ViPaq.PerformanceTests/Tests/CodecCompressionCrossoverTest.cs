@@ -1,4 +1,4 @@
-using Binacle.TestReporting;
+using Binacle.Reporting;
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.Testing.ViPaq;
 using Microsoft.Extensions.Logging;

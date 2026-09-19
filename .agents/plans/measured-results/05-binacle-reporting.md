@@ -29,8 +29,8 @@ Small. If the maintainer would rather not commit it alone, it rides with step 4.
 
 ## Done when
 
-- [ ] `test -d shared/test/Binacle.Reporting && test ! -d shared/test/Binacle.TestReporting`
-- [ ] `grep -n "Binacle.Reporting" .netconfig` hits.
-- [ ] `grep -rn "TestReporting" --include=*.cs --include=*.csproj --include=*.slnx --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites"`
+- [x] `test -d shared/test/Binacle.Reporting && test ! -d shared/test/Binacle.TestReporting`
+- [x] `grep -n "Binacle.Reporting" .netconfig` hits.
+- [x] `grep -rn "TestReporting" --include=*.cs --include=*.csproj --include=*.slnx --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites"`
       is empty.
-- [ ] `dotnet build shared/tools/Binacle.OrLibrary.Converter` succeeds.
+- [x] `dotnet build shared/tools/Binacle.OrLibrary.Converter` succeeds.

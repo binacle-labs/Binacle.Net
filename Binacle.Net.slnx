@@ -103,7 +103,7 @@
   <Folder Name="/shared/test/">
     <Project Path="shared/test/Binacle.CompactNotation.UnitTests/Binacle.CompactNotation.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.FluxResults.UnitTests/Binacle.FluxResults.UnitTests.csproj" />
-    <Project Path="shared/test/Binacle.TestReporting/Binacle.TestReporting.csproj" />
+    <Project Path="shared/test/Binacle.Reporting/Binacle.Reporting.csproj" />
   </Folder>
   <Folder Name="/shared/tools/">
     <Project Path="shared/tools/Binacle.OrLibrary.Converter/Binacle.OrLibrary.Converter.csproj" />

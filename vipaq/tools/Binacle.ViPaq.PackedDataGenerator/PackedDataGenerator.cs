@@ -2,7 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Binacle.CompactNotation;
 using Binacle.Lib;
-using Binacle.TestReporting;
+using Binacle.Reporting;
 using LibModels = Binacle.Lib.Models;
 
 namespace Binacle.ViPaq.PackedDataGenerator;

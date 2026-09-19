@@ -1,4 +1,4 @@
-using Binacle.TestReporting;
+using Binacle.Reporting;
 using Binacle.ViPaq.PerformanceTests.ExtensionMethods;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

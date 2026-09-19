@@ -37,7 +37,7 @@ The scenario data and the code that reads it are `data/Binacle.Data` - see
 Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Runs with
 `just test cs_binacle-flux-results_unit`.
 
-### 📄 `Binacle.TestReporting`
+### 📄 `Binacle.Reporting`
 
 The markdown report writer behind the performance suites. Register `ITest` implementations and an
 `IFileWriter` in DI, and `TestRunner` runs each test, logs it, and groups the results into one file per report.

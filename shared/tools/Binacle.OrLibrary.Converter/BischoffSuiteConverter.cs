@@ -5,7 +5,7 @@ using System.Text.Json;
 using Binacle.CompactNotation;
 using Binacle.Geometry;
 using Binacle.Packing;
-using Binacle.TestReporting;
+using Binacle.Reporting;
 
 namespace Binacle.OrLibrary.Converter;
 

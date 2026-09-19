@@ -167,7 +167,7 @@ table of [README.md](README.md).
   description: "Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)"
   paths: ["shared/**"]
 - file: shared/dependencies.md
-  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals."
+  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals."
   paths: ["shared/**"]
 ```
 

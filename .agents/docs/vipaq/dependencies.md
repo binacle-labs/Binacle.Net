@@ -40,22 +40,22 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │                     EncoderInfo, ScenarioComparison, the curated and synthetic picks
    │              │   │                  ▲          ▲
    │              │   │                  │          └── Binacle.ViPaq.PerformanceTests  [IVT]  exe
-   │              │   │                  │                  refs: Testing, ViPaq.Data, TestReporting
+   │              │   │                  │                  refs: Testing, ViPaq.Data, Reporting
    │              │   │                  │                  runs the pre-report gates + size/codec reports
    │              │   │                  │
    │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe
    │              │   │                                          refs: Testing, ViPaq.Data (BenchmarkDotNet)
    │              │   │
    │              │   └── Binacle.ViPaq.VectorGenerators  [IVT]  tool exe — regenerates test-vectors/
-   │              │           refs: ViPaq, CompactNotation, TestReporting
+   │              │           refs: ViPaq, CompactNotation, Reporting
    │              │
    │              └────── Binacle.ViPaq.PackedDataGenerator  (no IVT)  tool exe — freezes data/packed/
-   │                          refs: Lib, Packing, ViPaq, CompactNotation, Geometry, TestReporting
+   │                          refs: Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting
    │
    └── lib/src/Binacle.Lib                     the packing engine — reached only by PackedDataGenerator
 ```
 
-`Binacle.TestReporting` (a shared markdown-report writer) is referenced by PerformanceTests and both generators.
+`Binacle.Reporting` (a shared markdown-report writer) is referenced by PerformanceTests and both generators.
 
 ## Projects at a glance
 
@@ -65,10 +65,10 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, CompactNotation | yes | spec/correctness — vectors + curated inputs, no real data |
 | `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,316 real packs as scenarios, one class per family |
 | `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders, protobuf, the curated and synthetic picks |
-| `Binacle.ViPaq.PerformanceTests` | exe | Testing, ViPaq.Data, TestReporting | yes | pre-report gates + size/codec reports |
+| `Binacle.ViPaq.PerformanceTests` | exe | Testing, ViPaq.Data, Reporting | yes | pre-report gates + size/codec reports |
 | `Binacle.ViPaq.Benchmarks` | exe | Testing, ViPaq.Data | yes | BenchmarkDotNet timings |
-| `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, TestReporting | yes | regenerates `test-vectors/` |
-| `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, TestReporting | **no** | packs problems offline, freezes `data/packed/` |
+| `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
+| `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
 
 ## The walls (easy to break, deliberate)
 

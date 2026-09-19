@@ -27,7 +27,7 @@ grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/data/`, `/lib/test/` — `Binacle.Lib` (the only src project), `Binacle.Lib.Data` (the result-selection scenarios) + `Binacle.Lib.Testing` and three lib test projects
 - `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), three integration-test projects and five unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`)
-- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.TestReporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
+- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.Reporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects
 - `/samples/`, `/samples/docker/` (5 `.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
 - `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`
@@ -53,14 +53,14 @@ analyzer driver so editorconfig severity cannot reach it. The file carries the f
 
 ### `SonarQubeTestProject` — the support projects {#sonar-test-projects}
 
-A fifth property is set **conditionally**: any project whose directory path contains `/test/` or `/tools/` gets
+A fifth property is set **conditionally**: any project whose directory path contains `/data/`, `/test/` or `/tools/` gets
 `<SonarQubeTestProject>true</SonarQubeTestProject>`. The path is normalised to forward slashes first, because
 `MSBuildProjectDirectory` is separator-native and the match would miss on Linux otherwise.
 
 The Scanner for .NET identifies a test project by its `Microsoft.NET.Test.Sdk` reference. That finds the xunit
-suites but **not** the twelve support projects that have no such reference — the two data projects,
-`Binacle.Lib.Testing`, the ViPaq kernel, `TestReporting`, the two benchmark projects, the two performance
-suites, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
+suites but **not** the thirteen support projects that have no such reference — the three data projects,
+`Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, the two benchmark projects, the two
+performance suites, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
 lines into the coverage denominator that no test will ever cover (measured when there were ten projects, so
 the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class
 names, `S2223` on the scenario key holders). Deriving it from the folder — `data/`, `test/` or `tools/` —

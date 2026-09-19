@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // A plain table of text cells. A report builds its columns and rows directly, enough for any table that
 // does not need a bespoke result type.

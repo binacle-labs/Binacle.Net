@@ -1,4 +1,4 @@
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // A small alias so the runner can collect result tasks without spelling out List<Task<T>> each time.
 internal class TaskList<T> : List<Task<T>>

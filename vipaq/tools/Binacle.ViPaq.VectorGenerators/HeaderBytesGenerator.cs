@@ -1,4 +1,4 @@
-using Binacle.TestReporting;
+using Binacle.Reporting;
 
 namespace Binacle.ViPaq.VectorGenerators;
 

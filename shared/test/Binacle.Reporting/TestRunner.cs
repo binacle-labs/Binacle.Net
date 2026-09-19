@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // Runs every registered ITest, groups the results by their file, logs each to the console, and hands each
 // file's results to every registered IFileWriter. Register the tests and writers in DI; this ties them

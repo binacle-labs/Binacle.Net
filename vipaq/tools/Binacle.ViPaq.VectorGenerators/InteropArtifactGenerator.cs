@@ -2,7 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Binacle.CompactNotation;
 using Binacle.Geometry;
-using Binacle.TestReporting;
+using Binacle.Reporting;
 using Binacle.ViPaq;
 using Binacle.ViPaq.Compression;
 

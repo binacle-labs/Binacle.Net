@@ -1,7 +1,7 @@
 ---
 id: ci-cd/decisions
 description: CI/CD decisions ledger — why a release is dispatched with a version and tagged last, why the pipeline stages on GHCR and copies to Docker Hub by digest, why a prerelease stays on GHCR but still gets its tag and a GitHub prerelease, and the two job conditions that do it, why the notes come from CHANGELOG.md, the pinning rules, why lychee is a pinned binary rather than its own action, why the test suite is split in two by what ships, why the gem sources need a built project and what a slnx project type decides, why a workflow step calls a just recipe rather than inlining shell, how CodeQL is configured, what `just image verify` checks and in what order, why the moving tags were proven on the real release rather than a scratch repository, why Sonar runs on a pull request as a called workflow rather than a direct trigger and stays out of the merge gate, why the Docker Hub credential is not scoped to an environment, why no job holds a git credential after checkout, why the site half of the path filter names the files a site depends on, why the three site deploys are one workflow with the site chosen at dispatch, why the release logs into Docker Hub with the run's OIDC token, and the open questions about the PR gate and supply-chain attestation.
-verified: 2026-09-19
+verified: 2026-09-20
 check: Decisions still match .github/workflows/*.yml and tooling/build.just; D32 against deploy-site.yml, whose dispatch must take a site choice of docs, demo and www and whose concurrency group must carry inputs.site; D8's scope claims against tooling/ci/sonar-analysis.xml, whose exclusions must still name sites/*/js, sites/*/lib, the media folders and sites/**/*.html and must not exclude either site whole; D1 against release-docker-image.yml, whose trigger must be workflow_dispatch alone with a required version input and whose gate job must carry the ref, semver and tag checks; D2/D3/D14 against release-docker-image.yml's publish job, which must carry `if: ${{ !contains(inputs.version, '-') }}`, and its release job, which must carry `if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}` and keep `publish` in its needs, with no condition on `page`; D33 against the same job's Docker Hub login, which must carry no password: and must read vars.DOCKERHUB_OIDC_CONNECTIONID, D7 against tooling/changelog.just and the two changelog.*.sh it calls, D6 against shared-smoke-image.yml's runs-on, D11 against .github/dependabot.yml, D12 against build.just's publish recipe, D14's STAGING_IMAGE against release-docker-image.yml, D15's identity regexp against SECURITY.md and tooling/image.just, D16 against .github/actions/install-lychee and deploy-site.yml's link-check step, D17 against deploy-site.yml's trigger, which must stay workflow_dispatch only; D4 against tooling/ci.just and tooling/ci/*.sh, which must be shellcheck-clean and take their inputs as arguments, and against `grep -c 'run: |' .github/workflows/release-docker-image.yml`, which is 1 and must not grow; D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the five javascript ones, and against deploy-site.yml's first job; D20 against codeql-analysis.yml, whose matrix must stay four languages on build-mode none with a category per language, D22 against Binacle.Net.slnx, whose ruby.rbproj entry must carry a buildable Type and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/; D21 against tooling/image.just and tooling/image/verify*.sh, whose verify recipe must take a version with no default and whose scripts reach no registry that needs a login; D25 against release-docker-image.yml's `Move the tags that move` step, which must stay conditional on a non-empty moving list; and D28 against sonar-analysis.yml, whose `on:` must carry `workflow_call` and a concurrency group that does not read `github.workflow`, and against pull-request.yml's `sonar` job, whose `if:` must still gate on `changes.outputs.code`, a fork check and a Dependabot check, and which must not appear in `gate`'s `needs`
 paths:
   - ".github/workflows/**"
@@ -833,16 +833,16 @@ what it covers.
 ### D19 — the merged coverage report drops the test-support assemblies
 
 `.netconfig` at the repo root, reportgenerator's own config file, carries
-`assemblyfilters = "-*.Data;-*.Testing;-*.TestsKernel;-Binacle.TestReporting;-*.UnitTests;-*.IntegrationTests"`.
+`assemblyfilters = "-*.Data;-*.Testing;-Binacle.Reporting;-*.UnitTests;-*.IntegrationTests"`.
 Both `just coverage` recipes read it.
 
 **Why:** a test helper scoring itself says nothing about shipped code. `*.Data` and `*.Testing` are patterns
-rather than names, so adding a data project or a test support library needs no edit. `*.TestsKernel` goes
-when the last kernel does.
+rather than names, so adding a data project or a test support library needs no edit. `-*.TestsKernel` was on
+the list until the last kernel went (2026-09-20).
 
-**Why `Binacle.TestReporting` and the ViPaq kernel are named even though neither is in the report today.**
-They only reach it if a suite that runs under coverage starts referencing them. Naming them now means that
-day is silent, instead of moving the denominator with nobody noticing.
+**Why `Binacle.Reporting` is named even though it is not in the report today.** It only reaches it if a suite
+that runs under coverage starts referencing it. Naming it now means that day is silent, instead of moving the
+denominator with nobody noticing.
 
 ### D20 — CodeQL runs buildless, on merge only, and reports nothing on a check
 

@@ -1,5 +1,5 @@
 using Binacle.Lib;
-using Binacle.TestReporting;
+using Binacle.Reporting;
 
 namespace Binacle.ViPaq.PackedDataGenerator;
 

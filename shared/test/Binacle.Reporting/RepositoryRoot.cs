@@ -1,4 +1,4 @@
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // Climbs from the running binary to the folder holding the marker file (the solution file by default), so a
 // tool or report writes to stable repo-level paths no matter how deep the build puts the executable.

@@ -1,4 +1,4 @@
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // Names one output file and its heading. Tests that share a Filename are grouped into the same file, each
 // as its own section.

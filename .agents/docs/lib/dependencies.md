@@ -30,7 +30,7 @@ Binacle.Packing ─────────────────────�
    │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks
    │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
    │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
-   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Lib.Testing, Binacle.Data, TestReporting
+   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting
    │
    └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
           refs: Binacle.Data (the reader), Binacle.Packing, Binacle.CompactNotation
@@ -46,7 +46,7 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
 | `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
 | `Binacle.Lib.Benchmarks` | exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | BenchmarkDotNet timings |
-| `Binacle.Lib.PerformanceTests` | exe | Lib, Lib.Testing, Binacle.Data, TestReporting | yes | markdown perf reports |
+| `Binacle.Lib.PerformanceTests` | exe | Lib, Lib.Testing, Binacle.Data, Reporting | yes | markdown perf reports |
 
 `Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.Data` and `Lib.Testing` are this slice's own.
 `Lib.Testing` needs the friend grant because `AlgorithmFactories` constructs the internal algorithm classes.

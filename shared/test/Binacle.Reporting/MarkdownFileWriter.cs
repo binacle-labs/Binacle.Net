@@ -1,4 +1,4 @@
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // Writes each report to <outputDirectory>/<Filename>.md. The directory is passed in, so each project points
 // it wherever its results live (e.g. a repo-level results folder). One file per report, overwritten each

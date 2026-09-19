@@ -1,7 +1,7 @@
 using System.Text;
 using ConsoleTables;
 
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // One section of a report: a title, an optional description, and a result table. Knows how to print itself
 // to the console (minimal) and to markdown.

@@ -11,7 +11,7 @@
 
 	# Test support scoring itself says nothing about shipped code. `*.Data` covers every data project and
 	# `*.Testing` every test support library, so adding one needs no edit here.
-	assemblyfilters = "-*.Data;-*.Testing;-*.TestsKernel;-Binacle.TestReporting;-*.UnitTests;-*.IntegrationTests"
+	assemblyfilters = "-*.Data;-*.Testing;-Binacle.Reporting;-*.UnitTests;-*.IntegrationTests"
 
 	# obj/ is what the source generators wrote. 2268 uncovered lines of it in the run of 2026-08-31, none of
 	# it ours to test.

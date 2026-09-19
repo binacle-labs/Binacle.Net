@@ -1,4 +1,4 @@
-namespace Binacle.TestReporting;
+namespace Binacle.Reporting;
 
 // One report producer. Run it to get a table of results bound to a file. Both the lib and the ViPaq
 // performance-test projects implement this; the shared runner and writers do the rest.
