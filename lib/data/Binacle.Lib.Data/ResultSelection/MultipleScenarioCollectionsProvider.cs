@@ -1,21 +1,21 @@
 using System.Collections;
 
-namespace Binacle.Lib.TestsKernel.ResultSelection;
+namespace Binacle.Lib.Data.ResultSelection;
 
-internal class MultipleScenarioCollectionsProvider : IEnumerable<Models.CollectionScenario>
+internal class MultipleScenarioCollectionsProvider : IEnumerable<CollectionScenario>
 {
-    private readonly List<Models.CollectionScenario> scenarios;
+    private readonly List<CollectionScenario> scenarios;
     internal MultipleScenarioCollectionsProvider(string[] collectionKeys)
     {
-        this.scenarios = new List<Models.CollectionScenario>();
+        this.scenarios = new List<CollectionScenario>();
         foreach (var collectionKey in collectionKeys)
         {
             var collectionScenarios = ScenarioCollectionsProvider.GetScenarios(collectionKey)
-                .Select(x => new Models.CollectionScenario(collectionKey, x));
+                .Select(x => new CollectionScenario(collectionKey, x));
             this.scenarios.AddRange(collectionScenarios);
         }
     }
-    public virtual IEnumerator<Models.CollectionScenario> GetEnumerator()
+    public virtual IEnumerator<CollectionScenario> GetEnumerator()
     {
         foreach (var scenario in this.scenarios)
         {

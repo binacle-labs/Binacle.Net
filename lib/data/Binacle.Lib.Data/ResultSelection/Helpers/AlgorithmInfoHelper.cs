@@ -1,5 +1,5 @@
 
-namespace Binacle.Lib.TestsKernel.ResultSelection.Helpers;
+namespace Binacle.Lib.Data.ResultSelection.Helpers;
 
 public static class AlgorithmInfoHelper
 {

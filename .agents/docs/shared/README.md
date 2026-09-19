@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-19
+verified: 2026-09-20
 check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -33,7 +33,7 @@ references it, in any slice.
 
 ## One area
 
-This project holds the algorithm scenarios only. **Result selection lives in `lib/test/Binacle.Lib.TestsKernel`**,
+This project holds the algorithm scenarios only. **Result selection lives in `lib/data/Binacle.Lib.Data`**,
 because nothing outside the lib slice reads it — see `$lib/dependencies`.
 
 The project root also holds what both audiences share: `ScenarioBin`, `ScenarioItem`, `TestOperationParameters`,
@@ -76,7 +76,7 @@ consumer, so it lives in `lib/data`.
 given whose manifest name starts with the prefix. Each comes back as an `EmbeddedResourceFile` with the name
 after the prefix unsplit, and `OpenRead()` reads from that same assembly. **The caller names the assembly**
 (`typeof(SomeTypeInThatProject).Assembly`) and splits the name its own way, so one reader serves every data
-project however its manifest names are shaped.
+project however its manifest names are shaped. `Binacle.Lib.Data` is the first other caller.
 
 ## Compact-string formats
 
@@ -89,7 +89,7 @@ Scenario JSON keeps values terse. Each field has its own parser. Verify against 
 | Result (a map) | `Helpers/ScenarioResultHelper.cs` | a JSON object keyed by algorithm name, and **it must name every one** — `FFD`, `WFD`, `BFD`. Each value is 2 space-separated statuses: **`parts[0]` = packing, `parts[1]` = fitting** | `{"FFD": "PartiallyPacked PartiallyPacked", "WFD": …, "BFD": …}` |
 
 The result-selection formats (the 5-part `OperationResult` and the `"Name_vN"` `AlgorithmInfo`) live with their
-parsers in `lib/test/Binacle.Lib.TestsKernel/ResultSelection/Helpers/`.
+parsers in `lib/data/Binacle.Lib.Data/ResultSelection/Helpers/`.
 
 **Keyed by algorithm, never by version.** Every version of an algorithm must produce the same result, so
 there is deliberately no way to name `FFD_v1` and `FFD_v2` apart. `ParseFromMap` rejects an unknown name, a
@@ -115,7 +115,7 @@ Static, lazily built, keyed by scenario `Name`. Each exposes `GetScenarioNames()
   `Binacle.Data.CustomProblems.Scenarios`, `Binacle.Data.DemoSamples.Scenarios`
 
 A file that reads one set imports its namespace and writes `Scenarios`; a file that reads two writes the full
-name. The result-selection providers in `lib/test/Binacle.Lib.TestsKernel` follow the same shape.
+name. The result-selection sets in `lib/data/Binacle.Lib.Data` follow the same shape.
 
 ### The bins a set runs against
 

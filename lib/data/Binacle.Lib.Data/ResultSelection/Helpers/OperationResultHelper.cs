@@ -1,6 +1,6 @@
 using Binacle.CompactNotation;
 
-namespace Binacle.Lib.TestsKernel.ResultSelection.Helpers;
+namespace Binacle.Lib.Data.ResultSelection.Helpers;
 
 internal static class OperationResultHelper
 {

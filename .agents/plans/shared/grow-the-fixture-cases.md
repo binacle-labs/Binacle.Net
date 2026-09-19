@@ -20,7 +20,7 @@ authoring files - but each one is a piece of reasoning, not a paste, because the
 ### 2026-08-13 - the data move landed and the fixtures were split by consumer
 
 The Bischoff suite and custom-problems stay in `shared/data/` because more than one slice reads them.
-Result-selection moved to `lib/data/result-selection/` and is embedded by `lib/test/Binacle.Lib.TestsKernel`,
+Result-selection moved to `lib/data/result-selection/` and is embedded by `lib/data/Binacle.Lib.Data`,
 whose manifest prefix is `ResultSelection.`.
 
 ### 2026-08-26 - the demo's sample set is fixture data
@@ -50,7 +50,7 @@ A single `baseline.json` per case today (BestAlgorithm, BestBin, SmallestBin).
   where the smallest wins; algorithms that tie on fit but differ on efficiency; a bin that only one algorithm
   can fill. Name cases so the intent is obvious.
 - Cross-check against the selectors in `lib/src/Binacle.Lib/ResultSelection/` so every branch has a scenario.
-  The fixtures and their providers are in `lib/data/result-selection/` and `lib/test/Binacle.Lib.TestsKernel/`.
+  The fixtures and their set classes are in `lib/data/result-selection/` and `lib/data/Binacle.Lib.Data/`.
 
 ### Date not recorded - what growing `custom-problems` would add
 

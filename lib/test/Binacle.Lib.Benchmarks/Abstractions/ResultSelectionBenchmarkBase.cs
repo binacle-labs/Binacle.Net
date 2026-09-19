@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Abstractions;
-using Binacle.Lib.TestsKernel.ResultSelection.Models;
-using Binacle.Lib.TestsKernel.ResultSelection.Providers;
+using Binacle.Lib.Data.ResultSelection;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
 
@@ -13,7 +12,7 @@ public abstract class ResultSelectionBenchmarkBase
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
-		this.Scenario = AllScenariosProvider.GetScenarioByName(this.ScenarioName!);
+		this.Scenario = All.GetScenarioByName(this.ScenarioName!);
 	}
 	
 	protected OperationResult Run(IResultSelectionStrategy strategy)

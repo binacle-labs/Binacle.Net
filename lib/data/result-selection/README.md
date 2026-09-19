@@ -1,6 +1,6 @@
 # Result Selection
 
-Hand-authored result-selection scenarios, for the **lib tests kernel**. Read by the lib unit tests and
+Hand-authored result-selection scenarios, embedded by `Binacle.Lib.Data`. Read by the lib unit tests and
 benchmarks only - not by the api suite, and not by ViPaq.
 
 These fixtures exercise how the lib picks a single winning result out of many candidate packings. Unlike the
@@ -34,11 +34,11 @@ A JSON array of scenarios. Each scenario names the expected winner and the candi
   `Bin Algorithm PackingStatus <metric> <metric>`.
 
 This set uses its **own** provider/reader/model (`ResultSelection/ScenarioCollectionsProvider.cs`, its own
-`Scenario` model and `CollectionKeys`), a different shape from the algorithm fixtures; the two are kept separate.
+`Scenario` model and the set classes), a different shape from the algorithm fixtures; the two are kept separate.
 
-This folder is the single source: the lib tests kernel embeds these files directly (via `Link`/`LogicalName` in
-`lib/test/Binacle.Lib.TestsKernel/Binacle.Lib.TestsKernel.csproj`) under the manifest name
-`ResultSelection.<Case>.<file>`, so there is no separate kernel copy.
+This folder is the single source: `Binacle.Lib.Data` embeds these files directly (via `Link`/`LogicalName` in
+`Binacle.Lib.Data/Binacle.Lib.Data.csproj`) under the manifest name `ResultSelection.<Case>.<file>`, so there is
+no separate copy.
 
 It lives in the `lib` slice because the `lib` slice is its only consumer. The fixture sets that more than one
 slice reads stay in `shared/data`.

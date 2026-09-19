@@ -1,7 +1,7 @@
 ---
 id: lib/decisions
-description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two tests kernels, and the open parallelization question.
-verified: 2026-09-19
+description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question.
+verified: 2026-09-20
 check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/Scenarios.cs and CustomProblems/Scenarios.cs
 also_update:
   - lib/findings
@@ -74,7 +74,8 @@ a build after removal proves that.
 ### D3 — two data hubs, split by who reads the fixtures
 
 Split on 2026-08-13. `shared/data/Binacle.Data` (the shared tests kernel until 2026-09-19) keeps
-the algorithm fixtures, which the api integration suite reads in 25 files as well as the lib tests. `lib/test/Binacle.Lib.TestsKernel` holds result selection,
+the algorithm fixtures, which the api integration suite reads in 25 files as well as the lib tests.
+`lib/data/Binacle.Lib.Data` (the lib tests kernel until 2026-09-20) holds result selection,
 which **nothing outside the lib slice reads**, so its fixtures live in `lib/data` rather than `shared/data`.
 
 **The rule that falls out:** a fixture set lives in `shared/data` when more than one slice reads it, and in the
@@ -89,14 +90,16 @@ runs every version of every algorithm over it. Its `Result` came from the packer
 regression baseline, not an independent check.
 
 **The friend grant is preferred to a shared bin model.** `OperationResultHelper` bridges through Packing's
-internal `Dimensions` rather than taking a bin type from the shared algorithm kernel. Reaching for that kernel
-would give the lib fixture hub a dependency on fixtures it never reads, to borrow one type (`ScenarioBin`).
+internal `Dimensions` rather than taking `ScenarioBin` from `Binacle.Data`. `PackedBin`'s constructor is
+internal, so the grant is needed either way; borrowing the type would add a dependency without removing one.
+Since 2026-09-20 `Binacle.Lib.Data` references `Binacle.Data` anyway, for its reader - the argument now rests
+on the constructor alone.
 
 **One embedded-resource reader, and the caller names the assembly. Superseded 2026-09-19.** Until then each
 kernel owned a copy, because `Assembly.GetExecutingAssembly()` inside a shared reader resolves to the shared
 assembly, which embeds nothing. `Binacle.Data`'s `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)`
 takes the assembly instead, so that failure cannot happen, and hands the manifest name back unsplit so each
-data project keeps its own name shape. The lib kernel's copy goes when it moves to that reader.
+data project keeps its own name shape. `Binacle.Lib.Data` reads through it since 2026-09-20.
 
 **The manifest prefix names the purpose, not the assembly.** `ResultSelection.<case>.<file>`, following ViPaq's
 `PackedData.<family>.<file>`, so an assembly rename cannot silently break the manifest. A broken manifest name

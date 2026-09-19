@@ -1,7 +1,7 @@
 ---
 id: lib/result-selection
 description: IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them
-verified: 2026-09-04
+verified: 2026-09-20
 check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and the TestsKernel Scenario
 also_update:
   - api/service
@@ -91,7 +91,7 @@ fully — this one then takes the highest utilization, `SmallestBin_v2` the leas
 ## How tests verify selection
 
 `ResultSelectionTestingFixture.GetScenarioByName(scenarioName)` resolves the scenario (from JSON test data
-under `lib/data/result-selection/`, embedded by `lib/test/Binacle.Lib.TestsKernel` under the manifest prefix
+under `lib/data/result-selection/`, embedded by `lib/data/Binacle.Lib.Data` under the manifest prefix
 `ResultSelection.` — see `$lib/tests`).
 
 `ResultSelectionTestingFixture.Select(scenario, strategy, resultSelector)` then takes:

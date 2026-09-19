@@ -47,9 +47,11 @@
   <Folder Name="/lib/src/">
     <Project Path="lib/src/Binacle.Lib/Binacle.Lib.csproj" />
   </Folder>
+  <Folder Name="/lib/data/">
+    <Project Path="lib/data/Binacle.Lib.Data/Binacle.Lib.Data.csproj" />
+  </Folder>
   <Folder Name="/lib/test/">
     <Project Path="lib/test/Binacle.Lib.UnitTests/Binacle.Lib.UnitTests.csproj" />
-    <Project Path="lib/test/Binacle.Lib.TestsKernel/Binacle.Lib.TestsKernel.csproj" />
     <Project Path="lib/test/Binacle.Lib.Benchmarks/Binacle.Lib.Benchmarks.csproj" />
     <Project Path="lib/test/Binacle.Lib.PerformanceTests/Binacle.Lib.PerformanceTests.csproj" />
   </Folder>

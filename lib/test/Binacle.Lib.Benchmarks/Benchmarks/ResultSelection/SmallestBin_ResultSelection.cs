@@ -2,14 +2,14 @@ using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Benchmarks.Abstractions;
 using Binacle.Lib.Benchmarks.Order;
 using Binacle.Lib.ResultSelection;
-using Binacle.Lib.TestsKernel.ResultSelection.Providers;
+using Binacle.Lib.Data.ResultSelection.SmallestBin;
 
 namespace Binacle.Lib.Benchmarks.Benchmarks.ResultSelection;
 
 [MemoryDiagnoser]
 public class SmallestBin_ResultSelection : ResultSelectionBenchmarkBase
 {
-    [ParamsSource(typeof(SmallestBinScenarioProvider), nameof(SmallestBinScenarioProvider.GetScenarioNames))]
+    [ParamsSource(typeof(Scenarios), nameof(Scenarios.GetScenarioNames))]
     public override string? ScenarioName { get; set; }
     
     [Benchmark(Baseline = true)]

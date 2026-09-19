@@ -1,7 +1,7 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-09-19
+verified: 2026-09-20
 check: Project list and test aliases match the solution
 also_update:
   - lib/tests
@@ -19,7 +19,7 @@ One src project:
 - `lib/src/Binacle.Lib` — the algorithm code, processors and result selection. Its `Abstractions/` folder holds
   the engine interfaces; the vocabulary a caller needs is `Binacle.Packing`, in `shared/src`.
 
-Plus, in this slice: `lib/test/Binacle.Lib.TestsKernel` (the result-selection fixture kernel) and
+Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario project) and
 `lib/data/result-selection` (the fixtures it embeds).
 
 ## Docs

@@ -7,7 +7,7 @@
              internal Dimensions struct to satisfy PackedBin. A grant is not a dependency edge - it annotates
              one the grantee's ProjectReference already declares. -->
         <InternalsVisibleTo Include="Binacle.Lib"/>
-        <InternalsVisibleTo Include="Binacle.Lib.TestsKernel"/>
+        <InternalsVisibleTo Include="Binacle.Lib.Data"/>
     </ItemGroup>
 
     <ItemGroup>

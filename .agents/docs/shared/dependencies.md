@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
-verified: 2026-09-19
+verified: 2026-09-20
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"
@@ -26,9 +26,9 @@ Binacle.Geometry                 leaf — BCL only, no Binacle deps
    │      └── Binacle.CompactNotation.UnitTests   xUnit
    │
    └── Binacle.Packing ──────────┘   the packing vocabulary: results, identity, status enums
-          [IVT → Binacle.Lib, Binacle.Lib.TestsKernel]
+          [IVT → Binacle.Lib, Binacle.Lib.Data]
           consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.Data,
-                     Binacle.Lib.TestsKernel, OrLibrary.Converter, ViPaq.PackedDataGenerator
+                     Binacle.Lib.Data, OrLibrary.Converter, ViPaq.PackedDataGenerator
                      (Binacle.Net reaches it transitively and imports it globally - $api/dependencies)
 
 Binacle.FluxResults              leaf — BCL only, no Binacle deps
@@ -55,7 +55,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.Geometry` | library | — (BCL only) | — | the geometry leaf: `IWith[ReadOnly]*` + `Dimensions<T>`/`Coordinates<T>`/`Item<T>` (Apache-2.0, see note 8) |
 | `Binacle.CompactNotation` | library | Geometry | grants IVT to its UnitTests | parses/formats the `LxWxH (X,Y,Z)` compact string |
 | `Binacle.CompactNotation.UnitTests` | xUnit exe | CompactNotation | yes | notation tests |
-| `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.TestsKernel` | packing result models, identity, status enums |
+| `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.Data` | packing result models, identity, status enums |
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
@@ -75,17 +75,17 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 3. **`Binacle.Data` holds the algorithm scenarios only.** Bischoff suite and custom-problems, embedded by
    link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
    read it: the api integration suite and the lib tests. The result-selection fixtures went the other way —
-   one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.TestsKernel` (see
+   one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.Data` (see
    `$lib/dependencies`). Not to be confused with `Binacle.ViPaq.TestsKernel`, a separate ViPaq-only hub — see
    `$vipaq/dependencies`.
 
 4. **`Binacle.Data` owns the one embedded-resource reader, and the caller names the assembly.**
    `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)` reads from the assembly it is given, so any data
    project can use it by passing its own. It hands the manifest name back unsplit; how the name is shaped is
-   each project's to know. The lib and ViPaq kernels still carry a copy each until they move to this one.
+   each project's to know. `Binacle.Lib.Data` already reads through it; the ViPaq kernel carries a copy until it moves.
 
 5. **An `InternalsVisibleTo` grant is not a dependency edge.** It annotates one the grantee's `ProjectReference`
-   already declares — `Binacle.Packing` granting to `Binacle.Lib.TestsKernel` records that the kernel leans on
+   already declares — `Binacle.Packing` granting to `Binacle.Lib.Data` records that the data project leans on
    Packing's internals, not that Packing leans on the kernel.
 
 6. **`Binacle.TestReporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns

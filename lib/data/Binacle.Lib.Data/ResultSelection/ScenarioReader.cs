@@ -1,7 +1,6 @@
 using System.Text.Json;
-using Binacle.Lib.TestsKernel.Files;
 
-namespace Binacle.Lib.TestsKernel.ResultSelection;
+namespace Binacle.Lib.Data.ResultSelection;
 
 internal static class ScenarioReader
 { 
@@ -12,10 +11,10 @@ internal static class ScenarioReader
         public Dictionary<string, string>? Results { get; set; }
     }
 
-    public static List<Models.Scenario> ReadScenarios(IFile file)
+    public static List<Scenario> ReadScenarios(Stream stream)
     {
-        var resultScenarios = new List<Models.Scenario>();
-        using (var sr = new StreamReader(file.OpenRead()))
+        var resultScenarios = new List<Scenario>();
+        using (var sr = new StreamReader(stream))
         {
             var readScenarios = JsonSerializer.Deserialize<List<ReadScenario>>(sr.ReadToEnd());
             if(readScenarios is null)
@@ -44,7 +43,7 @@ internal static class ScenarioReader
                     throw new ArgumentException($"Expected result '{readScenario.ExpectedResult}' is not found in results");
                 }
 
-                var resultScenario = Models.Scenario.Create(
+                var resultScenario = Scenario.Create(
                     readScenario.Name,
                     readScenario.ExpectedResult,
                     readScenario.Results

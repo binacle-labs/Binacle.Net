@@ -32,12 +32,12 @@ Shape: [support-projects.md](support-projects.md). Protocol: the orchestrator be
 
 ## Done when
 
-- [ ] `test -d lib/data/Binacle.Lib.Data && test ! -d lib/test/Binacle.Lib.TestsKernel`
-- [ ] `test ! -d lib/data/Binacle.Lib.Data/Files`
-- [ ] `grep -n "InternalsVisibleTo" shared/src/Binacle.Packing/Binacle.Packing.csproj` names `Binacle.Lib.Data`,
+- [x] `test -d lib/data/Binacle.Lib.Data && test ! -d lib/test/Binacle.Lib.TestsKernel`
+- [x] `test ! -d lib/data/Binacle.Lib.Data/Files`
+- [x] `grep -n "InternalsVisibleTo" shared/src/Binacle.Packing/Binacle.Packing.csproj` names `Binacle.Lib.Data`,
       not the kernel.
-- [ ] `grep -rn "Lib.TestsKernel" --include=*.cs --include=*.csproj --include=*.slnx --include=*.props --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites"`
+- [x] `grep -rn "Lib.TestsKernel" --include=*.cs --include=*.csproj --include=*.slnx --include=*.props --include=*.md . | grep -v "^./.agents/plans/measured-results\|^./sites"`
       is empty.
-- [ ] `ls .agents/plans/shared/ | grep -i kernel` is empty.
-- [ ] `dotnet build lib/test/Binacle.Lib.UnitTests` and `dotnet build lib/test/Binacle.Lib.Benchmarks` succeed;
+- [x] `ls .agents/plans/shared/ | grep -i kernel` is empty.
+- [x] `dotnet build lib/test/Binacle.Lib.UnitTests` and `dotnet build lib/test/Binacle.Lib.Benchmarks` succeed;
       `just test cs_binacle-lib_unit` passes.

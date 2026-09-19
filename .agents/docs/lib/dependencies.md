@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
-description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection tests kernel, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-19
+description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
+verified: 2026-09-20
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -21,18 +21,18 @@ Arrows point at what a project references. `[IVT]` marks who can see a project's
 Binacle.Geometry                         (shared leaf — see $shared/dependencies)
    ▲
 Binacle.Packing ─────────────────────────┘   the packing vocabulary (shared/src)
-   ▲   [IVT → Binacle.Lib, Binacle.Lib.TestsKernel]
+   ▲   [IVT → Binacle.Lib, Binacle.Lib.Data]
    │
    ├── Binacle.Lib ──────────────────────┘   FFD/WFD/BFD algorithms, processors, result selection
    │      ▲   [IVT → UnitTests, Benchmarks, PerformanceTests]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
-   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Binacle.Data, Lib.TestsKernel
-   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Binacle.Data, Lib.TestsKernel
+   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Binacle.Data, Lib.Data
+   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Binacle.Data, Lib.Data
    │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Binacle.Data, TestReporting
    │
-   └── Binacle.Lib.TestsKernel ──────────┘   result-selection fixture hub (lib/test)
-          refs: Binacle.Packing, Binacle.CompactNotation
+   └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
+          refs: Binacle.Data (the reader), Binacle.Packing, Binacle.CompactNotation
           embeds lib/data/result-selection under the manifest prefix "ResultSelection."
 ```
 
@@ -41,12 +41,12 @@ Binacle.Packing ─────────────────────�
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
 | `Binacle.Lib` | library | Packing | grants IVT to its three test projects | the algorithms, processors, result selection |
-| `Binacle.Lib.TestsKernel` | library | Packing, CompactNotation | sees Packing's | result-selection fixtures + providers |
-| `Binacle.Lib.UnitTests` | xUnit exe | Lib, Binacle.Data, Lib.TestsKernel | yes | algorithm/result unit tests |
-| `Binacle.Lib.Benchmarks` | exe | Lib, Binacle.Data, Lib.TestsKernel | yes | BenchmarkDotNet timings |
+| `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
+| `Binacle.Lib.UnitTests` | xUnit exe | Lib, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
+| `Binacle.Lib.Benchmarks` | exe | Lib, Binacle.Data, Lib.Data | yes | BenchmarkDotNet timings |
 | `Binacle.Lib.PerformanceTests` | exe | Lib, Binacle.Data, TestReporting | yes | markdown perf reports |
 
-`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.TestsKernel` is this slice's own.
+`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.Data` is this slice's own.
 
 ## Notes
 
@@ -61,14 +61,14 @@ Binacle.Packing ─────────────────────�
    that ships.
 
 2. **Two data hubs, split by audience.** The shared `Binacle.Data` holds the algorithm scenarios, which the
-   api integration suite reads too. `Binacle.Lib.TestsKernel` holds result selection, which nothing outside
-   this slice reads — so its fixtures live in `lib/data` and it embeds them itself. The embedded-resource
-   reader is `Binacle.Data`'s and takes the assembly to read from; the lib kernel still carries a copy until
-   it moves to that one.
+   api integration suite reads too. `Binacle.Lib.Data` holds result selection, which nothing outside this
+   slice reads — so its fixtures live in `lib/data` and it embeds them itself. It reads them with
+   `Binacle.Data`'s embedded-resource reader, passing its own assembly, which is why it references
+   `Binacle.Data` without reading any of its scenarios.
 
-3. **The friend grant is what lets the kernel fabricate results.** `Binacle.Packing`'s result models have internal
-   constructors; `Binacle.Lib.TestsKernel` builds them from compact strings, and uses Packing's internal
-   `Dimensions` struct to satisfy `PackedBin`. That grant annotates the kernel's existing reference to Packing —
+3. **The friend grant is what lets `Binacle.Lib.Data` fabricate results.** `Binacle.Packing`'s result models
+   have internal constructors; `Binacle.Lib.Data` builds them from compact strings, and uses Packing's internal
+   `Dimensions` struct to satisfy `PackedBin`. That grant annotates its existing reference to Packing —
    it does not add an edge, and nothing in `shared` depends on `lib` because of it.
 
 4. **Nothing enforces the abstractions boundary.** Only convention stops an interface under

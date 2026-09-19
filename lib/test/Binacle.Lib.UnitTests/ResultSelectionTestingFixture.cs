@@ -1,6 +1,5 @@
 using Binacle.Lib.Abstractions;
-using Binacle.Lib.TestsKernel.ResultSelection.Models;
-using Binacle.Lib.TestsKernel.ResultSelection.Providers;
+using Binacle.Lib.Data.ResultSelection;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -18,7 +17,7 @@ public sealed class ResultSelectionTestingFixture : IDisposable
 
 	// Arrange. The scenario holds the candidate results and the one the strategy is meant to pick.
 	public Scenario GetScenarioByName(string scenarioName)
-		=> AllScenariosProvider.GetScenarioByName(scenarioName);
+		=> All.GetScenarioByName(scenarioName);
 
 	// Act. Selects, then projects to the string the test compares. No assertion here - the test makes its
 	// own Shouldly call, which Sonar already recognises, so this side needs no [AssertionMethod] hint.

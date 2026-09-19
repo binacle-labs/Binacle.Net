@@ -2,14 +2,14 @@ using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Benchmarks.Abstractions;
 using Binacle.Lib.Benchmarks.Order;
 using Binacle.Lib.ResultSelection;
-using Binacle.Lib.TestsKernel.ResultSelection.Providers;
+using Binacle.Lib.Data.ResultSelection.BestAlgorithm;
 
 namespace Binacle.Lib.Benchmarks.Benchmarks.ResultSelection;
 
 [MemoryDiagnoser]
 public class BestAlgorithm_ResultSelection : ResultSelectionBenchmarkBase
 {
-    [ParamsSource(typeof(BestAlgorithmScenarioProvider), nameof(BestAlgorithmScenarioProvider.GetScenarioNames))]
+    [ParamsSource(typeof(Scenarios), nameof(Scenarios.GetScenarioNames))]
     public override string? ScenarioName { get; set; }
     
     [Benchmark(Baseline = true)]

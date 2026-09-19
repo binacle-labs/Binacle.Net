@@ -9,6 +9,7 @@ items, it works out whether they fit (**fit**) and packs as many as it can (**pa
 |---|---|
 | `src/Binacle.Lib` | The algorithms, processors, and result building. The only project in `src`. |
 | `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's tests only. |
+| `data/Binacle.Lib.Data` | The project that embeds those fixtures and reads them into models - see [its README](data/Binacle.Lib.Data/README.md). |
 
 ## ⚙️ How it works
 
@@ -41,7 +42,6 @@ then picks the best outcome across algorithms or across bins.
 
 | Project | Run with | Covers |
 |---|---|---|
-| `test/Binacle.Lib.TestsKernel` | - | Fixture kernel for result selection. Embeds `data/result-selection`. |
 | `test/Binacle.Lib.UnitTests` | `just test cs_binacle-lib_unit` | All algorithm versions × scenarios; result selection |
 | `test/Binacle.Lib.PerformanceTests` | `./tooling/performance.lib.sh` | Algorithm performance (console runner) |
 | `test/Binacle.Lib.Benchmarks` | `./tooling/benchmarks.lib.sh` | BenchmarkDotNet microbenchmarks |

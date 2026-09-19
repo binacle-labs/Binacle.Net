@@ -1,5 +1,7 @@
 using Binacle.Lib.ResultSelection;
-using Binacle.Lib.TestsKernel.ResultSelection.Providers;
+using BestAlgorithm = Binacle.Lib.Data.ResultSelection.BestAlgorithm.Scenarios;
+using BestBin = Binacle.Lib.Data.ResultSelection.BestBin.Scenarios;
+using SmallestBin = Binacle.Lib.Data.ResultSelection.SmallestBin.Scenarios;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -14,7 +16,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BestAlgorithmScenarioProvider.ScenarioNames), MemberType = typeof(BestAlgorithmScenarioProvider))]
+	[MemberData(nameof(BestAlgorithm.ScenarioNames), MemberType = typeof(BestAlgorithm))]
 	public void BestAlgorithm_v1(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
@@ -25,7 +27,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
     
 	[Theory]
-	[MemberData(nameof(BestAlgorithmScenarioProvider.ScenarioNames), MemberType = typeof(BestAlgorithmScenarioProvider))]
+	[MemberData(nameof(BestAlgorithm.ScenarioNames), MemberType = typeof(BestAlgorithm))]
 	public void BestAlgorithm_v2(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
@@ -36,7 +38,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
     
 	[Theory]
-	[MemberData(nameof(BestBinScenarioProvider.ScenarioNames), MemberType = typeof(BestBinScenarioProvider))]
+	[MemberData(nameof(BestBin.ScenarioNames), MemberType = typeof(BestBin))]
 	public void BestBin_v1(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
@@ -47,7 +49,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
     
 	[Theory]
-	[MemberData(nameof(BestBinScenarioProvider.ScenarioNames), MemberType = typeof(BestBinScenarioProvider))]
+	[MemberData(nameof(BestBin.ScenarioNames), MemberType = typeof(BestBin))]
 	public void BestBin_v2(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
@@ -58,7 +60,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
 	
 	[Theory]
-	[MemberData(nameof(SmallestBinScenarioProvider.ScenarioNames), MemberType = typeof(SmallestBinScenarioProvider))]
+	[MemberData(nameof(SmallestBin.ScenarioNames), MemberType = typeof(SmallestBin))]
 	public void SmallestBin_v1(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
@@ -69,7 +71,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	}
     
 	[Theory]
-	[MemberData(nameof(SmallestBinScenarioProvider.ScenarioNames), MemberType = typeof(SmallestBinScenarioProvider))]
+	[MemberData(nameof(SmallestBin.ScenarioNames), MemberType = typeof(SmallestBin))]
 	public void SmallestBin_v2(string scenarioName)
 	{
 		var scenario = this.fixture.GetScenarioByName(scenarioName);
