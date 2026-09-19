@@ -23,10 +23,9 @@ Worked examples of the first:
 - **S2699 "tests should include assertions"** — restructure so the assert sits in the test body, or mark the
   helper that does the asserting with `[AssertionMethod]`. The analyser matches that attribute **by name
   alone**: no package, any namespace. It is declared twice, in
-  `shared/data/Binacle.Data/AssertionMethodAttribute.cs` and
-  `vipaq/test/Binacle.ViPaq.UnitTests/AssertionMethodAttribute.cs`, because ViPaq.UnitTests deliberately does
-  not reference the ViPaq kernel (`$vipaq/dependencies`). C# S2699 has no rule parameters, so the Java
-  `customAssertionMethods` advice found in Sonar community threads does not transfer.
+  `lib/test/Binacle.Lib.UnitTests/AssertionMethodAttribute.cs` and
+  `vipaq/test/Binacle.ViPaq.UnitTests/AssertionMethodAttribute.cs`, one per unit-test project that needs it.
+  C# S2699 has no rule parameters, so the Java `customAssertionMethods` advice found in Sonar community threads does not transfer.
 - **S6418 "hard-coded secret"** on a dev placeholder — change the value so it stops looking like a credential.
   A path ignore would also blind that file to a real secret pasted in later.
 

@@ -1,5 +1,5 @@
 
-namespace Binacle.Data;
+namespace Binacle.Lib.Testing;
 
 public class TestOperationParameters : IOperationParameters
 {

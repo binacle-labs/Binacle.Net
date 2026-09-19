@@ -31,7 +31,7 @@ enough to make it a format with readers.
 with no exceptions, because the format above is the thing they all have to agree with.
 
 That covers the lib types (`BestFitDecreasing_v1`, `BestAlgorithm_v2`, `AlgorithmFactory_v1`), the
-`FFD_v1`/`BFD_v1`/`WFD_v1` factory constants in all three `AlgorithmFactories.cs` copies, the unit test method
+`FFD_v1`/`BFD_v1`/`WFD_v1` factory constants in `AlgorithmFactories.cs`, the unit test method
 names (`CustomProblems_Fitting_BFD_v1`), and the benchmark class names (`AlgorithmRacing_Packing_v1`).
 
 An S101 sweep on 2026-08-09 renamed the 14 lib types to `BestFitDecreasingV1` and so on, then **reverted the

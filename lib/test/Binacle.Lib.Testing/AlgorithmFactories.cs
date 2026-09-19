@@ -1,9 +1,8 @@
 using Binacle.Lib.Abstractions.Algorithms;
-using Binacle.Data;
 
-namespace Binacle.Lib.UnitTests;
+namespace Binacle.Lib.Testing;
 
-internal static class AlgorithmFactories
+public static class AlgorithmFactories
 {
 	public static TestAlgorithmFactory<IPackingAlgorithm> FFD_v1 = (bin, items)
 		=> new Binacle.Lib.Algorithms.FirstFitDecreasing_v1<ScenarioBin, ScenarioItem>(bin, items);

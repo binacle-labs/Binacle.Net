@@ -1,7 +1,8 @@
 # Binacle.Data
 
 The scenario data of `shared/data` as C#. It embeds the three scenario sets next to it and reads them into
-models the tests run against. Not a test project: nothing in it asserts, and no test SDK is referenced.
+models the tests run against. Not a test project: nothing in it asserts, no test SDK is referenced, and it
+names no packing result - the checks live with the lib tests.
 
 ## 📂 What is in it
 
@@ -12,7 +13,7 @@ models the tests run against. Not a test project: nothing in it asserts, and no 
 | `Scenario.cs`, `ScenarioBin.cs`, `ScenarioItem.cs`, `ScenarioMetrics.cs`, `ScenarioResult.cs`, `AlgorithmResult.cs` | The models a scenario reads into |
 | `Helpers/` | The parsers for the compact `Metrics` and `Result` strings |
 | `Files/` | The embedded-resource reader. It takes the assembly to read from, so other data projects use it too |
-| `ExtensionMethods/`, `TestAlgorithmFactory.cs`, `TestOperationParameters.cs`, `PercentageComparer.cs` | Test helpers the lib and api suites share |
+| `PercentageComparer.cs` | The 0.1% tolerance the lib and api suites compare fill percentages with |
 
 The set folders you see in the IDE are not on disk. The JSON lives in the sibling folders (`../bischoff-suite`,
 `../custom-problems`, `../demo-samples`) and is linked in by the csproj; edit it there. A new file is embedded

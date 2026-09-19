@@ -1,6 +1,6 @@
+using Binacle.Lib.Testing.Providers;
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Benchmarks.Abstractions;
-using Binacle.Lib.Benchmarks.Providers;
 using Binacle.Data;
 using Binacle.Data.BischoffSuite;
 

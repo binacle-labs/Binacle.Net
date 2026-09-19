@@ -59,7 +59,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
-| `Binacle.Data` | library | Packing, CompactNotation | — | algorithm scenarios + set classes + the reader (see notes 3, 4) |
+| `Binacle.Data` | library | Packing, CompactNotation | — | algorithm scenarios + set classes + the reader; no harness code (see notes 3, 4) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
 
 ## Notes

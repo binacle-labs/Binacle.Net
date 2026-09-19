@@ -1,4 +1,4 @@
-namespace Binacle.Data;
+namespace Binacle.Lib.UnitTests;
 
 // Marks a helper that does the asserting on a test's behalf.
 //

@@ -38,12 +38,12 @@ Consumers re-point: `Binacle.Lib.UnitTests`, `Binacle.Lib.Benchmarks`, `Binacle.
 
 ## Done when
 
-- [ ] `test -d lib/test/Binacle.Lib.Testing`
-- [ ] `find lib -name AlgorithmFactories.cs -not -path "*/obj/*"` lists one file.
-- [ ] `grep -rnw "OperationResult\|IOperationParameters\|AlgorithmOperation\|AssertionMethodAttribute" shared/data/Binacle.Data --include=*.cs`
+- [x] `test -d lib/test/Binacle.Lib.Testing`
+- [x] `find lib -name AlgorithmFactories.cs -not -path "*/obj/*"` lists one file.
+- [x] `grep -rnw "OperationResult\|IOperationParameters\|AlgorithmOperation\|AssertionMethodAttribute" shared/data/Binacle.Data --include=*.cs`
       is empty (`-w`, so `OperationResultStatus`, which stays, does not match).
-- [ ] `grep -o 'Include="[^"]*csproj"' shared/data/Binacle.Data/*.csproj` names Packing and CompactNotation
+- [x] `grep -o 'Include="[^"]*csproj"' shared/data/Binacle.Data/*.csproj` names Packing and CompactNotation
       and nothing else; Geometry comes through them.
-- [ ] `test ! -d lib/test/Binacle.Lib.Benchmarks/Providers`
-- [ ] `dotnet build` on `Binacle.Lib.UnitTests`, `Binacle.Lib.Benchmarks`, `Binacle.Lib.PerformanceTests`
+- [x] `test ! -d lib/test/Binacle.Lib.Benchmarks/Providers`
+- [x] `dotnet build` on `Binacle.Lib.UnitTests`, `Binacle.Lib.Benchmarks`, `Binacle.Lib.PerformanceTests`
       succeeds; `just test cs_binacle-lib_unit` passes.

@@ -1,6 +1,6 @@
 ---
 id: lib/tests
-description: lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, performance tests, benchmarks; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
 verified: 2026-09-20
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
 also_update:
@@ -14,24 +14,42 @@ paths:
 
 # Lib Tests
 
-Three projects under `lib/test/`. Algorithm scenario data and the `TestAlgorithmFactory<>` delegate come from
-the shared `Binacle.Data` project — see shared (`$shared`). The **result-selection** fixtures come from this
+Four projects under `lib/test/`, one of them a support library rather than a suite. Algorithm scenario data
+comes from the shared `Binacle.Data` project — see shared (`$shared`); the harness code every lib suite
+shares comes from `Binacle.Lib.Testing`, below. The **result-selection** fixtures come from this
 slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection` under the manifest prefix
 `ResultSelection.` — it is here rather than in `shared` because nothing outside this slice reads it
 (`$lib/dependencies`).
 
 | Project | Kind | Run |
 |---|---|---|
+| `Binacle.Lib.Testing` | support library (no suite) | — |
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PerformanceTests` | console host (writes markdown reports) | `./tooling/performance.lib.sh` |
 | `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
 
+## Binacle.Lib.Testing
+
+The harness code the three suites share, referenced by all of them and imported globally
+(`<Using Include="Binacle.Lib.Testing" />` in each csproj). `Binacle.Lib` grants it friend access, because
+it constructs the internal algorithm classes.
+
+- `AlgorithmFactories.cs` defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
+  `WFD_v1/_v2`, `BFD_v1/_v2` — each constructing the algorithm directly
+  (`new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
+  This keeps every version (including v1) under test without coupling it to the production factory.
+- `TestAlgorithmFactory<TAlgorithm>` — `delegate TAlgorithm (ScenarioBin bin, List<ScenarioItem> items)` — and
+  `TestOperationParameters`, the `IOperationParameters` a test hands to `Execute`.
+- `ScenarioChecks` — the two `EvaluateResult` extensions, on `ScenarioMetrics` and on `AlgorithmResult`
+  (**not** on `ScenarioResult`, which is the map). The `AlgorithmResult` one picks the packing or the fitting
+  expected status by `result.AlgorithmOperation`, then throws on mismatch. `OperationResultExtensions` holds
+  the volume and count totals they compare against.
+- `Providers/` — the benchmark picks: `BischoffCuratedProblemsProvider` (five scenarios), `CubeScalingProblemsProvider`,
+  `SpecializedScalingProblemsProvider`, `ConcurrencyProvider`.
+
 ## Binacle.Lib.UnitTests
 
-`AlgorithmFactories.cs` (in this project) defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics —
-`FFD_v1/_v2`, `WFD_v1/_v2`, `BFD_v1/_v2` — each constructing the algorithm directly
-(`new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
-This keeps every version (including v1) under test without coupling it to the production factory.
+Keeps its own `AssertionMethodAttribute`, the Sonar S2699 marker; ViPaq's unit tests carry a copy too.
 
 Both fixtures split arrange, act and assert into separate members, so a test body shows all three steps
 rather than handing them to one helper.
@@ -85,7 +103,7 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 
 ## Binacle.Lib.PerformanceTests
 
-Console host (not xUnit). Has its own copy of the six `AlgorithmFactories`. `Program.cs` wires a `TestRunner` +
+Console host (not xUnit). `Program.cs` wires a `TestRunner` +
 `MarkdownFileWriter` and runs Bischoff-suite `ITest` implementations: `PackingEfficiencyTests`, `RegressionTests`
 (FFD/WFD/BFD v1-vs-v2), `EfficiencyStatisticsTests`, `BaselineComparisonTests`. Output is markdown reports, not
 pass/fail assertions.
@@ -94,8 +112,8 @@ pass/fail assertions.
 
 BenchmarkDotNet. Two factory paths:
 
-- Bischoff-suite and FastValidation benchmarks use the project's own six `TestAlgorithmFactory` statics, via
-  `BischoffSuiteBenchmarkBase` and `FastValidationBenchmarkBase`.
+- Bischoff-suite and FastValidation benchmarks use the six `AlgorithmFactories` statics from `Binacle.Lib.Testing`,
+  via `BischoffSuiteBenchmarkBase` and `FastValidationBenchmarkBase`.
 - AlgorithmProcessing and BinProcessing benchmarks use the lib's **internal** `AlgorithmFactory_v1()` /
   `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`) fed into `LoopAlgorithmProcessor` /
   `ParallelAlgorithmProcessor` and `LoopBinProcessor` / `ParallelBinProcessor`.

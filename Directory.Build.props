@@ -12,7 +12,7 @@
 
     <!--
         Tell Sonar which projects are support code. The Scanner for .NET spots a test project by its
-        Microsoft.NET.Test.Sdk reference, so it finds the xunit suites on its own but reads the eleven projects
+        Microsoft.NET.Test.Sdk reference, so it finds the xunit suites on its own but reads the twelve projects
         without one - the data projects, the test support libraries, the benchmarks, the performance suites and
         the generator/converter tools - as product code. That put 1203 lines into the coverage denominator that
         no test will ever cover, and ran the product rule set over them: S101 firing on benchmark names like

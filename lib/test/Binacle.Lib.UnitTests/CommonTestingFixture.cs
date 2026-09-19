@@ -1,6 +1,5 @@
 using Binacle.Lib.Abstractions.Algorithms;
 using Binacle.Data;
-using Binacle.Data.ExtensionMethods;
 
 namespace Binacle.Lib.UnitTests;
 

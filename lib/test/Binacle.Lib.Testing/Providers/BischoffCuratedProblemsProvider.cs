@@ -1,4 +1,4 @@
-namespace Binacle.Lib.Benchmarks.Providers;
+namespace Binacle.Lib.Testing.Providers;
 
 public static class BischoffCuratedProblemsProvider
 {

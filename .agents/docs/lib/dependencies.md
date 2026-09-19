@@ -24,12 +24,13 @@ Binacle.Packing ─────────────────────�
    ▲   [IVT → Binacle.Lib, Binacle.Lib.Data]
    │
    ├── Binacle.Lib ──────────────────────┘   FFD/WFD/BFD algorithms, processors, result selection
-   │      ▲   [IVT → UnitTests, Benchmarks, PerformanceTests]
+   │      ▲   [IVT → UnitTests, Benchmarks, PerformanceTests, Testing]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
-   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Binacle.Data, Lib.Data
-   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Binacle.Data, Lib.Data
-   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Binacle.Data, TestReporting
+   │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks
+   │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
+   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
+   │      └── Binacle.Lib.PerformanceTests  exe     refs: Lib, Lib.Testing, Binacle.Data, TestReporting
    │
    └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
           refs: Binacle.Data (the reader), Binacle.Packing, Binacle.CompactNotation
@@ -40,13 +41,15 @@ Binacle.Packing ─────────────────────�
 
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
-| `Binacle.Lib` | library | Packing | grants IVT to its three test projects | the algorithms, processors, result selection |
+| `Binacle.Lib` | library | Packing | grants IVT to `Testing` and its three suites | the algorithms, processors, result selection |
 | `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
-| `Binacle.Lib.UnitTests` | xUnit exe | Lib, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
-| `Binacle.Lib.Benchmarks` | exe | Lib, Binacle.Data, Lib.Data | yes | BenchmarkDotNet timings |
-| `Binacle.Lib.PerformanceTests` | exe | Lib, Binacle.Data, TestReporting | yes | markdown perf reports |
+| `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
+| `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
+| `Binacle.Lib.Benchmarks` | exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | BenchmarkDotNet timings |
+| `Binacle.Lib.PerformanceTests` | exe | Lib, Lib.Testing, Binacle.Data, TestReporting | yes | markdown perf reports |
 
-`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.Data` is this slice's own.
+`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.Data` and `Lib.Testing` are this slice's own.
+`Lib.Testing` needs the friend grant because `AlgorithmFactories` constructs the internal algorithm classes.
 
 ## Notes
 

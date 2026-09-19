@@ -36,8 +36,9 @@ references it, in any slice.
 This project holds the algorithm scenarios only. **Result selection lives in `lib/data/Binacle.Lib.Data`**,
 because nothing outside the lib slice reads it — see `$lib/dependencies`.
 
-The project root also holds what both audiences share: `ScenarioBin`, `ScenarioItem`, `TestOperationParameters`,
-`TestAlgorithmFactory`, `PercentageComparer`, `AssertionMethodAttribute` and the `Files/` reader.
+The project root also holds what both audiences share: `ScenarioBin`, `ScenarioItem`, `PercentageComparer`
+and the `Files/` reader. Nothing here names a packing result type or a test: the checks, the factories and
+the benchmark picks are lib's, in `Binacle.Lib.Testing` (`$lib/tests`).
 
 ## Scenario sets
 
@@ -134,8 +135,8 @@ the missing pair to Bischoff when a caller needs it, not to even the two up.
 
 ## Models and helpers
 
-Models: `ScenarioBin` (`IWithID, IWithDimensions`), `ScenarioItem` (`IWithID, IWithDimensions, IWithQuantity`),
-`TestOperationParameters`. `ScenarioBin`/`ScenarioItem` each expose a `FromCompactString` factory (and a
+Models: `ScenarioBin` (`IWithID, IWithDimensions`), `ScenarioItem` (`IWithID, IWithDimensions, IWithQuantity`).
+`ScenarioBin`/`ScenarioItem` each expose a `FromCompactString` factory (and a
 `Binacle.Geometry.IWithDimensions<int>` ctor) that parse via the shared notation. `Scenario` carries `Name` +
 bin + items + `ScenarioMetrics` + `ScenarioResult`, and `Scenario.Create` is what parses all three from their
 compact forms.
@@ -145,15 +146,9 @@ returns the `AlgorithmResult` for that algorithm and throws if the scenario does
 `AlgorithmResult` carries `PackingStatus`, `PackingEarlyExitReason`, `FittingStatus` and
 `FittingEarlyExitReason`.
 
-The project defines **no xUnit fixtures** — those live in the test projects (see lib tests (`$lib/tests`)).
-It provides:
-
-- `TestAlgorithmFactory<TAlgorithm>` — `delegate TAlgorithm (ScenarioBin bin, List<ScenarioItem> items)`
-- `EvaluateResult` extensions on `ScenarioMetrics` and on `AlgorithmResult` — **not on `ScenarioResult`**, which
-  is the map. The `AlgorithmResult` one picks the packing or the fitting expected status by
-  `result.AlgorithmOperation`, then throws on mismatch. A caller reaches it as
-  `scenario.Result.For(result.AlgorithmInfo.Algorithm).EvaluateResult(result)`.
-- `OperationResultExtensions` (volume/count totals) and `PercentageComparer` (0.1% tolerance)
+The project defines **no xUnit fixtures and no checks** — those live in the test projects and in
+`Binacle.Lib.Testing` (see lib tests (`$lib/tests`)). What it does provide is `PercentageComparer`
+(0.1% tolerance), which the api suite and the lib checks both use.
 
 ## shared/data — OR-Library
 
