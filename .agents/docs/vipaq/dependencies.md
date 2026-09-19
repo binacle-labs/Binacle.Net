@@ -27,7 +27,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │   │
    │   ├────── Binacle.ViPaq.Data  (no IVT)  library — the real packs
    │   │           refs: Binacle.Data (the embedded-resource reader), Geometry, CompactNotation
-   │   │           owns: the 2,316 frozen packs, Scenario, one class per family under Packed/
+   │   │           owns: the 2,322 frozen packs, Scenario, one class per family under Packed/
    │   │              ▲
    │   └────── Binacle.ViPaq  [grants IVT]  the format (reference implementation)
    │              ▲   ▲   ▲   ▲
@@ -38,12 +38,12 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │   │
    │              │   │   └────── Binacle.ViPaq.Testing          [IVT]  library — the harness's encoders
    │              │   │               refs: ViPaq, ViPaq.Data, Geometry, CompactNotation
-   │              │   │               owns: ViPaqEncoder/ViPaqHeader (drives ProtocolEncoder), protobuf,
-   │              │   │                     EncoderInfo, the curated and synthetic picks
+   │              │   │               owns: ViPaqEncoder/ViPaqHeader (drives ProtocolEncoder), protobuf, JSON,
+   │              │   │                     compact, EncoderInfo, the curated and synthetic picks
    │              │   │                  ▲          ▲
    │              │   │                  │          └── Binacle.ViPaq.EncodedSize  [IVT]  exe (vipaq/measure)
    │              │   │                  │                  refs: Testing, ViPaq.Data, Reporting
-   │              │   │                  │                  runs the curated-picks gate, writes vipaq/results/
+   │              │   │                  │                  runs the curated-picks gate, writes vipaq/results/ (README.md, encoded-size.md)
    │              │   │                  │
    │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe
    │              │   │                                          refs: Testing, ViPaq.Data (BenchmarkDotNet)
@@ -65,9 +65,9 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 |---|---|---|---|---|
 | `Binacle.ViPaq` | library | Geometry | grants IVT | the format; everything but the public surface is `internal` |
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, ViPaq.Data, CompactNotation | yes | spec/correctness — vectors + curated inputs, plus every real pack round-tripped |
-| `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,316 real packs as scenarios, one class per family |
-| `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders, protobuf, the curated and synthetic picks |
-| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks gate, then the size and crossover reports into `vipaq/results/` |
+| `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,322 real packs as scenarios, one class per family |
+| `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders - ViPaq, protobuf, JSON, compact - and the curated and synthetic picks |
+| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks gate, then `README.md` and `encoded-size.md` into `vipaq/results/` |
 | `Binacle.ViPaq.Benchmarks` | exe | Testing, ViPaq.Data | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
@@ -82,7 +82,9 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 2. **ViPaq.Data holds the real packs and nothing else; Testing holds the harness's encoders.** `ViPaq.Data`
    does not reference `Binacle.ViPaq` and has no internals grant - it is inputs only. `Testing` reaches the
    internal `ProtocolEncoder` through its own thin `ViPaqEncoder`/`ViPaqHeader`, so every mode (each codec,
-   each layout) is forceable. Only Benchmarks and EncodedSize reference `Testing`.
+   each layout) is forceable, and holds the three rival encoders the size file compares against: protobuf (the
+   fair format comparison, same codec both sides), JSON and compact notation (the text a user's token replaces,
+   bin and placed items only). Only Benchmarks and EncodedSize reference `Testing`.
 
 3. **PackedDataGenerator has no internals grant.** It produces the frozen data through the public surface and the
    packing engine only. It must never reach into ViPaq internals — the data has to be generatable the way any
@@ -109,7 +111,7 @@ runs it every time:
 
 | Theory | What it sweeps |
 |---|---|
-| `Serializer_Round_Trips_In_Every_Mode` | all 2,316 packs through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for. Gzip is harness-only and is not part of this |
+| `Serializer_Round_Trips_In_Every_Mode` | all 2,322 packs through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for. Gzip is harness-only and is not part of this |
 | `Forced_Sixteen_Bit_Widths_Round_Trip` | the same packs forced to 16-bit widths through `ProtocolTestingFixture`, which hands `ProtocolEncoder` a header, so the 16-bit read path is exercised on real data the serializer would never widen |
 
 The forced-width theory **skips the nine empty packs** — six in custom-problems, three in demo-samples: §4 keeps

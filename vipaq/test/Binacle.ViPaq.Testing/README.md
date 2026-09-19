@@ -10,6 +10,8 @@ The unit tests never reference it - they are the spec gate and must not lean on 
 |---|---|
 | `ViPaq/` | `ViPaqEncoder` and `ViPaqHeader` - the door into ViPaq's internal encoder, so every codec and layout can be forced |
 | `Protobuf/` | `ProtobufEncoder` and `packing.proto` - the rival the size reports compare against |
+| `Json/` | `JsonEncoder` - the bin and placed items as the JSON a user's token replaces; text, not base64 |
+| `Compact/` | `CompactEncoder` - the same in compact notation, items joined by `;`; text, not base64 |
 | `EncoderInfo.cs` | Which layout to encode with, handed out as two ready-made instances |
 | `Providers/` | The curated picks per family, the merged curated set, and the synthetic scenarios for the speed benchmarks |
 

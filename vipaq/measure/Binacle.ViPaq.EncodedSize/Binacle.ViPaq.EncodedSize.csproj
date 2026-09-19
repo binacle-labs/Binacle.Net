@@ -5,14 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConsoleTables" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Serilog.Extensions.Hosting" />
-    <PackageReference Include="Serilog.Enrichers.Environment" />
-    <PackageReference Include="Serilog.Enrichers.Thread" />
-    <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +16,7 @@
 
   <ItemGroup>
     <Using Include="Binacle.Geometry" />
+    <Using Include="Binacle.Reporting" />
     <Using Include="Binacle.ViPaq.Data" />
     <Using Include="Binacle.ViPaq.Testing" />
   </ItemGroup>

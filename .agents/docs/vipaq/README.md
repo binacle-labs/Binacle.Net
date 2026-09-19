@@ -71,8 +71,8 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 
 | Project | Covers |
 |---|---|
-| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, and all 2,316 real packs round-tripped in every public mode and at forced 16-bit widths; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
-| `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gate — every curated benchmark pick still names a real scenario, run before the size reports |
+| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, and all 2,322 real packs round-tripped in every public mode and at forced 16-bit widths; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
+| `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gate — every curated benchmark pick still names a real scenario — then every pack's size in ViPaq, protobuf, JSON and compact notation, written to `vipaq/results/` |
 | `vipaq/test/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings over the curated picks and the synthetic sets |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 

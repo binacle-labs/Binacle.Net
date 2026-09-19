@@ -73,7 +73,7 @@ vipaq/
             Binacle.ViPaq.Benchmarks.Scale
   results/
     README.md
-    encoded-size.md           one row per pack per layout, six sizes, base64 only
+    encoded-size.md           one row per pack per layout: six base64 sizes, JSON and compact as text
     benchmarks/
       README.md
       encoding/
@@ -118,11 +118,14 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
   "every real pack deflates to under N base64 characters" (1,248 over 1,400 packs in the old data), the
   fits-a-URL claim; links.
 - `encoded-size.md` - Scenario, Algorithm, Items, Widths, ViPaq raw / deflate / gzip, protobuf raw /
-  deflate / gzip, ratio, best codec, saved %. Base64 lengths only - the stored form; bytes are 3/4 of it.
-  Two sections, one per layout. Replaces sixteen tables in five files.
-- **A JSON baseline is added**, a small encoder beside `ProtobufEncoder` in `Binacle.ViPaq.Testing`.
-  Protobuf is the fair format comparison; JSON is what a user's token replaces, and "N% of the JSON body"
-  is the user's number.
+  deflate / gzip, JSON, Compact, ratio, best codec, saved %. Base64 lengths for the binary formats - the
+  stored form; bytes are 3/4 of it - and text lengths for JSON and compact, which are their own stored form.
+  Two sections, one per layout, every pack. Replaces sixteen tables in five files.
+- **Two text baselines are added**, small encoders beside `ProtobufEncoder` in `Binacle.ViPaq.Testing`:
+  JSON and compact notation, both the bin and the placed items only - no IDs, algorithm or percentages, which
+  the token does not carry. Protobuf is the fair format comparison; the text formats are what a user's token
+  replaces, and "N% of the JSON" is the user's number. Compact notation has no whole-pack form, so the
+  harness joins bin and items with `;` and says so. Settled 2026-09-20.
 - Two of the three pre-report gates move to `Binacle.ViPaq.UnitTests`: they round-trip every real pack in
   every codec and layout, one at a forced 16-bit width, and are the only round trip of every real pack;
   today they run only when someone runs the report. The third checks that every curated pick still names a
@@ -255,8 +258,7 @@ D1 in fill; **"every real pack fits a URL"** - largest deflated token over 1,400
 one README line; **RatioSD beside every ratio** in the trace table.
 
 **Not decided - the maintainer is unsure, so the shape above stands until a session argues otherwise:**
-`encoded-size.md` at 4,300 rows and ~500 KB (one algorithm's packs raw, per-algorithm means in the
-README); README part 3 as a separate section (the newest trace row per family, marked, does the job).
+README part 3 as a separate section (the newest trace row per family, marked, does the job).
 
 Conventions, noted and not acted on: no well-known project keeps dated per-family benchmark folders in the source tree - the .NET
 norm is one table in the README refreshed at release, and `benchmark-action/github-action-benchmark` on a
