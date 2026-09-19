@@ -2,7 +2,6 @@ using BenchmarkDotNet.Attributes;
 using Binacle.Geometry;
 using Binacle.ViPaq.Benchmarks.Abstractions;
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.Testing.Models;
 using Binacle.ViPaq.Testing.Providers;
 using Binacle.ViPaq.Testing.ViPaq;
 

@@ -1,5 +1,3 @@
-using Binacle.ViPaq.Testing.Models;
-
 namespace Binacle.ViPaq.Testing.ViPaq;
 
 // What the harness needs to know about a token, read off its header: did ViPaq compress (so the harness can

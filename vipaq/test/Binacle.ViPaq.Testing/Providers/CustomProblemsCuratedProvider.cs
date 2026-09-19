@@ -1,4 +1,4 @@
-using Binacle.ViPaq.Testing.Models;
+using Binacle.ViPaq.Data.Packed;
 
 namespace Binacle.ViPaq.Testing.Providers;
 
@@ -24,5 +24,5 @@ public static class CustomProblemsCuratedProvider
 
 	public static IEnumerable<string> Names => UncompressedNames.Concat(CompressedNames);
 
-	public static Scenario GetByName(string name) => CustomProblemsDataProvider.GetByName(name);
+	public static Scenario GetByName(string name) => CustomProblems.GetByName(name);
 }

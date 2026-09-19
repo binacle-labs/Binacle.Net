@@ -35,10 +35,10 @@ Shape: [support-projects.md](support-projects.md). Protocol: the orchestrator be
 
 ## Done when
 
-- [ ] `test -d vipaq/data/Binacle.ViPaq.Data && test -d vipaq/test/Binacle.ViPaq.Testing && test ! -d vipaq/test/Binacle.ViPaq.TestsKernel`
-- [ ] `grep -rln "ViPaqEncoder\|Protobuf\|Curated\|Synthetic" vipaq/data/Binacle.ViPaq.Data --include=*.cs` is empty.
-- [ ] `grep -n "EmbeddedResource" vipaq/test/Binacle.ViPaq.Testing/*.csproj` is empty.
-- [ ] `test ! -d vipaq/data/Binacle.ViPaq.Data/Files`
-- [ ] `grep -n "InternalsVisibleTo" vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj` names `.Testing`, not `.TestsKernel`.
-- [ ] `dotnet build vipaq/test/Binacle.ViPaq.Benchmarks` and `dotnet build vipaq/test/Binacle.ViPaq.PerformanceTests`
+- [x] `test -d vipaq/data/Binacle.ViPaq.Data && test -d vipaq/test/Binacle.ViPaq.Testing && test ! -d vipaq/test/Binacle.ViPaq.TestsKernel`
+- [x] `grep -rln "ViPaqEncoder\|Protobuf\|Curated\|Synthetic" vipaq/data/Binacle.ViPaq.Data --include=*.cs` is empty.
+- [x] `grep -n "EmbeddedResource" vipaq/test/Binacle.ViPaq.Testing/*.csproj` is empty.
+- [x] `test ! -d vipaq/data/Binacle.ViPaq.Data/Files`
+- [x] `grep -n "InternalsVisibleTo" vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj` names `.Testing`, not `.TestsKernel`.
+- [x] `dotnet build vipaq/test/Binacle.ViPaq.Benchmarks` and `dotnet build vipaq/test/Binacle.ViPaq.PerformanceTests`
       succeed.

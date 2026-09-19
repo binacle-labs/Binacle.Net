@@ -2,7 +2,7 @@
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
 verified: 2026-08-27
-check: Numbers match the latest results/vipaq/compression/ size reports and results/vipaq/benchmarks/ output; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/ and .Testing/Providers/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
+check: Numbers match the latest results/vipaq/compression/ size reports and results/vipaq/benchmarks/ output; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/, vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:

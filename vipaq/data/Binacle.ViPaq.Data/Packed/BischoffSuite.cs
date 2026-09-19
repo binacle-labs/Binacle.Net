@@ -1,22 +1,21 @@
-using Binacle.ViPaq.Testing.Models;
+namespace Binacle.ViPaq.Data.Packed;
 
-namespace Binacle.ViPaq.Testing.Providers;
-
-// Real placed results for the demo site's sample set: the bin plus the placed items the packer produced.
+// Real placed results for the Bischoff suite (thpack1..7): the bin plus the placed items the packer produced.
 // Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under
-// vipaq/data/packed/demo-samples/ and read here as embedded resources. No token is stored - it is derivable,
+// vipaq/data/packed/bischoff-suite/ and read here as embedded resources. No token is stored - it is derivable,
 // so the benchmark computes it. Do not hand-edit.
-public static class DemoSamplesDataProvider
+public static class BischoffSuite
 {
-	private const string Family = "demo-samples";
+	private const string Family = "bischoff-suite";
 
 	private static readonly Dictionary<string, Scenario> scenarios = new();
 
-	static DemoSamplesDataProvider()
+	static BischoffSuite()
 	{
 		foreach (var scenario in PackedDataReader.Read(Family))
 		{
-			// See BischoffDataProvider: the name's algorithm suffix is what keeps the three algorithms apart.
+			// Scenario.Name already ends in the algorithm suffix, so the same problem under FFD, WFD and BFD
+			// are three distinct keys.
 			scenarios.Add(scenario.Name, scenario);
 		}
 	}

@@ -1,13 +1,13 @@
 using System.Text.Json;
 using Binacle.CompactNotation;
-using Binacle.ViPaq.Testing.Files;
-using Binacle.ViPaq.Testing.Models;
+using Binacle.Data.Files;
 
-namespace Binacle.ViPaq.Testing;
+namespace Binacle.ViPaq.Data;
 
 // Reads the frozen placed-result files that Binacle.ViPaq.PackedDataGenerator emits under vipaq/data/packed and
-// the .csproj embeds as "PackedData.<family>.<name>.<algo>.json", and turns their rows into Scenarios. It has
-// its own reader rather than borrowing VectorReader because the kernel does not reference the ViPaq UnitTests.
+// the .csproj embeds as "PackedData.<family>.<name>.<algo>.json", and turns their rows into Scenarios. The
+// embedded-resource reader is Binacle.Data's; the four-part name is parsed here because only this project
+// embeds files in that shape.
 internal static class PackedDataReader
 {
 	private const string ResourcePrefix = "PackedData.";
@@ -23,12 +23,14 @@ internal static class PackedDataReader
 	// stream is stable.
 	public static IEnumerable<Scenario> Read(string family)
 	{
-		var files = EmbeddedResourceFileProvider.ByPrefix(ResourcePrefix)
+		var assembly = typeof(PackedDataReader).Assembly;
+		var files = EmbeddedResourceFileProvider.ByPrefix(assembly, ResourcePrefix)
+			.Select(PackedFile.Parse)
 			.Where(file => file.Family == family);
 
 		foreach (var file in files)
 		{
-			using var stream = file.OpenRead();
+			using var stream = file.Resource.OpenRead();
 
 			var records = JsonSerializer.Deserialize<PackedRecord[]>(stream, Options)
 				?? throw new InvalidOperationException($"Packed data '{file.Name}' deserialized to null.");
@@ -37,6 +39,24 @@ internal static class PackedDataReader
 			{
 				yield return ToScenario(record, file.Algorithm);
 			}
+		}
+	}
+
+	// One embedded file with its name split. The part after the prefix is "<family>.<name>.<algorithm>.<extension>",
+	// e.g. "bischoff-suite.orlib_thpack1.ffd.json". Family folders and names carry no dots, so a plain split
+	// gives exactly four parts.
+	private sealed record PackedFile(EmbeddedResourceFile Resource, string Family, string Name, string Algorithm)
+	{
+		public static PackedFile Parse(EmbeddedResourceFile resource)
+		{
+			var parts = resource.RelativeName.Split('.');
+			if (parts.Length != 4)
+			{
+				throw new ArgumentException(
+					$"Packed-data resource '{resource.ResourceName}' is not the expected <family>.<name>.<algorithm>.<extension> shape.");
+			}
+
+			return new PackedFile(resource, parts[0], parts[1], parts[2]);
 		}
 	}
 

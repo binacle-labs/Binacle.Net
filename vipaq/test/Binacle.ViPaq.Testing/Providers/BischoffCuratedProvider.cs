@@ -1,4 +1,4 @@
-using Binacle.ViPaq.Testing.Models;
+using Binacle.ViPaq.Data.Packed;
 
 namespace Binacle.ViPaq.Testing.Providers;
 
@@ -10,7 +10,7 @@ namespace Binacle.ViPaq.Testing.Providers;
 //   - OrLibrary_thpack1_2: 108 items, raw 1312 -> deflate 404 b64 (saves ~69% row, ~77% columnar). The upper
 //     end: a larger, more repetitive pack where compression and columnar pay the most.
 //
-// Both picks are the FFD packs those numbers were measured on. Names resolve through BischoffDataProvider, so a
+// Both picks are the FFD packs those numbers were measured on. Names resolve through BischoffSuite, so a
 // stale pick is caught by the curated check.
 public static class BischoffCuratedProvider
 {
@@ -20,5 +20,5 @@ public static class BischoffCuratedProvider
 		"OrLibrary_thpack1_2.ffd"
 	];
 
-	public static Scenario GetByName(string name) => BischoffDataProvider.GetByName(name);
+	public static Scenario GetByName(string name) => BischoffSuite.GetByName(name);
 }

@@ -155,8 +155,8 @@ them** — that page decodes in the browser through the TypeScript package, and 
 - `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.Testing`,
   `.PerformanceTests` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
-- **Racing the codecs needs internals**, and `Testing` has them. The race is part of the permanent harness,
-  so it belongs there rather than in a throwaway. No new grant is needed. The reports are in
+- **Racing the codecs needs internals**, and `Binacle.ViPaq.Testing` has them. The race is part of the
+  permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The reports are in
   `results/vipaq/compression/`.
 
 The public contract does not grow, yet tests can force any combination.

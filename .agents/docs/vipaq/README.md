@@ -1,7 +1,7 @@
 ---
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
-verified: 2026-09-04
+verified: 2026-09-20
 check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in PerformanceTests/PreReportChecks/
 also_update:
   - vipaq/typescript
@@ -62,9 +62,9 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/src/Binacle.ViPaq/` | C# reference implementation |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror (`$vipaq/typescript`) |
 | `vipaq/test-vectors/` | Language-neutral vectors read by both suites |
-| `vipaq/test/` | C# unit tests, the real-data tests kernel, benchmarks, performance tests |
+| `vipaq/test/` | C# unit tests, `Binacle.ViPaq.Testing` (the harness's encoders and picks), benchmarks, performance tests |
 | `vipaq/tools/` | `VectorGenerators` (writes `test-vectors/`) and `PackedDataGenerator` (writes `data/packed/`) |
-| `vipaq/data/packed/` | The frozen placed results the kernel embeds — `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
+| `vipaq/data/` | `packed/` — the frozen placed results, `bischoff-suite/`, `custom-problems/`, `demo-samples/` — and `Binacle.ViPaq.Data`, which embeds them |
 
 ## Tests
 
@@ -82,4 +82,4 @@ How the two languages are held to one wire — the shared vectors, the generator
 for compressed payloads — is in `$vipaq/cross-language-testing`.
 
 How the projects reference each other, who can see internals, and the walls between them (UnitTests never touches
-the real-data kernel) are in `$vipaq/dependencies`.
+`Binacle.ViPaq.Testing`) are in `$vipaq/dependencies`.

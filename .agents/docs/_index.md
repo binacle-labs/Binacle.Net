@@ -108,7 +108,7 @@ table of [README.md](README.md).
   description: "Packing heuristics (FFD/WFD/BFD) — versions, operation types, trade-offs, and the fit/pack guarantee"
   paths: ["lib/src/Binacle.Lib/Algorithms/**"]
 - file: lib/dependencies.md
-  description: "Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection tests kernel, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer)."
+  description: "Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer)."
   paths: ["lib/**"]
 - file: lib/models.md
   description: "Lib model types and IWith* interfaces — Bin, Item, packed/unpacked results, and the constraints used in generic type parameters"
@@ -123,7 +123,7 @@ table of [README.md](README.md).
   description: "IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them"
   paths: ["lib/src/Binacle.Lib/ResultSelection/**"]
 - file: lib/tests.md
-  description: "lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
+  description: "lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, performance tests, benchmarks; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
   paths: ["lib/test/**"]
 ```
 
@@ -164,10 +164,10 @@ table of [README.md](README.md).
 
 ```yaml
 - file: shared/README.md
-  description: "Shared slice — Binacle.TestsKernel (algorithm scenario data, compact-string formats, providers, fixtures) and shared/data (the fixture corpus more than one slice reads)"
+  description: "Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)"
   paths: ["shared/**"]
 - file: shared/dependencies.md
-  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals."
+  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals."
   paths: ["shared/**"]
 ```
 
@@ -209,7 +209,7 @@ table of [README.md](README.md).
   description: "ViPaq cross-language wire testing — the C#/TS shared-vector apparatus, its inventory, and the decode-to-input contract"
   paths: ["vipaq/**"]
 - file: vipaq/dependencies.md
-  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references TestsKernel; no test project references a generator)."
+  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references Testing; no test project references a generator)."
   paths: ["vipaq/**"]
 - file: vipaq/typescript.md
   description: "Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library"

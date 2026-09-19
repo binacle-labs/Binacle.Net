@@ -1,5 +1,4 @@
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.Testing.Models;
 using Google.Protobuf;
 
 namespace Binacle.ViPaq.Testing.Protobuf;

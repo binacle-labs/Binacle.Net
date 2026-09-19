@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.Testing.Models;
 
 namespace Binacle.ViPaq.Testing.ViPaq;
 

@@ -10,10 +10,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Binacle.ViPaq.Testing\Binacle.ViPaq.Testing.csproj" />
+    <ProjectReference Include="..\..\data\Binacle.ViPaq.Data\Binacle.ViPaq.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Binacle.Geometry" />
+    <Using Include="Binacle.ViPaq.Data" />
+    <Using Include="Binacle.ViPaq.Testing" />
   </ItemGroup>
 
 </Project>

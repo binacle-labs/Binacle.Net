@@ -1,5 +1,3 @@
-using Binacle.ViPaq.Testing.Models;
-
 namespace Binacle.ViPaq.Testing.Providers;
 
 // The full curated set the benchmarks fan out over, both families merged into one lookup. BischoffCuratedProvider

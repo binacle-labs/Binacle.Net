@@ -24,7 +24,7 @@ The shared test vectors are what keep them honest.
 | `test-vectors/` | Language-neutral test data read by both suites - see its `README.md` |
 | `test/` | C# unit tests, benchmarks, performance tests |
 | `tools/` | Data generators |
-| `data/` | Frozen real packing results used by the benchmarks |
+| `data/` | Frozen real packing results used by the benchmarks, and the project that reads them |
 
 ## 📏 Key rule
 

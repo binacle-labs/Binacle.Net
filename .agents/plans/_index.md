@@ -190,9 +190,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
-  paths: ["shared/data/**", "shared/test/Binacle.TestsKernel/**"]
-- file: shared/testskernel-data-extraction.md
-  description: "TestsKernel - grow the shared fixture cases"
+  paths: ["shared/data/**", "shared/data/Binacle.Data/**"]
+- file: shared/grow-the-fixture-cases.md
+  description: "Binacle.Data - grow the shared fixture cases"
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future

@@ -1,5 +1,3 @@
-using Binacle.ViPaq.Testing.Models;
-
 namespace Binacle.ViPaq.Testing;
 
 // The decode-to-input oracle: does a decoded (bin, items) equal the `Scenario` it came from. `Bin`/`Item` are

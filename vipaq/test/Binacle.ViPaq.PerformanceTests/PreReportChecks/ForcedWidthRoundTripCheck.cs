@@ -1,5 +1,5 @@
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.Testing.Models;
+using Binacle.ViPaq.Data.Packed;
 using Binacle.ViPaq.Testing.Providers;
 
 namespace Binacle.ViPaq.PerformanceTests.PreReportChecks;
@@ -16,9 +16,9 @@ internal sealed class ForcedWidthRoundTripCheck : IPreReportCheck
 
 	public void Run()
 	{
-		AssertRoundTrips(CustomProblemsDataProvider.All);
-		AssertRoundTrips(BischoffDataProvider.All);
-		AssertRoundTrips(DemoSamplesDataProvider.All);
+		AssertRoundTrips(CustomProblems.All);
+		AssertRoundTrips(BischoffSuite.All);
+		AssertRoundTrips(DemoSamples.All);
 	}
 
 	private static void AssertRoundTrips(IReadOnlyCollection<Scenario> scenarios)

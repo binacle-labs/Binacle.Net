@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-09-19
+verified: 2026-09-20
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -69,7 +69,7 @@ The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Seriali
 what makes the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
 re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `ViPaqHeader`
 holds `Header` in an `internal` field, exposing only `bool`/`int`/`string` publicly. Internal rather than
-private because the kernel's own encoder reads it; what matters is that no *public* member names `Header`,
+private because `Testing`'s own encoder reads it; what matters is that no *public* member names `Header`,
 `Width` or `Layout`. **One copy of the spec beats a clean
 boundary here** — `Header` is a frozen wire description, not an evolving API, so if it churns the format churned and
 the harness *should* break. (This reading-via-internals rule replaced an earlier re-parse-the-bytes rule; the
@@ -146,8 +146,8 @@ The contrast itself (synthetic inflates, real saves 45–68%) is a keep-it findi
 **Superseded.** `shared/data/Binacle.Data` now holds one reader, `EmbeddedResourceFileProvider.ByPrefix(assembly,
 prefix)`, that takes the assembly to read from and hands the manifest name back unsplit. That is the shape this
 decision asked for - share the enumeration, not the parse - with the wrong-assembly failure removed at the
-call. The ViPaq kernel keeps its copy until it moves to that reader. The record below is why the earlier
-shared copy was reverted.
+call. `Binacle.ViPaq.Data` reads through it since 2026-09-20 and parses the four-part name itself. The
+record below is why the earlier shared copy was reverted.
 
 An earlier session extracted the embedded-file plumbing into a shared `shared/test/Binacle.TestFiles` so both the
 shared kernel and the ViPaq kernel could use it. **Reverted.** The only genuinely shared part is ~15 lines of
@@ -156,10 +156,9 @@ shared kernel's is `<folder>.<name>` — so sharing needed a generic factory sea
 little gain. Worse, a shared copy is silently broken: `Assembly.GetExecutingAssembly()` inside a shared library
 resolves to *that* library, which embeds nothing, so lookups return empty and tests quietly vanish.
 
-The ViPaq kernel now has its own `Files/` trio (`IFile`, `EmbeddedResourceFile`, `EmbeddedResourceFileProvider`),
-where `GetExecutingAssembly` correctly resolves to the assembly that embeds the data. This matches the standalone
-principle already recorded for the reader. **Revisit sharing only if a third
-consumer appears** — and even then, share the enumeration, not the parse.
+The ViPaq kernel then kept its own `Files/` trio (`IFile`, `EmbeddedResourceFile`, `EmbeddedResourceFileProvider`),
+where `GetExecutingAssembly` correctly resolves to the assembly that embeds the data. The shared reader that
+replaced it shares the enumeration only, and the caller names the assembly - both failures above designed out.
 
 ### D11 — Breaking rebuild; the old format is ignored (CONFIRMED 2026-07-09)
 No compatibility, no migration, no fallback. No decoder reads the old wire and no code path detects it; stored

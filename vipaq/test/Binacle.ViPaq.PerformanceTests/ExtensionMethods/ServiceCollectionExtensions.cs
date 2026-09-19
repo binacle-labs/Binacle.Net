@@ -1,7 +1,7 @@
 using Binacle.TestReporting;
 using Binacle.ViPaq.Compression;
+using Binacle.ViPaq.Data.Packed;
 using Binacle.ViPaq.PerformanceTests.Tests;
-using Binacle.ViPaq.Testing.Models;
 using Binacle.ViPaq.Testing.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,8 +21,8 @@ public static class ServiceCollectionExtensions
 	// Real sets only. Synthetic random data is never size-measured - gzip can't grip it.
 	private static (string Label, IReadOnlyCollection<Scenario> Scenarios)[] ScenarioSets =
 	[
-		("custom packs", CustomProblemsDataProvider.All),
-		("Bischoff suite", BischoffDataProvider.All),
+		("custom packs", CustomProblems.All),
+		("Bischoff suite", BischoffSuite.All),
 	];
 
 	private static EncoderInfo[] Layouts = [EncoderInfo.RowMajor, EncoderInfo.Columnar];

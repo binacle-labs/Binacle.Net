@@ -1,7 +1,7 @@
 # Packed placed-result data
 
-Frozen, packed results read by the ViPaq test kernel's `BischoffDataProvider`, `CustomProblemsDataProvider`
-and `DemoSamplesDataProvider` (the first two merged for curated runs by `CuratedScenarioProvider`). Each
+Frozen, packed results read by `Binacle.ViPaq.Data`, one class per family under `Packed/` (the harness's
+curated picks in `Binacle.ViPaq.Testing` resolve by name against them). Each
 sample is a bin plus the **placed** items a packing run produced: dimensions **and** coordinates
 (`L x W x H (X,Y,Z)`), which is what ViPaq serializes. The source problems carry only item *types* with a
 quantity and no coordinates, so the coordinates only exist after packing.
@@ -36,7 +36,7 @@ same folder. The suffix names the family, not the implementation version. The to
 factory the API uses, which is the v2 implementation of each. Different algorithms place items differently, so
 their coordinates, and tokens, differ; the suffix keeps the sets apart without duplicating the folder tree.
 
-The test kernel reads a sample's name as `<problem>.<algo>`, so the same problem under three algorithms is
+`Binacle.ViPaq.Data` reads a sample's name as `<problem>.<algo>`, so the same problem under three algorithms is
 three distinct scenarios.
 
 The tool prints a per-file and total sample/item count on each run; that console summary is the run's report,
@@ -64,6 +64,6 @@ Each problem file is a JSON array of samples. One sample:
   fill ~98%, never tessellate perfectly), so not every source box appears here, only the placed ones.
 
 Only placed geometry is stored, no ViPaq token. The token is derivable from `Bin`+`Items`, and its compressed
-bytes vary by gzip encoder/runtime, so committing it would churn the files on every regen. The kernel computes
+bytes vary by gzip encoder/runtime, so committing it would churn the files on every regen. The harness computes
 the token itself when it benchmarks. Every sample is still round-tripped (encode -> decode == input) at
 generation time, or the run fails.

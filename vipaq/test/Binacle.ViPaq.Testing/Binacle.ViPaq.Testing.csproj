@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" />
     <PackageReference Include="Grpc.Tools" PrivateAssets="all" />
@@ -7,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Binacle.ViPaq\Binacle.ViPaq.csproj" />
+    <ProjectReference Include="..\..\data\Binacle.ViPaq.Data\Binacle.ViPaq.Data.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Binacle.Geometry\Binacle.Geometry.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Binacle.CompactNotation\Binacle.CompactNotation.csproj" />
   </ItemGroup>
@@ -16,28 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--
-      Frozen placed-result data, generated offline by Binacle.ViPaq.PackedDataGenerator. The "*.*.json" glob
-      takes every algorithm - the inner dot is the ".ffd" / ".wfd" / ".bfd" suffix. Flat, no RecursiveDir, so
-      the LogicalName stays "PackedData.<family>.<name>.<algo>.json", the four-part shape EmbeddedResourceFile
-      splits on. Rebuild after regenerating the data.
-    -->
-    <EmbeddedResource Include="..\..\data\packed\bischoff-suite\*.*.json">
-      <Link>Data\bischoff-suite\%(Filename)%(Extension)</Link>
-      <LogicalName>PackedData.bischoff-suite.%(Filename)%(Extension)</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\data\packed\custom-problems\*.*.json">
-      <Link>Data\custom-problems\%(Filename)%(Extension)</Link>
-      <LogicalName>PackedData.custom-problems.%(Filename)%(Extension)</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\data\packed\demo-samples\*.*.json">
-      <Link>Data\demo-samples\%(Filename)%(Extension)</Link>
-      <LogicalName>PackedData.demo-samples.%(Filename)%(Extension)</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <Using Include="Binacle.Geometry" />
+    <Using Include="Binacle.ViPaq.Data" />
   </ItemGroup>
 
 </Project>
