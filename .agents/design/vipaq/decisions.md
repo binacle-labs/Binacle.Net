@@ -57,12 +57,10 @@ ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2
 - **Committed result files are the recorded baseline** — the size reports under `results/vipaq/compression/`. A *win* = a
   diff showing smaller base64 / lower ns / lower allocs **while the protobuf anchor is unchanged**. Small
   increments; keep only measured wins.
-- **The perf test writes to build-local scratch, not to the committed vault** (2026-07-14). It emits into its
-  `PerformanceTests.Artifacts/` folder (gitignored); to check for a win, diff that against
-  `results/vipaq/compression/`, and copy the report in by hand only when it's a keeper. The committed baseline is
-  hand-curated, never auto-overwritten — same model as `results/lib/`.
-- Results stay in the repo under `results/`, organized by slice — see [results/README.md](../../../results/README.md)
-  for the layout and the scratch-vs-curated convention. (Settled 2026-07-14; the old results migration is closed.)
+- **The measure project writes the tracked file, and a win is a diff** (2026-09-20). `Binacle.ViPaq.EncodedSize`
+  writes its reports straight into `vipaq/results/`; run it, read `git diff`, commit what changed. From
+  2026-07-14 to 2026-09-20 it wrote to a gitignored scratch folder and a keeper was copied into a root
+  `results/` vault by hand; the copy step was where reports went stale, so it went.
 
 ### D4 — The permanent harness uses only the minimal public API (CONFIRMED 2026-07-07)
 The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Serialize`/`Deserialize` only — that is

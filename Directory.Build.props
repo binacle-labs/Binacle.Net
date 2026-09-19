@@ -19,8 +19,8 @@
         BestBin_ResultSelection, and S2223 on the scenario key holders, are both that. The 1203 was measured
         when there were ten projects.
 
-        Every project under a data/, test/ or tools/ folder is support code, so the layout decides it and
-        nothing has to be listed. Marking the xunit suites too is a no-op - the scanner already had them.
+        Every project under a data/, test/, measure/, bench/ or tools/ folder is support code, so the layout
+        decides it and nothing has to be listed. Marking the xunit suites too is a no-op - the scanner already had them.
 
         SonarQubeTestProject is read only by the scanner's targets, which are injected during a Sonar run and
         absent otherwise, so a normal build does not see this. Sonar still runs test-scope rules on these
@@ -29,6 +29,12 @@
     <PropertyGroup>
         <!-- MSBuildProjectDirectory is separator-native, so normalise before matching or this misses on Linux. -->
         <_BinacleProjectPath>$(MSBuildProjectDirectory.Replace('\', '/'))</_BinacleProjectPath>
-        <SonarQubeTestProject Condition="$(_BinacleProjectPath.Contains('/data/')) or $(_BinacleProjectPath.Contains('/test/')) or $(_BinacleProjectPath.Contains('/tools/'))">true</SonarQubeTestProject>
+        <SonarQubeTestProject Condition="
+            $(_BinacleProjectPath.Contains('/data/'))
+            or $(_BinacleProjectPath.Contains('/test/'))
+            or $(_BinacleProjectPath.Contains('/measure/'))
+            or $(_BinacleProjectPath.Contains('/bench/'))
+            or $(_BinacleProjectPath.Contains('/tools/'))
+        ">true</SonarQubeTestProject>
     </PropertyGroup>
 </Project>

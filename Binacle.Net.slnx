@@ -50,11 +50,13 @@
   <Folder Name="/lib/data/">
     <Project Path="lib/data/Binacle.Lib.Data/Binacle.Lib.Data.csproj" />
   </Folder>
+  <Folder Name="/lib/measure/">
+    <Project Path="lib/measure/Binacle.Lib.PackingEfficiency/Binacle.Lib.PackingEfficiency.csproj" />
+  </Folder>
   <Folder Name="/lib/test/">
     <Project Path="lib/test/Binacle.Lib.UnitTests/Binacle.Lib.UnitTests.csproj" />
     <Project Path="lib/test/Binacle.Lib.Testing/Binacle.Lib.Testing.csproj" />
     <Project Path="lib/test/Binacle.Lib.Benchmarks/Binacle.Lib.Benchmarks.csproj" />
-    <Project Path="lib/test/Binacle.Lib.PerformanceTests/Binacle.Lib.PerformanceTests.csproj" />
   </Folder>
   <Folder Name="/api/src/">
     <Project Path="api/src/Binacle.Net/Binacle.Net.csproj" />
@@ -81,11 +83,13 @@
   <Folder Name="/vipaq/src/">
     <Project Path="vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj" />
   </Folder>
+  <Folder Name="/vipaq/measure/">
+    <Project Path="vipaq/measure/Binacle.ViPaq.EncodedSize/Binacle.ViPaq.EncodedSize.csproj" />
+  </Folder>
   <Folder Name="/vipaq/test/">
     <Project Path="vipaq/test/Binacle.ViPaq.UnitTests/Binacle.ViPaq.UnitTests.csproj" />
     <Project Path="vipaq/test/Binacle.ViPaq.Testing/Binacle.ViPaq.Testing.csproj" />
     <Project Path="vipaq/test/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.PerformanceTests/Binacle.ViPaq.PerformanceTests.csproj" />
   </Folder>
   <Folder Name="/vipaq/tools/">
     <Project Path="vipaq/tools/Binacle.ViPaq.VectorGenerators/Binacle.ViPaq.VectorGenerators.csproj" />

@@ -20,12 +20,12 @@ paths:
 
 ## Who uses Binacle.Data
 
-Four project references, all support or test projects:
+Seven project references, all support, test or measure projects:
 
-- `lib/test/Binacle.Lib.UnitTests`
-- `lib/test/Binacle.Lib.PerformanceTests`
-- `lib/test/Binacle.Lib.Benchmarks`
+- `lib/test/Binacle.Lib.Testing`, `Binacle.Lib.UnitTests`, `Binacle.Lib.Benchmarks`
+- `lib/measure/Binacle.Lib.PackingEfficiency`
 - `api/test/Binacle.Net.IntegrationTests`
+- `lib/data/Binacle.Lib.Data` and `vipaq/data/Binacle.ViPaq.Data`, for the embedded-resource reader only
 
 `Binacle.Net.ServiceModule.IntegrationTests` and `vipaq/test/Binacle.ViPaq.UnitTests` do **not** use it —
 they have their own self-contained fixtures (ServiceModule) or use Bogus fakers (ViPaq). Nothing in `src`

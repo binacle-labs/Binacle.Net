@@ -53,14 +53,14 @@ analyzer driver so editorconfig severity cannot reach it. The file carries the f
 
 ### `SonarQubeTestProject` — the support projects {#sonar-test-projects}
 
-A fifth property is set **conditionally**: any project whose directory path contains `/data/`, `/test/` or `/tools/` gets
+A fifth property is set **conditionally**: any project whose directory path contains `/data/`, `/test/`, `/measure/`, `/bench/` or `/tools/` gets
 `<SonarQubeTestProject>true</SonarQubeTestProject>`. The path is normalised to forward slashes first, because
 `MSBuildProjectDirectory` is separator-native and the match would miss on Linux otherwise.
 
 The Scanner for .NET identifies a test project by its `Microsoft.NET.Test.Sdk` reference. That finds the xunit
 suites but **not** the thirteen support projects that have no such reference — the three data projects,
 `Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, the two benchmark projects, the two
-performance suites, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
+measure projects, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
 lines into the coverage denominator that no test will ever cover (measured when there were ten projects, so
 the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class
 names, `S2223` on the scenario key holders). Deriving it from the folder — `data/`, `test/` or `tools/` —
@@ -215,7 +215,7 @@ twenty-one added references or a decision that transitive resolution is fine her
 ## `tooling/` vs `samples/`
 
 `tooling/` holds **every task the repo can run**, CI included — the `tests.just`, `coverage.just`, `openapi.just`,
-`agents.just`, `serve.just` and `build.just` modules for `just`, the scripts that have not moved yet (the
-per-slice `performance.*` and `benchmarks.*`), local compose files, and emulator state. `samples/` are
+`agents.just`, `serve.just`, `build.just` and `measure.just` modules for `just`, the scripts that have not moved
+yet (the per-slice `benchmarks.*`), local compose files, and emulator state. `samples/` are
 **user-facing deployment starting points** to copy and run the published image. See `$commands` for
 the scripts and samples (`$samples`) for the deployment examples.

@@ -31,8 +31,6 @@ data/logs/
 data/pack-logs/
 packing-logs/
 BenchmarkDotNet.Artifacts
-PerformanceTestsArtifacts
-PerformanceTests.Artifacts
 coverage/
 Output
 output

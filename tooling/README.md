@@ -317,14 +317,23 @@ a dead inbound link, because the link check runs offline against the built folde
 
 ---
 
-## 📈 Benchmarks and performance
+## 📊 Measured results
+`measure.just`, loaded as the `measure` module. One project per slice packs or encodes every scenario and
+writes the numbers into the slice's tracked `results/` folder, so a change is a diff.
+
+```bash
+just measure all       # both slices
+just measure lib       # lib/measure/Binacle.Lib.PackingEfficiency -> lib/results/
+just measure vipaq     # vipaq/measure/Binacle.ViPaq.EncodedSize   -> vipaq/results/
+just measure check     # all, then fail if either results/ changed
+```
+
+## 📈 Benchmarks
 Still scripts, one per slice. Both take `-c Release` and write into gitignored folders.
 
 ```bash
 ./tooling/benchmarks.lib.sh [FastValidation|AlgorithmRacing|BischoffSuite|Parallelization|ResultSelection]
 ./tooling/benchmarks.vipaq.sh [Encode|Decode]      # no argument = every benchmark
-./tooling/performance.lib.sh                       # console runner, writes markdown reports
-./tooling/performance.vipaq.sh
 ```
 
 The alias tables live at the top of each `benchmarks.*` script - that is the list to change when a benchmark

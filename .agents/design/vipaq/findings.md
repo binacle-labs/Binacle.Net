@@ -39,7 +39,7 @@ is noise. Measure everything in **base64 chars**.
 
 ## The harness — real data, shipped v1 library
 
-Source: `Binacle.ViPaq.PerformanceTests` (size + crossover) and
+Source: `Binacle.ViPaq.EncodedSize` (size + crossover) and
 `Binacle.ViPaq.Benchmarks` (BDN). Data: 716 placed scenarios, 58,834 items, FFD-packed offline by
 `Binacle.ViPaq.PackedDataGenerator` from the Bischoff suite (thpack1–7) + custom problems. Round-trip green on
 every scenario, both in the generator and the harness.

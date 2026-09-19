@@ -45,10 +45,6 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "This repository's OIDC token carries GitHub's immutable subject claim, which breaks nothing today but is what a cloud trust policy keyed on `sub` would have to match"
   when: "wiring OIDC trust to a cloud provider, or debugging a trust policy that will not match"
   paths: [".github/workflows/**"]
-- file: results-curated.md
-  description: "results/ is a hand-curated vault — harnesses write to gitignored scratch, never straight into results/"
-  when: "writing anything into results/"
-  paths: ["results/**"]
 - file: servicemodule-test-infra.md
   description: "Test-host config goes through an env var the harness reads, never a .runsettings file — the MTP runner ignores VSTest runsettings"
   when: "changing ServiceModule test-host configuration"

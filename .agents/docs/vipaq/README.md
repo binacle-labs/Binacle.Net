@@ -2,7 +2,7 @@
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
 verified: 2026-09-20
-check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in PerformanceTests/PreReportChecks/
+check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
 also_update:
   - vipaq/typescript
   - vipaq/cross-language-testing
@@ -62,7 +62,8 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/src/Binacle.ViPaq/` | C# reference implementation |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror (`$vipaq/typescript`) |
 | `vipaq/test-vectors/` | Language-neutral vectors read by both suites |
-| `vipaq/test/` | C# unit tests, `Binacle.ViPaq.Testing` (the harness's encoders and picks), benchmarks, performance tests |
+| `vipaq/test/` | C# unit tests, `Binacle.ViPaq.Testing` (the harness's encoders and picks), benchmarks |
+| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` — encodes every pack and writes `vipaq/results/` |
 | `vipaq/tools/` | `VectorGenerators` (writes `test-vectors/`) and `PackedDataGenerator` (writes `data/packed/`) |
 | `vipaq/data/` | `packed/` — the frozen placed results, `bischoff-suite/`, `custom-problems/`, `demo-samples/` — and `Binacle.ViPaq.Data`, which embeds them |
 
@@ -71,12 +72,12 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | Project | Covers |
 |---|---|
 | `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
-| `vipaq/test/Binacle.ViPaq.PerformanceTests` | the `IPreReportCheck` gates — all 2,316 real packs × every codec × both layouts × natural/forced-16-bit widths, header + decode-to-input, run before the size reports |
+| `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gates — all 2,316 real packs × every codec × both layouts × natural/forced-16-bit widths, header + decode-to-input, run before the size reports |
 | `vipaq/test/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings over the curated picks and the synthetic sets |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
 The C# unit suite runs with `just test cs_binacle-vipaq_unit`. Only the two unit suites are on `just test all`; the
-performance and benchmark projects are run on demand.
+measure and benchmark projects are run on demand (`just measure vipaq`, `./tooling/benchmarks.vipaq.sh`).
 
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract
 for compressed payloads — is in `$vipaq/cross-language-testing`.

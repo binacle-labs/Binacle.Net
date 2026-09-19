@@ -40,13 +40,13 @@ Shape: [results.md](results.md), "Two kinds, two rules" and "Recipes". Protocol:
 
 ## Done when
 
-- [ ] `test -d lib/measure/Binacle.Lib.PackingEfficiency && test -d vipaq/measure/Binacle.ViPaq.EncodedSize`
-- [ ] `ls lib/test vipaq/test` lists no `PerformanceTests`.
-- [ ] `grep -rn "Find(" lib/measure/*/Program.cs vipaq/measure/*/Program.cs` shows the results path;
+- [x] `test -d lib/measure/Binacle.Lib.PackingEfficiency && test -d vipaq/measure/Binacle.ViPaq.EncodedSize`
+- [x] `ls lib/test vipaq/test` lists no `PerformanceTests`.
+- [x] `grep -rn "Find(" lib/measure/*/Program.cs vipaq/measure/*/Program.cs` shows the results path;
       `grep -rn "PerformanceTests.Artifacts" lib vipaq --include=*.cs` is empty.
-- [ ] `grep -n "Contains('/measure/')" Directory.Build.props` and `Contains('/bench/')` both hit.
-- [ ] `test -f tooling/measure.just && test ! -f tooling/performance.lib.sh && test ! -f tooling/performance.vipaq.sh`;
+- [x] `grep -n "Contains('/measure/')" Directory.Build.props` and `Contains('/bench/')` both hit.
+- [x] `test -f tooling/measure.just && test ! -f tooling/performance.lib.sh && test ! -f tooling/performance.vipaq.sh`;
       `just measure` lists four recipes.
-- [ ] `test ! -f .agents/memory/results-curated.md`; `grep -n "scratch" .agents/design/vipaq/decisions.md .agents/docs/commands.md`
+- [x] `test ! -f .agents/memory/results-curated.md`; `grep -n "scratch" .agents/design/vipaq/decisions.md .agents/docs/commands.md`
       names no `PerformanceTests.Artifacts`.
-- [ ] `dotnet build` on both projects succeeds. No run.
+- [x] `dotnet build` on both projects succeeds. No run.

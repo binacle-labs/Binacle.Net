@@ -123,7 +123,7 @@ table of [README.md](README.md).
   description: "IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them"
   paths: ["lib/src/Binacle.Lib/ResultSelection/**"]
 - file: lib/tests.md
-  description: "lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, performance tests, benchmarks; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
+  description: "lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, benchmarks, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
   paths: ["lib/test/**"]
 ```
 

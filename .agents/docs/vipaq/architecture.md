@@ -1,7 +1,7 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-08-27
+verified: 2026-09-20
 check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; the report files under results/vipaq/compression/ resolve
 paths:
   - "vipaq/**"
@@ -153,7 +153,7 @@ them** — that page decodes in the browser through the TypeScript package, and 
   codec implementations. **`ICompressionCodec` itself is public** while `DeflateCodec` / `GzipCodec` /
   `NoOpCodec` are not: the seam is visible, the choice of stream is not.
 - `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.Testing`,
-  `.PerformanceTests` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
+  `.EncodedSize` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
 - **Racing the codecs needs internals**, and `Binacle.ViPaq.Testing` has them. The race is part of the
   permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The reports are in

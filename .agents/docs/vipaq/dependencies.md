@@ -2,7 +2,7 @@
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references Testing; no test project references a generator).
 verified: 2026-09-20
-check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gates match PerformanceTests/PreReportChecks/ and the families each one sweeps
+check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gates match vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/ and the families each one sweeps
 paths:
   - "vipaq/**"
 ---
@@ -41,9 +41,9 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │               owns: ViPaqEncoder/ViPaqHeader (drives ProtocolEncoder), protobuf,
    │              │   │                     EncoderInfo, ScenarioComparison, the curated and synthetic picks
    │              │   │                  ▲          ▲
-   │              │   │                  │          └── Binacle.ViPaq.PerformanceTests  [IVT]  exe
+   │              │   │                  │          └── Binacle.ViPaq.EncodedSize  [IVT]  exe (vipaq/measure)
    │              │   │                  │                  refs: Testing, ViPaq.Data, Reporting
-   │              │   │                  │                  runs the pre-report gates + size/codec reports
+   │              │   │                  │                  runs the pre-report gates, writes vipaq/results/
    │              │   │                  │
    │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe
    │              │   │                                          refs: Testing, ViPaq.Data (BenchmarkDotNet)
@@ -57,7 +57,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    └── lib/src/Binacle.Lib                     the packing engine — reached only by PackedDataGenerator
 ```
 
-`Binacle.Reporting` (a shared markdown-report writer) is referenced by PerformanceTests and both generators.
+`Binacle.Reporting` (a shared markdown-report writer) is referenced by EncodedSize and both generators.
 
 ## Projects at a glance
 
@@ -67,7 +67,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, CompactNotation | yes | spec/correctness — vectors + curated inputs, no real data |
 | `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,316 real packs as scenarios, one class per family |
 | `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders, protobuf, the curated and synthetic picks |
-| `Binacle.ViPaq.PerformanceTests` | exe | Testing, ViPaq.Data, Reporting | yes | pre-report gates + size/codec reports |
+| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | pre-report gates, then the size and crossover reports into `vipaq/results/` |
 | `Binacle.ViPaq.Benchmarks` | exe | Testing, ViPaq.Data | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
@@ -83,7 +83,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 2. **ViPaq.Data holds the real packs and nothing else; Testing holds the harness's encoders.** `ViPaq.Data`
    does not reference `Binacle.ViPaq` and has no internals grant - it is inputs only. `Testing` reaches the
    internal `ProtocolEncoder` through its own thin `ViPaqEncoder`/`ViPaqHeader`, so every mode (each codec,
-   each layout) is forceable. Only Benchmarks and PerformanceTests reference `Testing`.
+   each layout) is forceable. Only Benchmarks and EncodedSize reference `Testing`.
 
 3. **PackedDataGenerator has no internals grant.** It produces the frozen data through the public surface and the
    packing engine only. It must never reach into ViPaq internals — the data has to be generatable the way any
@@ -104,7 +104,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 
 ## The real-data round-trip gate
 
-The packed-data conformance suite is a set of `IPreReportCheck` gates in `PerformanceTests/PreReportChecks/`.
+The packed-data conformance suite is a set of `IPreReportCheck` gates in `Binacle.ViPaq.EncodedSize/PreReportChecks/`.
 They throw rather than writing a report, and `RunPreReportChecks()` runs them all before the report
 `TestRunner`, in the order `AddPreReportChecks` registers them:
 

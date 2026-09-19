@@ -7,8 +7,8 @@
 #   just regen demo-samples            shared/data/demo-samples -> the demo's sample set
 #   just regen check                   regenerate, then fail if any of it changed
 #
-# Every tool here rewrites committed files. No recipe takes an argument, so a run does its whole list and
-# cannot leave the data half written.
+# Every tool here rewrites committed files, as measure.just's do. No recipe takes an argument, so a run does
+# its whole list and cannot leave the data half written.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'

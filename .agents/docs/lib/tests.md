@@ -1,8 +1,8 @@
 ---
 id: lib/tests
-description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, performance tests, benchmarks; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, benchmarks, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
 verified: 2026-09-20
-check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/ and tooling/tests.just + tooling/performance.lib.sh + tooling/benchmarks.lib.sh
+check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/ and tooling/tests.just + tooling/measure.just + tooling/benchmarks.lib.sh
 also_update:
   - shared
   - lib/algorithm-factory
@@ -25,7 +25,7 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 |---|---|---|
 | `Binacle.Lib.Testing` | support library (no suite) | — |
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
-| `Binacle.Lib.PerformanceTests` | console host (writes markdown reports) | `./tooling/performance.lib.sh` |
+| `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
 | `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
 
 ## Binacle.Lib.Testing
@@ -101,12 +101,12 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 `x => x.AlgorithmInfo.GetAlgorithmIdentifierName()`), `BestBin_v1/v2` and `SmallestBin_v1/v2` (selector
 `x => x.Bin.ID`). See `$lib/result-selection`.
 
-## Binacle.Lib.PerformanceTests
+## Binacle.Lib.PackingEfficiency
 
-Console host (not xUnit). `Program.cs` wires a `TestRunner` +
-`MarkdownFileWriter` and runs Bischoff-suite `ITest` implementations: `PackingEfficiencyTests`, `RegressionTests`
-(FFD/WFD/BFD v1-vs-v2), `EfficiencyStatisticsTests`, `BaselineComparisonTests`. Output is markdown reports, not
-pass/fail assertions.
+Console host (not xUnit), in `lib/measure/`. `Program.cs` wires a `TestRunner` + `MarkdownFileWriter` pointed at
+`lib/results/` and runs Bischoff-suite `ITest` implementations: `PackingEfficiencyTests`, `RegressionTests`
+(FFD/WFD/BFD v1-vs-v2), `EfficiencyStatisticsTests`, `BaselineComparisonTests`. Output is markdown reports
+written over the tracked files, not pass/fail assertions; a change is a diff.
 
 ## Binacle.Lib.Benchmarks
 

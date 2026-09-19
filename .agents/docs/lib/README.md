@@ -37,7 +37,7 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 | Project | Alias | What it covers |
 |---|---|---|
 | `lib/test/Binacle.Lib.UnitTests` | `cs_binacle-lib_unit` | All algorithm versions × all scenarios; result selection strategies |
-| `lib/test/Binacle.Lib.PerformanceTests` | (none) | Algorithm performance (console runner, not xUnit) — run via `./tooling/performance.lib.sh` |
+| `lib/measure/Binacle.Lib.PackingEfficiency` | (none) | Packing efficiency over every scenario (console runner, not xUnit), written to `lib/results/` — run via `just measure lib` |
 | `lib/test/Binacle.Lib.Benchmarks` | (none) | BenchmarkDotNet microbenchmarks — run via `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
 
 See Lib Tests (`$lib/tests`) for fixtures and the test projects, and Shared (`$shared`) for the

@@ -36,9 +36,11 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `api/test/*.UnitTests` | One unit suite per source project — `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`. `Kernel.UnitTests` is split by feature folder |
 | `lib/src/Binacle.Lib` | Core bin-packing algorithms and processors |
 | `shared/src/Binacle.Packing` | The packing vocabulary shared between `Binacle.Lib` and the API layer |
-| `lib/test/` | Lib unit tests, performance tests, benchmarks |
+| `lib/test/` | Lib unit tests, `Binacle.Lib.Testing`, benchmarks |
+| `lib/measure/` | `Binacle.Lib.PackingEfficiency` - packs every scenario and writes `lib/results/` |
 | `vipaq/src/Binacle.ViPaq` | Compact binary format for encoding packing results |
-| `vipaq/test/` | ViPaq unit tests, performance tests, benchmarks |
+| `vipaq/test/` | ViPaq unit tests, `Binacle.ViPaq.Testing`, benchmarks |
+| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` - encodes every pack and writes `vipaq/results/` |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror of ViPaq |
 | `shared/src/Binacle.Geometry` | Shared geometry leaf — generic `IWith*` interfaces + concrete `Dimensions<T>`/`Coordinates<T>` (BCL-only, referenced by lib, ViPaq, CompactNotation) |
 | `shared/src/Binacle.CompactNotation` | Shared compact-string parser/formatter (`LxWxH (X,Y,Z) [Q]`) |
@@ -46,7 +48,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/Binacle.Data` | Shared scenario data and the code that reads it |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
 | `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
-| `shared/test/Binacle.Reporting` | The report runner and markdown/console writers the performance runs and the converter tools share |
+| `shared/test/Binacle.Reporting` | The report runner and markdown/console writers the measure projects and the converter tools share |
 | `packages/` | TypeScript packages (npm workspaces) |
 | `ruby/` | Ruby gems (Jekyll plugins) |
 | `sites/` | Every published site, one directory each (`$sites`) |
@@ -55,7 +57,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `sites/www/` | Jekyll marketing site (`$sites/www`) |
 | `api/requests/` | HTTP request files for manual testing (subfolders: v3, v4, Service) |
 | `samples/` | Docker and Kubernetes deployment samples (user-facing starting points) |
-| `tooling/` | Every task the repo can run, called by CI and by hand alike — twelve `just` modules (agents, build, changelog, check, ci, coverage, image, openapi, regen, serve, smoke, tests), the benchmark/performance scripts, the wrangler configs, local compose, emulator state |
+| `tooling/` | Every task the repo can run, called by CI and by hand alike — thirteen `just` modules (agents, build, changelog, check, ci, coverage, image, measure, openapi, regen, serve, smoke, tests), the benchmark scripts, the wrangler configs, local compose, emulator state |
 | `.github/workflows/` | The nine GitHub Actions workflows — the PR gate, the shared image tests, the shared site tests, Sonar, CodeQL, the release pipeline, image smoke, the Docker Hub overview push, and the site deploy (`$ci-cd`) |
 | `shared/data/` | Fixture data more than one slice reads — `or-library/` (raw), `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
 | `assets/` | Shared images, js, css and fonts, copied into the three Jekyll sites and the UI module by `gulpfile.js` |
