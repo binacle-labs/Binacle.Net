@@ -15,7 +15,7 @@ files hold the carve-outs.
 |---|---|
 | [never-commit](never-commit.md) | Never commit, stage or push. Leave changes in the working tree. |
 | [never-edit-published-sites](never-edit-published-sites.md) | Never edit anything under `sites/`. One carve-out, for security fixes to sample files. |
-| [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the three exceptions. |
+| [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the four exceptions. |
 | [talking-to-the-maintainer](talking-to-the-maintainer.md) | In chat: plain English, no flattery, say when he is wrong. A question gets an answer, not work. |
 
 ## Read when the trigger fires

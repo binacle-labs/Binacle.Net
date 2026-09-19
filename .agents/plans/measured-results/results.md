@@ -1,7 +1,7 @@
 ---
 description: Measured results get a home in each slice, a harness that writes the verdict, benchmark projects split by question, two just recipes, and the old vault converted in
 state: ready
-waits-on: "nothing - the reviewer pass landed 2026-09-19. The maintainer splits the work order into sessions"
+waits-on: "nothing - the reviewer pass landed 2026-09-19; the support projects (steps 1 to 6 of the orchestrator) go first"
 horizon: next-release
 paths:
   - "tooling/**"
@@ -70,20 +70,20 @@ lib/
 vipaq/
   data/  src/  test/  test-vectors/  tools/
   measure/  Binacle.ViPaq.EncodedSize
-  bench/    Binacle.ViPaq.Benchmarks.Format
+  bench/    Binacle.ViPaq.Benchmarks.Encoding
             Binacle.ViPaq.Benchmarks.Scale
   results/
     README.md
     encoded-size.md           one row per pack per layout, six sizes, base64 only
     benchmarks/
       README.md
-      format/
+      encoding/
       scale/
 ```
 
-Neither project set lives under `test/`: they assert nothing, and `test/` is what `just test` runs. If both
-slices share measure or bench plumbing it lives in `shared/measure/` and `shared/bench/`; plumbing one slice
-uses stays in that slice.
+Neither project set lives under `test/`: they assert nothing, and `test/` is what `just test` runs. What a
+slice's measure and bench projects share - factories, curated picks, the BDN config, the encoders - is its
+`Testing` project; what both slices share is `Binacle.Reporting`. No `shared/measure/` or `shared/bench/`.
 
 ### Deterministic projects - one run, many views
 
@@ -121,12 +121,14 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
 - `encoded-size.md` - Scenario, Algorithm, Items, Widths, ViPaq raw / deflate / gzip, protobuf raw /
   deflate / gzip, ratio, best codec, saved %. Base64 lengths only - the stored form; bytes are 3/4 of it.
   Two sections, one per layout. Replaces sixteen tables in five files.
-- **A JSON baseline is added**, a small encoder beside `ProtobufEncoder`. Protobuf is the fair format
-  comparison; JSON is what a user's token replaces, and "N% of the JSON body" is the user's number.
-- The three pre-report gates move to `Binacle.ViPaq.UnitTests`. Two round-trip every real pack in every
-  codec and layout, one of them at a forced 16-bit width; the third checks that every curated pick still
-  names a real scenario. They are the only round-trip of every real pack and today run only when someone
-  runs the report.
+- **A JSON baseline is added**, a small encoder beside `ProtobufEncoder` in `Binacle.ViPaq.Testing`.
+  Protobuf is the fair format comparison; JSON is what a user's token replaces, and "N% of the JSON body"
+  is the user's number.
+- Two of the three pre-report gates move to `Binacle.ViPaq.UnitTests`: they round-trip every real pack in
+  every codec and layout, one at a forced 16-bit width, and are the only round trip of every real pack;
+  today they run only when someone runs the report. The third checks that every curated pick still names a
+  real scenario; the picks live in `Binacle.ViPaq.Testing`, which the unit tests never reference, so it
+  stays in the measure project's startup.
 
 ### Benchmark projects - one project per question
 
@@ -136,12 +138,13 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
 | `Binacle.Lib.Benchmarks.ResultSelection` | the three strategy benchmarks - different code, different data, so its own project though only 18 cases | seconds |
 | `Binacle.Lib.Benchmarks.Racing` | AlgorithmRacing v1, v2 | ~30 min |
 | `Binacle.Lib.Benchmarks.Threshold` | both parallelization families. AlgorithmParallelizationThreshold stays as the evidence for why parallel racing was not wired up | hours |
-| `Binacle.ViPaq.Benchmarks.Format` | curated encode, curated decode, CompressionCost | minutes |
+| `Binacle.ViPaq.Benchmarks.Encoding` | curated encode, curated decode, CompressionCost | minutes |
 | `Binacle.ViPaq.Benchmarks.Scale` | synthetic encode and decode at 2,000 and 5,000 items | longer |
 
-The project is the category; no BenchmarkDotNet categories needed. The 20-line BDN config lives in one
-shared project. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix
-`Fitting/FastValidation/FastValidation_SpecializedBaseline_Packing.cs`, which holds the `_Fitting` class;
+The project is the category; no BenchmarkDotNet categories needed. The 20-line BDN config lives in each
+slice's `Testing` project - two copies, which is the "copy the few lines" lesson below, not a project for 20
+lines. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix
+`Benchmarks/Fitting/FastValidation/FastValidation_SpecializedBaseline_Packing.cs`, which holds the `_Fitting` class;
 delete the unused `Generator.cs`. JSON joins the protobuf baseline in the vipaq timing once the encoder
 exists. Every `_v1` baseline is marked in one comment as deleted with v1.
 
@@ -161,7 +164,7 @@ Two modules at the tooling root, following `tests.just`: `set working-directory 
 the family is the recipe name, so `just` rejects an unknown one by itself - no alias table, no `case`. The
 four `tooling/*.sh` scripts are absorbed - each is `dotnet run -c Release` with a path, the shape the earlier
 conversions absorbed rather than wrapped. The project list is the recipe list; nothing else holds it. The
-BDN config lives in the shared C# project, which is BDN's own config, so no file under `tooling/` is needed.
+BDN config is C# in the two `Testing` projects, which is BDN's own config, so no file under `tooling/` is needed.
 
 ```
 just measure                      the list
@@ -176,7 +179,7 @@ just bench lib-algorithms         default tier; `just bench lib-algorithms -- --
 just bench lib-racing | lib-threshold | lib-result-selection
 just bench lib-fast               lib-algorithms then lib-result-selection - the quick run
 just bench lib-all                says "hours" first, then every lib project
-just bench vipaq-format | vipaq-scale | vipaq-all
+just bench vipaq-encoding | vipaq-scale | vipaq-all
 ```
 
 How the full 700-scenario tier is named inside `lib-algorithms` is the implementer's - a BDN filter, a
@@ -184,8 +187,9 @@ second recipe, or an environment variable; whichever it is, the full run never h
 
 The root `justfile` gets two `mod` lines and loses the comment "benchmark and performance runs are still
 shell scripts". `tooling/README.md` rows for `performance.<slice>.sh` and `benchmarks.<slice>.sh` become the
-two modules. `just check scripts` loses four files. `regen.just` says it is the only place that runs a tool
-writing committed files; that sentence changes.
+two modules. `just check scripts` is a glob and loses the four files by itself. `regen.just` opens with
+"Regenerates the data that is committed to the repository" and "Every tool here rewrites committed files";
+once `measure` exists it is no longer the only module that does, and its header says so.
 
 ### What moves with it
 
@@ -200,17 +204,18 @@ Files that name the old layout by path or by rule. Each one is wrong the moment 
   built on every Sonar and image run.
 - **`.gitignore`** loses `PerformanceTests.Artifacts` and `PerformanceTestsArtifacts` once nothing writes
   there. `BenchmarkDotNet.Artifacts` stays.
-- **`AlgorithmFactories.cs`** is one file copied byte-for-byte into `Binacle.Lib.UnitTests`, `.Benchmarks`
-  and `.PerformanceTests`. The split would make it five copies. It needs a reference to `Binacle.Lib`, so it
-  cannot go into `Binacle.Lib.TestsKernel` as that project stands; it gets one home that the unit, measure
-  and bench projects all reference, settled with the tests-kernel question.
+- **`AlgorithmFactories.cs`** was one file copied into three lib projects; the support-projects shape gives
+  it one home, `Binacle.Lib.Testing`, before the bench split would make it five.
 - **`.agents/memory/results-curated.md`** says the opposite of this plan - "never point a harness's file
-  writer at `results/`". It is deleted in step 3, or the next agent obeys it.
+  writer at `results/`". It is deleted the day the writers move (step 7), or the next agent obeys it.
 - **`.agents/design/vipaq/decisions.md` D3** says the perf test writes to scratch and the vault is copied by
-  hand. That paragraph is rewritten in step 3. The same day: `design/vipaq/findings.md` (its `check:` line
-  and the crossover reference), `design/lib/findings.md` (the vault path), `docs/README.md` (the `results/`
-  row), `docs/build-topology.md` ("`results/` is deliberately not in the solution"), `.agents/README.md`
-  ("`results/` by real path"), `docs/commands.md` (the four scripts and the scratch sentence).
+  hand. That paragraph and the scratch sentence in `docs/commands.md` are rewritten in step 7 with the
+  memory. When the vault goes (step 11): `design/vipaq/findings.md` (its `check:` line and the crossover
+  reference), vipaq D5 and `docs/vipaq/architecture.md` (the compression report paths),
+  `design/lib/findings.md` (the vault path), `docs/README.md` (the `results/` row), `docs/build-topology.md`
+  ("`results/` is deliberately not in the solution"), `.agents/README.md` ("`results/` by real path"),
+  `docs/commands.md` (the four scripts). One line stays: the repo-wide design record names "the 2024 records
+  under `results/lib/benchmarks/`" as a record of what was true then; it is history, not a pointer.
 - **`shared/data/README.md`** and the slice READMEs name `results/` at the root nowhere, but
   `lib/README.md` and `vipaq/README.md` list `test/` projects and gain `measure/`, `bench/` and `results/`.
 
@@ -224,7 +229,7 @@ longer exists; the line says that too. One judgement per file. The hand-written 
 summaries carry charts on GitHub user-attachments and a "what changed" line; the line is worth keeping in
 the trace table, the rest is not. Then the trace table is read as a whole and the progress story checked.
 
-### Later, not now
+### Not in this plan
 
 - A docs-site page copied from the READMEs, and a www number.
 - Comparison against published results on the Bischoff instances: "we do 81% at X ns, others 87% at Y ns".
@@ -232,56 +237,8 @@ the trace table, the rest is not. Then the trace table is read as a whole and th
 
 ## Work order
 
-Each line is a session or less except 2.
-
-1. Move and rename the two deterministic projects to `<slice>/measure/`; point them at `<slice>/results/`
-   (`RepositoryRoot.Bind().Find(...)` exists). Same session: `Directory.Build.props` path rule, the `.slnx`
-   folders.
-2. Runner-plus-builder restructure, the README writers, the JSON encoder, the gates to unit tests.
-3. Delete `results/`; regrow both `results/` folders with `just measure`. Same session: delete the
-   `results-curated` memory, rewrite D3 and the six docs named above, fix the Sonar exclusion, `.gitignore`.
-4. Split the benchmark projects into `<slice>/bench/`, shared config project, naming pass, one
-   `AlgorithmFactories`.
-5. `measure.just`, `bench.just`; delete the four scripts; update the tooling doc and root justfile.
-6. Convert the old keepers; write both `benchmarks/README.md`.
-7. First keepers: `lib-fast` and `vipaq-format`; bin threshold once, on a quiet machine, and its finding.
-
-## Done when
-
-- [ ] `results/` at the root is gone and each slice has its own.
-      `test ! -d results && test -d lib/results && test -d vipaq/results`
-- [ ] The deterministic harnesses write into the slice, and the README they write holds the summaries.
-      `just measure lib && git status --short lib/results` shows only files the run changed;
-      `head -30 lib/results/README.md` is a summary table, not 700 rows.
-- [ ] Nothing under `<slice>/test/` produces a report.
-      `ls lib/test vipaq/test` lists no `PerformanceTests` and no `Benchmarks`.
-- [ ] One benchmark project per question, in `bench/`.
-      `ls lib/bench vipaq/bench` lists the six projects named above.
-- [ ] The round-trip of every real pack runs under `just test`.
-      `grep -rl "BischoffDataProvider" vipaq/test/Binacle.ViPaq.UnitTests` is not empty.
-- [ ] `encoded-size.md` carries a JSON column.
-      `head -12 vipaq/results/encoded-size.md | grep -i json`
-- [ ] The four scripts are gone and two modules exist.
-      `ls tooling/benchmarks.*.sh tooling/performance.*.sh` lists nothing; `test -f tooling/measure.just && test -f tooling/bench.just`
-- [ ] No doc, README or memory names a path into `tooling/` for these runs, or the root vault.
-      `grep -rn "tooling/performance\.\|tooling/benchmarks\.\|results-curated" --include=*.md . | grep -v "^./sites"`
-      returns nothing, and so does
-      `grep -rn "results/" --include=*.md .agents | grep -v "lib/results\|vipaq/results\|/plans/"`.
-- [ ] Sonar still sees the moved projects as support code.
-      `grep -n "measure\|bench" Directory.Build.props` hits the path rule;
-      `grep -n "results" tooling/ci/sonar-analysis.xml` shows the two slice paths, not `results/**`.
-- [ ] One `AlgorithmFactories.cs` in the lib slice.
-      `find lib -name AlgorithmFactories.cs -not -path "*/obj/*"` lists one file.
-- [ ] Every old keeper sits under a family folder with a date and a line naming its real class.
-      **By eye.** Open each file under `lib/results/benchmarks/*/`; the first lines say class and ruler.
-- [ ] Both `benchmarks/README.md` have the rule, the trace and what they say.
-      **By eye.** Three headings, and every number in the trace appears in a keeper file.
-- [ ] The scaling curve exists and has a keeper.
-      `ls lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.
-- [ ] The bin-threshold question has a finding.
-      `grep -n "BinParallelizationThreshold" .agents/design/lib/findings.md` is a section with numbers, not "no finding yet".
-- [ ] The doc for lib tests, the tooling doc, D3 and the lib and vipaq READMEs describe the new layout.
-      `just agents all` regenerates clean; **by eye** the files name `measure/`, `bench/`, `results/`.
+Steps 7 to 14 of the orchestrator beside this folder, one file each. The support projects go first, because
+the bench split multiplies every copy they remove.
 
 ## Research
 
@@ -312,9 +269,9 @@ anything a script reads, no `Job` is set in either project today. Label per-set 
 reader of the papers recognises them.
 
 Recipe shape, simpler than first drawn: with one project per family the family is the recipe name and
-`just` rejects an unknown one itself - `just bench lib-algorithms`, `lib-fast`, `lib-all`, `vipaq-format`;
-`just measure lib`, `vipaq`, `all`, `check`. `*args` passes BDN flags after `--`. `regen.just` says it is
-the only place that runs a tool writing committed files; that sentence changes when `measure` exists.
+`just` rejects an unknown one itself - `just bench lib-algorithms`, `lib-fast`, `lib-all`, `vipaq-encoding`;
+`just measure lib`, `vipaq`, `all`, `check`. `*args` passes BDN flags after `--`. `regen.just`'s header
+says every tool there rewrites committed files; once `measure` does too, the header says it is not alone.
 
 ### 2026-09-19 - what survives a ruler change
 
@@ -363,7 +320,8 @@ README says Mean does not compare, and why a two-ruler comparison is a design fi
 `Binacle.Lib.PerformanceTests`: four `ITest` classes each walk 700 scenarios and pack again - 12,600
 packings for four views of 4,200 numbers. No summary table; `RegressionTests` lists any v1/v2 difference;
 `BaselineComparison` hard-codes BFD and gives no count; per-set rows say `thpack3`, not "8 item types"; no
-header; unused Serilog packages; `AlgorithmFactories` copied in three projects. Born
+header; a Serilog bootstrap logger with two packages nothing uses (`Enrichers.Process`, `Sinks.File`);
+`AlgorithmFactories` copied in three projects. Born
 `Binacle.Net.Lib.PackingEfficiencyTests` 2024-10, renamed 2024-11 when timing was added; timing is gone.
 
 `Binacle.Lib.Benchmarks`: four class-name patterns; five namespaces including
@@ -406,3 +364,40 @@ the raw filter; `results/vipaq/benchmarks/` is empty.
 
 The numbers are in `.agents/design/lib/findings.md` (F1, F2). The reports behind them were never curated
 in; `racing/2026-07-17.md` is the keeper to recover if the scratch folder still exists on that machine.
+
+## Done when
+
+- [ ] `results/` at the root is gone and each slice has its own.
+      `test ! -d results && test -d lib/results && test -d vipaq/results`
+- [ ] The deterministic harnesses write into the slice, and the README they write holds the summaries.
+      `just measure lib && git status --short lib/results` shows only files the run changed;
+      `head -30 lib/results/README.md` is a summary table, not 700 rows.
+- [ ] Nothing under `<slice>/test/` produces a report.
+      `ls lib/test vipaq/test` lists no `PerformanceTests` and no `Benchmarks`.
+- [ ] One benchmark project per question, in `bench/`.
+      `ls lib/bench vipaq/bench` lists the six projects named above.
+- [ ] The round-trip of every real pack runs under `just test`.
+      `grep -l "Binacle.ViPaq.Data" vipaq/test/Binacle.ViPaq.UnitTests/*.csproj` is not empty.
+- [ ] `encoded-size.md` carries a JSON column.
+      `head -12 vipaq/results/encoded-size.md | grep -i json`
+- [ ] The four scripts are gone and two modules exist.
+      `ls tooling/benchmarks.*.sh tooling/performance.*.sh` lists nothing; `test -f tooling/measure.just && test -f tooling/bench.just`
+- [ ] No doc, README or memory names a path into `tooling/` for these runs, or the root vault.
+      `grep -rn "tooling/performance\.\|tooling/benchmarks\.\|results-curated" --include=*.md . | grep -v "^./sites"`
+      returns nothing, and so does
+      `grep -rn "results/" --include=*.md .agents | grep -v "lib/results\|vipaq/results\|/plans/\|_index.md\|what was true then"`.
+- [ ] Sonar still sees the moved projects as support code.
+      `grep -n "Contains('/measure/')" Directory.Build.props` and `Contains('/bench/')` both hit;
+      `grep -n "results" tooling/ci/sonar-analysis.xml` shows the two slice paths, not `results/**`.
+- [ ] One `AlgorithmFactories.cs` in the lib slice.
+      `find lib -name AlgorithmFactories.cs -not -path "*/obj/*"` lists one file.
+- [ ] Every old keeper sits under a family folder with a date and a line naming its real class.
+      **By eye.** Open each file under `lib/results/benchmarks/*/`; the first lines say class and ruler.
+- [ ] Both `benchmarks/README.md` have the rule, the trace and what they say.
+      **By eye.** Three headings, and every number in the trace appears in a keeper file.
+- [ ] The scaling curve exists and has a keeper.
+      `ls lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.
+- [ ] The bin-threshold question has a finding.
+      `grep -n "BinParallelizationThreshold" .agents/design/lib/findings.md` is a section with numbers, not "no finding yet".
+- [ ] The doc for lib tests, the tooling doc, D3 and the lib and vipaq READMEs describe the new layout.
+      `just agents all` regenerates clean; **by eye** the files name `measure/`, `bench/`, `results/`.

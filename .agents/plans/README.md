@@ -56,6 +56,9 @@ index says how far out everything is. The body of the plan still carries no timi
   without pulling in three unrelated topics. Something that needs a decision, research, or more than one sitting
   gets its own file. A single mechanical act with a known answer does not: just do it, or make it a checkbox on
   the release file if it gates a release.
+- **A plan too big for one file becomes a topic folder** - the maintainer grants it, case by case. An
+  orchestrator file at the root points at the folder's shape files and one file per step; a step points at its
+  shape. It is the one place a plan may point at a plan; the reference rule names it.
 - **One master plan per topic**, holding what is done and what is left. When a review turns up issues, put them
   in **one findings file** beside it; a finding lives there until it is fixed, then moves into the master and is
   deleted from findings. Delete findings when it's empty. Don't let a topic sprawl into four overlapping plans,
