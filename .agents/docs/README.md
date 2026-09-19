@@ -62,7 +62,8 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/` | Fixture data more than one slice reads — `or-library/` (raw), `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
 | `assets/` | Shared images, js, css and fonts, copied into the three Jekyll sites and the UI module by `gulpfile.js` |
 | `LICENSE.GPL-3.0/` | The GPL-3.0 text, kept because images and tags published before v3.0.0 link to this path |
-| `results/` | The hand-curated measurement vault — benchmark and size reports, never auto-written (`$build-topology`) |
+| `lib/results/`, `vipaq/results/` | Measured results the measure projects write and overwrite; a change is a diff |
+| `results/` | The old hand-kept benchmark records, kept until the benchmark projects have their own keepers |
 | `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `www/`, `openapi/`, `tests/`, `coverage/`. Never edit |
 
 ## Commands

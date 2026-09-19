@@ -220,8 +220,8 @@ Renamed from `config/` on 2026-08-12, and `build/` became `artifacts/` in the sa
 each wrong in a different way: `config/` held recipes rather than configuration, while the API's own runtime
 settings live in `Config_Files`; `build/` held output, which the .NET convention calls `artifacts/` and the Go
 convention reads as the opposite — build *scripts*. `eng/` was considered and rejected as jargon, `tooling/`
-being the plain word for what it holds. `artifacts/` is not `results/`: that one is committed measured
-evidence, records that outlive a build.
+being the plain word for what it holds. `artifacts/` is not `lib/results/` or `vipaq/results/`: those are committed
+measured evidence, records that outlive a build.
 
 **Every module sets `set working-directory := '..'`, which resolves relative to the module file.** The folder
 therefore has to stay one level below the repo root. Moving it deeper or shallower breaks every path in every

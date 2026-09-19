@@ -2,7 +2,7 @@
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
 verified: 2026-09-20
-check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; the report files under results/vipaq/compression/ resolve
+check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/encoded-size.md exists
 paths:
   - "vipaq/**"
 ---
@@ -156,8 +156,8 @@ them** — that page decodes in the browser through the TypeScript package, and 
   `.EncodedSize` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
 - **Racing the codecs needs internals**, and `Binacle.ViPaq.Testing` has them. The race is part of the
-  permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The reports are in
-  `results/vipaq/compression/`.
+  permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The sizes are in
+  `vipaq/results/encoded-size.md`.
 
 The public contract does not grow, yet tests can force any combination.
 
@@ -182,8 +182,8 @@ the two could silently disagree in a mode neither would choose on its own.
 
 ## Open — do not assume
 
-- **Does columnar actually pay?** Both layouts were raced against both codecs — the reports are in
-  `results/vipaq/compression/` (`CodecCompressionCrossover.Row.md`, `.Columnar.md`). `RowMajor` remains the
+- **Does columnar actually pay?** Both layouts were raced against both codecs — `vipaq/results/README.md`
+  carries the codec × layout table and `encoded-size.md` has every pack per layout. `RowMajor` remains the
   default; treat columnar as available and measured, not as the better choice.
 - **Whether the library should choose `Compressed` for you.** It does not. Encoding both ways and keeping the
   shorter blob is still unmeasured for encode time, so the decision stays with the caller.

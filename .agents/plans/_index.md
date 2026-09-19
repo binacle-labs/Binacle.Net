@@ -144,12 +144,12 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "step 8's gate"
   horizon: next-release
 - file: measured-results/10-vipaq-encoded-size.md
-  description: "Step 10 - a JSON encoder joins protobuf, then the ViPaq runner and builder write encoded-size.md with its JSON column and the README with the largest-token line"
+  description: "Step 10 - JSON and compact-notation encoders join protobuf, then the ViPaq runner and reporters write encoded-size.md with its text columns and the README with the largest-token line"
   state: ready
   waits-on: "step 9's gate"
   horizon: next-release
 - file: measured-results/11-the-vault.md
-  description: "Step 11 - root results/ goes, both slices are regrown with just measure, and every doc, record and config line that named the vault is rewritten"
+  description: "Step 11 - every doc, record and config line that named the vault is rewritten; results/ itself stays on disk until the new benchmarks have run"
   state: ready
   waits-on: "step 10's gate"
   horizon: next-release

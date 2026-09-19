@@ -12,7 +12,8 @@ Shape: [results.md](results.md), "Converting the old vault" and the README parag
 
 ## The step
 
-- The old files are in git history under `results/lib/benchmarks/`, deleted in step 11. Every raw report
+- The old files are still on disk under `results/lib/`; the folder goes at the end of step 14, once the new
+  benchmarks have run. Every raw report
   there names a deleted class: `AlgorithmVersion_*`, `MultipleItems_*`, `MultipleBins_*`. Each lands under
   the nearest current family - the 20 `Multiple*` reports under `algorithms/` beside the new scaling class,
   the `AlgorithmVersion_*` ones too - dated from its BDN header and git, with a first line saying which class

@@ -22,9 +22,9 @@ BenchmarkDotNet v0.15.8 · Linux Ubuntu 26.04 · AMD Ryzen 9 9900X, 12 physical 
 below are far outside the noise.
 
 **These numbers cannot be re-checked from a clone.** BenchmarkDotNet writes to `BenchmarkDotNet.Artifacts/`,
-which `.gitignore` excludes, so the reports behind them exist only on the machine that ran them. The curated
-vault is `results/lib/benchmarks/`, and its newest entry is `2025-02-10.md` — no keeper was ever curated in for
-this run. So what a later session can confirm is that the harness still races what is quoted here, not that a
+which `.gitignore` excludes, so the reports behind them exist only on the machine that ran them. The old
+hand-kept records are `results/lib/benchmarks/`, and their newest entry is `2025-02-10.md` — no keeper was ever
+curated in for this run. So what a later session can confirm is that the harness still races what is quoted here, not that a
 re-run would land on the same microseconds. Re-running is a day's work on a quiet machine, and the ratios are
 what the decisions rest on, not the absolute times.
 

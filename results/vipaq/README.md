@@ -5,10 +5,8 @@ Measured output for the ViPaq wire format. Two kinds, one per folder, the same s
 | Folder | What it measures | Written by |
 |---|---|---|
 | [benchmarks/](benchmarks/) | Encode/decode speed and allocation, per mode | `vipaq/test/Binacle.ViPaq.Benchmarks` (BenchmarkDotNet) |
-| [compression/](compression/) | Encoded size vs protobuf, and where compression starts to pay | `vipaq/test/Binacle.ViPaq.PerformanceTests` |
+| [compression/](compression/) | Encoded size vs protobuf, and where compression starts to pay | the old performance-tests project, since replaced |
 
-Both folders are **hand-curated**. The harnesses write their raw run to build-local `*.Artifacts` scratch
-(gitignored), and you copy the keepers in. To record a size run, diff the perf test's `PerformanceTests.Artifacts`
-against `compression/` and copy it in on a win; `benchmarks/` works the same way off the BDN artifacts. Only a
-win gets promoted, so what is committed here is the best measured result, not the most recent one. See the
-scratch-vs-curated convention in the [parent README](../README.md).
+Nothing writes here any more. Size and crossover are now `vipaq/results/encoded-size.md` and its README,
+written by `just measure vipaq`; the `compression/` files are the last hand-copied reports, kept until the
+benchmark projects have run. `benchmarks/` is empty.

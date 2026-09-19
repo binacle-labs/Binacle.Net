@@ -1,8 +1,8 @@
 # Packing Efficiency Results
 
-How well each algorithm fills a bin, and how long it takes. Written by
-`lib/test/Binacle.Lib.PerformanceTests` (`./tooling/performance.lib.sh`) and committed so a rerun can be
-diffed against a known baseline. Records, not source.
+How well each algorithm fills a bin, and how long it took, as the old performance-tests project wrote them.
+Nothing writes here any more: fill is now `lib/results/packing-efficiency.md`, written by `just measure lib`.
+These stay only until the timing rows have a home under `lib/results/benchmarks/`.
 
 | File | What it shows |
 |---|---|

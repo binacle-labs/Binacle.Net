@@ -90,7 +90,7 @@ Point at another agent doc with a **`$` reference**, not a file path. Paths brea
 - **Annotate a referenced section** so the target is findable: a heading tag `{#width-selection}`, or a label the
   heading already carries (the decision headings `D1…`, `O1…` are their own anchors).
 - `also_update:` lists sibling docs by **id** (`vipaq/findings`), not path.
-- Reference **code, `results/`, and the wire spec by real path** — the `$` scheme is for `.agents` docs only.
+- Reference **code, `lib/results/`, `vipaq/results/`, and the wire spec by real path** — the `$` scheme is for `.agents` docs only.
 
 **Ref codes stay inside the agent docs** - see `rules/ref-codes-stay-in-the-agent-docs.md`.
 

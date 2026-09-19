@@ -54,7 +54,7 @@ physical bins. **Done:** the old `ViPaqLimits.MaxInteger` (2⁵³−1) is gone �
 ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2 racing. Two mechanisms replace it:
 - **Protobuf is the in-run anchor** — `[Benchmark(Baseline = true)]`. ViPaq is reported as a *ratio* to protobuf,
   so a rerun on another machine/day stays comparable; the anchor absorbs environment drift.
-- **Committed result files are the recorded baseline** — the size reports under `results/vipaq/compression/`. A *win* = a
+- **Committed result files are the recorded baseline** — `vipaq/results/encoded-size.md` and its README. A *win* = a
   diff showing smaller base64 / lower ns / lower allocs **while the protobuf anchor is unchanged**. Small
   increments; keep only measured wins.
 - **The measure project writes the tracked file, and a win is a diff** (2026-09-20). `Binacle.ViPaq.EncodedSize`
@@ -89,8 +89,8 @@ Two consequences of the public-API rule, both still true:
 - **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio, and *observes* the shipped
   compression crossover by sweeping item count.
 - **The codec race is part of it, permanently.** The harness encodes every scenario in each mode — `Raw`, `NoOp`,
-  and deflate/gzip across both layouts — and mirrors each codec onto protobuf. The reports are in
-  `results/vipaq/compression/`.
+  and deflate/gzip across both layouts — and mirrors each codec onto protobuf. The sizes are in
+  `vipaq/results/encoded-size.md`, the summaries in its README.
 
 Why it belongs in the permanent ruler, not a throwaway — **the race is not only about the codec:**
 - It also settles **row-major vs columnar**, which is unmeasured and is a permanent harness concern.

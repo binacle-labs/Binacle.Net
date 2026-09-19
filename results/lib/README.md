@@ -1,13 +1,10 @@
-# Binacle.Lib results
+# Binacle.Lib results (old records)
 
-Measured output for the packing algorithms. Two kinds, one per folder:
+Hand-kept records from before the measure and benchmark projects wrote their own. Two folders:
 
-| Folder | What it measures | Written by |
+| Folder | What it holds | Where it lives now |
 |---|---|---|
-| [benchmarks/](benchmarks/) | Raw speed - fit and pack, per algorithm (FFD/BFD/WFD), across runtimes and machines | `lib/test/Binacle.Lib.Benchmarks` (`./tooling/benchmarks.lib.sh`) |
-| [efficiency/](efficiency/) | How well each algorithm fills a bin, and how long it takes | `lib/test/Binacle.Lib.PerformanceTests` (`./tooling/performance.lib.sh`) |
+| [benchmarks/](benchmarks/) | Dated BenchmarkDotNet keepers, 2024-02 to 2025-02, plus raw runs per runtime | To be filed under `lib/results/benchmarks/<family>/` by date |
+| [efficiency/](efficiency/) | The last hand-copied fill and timing reports, and dated snapshots | Fill is `lib/results/packing-efficiency.md`, written by `just measure lib`; timing goes to the benchmark keepers |
 
-Both harnesses write to a build-local artifacts folder first (`BenchmarkDotNet.Artifacts` /
-`PerformanceTests.Artifacts`, gitignored). Nothing writes here automatically, you copy the reports worth keeping
-into these folders by hand, following the scratch-vs-curated convention in the [parent README](../README.md):
-overwrite the current best, and add a dated snapshot when a run is worth marking.
+Nothing here is written by any tool any more. Do not add to it.

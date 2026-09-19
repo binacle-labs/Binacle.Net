@@ -3,7 +3,7 @@ description: Step 14 - the scaling class and the JSON timing are written, then t
 state: ready
 waits-on: "step 13's gate, and a quiet machine for the threshold run"
 horizon: next-release
-paths: ["lib/bench/**", "vipaq/bench/**", "lib/results/benchmarks/**", "vipaq/results/benchmarks/**", ".agents/design/lib/findings.md"]
+paths: ["lib/bench/**", "vipaq/bench/**", "lib/results/benchmarks/**", "vipaq/results/benchmarks/**", "results/**", ".agents/design/lib/findings.md", ".agents/docs/**", "tooling/ci/**"]
 ---
 
 # Step 14 - the new classes and the first keepers
@@ -24,7 +24,11 @@ Shape: [results.md](results.md), "Benchmark projects" and "Two kinds, two rules"
   racing was not wired up.
 - Keep a run when the ruler or the code changed, not because it ran. These are the first, so they are
   keepers by definition.
-- Two commits: the two classes; then the keepers and the finding.
+- Then, and only then, root `results/` goes: `git rm -r results` is the maintainer's line, once every old
+  record has been filed by step 13 or beaten by a new keeper here. With it: the `docs/README.md` row for the
+  old records, `results/**` in `sonar.exclusions`, and the `design/lib/findings.md` line that names
+  `results/lib/benchmarks/` as where the old records are.
+- Three commits: the two classes; the keepers and the finding; the folder.
 
 ## Open before starting
 
@@ -44,5 +48,7 @@ Shape: [results.md](results.md), "Benchmark projects" and "Two kinds, two rules"
 - [ ] `grep -n "BinParallelizationThreshold" .agents/design/lib/findings.md` is a section with numbers, not
       "no finding yet".
 - [ ] Every keeper has a trace row: **by eye**, count the files and the rows.
+- [ ] `test ! -d results`, and `grep -rn "results/lib\|old hand-kept\|results/\*\*" --include=*.md --include=*.xml .agents tooling/ci | grep -v "_index.md\|measured-results\|is history"`
+      is empty.
 - [ ] The results shape's `Done when` list is all ticked. Then the maintainer deletes this folder and the
       orchestrator.

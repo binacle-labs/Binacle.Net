@@ -71,10 +71,10 @@ Support projects go first because the bench split in step 12 multiplies every co
 | 8 | [08-lib-packing-efficiency](measured-results/08-lib-packing-efficiency.md) | one run, many views: the runner, the bag, the reporters, the three lib files | `test -f lib/results/version-parity.md` |
 | 9 | [09-vipaq-gates-and-json](measured-results/09-vipaq-gates-and-json.md) | the two round-trip gates become unit tests over `ViPaq.Data`; the curated check stays | `test ! -f vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/ReportPathRoundTripCheck.cs` |
 | 10 | [10-vipaq-encoded-size](measured-results/10-vipaq-encoded-size.md) | JSON and compact encoders join protobuf; the ViPaq runner and reporters, `encoded-size.md` with its text columns, the README | `test -f vipaq/results/encoded-size.md` |
-| 11 | [11-the-vault](measured-results/11-the-vault.md) | root `results/` goes, `just measure all` regrows both slices, every doc and config line that named the vault is rewritten | `test ! -d results` |
+| 11 | [11-the-vault](measured-results/11-the-vault.md) | every doc and config line that named the vault is rewritten; `results/` itself stays until step 14 | `grep -rn "curated vault\|hand-curated" --include=*.md .agents \| grep -v _index.md \| wc -l` is 0 |
 | 12 | [12-bench-split](measured-results/12-bench-split.md) | six benchmark projects, the config in the `Testing` projects, `bench.just`, the two benchmark scripts gone | `test -f tooling/bench.just && test ! -f tooling/benchmarks.lib.sh` |
 | 13 | [13-convert-the-vault](measured-results/13-convert-the-vault.md) | every old keeper under its family with a date and its real class; both `benchmarks/README.md` | `test -f lib/results/benchmarks/README.md` |
-| 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-fast`, `vipaq-encoding`, the bin threshold once, and its finding | `ls lib/results/benchmarks/threshold/*.md` |
+| 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-fast`, `vipaq-encoding`, the bin threshold once, and its finding; then root `results/` goes | `test ! -d results` |
 
 ## Done when
 

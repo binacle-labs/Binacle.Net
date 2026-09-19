@@ -2,7 +2,7 @@
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
 verified: 2026-08-27
-check: Numbers match the latest results/vipaq/compression/ size reports and results/vipaq/benchmarks/ output; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/, vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
+check: Numbers match vipaq/results/encoded-size.md and its README; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/, vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -83,7 +83,8 @@ and would miss small compressible data. This drives `$vipaq/decisions#D7`.
 ## Compression crossover
 
 A controlled count ladder pins it: `Simple_5x5x5-N` (N = 5/13/50/200) in a fixed 50³ bin, only the count changing
-(`results/vipaq/compression/CodecCompressionCrossover.*`). For this uniform, maximally-repetitive family deflate
+(measured 2026-07 by the codec crossover report, since replaced by `vipaq/results/encoded-size.md`, which
+covers real packs only). For this uniform, maximally-repetitive family deflate
 already wins at the smallest rung — 5 items: raw 52 → deflate 36 b64 (31% saved) — and the saving climbs with count
 (45% / 64% / 66% at 13 / 50 / 200). Uniform data is gzip's best case; mixed real packs (Bischoff) are less
 repetitive and cross later, in the tens of items. **So the crossover tracks how repetitive the data is, not the

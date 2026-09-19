@@ -182,8 +182,9 @@ into the solution (and travel with build output). There are seven: `assets/asset
 `api/requests/requests.proj` and `samples/kubernetes/minimal/minimal.proj`.
 The Docker samples use `Microsoft.Docker.Sdk` `.dcproj` files instead. None of these affect the C# build.
 
-**`results/` is deliberately not in the solution.** The curated benchmark vault is read and hand-edited, never
-built, so it carries no `.proj` and has no solution folder — open the markdown directly.
+**`lib/results/`, `vipaq/results/` and the old `results/` vault are deliberately not in the solution.** They are
+markdown - written by the measure projects, or hand-kept benchmark records - never built, so they carry no
+`.proj` and no solution folder. Open the markdown directly.
 
 ## Cross-slice edges, and the ones no project file declares
 
