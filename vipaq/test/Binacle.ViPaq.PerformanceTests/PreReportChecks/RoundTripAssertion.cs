@@ -1,5 +1,5 @@
-using Binacle.ViPaq.TestsKernel;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing;
+using Binacle.ViPaq.Testing.Models;
 
 namespace Binacle.ViPaq.PerformanceTests.PreReportChecks;
 

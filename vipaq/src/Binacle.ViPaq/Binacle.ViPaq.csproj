@@ -6,7 +6,7 @@
 		<!-- The vector-generator tool drives the internal encoder to produce golden vectors. -->
 		<InternalsVisibleTo Include="$(ProjectName).VectorGenerators" />
 		<!-- The benchmark harness reads the internal Header off a token, rather than re-parsing the spec. -->
-		<InternalsVisibleTo Include="$(ProjectName).TestsKernel" />
+		<InternalsVisibleTo Include="$(ProjectName).Testing" />
 		<!-- The performance and benchmark harnesses build the codecs directly to force each race mode. -->
 		<InternalsVisibleTo Include="$(ProjectName).PerformanceTests" />
 		<InternalsVisibleTo Include="$(ProjectName).Benchmarks" />

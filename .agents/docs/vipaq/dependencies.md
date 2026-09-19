@@ -1,6 +1,6 @@
 ---
 id: vipaq/dependencies
-description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references TestsKernel; no test project references a generator).
+description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references Testing; no test project references a generator).
 verified: 2026-09-04
 check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gates match PerformanceTests/PreReportChecks/ and the families each one sweeps
 paths:
@@ -28,19 +28,19 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │   │   │
    │              │   │   │   └── Binacle.ViPaq.UnitTests        [IVT]  xUnit — spec/correctness
    │              │   │   │           refs: ViPaq, CompactNotation
-   │              │   │   │           NO ref to TestsKernel (deliberate)
+   │              │   │   │           NO ref to Testing (deliberate)
    │              │   │   │
-   │              │   │   └────── Binacle.ViPaq.TestsKernel      [IVT]  library — real-data hub
+   │              │   │   └────── Binacle.ViPaq.Testing      [IVT]  library — real-data hub
    │              │   │               refs: ViPaq, Geometry, CompactNotation
    │              │   │               owns: the 2,316 frozen packs, providers, protobuf,
    │              │   │                     ViPaqEncoder/ViPaqHeader (drives ProtocolEncoder)
    │              │   │                  ▲          ▲
    │              │   │                  │          └── Binacle.ViPaq.PerformanceTests  [IVT]  exe
-   │              │   │                  │                  refs: TestsKernel, TestReporting
+   │              │   │                  │                  refs: Testing, TestReporting
    │              │   │                  │                  runs the pre-report gates + size/codec reports
    │              │   │                  │
    │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe
-   │              │   │                                          refs: TestsKernel (BenchmarkDotNet)
+   │              │   │                                          refs: Testing (BenchmarkDotNet)
    │              │   │
    │              │   └── Binacle.ViPaq.VectorGenerators  [IVT]  tool exe — regenerates test-vectors/
    │              │           refs: ViPaq, CompactNotation, TestReporting
@@ -59,20 +59,20 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 |---|---|---|---|---|
 | `Binacle.ViPaq` | library | Geometry | grants IVT | the format; everything but the public surface is `internal` |
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, CompactNotation | yes | spec/correctness — vectors + curated inputs, no real data |
-| `Binacle.ViPaq.TestsKernel` | library | ViPaq, Geometry, CompactNotation | yes | real-data hub — 2,316 packs, providers, protobuf, its own encoder |
-| `Binacle.ViPaq.PerformanceTests` | exe | TestsKernel, TestReporting | yes | pre-report gates + size/codec reports |
-| `Binacle.ViPaq.Benchmarks` | exe | TestsKernel | yes | BenchmarkDotNet timings |
+| `Binacle.ViPaq.Testing` | library | ViPaq, Geometry, CompactNotation | yes | real-data hub — 2,316 packs, providers, protobuf, its own encoder |
+| `Binacle.ViPaq.PerformanceTests` | exe | Testing, TestReporting | yes | pre-report gates + size/codec reports |
+| `Binacle.ViPaq.Benchmarks` | exe | Testing | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, TestReporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, TestReporting | **no** | packs problems offline, freezes `data/packed/` |
 
 ## The walls (easy to break, deliberate)
 
-1. **UnitTests never references TestsKernel.** UnitTests is the spec gate: it proves the code obeys `PROTOCOL.md`
+1. **UnitTests never references Testing.** UnitTests is the spec gate: it proves the code obeys `PROTOCOL.md`
    using the shared cross-language vectors and its own curated inputs. Keeping it clear of the real-data hub means
    a data change can never turn a spec test red, and the C# vector suite reads exactly what the TypeScript suite
    reads. If a test needs the 2,316 real packs, it belongs on the kernel side, not here.
 
-2. **TestsKernel is the only home for the real packs, and only the measurement harnesses consume it.**
+2. **Testing is the only home for the real packs, and only the measurement harnesses consume it.**
    Benchmarks and PerformanceTests reference it; nothing else does. It reaches the internal `ProtocolEncoder`
    through its own thin `ViPaqEncoder`/`ViPaqHeader`, so every mode (each codec, each layout) is forceable.
 

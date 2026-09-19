@@ -1,4 +1,4 @@
-using Binacle.ViPaq.TestsKernel.Providers;
+using Binacle.ViPaq.Testing.Providers;
 
 namespace Binacle.ViPaq.PerformanceTests.PreReportChecks;
 

@@ -1,4 +1,4 @@
-namespace Binacle.ViPaq.TestsKernel.Models;
+namespace Binacle.ViPaq.Testing.Models;
 
 // One benchmark input: a bin plus placed items, exactly what both ViPaq and protobuf serialize. Uses the shared
 // Binacle.Geometry types so no second model can drift from them.

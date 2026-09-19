@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Attributes;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
 namespace Binacle.ViPaq.Benchmarks.Abstractions;
 

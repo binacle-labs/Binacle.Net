@@ -76,7 +76,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
    read it: the api integration suite and the lib tests. The result-selection fixtures went the other way —
    one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.Data` (see
-   `$lib/dependencies`). Not to be confused with `Binacle.ViPaq.TestsKernel`, a separate ViPaq-only hub — see
+   `$lib/dependencies`). Not to be confused with `Binacle.ViPaq.Testing`, a separate ViPaq-only hub — see
    `$vipaq/dependencies`.
 
 4. **`Binacle.Data` owns the one embedded-resource reader, and the caller names the assembly.**

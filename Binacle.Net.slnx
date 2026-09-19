@@ -80,7 +80,7 @@
   </Folder>
   <Folder Name="/vipaq/test/">
     <Project Path="vipaq/test/Binacle.ViPaq.UnitTests/Binacle.ViPaq.UnitTests.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.TestsKernel/Binacle.ViPaq.TestsKernel.csproj" />
+    <Project Path="vipaq/test/Binacle.ViPaq.Testing/Binacle.ViPaq.Testing.csproj" />
     <Project Path="vipaq/test/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
     <Project Path="vipaq/test/Binacle.ViPaq.PerformanceTests/Binacle.ViPaq.PerformanceTests.csproj" />
   </Folder>

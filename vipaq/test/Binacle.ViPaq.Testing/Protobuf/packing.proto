@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Binacle.ViPaq.TestsKernel.Protobuf";
+option csharp_namespace = "Binacle.ViPaq.Testing.Protobuf";
 
 package binacle.vipaq.benchmarks;
 

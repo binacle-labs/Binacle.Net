@@ -1,8 +1,8 @@
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 using Google.Protobuf;
 
-namespace Binacle.ViPaq.TestsKernel.Protobuf;
+namespace Binacle.ViPaq.Testing.Protobuf;
 
 // Turns a scenario into protobuf bytes, the baseline ViPaq is measured against. It runs the same codec as the
 // ViPaq side of the same file, so a table only ever differs by format, never by compressor. Protobuf has no

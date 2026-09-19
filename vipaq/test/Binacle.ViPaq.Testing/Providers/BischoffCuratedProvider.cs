@@ -1,6 +1,6 @@
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.Providers;
+namespace Binacle.ViPaq.Testing.Providers;
 
 // The hand-picked Bischoff scenarios the benchmarks fan out over. Both are 16-bit real packs that clear the
 // compression threshold, from two different thpack families, chosen to span the range deflate covers:

@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Binacle.ViPaq.TestsKernel.Files;
+namespace Binacle.ViPaq.Testing.Files;
 
 // Finds packed-data files embedded in this assembly by manifest-name prefix, caching per prefix. The ViPaq
 // kernel owns this rather than sharing one: GetExecutingAssembly resolves to this assembly, the one that embeds

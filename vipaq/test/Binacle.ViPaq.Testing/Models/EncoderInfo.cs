@@ -1,4 +1,4 @@
-namespace Binacle.ViPaq.TestsKernel.Models;
+namespace Binacle.ViPaq.Testing.Models;
 
 // Which form of a token to build, minus the codec. The race always compresses - NoOp prices the raw size - so
 // there is no "compressed?" flag, only the layout. `Layout` is a library-internal enum and cannot be a public

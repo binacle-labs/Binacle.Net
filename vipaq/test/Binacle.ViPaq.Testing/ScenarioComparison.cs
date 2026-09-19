@@ -1,6 +1,6 @@
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel;
+namespace Binacle.ViPaq.Testing;
 
 // The decode-to-input oracle: does a decoded (bin, items) equal the `Scenario` it came from. `Bin`/`Item` are
 // plain classes with no value equality, so it compares field by field, which also turns a field-swap wiring bug

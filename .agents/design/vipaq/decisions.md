@@ -67,7 +67,7 @@ ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2
 ### D4 — The permanent harness uses only the minimal public API (CONFIRMED 2026-07-07)
 The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Serialize`/`Deserialize` only — that is
 what makes the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
-re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.TestsKernel`, and `ViPaqHeader`
+re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `ViPaqHeader`
 holds `Header` in an `internal` field, exposing only `bool`/`int`/`string` publicly. Internal rather than
 private because the kernel's own encoder reads it; what matters is that no *public* member names `Header`,
 `Width` or `Layout`. **One copy of the spec beats a clean

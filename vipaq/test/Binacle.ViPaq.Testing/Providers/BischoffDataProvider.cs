@@ -1,6 +1,6 @@
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.Providers;
+namespace Binacle.ViPaq.Testing.Providers;
 
 // Real placed results for the Bischoff suite (thpack1..7): the bin plus the placed items the packer produced.
 // Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under

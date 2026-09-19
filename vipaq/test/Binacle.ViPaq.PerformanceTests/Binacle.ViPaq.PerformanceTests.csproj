@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Binacle.ViPaq.TestsKernel\Binacle.ViPaq.TestsKernel.csproj" />
+    <ProjectReference Include="..\Binacle.ViPaq.Testing\Binacle.ViPaq.Testing.csproj" />
     <ProjectReference Include="..\..\..\shared\test\Binacle.TestReporting\Binacle.TestReporting.csproj" />
   </ItemGroup>
 

@@ -152,10 +152,10 @@ them** — that page decodes in the browser through the TypeScript package, and 
   codecs and their factory, `ProtocolEncoder`, `Header`, `Version`, `Width`, `HeaderNotation`, and the three
   codec implementations. **`ICompressionCodec` itself is public** while `DeflateCodec` / `GzipCodec` /
   `NoOpCodec` are not: the seam is visible, the choice of stream is not.
-- `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.TestsKernel`,
+- `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.Testing`,
   `.PerformanceTests` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
-- **Racing the codecs needs internals**, and `TestsKernel` has them. The race is part of the permanent harness,
+- **Racing the codecs needs internals**, and `Testing` has them. The race is part of the permanent harness,
   so it belongs there rather than in a throwaway. No new grant is needed. The reports are in
   `results/vipaq/compression/`.
 

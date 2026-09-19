@@ -1,7 +1,7 @@
 using Binacle.Geometry;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.Providers;
+namespace Binacle.ViPaq.Testing.Providers;
 
 // Deterministic random scenarios at item counts no real pack reaches (2000, 5000), for the speed and memory
 // benchmarks only.

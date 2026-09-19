@@ -1,4 +1,4 @@
-namespace Binacle.ViPaq.TestsKernel.Files;
+namespace Binacle.ViPaq.Testing.Files;
 
 // An embedded packed-data file. The name carries three parts, <family>.<name>.<algorithm>, that the reader
 // groups by; the extension is kept apart from them.

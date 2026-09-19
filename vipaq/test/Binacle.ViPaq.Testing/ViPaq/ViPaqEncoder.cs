@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.ViPaq;
+namespace Binacle.ViPaq.Testing.ViPaq;
 
 // The harness's door into ViPaq for the codec race. It drives the blind `ProtocolEncoder` directly, because
 // `ViPaqSerializer.Serialize` fixes the mode at row-major and uncompressed and the race has to force every

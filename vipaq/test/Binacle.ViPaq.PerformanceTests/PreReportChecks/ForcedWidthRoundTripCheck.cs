@@ -1,6 +1,6 @@
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.TestsKernel.Models;
-using Binacle.ViPaq.TestsKernel.Providers;
+using Binacle.ViPaq.Testing.Models;
+using Binacle.ViPaq.Testing.Providers;
 
 namespace Binacle.ViPaq.PerformanceTests.PreReportChecks;
 

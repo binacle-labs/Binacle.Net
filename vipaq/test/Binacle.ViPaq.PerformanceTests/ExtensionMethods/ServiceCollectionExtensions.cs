@@ -1,8 +1,8 @@
 using Binacle.TestReporting;
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.PerformanceTests.Tests;
-using Binacle.ViPaq.TestsKernel.Models;
-using Binacle.ViPaq.TestsKernel.Providers;
+using Binacle.ViPaq.Testing.Models;
+using Binacle.ViPaq.Testing.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

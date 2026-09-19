@@ -1,6 +1,6 @@
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.ViPaq;
+namespace Binacle.ViPaq.Testing.ViPaq;
 
 // What the harness needs to know about a token, read off its header: did ViPaq compress (so the harness can
 // mirror that on protobuf), which width did it pick, and what would the token have cost raw.

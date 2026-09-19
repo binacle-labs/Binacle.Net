@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Binacle.CompactNotation;
-using Binacle.ViPaq.TestsKernel.Files;
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Files;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel;
+namespace Binacle.ViPaq.Testing;
 
 // Reads the frozen placed-result files that Binacle.ViPaq.PackedDataGenerator emits under vipaq/data/packed and
 // the .csproj embeds as "PackedData.<family>.<name>.<algo>.json", and turns their rows into Scenarios. It has

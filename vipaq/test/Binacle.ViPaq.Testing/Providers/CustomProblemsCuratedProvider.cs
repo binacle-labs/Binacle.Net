@@ -1,6 +1,6 @@
-using Binacle.ViPaq.TestsKernel.Models;
+using Binacle.ViPaq.Testing.Models;
 
-namespace Binacle.ViPaq.TestsKernel.Providers;
+namespace Binacle.ViPaq.Testing.Providers;
 
 // The hand-picked custom scenarios the benchmarks fan out over, split by the two paths ViPaq takes so both are
 // measured. All are the FFD packs. The curated check confirms the uncompressed ones really stay uncompressed.
