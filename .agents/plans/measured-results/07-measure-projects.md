@@ -35,8 +35,10 @@ Shape: [results.md](results.md), "Two kinds, two rules" and "Recipes". Protocol:
 
 ## Open before starting
 
-- The fixed header text on every written file - tool, scenario count, data set; never a date or commit.
-  Settle the wording once here, both slices use it.
+- Settled 2026-09-20, both slices use it. Every written file opens with its title as the `#` line, then one
+  sentence, for lib: Written by `just measure lib` from `Binacle.Lib.PackingEfficiency` over 700 scenarios
+  (bischoff-suite, custom-problems, demo-samples). Do not edit. - tool, count, data set; never a date or a
+  commit. ViPaq's names its own recipe, project, pack count and families.
 
 ## Done when
 

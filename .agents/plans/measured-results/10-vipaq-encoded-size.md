@@ -20,6 +20,7 @@ Shape: [results.md](results.md), the `Binacle.ViPaq.EncodedSize` bullets. Protoc
 - `encoded-size.md`: Scenario, Algorithm, Items, Widths, ViPaq raw / deflate / gzip, protobuf raw / deflate /
   gzip, JSON, ratio, best codec, saved %. Base64 lengths only. Two sections, one per layout. Replaces
   sixteen tables in five files.
+- Every file opens with the header step 7 settled (recipe, project, pack count, families; no date).
 - `README.md`: codec x layout table of mean / min / max ViPaq-to-protobuf ratio; the same per algorithm;
   crossover item count per layout (today logged to the console and written nowhere); codec win-count; the
   JSON row; the largest token - "every real pack deflates to under N base64 characters"; links.

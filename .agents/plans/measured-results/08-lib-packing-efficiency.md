@@ -15,7 +15,7 @@ Shape: [results.md](results.md), "Deterministic projects" and the lib file list.
 - Today four `ITest` classes each walk 700 scenarios and pack again - 12,600 packings for four views of
   4,200 numbers. Becomes: one runner packs every scenario once per shipped version, holds the results, and
   one builder writes the files from that set.
-- The files, all under `lib/results/`, all harness-written, header fixed text:
+- The files, all under `lib/results/`, all harness-written, opening with the header step 7 settled:
   `README.md` (the summaries), `packing-efficiency.md` (700 rows: Scenario, Items, Types, Ceiling %, FFD,
   WFD, BFD), `algorithm-wins.md` (best per scenario and margin; replaces BaselineComparison, which hard-coded
   BFD), `version-parity.md` (only rows where v1 and v2 differ; replaces RegressionTests). `PackingTime.md`
