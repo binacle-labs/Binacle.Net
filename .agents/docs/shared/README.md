@@ -58,7 +58,7 @@ packer, so `PackingDemoSamplesTests` proves the algorithms still land where they
 right. A new file under `shared/data/demo-samples/` is embedded on its own but is not read until its key is
 added to `DemoSamples.Scenarios.Keys`. The set is also read by the demo component in
 `packages/binacle-net-ui/` and by ViPaq, which reads the *packed* form from `vipaq/data/packed/demo-samples/`
-through its own kernel.
+through `Binacle.ViPaq.Data`.
 
 **The set folders in the IDE are not on disk.** Every scenario JSON lives under `shared/data/` and is pulled in
 as an `EmbeddedResource` with a `<Link>`, so it only *looks* like `BischoffSuite/…` in the IDE. To edit a

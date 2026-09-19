@@ -20,8 +20,8 @@ rather than each defining their own.
 | Project | What it is | Used by |
 |---|---|---|
 | `src/Binacle.Geometry` | Dimensions, coordinates, volume and quantity - the `IWith*` interfaces plus concrete `Dimensions`, `Coordinates`, `Item` | `Binacle.Packing`, `Binacle.CompactNotation`, ViPaq |
-| `src/Binacle.Packing` | The packing vocabulary - `Algorithm`, `AlgorithmInfo`, `PackedBin`, `PackedItem`, `UnpackedItem`, `OperationResultStatus` | `Binacle.Lib`, the API, `Binacle.Data` and the lib kernel |
-| `src/Binacle.CompactNotation` | Parses and formats the terse strings used in fixtures and API payloads - `"60x40x30"`, `"108x76x30 [40]"` | The API, `Binacle.Data`, the lib kernel, every generator |
+| `src/Binacle.Packing` | The packing vocabulary - `Algorithm`, `AlgorithmInfo`, `PackedBin`, `PackedItem`, `UnpackedItem`, `OperationResultStatus` | `Binacle.Lib`, the API, `Binacle.Data` and `Binacle.Lib.Data` |
+| `src/Binacle.CompactNotation` | Parses and formats the terse strings used in fixtures and API payloads - `"60x40x30"`, `"108x76x30 [40]"` | The API, `Binacle.Data`, `Binacle.Lib.Data`, `Binacle.ViPaq.Data`, every generator |
 | `src/Binacle.FluxResults` | Result and union types a repository or handler returns instead of throwing - `FluxUnion<T0, T1>`, `Success`, `NotFound`, `Conflict` | The service module - see [its README](src/Binacle.FluxResults/README.md) |
 
 `Binacle.Packing` and `Binacle.CompactNotation` both build on `Binacle.Geometry`; nothing points the other way.

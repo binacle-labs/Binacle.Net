@@ -2,7 +2,7 @@
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
 verified: 2026-09-20
-check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
+check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
   - vipaq/findings
@@ -242,6 +242,17 @@ types it names, not the file it is used from.**
 bump, and a bump changes token 0, so a parser that reads token 0 first can always tell whether it understands
 the rest. That is what makes positional parsing safe to extend, and it is why the grammar is not
 order-independent.
+
+### D18 — `Binacle.ViPaq.UnitTests` never references `Binacle.ViPaq.Testing` (2026-09-20)
+
+The unit tests are the spec gate. They prove the code obeys `PROTOCOL.md` through the shared vectors and their
+own curated inputs, and they must not lean on the harness's rival encoder. The repo-wide folder rule
+(`$decisions#D9`) lets a unit suite reference its slice's `data/` and any `test/` support library; this
+sentence closes that door for one library. `Binacle.ViPaq.Data` is open - the packs are inputs, not an encoder
+- but the suite does not reference it today.
+
+Before 2026-09-20 the doc said "UnitTests never references the kernel", which also shut out the data, because
+the packs and the encoders were one project.
 
 ## Open — decide with data
 

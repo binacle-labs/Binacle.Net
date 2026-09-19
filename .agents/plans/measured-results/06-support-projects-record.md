@@ -29,8 +29,8 @@ Shape: [support-projects.md](support-projects.md). Protocol: the orchestrator be
 
 ## Done when
 
-- [ ] `grep -n "Testing" .agents/design/decisions.md` finds the decision with the folder table.
-- [ ] **By eye.** The three dependency docs draw the shape's graph and name no kernel.
-- [ ] `grep -rni "testskernel\|tests\? kernel" .agents/docs .agents/design` is empty, except lines that say
+- [x] `grep -n "Testing" .agents/design/decisions.md` finds the decision with the folder table.
+- [x] **By eye.** The three dependency docs draw the shape's graph and name no kernel.
+- [x] `grep -rni "testskernel\|tests\? kernel" .agents/docs .agents/design` is empty, except lines that say
       "superseded".
-- [ ] `test ! -f .agents/plans/measured-results/support-projects.md`
+- [x] `test ! -f .agents/plans/measured-results/support-projects.md`

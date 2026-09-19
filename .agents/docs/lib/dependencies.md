@@ -9,7 +9,8 @@ paths:
 
 # Lib — project dependencies
 
-The bin-packing algorithm layer. **`lib/src` holds one project, `Binacle.Lib`.** There is no separate
+The bin-packing algorithm layer. Which folder may reference which is the repo-wide rule, `$decisions#D9`; this
+file is where the lib projects sit on it. **`lib/src` holds one project, `Binacle.Lib`.** There is no separate
 abstractions assembly: the packing vocabulary that callers need moved down into `shared/src/Binacle.Packing`,
 and the engine interfaces folded into `Binacle.Lib` itself, under its `Abstractions/` folder.
 
@@ -58,10 +59,10 @@ Binacle.Packing ─────────────────────�
    entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
    that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
 
-   **Six projects reference it in total, counted 2026-09-04**, and the other five are not consumers in the
-   sense this rule is about: `shared/src/Binacle.Packing`, the three `lib/test/*` harnesses, and
-   `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`, which is a generator run by hand rather than anything
-   that ships.
+   **Six projects reference it in total, counted 2026-09-20**, and the other five are not consumers in the
+   sense this rule is about: the four `lib/test/*` projects, and `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
+   which is a generator run by hand rather than anything that ships - the one accepted cross-slice reference,
+   `$decisions#D9`.
 
 2. **Two data hubs, split by audience.** The shared `Binacle.Data` holds the algorithm scenarios, which the
    api integration suite reads too. `Binacle.Lib.Data` holds result selection, which nothing outside this

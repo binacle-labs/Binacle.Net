@@ -174,12 +174,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing - the reviewer pass landed 2026-09-19; the support projects (steps 1 to 6 of the orchestrator) go first"
   horizon: next-release
   paths: ["tooling/**", "results/**", "lib/**", "vipaq/**", "shared/test/**"]
-- file: measured-results/support-projects.md
-  description: "The three tests kernels dissolve into a Data project per data folder, a Testing project per slice, and Reporting - data knows no algorithm, shared references only shared"
-  state: ready
-  waits-on: "nothing - the shape was agreed 2026-09-19. Steps 1 to 6 of the orchestrator beside this folder build it"
-  horizon: next-release
-  paths: ["shared/**", "lib/**", "vipaq/**", "api/test/**", "Binacle.Net.slnx", "Directory.Build.props"]
 ```
 
 ## Shared

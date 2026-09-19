@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
-verified: 2026-09-02
-check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model, and the four project folders and what each may reference.
+verified: 2026-09-20
+check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/
 paths:
   - "NOTICE"
   - "README.md"
@@ -274,6 +274,61 @@ will re-derive the same five answers from scratch, or take one of them the other
 **TypeScript duplicates the model shapes on purpose.** TS is structurally typed, so the duplicates already
 interoperate and nothing is broken; there is simply no single source. Worth revisiting only if the shapes
 start to drift.
+
+### D9 — four folders, and what each may reference (2026-09-20)
+
+Every C# project sits in one of four kinds of folder, and the folder says what it may reference. Stated by the
+maintainer 2026-09-19; the tree matched it on 2026-09-20.
+
+| Folder | Holds | May reference |
+|---|---|---|
+| `src/` | the product, or support libraries about the product | `src` |
+| `data/` | test data and the code that reads it into models | shared `src`, `data` |
+| `test/` | tests of the product, or support libraries about tests | `src`, `data`, `test` support libraries |
+| `measure/`, `bench/`, `tools/` | executables that produce something auxiliary - a report, a keeper, a data file | `src`, `data`, `test` support libraries |
+
+Three sentences finish it:
+
+1. **Nothing references a test project or an executable.** A project named `*.UnitTests` or
+   `*.IntegrationTests` is a test project: it has the test SDK, `just test` runs it, and no `ProjectReference`
+   points at it. Nothing under `measure/`, `bench/` or `tools/` is referenced either. Everything else under
+   `test/` is a support library, named for what it holds - `Data`, `Testing`, `Reporting` - never for a test.
+2. **A slice references itself and shared, never another slice.** `Binacle.ViPaq.UnitTests` may reference
+   `Binacle.ViPaq.Data` and anything under `shared/`; never `lib/data` or lib's `Testing`. The one accepted
+   exception is `Binacle.ViPaq.PackedDataGenerator`, which packs with `Binacle.Lib` to make vipaq's data; a
+   lib tool writing into vipaq would be worse.
+3. **Nothing in `data/` knows an algorithm, a benchmark pick or a generator.** `Binacle.Data` takes
+   interfaces, enums and one parser from shared `src` and nothing else; a `Testing` project is the only
+   support library that references its slice's `src`.
+
+Sonar draws the same line by path: `/data/`, `/test/` and `/tools/` are support code
+(`$build-topology#sonar-test-projects`).
+
+**Why.** Until 2026-09-19 three projects were each called a tests kernel, and each mixed the JSON on disk and
+its reader, the scenario models, and harness code - assertion helpers, algorithm factories, the encoders a
+benchmark drives. The name told nobody which of the three was inside. The mix cost real copies: the
+embedded-resource reader existed three times, `AlgorithmFactories.cs` three times byte for byte, and the
+benchmark split planned next would have made that five. Two projects were named for tests and were not:
+`TestsKernel` and `TestReporting`. The kernels became `Binacle.Data`, `Binacle.Lib.Data`, `Binacle.ViPaq.Data`
+and `Binacle.ViPaq.Testing`; `Binacle.Lib.Testing` took the factories and checks; `Binacle.TestReporting`
+became `Binacle.Reporting`. The reader lives once, in `Binacle.Data`, and the caller names the assembly.
+
+**The names.** `Data` is the folder the project sits in. `.Testing` is the .NET convention for "helpers for
+testing X" (`Mvc.Testing`, `TimeProvider.Testing`); `Fixtures` collides with xunit, `Harness` is what the
+measure projects are called. The set is in the namespace, so the class does not repeat it:
+`Binacle.Data.BischoffSuite.Scenarios`, and the two ViPaq "Bischoff" providers are told apart by where they
+sit - `ViPaq.Data.Packed.BischoffSuite` is every pack, the curated picks are in `ViPaq.Testing`. Not a project
+per set: every consumer of the shared sets reads them together, so two projects would be two builds nothing
+references apart.
+
+**The check, three greps.** If a dependency lint ever exists, these are its first ruleset:
+
+- no `ProjectReference` under `src/` or `data/` points into `test/`, `measure/`, `bench/` or `tools/`;
+- no `ProjectReference` anywhere ends in `Tests.csproj`;
+- no `data/` project points outside shared `src` and `data/`.
+
+Where each slice's projects sit on this rule is drawn in `$shared/dependencies`, `$lib/dependencies` and
+`$vipaq/dependencies`. ViPaq adds one sentence of its own, `$vipaq/decisions#D18`.
 
 ## Open
 

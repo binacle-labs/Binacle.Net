@@ -2,7 +2,7 @@
 id: lib/result-selection
 description: IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them
 verified: 2026-09-20
-check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and the TestsKernel Scenario
+check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and lib/data/Binacle.Lib.Data/ResultSelection/Scenario.cs
 also_update:
   - api/service
 paths:

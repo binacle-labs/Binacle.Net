@@ -50,7 +50,7 @@ The quantity interfaces are used by `Binacle.CompactNotation`, the OR-Library co
 tests — consumers that never touch packing — so they are correctly in Geometry. All three name
 `IWithReadOnlyQuantity<T>`, the read-only base, not `IWithQuantity<T>` itself; the pair moves together.
 `IWithID` is used by none of those three, only by
-`api/src`, `lib/src`, `lib/test` and the fixture kernels. That is why identity is packing vocabulary and not
+`api/src`, `lib/src`, `lib/test` and the data projects. That is why identity is packing vocabulary and not
 geometry.
 
 **Why there is no separate abstractions assembly.** After the extraction the engine interfaces had exactly one

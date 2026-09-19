@@ -10,6 +10,8 @@ paths:
 # ViPaq — project dependencies
 
 One picture of how the ViPaq projects fit together, plus the boundaries that are easy to break by accident.
+Which folder may reference which is the repo-wide rule, `$decisions#D9`; this file is where the ViPaq projects
+sit on it.
 The *why* of the format is in `$vipaq/architecture` and the design decisions behind it; this file is
 just the wiring.
 
@@ -76,6 +78,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    using the shared cross-language vectors and its own curated inputs. Keeping it clear of the real-data hub means
    a data change can never turn a spec test red, and the C# vector suite reads exactly what the TypeScript suite
    reads. UnitTests may reference `ViPaq.Data` - the packs are inputs, not a rival encoder - but does not yet.
+   The reasoning is `$vipaq/decisions#D18`.
 
 2. **ViPaq.Data holds the real packs and nothing else; Testing holds the harness's encoders.** `ViPaq.Data`
    does not reference `Binacle.ViPaq` and has no internals grant - it is inputs only. `Testing` reaches the

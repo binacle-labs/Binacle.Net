@@ -10,7 +10,8 @@ paths:
 # Shared — project dependencies
 
 The foundation slice. **Nothing here references `api`, `lib` or `vipaq`.** There is no exception: the slice is
-the bottom of the stack in both directions, production and test.
+the bottom of the stack in both directions, production and test. Which folder may reference which is the
+repo-wide rule, `$decisions#D9`; this file is where the shared projects sit on it.
 
 ## The graph
 
@@ -37,9 +38,10 @@ Binacle.FluxResults              leaf — BCL only, no Binacle deps
    │                             SM.IntegrationTests reach it transitively and import it globally
    └── Binacle.FluxResults.UnitTests   xUnit
 
-shared/data/Binacle.Data         algorithm scenario hub — Bischoff + custom-problems scenarios, the one
-   refs: Binacle.Packing, Binacle.CompactNotation                      embedded-resource reader
-   consumers: api IntegrationTests, Binacle.Lib.UnitTests/Benchmarks/PerformanceTests
+shared/data/Binacle.Data         the three scenario sets — Bischoff, custom-problems, demo-samples — and
+   refs: Binacle.Packing, Binacle.CompactNotation                      the one embedded-resource reader
+   consumers: api IntegrationTests, the four lib/test projects, Binacle.Lib.Data and
+              Binacle.ViPaq.Data (the reader only)
 
 Binacle.Reporting            leaf — markdown report writer, no Binacle deps
    consumers: Binacle.Lib.PerformanceTests, ViPaq.PerformanceTests, both ViPaq generators, OrLibrary.Converter
@@ -59,7 +61,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.Reporting` | library | — | — | markdown report writer for the perf harnesses |
-| `Binacle.Data` | library | Packing, CompactNotation | — | algorithm scenarios + set classes + the reader; no harness code (see notes 3, 4) |
+| `Binacle.Data` | library | Packing, CompactNotation | — | the three scenario sets + the reader; no harness code (see notes 3, 4) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, Reporting | — | converts OR-Library benchmark data |
 
 ## Notes
@@ -69,11 +71,11 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 
 2. **`Binacle.Packing` is the vocabulary, not the engine.** It holds what a packing *result* is written in —
    `OperationResult`, `PackedBin`, `PackedItem`, the status enums, `IWithID`. The engine interfaces and the
-   algorithms live in `Binacle.Lib`, one slice up. The split is what lets the api integration suite and both
-   tests kernels assert on results without referencing the packer.
+   algorithms live in `Binacle.Lib`, one slice up. The split is what lets the api integration suite and the
+   data projects name a result without referencing the packer.
 
-3. **`Binacle.Data` holds the algorithm scenarios only.** Bischoff suite and custom-problems, embedded by
-   link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
+3. **`Binacle.Data` holds the algorithm scenarios only.** Bischoff suite, custom-problems and demo-samples,
+   embedded by link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
    read it: the api integration suite and the lib tests. The result-selection fixtures went the other way —
    one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.Data` (see
    `$lib/dependencies`). ViPaq's placed packs went the same way: `vipaq/data`, embedded by `Binacle.ViPaq.Data` -
@@ -82,11 +84,12 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 4. **`Binacle.Data` owns the one embedded-resource reader, and the caller names the assembly.**
    `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)` reads from the assembly it is given, so any data
    project can use it by passing its own. It hands the manifest name back unsplit; how the name is shaped is
-   each project's to know. `Binacle.Lib.Data` already reads through it; the ViPaq kernel carries a copy until it moves.
+   each project's to know. `Binacle.Lib.Data` and `Binacle.ViPaq.Data` both read through it, which is the only
+   reason either references this project.
 
 5. **An `InternalsVisibleTo` grant is not a dependency edge.** It annotates one the grantee's `ProjectReference`
    already declares — `Binacle.Packing` granting to `Binacle.Lib.Data` records that the data project leans on
-   Packing's internals, not that Packing leans on the kernel.
+   Packing's internals, not that Packing leans on the data project.
 
 6. **`Binacle.Reporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
    `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.

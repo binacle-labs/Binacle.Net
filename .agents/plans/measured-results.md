@@ -25,8 +25,9 @@ one that points at every file in it.
 
 Two shapes, both settled, both in `measured-results/`:
 
-- [`support-projects.md`](measured-results/support-projects.md) - the three tests kernels dissolve into a
-  `Data` project per data folder, a `Testing` project per slice and `Binacle.Reporting`. Steps 1 to 6.
+- Support projects - the three tests kernels dissolved into a `Data` project per data folder, a `Testing`
+  project per slice and `Binacle.Reporting`. Steps 1 to 6, landed 2026-09-20; the shape file is gone and
+  its rules are the general design record's D9.
 - [`results.md`](measured-results/results.md) - deterministic numbers written by a harness into
   `<slice>/results/`, timing keepers dated per family, one benchmark project per question, two `just`
   modules, the old vault converted in. Steps 7 to 14.
