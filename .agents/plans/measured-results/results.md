@@ -57,8 +57,7 @@ lib/
             Binacle.Lib.Benchmarks.Threshold
   results/
     README.md                 harness-written: the summaries, nothing else
-    packing-efficiency.md     700 rows, shipped versions, ceiling column
-    algorithm-wins.md         700 rows: best algorithm per scenario, margin
+    packing-efficiency.md     700 rows, shipped versions, ceiling column, best and margin
     version-parity.md         only rows where v1 and v2 differ
     benchmarks/
       README.md               rule, trace table, what they say - see below
@@ -103,8 +102,8 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
   **the user's fill** - mean of best-of-FFD-and-BFD (what the API races) and best-of-all-three, from the
   same packings, which prices the racing decision in fill; best-or-tied count per algorithm; v1/v2 agreement
   count; links.
-- `packing-efficiency.md` - Scenario, Items, Types, Ceiling %, FFD, WFD, BFD.
-- `algorithm-wins.md` - replaces BaselineComparison, which hard-coded BFD as the answer.
+- `packing-efficiency.md` - Scenario, Types, Items, Ceiling %, FFD, WFD, BFD, Best, Margin. The last two replace
+  BaselineComparison, which hard-coded BFD as the answer; settled 2026-09-20 as columns, not a file.
 - `version-parity.md` - replaces RegressionTests, which listed any difference, not only worse. v1 code stays
   for the speed benchmarks; in the fill files it appears here only. It reports where v2 packs differently -
   the old vault shows at least one such scenario (thpack7_45, BFD 79.08 vs 79.73) - so it is a count, not a
@@ -256,8 +255,7 @@ D1 in fill; **"every real pack fits a URL"** - largest deflated token over 1,400
 one README line; **RatioSD beside every ratio** in the trace table.
 
 **Not decided - the maintainer is unsure, so the shape above stands until a session argues otherwise:**
-cutting `algorithm-wins.md` as a file (two columns in `packing-efficiency.md`
-instead); `encoded-size.md` at 4,300 rows and ~500 KB (one algorithm's packs raw, per-algorithm means in the
+`encoded-size.md` at 4,300 rows and ~500 KB (one algorithm's packs raw, per-algorithm means in the
 README); README part 3 as a separate section (the newest trace row per family, marked, does the job).
 
 Conventions, noted and not acted on: no well-known project keeps dated per-family benchmark folders in the source tree - the .NET

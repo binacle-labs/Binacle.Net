@@ -13,7 +13,7 @@ namespace Binacle.ViPaq.EncodedSize.Tests;
 //
 // Base64 is the stored form and the headline, with raw byte counts beside it. No layout column: layout is fixed
 // per table and does not move raw size. Synthetic data is never size-measured - gzip can't grip random data.
-internal class VipaqProtobufSizeComparisonTest : ITest
+internal class VipaqProtobufSizeComparisonTest : IReporter
 {
 	private readonly IReadOnlyCollection<Scenario> scenarios;
 	private readonly ICompressionCodec compressionCodec;
@@ -43,7 +43,7 @@ internal class VipaqProtobufSizeComparisonTest : ITest
 		this.logger = logger;
 	}
 
-	public TestResult Run()
+	public ReportSection[] Report()
 	{
 		var table = new TableResult(
 			"Scenario",
@@ -84,12 +84,14 @@ internal class VipaqProtobufSizeComparisonTest : ITest
 			);
 		}
 
-		return new TestResult
-		{
-			Title = this.title,
-			File = this.File,
-			Description = this.description,
-			Result = table
-		};
+		return
+		[
+			new ReportSection
+			{
+				Title = this.title,
+				Description = this.description,
+				Table = table
+			}
+		];
 	}
 }

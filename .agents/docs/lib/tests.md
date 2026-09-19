@@ -103,10 +103,13 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 
 ## Binacle.Lib.PackingEfficiency
 
-Console host (not xUnit), in `lib/measure/`. `Program.cs` wires a `TestRunner` + `MarkdownFileWriter` pointed at
-`lib/results/` and runs Bischoff-suite `ITest` implementations: `PackingEfficiencyTests`, `RegressionTests`
-(FFD/WFD/BFD v1-vs-v2), `EfficiencyStatisticsTests`, `BaselineComparisonTests`. Output is markdown reports
-written over the tracked files, not pass/fail assertions; a change is a diff.
+Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs the 700 Bischoff-suite scenarios
+with all six algorithm versions once and fills `PackingBag`; three `IReporter`s read the bag and each writes one
+file under `lib/results/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `ReadmeReporter`
+(`README.md`, the summaries), `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
+the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, only rows where v1 and v2
+differ). `ResultFiles` holds the three `ResultFile`s and the shared header sentence. Not pass/fail; a change is
+a diff.
 
 ## Binacle.Lib.Benchmarks
 

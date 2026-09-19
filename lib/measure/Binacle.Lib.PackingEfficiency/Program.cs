@@ -1,129 +1,30 @@
+using Binacle.Lib.PackingEfficiency.Reporters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Binacle.Lib.PackingEfficiency;
 
 internal class Program
 {
 	static async Task Main(string[] args)
-    {
-	    Log.Logger = new LoggerConfiguration()
-		    .MinimumLevel.Debug()
-		    .Enrich.FromLogContext()
-		    .Enrich.WithMachineName()
-		    .Enrich.WithThreadId()
-		    .WriteTo.Console(
-			    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {NewLine}",
-			    theme: AnsiConsoleTheme.Code
-		    )
-		    .CreateBootstrapLogger();
+	{
+		var builder = Host.CreateApplicationBuilder();
 
-	    var builder = Host.CreateApplicationBuilder();
-	    builder.Logging.ClearProviders();
-	    builder.Logging.AddSerilog();
-	    
-	    // The reports are tracked files: the writer overwrites lib/results/ and a change shows up as a diff.
-	    var resultsDirectory = RepositoryRoot.Bind().Find("lib", "results");
-	    builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(resultsDirectory));
-	    builder.Services.AddTransient<TestRunner>();
-	    
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.PackingEfficiencyTests>(sp => new Tests.BischoffSuite.PackingEfficiencyTests(
-		    file: new ResultFile
-		    {
-			    Filename = "PackingEfficiency",
-			    Title = "Packing Efficiency Tests",
-			    Description = "Packing efficiency results for various algorithms using the Bischoff Suite scenarios"
-		    },
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.PackingEfficiencyTests>>()
-		));
+		// The files are tracked: the writer overwrites lib/results/ and a change shows up as a diff.
+		var resultsDirectory = RepositoryRoot.Bind().Find("lib", "results");
+		builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(resultsDirectory));
 
-	    
-	    var regressionTestsFile = new ResultFile
-	    {
-		    Filename = "RegressionTests",
-		    Title = "Regression Tests",
-		    Description = "Regression tests for various algorithms using the Bischoff Suite scenarios"
-	    };
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.RegressionTests>(sp => new Tests.BischoffSuite.RegressionTests(
-		    title: "FFD Regression Tests",
-		    description: "Regression tests for First Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: regressionTestsFile,
-		    algorithmsUnderTest: [AlgorithmFactories.FFD_v1, AlgorithmFactories.FFD_v2],
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.RegressionTests>>()
-	    ));
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.RegressionTests>(sp => new Tests.BischoffSuite.RegressionTests(
-		    title: "WFD Regression Tests",
-		    description: "Regression tests for Worst Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: regressionTestsFile,
-		    algorithmsUnderTest: [AlgorithmFactories.WFD_v1, AlgorithmFactories.WFD_v2],
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.RegressionTests>>()
-	    ));
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.RegressionTests>(sp => new Tests.BischoffSuite.RegressionTests(
-		    title: "BFD Regression Tests",
-		    description: "Regression tests for Best Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: regressionTestsFile,
-		    algorithmsUnderTest: [AlgorithmFactories.BFD_v1, AlgorithmFactories.BFD_v2],
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.RegressionTests>>()
-	    ));
-	    
-	    var statisticsFile = new ResultFile
-	    {
-		    Filename = "EfficiencyStatistics",
-		    Title = "Efficiency Statistics",
-		    Description = "Efficiency statistics for various algorithms using the Bischoff Suite scenarios"
-	    };
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.EfficiencyStatisticsTests>(sp => new Tests.BischoffSuite.EfficiencyStatisticsTests(
-		    title: "FFD Bischoff Statistics Tests",
-		    description: "Efficiency statistics tests for First Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: statisticsFile,
-		    algorithmUnderTest: AlgorithmFactories.FFD_v2,
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.EfficiencyStatisticsTests>>()
-	    ));
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.EfficiencyStatisticsTests>(sp => new Tests.BischoffSuite.EfficiencyStatisticsTests(
-		    title: "WFD Bischoff Statistics Tests",
-		    description: "Efficiency statistics tests for Worst Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: statisticsFile,
-		    algorithmUnderTest: AlgorithmFactories.WFD_v2,
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.EfficiencyStatisticsTests>>()
-	    ));
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.EfficiencyStatisticsTests>(sp => new Tests.BischoffSuite.EfficiencyStatisticsTests(
-		    title: "BFD Bischoff Statistics Tests",
-		    description: "Efficiency statistics tests for Best Fit Decreasing algorithms using the Bischoff Suite scenarios",
-		    file: statisticsFile,
-		    algorithmUnderTest: AlgorithmFactories.BFD_v2,
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.EfficiencyStatisticsTests>>()
-	    ));
-	    
-	    
-	    builder.Services.AddTransient<ITest, Tests.BischoffSuite.BaselineComparisonTests>(sp => new Tests.BischoffSuite.BaselineComparisonTests(
-		    title: "Baseline (BFD) Comparison Tests",
-		    description: "Comparison of various algorithms against the Best Fit Decreasing algorithm using the Bischoff Suite scenarios",
-		    file: new ResultFile()
-		    {
-			  Filename  = "BaselineComparisonTests",
-			  Title = "Baseline Comparison Tests",
-			  Description = "Comparison of various algorithms against the Best Fit Decreasing algorithm using the Bischoff Suite scenarios"
-		    },
-		    baselineAlgorithm: AlgorithmFactories.BFD_v2,
-		    algorithmsUnderTest: [
-			    AlgorithmFactories.FFD_v2,
-			    AlgorithmFactories.WFD_v2
-		    ],
-		    sp.GetRequiredService<ILogger<Tests.BischoffSuite.BaselineComparisonTests>>()
-	    ));
-	    
+		builder.Services.AddSingleton<PackingBag>();
+		builder.Services.AddTransient<IRunner, PackingRunner>();
+		builder.Services.AddTransient<IReporter, ReadmeReporter>();
+		builder.Services.AddTransient<IReporter, PackingEfficiencyReporter>();
+		builder.Services.AddTransient<IReporter, VersionParityReporter>();
+		builder.Services.AddTransient<Measure>();
 
-	    IHost host = builder.Build();
+		IHost host = builder.Build();
 
-	    using (var scope = host.Services.CreateScope())
-	    {
-		    // GetRequiredService, not GetService + !. TestRunner is registered a few lines up, so a null here
-		    // is a wiring bug: this throws naming the missing service instead of a NullReferenceException.
-		    var testCoordinator = scope.ServiceProvider.GetRequiredService<TestRunner>();
-		    await testCoordinator.RunAsync();
-	    }
-    }
+		using var scope = host.Services.CreateScope();
+		var measure = scope.ServiceProvider.GetRequiredService<Measure>();
+		await measure.RunAsync();
+	}
 }

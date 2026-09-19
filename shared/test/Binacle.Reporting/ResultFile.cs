@@ -1,7 +1,6 @@
 namespace Binacle.Reporting;
 
-// Names one output file and its heading. Tests that share a Filename are grouped into the same file, each
-// as its own section.
+// Names one output file. Title is the `#` line; Description is the one sentence under it.
 public class ResultFile
 {
 	public required string Filename { get; set; }

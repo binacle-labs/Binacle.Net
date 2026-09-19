@@ -105,8 +105,8 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 ## The real-data round-trip gate
 
 The packed-data conformance suite is a set of `IPreReportCheck` gates in `Binacle.ViPaq.EncodedSize/PreReportChecks/`.
-They throw rather than writing a report, and `RunPreReportChecks()` runs them all before the report
-`TestRunner`, in the order `AddPreReportChecks` registers them:
+They throw rather than writing a report, and `RunPreReportChecks()` runs them all before `Measure` runs the
+reporters, in the order `AddPreReportChecks` registers them:
 
 | Gate | What it sweeps |
 |---|---|

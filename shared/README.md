@@ -39,8 +39,8 @@ Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Ru
 
 ### 📄 `Binacle.Reporting`
 
-The markdown report writer behind the performance suites. Register `ITest` implementations and an
-`IFileWriter` in DI, and `TestRunner` runs each test, logs it, and groups the results into one file per report.
+The runner-and-reporter loop behind the measure projects. Register a bag, `IRunner`s, `IReporter`s and an
+`IFileWriter` in DI; `Measure` runs every runner, then every reporter, and writes one file per reporter.
 Used by `lib/measure/Binacle.Lib.PackingEfficiency`, `vipaq/measure/Binacle.ViPaq.EncodedSize` and every data
 generator under `shared/tools/` and `vipaq/tools/`. The reports it writes are the ones committed under [`results/`](../results).
 

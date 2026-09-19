@@ -30,7 +30,7 @@ internal class Program
 		// The reports are tracked files: the writer overwrites vipaq/results/ and a change shows up as a diff.
 		var resultsDirectory = RepositoryRoot.Bind().Find("vipaq", "results");
 		builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(resultsDirectory));
-		builder.Services.AddTransient<TestRunner>();
+		builder.Services.AddTransient<Measure>();
 		builder.Services.AddPreReportChecks();
 		builder.Services.AddVipaqProtobufSizeComparisonTests();
 		builder.Services.AddCodecCompressionCrossoverTests();
@@ -42,7 +42,7 @@ internal class Program
 		// Fail fast before the reports: run every registered gate (round-trip conformance, curated-pick resolution).
 		scope.ServiceProvider.RunPreReportChecks();
 
-		var testRunner = scope.ServiceProvider.GetRequiredService<TestRunner>();
-		await testRunner.RunAsync();
+		var measure = scope.ServiceProvider.GetRequiredService<Measure>();
+		await measure.RunAsync();
 	}
 }

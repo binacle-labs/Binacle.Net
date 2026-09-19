@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
 			{
 				foreach (var layout in Layouts)
 				{
-					services.AddTransient<ITest, VipaqProtobufSizeComparisonTest>(serviceProvider =>
+					services.AddTransient<IReporter, VipaqProtobufSizeComparisonTest>(serviceProvider =>
 						new VipaqProtobufSizeComparisonTest(
 							scenarios,
 							codec,
@@ -77,7 +77,7 @@ public static class ServiceCollectionExtensions
 
 			foreach (var (setLabel, scenarios) in ScenarioSets)
 			{
-				services.AddTransient<ITest, CodecCompressionCrossoverTest>(serviceProvider =>
+				services.AddTransient<IReporter, CodecCompressionCrossoverTest>(serviceProvider =>
 					new CodecCompressionCrossoverTest(
 						scenarios,
 						layout,

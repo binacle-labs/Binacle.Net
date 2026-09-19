@@ -1,8 +1,7 @@
 namespace Binacle.Reporting;
 
-// Writes each report to <outputDirectory>/<Filename>.md. The directory is passed in, so each project points
-// it wherever its results live (e.g. a repo-level results folder). One file per report, overwritten each
-// run. The file is the recorded baseline the next run is diffed against.
+// Writes <outputDirectory>/<Filename>.md: the title, the one-sentence header, then the sections. Overwritten
+// every run; the committed copy is what the next run is diffed against.
 public class MarkdownFileWriter : IFileWriter
 {
 	private readonly string outputDirectory;
@@ -12,7 +11,7 @@ public class MarkdownFileWriter : IFileWriter
 		this.outputDirectory = outputDirectory;
 	}
 
-	public async Task WriteAsync(ResultFile file, TestResult[] results)
+	public async Task WriteAsync(ResultFile file, ReportSection[] sections)
 	{
 		Directory.CreateDirectory(this.outputDirectory);
 
@@ -33,11 +32,9 @@ public class MarkdownFileWriter : IFileWriter
 			await writer.WriteLineAsync(string.Empty);
 		}
 
-		foreach (var result in results)
+		foreach (var section in sections)
 		{
-			await writer.WriteLineAsync(string.Empty);
-			await writer.WriteAsync(result.MarkdownPrint());
-			await writer.WriteLineAsync(string.Empty);
+			await writer.WriteAsync(section.MarkdownPrint());
 		}
 	}
 }

@@ -36,9 +36,10 @@ Shape: [results.md](results.md), "Two kinds, two rules" and "Recipes". Protocol:
 ## Open before starting
 
 - Settled 2026-09-20, both slices use it. Every written file opens with its title as the `#` line, then one
-  sentence, for lib: Written by `just measure lib` from `Binacle.Lib.PackingEfficiency` over 700 scenarios
-  (bischoff-suite, custom-problems, demo-samples). Do not edit. - tool, count, data set; never a date or a
-  commit. ViPaq's names its own recipe, project, pack count and families.
+  sentence, for lib: Written by `just measure lib` from `Binacle.Lib.PackingEfficiency` over the 700 Bischoff
+  suite scenarios (thpack1..7). Do not edit. - tool, count, data set; never a date or a commit. The 700 are the
+  Bischoff suite alone; custom problems and demo samples are not in the run (corrected 2026-09-20, step 8).
+  ViPaq's names its own recipe, project, pack count and families.
 
 ## Done when
 

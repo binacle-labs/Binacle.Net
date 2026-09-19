@@ -48,7 +48,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/Binacle.Data` | Shared scenario data and the code that reads it |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
 | `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
-| `shared/test/Binacle.Reporting` | The report runner and markdown/console writers the measure projects and the converter tools share |
+| `shared/test/Binacle.Reporting` | The runner-and-reporter loop and the markdown writer the measure projects and the converter tools share |
 | `packages/` | TypeScript packages (npm workspaces) |
 | `ruby/` | Ruby gems (Jekyll plugins) |
 | `sites/` | Every published site, one directory each (`$sites`) |

@@ -10,7 +10,7 @@ namespace Binacle.ViPaq.EncodedSize.Tests;
 //
 // One test is one (scenario set × layout). Real data is not a clean ladder, so the crossover is as fine as the
 // data allows, not to the single item.
-internal class CodecCompressionCrossoverTest : ITest
+internal class CodecCompressionCrossoverTest : IReporter
 {
 	private readonly IReadOnlyCollection<Scenario> scenarios;
 	private readonly EncoderInfo encoderInfo;
@@ -37,7 +37,7 @@ internal class CodecCompressionCrossoverTest : ITest
 		this.logger = logger;
 	}
 
-	public TestResult Run()
+	public ReportSection[] Report()
 	{
 		var table = new TableResult(
 			"Scenario", "Items", "Widths b/i/c", "Raw b64", "Deflate b64", "Gzip b64", "Best", "Saved %");
@@ -88,13 +88,15 @@ internal class CodecCompressionCrossoverTest : ITest
 				? "(never in this set)"
 				: $"{crossover.ItemCount} items ({crossover.Name})");
 
-		return new TestResult
-		{
-			Title = this.title,
-			File = this.File,
-			Description = this.description,
-			Result = table
-		};
+		return
+		[
+			new ReportSection
+			{
+				Title = this.title,
+				Description = this.description,
+				Table = table
+			}
+		];
 	}
 
 	// The smallest of the three. Raw wins ties, then deflate, so a "Raw" best means compression did not pay.

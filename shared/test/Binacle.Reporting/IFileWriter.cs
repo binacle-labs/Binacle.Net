@@ -1,7 +1,7 @@
 namespace Binacle.Reporting;
 
-// Writes the results for one file. Markdown is the only writer today; the interface leaves room for others.
+// Writes one file. Markdown is the only writer today; the interface leaves room for others.
 public interface IFileWriter
 {
-	Task WriteAsync(ResultFile file, TestResult[] results);
+	Task WriteAsync(ResultFile file, ReportSection[] sections);
 }
