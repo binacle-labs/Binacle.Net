@@ -1,7 +1,7 @@
 ---
 id: lib/processors
 description: IAlgorithmProcessor, IBinProcessor, and IMultiAlgorithmBinProcessor — their factories and which algorithms each execution path uses
-verified: 2026-08-19
+verified: 2026-09-22
 check: Interface names and full Process() signatures, cancellation token included, match lib/src/Binacle.Lib/Abstractions/; the algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the result-selection table matches which selector methods BinacleService actually calls; a grep for the three Parallel* types shows no factory returning one
 also_update:
   - api/service
@@ -138,9 +138,10 @@ See `$lib/result-selection` for scoring rules and how tests verify each strategy
 
 `ParallelAlgorithmProcessor` (`lib/src/Binacle.Lib/AlgorithmProcessing/`) and `ParallelBinProcessor` /
 `ParallelMultiAlgorithmBinProcessor` (`lib/src/Binacle.Lib/BinProcessing/`) exist, and **no factory returns
-one** — so nothing the API runs ever reaches them. The first two are constructed directly by
-`lib/test/Binacle.Lib.Benchmarks`, which measures them against the `Loop` versions, and by one cancellation
-test in `lib/test/Binacle.Lib.UnitTests`.
+one** — so nothing the API runs ever reaches them. The first two are constructed directly by the
+benchmarks that measure them against the `Loop` versions - `lib/bench/Binacle.Lib.Benchmarks.Racing` for the
+algorithm processor, the threshold classes still in `lib/test/Binacle.Lib.Benchmarks` for the bin one - and by one
+cancellation test in `lib/test/Binacle.Lib.UnitTests`.
 
 **`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — checked 2026-09-04, the only file
 that names it is its own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be wired in is an open question with measured

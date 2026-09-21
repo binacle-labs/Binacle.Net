@@ -16,6 +16,7 @@ set working-directory := '..'
 set no-exit-message := true
 
 algorithms := 'lib/bench/Binacle.Lib.Benchmarks.Algorithms'
+racing := 'lib/bench/Binacle.Lib.Benchmarks.Racing'
 
 # List the recipes
 default:
@@ -33,6 +34,15 @@ lib-algorithms-sample *words: (_run algorithms 'short' 'sample' words)
 # v1 against v2 per algorithm on all 700 Bischoff problems: 8,400 cases, about 30 hours; job="short" is about 12
 lib-algorithms-full job="default" *words: && (_run algorithms job 'full' words)
     @echo '8,400 cases: about 30 hours at the default job, about 12 at short. Ctrl-C stops it.'
+
+# The full tier
+lib-racing *words: (lib-racing-full words)
+
+# Loop against Parallel, two sets x five problems x v1, v2: 40 cases, about 2 minutes
+lib-racing-smoke *words: (_run racing 'short' words)
+
+# The same 40 at the default job, about 10 minutes - the findings rest on ratios short would blur
+lib-racing-full *words: (_run racing 'default' words)
 
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes
 lib-result-selection *words: (_run 'lib/bench/Binacle.Lib.Benchmarks.ResultSelection' 'short' words)

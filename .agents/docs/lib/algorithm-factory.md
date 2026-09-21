@@ -1,7 +1,7 @@
 ---
 id: lib/algorithm-factory
 description: IAlgorithmFactory — how algorithm instances are created, DI registration, and how tests construct algorithms directly
-verified: 2026-09-19
+verified: 2026-09-22
 check: The signature, constraints and switch arms match lib/src/Binacle.Lib/AlgorithmFactory.cs and both files under AlgorithmFactories/; DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; a grep for AlgorithmFactory_v1 and AlgorithmFactory_v2 over lib/ lands only in the benchmarks
 also_update:
   - lib/algorithms
@@ -42,8 +42,8 @@ Class files live under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/` — se
 
 `AlgorithmFactory_v1` and `AlgorithmFactory_v2` (`lib/src/Binacle.Lib/AlgorithmFactories/`) are the same
 switch pinned to one version each. Both are `internal` and used for benchmarks only
-(`lib/test/Binacle.Lib.Benchmarks`, BenchmarkDotNet runner), which reaches them through the
-`InternalsVisibleTo` in `Binacle.Lib.csproj`.
+(`lib/bench/Binacle.Lib.Benchmarks.Racing` and the threshold classes still in `lib/test/Binacle.Lib.Benchmarks`),
+which reach them through one `InternalsVisibleTo` each in `Binacle.Lib.csproj`.
 
 ## DI Registration
 

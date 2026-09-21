@@ -346,6 +346,6 @@ The tier and the words are BenchmarkDotNet categories the classes carry, and eve
 `ffd packing` is the AND. The recipe knows the project, the job, the tier and the cost; the script knows only
 how to call `dotnet run`; the classes know which tier they are in. From the first word starting with `-`,
 everything goes to BenchmarkDotNet as it is. The split is under way: `lib/test/Binacle.Lib.Benchmarks` still
-holds the racing and threshold classes, run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks`.
+holds the threshold classes, run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks`.
 
 

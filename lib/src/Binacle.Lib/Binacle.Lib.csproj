@@ -3,6 +3,7 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="$(ProjectName).UnitTests" />
 		<InternalsVisibleTo Include="$(ProjectName).Benchmarks" />
+		<InternalsVisibleTo Include="$(ProjectName).Benchmarks.Racing" />
 		<InternalsVisibleTo Include="Binacle.Lib.PackingEfficiency" />
 		<InternalsVisibleTo Include="$(ProjectName).Testing" />
 	</ItemGroup>
