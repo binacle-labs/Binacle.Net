@@ -1,18 +1,13 @@
-using BenchmarkDotNet.Attributes;
-using Binacle.ViPaq.Benchmarks.Abstractions;
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.Testing.Protobuf;
-using Binacle.ViPaq.Testing.Providers;
 using Binacle.ViPaq.Testing.ViPaq;
 
-namespace Binacle.ViPaq.Benchmarks.Benchmarks;
+namespace Binacle.ViPaq.Benchmarks;
 
-// Decode cost over the curated scenarios, uncompressed: turning bytes back into a bin and items. The codec is
-// NoOp, so this times the format alone, not decompression. Setup pre-encodes each form once (plus the header
-// ViPaq's decode needs) so only the read is timed. ViPaq is split into its two layouts against the protobuf
-// baseline.
+// The codec is NoOp, so this times the format alone. Setup encodes each form once, plus the header ViPaq's
+// decode needs, so only the read is timed.
 [MemoryDiagnoser]
-public class CuratedDecodeBenchmarks : ScenarioBenchmarkBase
+public class Decode : BenchmarkBase
 {
 	[ParamsSource(typeof(CuratedScenarioProvider), nameof(CuratedScenarioProvider.GetScenarioNames))]
 	public override string ScenarioName { get; set; } = "";
@@ -21,11 +16,11 @@ public class CuratedDecodeBenchmarks : ScenarioBenchmarkBase
 	private ViPaqEncoder vipaqEncoder = null!;
 	private byte[] protobufToken = [];
 	private byte[] vipaqTokenRow = [];
-	private byte[] vipaqTokenCol = [];
+	private byte[] vipaqTokenColumnar = [];
 	private ViPaqHeader vipaqHeaderRow;
-	private ViPaqHeader vipaqHeaderCol;
+	private ViPaqHeader vipaqHeaderColumnar;
 
-	protected override Scenario GetScenario(string name)
+	protected override Scenario Load(string name)
 		=> CuratedScenarioProvider.GetScenarioByName(name);
 
 	public override void GlobalSetup()
@@ -40,19 +35,22 @@ public class CuratedDecodeBenchmarks : ScenarioBenchmarkBase
 		this.vipaqHeaderRow = ViPaqHeader.Create(this.Scenario, EncoderInfo.RowMajor);
 		this.vipaqTokenRow = this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.RowMajor);
 
-		this.vipaqHeaderCol = ViPaqHeader.Create(this.Scenario, EncoderInfo.Columnar);
-		this.vipaqTokenCol = this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.Columnar);
+		this.vipaqHeaderColumnar = ViPaqHeader.Create(this.Scenario, EncoderInfo.Columnar);
+		this.vipaqTokenColumnar = this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.Columnar);
 	}
 
 	[Benchmark(Baseline = true)]
+	[BenchmarkOrder(10)]
 	public PackedResult Protobuf()
 		=> this.protobufEncoder.Decode(this.protobufToken);
 
 	[Benchmark]
+	[BenchmarkOrder(20)]
 	public (Dimensions<ushort> Bin, IList<Item<ushort>> Items) ViPaq_Row()
 		=> this.vipaqEncoder.Decode(this.vipaqTokenRow, this.vipaqHeaderRow);
 
 	[Benchmark]
-	public (Dimensions<ushort> Bin, IList<Item<ushort>> Items) ViPaq_Col()
-		=> this.vipaqEncoder.Decode(this.vipaqTokenCol, this.vipaqHeaderCol);
+	[BenchmarkOrder(30)]
+	public (Dimensions<ushort> Bin, IList<Item<ushort>> Items) ViPaq_Columnar()
+		=> this.vipaqEncoder.Decode(this.vipaqTokenColumnar, this.vipaqHeaderColumnar);
 }

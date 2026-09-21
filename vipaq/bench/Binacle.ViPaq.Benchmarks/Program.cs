@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Running;
-using Binacle.Benchmarking;
 
 namespace Binacle.ViPaq.Benchmarks;
 

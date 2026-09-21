@@ -29,4 +29,4 @@ caused it.
 ## ⚠️ What will bite you
 
 It overwrites the tracked files every run. Timings are not measured here - they belong in
-`vipaq/test/Binacle.ViPaq.Benchmarks`.
+`vipaq/bench/Binacle.ViPaq.Benchmarks`.

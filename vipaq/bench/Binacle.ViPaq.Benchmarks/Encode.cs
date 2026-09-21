@@ -1,18 +1,12 @@
-using BenchmarkDotNet.Attributes;
-using Binacle.ViPaq.Benchmarks.Abstractions;
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.Testing.Protobuf;
-using Binacle.ViPaq.Testing.Providers;
 using Binacle.ViPaq.Testing.ViPaq;
 
-namespace Binacle.ViPaq.Benchmarks.Benchmarks;
+namespace Binacle.ViPaq.Benchmarks;
 
-// Encode cost over the curated scenarios, uncompressed: turning a scenario into bytes. The codec is NoOp and the
-// body is passed straight through, so this times the format alone, not compression. ViPaq is split into its two
-// layouts, row-major and columnar, against the protobuf baseline. Compression time (deflate vs gzip) is a
-// separate question, to be measured when the codec is raced on time.
+// The codec is NoOp, so this times the format alone; CompressionCost prices the codec.
 [MemoryDiagnoser]
-public class CuratedEncodeBenchmarks : ScenarioBenchmarkBase
+public class Encode : BenchmarkBase
 {
 	[ParamsSource(typeof(CuratedScenarioProvider), nameof(CuratedScenarioProvider.GetScenarioNames))]
 	public override string ScenarioName { get; set; } = "";
@@ -20,7 +14,7 @@ public class CuratedEncodeBenchmarks : ScenarioBenchmarkBase
 	private ProtobufEncoder protobufEncoder = null!;
 	private ViPaqEncoder vipaqEncoder = null!;
 
-	protected override Scenario GetScenario(string name)
+	protected override Scenario Load(string name)
 		=> CuratedScenarioProvider.GetScenarioByName(name);
 
 	public override void GlobalSetup()
@@ -31,14 +25,17 @@ public class CuratedEncodeBenchmarks : ScenarioBenchmarkBase
 	}
 
 	[Benchmark(Baseline = true)]
+	[BenchmarkOrder(10)]
 	public byte[] Protobuf()
 		=> this.protobufEncoder.Encode(this.Scenario);
 
 	[Benchmark]
+	[BenchmarkOrder(20)]
 	public byte[] ViPaq_Row()
 		=> this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.RowMajor);
 
 	[Benchmark]
-	public byte[] ViPaq_Column()
+	[BenchmarkOrder(30)]
+	public byte[] ViPaq_Columnar()
 		=> this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.Columnar);
 }

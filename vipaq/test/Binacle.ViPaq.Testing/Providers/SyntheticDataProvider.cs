@@ -2,8 +2,8 @@ using Binacle.Geometry;
 
 namespace Binacle.ViPaq.Testing.Providers;
 
-// Deterministic random scenarios at item counts no real pack reaches (2000, 5000), for the speed and memory
-// benchmarks only.
+// Deterministic random scenarios at item counts past any real pack, up to the format's limit, for the speed and
+// memory benchmarks only. The name is the column the report prints.
 //
 // Never use these for size or compression. Random data has nothing for a codec to grip, so it reports the
 // opposite of real behaviour. CPU and memory depend on item count and byte width, not on whether values repeat,
@@ -16,9 +16,9 @@ public static class SyntheticDataProvider
 	private const ushort EightBitMax = 255;
 	private const ushort SixteenBitMax = 65_535;
 
-	// Two counts past any real pack, at each width family. Spread is "mixed": CPU and memory depend on the count
-	// and byte width, not on where the values sit.
-	private static readonly int[] Counts = [2_000, 5_000];
+	// The largest real pack is 371 items; 65,535 is Limits.MaxItemCount. Spread is "mixed": CPU and memory depend
+	// on the count and byte width, not on where the values sit.
+	private static readonly int[] Counts = [1_000, 5_000, 65_535];
 	private static readonly int[] WidthBitsMatrix = [8, 16];
 
 	private static readonly Dictionary<string, Scenario> scenarios;
@@ -75,7 +75,7 @@ public static class SyntheticDataProvider
 
 		return new Scenario
 		{
-			Name = $"synthetic_{count}_{widthBits}bit",
+			Name = $"{count} items, {widthBits}-bit",
 			Bin = bin,
 			Items = items,
 			WidthBits = widthBits,

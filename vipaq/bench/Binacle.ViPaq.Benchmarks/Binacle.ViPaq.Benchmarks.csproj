@@ -6,10 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\test\Binacle.Benchmarking\Binacle.Benchmarking.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Binacle.ViPaq.Testing\Binacle.ViPaq.Testing.csproj" />
+    <ProjectReference Include="..\..\test\Binacle.ViPaq.Testing\Binacle.ViPaq.Testing.csproj" />
     <ProjectReference Include="..\..\data\Binacle.ViPaq.Data\Binacle.ViPaq.Data.csproj" />
   </ItemGroup>
 
@@ -17,6 +14,9 @@
     <Using Include="Binacle.Geometry" />
     <Using Include="Binacle.ViPaq.Data" />
     <Using Include="Binacle.ViPaq.Testing" />
+    <Using Include="Binacle.ViPaq.Testing.Providers" />
+    <Using Include="Binacle.Benchmarking" />
+    <Using Include="BenchmarkDotNet.Attributes" />
   </ItemGroup>
 
 </Project>

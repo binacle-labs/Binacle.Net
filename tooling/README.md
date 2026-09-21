@@ -345,7 +345,6 @@ just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNe
 The tier and the words are BenchmarkDotNet categories the classes carry, and every one given must match -
 `ffd packing` is the AND. The recipe knows the project, the job, the tier and the cost; the script knows only
 how to call `dotnet run`; the classes know which tier they are in. From the first word starting with `-`,
-everything goes to BenchmarkDotNet as it is. The lib split is done; `vipaq/test/Binacle.ViPaq.Benchmarks` still runs with
-`dotnet run -c Release --project vipaq/test/Binacle.ViPaq.Benchmarks` until its project lands.
+everything goes to BenchmarkDotNet as it is.
 
 

@@ -1,27 +1,32 @@
 namespace Binacle.ViPaq.Testing.Providers;
 
-// The full curated set the benchmarks fan out over, both families merged into one lookup. BischoffCuratedProvider
-// and CustomProblemsCuratedProvider pick the scenarios per family; this joins them and resolves each by name.
+// The columns of the Encode and Decode timing classes: the real packs by what each covers, then the synthetic
+// curve past them. Each family provider picks its own; this joins them in report order.
 public static class CuratedScenarioProvider
 {
-	private static readonly Dictionary<string, Scenario> scenarios;
+	private static readonly Dictionary<string, Func<Scenario>> scenarios;
 
 	static CuratedScenarioProvider()
 	{
-		scenarios = new Dictionary<string, Scenario>();
+		scenarios = new Dictionary<string, Func<Scenario>>();
 
-		foreach (var name in BischoffCuratedProvider.Names)
+		foreach (var (column, name) in CustomProblemsCuratedProvider.TimingColumns)
 		{
-			scenarios[name] = BischoffCuratedProvider.GetByName(name);
+			scenarios[column] = () => CustomProblemsCuratedProvider.GetByName(name);
 		}
 
-		foreach (var name in CustomProblemsCuratedProvider.Names)
+		foreach (var (column, name) in BischoffCuratedProvider.TimingColumns)
 		{
-			scenarios[name] = CustomProblemsCuratedProvider.GetByName(name);
+			scenarios[column] = () => BischoffCuratedProvider.GetByName(name);
+		}
+
+		foreach (var name in SyntheticDataProvider.Names)
+		{
+			scenarios[name] = () => SyntheticDataProvider.GetByName(name);
 		}
 	}
 
 	public static IEnumerable<string> GetScenarioNames() => scenarios.Keys;
 
-	public static Scenario GetScenarioByName(string name) => scenarios[name];
+	public static Scenario GetScenarioByName(string name) => scenarios[name]();
 }

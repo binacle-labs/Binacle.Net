@@ -88,13 +88,15 @@
   <Folder Name="/vipaq/src/">
     <Project Path="vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj" />
   </Folder>
+  <Folder Name="/vipaq/bench/">
+    <Project Path="vipaq/bench/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/vipaq/measure/">
     <Project Path="vipaq/measure/Binacle.ViPaq.EncodedSize/Binacle.ViPaq.EncodedSize.csproj" />
   </Folder>
   <Folder Name="/vipaq/test/">
     <Project Path="vipaq/test/Binacle.ViPaq.UnitTests/Binacle.ViPaq.UnitTests.csproj" />
     <Project Path="vipaq/test/Binacle.ViPaq.Testing/Binacle.ViPaq.Testing.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/vipaq/tools/">
     <Project Path="vipaq/tools/Binacle.ViPaq.VectorGenerators/Binacle.ViPaq.VectorGenerators.csproj" />

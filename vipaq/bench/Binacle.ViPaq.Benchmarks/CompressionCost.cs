@@ -1,19 +1,14 @@
-using BenchmarkDotNet.Attributes;
-using Binacle.Geometry;
-using Binacle.ViPaq.Benchmarks.Abstractions;
 using Binacle.ViPaq.Compression;
-using Binacle.ViPaq.Testing.Providers;
 using Binacle.ViPaq.Testing.ViPaq;
 
-namespace Binacle.ViPaq.Benchmarks.Benchmarks;
+namespace Binacle.ViPaq.Benchmarks;
 
-// Prices the compression itself, which the other benchmarks leave out by running NoOp only. NoOp passes the
-// body straight through, so `Deflate - NoOp` is what deflate's squeezing costs and `Gzip - Deflate` is gzip's
-// extra framing. Row-major, over the two curated Bischoff packs. Run with `--filter *CompressionCost*`.
+// Prices the codec, which Encode and Decode leave out by running NoOp. NoOp passes the body straight through,
+// so `Deflate - NoOp` is what deflate's squeezing costs and `Gzip - Deflate` is gzip's extra framing. Row-major.
 [MemoryDiagnoser]
-public class CompressionCostBenchmarks : ScenarioBenchmarkBase
+public class CompressionCost : BenchmarkBase
 {
-	[ParamsSource(typeof(BischoffCuratedProvider), nameof(BischoffCuratedProvider.Names))]
+	[ParamsSource(typeof(BischoffCuratedProvider), nameof(BischoffCuratedProvider.GetCompressionCostNames))]
 	public override string ScenarioName { get; set; } = "";
 
 	private ViPaqEncoder noopEncoder = null!;
@@ -25,8 +20,8 @@ public class CompressionCostBenchmarks : ScenarioBenchmarkBase
 	private byte[] deflateToken = [];
 	private byte[] gzipToken = [];
 
-	protected override Scenario GetScenario(string name)
-		=> BischoffCuratedProvider.GetByName(name);
+	protected override Scenario Load(string name)
+		=> BischoffCuratedProvider.GetCompressionCostByName(name);
 
 	public override void GlobalSetup()
 	{

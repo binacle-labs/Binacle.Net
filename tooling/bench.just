@@ -18,6 +18,7 @@ set no-exit-message := true
 algorithms := 'lib/bench/Binacle.Lib.Benchmarks.Algorithms'
 racing := 'lib/bench/Binacle.Lib.Benchmarks.Racing'
 threshold := 'lib/bench/Binacle.Lib.Benchmarks.Threshold'
+vipaq := 'vipaq/bench/Binacle.ViPaq.Benchmarks'
 
 # List the recipes
 default:
@@ -60,6 +61,9 @@ lib-threshold-full job="default" *words: && (_run threshold job 'full' words)
 
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes
 lib-result-selection *words: (_run 'lib/bench/Binacle.Lib.Benchmarks.ResultSelection' 'short' words)
+
+# Encode, Decode, CompressionCost - protobuf against ViPaq's two layouts: 84 cases, about 20 minutes; job="short" is about 7
+vipaq job="default" *words: (_run vipaq job words)
 
 # One project at one job; the tier and the words are categories the classes carry
 [private]

@@ -2,23 +2,34 @@ using Binacle.ViPaq.Data.Packed;
 
 namespace Binacle.ViPaq.Testing.Providers;
 
-// The hand-picked Bischoff scenarios the benchmarks fan out over. Both are 16-bit real packs that clear the
-// compression threshold, from two different thpack families, chosen to span the range deflate covers:
+// The Bischoff packs the benchmarks time, all FFD packs, keyed by the column name the report prints.
 //
-//   - OrLibrary_thpack4_1: 70 items, raw 856 -> deflate 396 b64 (saves ~54%). The lower end of the win: more
-//     varied placement, so deflate has less to grip on.
-//   - OrLibrary_thpack1_2: 108 items, raw 1312 -> deflate 404 b64 (saves ~69% row, ~77% columnar). The upper
-//     end: a larger, more repetitive pack where compression and columnar pay the most.
+//   OrLibrary_thpack4_1     70 items, width 16/8/16 - the median real pack is 79 items at that width
+//   OrLibrary_thpack1_65   365 items - the largest real pack, the tail no other pick reaches
+//   OrLibrary_thpack1_2    108 items - raw 1312 -> deflate 404 b64, 69% saved, the high end of deflate's win;
+//                          thpack4_1 is the low end at 54%
 //
-// Both picks are the FFD packs those numbers were measured on. Names resolve through BischoffSuite, so a
-// stale pick is caught by the curated check.
+// Names resolve through BischoffSuite, so a stale pick is caught by the curated check.
 public static class BischoffCuratedProvider
 {
-	public static IEnumerable<string> Names =>
-	[
-		"OrLibrary_thpack4_1.ffd",
-		"OrLibrary_thpack1_2.ffd"
-	];
+	public static IReadOnlyDictionary<string, string> TimingColumns { get; } = new Dictionary<string, string>
+	{
+		["typical container"] = "OrLibrary_thpack4_1.ffd",
+		["largest real pack"] = "OrLibrary_thpack1_65.ffd",
+	};
+
+	public static IReadOnlyDictionary<string, string> CompressionCostColumns { get; } = new Dictionary<string, string>
+	{
+		["compression low win"] = "OrLibrary_thpack4_1.ffd",
+		["compression high win"] = "OrLibrary_thpack1_2.ffd",
+	};
+
+	public static IEnumerable<string> Names
+		=> TimingColumns.Values.Concat(CompressionCostColumns.Values).Distinct();
 
 	public static Scenario GetByName(string name) => BischoffSuite.GetByName(name);
+
+	public static IEnumerable<string> GetCompressionCostNames() => CompressionCostColumns.Keys;
+
+	public static Scenario GetCompressionCostByName(string column) => GetByName(CompressionCostColumns[column]);
 }

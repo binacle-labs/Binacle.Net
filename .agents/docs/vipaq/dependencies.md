@@ -1,7 +1,7 @@
 ---
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator).
-verified: 2026-09-20
+verified: 2026-09-22
 check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gate matches vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes named below
 paths:
   - "vipaq/**"
@@ -45,7 +45,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │                  │                  refs: Testing, ViPaq.Data, Reporting
    │              │   │                  │                  runs the curated-picks gate, writes vipaq/results/ (README.md, encoded-size.md)
    │              │   │                  │
-   │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe
+   │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe (vipaq/bench)
    │              │   │                                          refs: Testing, ViPaq.Data (BenchmarkDotNet)
    │              │   │
    │              │   └── Binacle.ViPaq.VectorGenerators  [IVT]  tool exe — regenerates test-vectors/
@@ -68,7 +68,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 | `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,322 real packs as scenarios, one class per family |
 | `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders - ViPaq, protobuf, JSON, compact - and the curated and synthetic picks |
 | `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks gate, then `README.md` and `encoded-size.md` into `vipaq/results/` |
-| `Binacle.ViPaq.Benchmarks` | exe | Testing, ViPaq.Data | yes | BenchmarkDotNet timings |
+| `Binacle.ViPaq.Benchmarks` | exe (`vipaq/bench`) | Testing, ViPaq.Data, Benchmarking | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
 
