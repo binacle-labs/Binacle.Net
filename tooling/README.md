@@ -336,13 +336,16 @@ gitignored `BenchmarkDotNet.Artifacts/`.
 
 ```bash
 just bench                                # the list, each recipe with its cost
-just bench lib-result-selection           # one recipe
+just bench lib-algorithms-smoke           # one recipe; a project with tiers has one per tier
+just bench lib-algorithms-full            # the long one: prints the count and estimates first, job="short" for the cheap run
 just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
 just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNet as is
 ```
 
-The words become one `--filter` glob, always `*<Op>*<Alg>*` whatever order they come in - one algorithm word
-and one operation word at most. The split is under way: `lib/test/Binacle.Lib.Benchmarks` still holds the classes that
-have not moved to `lib/bench/` yet, run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks`.
+The tier and the words are BenchmarkDotNet categories the classes carry, and every one given must match -
+`ffd packing` is the AND. The recipe knows the project, the job, the tier and the cost; the script knows only
+how to call `dotnet run`; the classes know which tier they are in. From the first word starting with `-`,
+everything goes to BenchmarkDotNet as it is. The split is under way: `lib/test/Binacle.Lib.Benchmarks` still
+holds the racing and threshold classes, run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks`.
 
 

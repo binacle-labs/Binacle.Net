@@ -12,7 +12,7 @@ project: nothing in it asserts on its own, and no test SDK is referenced. Every 
 | `TestAlgorithmFactory.cs`, `TestOperationParameters.cs` | The delegate the factories are, and the parameters a test hands to `Execute` |
 | `ScenarioChecks.cs` | `EvaluateResult` on a scenario's metrics and on its expected result - throws on mismatch |
 | `OperationResultExtensions.cs` | Volume and count totals over an `OperationResult` |
-| `Providers/` | The benchmark picks - the five curated Bischoff scenarios, the cube and specialized scaling baselines, the core count |
+| `Providers/` | The benchmark picks - the smoke four, the 30-problem Bischoff sample, the five curated Bischoff scenarios, the cube and specialized scaling baselines, the core count |
 
 ## 🛠️ How you use it
 

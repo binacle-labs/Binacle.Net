@@ -8,15 +8,17 @@ worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) 
 
 | Project | The question |
 |---|---|
+| `Binacle.Lib.Benchmarks.Algorithms` | Is v2 of each packing algorithm still faster than v1, and on which problems? Three tiers - smoke, sample, full. See [its README](Binacle.Lib.Benchmarks.Algorithms/README.md). |
 | `Binacle.Lib.Benchmarks.ResultSelection` | Is v2 of each result selector still faster and allocation-free against v1? See [its README](Binacle.Lib.Benchmarks.ResultSelection/README.md). |
 
-The classes not yet moved here are still in `lib/test/Binacle.Lib.Benchmarks`.
+The racing and threshold classes are still in `lib/test/Binacle.Lib.Benchmarks` until their projects land.
 
 ## 🛠️ How you use it
 
 ```
 just bench                          # every recipe with its cost
-just bench lib-result-selection     # one project
+just bench lib-algorithms-smoke     # one recipe; a project with tiers has one per tier
+just bench lib-result-selection     # a project with one tier has its plain name
 ```
 
 Reports land in the project's `BenchmarkDotNet.Artifacts/results/`, gitignored.

@@ -54,6 +54,7 @@
     <Project Path="lib/measure/Binacle.Lib.PackingEfficiency/Binacle.Lib.PackingEfficiency.csproj" />
   </Folder>
   <Folder Name="/lib/bench/">
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.Algorithms/Binacle.Lib.Benchmarks.Algorithms.csproj" />
     <Project Path="lib/bench/Binacle.Lib.Benchmarks.ResultSelection/Binacle.Lib.Benchmarks.ResultSelection.csproj" />
   </Folder>
   <Folder Name="/lib/test/">

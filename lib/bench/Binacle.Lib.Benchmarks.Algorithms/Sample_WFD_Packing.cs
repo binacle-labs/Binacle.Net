@@ -1,0 +1,20 @@
+namespace Binacle.Lib.Benchmarks.Algorithms;
+
+[MemoryDiagnoser]
+[BenchmarkCategory("sample", "wfd", "packing")]
+public class Sample_WFD_Packing : SampleBase
+{
+	protected override AlgorithmOperation Operation
+		=> AlgorithmOperation.Packing;
+
+	// Deleted with v1.
+	[Benchmark(Baseline = true)]
+	[BenchmarkOrder(10)]
+	public OperationResult v1()
+		=> this.Run(AlgorithmFactories.WFD_v1);
+
+	[Benchmark]
+	[BenchmarkOrder(20)]
+	public OperationResult v2()
+		=> this.Run(AlgorithmFactories.WFD_v2);
+}

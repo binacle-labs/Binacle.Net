@@ -141,7 +141,8 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
 | `Binacle.Lib.Benchmarks.Threshold` | both parallelization families. AlgorithmParallelizationThreshold stays as the evidence for why parallel racing was not wired up | hours |
 | `Binacle.ViPaq.Benchmarks` | encode, decode, CompressionCost; the synthetic scale points are columns in encode and decode | minutes |
 
-The project is the category; no BenchmarkDotNet categories needed. The BDN config, the orderer and the
+The project is the family, so no category names a family; categories name the tier and the narrowing words
+(the step 12 file, "Narrowing"). The BDN config, the orderer and the
 order attribute live once, in `shared/test/Binacle.Benchmarking`, the only project that references
 BenchmarkDotNet - decided 2026-09-20 over two copies in the `Testing` projects, because a `Testing` copy
 would pull BenchmarkDotNet into every unit-test and measure restore. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix

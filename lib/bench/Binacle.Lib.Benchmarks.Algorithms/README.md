@@ -1,0 +1,35 @@
+# Binacle.Lib.Benchmarks.Algorithms
+
+Times the three packing algorithms, v1 against v2, on scenarios from the shared data. Three tiers; the tier
+is in the class name, so it is in the report file name, and in `[BenchmarkCategory]` with the algorithm and
+operation, which is what the recipe's words select on.
+
+## 📂 What is in it
+
+| Path | What it is |
+|---|---|
+| `Smoke_Packing.cs`, `Smoke_Fitting.cs` | Six rows (FFD, WFD, BFD x v1, v2); the column is one of four scenarios: full bin, one type / small order / typical container / most item types |
+| `Sample_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is one of 30 Bischoff problems, named `<category> (<id>)` |
+| `Full_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is every one of the 700 Bischoff problems |
+| `SmokeBase.cs`, `SampleBase.cs`, `FullBase.cs` | Where each tier gets its scenarios; the picks are in `lib/test/Binacle.Lib.Testing/Providers/` |
+| `BenchmarkBase.cs` | Loads the scenario before the run and runs one algorithm on it |
+| `Program.cs` | The BenchmarkDotNet switcher with the config from `shared/test/Binacle.Benchmarking` |
+
+## 🛠️ How you use it
+
+```
+just bench lib-algorithms-smoke            # 48 cases, about 4 minutes: did my change help or hurt
+just bench lib-algorithms                  # the sample: 360 cases, about 30 minutes
+just bench lib-algorithms-full             # 8,400 cases, about 30 hours; job="short" is about 12
+just bench lib-algorithms-smoke ffd packing
+```
+
+Smoke and sample run the `short` job. Full runs the default job unless told `job="short"`, and prints the
+count and both estimates before it starts. The report lands in `BenchmarkDotNet.Artifacts/results/`,
+gitignored.
+
+## ⚠️ What will bite you
+
+`short` widens Error and RatioSD; a finding that rests on a ratio under 1.1 needs the default job. `Mean` is
+one machine's number - read `Ratio` and `Allocated`. The full tier is a day of your machine; run it when the
+code or the machine changed, not to see.

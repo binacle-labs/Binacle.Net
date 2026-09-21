@@ -1,6 +1,6 @@
 ---
 id: lib/tests
-description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, benchmarks in lib/test and lib/bench, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the Algorithms and ResultSelection bench projects in lib/bench with their tiers, the racing and threshold classes still in lib/test, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
 verified: 2026-09-22
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
@@ -27,8 +27,9 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.Testing` | support library (no suite) | — |
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
+| `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms` (= `-sample`), `-smoke`, `-full` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
-| `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter <glob>` until its classes have moved to `lib/bench/` |
+| `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter <glob>` until the racing and threshold classes have moved to `lib/bench/` |
 
 ## Binacle.Lib.Testing
 
@@ -46,7 +47,10 @@ it constructs the internal algorithm classes.
   (**not** on `ScenarioResult`, which is the map). The `AlgorithmResult` one picks the packing or the fitting
   expected status by `result.AlgorithmOperation`, then throws on mismatch. `OperationResultExtensions` holds
   the volume and count totals they compare against.
-- `Providers/` — the benchmark picks: `BischoffCuratedProblemsProvider` (five scenarios), `CubeScalingProblemsProvider`,
+- `Providers/` — the benchmark picks. `SmokeProblemsProvider` (the four smoke scenarios by name: `full bin, one type`,
+  `small order`, `typical container`, `most item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
+  `<category> (<id>)`), `BischoffCuratedProblemsProvider` (five scenarios keyed `typical container`, `BFD wins big`,
+  `near tie`, `WFD falls over`, `most item types` — Racing reads the keys), `CubeScalingProblemsProvider`,
   `SpecializedScalingProblemsProvider`, `ConcurrencyProvider`.
 
 ## Binacle.Lib.UnitTests
@@ -113,6 +117,22 @@ the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md
 differ). `ResultFiles` holds the three `ResultFile`s and the shared header sentence. Not pass/fail; a change is
 a diff.
 
+## Binacle.Lib.Benchmarks.Algorithms
+
+In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds the scenario, loads it in
+`[GlobalSetup]` through the abstract `Load`, and `Run(factory)` executes it with the abstract `Operation`.
+
+- `Smoke_Packing`, `Smoke_Fitting` (`SmokeBase`): six rows `FFD_v1` (baseline) … `BFD_v2`, the column from
+  `[ParamsSource]` over `SmokeProblemsProvider.GetScenarioNames`. 48 cases, `short` job.
+- `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
+  `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, `short` job.
+- `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.Scenarios.GetScenarioNames`,
+  all 700. 8,400 cases, default job unless `job="short"`.
+
+Every class is `[MemoryDiagnoser]` and carries `[BenchmarkCategory]` with its tier and words (`"sample", "ffd", "packing"`;
+the smoke classes put the algorithm on the row), which is what `just bench` narrows on; the `Categories` column is
+hidden in `BenchmarkConfig`. Every `v1` method carries the deleted-with-v1 comment.
+
 ## Binacle.Lib.Benchmarks.ResultSelection
 
 In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per selector, `[MemoryDiagnoser]`, rows
@@ -123,14 +143,10 @@ the `short` job.
 
 ## Binacle.Lib.Benchmarks
 
-The classes not yet split into `lib/bench/`. BenchmarkDotNet. Two factory paths:
+The racing and threshold classes, not yet split into `lib/bench/`. BenchmarkDotNet. They use the lib's
+**internal** `AlgorithmFactory_v1()` / `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`) fed
+into `LoopAlgorithmProcessor` / `ParallelAlgorithmProcessor` and `LoopBinProcessor` / `ParallelBinProcessor`.
 
-- Bischoff-suite and FastValidation benchmarks use the six `AlgorithmFactories` statics from `Binacle.Lib.Testing`,
-  via `BischoffSuiteBenchmarkBase` and `FastValidationBenchmarkBase`.
-- AlgorithmProcessing and BinProcessing benchmarks use the lib's **internal** `AlgorithmFactory_v1()` /
-  `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`) fed into `LoopAlgorithmProcessor` /
-  `ParallelAlgorithmProcessor` and `LoopBinProcessor` / `ParallelBinProcessor`.
-
-Families: Fitting + Packing × {BischoffSuite, FastValidation}, Packing × {AlgorithmProcessing (AlgorithmRacing,
-AlgorithmParallelizationThreshold), BinProcessing (BinParallelizationThreshold)}. Ordering via
-`Binacle.Benchmarking`'s `[BenchmarkOrder]`. Run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter '*FastValidation*'`.
+Families: Packing × {AlgorithmProcessing (AlgorithmRacing, AlgorithmParallelizationThreshold), BinProcessing
+(BinParallelizationThreshold)}. Ordering via `Binacle.Benchmarking`'s `[BenchmarkOrder]`. Run with
+`dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter '*AlgorithmRacing*'`.

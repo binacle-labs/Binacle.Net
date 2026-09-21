@@ -1,8 +1,8 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions.
-verified: 2026-08-27
-check: AlgorithmRacing_Packing_v2, its base class and the five scenario keys in BischoffCuratedProblemsProvider still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
+verified: 2026-09-22
+check: AlgorithmRacing_Packing_v2, its base class and the five keys in BischoffCuratedProblemsProvider (typical container, BFD wins big, near tie, WFD falls over, most item types) still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
 also_update:
   - lib/decisions
 paths:
@@ -27,6 +27,11 @@ hand-kept records are `results/lib/benchmarks/`, and their newest entry is `2025
 curated in for this run. So what a later session can confirm is that the harness still races what is quoted here, not that a
 re-run would land on the same microseconds. Re-running is a day's work on a quiet machine, and the ratios are
 what the decisions rest on, not the absolute times.
+
+**The scenario names below are the ones the run printed.** The keys in `BischoffCuratedProblemsProvider` were
+renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
+`typical container` (thpack1_7), BFD dominance is `BFD wins big` (thpack1_44), High efficiency is `near tie`
+(thpack2_30), WFD weakness is `WFD falls over` (thpack2_35), Max complexity is `most item types` (thpack7_56).
 
 Racing benchmarks run **one bin** and race algorithms against each other. They say nothing about running many
 **bins** in parallel — that is a different axis, covered by the `Parallelization` benchmark.

@@ -52,9 +52,12 @@ hurt), **sample** (a middle set, only where the full run is hours), **full** (ev
   2026-09-21 on the BDN 0.15.8 source: the default job is 13-20 s per case whatever the method costs,
   `short` about 5 s, `short --iterationTime 100` about 2 s. `short` keeps Mean and Ratio; it widens Error
   and RatioSD, so a finding that rests on a ratio under 1.1 needs the default job.
-- **Narrowing.** Every tier recipe takes `*words`: `ffd`, `bfd`, `wfd`, `packing`, `fitting` map to one
-  `--filter` glob (`--filter` matches `Namespace.Class.Method(params)`; two globs would be OR, not AND).
-  Anything else passes through as a raw BDN flag. One private helper does the mapping for all recipes.
+- **Narrowing.** Every tier recipe takes `*words`: `ffd`, `bfd`, `wfd`, `packing`, `fitting`. Settled again
+  2026-09-22: the tier and the words are `[BenchmarkCategory]` values on the classes and rows, passed as
+  `--allCategories` (BDN's AND). Not `--filter` globs - the settled class names put the words either way
+  round (`Smoke_Packing.FFD_v1`, `Sample_FFD_Packing.v1`), and threshold's sample tier is two unrelated
+  classes, so no glob rule covers every binary. From the first word starting with `-`, everything passes
+  through as a raw BDN flag. The recipe knows project, job, tier and cost; the script only calls `dotnet run`.
 - `--join` adds nothing with one project per family. JSON exporters come when a script needs them, not before.
 
 ## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Algorithms`
