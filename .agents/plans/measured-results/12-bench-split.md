@@ -47,17 +47,19 @@ hurt), **sample** (a middle set, only where the full run is hours), **full** (ev
 - **Smoke and sample are their own classes**, so the tier is in the class name and so in the report file name.
   Full is the classes that exist today. Where a tier is only a cheaper job over the same classes (racing), no
   class is added.
-- **Jobs.** No `Job` in code. Smoke and sample pass `--job short`; full runs BDN's default job and takes
-  `job="short"` for the cheap run. Full prints the case count and both estimates before it starts. Measured
+- **Jobs.** No `Job` in code. Smoke and sample pass `--job short`; full runs BDN's default job and takes the
+  job as its one argument for the cheap run (`just bench vipaq short` - not `job="short"`, which is only how
+  `just --list` prints a default and cannot be typed). Full prints both estimates before it starts. Measured
   2026-09-21 on the BDN 0.15.8 source: the default job is 13-20 s per case whatever the method costs,
   `short` about 5 s, `short --iterationTime 100` about 2 s. `short` keeps Mean and Ratio; it widens Error
   and RatioSD, so a finding that rests on a ratio under 1.1 needs the default job.
-- **Narrowing.** Every tier recipe takes `*words`: `ffd`, `bfd`, `wfd`, `packing`, `fitting`. Settled again
-  2026-09-22: the tier and the words are `[BenchmarkCategory]` values on the classes and rows, passed as
-  `--allCategories` (BDN's AND). Not `--filter` globs - the settled class names put the words either way
-  round (`Smoke_Packing.FFD_v1`, `Sample_FFD_Packing.v1`), and threshold's sample tier is two unrelated
-  classes, so no glob rule covers every binary. From the first word starting with `-`, everything passes
-  through as a raw BDN flag. The recipe knows project, job, tier and cost; the script only calls `dotnet run`.
+- **Narrowing - open again since 2026-09-22.** As built, the tier and the words `ffd`, `bfd`, `wfd`,
+  `packing`, `fitting` are `[BenchmarkCategory]` values passed as `--allCategories`, and a shell script
+  (`tooling/bench.run.sh`) assembles the `dotnet run` line. The maintainer rejected both the script and the
+  categories on review. [`findings.md`](findings.md) holds the objection, what is wrong with the built form
+  (a `job=` recipe eats the first word as the job; every mistake exits 0), and a candidate shape - `--filter`
+  on the class name, which already carries the tier, and the job from the environment. Nothing about it is
+  settled until he picks.
 - `--join` adds nothing with one project per family. JSON exporters come when a script needs them, not before.
 
 ## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Algorithms`
@@ -242,7 +244,7 @@ thing size cannot say. Step 14's `Json` row is encode only (`JsonEncoder` has no
 
 Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7 minutes at `short`, about
 20 at the default job. One tier: `vipaq` at the default job - the parity findings rest on ratios like 0.89 and
-1.20 - with `job="short"` for a did-it-help run.
+1.20 - with `short` as its one argument for a did-it-help run.
 
 ## Done when
 
@@ -261,5 +263,9 @@ Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7
       `just bench lib-algorithms-full` prints the case count and both estimates before it starts.
       **By eye** for the last: the maintainer runs it and stops it.
 - [x] `grep -n "still shell scripts" justfile` is empty; `grep -n "benchmarks\." tooling/README.md` is empty.
+- [ ] The tooling shape in `findings.md` section 1 is settled and built: no `tooling/bench.run.sh`, no
+      `[BenchmarkCategory]`, and a wrong job or an empty filter fails the recipe.
+      `test ! -f tooling/bench.run.sh && ! grep -rq BenchmarkCategory lib/bench vipaq/bench --include=*.cs`,
+      and `just bench lib-result-selection nothing-matches-this` exits non-zero.
 - [x] Every scenario name in the settled tables appears in a provider or a data file:
       `grep -rn "typical container\|BFD wins big\|largest real pack\|one full winner\|all partial, tie on volume" lib vipaq --include=*.cs --include=*.json | wc -l` is at least 5.

@@ -141,8 +141,9 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
 | `Binacle.Lib.Benchmarks.Threshold` | both parallelization families. AlgorithmParallelizationThreshold stays as the evidence for why parallel racing was not wired up | hours |
 | `Binacle.ViPaq.Benchmarks` | encode, decode, CompressionCost; the synthetic scale points are columns in encode and decode | minutes |
 
-The project is the family, so no category names a family; categories name the tier and the narrowing words
-(the step 12 file, "Narrowing"). The BDN config, the orderer and the
+The project is the family, so no category names a family. How a tier and a narrowing word select their cases
+is open again (the step 12 file, "Narrowing", and the findings file beside it): the built form - categories
+and a shell script - was rejected on 2026-09-22. The BDN config, the orderer and the
 order attribute live once, in `shared/test/Binacle.Benchmarking`, the only project that references
 BenchmarkDotNet - decided 2026-09-20 over two copies in the `Testing` projects, because a `Testing` copy
 would pull BenchmarkDotNet into every unit-test and measure restore. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix
@@ -179,7 +180,7 @@ just measure check                all, then fail if git status under either resu
 just bench                        the list, each binary and tier with its cost
 just bench lib-algorithms         the binary's default tier (sample)
 just bench lib-algorithms-smoke   minutes: did my change help or hurt
-just bench lib-algorithms-full    everything; prints the count and both estimates first; `job="short"` for the cheap run
+just bench lib-algorithms-full    everything; prints the count and both estimates first; the job as its one argument for the cheap run
 just bench lib-algorithms-smoke ffd packing   words narrow to one --filter glob; anything else passes to BDN
 just bench lib-racing | lib-racing-smoke | lib-threshold | lib-threshold-smoke | lib-threshold-full
 just bench lib-result-selection | vipaq

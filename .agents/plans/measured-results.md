@@ -34,6 +34,10 @@ Two shapes, both settled, both in `measured-results/`:
 
 Support projects go first because the bench split in step 12 multiplies every copy they remove.
 
+[`findings.md`](measured-results/findings.md) holds what the 2026-09-22 review of step 12 found: the tooling
+the maintainer wants reworked (no shell script, no BenchmarkDotNet categories), what must be fixed before the
+commit, and what can wait. A finding leaves it when fixed; the file goes when empty.
+
 ## How a session works this plan
 
 - **A session takes one step or several; the maintainer commits between steps.** No session commits. A step
