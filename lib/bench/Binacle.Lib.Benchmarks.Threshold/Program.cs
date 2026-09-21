@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Running;
-using Binacle.Benchmarking;
 
-namespace Binacle.Lib.Benchmarks;
+namespace Binacle.Lib.Benchmarks.Threshold;
 
 internal class Program
 {

@@ -140,7 +140,7 @@ See `$lib/result-selection` for scoring rules and how tests verify each strategy
 `ParallelMultiAlgorithmBinProcessor` (`lib/src/Binacle.Lib/BinProcessing/`) exist, and **no factory returns
 one** — so nothing the API runs ever reaches them. The first two are constructed directly by the
 benchmarks that measure them against the `Loop` versions - `lib/bench/Binacle.Lib.Benchmarks.Racing` for the
-algorithm processor, the threshold classes still in `lib/test/Binacle.Lib.Benchmarks` for the bin one - and by one
+algorithm processor, `lib/bench/Binacle.Lib.Benchmarks.Threshold` for both - and by one
 cancellation test in `lib/test/Binacle.Lib.UnitTests`.
 
 **`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — checked 2026-09-04, the only file

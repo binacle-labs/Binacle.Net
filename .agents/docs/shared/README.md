@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-20
+verified: 2026-09-22
 check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -20,9 +20,10 @@ paths:
 
 ## Who uses Binacle.Data
 
-Seven project references, all support, test or measure projects:
+Nine project references, all support, test, bench or measure projects:
 
-- `lib/test/Binacle.Lib.Testing`, `Binacle.Lib.UnitTests`, `Binacle.Lib.Benchmarks`
+- `lib/test/Binacle.Lib.Testing`, `Binacle.Lib.UnitTests`
+- `lib/bench/Binacle.Lib.Benchmarks.Algorithms`, `.Racing`, `.Threshold` (not `.ResultSelection`, which reads `Lib.Data` only)
 - `lib/measure/Binacle.Lib.PackingEfficiency`
 - `api/test/Binacle.Net.IntegrationTests`
 - `lib/data/Binacle.Lib.Data` and `vipaq/data/Binacle.ViPaq.Data`, for the embedded-resource reader only

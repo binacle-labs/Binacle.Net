@@ -42,8 +42,8 @@ Class files live under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/` — se
 
 `AlgorithmFactory_v1` and `AlgorithmFactory_v2` (`lib/src/Binacle.Lib/AlgorithmFactories/`) are the same
 switch pinned to one version each. Both are `internal` and used for benchmarks only
-(`lib/bench/Binacle.Lib.Benchmarks.Racing` and the threshold classes still in `lib/test/Binacle.Lib.Benchmarks`),
-which reach them through one `InternalsVisibleTo` each in `Binacle.Lib.csproj`.
+(`lib/bench/Binacle.Lib.Benchmarks.Racing` and `.Threshold`), which reach them through one `InternalsVisibleTo`
+each in `Binacle.Lib.csproj`.
 
 ## DI Registration
 

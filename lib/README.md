@@ -44,6 +44,5 @@ then picks the best outcome across algorithms or across bins.
 
 | Project | Run with | Covers |
 |---|---|---|
-| `test/Binacle.Lib.Testing` | - | What the three suites share: the algorithm factories, the scenario checks, the benchmark picks |
+| `test/Binacle.Lib.Testing` | - | What the unit tests, the measure project and the bench projects share: the algorithm factories, the scenario checks, the benchmark picks |
 | `test/Binacle.Lib.UnitTests` | `just test cs_binacle-lib_unit` | All algorithm versions × scenarios; result selection |
-| `test/Binacle.Lib.Benchmarks` | `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks` | The benchmark classes not yet moved to `bench/` |

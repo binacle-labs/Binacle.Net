@@ -10,9 +10,8 @@ worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) 
 |---|---|
 | `Binacle.Lib.Benchmarks.Algorithms` | Is v2 of each packing algorithm still faster than v1, and on which problems? Three tiers - smoke, sample, full. See [its README](Binacle.Lib.Benchmarks.Algorithms/README.md). |
 | `Binacle.Lib.Benchmarks.Racing` | When `Best` races several algorithms on one bin, is parallel faster than one after the other? See [its README](Binacle.Lib.Benchmarks.Racing/README.md). |
+| `Binacle.Lib.Benchmarks.Threshold` | Should the parallel processors be wired up, and from what size? Two families, three tiers. See [its README](Binacle.Lib.Benchmarks.Threshold/README.md). |
 | `Binacle.Lib.Benchmarks.ResultSelection` | Is v2 of each result selector still faster and allocation-free against v1? See [its README](Binacle.Lib.Benchmarks.ResultSelection/README.md). |
-
-The threshold classes are still in `lib/test/Binacle.Lib.Benchmarks` until their project lands.
 
 ## 🛠️ How you use it
 

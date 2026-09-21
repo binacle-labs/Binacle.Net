@@ -17,6 +17,7 @@ set no-exit-message := true
 
 algorithms := 'lib/bench/Binacle.Lib.Benchmarks.Algorithms'
 racing := 'lib/bench/Binacle.Lib.Benchmarks.Racing'
+threshold := 'lib/bench/Binacle.Lib.Benchmarks.Threshold'
 
 # List the recipes
 default:
@@ -43,6 +44,19 @@ lib-racing-smoke *words: (_run racing 'short' words)
 
 # The same 40 at the default job, about 10 minutes - the findings rest on ratios short would blur
 lib-racing-full *words: (_run racing 'default' words)
+
+# The sample tier
+lib-threshold *words: (lib-threshold-sample words)
+
+# Loop against Parallel at four item counts, both sets; and over bins 2, 3, 7 for FFD and BFD: 64 cases, about 5 minutes
+lib-threshold-smoke *words: (_run threshold 'short' 'smoke' words)
+
+# The whole item ladder for the sets, and bins 1-7 at three item counts: 128 cases, about 11 minutes
+lib-threshold-sample *words: (_run threshold 'short' 'sample' words)
+
+# v1 and v2 over the whole ladder and bins 1-7: 704 cases, about 3 hours; job="short" is about 1
+lib-threshold-full job="default" *words: && (_run threshold job 'full' words)
+    @echo '704 cases: about 3 hours at the default job, about 1 at short. Ctrl-C stops it.'
 
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes
 lib-result-selection *words: (_run 'lib/bench/Binacle.Lib.Benchmarks.ResultSelection' 'short' words)

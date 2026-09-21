@@ -25,12 +25,14 @@ Binacle.Packing ─────────────────────�
    ▲   [IVT → Binacle.Lib, Binacle.Lib.Data]
    │
    ├── Binacle.Lib ──────────────────────┘   FFD/WFD/BFD algorithms, processors, result selection
-   │      ▲   [IVT → UnitTests, Benchmarks, Testing, Lib.PackingEfficiency]
+   │      ▲   [IVT → UnitTests, Benchmarks.Racing, Benchmarks.Threshold, Testing, Lib.PackingEfficiency]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
    │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks
    │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
-   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Lib.Data, Benchmarking   (the classes not yet in lib/bench)
+   │      ├── Binacle.Lib.Benchmarks.Algorithms       BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
+   │      ├── Binacle.Lib.Benchmarks.Racing           BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
+   │      ├── Binacle.Lib.Benchmarks.Threshold        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Testing, Lib.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
    │
@@ -43,11 +45,13 @@ Binacle.Packing ─────────────────────�
 
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
-| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, the two suites and the measure project | the algorithms, processors, result selection |
+| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, `UnitTests`, `Benchmarks.Racing`, `Benchmarks.Threshold` and the measure project | the algorithms, processors, result selection |
 | `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
 | `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
 | `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
-| `Binacle.Lib.Benchmarks` | exe | Lib, Lib.Testing, Binacle.Data, Lib.Data, Benchmarking | yes | BenchmarkDotNet timings, the classes not yet in `lib/bench` |
+| `Binacle.Lib.Benchmarks.Algorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, in three tiers |
+| `Binacle.Lib.Benchmarks.Racing` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race |
+| `Binacle.Lib.Benchmarks.Threshold` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel on the item and bin ladders |
 | `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Testing, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
 | `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/` |
 
@@ -62,8 +66,8 @@ Binacle.Packing ─────────────────────�
    entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
    that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
 
-   **Seven projects reference it in total, counted 2026-09-22**, and the other six are not consumers in the
-   sense this rule is about: the three `lib/test/*` projects, `lib/bench/Binacle.Lib.Benchmarks.ResultSelection`,
+   **Nine projects reference it in total, counted 2026-09-22**, and the other eight are not consumers in the
+   sense this rule is about: the two `lib/test/*` projects, the four `lib/bench/*` projects,
    `lib/measure/Binacle.Lib.PackingEfficiency`, and `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
    which is a generator run by hand rather than anything that ships - the one accepted cross-slice reference,
    `$decisions#D9`.

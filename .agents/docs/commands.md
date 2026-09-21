@@ -250,13 +250,17 @@ BenchmarkDotNet, markdown-only, reports pinned next to the project. One project 
 
 ```bash
 just bench                                # the list, each recipe with its cost
+just bench lib-algorithms-smoke           # 48 cases, about 4 minutes; -sample (= lib-algorithms), -full job="default"
+just bench lib-racing-smoke               # 40 cases; lib-racing runs the same at the default job
+just bench lib-threshold-smoke            # 64 cases; -sample (= lib-threshold), -full job="default"
 just bench lib-result-selection           # 22 cases, about 2 minutes
 just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
-just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNet as is
+just bench <recipe> --iterationTime 100   # from the first -word on, everything goes to BenchmarkDotNet as is
 ```
 
-The split is under way: the classes still in `lib/test/Binacle.Lib.Benchmarks` and
-`vipaq/test/Binacle.ViPaq.Benchmarks` run with `dotnet run -c Release --project <path> -- --filter <glob>`.
+The tier and the words are `[BenchmarkCategory]` values on the classes; every one given must match. The lib
+split is done; `vipaq/test/Binacle.ViPaq.Benchmarks` still runs with
+`dotnet run -c Release --project vipaq/test/Binacle.ViPaq.Benchmarks -- --filter <glob>` until its project lands.
 
 ## Run the image
 
