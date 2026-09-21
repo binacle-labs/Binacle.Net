@@ -69,20 +69,19 @@ lib/
 vipaq/
   data/  src/  test/  test-vectors/  tools/
   measure/  Binacle.ViPaq.EncodedSize
-  bench/    Binacle.ViPaq.Benchmarks.Encoding
-            Binacle.ViPaq.Benchmarks.Scale
+  bench/    Binacle.ViPaq.Benchmarks
   results/
     README.md
     encoded-size.md           one row per pack per layout: six base64 sizes, JSON and compact as text
     benchmarks/
       README.md
-      encoding/
-      scale/
+      encode/  decode/  compression-cost/
 ```
 
 Neither project set lives under `test/`: they assert nothing, and `test/` is what `just test` runs. What a
-slice's measure and bench projects share - factories, curated picks, the BDN config, the encoders - is its
-`Testing` project; what both slices share is `Binacle.Reporting`. No `shared/measure/` or `shared/bench/`.
+slice's measure and bench projects share - factories, curated picks, the encoders - is its `Testing`
+project; what both slices share is `Binacle.Reporting` for the measure side and `Binacle.Benchmarking` for
+the bench side, both under `shared/test/`. No `shared/measure/` or `shared/bench/`.
 
 ### Deterministic projects - one run, many views
 
@@ -137,15 +136,15 @@ fixed text - tool, scenario count, data set - never a date or commit, which git 
 | Project | Holds | Cost |
 |---|---|---|
 | `Binacle.Lib.Benchmarks.Algorithms` | FastValidation; **a scaling class** - six versions over the 11-step item ladder already in `SpecializedScalingProblemsProvider`, the time-against-item-count curve no family gives today; BischoffSuite in tiers - quick validation, perhaps a curated sample, and the full 700 which runs only when named | minutes to a day |
-| `Binacle.Lib.Benchmarks.ResultSelection` | the three strategy benchmarks - different code, different data, so its own project though only 18 cases | seconds |
-| `Binacle.Lib.Benchmarks.Racing` | AlgorithmRacing v1, v2 | ~30 min |
+| `Binacle.Lib.Benchmarks.ResultSelection` | the three strategy benchmarks - different code, different data, so its own project though only 22 cases | minutes |
+| `Binacle.Lib.Benchmarks.Racing` | AlgorithmRacing v1, v2 | ~10 min |
 | `Binacle.Lib.Benchmarks.Threshold` | both parallelization families. AlgorithmParallelizationThreshold stays as the evidence for why parallel racing was not wired up | hours |
-| `Binacle.ViPaq.Benchmarks.Encoding` | curated encode, curated decode, CompressionCost | minutes |
-| `Binacle.ViPaq.Benchmarks.Scale` | synthetic encode and decode at 2,000 and 5,000 items | longer |
+| `Binacle.ViPaq.Benchmarks` | encode, decode, CompressionCost; the synthetic scale points are columns in encode and decode | minutes |
 
-The project is the category; no BenchmarkDotNet categories needed. The 20-line BDN config lives in each
-slice's `Testing` project - two copies, which is the "copy the few lines" lesson below, not a project for 20
-lines. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix
+The project is the category; no BenchmarkDotNet categories needed. The BDN config, the orderer and the
+order attribute live once, in `shared/test/Binacle.Benchmarking`, the only project that references
+BenchmarkDotNet - decided 2026-09-20 over two copies in the `Testing` projects, because a `Testing` copy
+would pull BenchmarkDotNet into every unit-test and measure restore. One class-name rule, `<Family>_<Operation>_<Variant>`, one namespace per project; fix
 `Benchmarks/Fitting/FastValidation/FastValidation_SpecializedBaseline_Packing.cs`, which holds the `_Fitting` class;
 delete the unused `Generator.cs`. JSON joins the protobuf baseline in the vipaq timing once the encoder
 exists. Every `_v1` baseline is marked in one comment as deleted with v1.
@@ -166,7 +165,7 @@ Two modules at the tooling root, following `tests.just`: `set working-directory 
 the family is the recipe name, so `just` rejects an unknown one by itself - no alias table, no `case`. The
 four `tooling/*.sh` scripts are absorbed - each is `dotnet run -c Release` with a path, the shape the earlier
 conversions absorbed rather than wrapped. The project list is the recipe list; nothing else holds it. The
-BDN config is C# in the two `Testing` projects, which is BDN's own config, so no file under `tooling/` is needed.
+BDN config is C# in `shared/test/Binacle.Benchmarking`, which is BDN's own config, so no file under `tooling/` is needed.
 
 ```
 just measure                      the list
@@ -176,16 +175,16 @@ just measure all
 just measure check                all, then fail if git status under either results/ is dirty - the golden-file check,
                                   the same ten lines as `just regen check`
 
-just bench                        the list, each project with its cost
-just bench lib-algorithms         default tier; `just bench lib-algorithms -- --filter '*Bischoff*'` passes BDN flags
-just bench lib-racing | lib-threshold | lib-result-selection
-just bench lib-fast               lib-algorithms then lib-result-selection - the quick run
-just bench lib-all                says "hours" first, then every lib project
-just bench vipaq-encoding | vipaq-scale | vipaq-all
+just bench                        the list, each binary and tier with its cost
+just bench lib-algorithms         the binary's default tier (sample)
+just bench lib-algorithms-smoke   minutes: did my change help or hurt
+just bench lib-algorithms-full    everything; prints the count and both estimates first; `job="short"` for the cheap run
+just bench lib-algorithms-smoke ffd packing   words narrow to one --filter glob; anything else passes to BDN
+just bench lib-racing | lib-racing-smoke | lib-threshold | lib-threshold-smoke | lib-threshold-full
+just bench lib-result-selection | vipaq
 ```
 
-How the full 700-scenario tier is named inside `lib-algorithms` is the implementer's - a BDN filter, a
-second recipe, or an environment variable; whichever it is, the full run never happens without being asked.
+The tiers, their classes and their scenarios per binary are settled in the step 12 file.
 
 The root `justfile` gets two `mod` lines and loses the comment "benchmark and performance runs are still
 shell scripts". `tooling/README.md` rows for `performance.<slice>.sh` and `benchmarks.<slice>.sh` become the
@@ -269,7 +268,7 @@ anything a script reads, no `Job` is set in either project today. Label per-set 
 reader of the papers recognises them.
 
 Recipe shape, simpler than first drawn: with one project per family the family is the recipe name and
-`just` rejects an unknown one itself - `just bench lib-algorithms`, `lib-fast`, `lib-all`, `vipaq-encoding`;
+`just` rejects an unknown one itself - `just bench lib-algorithms`, `lib-algorithms-smoke`, `vipaq`;
 `just measure lib`, `vipaq`, `all`, `check`. `*args` passes BDN flags after `--`. `regen.just`'s header
 says every tool there rewrites committed files; once `measure` does too, the header says it is not alone.
 

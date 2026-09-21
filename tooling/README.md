@@ -329,14 +329,20 @@ just measure check     # all, then fail if either results/ changed
 ```
 
 ## 📈 Benchmarks
-Still scripts, one per slice. Both take `-c Release` and write into gitignored folders.
+`bench.just`, loaded as the `bench` module, with `bench.run.sh` as the one body behind every recipe. One
+project per question under `<slice>/bench/`, one recipe per project and tier; the recipe's comment is its
+cost. The BenchmarkDotNet config is C# in `shared/test/Binacle.Benchmarking`; reports land in the project's
+gitignored `BenchmarkDotNet.Artifacts/`.
 
 ```bash
-./tooling/benchmarks.lib.sh [FastValidation|AlgorithmRacing|BischoffSuite|Parallelization|ResultSelection]
-./tooling/benchmarks.vipaq.sh [Encode|Decode]      # no argument = every benchmark
+just bench                                # the list, each recipe with its cost
+just bench lib-result-selection           # one recipe
+just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
+just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNet as is
 ```
 
-The alias tables live at the top of each `benchmarks.*` script - that is the list to change when a benchmark
-class is added or renamed.
+The words become one `--filter` glob, always `*<Op>*<Alg>*` whatever order they come in - one algorithm word
+and one operation word at most. The split is under way: `lib/test/Binacle.Lib.Benchmarks` still holds the classes that
+have not moved to `lib/bench/` yet, run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks`.
 
 

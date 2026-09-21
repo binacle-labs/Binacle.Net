@@ -11,6 +11,7 @@ items, it works out whether they fit (**fit**) and packs as many as it can (**pa
 | `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's tests only. |
 | `data/Binacle.Lib.Data` | The project that embeds those fixtures and reads them into models - see [its README](data/Binacle.Lib.Data/README.md). |
 | `measure/Binacle.Lib.PackingEfficiency` | Packs every scenario with every algorithm and writes the numbers to `results/` - see [its README](measure/Binacle.Lib.PackingEfficiency/README.md). |
+| `bench/` | The timings, one BenchmarkDotNet project per question - see [its README](bench/README.md). |
 
 ## ⚙️ How it works
 
@@ -45,4 +46,4 @@ then picks the best outcome across algorithms or across bins.
 |---|---|---|
 | `test/Binacle.Lib.Testing` | - | What the three suites share: the algorithm factories, the scenario checks, the benchmark picks |
 | `test/Binacle.Lib.UnitTests` | `just test cs_binacle-lib_unit` | All algorithm versions × scenarios; result selection |
-| `test/Binacle.Lib.Benchmarks` | `./tooling/benchmarks.lib.sh` | BenchmarkDotNet microbenchmarks |
+| `test/Binacle.Lib.Benchmarks` | `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks` | The benchmark classes not yet moved to `bench/` |

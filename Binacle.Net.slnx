@@ -53,6 +53,9 @@
   <Folder Name="/lib/measure/">
     <Project Path="lib/measure/Binacle.Lib.PackingEfficiency/Binacle.Lib.PackingEfficiency.csproj" />
   </Folder>
+  <Folder Name="/lib/bench/">
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ResultSelection/Binacle.Lib.Benchmarks.ResultSelection.csproj" />
+  </Folder>
   <Folder Name="/lib/test/">
     <Project Path="lib/test/Binacle.Lib.UnitTests/Binacle.Lib.UnitTests.csproj" />
     <Project Path="lib/test/Binacle.Lib.Testing/Binacle.Lib.Testing.csproj" />
@@ -108,6 +111,7 @@
     <Project Path="shared/test/Binacle.CompactNotation.UnitTests/Binacle.CompactNotation.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.FluxResults.UnitTests/Binacle.FluxResults.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.Reporting/Binacle.Reporting.csproj" />
+    <Project Path="shared/test/Binacle.Benchmarking/Binacle.Benchmarking.csproj" />
   </Folder>
   <Folder Name="/shared/tools/">
     <Project Path="shared/tools/Binacle.OrLibrary.Converter/Binacle.OrLibrary.Converter.csproj" />

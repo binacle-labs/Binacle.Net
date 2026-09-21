@@ -10,7 +10,7 @@ public static class BischoffCuratedProblemsProvider
 	//   thpack1_44   83.86%   62.65%   69.43%  BFD dominance (medium)
 	//   thpack2_30   88.17%   87.75%   87.40%  high efficiency, low variance
 	//   thpack2_35   85.86%   75.77%   56.82%  WFD weakness
-	//   thpack7_56   84.65%   65.36%   60.74%  hardest, max complexity
+	//   thpack7_56   79.18%   69.10%   68.19%  most item types (20)
 	public static Dictionary<string ,string> ScenarioDescriptions { get; }
 		= new()
 		{

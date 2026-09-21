@@ -4,9 +4,9 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System.Collections.Immutable;
 
-namespace Binacle.Lib.Benchmarks.Order;
+namespace Binacle.Benchmarking;
 
-internal class AttributeOrderer : IOrderer
+public class AttributeOrderer : IOrderer
 {
 	public bool SeparateLogicalGroups => true;
 

@@ -27,4 +27,4 @@ Run it after touching an algorithm. A diff is the finding; commit it with the ch
 ## ⚠️ What will bite you
 
 It overwrites the tracked files every run. Timings are not measured here on purpose - they vary by machine
-and belong in `lib/test/Binacle.Lib.Benchmarks`.
+and belong in `lib/bench/`.

@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Abstractions.Algorithms;
-using Binacle.Lib.Benchmarks.Order;
+using Binacle.Benchmarking;
 using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;

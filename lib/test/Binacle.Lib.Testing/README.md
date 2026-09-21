@@ -1,7 +1,8 @@
 # Binacle.Lib.Testing
 
-What the three lib suites share and nothing else needs. Not a test project: nothing in it asserts on its own,
-and no test SDK is referenced. Every project under `lib/test/` references it and imports it globally.
+What the lib suites, the measure project and the bench projects share and nothing else needs. Not a test
+project: nothing in it asserts on its own, and no test SDK is referenced. Every project under `lib/test/`,
+`lib/measure/` and `lib/bench/` references it and imports it globally.
 
 ## 📂 What is in it
 

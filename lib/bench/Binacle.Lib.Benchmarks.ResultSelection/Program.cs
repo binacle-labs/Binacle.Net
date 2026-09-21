@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Running;
-using Binacle.Benchmarking;
 
-namespace Binacle.ViPaq.Benchmarks;
+namespace Binacle.Lib.Benchmarks.ResultSelection;
 
 internal class Program
 {

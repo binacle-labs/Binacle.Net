@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" />
+    <ProjectReference Include="..\..\..\shared\test\Binacle.Benchmarking\Binacle.Benchmarking.csproj" />
   </ItemGroup>
 
   <ItemGroup>

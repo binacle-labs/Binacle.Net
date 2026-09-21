@@ -1,7 +1,7 @@
-namespace Binacle.Lib.Benchmarks.Order;
+namespace Binacle.Benchmarking;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-internal class BenchmarkOrderAttribute : Attribute
+public class BenchmarkOrderAttribute : Attribute
 {
 	public int Order { get; }
 

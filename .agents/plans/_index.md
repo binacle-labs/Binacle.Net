@@ -154,7 +154,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "step 10's gate"
   horizon: next-release
 - file: measured-results/12-bench-split.md
-  description: "Step 12 - one benchmark project per question, six of them, the config in the two Testing projects, bench.just, the two benchmark scripts gone"
+  description: "Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone"
   state: ready
   waits-on: "step 11's gate"
   horizon: next-release
@@ -164,7 +164,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "step 12's gate"
   horizon: next-release
 - file: measured-results/14-first-keepers.md
-  description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-fast, vipaq-encoding, the bin threshold once on a quiet machine - and its finding"
+  description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - and its finding"
   state: ready
   waits-on: "step 13's gate, and a quiet machine for the threshold run"
   horizon: next-release

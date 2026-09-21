@@ -1,7 +1,7 @@
 ---
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
-verified: 2026-09-20
+verified: 2026-09-22
 check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects, the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ and the gate in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
 also_update:
   - vipaq/typescript
@@ -77,7 +77,9 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
 The C# unit suite runs with `just test cs_binacle-vipaq_unit`. Only the two unit suites are on `just test all`; the
-measure and benchmark projects are run on demand (`just measure vipaq`, `./tooling/benchmarks.vipaq.sh`).
+measure and benchmark projects are run on demand (`just measure vipaq`; the benchmarks with
+`dotnet run -c Release --project vipaq/test/Binacle.ViPaq.Benchmarks -- --filter <glob>` until they move to
+`vipaq/bench/` and get their `just bench vipaq` recipe).
 
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract
 for compressed payloads — is in `$vipaq/cross-language-testing`.

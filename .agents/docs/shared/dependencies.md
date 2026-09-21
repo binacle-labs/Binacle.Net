@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
 description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
-verified: 2026-09-20
+verified: 2026-09-22
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"
@@ -46,6 +46,9 @@ shared/data/Binacle.Data         the three scenario sets — Bischoff, custom-pr
 Binacle.Reporting            leaf — markdown report writer, no Binacle deps
    consumers: Lib.PackingEfficiency, ViPaq.EncodedSize, both ViPaq generators, OrLibrary.Converter
 
+Binacle.Benchmarking         leaf — the BDN config and the order attribute; refs BenchmarkDotNet, no Binacle deps
+   consumers: every bench project (Lib.Benchmarks, Lib.Benchmarks.ResultSelection, ViPaq.Benchmarks)
+
 shared/tools/Binacle.OrLibrary.Converter   exe tool
    refs: Binacle.CompactNotation, Binacle.Packing, Binacle.Reporting
 ```
@@ -61,6 +64,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
 | `Binacle.Reporting` | library | — | — | markdown report writer for the measure projects and the tools |
+| `Binacle.Benchmarking` | library | — (BenchmarkDotNet only) | — | `BenchmarkConfig.Create()` and `[BenchmarkOrder]` for every bench project; the only project that references BenchmarkDotNet |
 | `Binacle.Data` | library | Packing, CompactNotation | — | the three scenario sets + the reader; no harness code (see notes 3, 4) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, Reporting | — | converts OR-Library benchmark data |
 

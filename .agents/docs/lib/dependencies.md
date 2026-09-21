@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-20
+verified: 2026-09-22
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -30,7 +30,8 @@ Binacle.Packing ─────────────────────�
    │      │
    │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks
    │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
-   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
+   │      ├── Binacle.Lib.Benchmarks        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Lib.Data, Benchmarking   (the classes not yet in lib/bench)
+   │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Testing, Lib.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
    │
    └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
@@ -46,10 +47,12 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
 | `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
 | `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
-| `Binacle.Lib.Benchmarks` | exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | BenchmarkDotNet timings |
+| `Binacle.Lib.Benchmarks` | exe | Lib, Lib.Testing, Binacle.Data, Lib.Data, Benchmarking | yes | BenchmarkDotNet timings, the classes not yet in `lib/bench` |
+| `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Testing, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
 | `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/` |
 
-`Binacle.Data` above is the shared scenario project in `shared/data`; `Lib.Data` and `Lib.Testing` are this slice's own.
+`Binacle.Data` above is the shared scenario project in `shared/data` and `Benchmarking` is `shared/test/Binacle.Benchmarking`;
+`Lib.Data` and `Lib.Testing` are this slice's own.
 `Lib.Testing` needs the friend grant because `AlgorithmFactories` constructs the internal algorithm classes.
 
 ## Notes
@@ -59,9 +62,9 @@ Binacle.Packing ─────────────────────�
    entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
    that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
 
-   **Six projects reference it in total, counted 2026-09-20**, and the other five are not consumers in the
-   sense this rule is about: the three `lib/test/*` projects, `lib/measure/Binacle.Lib.PackingEfficiency`, and
-   `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
+   **Seven projects reference it in total, counted 2026-09-22**, and the other six are not consumers in the
+   sense this rule is about: the three `lib/test/*` projects, `lib/bench/Binacle.Lib.Benchmarks.ResultSelection`,
+   `lib/measure/Binacle.Lib.PackingEfficiency`, and `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
    which is a generator run by hand rather than anything that ships - the one accepted cross-slice reference,
    `$decisions#D9`.
 

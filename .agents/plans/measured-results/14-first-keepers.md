@@ -1,5 +1,5 @@
 ---
-description: Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-fast, vipaq-encoding, the bin threshold once on a quiet machine - and its finding
+description: Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - and its finding
 state: ready
 waits-on: "step 13's gate, and a quiet machine for the threshold run"
 horizon: next-release
@@ -15,8 +15,8 @@ Shape: [results.md](results.md), "Benchmark projects" and "Two kinds, two rules"
 - The scaling class in `Binacle.Lib.Benchmarks.Algorithms`: six versions over the 11-step item ladder
   already in `SpecializedScalingProblemsProvider`, the time-against-item-count curve no family gives today,
   and the family the 20 old `Multiple*` reports sit under since step 13.
-- JSON joins protobuf as a baseline row in `Binacle.ViPaq.Benchmarks.Encoding`, using step 10's encoder.
-- `just bench lib-fast` and `just bench vipaq-encoding` - the maintainer's runs. The session copies each
+- `Json` joins protobuf as a row in `Binacle.ViPaq.Benchmarks` `Encode` (encode only - the encoder has no decode), using step 10's encoder.
+- `just bench lib-algorithms-smoke` and `just bench vipaq` - the maintainer's runs. The session copies each
   report into its family folder as `<date>.md`, adds the trace row and the "what they say" line.
 - `just bench lib-threshold` once, on a quiet machine, hours. The bin-parallelization question - does
   parallel bin processing pay, and from how many bins - gets its finding in the lib findings record with
@@ -40,7 +40,7 @@ Shape: [results.md](results.md), "Benchmark projects" and "Two kinds, two rules"
 
 - [ ] `grep -rln "SpecializedScalingProblemsProvider" lib/bench/Binacle.Lib.Benchmarks.Algorithms --include=*.cs`
       names a class with an item-count `[Params]`.
-- [ ] `grep -rn "JsonEncoder" vipaq/bench/Binacle.ViPaq.Benchmarks.Encoding --include=*.cs` hits.
+- [ ] `grep -rn "JsonEncoder" vipaq/bench/Binacle.ViPaq.Benchmarks --include=*.cs` hits.
 - [ ] `ls lib/results/benchmarks/algorithms/ lib/results/benchmarks/result-selection/ vipaq/results/benchmarks/encoding/`
       each has a `.md` dated after step 13's conversion.
 - [ ] `ls lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.

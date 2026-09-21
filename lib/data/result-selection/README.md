@@ -1,7 +1,7 @@
 # Result Selection
 
 Hand-authored result-selection scenarios, embedded by `Binacle.Lib.Data`. Read by the lib unit tests and
-benchmarks only - not by the api suite, and not by ViPaq.
+`lib/bench/Binacle.Lib.Benchmarks.ResultSelection` only - not by the api suite, and not by ViPaq.
 
 These fixtures exercise how the lib picks a single winning result out of many candidate packings. Unlike the
 algorithm fixtures (Bischoff suite, custom-problems) these do not describe a packing problem. Each case lists a set
@@ -19,7 +19,7 @@ A JSON array of scenarios. Each scenario names the expected winner and the candi
 
 ```json
 {
-  "Name": "Best Bin - One Fully Packed winner",
+  "Name": "one full winner",
   "ExpectedResult": "60x40x30",
   "Results": {
     "60x40x10": "60x40x10 FFD_v2 PartiallyPacked 40 60",
@@ -29,6 +29,8 @@ A JSON array of scenarios. Each scenario names the expected winner and the candi
 }
 ```
 
+- `Name` - short, and the benchmark's column header as is. Names repeat across folders, so a name is looked
+  up through its folder's `Scenarios` class, never across all three.
 - `ExpectedResult` - the bin key the selector under test must choose.
 - `Results` - candidate results keyed by bin; each value is a compact operation result
   `Bin Algorithm PackingStatus <metric> <metric>`.

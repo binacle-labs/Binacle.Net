@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-20
+verified: 2026-09-22
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -245,13 +245,18 @@ just measure check      # all, then fail if either results/ changed
 
 ## Benchmarks
 
-Per slice; BenchmarkDotNet, markdown-only, output pinned next to the project:
+BenchmarkDotNet, markdown-only, reports pinned next to the project. One project per question under
+`<slice>/bench/`, one recipe per project and tier:
 
 ```bash
-./tooling/benchmarks.lib.sh [FastValidation|AlgorithmRacing|BischoffSuite|Parallelization|ResultSelection]
-./tooling/benchmarks.vipaq.sh [Encode|Decode]
-# No argument = all
+just bench                                # the list, each recipe with its cost
+just bench lib-result-selection           # 22 cases, about 2 minutes
+just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
+just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNet as is
 ```
+
+The split is under way: the classes still in `lib/test/Binacle.Lib.Benchmarks` and
+`vipaq/test/Binacle.ViPaq.Benchmarks` run with `dotnet run -c Release --project <path> -- --filter <glob>`.
 
 ## Run the image
 

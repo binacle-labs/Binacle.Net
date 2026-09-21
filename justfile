@@ -2,7 +2,7 @@
 #
 # Install: sudo apt install just
 #
-# Each module below is one file in tooling/. The benchmark runs are still shell scripts in there, not recipes.
+# Each module below is one file in tooling/.
 
 # List all tasks
 default:
@@ -25,6 +25,9 @@ mod regen 'tooling/regen.just'
 
 # The measured results: `just measure all` rewrites lib/results and vipaq/results, `just measure check` proves they are in step.
 mod measure 'tooling/measure.just'
+
+# The timings: `just bench` lists every project and tier with its cost, `just bench lib-result-selection` runs one.
+mod bench 'tooling/bench.just'
 
 # CHANGELOG.md sections: `just changelog extract <version|Unreleased>`, `just changelog check <version>`.
 mod changelog 'tooling/changelog.just'

@@ -19,7 +19,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(BestAlgorithm.ScenarioNames), MemberType = typeof(BestAlgorithm))]
 	public void BestAlgorithm_v1(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = BestAlgorithm.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new BestAlgorithm_v1(), x=> x.AlgorithmInfo.GetAlgorithmIdentifierName());
 
@@ -30,7 +30,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(BestAlgorithm.ScenarioNames), MemberType = typeof(BestAlgorithm))]
 	public void BestAlgorithm_v2(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = BestAlgorithm.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new BestAlgorithm_v2(), x=> x.AlgorithmInfo.GetAlgorithmIdentifierName());
 
@@ -41,7 +41,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(BestBin.ScenarioNames), MemberType = typeof(BestBin))]
 	public void BestBin_v1(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = BestBin.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new BestBin_v1(), x=> x.Bin.ID);
 
@@ -52,7 +52,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(BestBin.ScenarioNames), MemberType = typeof(BestBin))]
 	public void BestBin_v2(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = BestBin.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new BestBin_v2(), x=> x.Bin.ID);
 
@@ -63,7 +63,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(SmallestBin.ScenarioNames), MemberType = typeof(SmallestBin))]
 	public void SmallestBin_v1(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = SmallestBin.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new SmallestBin_v1(), x=> x.Bin.ID);
 
@@ -74,7 +74,7 @@ public class ResultSelectionTests : IClassFixture<ResultSelectionTestingFixture>
 	[MemberData(nameof(SmallestBin.ScenarioNames), MemberType = typeof(SmallestBin))]
 	public void SmallestBin_v2(string scenarioName)
 	{
-		var scenario = this.fixture.GetScenarioByName(scenarioName);
+		var scenario = SmallestBin.GetScenarioByName(scenarioName);
 
 		var selected = this.fixture.Select(scenario, new SmallestBin_v2(), x=> x.Bin.ID);
 

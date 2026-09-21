@@ -1,7 +1,7 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-09-20
+verified: 2026-09-22
 check: Every solution folder and project count matches Binacle.Net.slnx (51 projects); the cross-slice edges against the three site Gemfiles, the four webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
@@ -27,7 +27,7 @@ grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/data/`, `/lib/test/` — `Binacle.Lib` (the only src project), `Binacle.Lib.Data` (the result-selection scenarios) + `Binacle.Lib.Testing` and three lib test projects
 - `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), three integration-test projects and five unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`)
-- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.Reporting`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
+- `/vipaq/src/`, `/vipaq/test/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + its tests + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.Reporting`, `Binacle.Benchmarking`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects
 - `/samples/`, `/samples/docker/` (5 `.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
 - `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`
@@ -58,8 +58,8 @@ A fifth property is set **conditionally**: any project whose directory path cont
 `MSBuildProjectDirectory` is separator-native and the match would miss on Linux otherwise.
 
 The Scanner for .NET identifies a test project by its `Microsoft.NET.Test.Sdk` reference. That finds the xunit
-suites but **not** the thirteen support projects that have no such reference — the three data projects,
-`Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, the two benchmark projects, the two
+suites but **not** the fifteen support projects that have no such reference — the three data projects,
+`Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, `Binacle.Benchmarking`, the three benchmark projects, the two
 measure projects, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
 lines into the coverage denominator that no test will ever cover (measured when there were ten projects, so
 the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class
@@ -216,7 +216,7 @@ twenty-one added references or a decision that transitive resolution is fine her
 ## `tooling/` vs `samples/`
 
 `tooling/` holds **every task the repo can run**, CI included — the `tests.just`, `coverage.just`, `openapi.just`,
-`agents.just`, `serve.just`, `build.just` and `measure.just` modules for `just`, the scripts that have not moved
-yet (the per-slice `benchmarks.*`), local compose files, and emulator state. `samples/` are
+`agents.just`, `serve.just`, `build.just`, `measure.just` and `bench.just` modules for `just`, local compose
+files, and emulator state. `samples/` are
 **user-facing deployment starting points** to copy and run the published image. See `$commands` for
 the scripts and samples (`$samples`) for the deployment examples.

@@ -1,8 +1,8 @@
 ---
 id: lib/tests
-description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, benchmarks, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-20
-check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/ and tooling/tests.just + tooling/measure.just + tooling/benchmarks.lib.sh
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, benchmarks in lib/test and lib/bench, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+verified: 2026-09-22
+check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
   - lib/algorithm-factory
@@ -14,7 +14,8 @@ paths:
 
 # Lib Tests
 
-Four projects under `lib/test/`, one of them a support library rather than a suite. Algorithm scenario data
+Three projects under `lib/test/`, one of them a support library rather than a suite, plus the measure project
+in `lib/measure/` and the bench projects in `lib/bench/`. Algorithm scenario data
 comes from the shared `Binacle.Data` project — see shared (`$shared`); the harness code every lib suite
 shares comes from `Binacle.Lib.Testing`, below. The **result-selection** fixtures come from this
 slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection` under the manifest prefix
@@ -26,7 +27,8 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.Testing` | support library (no suite) | — |
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
-| `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `./tooling/benchmarks.lib.sh [FastValidation\|AlgorithmRacing\|BischoffSuite\|Parallelization\|ResultSelection]` |
+| `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
+| `Binacle.Lib.Benchmarks` | BenchmarkDotNet | `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter <glob>` until its classes have moved to `lib/bench/` |
 
 ## Binacle.Lib.Testing
 
@@ -90,12 +92,12 @@ Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `Packin
 `ResultSelectionTestingFixture`:
 
 ```csharp
-Scenario GetScenarioByName(string scenarioName)
 string Select(Scenario scenario, IResultSelectionStrategy strategy, Func<OperationResult, string> resultSelector)
 ```
 
-`GetScenarioByName` pulls from `Binacle.Lib.Data.ResultSelection.All`; `Select` calls
-`strategy.Select(scenario.Results)` and applies `resultSelector`. There is no assert member here — the check
+Each test resolves its scenario itself, through its own set — `BestAlgorithm.GetScenarioByName(name)` with
+the set's `Scenarios` class aliased; the short names repeat across sets, so there is no all-sets lookup.
+`Select` calls `strategy.Select(scenario.Results)` and applies `resultSelector`. There is no assert member here — the check
 is a single comparison, so the test makes it itself with `selected.ShouldBe(scenario.ExpectedResult)`.
 `ResultSelectionTests` runs both strategy versions: `BestAlgorithm_v1/v2` (selector
 `x => x.AlgorithmInfo.GetAlgorithmIdentifierName()`), `BestBin_v1/v2` and `SmallestBin_v1/v2` (selector
@@ -111,9 +113,17 @@ the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md
 differ). `ResultFiles` holds the three `ResultFile`s and the shared header sentence. Not pass/fail; a change is
 a diff.
 
+## Binacle.Lib.Benchmarks.ResultSelection
+
+In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per selector, `[MemoryDiagnoser]`, rows
+`v1` (baseline) and `v2`, the scenario name as the column from `[ParamsSource]` over the set's
+`Scenarios.GetScenarioNames`. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
+abstract `Load`, which each class points at its own set, and `Run(strategy)`. 11 scenarios, 22 cases, always
+the `short` job.
+
 ## Binacle.Lib.Benchmarks
 
-BenchmarkDotNet. Two factory paths:
+The classes not yet split into `lib/bench/`. BenchmarkDotNet. Two factory paths:
 
 - Bischoff-suite and FastValidation benchmarks use the six `AlgorithmFactories` statics from `Binacle.Lib.Testing`,
   via `BischoffSuiteBenchmarkBase` and `FastValidationBenchmarkBase`.
@@ -122,6 +132,5 @@ BenchmarkDotNet. Two factory paths:
   `ParallelAlgorithmProcessor` and `LoopBinProcessor` / `ParallelBinProcessor`.
 
 Families: Fitting + Packing × {BischoffSuite, FastValidation}, Packing × {AlgorithmProcessing (AlgorithmRacing,
-AlgorithmParallelizationThreshold), BinProcessing (BinParallelizationThreshold)}, and ResultSelection. Ordering
-via `Order/AttributeOrderer` + `[BenchmarkOrder]`. Filter with `./tooling/benchmarks.lib.sh FastValidation` or
-`AlgorithmRacing`; no argument runs all.
+AlgorithmParallelizationThreshold), BinProcessing (BinParallelizationThreshold)}. Ordering via
+`Binacle.Benchmarking`'s `[BenchmarkOrder]`. Run with `dotnet run -c Release --project lib/test/Binacle.Lib.Benchmarks -- --filter '*FastValidation*'`.

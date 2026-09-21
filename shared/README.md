@@ -44,6 +44,13 @@ The runner-and-reporter loop behind the measure projects. Register a bag, `IRunn
 Used by `lib/measure/Binacle.Lib.PackingEfficiency`, `vipaq/measure/Binacle.ViPaq.EncodedSize` and every data
 generator under `shared/tools/` and `vipaq/tools/`. The reports it writes are the ones committed under [`results/`](../results).
 
+### ⏱️ `Binacle.Benchmarking`
+
+What every bench project runs with: `BenchmarkConfig.Create()` - the BenchmarkDotNet defaults, the GitHub
+markdown report as the only export, reports pinned beside the calling project - and `[BenchmarkOrder(n)]`
+with the orderer that sorts a group's rows by it. The only project that references BenchmarkDotNet, so the
+unit tests and the measure projects never restore it.
+
 ### 🔤 `Binacle.CompactNotation.UnitTests`
 
 Parse, format and round-trip tests for `src/Binacle.CompactNotation`. Runs with `just test cs_binacle-compact-notation_unit`.

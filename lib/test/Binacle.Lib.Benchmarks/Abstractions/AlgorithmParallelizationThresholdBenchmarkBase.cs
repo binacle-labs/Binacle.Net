@@ -2,7 +2,7 @@ using Binacle.Lib.Testing.Providers;
 using BenchmarkDotNet.Attributes;
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
-using Binacle.Lib.Benchmarks.Order;
+using Binacle.Benchmarking;
 using Binacle.Data;
 
 namespace Binacle.Lib.Benchmarks.Abstractions;
