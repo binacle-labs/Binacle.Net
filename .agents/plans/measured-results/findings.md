@@ -38,10 +38,12 @@ The maintainer's shape: tiers are classes, the job is the switch.
 
 Left:
 
-- [ ] The maintainer deletes the old files: `tooling/bench.run.sh`, Racing `Packing_v1.cs` and `Packing_v2.cs`
+- [x] The maintainer deletes the old files: `tooling/bench.run.sh`, Racing `Packing_v1.cs` and `Packing_v2.cs`
       (Racing does not build until they go), Threshold `Algorithms_Packing_v1.cs`, `_v2.cs`,
       `Bins_Packing_v1.cs`, `_v2.cs`, ViPaq `Encode.cs`, `Decode.cs`, `CompressionCost.cs`.
 - [ ] The maintainer runs each smoke recipe once; a wrong word fails; `just bench lib-algorithms-full` asks.
+      Run by 2026-09-23: `lib-algorithms-smoke`, `lib-racing-smoke`. Left: `lib-threshold-smoke`, `vipaq-smoke`,
+      `lib-result-selection` (last run before the rework), and `lib-algorithms-smoke` again since the split.
 
 ## 2. Broken, or checking less than before
 
@@ -76,8 +78,9 @@ Nothing.
 
 ## 5. Small
 
-- [ ] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
+- [x] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
       project). It still shows a sixth namespace, but never says which project holds it.
+      Fixed 2026-09-23 (`p[3]`); it prints five projects, one namespace each.
 - [ ] `version-parity.md` prints an empty table for FFD and WFD. Fixed in the code 2026-09-23: a section's
       table is optional, and parity leaves it out and says "All 700 scenarios pack to the same fill". Ticks
       when the maintainer reruns `just measure lib`.
@@ -87,19 +90,19 @@ Nothing.
 - [ ] `MarkdownFileWriter` only overwrites. A dropped reporter leaves its old file behind.
 - [ ] `vipaq/results/encoded-size.md` is 1 MB, about half of it column padding; one longer scenario name
       rewrites all 4,644 rows. Whether GitHub renders it is not checked.
-- [ ] `lib-racing-smoke` says about 2 minutes; 40 cases at `short` is about 3.
-- [ ] Smoke's `most item types` pick (thpack7_56, 20 types) ties with all 100 thpack7 problems. The label
+- [x] `lib-racing-smoke` says about 2 minutes; 40 cases at `short` is about 3. Gone by 2026-09-23: the
+      recipe is 8 cases, "under a minute".
+- [x] Smoke's `most item types` pick (thpack7_56, 20 types) ties with all 100 thpack7 problems. The label
       is true; the "why" should say it stands for the set.
-- [ ] The smoke classes have one baseline, `FFD_v1`, so every row's Ratio is against FFD. `CompressionCost`
+      Done 2026-09-23: renamed `many item types` in the smoke, sample and curated picks.
+- [x] The smoke classes have one baseline, `FFD_v1`, so every row's Ratio is against FFD. `CompressionCost`
       has one baseline, `Encode_NoOp`, so the `Decode_*` rows get a Ratio against an encode; it also has no
       `[BenchmarkOrder]`. Fix: each algorithm or direction carries its own baseline.
       **By eye** in a smoke report: a Ratio of 1.00 on `WFD_v1` and `BFD_v1` as well as `FFD_v1`.
-      Lib smoke done 2026-09-23: one class per algorithm, `Smoke_<Alg>_<Op>`, like Sample and Full. The
-      maintainer deletes `Smoke_Packing.cs` and `Smoke_Fitting.cs` under `lib/bench/Binacle.Lib.Benchmarks.Algorithms`.
+      Lib smoke done 2026-09-23: one class per algorithm, `Smoke_<Alg>_<Op>`, like Sample and Full.
       ViPaq done 2026-09-23: `Sample_CompressionCost_Encode` and `_Decode`, each with its own NoOp and row
-      order. The maintainer deletes `vipaq/bench/Binacle.ViPaq.Benchmarks/Sample_CompressionCost.cs`; until
-      then `vipaq-sample` runs its 12 cases twice.
-- [ ] `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` references `Binacle.Lib.Testing` and uses nothing from
+      order.
+- [x] `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` references `Binacle.Lib.Testing` and uses nothing from
       it. Removing it makes two lines false: `lib/test/Binacle.Lib.Testing/README.md` ("every project under
       `lib/bench/` references it") and `.agents/docs/lib/dependencies.md`.
       `grep -c Binacle.Lib.Testing lib/bench/Binacle.Lib.Benchmarks.ResultSelection/*.csproj` is 0.
@@ -107,7 +110,8 @@ Nothing.
 - [ ] `Properties/launchSettings.json` - four copies under `lib/bench/*` and one under
       `lib/measure/Binacle.Lib.PackingEfficiency`, all old profiles. One `git rm` line, the maintainer's.
       `ls lib/bench/*/Properties lib/measure/*/Properties 2>/dev/null | wc -l` is 0.
-- [ ] `Binacle.Lib`'s grant to `Binacle.Lib.PackingEfficiency` may be unused; only a build says.
+- [x] `Binacle.Lib`'s grant to `Binacle.Lib.PackingEfficiency` may be unused; only a build says.
+      Done 2026-09-23: removed; a clean build of `Binacle.Lib.PackingEfficiency` passes without it.
 - [ ] `lib/bench/README.md`, `vipaq/bench/README.md` and a comment in `tooling/bench.just` link to
       `../results/benchmarks`, which step 14 creates. Dead until then.
 - [ ] `shared/test/Binacle.Reporting` and `shared/test/Binacle.Benchmarking` have no README; every sibling

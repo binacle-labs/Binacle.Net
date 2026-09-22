@@ -36,7 +36,7 @@ public static class BischoffSampleProblemsProvider
 		("most items", "thpack1_65"),
 		("fewest items", "thpack1_84"),
 		("BFD best fill", "thpack2_33"),
-		("most item types", "thpack7_56"),
+		("many item types", "thpack7_56"),
 		("v1 and v2 differ", "thpack7_45"),
 	];
 

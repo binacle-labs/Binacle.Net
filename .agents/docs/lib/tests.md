@@ -53,9 +53,9 @@ it constructs the internal algorithm classes.
   expected status by `result.AlgorithmOperation`, then throws on mismatch. `OperationResultExtensions` holds
   the volume and count totals they compare against.
 - `Providers/` — the benchmark picks. `SmokeProblemsProvider` (the four smoke scenarios by name: `full bin, one type`,
-  `small order`, `typical container`, `most item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
+  `small order`, `typical container`, `many item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
   `<category> (<id>)`), `BischoffCuratedProblemsProvider` (five scenarios keyed `typical container`, `BFD wins big`,
-  `near tie`, `WFD falls over`, `most item types` — Racing reads the keys), `CubeScalingProblemsProvider` (one
+  `near tie`, `WFD falls over`, `many item types` — Racing reads the keys), `CubeScalingProblemsProvider` (one
   cube baseline, `GetBaseline`), `SpecializedScalingProblemsProvider` (the ladders the threshold project climbs).
 
 ## Binacle.Lib.UnitTests

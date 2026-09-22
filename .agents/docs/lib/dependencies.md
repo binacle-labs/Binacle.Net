@@ -25,7 +25,7 @@ Binacle.Packing ─────────────────────�
    ▲   [IVT → Binacle.Lib, Binacle.Lib.Data]
    │
    ├── Binacle.Lib ──────────────────────┘   FFD/WFD/BFD algorithms, processors, result selection
-   │      ▲   [IVT → UnitTests, Benchmarks.Racing, Benchmarks.Threshold, Testing, Lib.PackingEfficiency]
+   │      ▲   [IVT → UnitTests, Benchmarks.Racing, Benchmarks.Threshold, Testing]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
    │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks

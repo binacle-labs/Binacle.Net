@@ -2,7 +2,7 @@
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions.
 verified: 2026-09-22
-check: lib/bench/Binacle.Lib.Benchmarks.Racing (Packing_v2, its BenchmarkBase) and the five keys in BischoffCuratedProblemsProvider (typical container, BFD wins big, near tie, WFD falls over, most item types) still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
+check: lib/bench/Binacle.Lib.Benchmarks.Racing (Packing_v2, its BenchmarkBase) and the five keys in BischoffCuratedProblemsProvider (typical container, BFD wins big, near tie, WFD falls over, many item types) still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
 also_update:
   - lib/decisions
 paths:
@@ -31,7 +31,7 @@ what the decisions rest on, not the absolute times.
 **The scenario names below are the ones the run printed.** The keys in `BischoffCuratedProblemsProvider` were
 renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
 `typical container` (thpack1_7), BFD dominance is `BFD wins big` (thpack1_44), High efficiency is `near tie`
-(thpack2_30), WFD weakness is `WFD falls over` (thpack2_35), Max complexity is `most item types` (thpack7_56).
+(thpack2_30), WFD weakness is `WFD falls over` (thpack2_35), Max complexity is `many item types` (thpack7_56; called `most item types` until 2026-09-23).
 
 Racing benchmarks run **one bin** and race algorithms against each other. They say nothing about running many
 **bins** in parallel — that is a different axis, covered by the `Bins_*` classes in `Binacle.Lib.Benchmarks.Threshold`.

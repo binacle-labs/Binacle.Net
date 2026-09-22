@@ -140,7 +140,7 @@ Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7
 - [x] `ls lib/bench` lists `Binacle.Lib.Benchmarks.Algorithms Binacle.Lib.Benchmarks.ResultSelection Binacle.Lib.Benchmarks.Racing Binacle.Lib.Benchmarks.Threshold`;
       `ls vipaq/bench` lists `Binacle.ViPaq.Benchmarks` alone.
 - [x] `ls lib/test vipaq/test` lists no `Benchmarks`.
-- [x] `grep -r "^namespace" lib/bench vipaq/bench --include=*.cs | awk -F: '{split($1,p,"/"); print p[2], $2}' | sort -u`
+- [x] `grep -r "^namespace" lib/bench vipaq/bench --include=*.cs | awk -F: '{split($1,p,"/"); print p[3], $2}' | sort -u`
       shows one namespace per project.
 - [x] `grep -l "ManualConfig" lib/bench/*/Program.cs vipaq/bench/*/Program.cs` is empty, and
       `grep -l BenchmarkDotNet */test/*/*.csproj` lists only `shared/test/Binacle.Benchmarking`.
