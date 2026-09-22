@@ -59,8 +59,8 @@ members: `Names`, `GetByName(name)`, `All`.** `Binacle.ViPaq.Data.Packed.Bischof
 ## What will bite
 
 - Files move: `git mv` is the maintainer's; hand him the lines, edit after they land, so history follows.
-- BenchmarkDotNet puts the namespace in the report file name, so a keeper saved before the rename carries the
-  old name.
+- A kept bench report is named after its bench class, which this rename does not touch. A renamed column
+  label (the largest real pack) does change the tables, so a kept run from before reads differently.
 - Docs to rewrite in the same change: the lib tests doc, the vipaq dependencies doc, the design record's
   folder decision (the sentence on the curated picks), and the READMEs of both `Testing` projects and the
   bench projects.

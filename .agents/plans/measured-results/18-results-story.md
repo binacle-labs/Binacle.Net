@@ -1,12 +1,14 @@
 ---
-description: The results READMEs as a story for a human - "X is N% faster, cheaper or smaller than Y" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove
+description: Step 18 - the results READMEs as a story for a human - "X is N% faster, cheaper or smaller than Y" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove
 state: ready
 waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
 horizon: undecided
 paths: ["lib/results/**", "vipaq/results/**"]
 ---
 
-# The results story
+# Step 18 - the results story
+
+Shape: the general design record, the decision on measured numbers. Protocol: the orchestrator.
 
 `just measure` writes raw files: one row per scenario or pack, every number. That is evidence, not something
 a person reads. What a person reads, and what we present as a win, is a sentence with a number:
@@ -27,7 +29,7 @@ Until then, each results README says only what the files are. The harness README
 - **Size.** Four ways to store the same packing picture: a conventional JSON that holds just enough to
   redraw it, compact notation, protobuf, ViPaq. The JSON is a general guide, not the API's own response;
   its field names do not have to match the API.
-- **Speed and memory.** v2 against v1 per algorithm; parallel against one-at-a-time; how cost grows with
+- **Speed and memory**, from the kept runs in `<slice>/results/benchmarks/`. v2 against v1 per algorithm; parallel against one-at-a-time; how cost grows with
   item count and bin count. Ratios within one run only; see the next section.
 - **What is missing.** Whether a claim we want to make has no measurement behind it yet. That gap is a
   finding for the measure or bench projects, not a sentence to write.
@@ -117,9 +119,9 @@ i5 is an i5-4570 on Debian 12; i7 an i7-14700 on Windows 11; runs of November 20
 - "N% faster from 2024 to 2025". The OS, runtime, benchmark tool and scenario all changed. The same code
   also drifts between runs: FFD v2 at 192 cubes ranged 171-197 us on one fixed setup.
 
-**A way to make the speed story current:** today's smoke case `full bin, one type` is the old 192-cube row.
-One `just bench lib-algorithms-smoke` on .NET 10 gives the v2/v1 ratios and memory to set beside the table
-above, and shows whether memory moved since November 2025.
+**A way to make the speed story current:** the smoke case `full bin, one type` is the old 192-cube row. The
+2026-09-23 `lib-algorithms-smoke` run, kept in `lib/results/benchmarks/baseline/algorithms/`, gives the v2/v1
+ratios and memory on .NET 10 to set beside the table above, and shows whether memory moved since November 2025.
 
 ## Not in this plan
 

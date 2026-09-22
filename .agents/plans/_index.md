@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 12 landed; what is left is the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 12 landed; left are 14 the baseline, 15 the new bench classes, 16 the bin-threshold finding, 17 the measure output, 18 the results story, and the provider names. The maintainer commits between steps"
   state: ready
-  waits-on: "the maintainer's answers in the fixes file, and step 14's open details"
+  waits-on: "nothing to start step 14"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -98,30 +98,35 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/14-first-keepers.md
-  description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
+- file: measured-results/14-baseline.md
+  description: "Step 14 - the kept bench runs get their shape - a baseline folder holding the first kept run of every class, and a dated folder per later run that moved - their two READMEs, and how a run gets copied in"
   state: ready
-  waits-on: "a quiet machine for the threshold run"
+  waits-on: "nothing to start; how a run gets copied is open and answered after more runs are kept by hand"
   horizon: next-release
+- file: measured-results/15-new-bench-classes.md
+  description: "Step 15 - two new bench classes - lib's time against item count, and a Json row beside protobuf in ViPaq's encode - and their first runs kept in the baseline"
+  state: ready
+  waits-on: "the scaling class's name; the kept-run shape in place"
+  horizon: next-release
+- file: measured-results/16-bin-threshold-finding.md
+  description: "Step 16 - one long threshold run on a quiet machine answers whether packing bins in parallel pays, and from how many bins; the answer becomes a finding in the lib design record"
+  state: ready
+  waits-on: "a quiet machine for hours, the maintainer's"
+  horizon: next-release
+- file: measured-results/17-measure-output.md
+  description: "Step 17 - what the measure tools write - encoded-size.md is too big to read and gets split; a dropped report's old file stays behind, likely left as is"
+  state: proposed
+  waits-on: "the maintainer's answer on both items. horizon was set by an agent, strike it"
+  horizon: undecided
+- file: measured-results/18-results-story.md
+  description: "Step 18 - the results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
+  state: ready
+  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+  horizon: undecided
 - file: measured-results/consistent-provider-names.md
   description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
   state: proposed
   waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
-  horizon: undecided
-- file: measured-results/fixes.md
-  description: "Open fixes in the measure and bench tooling that wait on the maintainer's answer"
-  state: proposed
-  waits-on: "the maintainer's answer on each item. horizon was set by an agent, strike it"
-  horizon: undecided
-- file: measured-results/keeping-bench-reports.md
-  description: "How a bench run worth keeping gets from the project's gitignored artifacts folder into <slice>/results/benchmarks/, and in what shape"
-  state: proposed
-  waits-on: "the maintainer's answer on how, likely after more keepers are made by hand; the shape is picked, the copy waits on the final shape. horizon was set by an agent, strike it"
-  horizon: undecided
-- file: measured-results/results-story.md
-  description: "The results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
-  state: ready
-  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
   horizon: undecided
 ```
 

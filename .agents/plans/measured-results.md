@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 12 landed; what is left is the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps
+description: Orchestrator - steps 1 to 12 landed; left are 14 the baseline, 15 the new bench classes, 16 the bin-threshold finding, 17 the measure output, 18 the results story, and the provider names. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer's answers in the fixes file, and step 14's open details"
+waits-on: "nothing to start step 14"
 horizon: next-release
 paths:
   - "shared/**"
@@ -24,13 +24,9 @@ the four project folders and the one on measured numbers. Step 12, the bench spl
 reasons are in the lib and ViPaq design records. Step 13, which converted the old `results/` folder, was
 dropped 2026-09-22 when the folder was deleted.
 
-- [`fixes.md`](measured-results/fixes.md) - fixes that wait on the maintainer's answer, settled together with
-  the two plans below.
-- [`keeping-bench-reports.md`](measured-results/keeping-bench-reports.md) - how a bench run worth keeping gets
-  into `<slice>/results/benchmarks/`, and in what shape.
-- [`results-story.md`](measured-results/results-story.md) - the results READMEs as a story for a human.
 - [`consistent-provider-names.md`](measured-results/consistent-provider-names.md) - one naming rule for every
-  scenario provider in the Data and Testing projects.
+  scenario provider in the Data and Testing projects. Not a numbered step: nothing depends on it, and it
+  depends on nothing.
 
 ## How a session works this plan
 
@@ -59,10 +55,16 @@ dropped 2026-09-22 when the folder was deleted.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, their benchmarks READMEs, and the bin-threshold finding | `test -f lib/results/benchmarks/README.md` |
+| 14 | [14-baseline](measured-results/14-baseline.md) | the kept-run shape - `baseline/` and dated folders - its READMEs, and the 2026-09-23 runs kept as the baseline | `test -f lib/results/benchmarks/README.md` |
+| 15 | [15-new-bench-classes](measured-results/15-new-bench-classes.md) | the scaling class and the Json row, their first runs kept | `grep -rq JsonEncoder vipaq/bench --include=*.cs` |
+| 16 | [16-bin-threshold-finding](measured-results/16-bin-threshold-finding.md) | the long threshold run, and the bins finding in the lib design record | `! grep -q "no finding yet" .agents/design/lib/findings.md` |
+| 17 | [17-measure-output](measured-results/17-measure-output.md) | `encoded-size.md` split; the dropped-report file answered | `test -z "$(find vipaq/results -name '*.md' -size +100k)"` |
+| 18 | [18-results-story](measured-results/18-results-story.md) | the results READMEs as a story, from everything above | **by eye** - the READMEs open with sentences and numbers |
+
+The order is the work's: 15 and 16 keep their runs in the shape 14 sets; 18 reads what 14 to 17 leave.
 
 ## Done when
 
-- [ ] Step 14's last box is ticked, the files above are done or deleted, and the maintainer has
+- [ ] Every step's last box is ticked, the provider names are done or dropped, and the maintainer has
       deleted the folder and this file.
       **By eye.** There is nothing left to check once the file is gone; the step files carried the checks.
