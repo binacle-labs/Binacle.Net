@@ -16,7 +16,7 @@ worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) 
 ## 🛠️ How you use it
 
 ```
-just bench                          # every recipe with its cost
+just bench                          # every recipe with its cost, in tier order
 just bench lib-algorithms-smoke     # one recipe; a project with tiers has one per tier
 just bench lib-result-selection     # a project with one tier has its plain name
 ```

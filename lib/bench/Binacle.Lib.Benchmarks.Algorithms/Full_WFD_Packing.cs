@@ -1,7 +1,6 @@
 namespace Binacle.Lib.Benchmarks.Algorithms;
 
 [MemoryDiagnoser]
-[BenchmarkCategory("full", "wfd", "packing")]
 public class Full_WFD_Packing : FullBase
 {
 	protected override AlgorithmOperation Operation

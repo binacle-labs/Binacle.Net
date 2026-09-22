@@ -24,7 +24,7 @@ The shared test vectors are what keep them honest.
 | `test-vectors/` | Language-neutral test data read by both suites - see its `README.md` |
 | `test/` | C# unit tests, and the harness's encoders and picks |
 | `measure/` | `Binacle.ViPaq.EncodedSize` - encodes every pack and writes the sizes to `results/` |
-| `bench/` | `Binacle.ViPaq.Benchmarks` - the timings, `just bench vipaq` - see [its README](bench/README.md) |
+| `bench/` | `Binacle.ViPaq.Benchmarks` - the timings, `just bench vipaq-smoke`, `vipaq-sample` - see [its README](bench/README.md) |
 | `tools/` | Data generators |
 | `data/` | Frozen real packing results, and the project that reads them - used by the unit tests, `measure/` and `bench/` |
 | `results/` | What `measure/` writes. Tracked, so a change in the sizes shows up as a diff - see [its README](results/README.md) |

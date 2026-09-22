@@ -14,8 +14,9 @@ into [`vipaq/results/benchmarks/`](../results/benchmarks) by hand, dated.
 ## 🛠️ How you use it
 
 ```
-just bench vipaq                  # 84 cases at the default job, about 20 minutes
-just bench vipaq short            # the same at the short job, about 7 minutes
+just bench vipaq-smoke          # 18 cases, about 2 minutes: did my change help or hurt
+just bench vipaq-sample         # 84 cases at the default job, about 20 minutes: the one to keep
+just bench vipaq-sample quick   # the same at the short job, about 7 minutes
 ```
 
 The report lands in the project's `BenchmarkDotNet.Artifacts/results/`, gitignored.

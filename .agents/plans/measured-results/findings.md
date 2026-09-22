@@ -1,7 +1,7 @@
 ---
 description: Findings from the 2026-09-22 reviews of steps 1 to 12 as landed - the bench tooling the maintainer wants reworked, what broke or lost coverage, what text is false, where the build drifted from the shape. A finding leaves here when it is fixed.
 state: ready
-waits-on: "the maintainer picks the bench tooling shape; everything else can start now"
+waits-on: "nothing - the bench tooling shape was picked and built 2026-09-22; the old files wait on the maintainer"
 horizon: now
 paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", "artifacts/README.md", ".agents/docs/**", ".agents/design/**", ".agents/memory/**", "Directory.Build.props", "Directory.Packages.props"]
 ---
@@ -19,55 +19,30 @@ shape and its three grep lines come back empty. Every number in `lib/results/REA
 tables. What is wrong is below: one thing that stopped working, test coverage that got thinner, and a lot of
 text that the moves made false.
 
-## 1. The bench tooling gets reworked - the maintainer's call, 2026-09-22
+## 1. The bench tooling - settled and built 2026-09-22
 
-He does not want **the shell script** (`tooling/bench.run.sh`) and does not want **BenchmarkDotNet categories**
-(`[BenchmarkCategory]` on the classes, `--allCategories` from the recipes) as the way a tier or a word selects
-its cases. Both go. The plan's "Narrowing" paragraph (settled again 2026-09-22 in `12-bench-split.md`) is
-therefore open again.
+The maintainer's shape: tiers are classes, the job is the switch.
 
-What the review found wrong with the shape as built, each one a thing a user will hit:
+- **Smoke** - minutes, takes no word. **Sample** - up to about an hour, the default job, `quick` for `short`
+  where it runs long. **Full** - hours, `[confirm]` first, `short` by default, `precise` for the default job.
+  A project under five minutes has one recipe and no tiers (`lib-result-selection`).
+- The tier is the first word of the class name, picked with `--filter '*.<Tier>_*'`. No categories, no
+  narrowing words, no free BDN flags.
+- Every recipe starts with `lib-` or `vipaq-`. One private `<name>-run` recipe per project holds its
+  `dotnet run` line. `[arg(..., pattern=...)]` checks the word; a recipe that takes one sets the job in a
+  short bash body on its own lines, then calls `-run`. `default` lists with `--unsorted`.
+- `BenchmarkProgram.Run` in `Binacle.Benchmarking` is every `Main`; it exits 1 when nothing ran or a case failed.
+- New classes: Racing `Smoke_Packing`, Threshold `Sample_Algorithms_Packing`, ViPaq `Smoke_Encode` and
+  `Smoke_Decode`. Renamed to carry the tier: Racing `Sample_Packing_v1`/`_v2`, Threshold `Full_*`, ViPaq
+  `Sample_Encode`, `Sample_Decode`, `Sample_CompressionCost` over `EncodeBase` and `DecodeBase`.
 
-- **A `job=` recipe eats the first word as the job.** `just bench lib-algorithms-full ffd packing` runs
-  `--job ffd`. `just bench vipaq --iterationTime 100` runs `--job --iterationTime`. Three recipes have this:
-  `lib-algorithms-full`, `lib-threshold-full`, `vipaq`.
-- **`job="short"` cannot be typed.** It is `just`'s display form of a positional default; `just bench vipaq
-  job=short` passes the literal string `job=short`. Every doc that shows `job="short"` teaches the broken form:
-  `lib/bench/Binacle.Lib.Benchmarks.Algorithms/README.md`, `.../Threshold/README.md`, `tooling/README.md`,
-  `.agents/docs/commands.md`, `.agents/docs/tooling/README.md`, `.agents/docs/lib/tests.md`,
-  `tooling/bench.just` itself. Only `vipaq/bench/Binacle.ViPaq.Benchmarks/README.md` writes the working form,
-  `just bench vipaq short`.
-- **Every mistake is silent.** BDN exits 0 on an invalid job ("The provided base job "ffd" is invalid"), on a
-  filter that matches nothing, and on a parse error. `Program.cs` in all five projects drops what `Run`
-  returns. So a wrong word runs nothing and the recipe reports success.
-- **The algorithm words select nothing on four of five binaries.** `ffd`, `bfd`, `wfd` are categories only in
-  Algorithms; in Racing and Threshold the algorithm is a column, in ResultSelection and vipaq there is none.
-  `just bench lib-racing bfd` runs nothing, exits 0.
-- **`just bench` lists alphabetically**, so `lib-algorithms` (the alias, no cost in its comment) sits above
-  `-full`, `-sample`, `-smoke`, and `default` shows as a recipe. `just measure` has the same fault.
-- Three recipe shapes for one job (`*words`, `job="default" *words`, an alias), one inline path where the
-  rest use variables, 25 lines of bash to put `--allCategories` in front of a list, and the full recipe's
-  `&&` body echoing its own comment.
+Left:
 
-Candidate shape, not decided. It keeps what is settled (a recipe per binary and tier, the plain name as the
-default tier, the tier in the class name) and drops the script and the categories:
-
-- The tier is selected by **`--filter` on the class name**, which already carries it: `'*.Smoke_*'`,
-  `'*.Sample_*'`, `'*.Full_*'`; Threshold's sample tier is two globs (`'*.Algorithms_Packing_v2.*' '*.Sample_Bins_*'`).
-  BDN ORs its globs, which is what a tier wants. The `[BenchmarkCategory]` attributes go.
-- The narrowing words go, or exist only on Algorithms as a documented `--filter` the user types himself.
-- No positional job. The job and any extra BDN flag come from the environment, the `DOTNET_TEST_ARGS`
-  precedent in `tests.just`: `BDN_JOB=short just bench vipaq`, `BDN_ARGS='--iterationTime 100' ...`.
-- Each recipe is one `dotnet run -c Release --project <path> -- --job <job> --filter <globs>` line, the way
-  `measure.just` writes its runs. No script.
-- `default` lists with `--unsorted`, so the file order is the tier order. Same for `measure.just`.
-- `Program.cs` exits 1 when `Run` returns nothing, so an invalid job or an empty filter fails the recipe.
-- Lessons from the earlier script-to-recipe conversions: a script that only wraps a tool is absorbed into
-  the recipe, not kept beside it; one module per job, and where two need the same few lines, copy them;
-  module recipes need `set working-directory := '..'`.
-- A misspelled curated id throws a `KeyNotFoundException` in `[GlobalSetup]`, in BDN's child process. BDN
-  marks the case NA and goes on, so this is silent today too. The exit code above should catch it: fail
-  when any report has a failed case, not only when there is no report.
+- [ ] The maintainer deletes the old files: `tooling/bench.run.sh`, Racing `Packing_v1.cs` and `Packing_v2.cs`
+      (Racing does not build until they go), Threshold `Algorithms_Packing_v1.cs`, `_v2.cs`,
+      `Bins_Packing_v1.cs`, `_v2.cs`, ViPaq `Encode.cs`, `Decode.cs`, `CompressionCost.cs`.
+- [ ] The maintainer runs each smoke recipe once; a wrong word fails; `just bench lib-algorithms-full` asks.
+- [ ] `measure.just`'s `default` lists with `--unsorted` too.
 
 ## 2. Broken, or checking less than before
 

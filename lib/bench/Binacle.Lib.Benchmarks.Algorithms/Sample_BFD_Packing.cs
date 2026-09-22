@@ -1,7 +1,6 @@
 namespace Binacle.Lib.Benchmarks.Algorithms;
 
 [MemoryDiagnoser]
-[BenchmarkCategory("sample", "bfd", "packing")]
 public class Sample_BFD_Packing : SampleBase
 {
 	protected override AlgorithmOperation Operation

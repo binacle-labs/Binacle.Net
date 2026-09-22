@@ -1,7 +1,7 @@
 ---
 description: Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone
 state: ready
-waits-on: "the maintainer picks the tooling shape in findings.md"
+waits-on: "the maintainer deletes the old files named in findings.md section 1, and runs the smoke recipes"
 horizon: next-release
 paths: ["lib/**", "vipaq/**", "tooling/**", "Binacle.Net.slnx", "justfile"]
 ---
@@ -41,129 +41,18 @@ Shape: the general design record, the decision on measured numbers. Open: the to
 Three tier words, the same on every binary that has more than one: **smoke** (minutes: did my change help or
 hurt), **sample** (a middle set, only where the full run is hours), **full** (everything the binary has).
 
-- **A tier is a recipe.** `lib-algorithms-smoke`, `lib-algorithms-sample`, `lib-algorithms-full`. The plain
-  name (`lib-algorithms`) runs that binary's default tier, so it exists on every binary. A binary with one tier
-  has only its plain name. `just` rejects a tier a binary does not have by itself.
-- **Smoke and sample are their own classes**, so the tier is in the class name and so in the report file name.
-  Full is the classes that exist today. Where a tier is only a cheaper job over the same classes (racing), no
-  class is added.
-- **Jobs.** No `Job` in code. Smoke and sample pass `--job short`; full runs BDN's default job and takes the
-  job as its one argument for the cheap run (`just bench vipaq short` - not `job="short"`, which is only how
-  `just --list` prints a default and cannot be typed). Full prints both estimates before it starts. Measured
-  2026-09-21 on the BDN 0.15.8 source: the default job is 13-20 s per case whatever the method costs,
-  `short` about 5 s, `short --iterationTime 100` about 2 s. `short` keeps Mean and Ratio; it widens Error
-  and RatioSD, so a finding that rests on a ratio under 1.1 needs the default job.
-- **Narrowing - open again since 2026-09-22.** As built, the tier and the words `ffd`, `bfd`, `wfd`,
-  `packing`, `fitting` are `[BenchmarkCategory]` values passed as `--allCategories`, and a shell script
-  (`tooling/bench.run.sh`) assembles the `dotnet run` line. The maintainer rejected both the script and the
-  categories on review. [`findings.md`](findings.md) holds the objection, what is wrong with the built form
-  (a `job=` recipe eats the first word as the job; every mistake exits 0), and a candidate shape - `--filter`
-  on the class name, which already carries the tier, and the job from the environment. Nothing about it is
-  settled until he picks.
-- `--join` adds nothing with one project per family. JSON exporters come when a script needs them, not before.
-
-## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Algorithms`
-
-Every fill below is from `lib/results/packing-efficiency.md` on 2026-09-21; every timing claim from the old records
-under root `results/` (deleted 2026-09-22; git history holds them). Re-run the table, do not trust this list, if either changes.
-
-| tier | classes | cases | at `short` |
-|---|---|---|---|
-| smoke | `Smoke_Packing`, `Smoke_Fitting` - six rows (FFD, WFD, BFD x v1, v2), scenario column | 48 | ~4 min |
-| sample | `Sample_<Alg>_<Op>` x 6 - rows v1, v2, 30 scenario columns | 360 | ~30 min (default) |
-| full | `Full_<Alg>_<Op>` x 6 - rows v1, v2, 700 columns by thpack id | 8,400 | ~12 h; ~30 h default |
-
-**Smoke - four scenarios.** The column shows the name; the id is in the provider.
-
-| name | scenario | why |
-|---|---|---|
-| `full bin, one type` | Cube: 192 5x5x5 in 60x40x10, exactly 100% | the 192 column in every dated record since 2024-04. Where WFD v2 is a memory win, not a time win (v2/v1 1.03, allocation 0.18x) - keep `[MemoryDiagnoser]` |
-| `small order` | Specialized: 3 types, 13 items | the small end. In the records the 10-item column moves in step with 192 for FFD and BFD; drop first if the budget is tight |
-| `typical container` | thpack1_7 | realistic problem; its Fitting rows hit the does-not-fit exit, a ~5x cheaper path |
-| `most item types` | thpack7_56, 20 types | item-type count is what separates the algorithms in time (WFD +131% on thpack1_7, +373% here). No other smoke scenario has more than 3 types |
-
-**Sample - 30 scenarios, by category.** A stride sample (5 per group) gives 33 of 35 that all read "BFD wins by
-8-22 points" and holds no WFD win, no FFD win, neither size end, and not thpack7_45. The column shows
-`<category> (<id>)`.
-
-| category | scenarios | why |
-|---|---|---|
-| `typical container` | 1_7 | the baseline every finding quotes |
-| `BFD wins big` | 4_77, 2_51, 5_26, 6_39, 7_48, 1_44 | biggest BFD margins (24.8 down to 14.4); 4_77 is also the biggest spread, 31.7 |
-| `WFD falls over` | 2_59, 3_98, 6_78, 2_35 | WFD's lowest fills (49.2 to 56.8) |
-| `FFD falls over` | 5_47 | FFD's lowest fill, 56.2 |
-| `WFD wins` | 6_93, 1_58, 3_43 | WFD is best alone on 14 of 700; these are its three biggest margins |
-| `FFD wins` | 4_25, 3_35, 4_93 | FFD is best alone on 14 of 700; biggest margin, and 4_93 where FFD and BFD sit 0.03 apart |
-| `all three tie` | 1_39, 3_17 | 17 three-way ties in the suite; 1_39 is the highest fill among them, 3_17 the only one past thpack2 |
-| `near tie` | 2_30, 5_29 | margins 0.42 and 1.53 |
-| `tightest fit` | 1_54, 7_4 | the only two with ceiling 100.00 |
-| `loosest fit` | 4_23 | ceiling 97.40, the lowest |
-| `most items` | 1_65 | 476 items |
-| `fewest items` | 1_84 | 69 items, and a three-way tie at 62.08 |
-| `BFD best fill` | 2_33 | 90.66, the highest fill in the suite |
-| `most item types` | 7_56 | 20 types |
-| `v1 and v2 differ` | 7_45 | the one scenario where BFD v2 packs differently from v1 (79.08 -> 79.73) |
-
-**Renames that fall out.** The keys in `BischoffCuratedProblemsProvider.ScenarioDescriptions` become the names
-above: `Baseline` -> `typical container`, `BFD dominance` -> `BFD wins big`, `High efficiency` -> `near tie`,
-`WFD weakness` -> `WFD falls over`, `Max complexity` -> `most item types`. Racing reads the same keys.
-
-**Seen in the records, not measured by any tier.** Cost steps at each bin's worth of items (192 -> 193 cubes:
-266 -> 452 us). An unshipped WFD variant from 2024-11 ran 2.5-3x faster and was never adopted. Both are notes
-for `design/lib/findings.md`, not cases.
-
-## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.ResultSelection`
-
-One tier, one recipe, `--job short` - the methods are sub-microsecond, the default job's extra iterations buy
-nothing. Three classes as today, rows v1 and v2, column = scenario. Class names `BestAlgorithm`, `BestBin`,
-`SmallestBin` - the project name already says ResultSelection.
-
-What the bench guards: v1 is LINQ (`Where().OrderBy().First()`, and a second pass when nothing is fully
-packed); v2 is one loop. The memory column and Ratio catch a v2 that grows an iterator or a second pass back.
-
-Candidate counts in real use, from the code: BestAlgorithm sees 3 on the single-bin path
-(`AlgorithmProcessorFactory.cs`) and 2 per bin on the multi-bin path (`BinProcessorFactory.cs`) - fixed, so 3 is
-the real number. BestBin and SmallestBin see the request's bin count; the api validator sets no maximum
-(`v4/Contracts/IWithBins.cs`), the shipped presets carry 3 each. So those two get one bigger count.
-
-| class | scenario (column name) | candidates | why |
-|---|---|---|---|
-| BestAlgorithm | `one full winner` | 3 | v1 stops at the first full result; v2 loops |
-| BestAlgorithm | `all full, first wins` | 3 | the tie; v2's strict `>` keeps the first |
-| BestAlgorithm | `all partial` | 3 | the only path where v1 sorts |
-| BestBin | `one full winner` | 3 | v1 filters to 1 |
-| BestBin | `all full, fullest wins` | 3 | v1 filters to 3, then sorts |
-| BestBin | `all partial` | 3 | v1 runs both passes |
-| BestBin | `20 bins, half full` | 20 | new - the uncapped user count |
-| SmallestBin | `one full winner` | 3 | |
-| SmallestBin | `two full, smallest wins` | 3 | what "Multiple Fully Packed" is today: 60x40x10 is partial there |
-| SmallestBin | `all partial, tie on volume` | 3 | rewritten - today's bins are 60x40x10/20/30, so the volume tie-break never decides; two bins share a volume (60x40x10 and 40x30x20, both 24000) |
-| SmallestBin | `20 bins, half full` | 20 | new |
-
-11 scenarios x 2 rows = 22 cases, about 2 minutes at `short`.
-
-**Names.** The JSON `Name` in `lib/data/result-selection/*/baseline.json` becomes the short name above and the
-column shows it unchanged - one string for data, bench and unit tests. The `Best Bin - ` prefix exists only
-because `All.cs` keys every set in one dictionary; the bench base and the unit-test fixture resolve through the
-per-set `Scenarios.GetScenarioByName` instead, and `All` goes or keys by `<set>/<name>`. The compact result
-format and `ExpectedResult` do not change. The unit tests read the same files and get the new names.
-
-## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Racing`
-
-The question: when `Best` races several algorithms on one bin, is parallel faster than one after the other
-(the lib findings record on parallel algorithm racing, and the lib decision not to wire it up). Rows `Loop` (baseline) and `Parallel`. Classes `Packing_v1` and
-`Packing_v2` (one per algorithm factory; v1 carries the deleted-with-v1 comment). No Fitting class in this step.
-
-- **Two algorithm sets, not four.** The lib decision on what `Best` races says production races exactly `FFD,BFD` (multi-bin routes) and
-  `FFD,WFD,BFD` (single-bin routes). `BFD,WFD` and `FFD,WFD` never run in production and cannot change the
-  answer; their side note is already in the lib findings record.
+- **Tiers and jobs - reworked 2026-09-22.** The shape above was replaced by the maintainer's; the settled
+  form is [`findings.md`](findings.md) section 1. In short: a tier is a class-name prefix and a recipe, the
+  job is the switch (`quick` on sample, `precise` on full), no plain-name aliases, no categories, no script.
+  Measured 2026-09-21 on the BDN 0.15.8 source: the default job is 13-20 s per case whatever the method
+  costs, `short` about 5 s. `short` keeps Mean and Ratio; it widens Error and RatioSD, so a finding that
+  rests on a ratio under 1.1 needs the default job.
 - **The five curated scenarios stay**, under their new names. The racing finding spreads them from 0.93x to 1.48x.
 - **`ProcessorCount` goes.** The parallel processor runs `Parallel.For` over the algorithms, so a race of N
   algorithms uses at most N threads and the set already decides it. BDN's header prints the machine's cores.
 
-5 scenarios x 2 sets x 2 rows x 2 classes = 40 cases. Two tiers over the same classes: `lib-racing-smoke` at
-`short`, about 2 minutes; `lib-racing` = `lib-racing-full` at the default job, about 10 minutes - the
-findings rest on ratios like 1.08, which `short` would blur.
+Sample: 5 scenarios x 2 sets x 2 rows x 2 classes = 40 cases at the default job, about 10 minutes - the
+findings rest on ratios like 1.08, which `short` would blur. Smoke: 2 scenarios, v2 only, 8 cases at `short`.
 
 ## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Threshold`
 
@@ -260,12 +149,12 @@ Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7
 - [x] `grep -c "Benchmarks\"" lib/src/Binacle.Lib/Binacle.Lib.csproj` is 0 and `grep -c "Benchmarks" vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj` is 1.
 - [x] `test -f tooling/bench.just && test ! -f tooling/benchmarks.lib.sh && test ! -f tooling/benchmarks.vipaq.sh`
 - [ ] `just bench` lists every binary and tier with its cost; `just bench lib-result-selection` runs to a report;
-      `just bench lib-algorithms-full` prints the case count and both estimates before it starts.
-      **By eye** for the last: the maintainer runs it and stops it.
+      `just bench lib-algorithms-full` asks before it starts.
+      **By eye** for the last: the maintainer runs it and says no.
 - [x] `grep -n "still shell scripts" justfile` is empty; `grep -n "benchmarks\." tooling/README.md` is empty.
 - [ ] The tooling shape in `findings.md` section 1 is settled and built: no `tooling/bench.run.sh`, no
       `[BenchmarkCategory]`, and a wrong job or an empty filter fails the recipe.
       `test ! -f tooling/bench.run.sh && ! grep -rq BenchmarkCategory lib/bench vipaq/bench --include=*.cs`,
-      and `just bench lib-result-selection nothing-matches-this` exits non-zero.
+      and `just bench lib-threshold-sample nothing-matches-this` exits non-zero.
 - [x] Every scenario name in the settled tables appears in a provider or a data file:
       `grep -rn "typical container\|BFD wins big\|largest real pack\|one full winner\|all partial, tie on volume" lib vipaq --include=*.cs --include=*.json | wc -l` is at least 5.

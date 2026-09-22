@@ -1,10 +1,11 @@
 # Times the code with BenchmarkDotNet. One project per question; one recipe per project and tier.
 #
-#   just bench                                the list, each recipe with its cost
-#   just bench lib-algorithms-smoke           one recipe
-#   just bench <recipe> ffd packing           words narrow the run: ffd, bfd, wfd, packing, fitting
-#   just bench <recipe> --iterationTime 100   anything from the first -word on goes to BenchmarkDotNet as is
+#   just bench                               the list, in tier order, each recipe with its cost
+#   just bench lib-algorithms-smoke          smoke: minutes, takes nothing
+#   just bench lib-algorithms-sample quick   sample: the default job; `quick` runs the short one
+#   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
+# The tier is the class name's first word: Smoke_, Sample_, Full_. Any other word fails before a run starts.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored. A run worth keeping is copied
 # into <slice>/results/benchmarks/<family>/ by hand, dated.
 
@@ -15,57 +16,101 @@ set working-directory := '..'
 # still gets through.
 set no-exit-message := true
 
-algorithms := 'lib/bench/Binacle.Lib.Benchmarks.Algorithms'
-racing := 'lib/bench/Binacle.Lib.Benchmarks.Racing'
-threshold := 'lib/bench/Binacle.Lib.Benchmarks.Threshold'
-vipaq := 'vipaq/bench/Binacle.ViPaq.Benchmarks'
-
 # List the recipes
 default:
-    @just --list bench
-
-# The sample tier
-lib-algorithms *words: (lib-algorithms-sample words)
+    @just --unsorted --list bench
 
 # FFD, WFD, BFD x v1, v2 on four scenarios: 48 cases, about 4 minutes
-lib-algorithms-smoke *words: (_run algorithms 'short' 'smoke' words)
+lib-algorithms-smoke: (lib-algorithms-run 'short' 'Smoke')
 
-# v1 against v2 per algorithm on 30 picked Bischoff problems: 360 cases, about 30 minutes
-lib-algorithms-sample *words: (_run algorithms 'short' 'sample' words)
+# v1 against v2 per algorithm on 30 picked Bischoff problems: 360 cases, about 30 minutes with `quick`
+[arg('mode', pattern='|quick')]
+lib-algorithms-sample mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# v1 against v2 per algorithm on all 700 Bischoff problems: 8,400 cases, about 30 hours; job="short" is about 12
-lib-algorithms-full job="default" *words: && (_run algorithms job 'full' words)
-    @echo '8,400 cases: about 30 hours at the default job, about 12 at short. Ctrl-C stops it.'
+    job=default
+    if [ "{{ mode }}" = quick ]; then job=short; fi
 
-# The full tier
-lib-racing *words: (lib-racing-full words)
+    just bench lib-algorithms-run "$job" Sample
 
-# Loop against Parallel, two sets x five problems x v1, v2: 40 cases, about 2 minutes
-lib-racing-smoke *words: (_run racing 'short' words)
+# v1 against v2 per algorithm on all 700 Bischoff problems: 8,400 cases, about 12 hours; `precise` about 30
+[arg('mode', pattern='|precise')]
+[confirm('lib-algorithms-full: 8,400 cases, about 12 hours (precise: about 30). Run?')]
+lib-algorithms-full mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# The same 40 at the default job, about 10 minutes - the findings rest on ratios short would blur
-lib-racing-full *words: (_run racing 'default' words)
+    job=short
+    if [ "{{ mode }}" = precise ]; then job=default; fi
 
-# The sample tier
-lib-threshold *words: (lib-threshold-sample words)
+    just bench lib-algorithms-run "$job" Full
+
+[private]
+lib-algorithms-run job tier:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Algorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
+
+# Loop against Parallel, two sets x two problems, v2: 8 cases, under a minute
+lib-racing-smoke: (lib-racing-run 'short' 'Smoke')
+
+# Loop against Parallel, two sets x five problems x v1, v2: 40 cases, about 10 minutes
+lib-racing-sample: (lib-racing-run 'default' 'Sample')
+
+[private]
+lib-racing-run job tier:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Racing -- --job {{ job }} --filter '*.{{ tier }}_*'
 
 # Loop against Parallel at four item counts, both sets; and over bins 2, 3, 7 for FFD and BFD: 64 cases, about 5 minutes
-lib-threshold-smoke *words: (_run threshold 'short' 'smoke' words)
+lib-threshold-smoke: (lib-threshold-run 'short' 'Smoke')
 
-# The whole item ladder for the sets, and bins 1-7 at three item counts: 128 cases, about 11 minutes
-lib-threshold-sample *words: (_run threshold 'short' 'sample' words)
+# The whole item ladder for the sets, and bins 1-7 at three item counts: 128 cases, about 11 minutes with `quick`
+[arg('mode', pattern='|quick')]
+lib-threshold-sample mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# v1 and v2 over the whole ladder and bins 1-7: 704 cases, about 3 hours; job="short" is about 1
-lib-threshold-full job="default" *words: && (_run threshold job 'full' words)
-    @echo '704 cases: about 3 hours at the default job, about 1 at short. Ctrl-C stops it.'
+    job=default
+    if [ "{{ mode }}" = quick ]; then job=short; fi
 
-# BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes
-lib-result-selection *words: (_run 'lib/bench/Binacle.Lib.Benchmarks.ResultSelection' 'short' words)
+    just bench lib-threshold-run "$job" Sample
 
-# Encode, Decode, CompressionCost - protobuf against ViPaq's two layouts: 84 cases, about 20 minutes; job="short" is about 7
-vipaq job="default" *words: (_run vipaq job words)
+# v1 and v2 over the whole ladder and bins 1-7: 704 cases, about 1 hour; `precise` about 3
+[arg('mode', pattern='|precise')]
+[confirm('lib-threshold-full: 704 cases, about 1 hour (precise: about 3). Run?')]
+lib-threshold-full mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# One project at one job; the tier and the words are categories the classes carry
+    job=short
+    if [ "{{ mode }}" = precise ]; then job=default; fi
+
+    just bench lib-threshold-run "$job" Full
+
 [private]
-_run project job *categories:
-    @tooling/bench.run.sh {{ quote(project) }} {{ quote(job) }} {{ categories }}
+lib-threshold-run job tier:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Threshold -- --job {{ job }} --filter '*.{{ tier }}_*'
+
+# BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes. Its one tier
+lib-result-selection: (lib-result-selection-run 'short')
+
+[private]
+lib-result-selection-run job:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ResultSelection -- --job {{ job }} --filter '*'
+
+# Encode and Decode on three packs - protobuf against ViPaq's two layouts: 18 cases, about 2 minutes
+vipaq-smoke: (vipaq-run 'short' 'Smoke')
+
+# Encode, Decode on twelve packs, and CompressionCost: 84 cases, about 20 minutes; about 7 with `quick`
+[arg('mode', pattern='|quick')]
+vipaq-sample mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    job=default
+    if [ "{{ mode }}" = quick ]; then job=short; fi
+
+    just bench vipaq-run "$job" Sample
+
+[private]
+vipaq-run job tier:
+    dotnet run -c Release --project vipaq/bench/Binacle.ViPaq.Benchmarks -- --job {{ job }} --filter '*.{{ tier }}_*'

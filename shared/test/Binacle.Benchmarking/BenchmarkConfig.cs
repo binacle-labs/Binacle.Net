@@ -18,8 +18,6 @@ public static class BenchmarkConfig
 			.AddAnalyser(defaults.GetAnalysers().ToArray())
 			.AddValidator(defaults.GetValidators().ToArray())
 			.AddExporter(MarkdownExporter.GitHub)
-			// The categories only pick which cases run; the tier is already in the class name.
-			.HideColumns(Column.Categories)
 			.WithOptions(ConfigOptions.DisableLogFile)
 			.WithBuildTimeout(TimeSpan.FromMinutes(20))
 			.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(50))

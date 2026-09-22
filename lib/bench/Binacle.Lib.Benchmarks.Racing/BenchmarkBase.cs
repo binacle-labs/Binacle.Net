@@ -10,8 +10,8 @@ public abstract class BenchmarkBase
 	private ParallelAlgorithmProcessor parallel = null!;
 	private Scenario? scenario;
 
-	[ParamsSource(typeof(BischoffCuratedProblemsProvider), nameof(BischoffCuratedProblemsProvider.GetBenchmarkScenarios))]
-	public string? ScenarioName { get; set; }
+	// Each tier picks its own problems.
+	public abstract string? ScenarioName { get; set; }
 
 	// The two sets production races: multi-bin routes and single-bin routes.
 	[Params("FFD,BFD", "FFD,WFD,BFD")]

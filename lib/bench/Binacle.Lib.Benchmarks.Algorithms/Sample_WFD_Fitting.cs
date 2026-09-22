@@ -1,7 +1,6 @@
 namespace Binacle.Lib.Benchmarks.Algorithms;
 
 [MemoryDiagnoser]
-[BenchmarkCategory("sample", "wfd", "fitting")]
 public class Sample_WFD_Fitting : SampleBase
 {
 	protected override AlgorithmOperation Operation

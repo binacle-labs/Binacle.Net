@@ -3,7 +3,6 @@ using Binacle.Lib.Abstractions;
 namespace Binacle.Lib.Benchmarks.Threshold;
 
 [MemoryDiagnoser]
-[BenchmarkCategory("smoke", "packing")]
 public class Smoke_Bins_Packing : BinsBase
 {
 	[Params(3, 47, 67, 79)]

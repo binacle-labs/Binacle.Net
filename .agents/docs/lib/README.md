@@ -39,9 +39,9 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 | `lib/test/Binacle.Lib.UnitTests` | `cs_binacle-lib_unit` | All algorithm versions × all scenarios; result selection strategies |
 | `lib/measure/Binacle.Lib.PackingEfficiency` | (none) | Packing efficiency over every scenario (console runner, not xUnit), written to `lib/results/` — run via `just measure lib` |
 | `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` | (none) | The three result selectors, v1 against v2 — `just bench lib-result-selection` |
-| `lib/bench/Binacle.Lib.Benchmarks.Algorithms` | (none) | The three algorithms, v1 against v2, in three tiers — `just bench lib-algorithms[-smoke|-sample|-full]` |
-| `lib/bench/Binacle.Lib.Benchmarks.Racing` | (none) | Loop against Parallel for `Best`'s race — `just bench lib-racing[-smoke]` |
-| `lib/bench/Binacle.Lib.Benchmarks.Threshold` | (none) | Loop against Parallel on the item and bin ladders — `just bench lib-threshold[-smoke|-full]` |
+| `lib/bench/Binacle.Lib.Benchmarks.Algorithms` | (none) | The three algorithms, v1 against v2, in three tiers — `just bench lib-algorithms-smoke|-sample|-full` |
+| `lib/bench/Binacle.Lib.Benchmarks.Racing` | (none) | Loop against Parallel for `Best`'s race — `just bench lib-racing-smoke|-sample` |
+| `lib/bench/Binacle.Lib.Benchmarks.Threshold` | (none) | Loop against Parallel on the item and bin ladders — `just bench lib-threshold-smoke|-sample|-full` |
 
 See Lib Tests (`$lib/tests`) for fixtures and the test projects, and Shared (`$shared`) for the
 scenario data format and providers.

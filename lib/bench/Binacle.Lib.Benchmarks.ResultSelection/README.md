@@ -11,7 +11,7 @@ iterator or a second pass back shows there first.
 |---|---|
 | `BestAlgorithm.cs`, `BestBin.cs`, `SmallestBin.cs` | One class per selector; the scenario is the column, v1 and v2 the rows |
 | `BenchmarkBase.cs` | Loads the named scenario from its own set before the run |
-| `Program.cs` | The BenchmarkDotNet switcher with the config from `shared/test/Binacle.Benchmarking` |
+| `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 
 ## 🛠️ How you use it
 

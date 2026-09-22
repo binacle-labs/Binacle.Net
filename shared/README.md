@@ -47,8 +47,9 @@ generators under `shared/tools/` and `vipaq/tools/` use only its `RepositoryRoot
 ### ⏱️ `Binacle.Benchmarking`
 
 What every bench project runs with: `BenchmarkConfig.Create()` - the BenchmarkDotNet defaults, the GitHub
-markdown report as the only export, reports pinned beside the calling project - and `[BenchmarkOrder(n)]`
-with the orderer that sorts a group's rows by it. The only project that references BenchmarkDotNet, so the
+markdown report as the only export, reports pinned beside the calling project - `[BenchmarkOrder(n)]`
+with the orderer that sorts a group's rows by it, and `BenchmarkProgram.Run`, every project's `Main`, which
+exits 1 when nothing ran or a case failed. The only project that references BenchmarkDotNet, so the
 unit tests and the measure projects never restore it.
 
 ### 🔤 `Binacle.CompactNotation.UnitTests`

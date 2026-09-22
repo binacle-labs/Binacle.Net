@@ -12,21 +12,20 @@ the evidence. Two families, both rows `Loop` (baseline) and `Parallel`, on the s
 | Path | What it is |
 |---|---|
 | `Smoke_Algorithms_Packing.cs`, `Smoke_Bins_Packing.cs` | v2 only; items 3, 47, 67, 79; bins 2, 3, 7 |
-| `Sample_Bins_Packing.cs` | v2; items 3, 47, 79; every bin count |
-| `Algorithms_Packing_v1.cs`, `_v2.cs`, `Bins_Packing_v1.cs`, `_v2.cs` | The whole ladder, bins 1 to 7 |
+| `Sample_Algorithms_Packing.cs`, `Sample_Bins_Packing.cs` | v2; the whole item ladder; items 3, 47, 79 at every bin count |
+| `Full_Algorithms_Packing_v1.cs`, `_v2.cs`, `Full_Bins_Packing_v1.cs`, `_v2.cs` | v1 and v2; the whole ladder, bins 1 to 7 |
 | `AlgorithmsBase.cs`, `BinsBase.cs` | One per family: builds both processors, loads the ladder step, holds the two rows |
-| `Program.cs` | The BenchmarkDotNet switcher with the config from `shared/test/Binacle.Benchmarking` |
+| `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 
 ## 🛠️ How you use it
 
 ```
 just bench lib-threshold-smoke     # 64 cases, about 5 minutes: did my change help or hurt
-just bench lib-threshold           # the sample: 128 cases, about 11 minutes
-just bench lib-threshold-full      # 704 cases, about 3 hours; job="short" is about 1
+just bench lib-threshold-sample    # 128 cases at the default job; `quick` is about 11 minutes
+just bench lib-threshold-full      # 704 cases at the short job, about 1 hour; `precise` is about 3
 ```
 
-The sample tier is `Sample_Bins_Packing` plus the v2 algorithms class, which is in both `sample` and `full`;
-the report header says which job ran. The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
+Full asks before it starts. The report header says which job ran. The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
 
 ## ⚠️ What will bite you
 

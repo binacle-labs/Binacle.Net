@@ -1,13 +1,7 @@
-using BenchmarkDotNet.Running;
-
 namespace Binacle.Lib.Benchmarks.Algorithms;
 
 internal class Program
 {
-	static void Main(string[] args)
-	{
-		BenchmarkSwitcher
-			.FromAssembly(typeof(Program).Assembly)
-			.Run(args, BenchmarkConfig.Create());
-	}
+	static int Main(string[] args)
+		=> BenchmarkProgram.Run(typeof(Program).Assembly, args);
 }

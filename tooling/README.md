@@ -328,22 +328,21 @@ just measure vipaq     # vipaq/measure/Binacle.ViPaq.EncodedSize   -> vipaq/resu
 ```
 
 ## 📈 Benchmarks
-`bench.just`, loaded as the `bench` module, with `bench.run.sh` as the one body behind every recipe. One
-project per question under `<slice>/bench/`, one recipe per project and tier; the recipe's comment is its
-cost. The BenchmarkDotNet config is C# in `shared/test/Binacle.Benchmarking`; reports land in the project's
+`bench.just`, loaded as the `bench` module. One project per question under `<slice>/bench/`, one recipe per
+project and tier; the recipe's comment is its cost. The BenchmarkDotNet config is C# in `shared/test/Binacle.Benchmarking`; reports land in the project's
 gitignored `BenchmarkDotNet.Artifacts/`.
 
 ```bash
-just bench                                # the list, each recipe with its cost
-just bench lib-algorithms-smoke           # one recipe; a project with tiers has one per tier
-just bench lib-algorithms-full            # the long one: prints the count and estimates first, job="short" for the cheap run
-just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
-just bench <recipe> --iterationTime 100   # anything else goes to BenchmarkDotNet as is
+just bench                               # the list, in tier order, each recipe with its cost
+just bench lib-algorithms-smoke          # smoke: minutes, takes nothing
+just bench lib-algorithms-sample quick   # sample: the default job; `quick` runs the short one
+just bench lib-algorithms-full precise   # full: hours, asks first; the short job unless `precise`
 ```
 
-The tier and the words are BenchmarkDotNet categories the classes carry, and every one given must match -
-`ffd packing` is the AND. The recipe knows the project, the job, the tier and the cost; the script knows only
-how to call `dotnet run`; the classes know which tier they are in. From the first word starting with `-`,
-everything goes to BenchmarkDotNet as it is.
+Three tiers. **Smoke** checks nothing broke, in minutes. **Sample** is the run to read, up to about an hour;
+where it runs long it takes `quick`. **Full** runs for hours, asks before it starts, and takes `precise` for
+the default job. The tier is the first word of the class name - `Smoke_`, `Sample_`, `Full_` - and the recipe
+picks it with `--filter`. A project under five minutes has one recipe and no tiers. Any other word fails
+before the run starts, and a run that times nothing, or has a failed case, exits 1.
 
 

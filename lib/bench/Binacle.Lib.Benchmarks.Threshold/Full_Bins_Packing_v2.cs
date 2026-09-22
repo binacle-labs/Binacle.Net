@@ -3,8 +3,7 @@ using Binacle.Lib.Abstractions;
 namespace Binacle.Lib.Benchmarks.Threshold;
 
 [MemoryDiagnoser]
-[BenchmarkCategory("full", "packing")]
-public class Bins_Packing_v2 : BinsBase
+public class Full_Bins_Packing_v2 : BinsBase
 {
 	[Params(3, 7, 13, 17, 23, 29, 37, 47, 59, 67, 79)]
 	public override int Items { get; set; }

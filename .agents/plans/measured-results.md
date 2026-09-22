@@ -1,7 +1,7 @@
 ---
 description: Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer picks the bench tooling shape in the findings file; the other findings can start now"
+waits-on: "the maintainer deletes the old bench files named in the findings file; the other findings can start now"
 horizon: next-release
 paths:
   - "shared/**"
@@ -54,7 +54,7 @@ converted the old `results/` folder, was dropped 2026-09-22 when the folder was 
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. Open: the tooling rework in the findings file | `test ! -f tooling/bench.run.sh` |
+| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. the tooling reworked 2026-09-22; open: the old files go | `test ! -f tooling/bench.run.sh` |
 | 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, their benchmarks READMEs, and the bin-threshold finding | `test -f lib/results/benchmarks/README.md` |
 
 ## Done when

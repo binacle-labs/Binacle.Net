@@ -5,12 +5,8 @@ using Binacle.ViPaq.Testing.ViPaq;
 namespace Binacle.ViPaq.Benchmarks;
 
 // The codec is NoOp, so this times the format alone; CompressionCost prices the codec.
-[MemoryDiagnoser]
-public class Encode : BenchmarkBase
+public abstract class EncodeBase : BenchmarkBase
 {
-	[ParamsSource(typeof(CuratedScenarioProvider), nameof(CuratedScenarioProvider.GetScenarioNames))]
-	public override string ScenarioName { get; set; } = "";
-
 	private ProtobufEncoder protobufEncoder = null!;
 	private ViPaqEncoder vipaqEncoder = null!;
 

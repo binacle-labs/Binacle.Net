@@ -16,9 +16,9 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
   already in `SpecializedScalingProblemsProvider` - the time-against-item-count curve no family gives today.
 - `Json` joins protobuf as a row in `Binacle.ViPaq.Benchmarks` `Encode` (encode only - the encoder has no
   decode), using `JsonEncoder` from `Binacle.ViPaq.Testing`.
-- `just bench lib-algorithms-smoke` and `just bench vipaq` - the maintainer's runs. The session copies each
+- `just bench lib-algorithms-smoke` and `just bench vipaq-sample` - the maintainer's runs. The session copies each
   report into its family folder as `<date>.md`.
-- `just bench lib-threshold` once, on a quiet machine, hours. The bin-parallelization question - does
+- `just bench lib-threshold-full precise` once, on a quiet machine, hours. The bin-parallelization question - does
   parallel bin processing pay, and from how many bins - gets its finding in the lib findings record with
   numbers, replacing "no finding yet". The algorithm-threshold family stays as the evidence for why parallel
   racing was not wired up.

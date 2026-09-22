@@ -6,12 +6,8 @@ namespace Binacle.ViPaq.Benchmarks;
 
 // The codec is NoOp, so this times the format alone. Setup encodes each form once, plus the header ViPaq's
 // decode needs, so only the read is timed.
-[MemoryDiagnoser]
-public class Decode : BenchmarkBase
+public abstract class DecodeBase : BenchmarkBase
 {
-	[ParamsSource(typeof(CuratedScenarioProvider), nameof(CuratedScenarioProvider.GetScenarioNames))]
-	public override string ScenarioName { get; set; } = "";
-
 	private ProtobufEncoder protobufEncoder = null!;
 	private ViPaqEncoder vipaqEncoder = null!;
 	private byte[] protobufToken = [];

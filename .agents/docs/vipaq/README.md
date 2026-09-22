@@ -75,11 +75,11 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 |---|---|
 | `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, every real pack round-tripped in every public mode and under gzip, and every non-empty pack at forced 16-bit widths in every codec (an empty pack keeps 8-bit widths); internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
 | `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gate — every curated benchmark pick still names a real scenario — then every pack's size in ViPaq, protobuf, JSON and compact notation, written to `vipaq/results/` |
-| `vipaq/bench/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings: `Encode`, `Decode` over the curated picks and the synthetic curve, `CompressionCost` — `just bench vipaq` |
+| `vipaq/bench/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings: `Smoke_Encode`, `Smoke_Decode` on three packs; `Sample_Encode`, `Sample_Decode` over the curated picks and the synthetic curve, and `Sample_CompressionCost` — `just bench vipaq-smoke`, `vipaq-sample` |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
 The C# unit suite runs with `just test cs_binacle-vipaq_unit`. Only the two unit suites are on `just test all`; the
-measure and benchmark projects are run on demand (`just measure vipaq`, `just bench vipaq`).
+measure and benchmark projects are run on demand (`just measure vipaq`, `just bench vipaq-smoke`, `vipaq-sample`).
 
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract
 for compressed payloads — is in `$vipaq/cross-language-testing`.

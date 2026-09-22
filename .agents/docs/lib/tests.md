@@ -30,10 +30,10 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.Testing` | support library (no suite) | — |
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
-| `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms` (= `-sample`), `-smoke`, `-full` |
-| `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing` (= `-full`), `-smoke` |
+| `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms-smoke`, `-sample`, `-full` |
+| `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing-smoke`, `-sample` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
-| `Binacle.Lib.Benchmarks.Threshold` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-threshold` (= `-sample`), `-smoke`, `-full` |
+| `Binacle.Lib.Benchmarks.Threshold` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-threshold-smoke`, `-sample`, `-full` |
 
 ## Binacle.Lib.Testing
 
@@ -129,23 +129,21 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
 - `Smoke_Packing`, `Smoke_Fitting` (`SmokeBase`): six rows `FFD_v1` (baseline) … `BFD_v2`, the column from
   `[ParamsSource]` over `SmokeProblemsProvider.GetScenarioNames`. 48 cases, `short` job.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
-  `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, `short` job.
+  `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, default job, `short` with `quick`.
 - `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.Scenarios.GetScenarioNames`,
-  all 700. 8,400 cases, default job unless `job="short"`.
+  all 700. 8,400 cases, `short` job, default with `precise`.
 
-Every class is `[MemoryDiagnoser]` and carries `[BenchmarkCategory]` with its tier and words (`"sample", "ffd", "packing"`;
-the smoke classes put the algorithm on the row), which is what `just bench` narrows on; the `Categories` column is
-hidden in `BenchmarkConfig`. Every `v1` method carries the deleted-with-v1 comment.
+Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<Tier>_*'`. Every `v1` method carries the deleted-with-v1 comment.
 
 ## Binacle.Lib.Benchmarks.Racing
 
-In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`). `Packing_v1` and `Packing_v2` name the
+In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`). The factory classes name the
 lib's **internal** `AlgorithmFactory_v1()` / `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`), so
 `Binacle.Lib` grants the project friend access. `BenchmarkBase` builds a `LoopAlgorithmProcessor` and a
 `ParallelAlgorithmProcessor` for the `Set` param (`FFD,BFD`, `FFD,WFD,BFD` - the two production races), loads
-the `ScenarioName` param from `BischoffCuratedProblemsProvider`'s five keys, and holds the rows `Loop` (baseline)
-and `Parallel`. 40 cases; both classes are `[MemoryDiagnoser]` and category `packing`; one tier of classes, two
-jobs (`short` for smoke, default for full).
+the scenario by the abstract `ScenarioName`, and holds the rows `Loop` (baseline) and `Parallel`.
+`Smoke_Packing` (v2; `typical container`, `BFD wins big`) is 8 cases at `short`; `Sample_Packing_v1` and `_v2`
+(`BischoffCuratedProblemsProvider`'s five keys) are 40 cases at the default job. Every class is `[MemoryDiagnoser]`.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 
@@ -164,10 +162,10 @@ own steps:
 
 - `AlgorithmsBase` — `LoopAlgorithmProcessor` / `ParallelAlgorithmProcessor`, param `Set` (`FFD,BFD`,
   `FFD,WFD,BFD`), one bin (`MaxSizeBin`). Classes `Smoke_Algorithms_Packing` (v2; items 3, 47, 67, 79),
-  `Algorithms_Packing_v1` and `_v2` (all 11 items).
+  `Sample_Algorithms_Packing` (v2; all 11 items), `Full_Algorithms_Packing_v1` and `_v2` (all 11 items).
 - `BinsBase` — `LoopBinProcessor` / `ParallelBinProcessor`, param `Algorithm` (FFD, BFD). Classes
   `Smoke_Bins_Packing` (v2; bins 2, 3, 7), `Sample_Bins_Packing` (v2; items 3, 47, 79; bins 1-7),
-  `Bins_Packing_v1` and `_v2` (all 11 items, bins 1-7).
+  `Full_Bins_Packing_v1` and `_v2` (all 11 items, bins 1-7).
 
-Categories: `smoke` on the two smoke classes, `sample` on `Sample_Bins_Packing` **and** `Algorithms_Packing_v2`,
-`full` on the four unprefixed classes, `packing` on all. 64 / 128 / 704 cases.
+Smoke 64 cases at `short`; sample 128 at the default job, `short` with `quick`; full 704 at `short`, default with
+`precise`.

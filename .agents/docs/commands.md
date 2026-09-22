@@ -247,17 +247,15 @@ BenchmarkDotNet, markdown-only, reports pinned next to the project. One project 
 `<slice>/bench/`, one recipe per project and tier:
 
 ```bash
-just bench                                # the list, each recipe with its cost
-just bench lib-algorithms-smoke           # 48 cases, about 4 minutes; -sample (= lib-algorithms), -full job="default"
-just bench lib-racing-smoke               # 40 cases; lib-racing runs the same at the default job
-just bench lib-threshold-smoke            # 64 cases; -sample (= lib-threshold), -full job="default"
-just bench lib-result-selection           # 22 cases, about 2 minutes
-just bench vipaq                          # 84 cases at the default job; job="short" for the cheap run
-just bench <recipe> ffd packing           # words narrow the run: ffd, bfd, wfd, packing, fitting
-just bench <recipe> --iterationTime 100   # from the first -word on, everything goes to BenchmarkDotNet as is
+just bench                               # the list, in tier order, each recipe with its cost
+just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also lib-racing-, lib-threshold-, vipaq-smoke
+just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-racing-, lib-threshold-, vipaq-sample
+just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-threshold-full
+just bench lib-result-selection          # 22 cases, about 2 minutes; its one tier
 ```
 
-The tier and the words are `[BenchmarkCategory]` values on the classes; every one given must match.
+The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with `--filter`. Any other word
+fails before the run; a run that times nothing or has a failed case exits 1.
 
 ## Run the image
 

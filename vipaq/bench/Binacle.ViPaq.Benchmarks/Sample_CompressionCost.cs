@@ -6,7 +6,7 @@ namespace Binacle.ViPaq.Benchmarks;
 // Prices the codec, which Encode and Decode leave out by running NoOp. NoOp passes the body straight through,
 // so `Deflate - NoOp` is what deflate's squeezing costs and `Gzip - Deflate` is gzip's extra framing. Row-major.
 [MemoryDiagnoser]
-public class CompressionCost : BenchmarkBase
+public class Sample_CompressionCost : BenchmarkBase
 {
 	[ParamsSource(typeof(BischoffCuratedProvider), nameof(BischoffCuratedProvider.GetCompressionCostNames))]
 	public override string ScenarioName { get; set; } = "";

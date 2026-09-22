@@ -9,18 +9,21 @@ compressing costs is a class of its own.
 
 | Path | What it is |
 |---|---|
-| `Encode.cs`, `Decode.cs` | Twelve columns: six real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
-| `CompressionCost.cs` | NoOp against Deflate and Gzip, encode and decode, row-major, on the low and the high end of deflate's win |
+| `Smoke_Encode.cs`, `Smoke_Decode.cs` | Three columns: one item, the typical container, the largest real pack |
+| `Sample_Encode.cs`, `Sample_Decode.cs` | Twelve columns: six real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
+| `EncodeBase.cs`, `DecodeBase.cs` | The three rows both tiers time |
+| `Sample_CompressionCost.cs` | NoOp against Deflate and Gzip, encode and decode, row-major, on the low and the high end of deflate's win |
 | `BenchmarkBase.cs` | Loads the column's scenario before the run |
-| `Program.cs` | The BenchmarkDotNet switcher with the config from `shared/test/Binacle.Benchmarking` |
+| `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 
 The picks are in `vipaq/test/Binacle.ViPaq.Testing/Providers/`, keyed by the column name the report prints.
 
 ## 🛠️ How you use it
 
 ```
-just bench vipaq              # 84 cases at the default job, about 20 minutes
-just bench vipaq short        # the same at the short job, about 7 minutes
+just bench vipaq-smoke          # 18 cases, about 2 minutes: did my change help or hurt
+just bench vipaq-sample         # 84 cases at the default job, about 20 minutes: the one to keep
+just bench vipaq-sample quick   # the same at the short job, about 7 minutes
 ```
 
 The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
