@@ -37,6 +37,8 @@ Until then, each results README says only what the files are. The harness README
 - A time claim is a ratio from one run on one machine. Mean never compares across machines or runtimes.
   Memory (Allocated) and fill compare anywhere.
 - Every number in the README can be found in, or computed from, a raw file beside it.
+- The story reads the raw files it knows by name, not whatever sits in the folder. A stale file left by a
+  dropped reporter is never read (the maintainer, 2026-09-23).
 - Name the version. The fill numbers are v2, the shipped version.
 - Say how a number was made when it is not obvious: StdDev over all 700 (population); compact notation joins
   the bin and the items with `;` because it has no whole-pack form; JSON and compact are counted in text

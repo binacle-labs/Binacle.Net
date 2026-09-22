@@ -8,14 +8,14 @@ paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", "artifact
 
 # Steps 1 to 12 - findings
 
-Two reviews on 2026-09-22: one of step 12 alone, then one of steps 1 to 12 against the shapes as first
+Two reviews on 2026-09-22: one of the bench split alone, then one of all the steps so far against the shapes as first
 written (`git show f7a5698c:.agents/plans/measured-results/results.md`, and the support-projects shape before
 step 6 deleted it). Every claim was checked by grep, `just -n` or a script over the committed files. Nothing
 was built, run or benchmarked.
 
 **Was the idea carried out? Yes.** Every step's gate passes. The project graph matches the support-projects
 shape and its three grep lines come back empty. Every number in `lib/results/README.md` and
-`vipaq/results/README.md` recomputes from the detail files. Every benchmark case count matches the step 12
+`vipaq/results/README.md` recomputes from the detail files. Every benchmark case count matches the planned
 tables. What is wrong is below: one thing that stopped working, test coverage that got thinner, and a lot of
 text that the moves made false.
 
@@ -78,7 +78,7 @@ Nothing.
 
 ## 5. Small
 
-- [x] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
+- [x] The one-namespace-per-project check prints `bench` for every project (the awk takes the folder, not the
       project). It still shows a sixth namespace, but never says which project holds it.
       Fixed 2026-09-23 (`p[3]`); it prints five projects, one namespace each.
 - [ ] `version-parity.md` prints an empty table for FFD and WFD. Fixed in the code 2026-09-23: a section's
@@ -87,7 +87,6 @@ Nothing.
 - [ ] `packing-efficiency.md` says Margin is "top fill minus the next one"; on a two-way tie it is the gap to
       the third (thpack1_4: 0.19). The code comment in `Wins.cs` says it right; copy that wording.
       Fixed in the code 2026-09-23; ticks when the maintainer reruns `just measure lib`.
-- [ ] `MarkdownFileWriter` only overwrites. A dropped reporter leaves its old file behind.
 - [ ] `vipaq/results/encoded-size.md` is 1 MB, about half of it column padding; one longer scenario name
       rewrites all 4,644 rows. Whether GitHub renders it is not checked.
 - [x] `lib-racing-smoke` says about 2 minutes; 40 cases at `short` is about 3. Gone by 2026-09-23: the
@@ -107,13 +106,13 @@ Nothing.
       `lib/bench/` references it") and `.agents/docs/lib/dependencies.md`.
       `grep -c Binacle.Lib.Testing lib/bench/Binacle.Lib.Benchmarks.ResultSelection/*.csproj` is 0.
       Done 2026-09-23; builds without it.
-- [ ] `Properties/launchSettings.json` - four copies under `lib/bench/*` and one under
+- [x] `Properties/launchSettings.json` - four copies under `lib/bench/*` and one under
       `lib/measure/Binacle.Lib.PackingEfficiency`, all old profiles. One `git rm` line, the maintainer's.
       `ls lib/bench/*/Properties lib/measure/*/Properties 2>/dev/null | wc -l` is 0.
 - [x] `Binacle.Lib`'s grant to `Binacle.Lib.PackingEfficiency` may be unused; only a build says.
       Done 2026-09-23: removed; a clean build of `Binacle.Lib.PackingEfficiency` passes without it.
 - [ ] `lib/bench/README.md`, `vipaq/bench/README.md` and a comment in `tooling/bench.just` link to
-      `../results/benchmarks`, which step 14 creates. Dead until then.
+      `../results/benchmarks`, which does not exist yet. Dead until it does.
 - [ ] `shared/test/Binacle.Reporting` and `shared/test/Binacle.Benchmarking` have no README; every sibling
       support project has one. The shared README covers both, which the rule allows. Judgement.
 

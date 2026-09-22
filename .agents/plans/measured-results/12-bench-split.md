@@ -1,20 +1,20 @@
 ---
 description: Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone
 state: ready
-waits-on: "the maintainer deletes the old files named in findings.md section 1, and runs the smoke recipes"
+waits-on: "the maintainer runs the smoke recipes"
 horizon: next-release
 paths: ["lib/**", "vipaq/**", "tooling/**", "Binacle.Net.slnx", "justfile"]
 ---
 
 # Step 12 - the bench split
 
-Shape: the general design record, the decision on measured numbers. Open: the tooling rework in [findings.md](findings.md). Protocol: the orchestrator.
+Shape: the general design record, the decision on measured numbers. Protocol: the orchestrator.
 
 ## The step
 
 - `lib/test/Binacle.Lib.Benchmarks` becomes four projects under `lib/bench/`: `.Algorithms`, `.ResultSelection`,
   `.Racing`, `.Threshold`. `vipaq/test/Binacle.ViPaq.Benchmarks` moves to `vipaq/bench/Binacle.ViPaq.Benchmarks`,
-  one project. The classes, tiers and scenarios of each are settled below; step 14's scaling class and JSON row
+  one project. The classes, tiers and scenarios of each are settled below; the scaling class and the JSON row
   are not written here.
 - The BDN config, `AttributeOrderer` and `BenchmarkOrderAttribute` move into `shared/test/Binacle.Benchmarking`,
   the only project that references BenchmarkDotNet; every bench project references it and calls
@@ -41,8 +41,7 @@ Shape: the general design record, the decision on measured numbers. Open: the to
 Three tier words, the same on every binary that has more than one: **smoke** (minutes: did my change help or
 hurt), **sample** (a middle set, only where the full run is hours), **full** (everything the binary has).
 
-- **Tiers and jobs - reworked 2026-09-22.** The shape above was replaced by the maintainer's; the settled
-  form is [`findings.md`](findings.md) section 1. In short: a tier is a class-name prefix and a recipe, the
+- **Tiers and jobs - reworked 2026-09-22.** The shape above was replaced by the maintainer's. In short: a tier is a class-name prefix and a recipe, the
   job is the switch (`quick` on sample, `precise` on full), no plain-name aliases, no categories, no script.
   Measured 2026-09-21 on the BDN 0.15.8 source: the default job is 13-20 s per case whatever the method
   costs, `short` about 5 s. `short` keeps Mean and Ratio; it widens Error and RatioSD, so a finding that
@@ -117,7 +116,7 @@ real data is enough, and it reads in the same table as the real packs.
 `Decode`; both `Synthetic*` classes and `SyntheticBenchmarkBase` go. Rows `Protobuf` (baseline), `ViPaq_Row`,
 `ViPaq_Columnar` - the size report's own words; today's `ViPaq_Col` / `ViPaq_Column` mismatch goes. Both
 layouts stay: the size README headlines columnar as the user's number, and whether it costs time is the one
-thing size cannot say. Step 14's `Json` row is encode only (`JsonEncoder` has no decode).
+thing size cannot say. A `Json` row would be encode only (`JsonEncoder` has no decode).
 
 | class | column | pack | why |
 |---|---|---|---|
@@ -152,7 +151,7 @@ Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7
       `just bench lib-algorithms-full` asks before it starts.
       **By eye** for the last: the maintainer runs it and says no.
 - [x] `grep -n "still shell scripts" justfile` is empty; `grep -n "benchmarks\." tooling/README.md` is empty.
-- [ ] The tooling shape in `findings.md` section 1 is settled and built: no `tooling/bench.run.sh`, no
+- [x] The tooling shape is settled and built: no `tooling/bench.run.sh`, no
       `[BenchmarkCategory]`, and a wrong job or an empty filter fails the recipe.
       `test ! -f tooling/bench.run.sh && ! grep -rq BenchmarkCategory lib/bench vipaq/bench --include=*.cs`,
       and `just bench lib-threshold-sample nothing-matches-this` exits non-zero.

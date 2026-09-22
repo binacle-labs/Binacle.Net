@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps
+description: Orchestrator - steps 1 to 12 landed; what is left is the rest of the findings from the review of steps 1 to 12, the fixes waiting on an answer, the results story, the provider names, and the first keepers. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer deletes the old bench files named in the findings file; the other findings can start now"
+waits-on: "the maintainer's smoke runs; the other findings can start now"
 horizon: next-release
 paths:
   - "shared/**"
@@ -20,12 +20,17 @@ one that points at every file in it.
 **Steps 1 to 11 landed 2026-09-20 to 2026-09-22 and their files are gone.** The three tests kernels became
 `Data` and `Testing` projects and `Binacle.Reporting`; both measure projects write `<slice>/results/`; the
 old vault stopped being current. Their lasting rules are in the general design record - the decision on
-the four project folders and the one on measured numbers. Step 12 is built, bar its tooling. Step 13, which
+the four project folders and the one on measured numbers. Step 12 is built, its tooling reworked 2026-09-22. Step 13, which
 converted the old `results/` folder, was dropped 2026-09-22 when the folder was deleted.
 
 - [`findings.md`](measured-results/findings.md) - what the 2026-09-22 reviews of steps 1 to 12 found: the
   bench tooling the maintainer wants reworked, what broke or checks less, text the moves made false, and
   drift from the shape. A finding leaves it when fixed; the file goes when empty.
+- [`fixes.md`](measured-results/fixes.md) - fixes that wait on the maintainer's answer, settled together with
+  the two plans below.
+- [`results-story.md`](measured-results/results-story.md) - the results READMEs as a story for a human.
+- [`consistent-provider-names.md`](measured-results/consistent-provider-names.md) - one naming rule for every
+  scenario provider in the Data and Testing projects.
 
 ## How a session works this plan
 
@@ -54,10 +59,11 @@ converted the old `results/` folder, was dropped 2026-09-22 when the folder was 
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. the tooling reworked 2026-09-22; open: the old files go | `test ! -f tooling/bench.run.sh` |
+| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. the tooling reworked 2026-09-22; open: the maintainer's smoke runs | `test ! -f tooling/bench.run.sh` |
 | 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, their benchmarks READMEs, and the bin-threshold finding | `test -f lib/results/benchmarks/README.md` |
 
 ## Done when
 
-- [ ] Step 14's last box is ticked, and the maintainer has deleted the folder and this file.
+- [ ] Step 14's last box is ticked, the four files above are done or deleted, and the maintainer has
+      deleted the folder and this file.
       **By eye.** There is nothing left to check once the file is gone; the step files carried the checks.

@@ -22,11 +22,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
-- file: consistent-provider-names.md
-  description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
-  state: proposed
-  waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
-  horizon: undecided
 - file: image-base-slimming.md
   description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
@@ -35,14 +30,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results.md
   description: "Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps"
   state: ready
-  waits-on: "the maintainer picks the bench tooling shape in the findings file; the other findings can start now"
+  waits-on: "the maintainer deletes the old bench files named in the findings file; the other findings can start now"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
-- file: results-story.md
-  description: "The results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
-  state: ready
-  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
-  horizon: undecided
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
@@ -111,18 +101,33 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/12-bench-split.md
   description: "Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone"
   state: ready
-  waits-on: "the maintainer picks the tooling shape in findings.md"
+  waits-on: "the maintainer deletes the old files named in findings.md section 1, and runs the smoke recipes"
   horizon: next-release
 - file: measured-results/14-first-keepers.md
   description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
   state: ready
   waits-on: "step 12's tooling rework, and a quiet machine for the threshold run"
   horizon: next-release
+- file: measured-results/consistent-provider-names.md
+  description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
+  state: proposed
+  waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
+  horizon: undecided
 - file: measured-results/findings.md
   description: "Findings from the 2026-09-22 reviews of steps 1 to 12 as landed - the bench tooling the maintainer wants reworked, what broke or lost coverage, what text is false, where the build drifted from the shape. A finding leaves here when it is fixed."
   state: ready
-  waits-on: "the maintainer picks the bench tooling shape; everything else can start now"
+  waits-on: "nothing - the bench tooling shape was picked and built 2026-09-22; the old files wait on the maintainer"
   horizon: now
+- file: measured-results/fixes.md
+  description: "Open fixes in the measure and bench tooling that wait on the maintainer's answer, settled together with the results story and the provider names"
+  state: proposed
+  waits-on: "the maintainer's answer on each item. horizon was set by an agent, strike it"
+  horizon: undecided
+- file: measured-results/results-story.md
+  description: "The results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
+  state: ready
+  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+  horizon: undecided
 ```
 
 ## Shared
@@ -161,6 +166,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Tooling
 
 ```yaml
+- file: tooling/just-recipes-cleanup.md
+  description: "The just modules get the fixes the bench module got - recipes listed in file order, a word checked by just before anything runs, short scripts folded back into their recipe, one way to name a private recipe"
+  state: proposed
+  waits-on: "a yes from the maintainer, item by item. State picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
 - file: tooling/linting.md
   description: "Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does."
   state: deferred

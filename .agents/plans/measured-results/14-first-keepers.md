@@ -1,7 +1,7 @@
 ---
 description: Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding
 state: ready
-waits-on: "step 12's tooling rework, and a quiet machine for the threshold run"
+waits-on: "a quiet machine for the threshold run"
 horizon: next-release
 paths: ["lib/bench/**", "vipaq/bench/**", "lib/results/benchmarks/**", "vipaq/results/benchmarks/**", ".agents/design/lib/findings.md", ".agents/docs/**"]
 ---
@@ -25,7 +25,7 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - `lib/results/benchmarks/README.md` and `vipaq/results/benchmarks/README.md`: the rule (Mean does not compare
   across files; Ratio and Allocated do, and for Loop vs Parallel only on the same core count) and the trace -
   one row per keeper: date, ruler, family, key ratio with its RatioSD, allocated. What the keepers say, as a
-  sentence for a person, is the results story, not this step.
+  sentence for a person, is not this step.
 - Keep a run when the ruler or the code changed, not because it ran. These are the first, so they are
   keepers by definition.
 - Two commits: the two classes; the keepers, their READMEs and the finding.
