@@ -251,7 +251,7 @@ just bench                               # the list, in tier order, each recipe 
 just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also lib-racing-, lib-threshold-, vipaq-smoke
 just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-racing-, lib-threshold-, vipaq-sample
 just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-threshold-full
-just bench lib-result-selection          # 22 cases, about 2 minutes; its one tier
+just bench lib-result-selection          # 22 cases, about 3 minutes; its one tier
 ```
 
 The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with `--filter`. Any other word

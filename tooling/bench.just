@@ -20,7 +20,7 @@ set no-exit-message := true
 default:
     @just --unsorted --list bench
 
-# FFD, WFD, BFD x v1, v2 on four scenarios: 48 cases, about 4 minutes
+# FFD, WFD, BFD x v1, v2 on four scenarios: 48 cases, about 6 minutes
 lib-algorithms-smoke: (lib-algorithms-run 'short' 'Smoke')
 
 # v1 against v2 per algorithm on 30 picked Bischoff problems: 360 cases, about 30 minutes with `quick`
@@ -60,7 +60,7 @@ lib-racing-sample: (lib-racing-run 'default' 'Sample')
 lib-racing-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Racing -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# Loop against Parallel at four item counts, both sets; and over bins 2, 3, 7 for FFD and BFD: 64 cases, about 5 minutes
+# Loop against Parallel at four item counts, both sets; and over bins 2, 3, 7 for FFD and BFD: 64 cases, about 8 minutes
 lib-threshold-smoke: (lib-threshold-run 'short' 'Smoke')
 
 # The whole item ladder for the sets, and bins 1-7 at three item counts: 128 cases, about 11 minutes with `quick`
@@ -90,14 +90,14 @@ lib-threshold-full mode='':
 lib-threshold-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Threshold -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 2 minutes. Its one tier
+# BestAlgorithm, BestBin, SmallestBin - v1 against v2: 22 cases, about 3 minutes. Its one tier
 lib-result-selection: (lib-result-selection-run 'short')
 
 [private]
 lib-result-selection-run job:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ResultSelection -- --job {{ job }} --filter '*'
 
-# Encode and Decode on three packs - protobuf against ViPaq's two layouts: 18 cases, about 2 minutes
+# Encode and Decode on three packs - protobuf against ViPaq's two layouts: 18 cases, about 3 minutes
 vipaq-smoke: (vipaq-run 'short' 'Smoke')
 
 # Encode, Decode on twelve packs, and CompressionCost: 84 cases, about 20 minutes; about 7 with `quick`

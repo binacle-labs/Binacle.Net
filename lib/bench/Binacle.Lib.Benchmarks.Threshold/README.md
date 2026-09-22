@@ -20,7 +20,7 @@ the evidence. Two families, both rows `Loop` (baseline) and `Parallel`, on the s
 ## 🛠️ How you use it
 
 ```
-just bench lib-threshold-smoke     # 64 cases, about 5 minutes: did my change help or hurt
+just bench lib-threshold-smoke     # 64 cases, about 8 minutes: did my change help or hurt
 just bench lib-threshold-sample    # 128 cases at the default job; `quick` is about 11 minutes
 just bench lib-threshold-full      # 704 cases at the short job, about 1 hour; `precise` is about 3
 ```

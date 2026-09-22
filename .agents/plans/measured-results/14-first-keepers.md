@@ -17,7 +17,8 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - `Json` joins protobuf as a row in `Binacle.ViPaq.Benchmarks` `Encode` (encode only - the encoder has no
   decode), using `JsonEncoder` from `Binacle.ViPaq.Testing`.
 - `just bench lib-algorithms-smoke` and `just bench vipaq-sample` - the maintainer's runs. The session copies each
-  report into its family folder as `<date>.md`.
+  report by hand from the project's `BenchmarkDotNet.Artifacts/results/` into its family folder as `<date>.md`;
+  nothing copies it yet.
 - `just bench lib-threshold-full precise` once, on a quiet machine, hours. The bin-parallelization question - does
   parallel bin processing pay, and from how many bins - gets its finding in the lib findings record with
   numbers, replacing "no finding yet". The algorithm-threshold family stays as the evidence for why parallel
@@ -34,7 +35,8 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 
 - Which machine is the ruler for the first keepers. Every BDN header records it, so the file does not; but
   the trace table's ruler column should say the same thing the same way for every row.
-- The scaling class's name under the `<Family>_<Operation>_<Variant>` rule.
+- The scaling class's tier and name. Since the 2026-09-22 rework a class name starts with its tier
+  (`Smoke_`, `Sample_`, `Full_`); six versions over 11 item counts is 66 cases.
 - Whether the 2026-07-17 racing reports still sit in a scratch folder on the maintainer's machine. If so,
   `racing/2026-07-17.md` is a keeper too.
 
@@ -47,6 +49,7 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - [ ] `ls lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.
 - [ ] `ls lib/results/benchmarks/threshold/` has a dated file for the bin family.
 - [ ] `grep -n "Bins_Packing" .agents/design/lib/findings.md` is a section with numbers, not "no finding yet".
-- [ ] Both `benchmarks/README.md` exist, and every keeper has a trace row.
+- [ ] Both `benchmarks/README.md` exist, and every keeper has a trace row. That also brings to life the
+      links in `lib/bench/README.md`, `vipaq/bench/README.md` and `tooling/bench.just`, dead until then.
       **By eye**, count the files and the rows.
 - [ ] Then the maintainer deletes this folder and the orchestrator.

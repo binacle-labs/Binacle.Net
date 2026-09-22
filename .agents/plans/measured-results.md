@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 12 landed; what is left is the rest of the findings from the review of steps 1 to 12, the fixes waiting on an answer, the results story, the provider names, and the first keepers. The maintainer commits between steps
+description: Orchestrator - steps 1 to 12 landed; what is left is step 12's smoke runs, the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer's smoke runs; the other findings can start now"
+waits-on: "the maintainer's smoke runs"
 horizon: next-release
 paths:
   - "shared/**"
@@ -23,9 +23,6 @@ old vault stopped being current. Their lasting rules are in the general design r
 the four project folders and the one on measured numbers. Step 12 is built, its tooling reworked 2026-09-22. Step 13, which
 converted the old `results/` folder, was dropped 2026-09-22 when the folder was deleted.
 
-- [`findings.md`](measured-results/findings.md) - what the 2026-09-22 reviews of steps 1 to 12 found: the
-  bench tooling the maintainer wants reworked, what broke or checks less, text the moves made false, and
-  drift from the shape. A finding leaves it when fixed; the file goes when empty.
 - [`fixes.md`](measured-results/fixes.md) - fixes that wait on the maintainer's answer, settled together with
   the two plans below.
 - [`results-story.md`](measured-results/results-story.md) - the results READMEs as a story for a human.

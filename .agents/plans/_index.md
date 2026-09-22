@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 12 landed; what is left is step 12's smoke runs, the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps"
   state: ready
-  waits-on: "the maintainer deletes the old bench files named in the findings file; the other findings can start now"
+  waits-on: "the maintainer's smoke runs"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -101,25 +101,20 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/12-bench-split.md
   description: "Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone"
   state: ready
-  waits-on: "the maintainer deletes the old files named in findings.md section 1, and runs the smoke recipes"
+  waits-on: "the maintainer runs the smoke recipes"
   horizon: next-release
 - file: measured-results/14-first-keepers.md
   description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
   state: ready
-  waits-on: "step 12's tooling rework, and a quiet machine for the threshold run"
+  waits-on: "a quiet machine for the threshold run"
   horizon: next-release
 - file: measured-results/consistent-provider-names.md
   description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
   state: proposed
   waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
   horizon: undecided
-- file: measured-results/findings.md
-  description: "Findings from the 2026-09-22 reviews of steps 1 to 12 as landed - the bench tooling the maintainer wants reworked, what broke or lost coverage, what text is false, where the build drifted from the shape. A finding leaves here when it is fixed."
-  state: ready
-  waits-on: "nothing - the bench tooling shape was picked and built 2026-09-22; the old files wait on the maintainer"
-  horizon: now
 - file: measured-results/fixes.md
-  description: "Open fixes in the measure and bench tooling that wait on the maintainer's answer, settled together with the results story and the provider names"
+  description: "Open fixes in the measure and bench tooling that wait on the maintainer's answer"
   state: proposed
   waits-on: "the maintainer's answer on each item. horizon was set by an agent, strike it"
   horizon: undecided

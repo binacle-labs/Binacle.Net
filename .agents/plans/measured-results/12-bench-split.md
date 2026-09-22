@@ -143,13 +143,14 @@ Encode 12 x 3 = 36, Decode 36, CompressionCost 2 x 6 = 12: **84 cases**, about 7
       shows one namespace per project.
 - [x] `grep -l "ManualConfig" lib/bench/*/Program.cs vipaq/bench/*/Program.cs` is empty, and
       `grep -l BenchmarkDotNet */test/*/*.csproj` lists only `shared/test/Binacle.Benchmarking`.
-- [x] `grep -rh "class Smoke_\|class Sample_\|class Full_" lib/bench --include=*.cs | wc -l` is 2 + 6 + 6 + 2 + 1 = 17,
+- [x] `grep -rh "class Smoke_\|class Sample_\|class Full_" lib/bench --include=*.cs | wc -l` is 18 (Algorithms: 6 per tier) + 3 (Racing) + 8 (Threshold) = 29,
       and `grep -rn "\[Params\|ParamsSource" lib/bench/Binacle.Lib.Benchmarks.Threshold --include=*.cs | grep -c ProcessorCount` is 0.
 - [x] `grep -c "Benchmarks\"" lib/src/Binacle.Lib/Binacle.Lib.csproj` is 0 and `grep -c "Benchmarks" vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj` is 1.
 - [x] `test -f tooling/bench.just && test ! -f tooling/benchmarks.lib.sh && test ! -f tooling/benchmarks.vipaq.sh`
-- [ ] `just bench` lists every binary and tier with its cost; `just bench lib-result-selection` runs to a report;
-      `just bench lib-algorithms-full` asks before it starts.
-      **By eye** for the last: the maintainer runs it and says no.
+- [x] `just bench` lists every binary and tier with its cost; `just bench lib-result-selection` runs to a report;
+      `just bench lib-algorithms-full` asks before it starts. Every smoke recipe runs once to a report.
+      Done 2026-09-23: the maintainer ran every smoke recipe and `lib-result-selection`; every report has the
+      planned case count and no failed case. `echo n | just bench lib-algorithms-full` stops at the question.
 - [x] `grep -n "still shell scripts" justfile` is empty; `grep -n "benchmarks\." tooling/README.md` is empty.
 - [x] The tooling shape is settled and built: no `tooling/bench.run.sh`, no
       `[BenchmarkCategory]`, and a wrong job or an empty filter fails the recipe.

@@ -19,7 +19,7 @@ iterator or a second pass back shows there first.
 just bench lib-result-selection
 ```
 
-22 cases, about two minutes at the `short` job - the methods are sub-microsecond, so a longer job buys
+22 cases, about three minutes at the `short` job - the methods are sub-microsecond, so a longer job buys
 nothing. The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
 
 ## ⚠️ What will bite you

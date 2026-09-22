@@ -14,3 +14,14 @@ paths: ["shared/test/Binacle.Reporting/**", "lib/results/**", "vipaq/results/**"
       files put there by hand.
       **Likely answer: do nothing.** Whatever reads the results reads files it knows by name, so a stale
       file nobody names is not read. Whoever removes a reporter deletes its file in the same change.
+- [ ] **`vipaq/results/encoded-size.md` is too big to read.** 1 MB, 4,644 rows: 2,322 packs, once per layout.
+      60% of it is the spaces that line up the columns, and the longest scenario name sets the width, so one
+      longer name rewrites every row. GitHub does not render it (checked 2026-09-23 on the pushed branch:
+      `richTextTruncated`, no table).
+      **Idea: split it by set and by layout.** Measured 2026-09-23: Bischoff is 2,100 packs, about 450 KB per
+      layout today; custom problems and demo samples together are 222, about 50 KB per layout. So Bischoff
+      would still be too big and needs splitting again, one file per thpack (300 rows, about 65 KB).
+- [ ] **Nothing moves a bench report to where it is kept.** A run writes its report into the project's own
+      `BenchmarkDotNet.Artifacts/results/`, which git ignores. The kept runs belong in
+      `<slice>/results/benchmarks/<family>/<date>.md`. Today that copy is by hand, and nothing does it: no
+      recipe, no script. Open: a recipe that copies a project's latest report there, dated, or stay by hand.

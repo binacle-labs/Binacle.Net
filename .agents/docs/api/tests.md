@@ -1,8 +1,8 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-09-19
-check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
+verified: 2026-09-23
+check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only endpoint folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
 paths:
@@ -20,13 +20,13 @@ Eight projects under `api/test/` — three integration suites, which this doc is
 | `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test cs_binacle-net-service-module_integration` |
 | `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
 | `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
-| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Logs/`, `Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
+| `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Cors/`, `Instance/`, `Logs/`, `Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, the three middlewares including `/_debug`, config validators | `just test cs_binacle-net-diagnostics-module_unit` |
 | `Binacle.Net.UIModule.UnitTests` | the applet list, the four page models, the error page | `just test cs_binacle-net-ui-module_unit` |
 | `Binacle.Net.ServiceModule.UnitTests` | ServiceModule config validators and policies, the password hasher, and `ConcurrentSortedDictionary` | `just test cs_binacle-net-service-module_unit` |
 
 The unit suites need no host and nothing brought up. `Binacle.Net.Kernel.UnitTests` is split by Kernel feature,
-each folder holding its own `Tests/` and `Providers/`.
+each folder holding a `Tests/` folder and, where needed, a `Providers/` folder or helper files.
 
 The two log processors are `BackgroundService`s and write real files, so `Logs/LogsHost.cs` gives them a
 throwaway content root. **`ExecuteAsync` does not start on the calling thread**, so `StartAsync` returning says
@@ -121,7 +121,7 @@ Each endpoint has up to two files. **Behavior** covers status codes, validation,
 **Scenario** replays the shared fixture cases (`$shared`) through the route and asserts the algorithm's answer.
 **The three `Presets` endpoints have a behavior file only** — `v3 Presets/List`, `v4 Presets/List` and
 `v4 Presets/Get`. They run no algorithm, so there is nothing for a scenario to assert, and they are the only
-three folders in the tree with one file.
+endpoint folders with one file. `Abstractions/` and `ExtensionMethods/` in each version also hold one file.
 
 **Two files sit at the root of `Tests/`, outside the version folders.** `SanityTests.cs`, and
 `CorsTests.cs` - four tests over the `CoreApi` policy: a preflight and a simple GET from a configured origin
@@ -138,17 +138,21 @@ Two consequences worth knowing:
 - `BinacleApi` and `PresetKeys` live in the root namespace, which is an ancestor of every test namespace, so
   they still resolve with no `using`.
 - `ScenarioResultExtensions` does **not** — it sits in `v{3,4}.ExtensionMethods`, a sibling. Every scenario
-  test needs `using Binacle.Net.IntegrationTests.v{3,4}.ExtensionMethods;` for `EvaluateResult`. **It is a
+  test that calls `EvaluateResult` needs `using Binacle.Net.IntegrationTests.v{3,4}.ExtensionMethods;`. **It is a
   different extension from `Binacle.Data`'s**: this one takes the request parameters as well, because the
   scenario's expected result is a map keyed by algorithm and the parameters say which algorithm ran
   (`$shared`). A test that needs the entry itself reaches it as
   `scenario.Result.For(request.Parameters.GetAlgorithm()!.Value)`.
 
 Scenario tests for the multi-bin endpoints send the scenario's single bin as a one-element list, so selection
-cannot change the answer and the result must match the single-bin endpoint's. The exceptions are the preset
-selecting endpoints (`pack/smallest-bin/{preset}`, `pack/best-bin/{preset}`, `fit/smallest-bin/{preset}`), whose bins
-come from config and cannot be reduced to one: they assert the selection invariant instead — if the scenario's
-own bin packs fully, the endpoint must return a fully packed result, and for smallest, in a bin no larger.
+cannot change the answer and the result must match the single-bin endpoint's. The exceptions post to a whole
+preset, whose bins come from config and cannot be reduced to one:
+
+- v3 `Fit/Pack ByPreset` and v4 `Fit/Pack PresetCompare` run the `custom-problems` preset and pick the
+  scenario's bin out of the results.
+- The preset selecting endpoints (`pack/smallest-bin/{preset}`, `pack/best-bin/{preset}`,
+  `fit/smallest-bin/{preset}`) assert the selection invariant instead - if the scenario's own bin packs fully,
+  the endpoint must return a fully packed result, and for smallest, in a bin no larger.
 
 ## Constants
 
@@ -174,18 +178,20 @@ scenario introduces a new bin, so the providers answer for it:
 `BinacleApi` builds both presets from `GetDistinctBins()`, so a test asserting on a preset reads the same
 source it was registered from and the two cannot drift.
 
-**Never write the bin list into a test.** `custom-problems` holds more than the three `60x40x…` bins —
-`600x400x300`, `50x50x50`, and others — which is easy to get wrong.
+**Never write the bin list into a test.** `custom-problems` holds five bins: the three `60x40x…`, `600x400x300` and
+`50x50x50` - which is easy to get wrong.
 
 ## Special bins
 
 The registered `special` preset has three bins, 60×40 footprint, heights 10/11/12:
 `special_bin_1` 60×40×10, `special_bin_2` 60×40×11, `special_bin_3` 60×40×12.
-`ListPresets` tests assert the preset contains these three.
+v4 `ListPresetsBehavior` asserts the preset holds these three, and v4 `GetPresetBehavior` checks `special`
+matches the list endpoint. v3's list tests do not touch `special`.
 
 `CreateSpecialRequest` request bodies differ by version (because the request shapes differ):
 
-- **v3** sends a `Bins` array of three: `special_bin_1` 10×40×60, `_2` 11×40×60, `_3` 12×40×60.
+- **v3 ByCustom** sends a `Bins` array of three: `special_bin_1` 10×40×60, `_2` 11×40×60, `_3` 12×40×60.
+- **v3 ByPreset** sends items only; the route names `special`.
 - **v4 custom-bin** (`Fit/CustomBin`, `Pack/CustomBin`) sends a single `Bin`:
   `{ ID = "special_bin", 10×40×60 }`.
 - **v4 preset-bin** (`Fit/PresetBin`) sends items only — the bin comes from the route, filled with
@@ -211,7 +217,8 @@ directly, or a `Results` list from the compare endpoints. Both base classes
 emptiness split.
 
 v4 adds `FitCompareRequest_Validate` / `PackCompareRequest_Validate` for the compare endpoints: 200, `Results`
-not empty, then the same per-entry asserts across every result.
+not empty, then per entry: fit compare repeats the fit asserts; pack compare checks only `Bin` and `AlgorithmUsed`, not
+the packed/unpacked split.
 
 ## Negative tests start from the typed request
 
@@ -232,7 +239,7 @@ naming policy, and assert the key is on the payload before replacing it:
 
 | Suite | Helper | Shape |
 |---|---|---|
-| core, `NegativeRequest.cs` at the project root | `Post_WithFieldValue_Returns_422UnprocessableContent` | `params string[]` of `nameof` segments, so any depth works - `nameof(FitPresetBinRequest.Parameters), nameof(OperationParameters.Algorithm)` |
+| core, `NegativeRequest.cs` at the project root | `Post_WithFieldValue_Returns_422UnprocessableContent`, reached through each base class's `RequestWithFieldValue_Returns_422UnprocessableContent` | the base class takes `params string[]` of `nameof` segments and passes the array on, so any depth works - `nameof(FitPresetBinRequest.Parameters), nameof(OperationParameters.Algorithm)` |
 | ServiceModule, `Endpoints/Admin/AdminEndpointsTestsBase.cs` | `SendWithFieldValueAsync` | one `nameof` and the HTTP verb; the contracts there are flat |
 
 Each version's `BehaviourTestsBase` forwards to `NegativeRequest` rather than holding its own copy, because v3
@@ -248,7 +255,8 @@ and assert nothing. `NegativeRequest` refuses one. That is not hypothetical: the
 these call sites missed five files, and this is what caught them.
 
 **Assert the body, not only the status.** Every negative test here has more than one route to its status code,
-so the helpers check the error key too - the 422 was right for a while when the key was not (`$api/decisions#D4`).
+so `NegativeRequest` checks the error key too. The ServiceModule helper returns the response and leaves
+that to the caller, and most callers check only the status - the 422 was right for a while when the key was not (`$api/decisions#D4`).
 
 **The set of enum fields is not written down anywhere.** `RequestEnumConverterTests`, one copy in
 `Binacle.Net.UnitTests` and one in `Binacle.Net.ServiceModule.UnitTests`, finds every nullable enum on every
@@ -265,9 +273,10 @@ covered the day it is added; nobody has to remember.
 - `Binacle.Net.ServiceModule.IntegrationTests/BinacleApi.cs` — `IAsyncLifetime`; enables ServiceModule via
   in-memory config (`SERVICE_MODULE=true`, an `AuthToken=NoLimiter::0` rate-limit rule, a connection string
   chosen by `ResolveTestInfrastructure()` from `BINACLE_TEST_INFRA`, JWT issuer and audience `"ForTestsOnly"`
-  with a separate 70-plus-character `TokenSecret`). `InitializeAsync` seeds an admin
-  (`DefaultAdminAccount`) and a known user; `NonExistentId = EF81C267-A003-44B8-AD89-4B48661C4AA5` is hard-coded.
+  with a separate 70-plus-character `TokenSecret`). `DefaultAdminAccount`, set in
+  `ConfigureTestServices`, makes the app seed an admin; `InitializeAsync` looks it up and creates a known user; `NonExistentId = EF81C267-A003-44B8-AD89-4B48661C4AA5` is hard-coded.
   Carries the same all-modules TODO. Tests that need their own account seed it per class through
   `EnsureAccountExists`, which takes an optional `AccountStatus` (default `Active`) so a suspended or inactive
   account can be seeded, or `EnsureAccountExistsWithSubscription` when the test needs one, and drop it again
-  through `EnsureAccountDoesNotExist`.
+  through `EnsureAccountDoesNotExist`, `EnsureAccountWithSubscriptionDoesNotExist`, or
+  `EnsureAccountWithUsernameDoesNotExist` by username.
