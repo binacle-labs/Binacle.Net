@@ -32,13 +32,10 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 ## Done 2026-09-23
 
 Every run the maintainer made that day was copied into `baseline/` by hand, because nothing was kept before:
-every smoke recipe, `lib-result-selection`, and `vipaq-sample`'s `Sample_Decode` and two `Sample_CompressionCost_*`
-classes. Each `baseline/README.md` lists what was copied: file, recipe, job, cases, and the machine.
+every smoke recipe, `lib-result-selection`, and all of `vipaq-sample`. Each `baseline/README.md` lists what was copied: file, recipe, job, cases, and the machine.
 
 ## The step
 
-- `Sample_Encode` joins `vipaq/results/benchmarks/baseline/encoding/` and its README's list once the
-  2026-09-23 `vipaq-sample` run finishes.
 - `lib/results/benchmarks/README.md` and `vipaq/results/benchmarks/README.md`: how to read the reports (Mean
   does not compare across files; Ratio and Allocated do, and Loop against Parallel only on the same core
   count), the shape above, and one row per entry: date, family, class, key ratio with its RatioSD, allocated.
@@ -66,8 +63,8 @@ maintainer's call of 2026-09-23: noted, left for later.
 
 ## Done when
 
-- [ ] `ls lib/results/benchmarks/baseline vipaq/results/benchmarks/baseline` lists every family, and
-      `ls vipaq/results/benchmarks/baseline/encoding` has `Sample_Encode.md`.
+- [x] `ls lib/results/benchmarks/baseline vipaq/results/benchmarks/baseline` lists every family, and
+      `ls vipaq/results/benchmarks/baseline/encoding` has `Sample_Encode.md`. Done 2026-09-23.
 - [ ] Both `benchmarks/README.md` exist, with a row for every file in `baseline/`, or pointing at the list in `baseline/README.md`. That also brings to life the
       links in `lib/bench/README.md`, `vipaq/bench/README.md` and `tooling/bench.just`, dead until then.
       **By eye**, count the files and the rows.

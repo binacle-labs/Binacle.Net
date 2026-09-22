@@ -21,8 +21,9 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 |---|---|---|---|
 | `encoding/Smoke_Encode.md` | `just bench vipaq-smoke` | short | 9 |
 | `encoding/Smoke_Decode.md` | `just bench vipaq-smoke` | short | 9 |
+| `encoding/Sample_Encode.md` | `just bench vipaq-sample` | default | 36 |
 | `encoding/Sample_Decode.md` | `just bench vipaq-sample` | default | 36 |
 | `encoding/Sample_CompressionCost_Encode.md` | `just bench vipaq-sample` | default | 6 |
 | `encoding/Sample_CompressionCost_Decode.md` | `just bench vipaq-sample` | default | 6 |
 
-Not here yet: `encoding/Sample_Encode.md`, from the same `vipaq-sample` run, still running at the copy.
+Every ViPaq bench class is here.
