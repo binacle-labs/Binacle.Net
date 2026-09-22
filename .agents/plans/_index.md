@@ -22,6 +22,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
+- file: consistent-provider-names.md
+  description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
+  state: proposed
+  waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
+  horizon: undecided
 - file: image-base-slimming.md
   description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
@@ -108,11 +113,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "the maintainer picks the tooling shape in findings.md"
   horizon: next-release
-- file: measured-results/13-convert-the-vault.md
-  description: "Step 13 - every old keeper lands under its family folder with a date and a line naming its real class; both benchmarks/README.md are written"
-  state: ready
-  waits-on: "step 12's gate"
-  horizon: next-release
 - file: measured-results/14-first-keepers.md
   description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
   state: ready
@@ -123,12 +123,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: ready
   waits-on: "the maintainer picks the bench tooling shape; everything else can start now"
   horizon: now
-- file: measured-results/results.md
-  description: "What is left of the measured-results shape - benchmark keepers dated per family with a README each, the old vault converted in, the scaling class and the JSON timing, then root results/ goes"
-  state: ready
-  waits-on: "the bench tooling rework in the findings file beside this one"
-  horizon: next-release
-  paths: ["results/**", "lib/bench/**", "vipaq/bench/**", "lib/results/benchmarks/**", "vipaq/results/benchmarks/**"]
 ```
 
 ## Shared

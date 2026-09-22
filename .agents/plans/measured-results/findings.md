@@ -87,12 +87,8 @@ deleted with its READMEs. What is left is in the code.
 
 ### Left in the code
 
-- [ ] The largest real pack is 365 items in `BischoffCuratedProvider.cs` (the FFD pack of thpack1_65) and 371
-      in `SyntheticDataProvider.cs` (the BFD pack). Pick one pack; name the column for what it is.
 - [ ] `ViPaqHeader.Read`, `IsCompressed` and `UncompressedByteCount` have no callers.
       `grep -rn "IsCompressed\|UncompressedByteCount\|ViPaqHeader.Read" vipaq --include=*.cs` hits only the definitions today.
-- [ ] `BischoffCuratedProblemsProvider.GetBenchmarkScenarios` - every sibling is `GetScenarioNames`.
-
 ### Found on the way, outside this plan
 
 - [ ] `.agents/docs/api/tests.md` has about ten claims the code does not back (one-file folders, the v3
@@ -108,11 +104,6 @@ deleted with its READMEs. What is left is in the code.
       `Scenario`, `CollectionScenario` and `ScenarioReader`. One copy needs a generic loader in `Binacle.Data`
       that takes the prefix and a read function. Merge, or record why two.
       `find shared/data lib/data -name ScenarioCollectionsProvider.cs -not -path "*/obj/*" | wc -l` is 1.
-- [ ] **The set-in-the-namespace rule was not applied to the curated picks.** The shape wanted
-      `Curated.BischoffSuite`; the tree has `BischoffCuratedProvider`, `CustomProblemsCuratedProvider`,
-      `BischoffCuratedProblemsProvider`. D9 now says only "the curated picks are in `ViPaq.Testing`", with no
-      reason for dropping the rule. The maintainer wants consistent names, 2026-09-22: rename, once the names
-      are agreed. **By eye.**
 ## 5. Small
 
 - [ ] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
@@ -142,8 +133,6 @@ deleted with its READMEs. What is left is in the code.
       `../results/benchmarks`, which step 14 creates. Dead until then.
 - [ ] `shared/test/Binacle.Reporting` and `shared/test/Binacle.Benchmarking` have no README; every sibling
       support project has one. The shared README covers both, which the rule allows. Judgement.
-- [ ] `just agents all` - `.agents/plans/_index.md` has no row for this file, and `.agents/docs/_index.md`
-      still describes lib/tests with the old wording. The maintainer's.
 
 ## Done when
 
