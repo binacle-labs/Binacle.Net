@@ -11,8 +11,7 @@ paths:
 # Commands
 
 Setup, running things, tests, coverage, the OpenAPI documents, the image build, the smoke suite, the agent
-indexes and the committed generated data are `just` recipes; only the benchmarks and the performance runs are
-still scripts in `tooling/`. All are run
+indexes, the committed generated data, the measured results and the benchmarks are all `just` recipes, run
 from the repo root. `just` with no arguments lists everything. For the `tooling/` directory anatomy (scripts,
 local compose, env, emulator state) see `$tooling`.
 
@@ -240,7 +239,6 @@ just measure            # list
 just measure lib        # Binacle.Lib.PackingEfficiency -> lib/results/
 just measure vipaq      # Binacle.ViPaq.EncodedSize     -> vipaq/results/
 just measure all
-just measure check      # all, then fail if either results/ changed
 ```
 
 ## Benchmarks

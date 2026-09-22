@@ -9,6 +9,9 @@ also_update:
   - lib/result-selection
 paths:
   - "lib/test/**"
+  - "lib/measure/**"
+  - "lib/bench/**"
+  - "shared/test/Binacle.Benchmarking/**"
 
 ---
 
@@ -35,7 +38,8 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 ## Binacle.Lib.Testing
 
 The harness code the unit tests, the measure project and the bench projects share, imported globally
-(`<Using Include="Binacle.Lib.Testing" />` in each csproj). `Binacle.Lib` grants it friend access, because
+(`<Using Include="Binacle.Lib.Testing" />` in each csproj except `Binacle.Lib.Benchmarks.ResultSelection`, which
+references it and imports nothing). `Binacle.Lib` grants it friend access, because
 it constructs the internal algorithm classes.
 
 - `AlgorithmFactories.cs` defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
@@ -51,8 +55,8 @@ it constructs the internal algorithm classes.
 - `Providers/` — the benchmark picks. `SmokeProblemsProvider` (the four smoke scenarios by name: `full bin, one type`,
   `small order`, `typical container`, `most item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
   `<category> (<id>)`), `BischoffCuratedProblemsProvider` (five scenarios keyed `typical container`, `BFD wins big`,
-  `near tie`, `WFD falls over`, `most item types` — Racing reads the keys), `CubeScalingProblemsProvider`,
-  `SpecializedScalingProblemsProvider` (the ladders the threshold project climbs).
+  `near tie`, `WFD falls over`, `most item types` — Racing reads the keys), `CubeScalingProblemsProvider` (one
+  cube baseline, `GetBaseline`), `SpecializedScalingProblemsProvider` (the ladders the threshold project climbs).
 
 ## Binacle.Lib.UnitTests
 
@@ -111,12 +115,11 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 ## Binacle.Lib.PackingEfficiency
 
 Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs the 700 Bischoff-suite scenarios
-with all six algorithm versions once and fills `PackingBag`; three `IReporter`s read the bag and each writes one
-file under `lib/results/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `ReadmeReporter`
-(`README.md`, the summaries), `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
+with all six algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
+file under `lib/results/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
 the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, only rows where v1 and v2
-differ). `ResultFiles` holds the three `ResultFile`s and the shared header sentence. Not pass/fail; a change is
-a diff.
+differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. `lib/results/README.md` is
+written by hand, not by the harness. Not pass/fail; a change is a diff.
 
 ## Binacle.Lib.Benchmarks.Algorithms
 

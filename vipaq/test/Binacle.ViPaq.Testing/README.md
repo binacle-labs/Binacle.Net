@@ -1,6 +1,6 @@
 # Binacle.ViPaq.Testing
 
-What the ViPaq benchmarks and performance tests share and nothing else needs: the harness's own encoders and
+What the ViPaq measure and bench projects share and nothing else needs: the harness's own encoders and
 the scenarios it picks. Not a test project: nothing in it asserts on its own, and no test SDK is referenced.
 The unit tests never reference it - they are the spec gate and must not lean on a rival encoder.
 
@@ -31,7 +31,8 @@ var header = ViPaqHeader.Create(scenario, EncoderInfo.RowMajor);
 ## ⚠️ What will bite you
 
 `ViPaqEncoder` drives internals of `Binacle.ViPaq`, so this project is a friend of it. A stale curated pick
-fails in `CuratedPicksCheck` before any benchmark runs, not inside one.
+fails in `CuratedPicksCheck` when `just measure vipaq` runs, before any report is written. The benchmarks do
+not run that check, so there a stale pick fails inside the run.
 
 Never use the synthetic scenarios for size or compression. Random data has nothing for a codec to grip, so it
 reports the opposite of real behaviour.

@@ -28,11 +28,16 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - measured results get a home in each slice, and the three tests kernels become Data and Testing projects first. Fourteen steps, one file each, the maintainer commits between them"
+  description: "Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps"
   state: ready
-  waits-on: "nothing - shape agreed 2026-09-19. Step 1 can start; each step settles its open details with the maintainer before it touches a file"
+  waits-on: "the maintainer picks the bench tooling shape in the findings file; the other findings can start now"
   horizon: next-release
-  paths: ["shared/**", "lib/**", "vipaq/**", "api/test/**", "tooling/**", "results/**", ".agents/**", "Binacle.Net.slnx", "Directory.Build.props", ".netconfig", ".gitignore", "justfile"]
+  paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
+- file: results-story.md
+  description: "The results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
+  state: ready
+  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+  horizon: undecided
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
@@ -98,65 +103,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/01-binacle-data.md
-  description: "Step 1 - shared/test/Binacle.TestsKernel becomes shared/data/Binacle.Data with one reader that takes an Assembly; then demo-samples gets a provider and its own tests"
-  state: ready
-  waits-on: "nothing - first step"
-  horizon: next-release
-- file: measured-results/02-binacle-lib-data.md
-  description: "Step 2 - lib/test/Binacle.Lib.TestsKernel becomes lib/data/Binacle.Lib.Data and uses the one reader"
-  state: ready
-  waits-on: "step 1's gate"
-  horizon: next-release
-- file: measured-results/03-binacle-lib-testing.md
-  description: "Step 3 - new Binacle.Lib.Testing takes the factories, the checks and the benchmark providers; Binacle.Data names no result type after it"
-  state: ready
-  waits-on: "step 2's gate"
-  horizon: next-release
-- file: measured-results/04-binacle-vipaq-data-and-testing.md
-  description: "Step 4 - the ViPaq kernel splits into Binacle.ViPaq.Data (the packs) and Binacle.ViPaq.Testing (the encoders, the picks, the generator)"
-  state: ready
-  waits-on: "step 3's gate"
-  horizon: next-release
-- file: measured-results/05-binacle-reporting.md
-  description: "Step 5 - Binacle.TestReporting becomes Binacle.Reporting; small, may ride with step 4"
-  state: ready
-  waits-on: "step 4's gate"
-  horizon: next-release
-- file: measured-results/06-support-projects-record.md
-  description: "Step 6 - the folder rules go into the design record, the dependency docs are redrawn end to end, the shape file is deleted"
-  state: ready
-  waits-on: "step 5's gate"
-  horizon: next-release
-- file: measured-results/07-measure-projects.md
-  description: "Step 7 - both PerformanceTests projects move to <slice>/measure/ under their new names, point their writer at <slice>/results/, and get measure.just; the memory and D3 that said otherwise go the same day"
-  state: ready
-  waits-on: "step 6's gate"
-  horizon: next-release
-- file: measured-results/08-lib-packing-efficiency.md
-  description: "Step 8 - one run, many views - the lib runner packs every scenario once into a bag, one reporter per file writes the three files, the README holds the summaries"
-  state: ready
-  waits-on: "step 7's gate"
-  horizon: next-release
-- file: measured-results/09-vipaq-gates-and-json.md
-  description: "Step 9 - the two round-trip gates become unit tests over ViPaq.Data and run under just test; the curated-picks check stays in the measure project"
-  state: ready
-  waits-on: "step 8's gate"
-  horizon: next-release
-- file: measured-results/10-vipaq-encoded-size.md
-  description: "Step 10 - JSON and compact-notation encoders join protobuf, then the ViPaq runner and reporters write encoded-size.md with its text columns and the README with the largest-token line"
-  state: ready
-  waits-on: "step 9's gate"
-  horizon: next-release
-- file: measured-results/11-the-vault.md
-  description: "Step 11 - every doc, record and config line that named the vault is rewritten; results/ itself stays on disk until the new benchmarks have run"
-  state: ready
-  waits-on: "step 10's gate"
-  horizon: next-release
 - file: measured-results/12-bench-split.md
   description: "Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone"
   state: ready
-  waits-on: "step 11's gate"
+  waits-on: "the maintainer picks the tooling shape in findings.md"
   horizon: next-release
 - file: measured-results/13-convert-the-vault.md
   description: "Step 13 - every old keeper lands under its family folder with a date and a line naming its real class; both benchmarks/README.md are written"
@@ -164,16 +114,21 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "step 12's gate"
   horizon: next-release
 - file: measured-results/14-first-keepers.md
-  description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - and its finding"
+  description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
   state: ready
-  waits-on: "step 13's gate, and a quiet machine for the threshold run"
+  waits-on: "step 12's tooling rework, and a quiet machine for the threshold run"
   horizon: next-release
+- file: measured-results/findings.md
+  description: "Findings from the 2026-09-22 reviews of steps 1 to 12 as landed - the bench tooling the maintainer wants reworked, what broke or lost coverage, what text is false, where the build drifted from the shape. A finding leaves here when it is fixed."
+  state: ready
+  waits-on: "the maintainer picks the bench tooling shape; everything else can start now"
+  horizon: now
 - file: measured-results/results.md
-  description: "Measured results get a home in each slice, a harness that writes the verdict, benchmark projects split by question, two just recipes, and the old vault converted in"
+  description: "What is left of the measured-results shape - benchmark keepers dated per family with a README each, the old vault converted in, the scaling class and the JSON timing, then root results/ goes"
   state: ready
-  waits-on: "nothing - the reviewer pass landed 2026-09-19; the support projects (steps 1 to 6 of the orchestrator) go first"
+  waits-on: "the bench tooling rework in the findings file beside this one"
   horizon: next-release
-  paths: ["tooling/**", "results/**", "lib/**", "vipaq/**", "shared/test/**"]
+  paths: ["results/**", "lib/bench/**", "vipaq/bench/**", "lib/results/benchmarks/**", "vipaq/results/benchmarks/**"]
 ```
 
 ## Shared

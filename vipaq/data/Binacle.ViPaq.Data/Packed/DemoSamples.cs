@@ -14,7 +14,7 @@ public static class DemoSamples
 	{
 		foreach (var scenario in PackedDataReader.Read(Family))
 		{
-			// See BischoffDataProvider: the name's algorithm suffix is what keeps the three algorithms apart.
+			// See BischoffSuite: the name's algorithm suffix is what keeps the three algorithms apart.
 			scenarios.Add(scenario.Name, scenario);
 		}
 	}

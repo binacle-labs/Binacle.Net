@@ -1,7 +1,8 @@
 # Bischoff Suite
 
 Converted **Bischoff & Ratcliff (BR)** container-loading instances, read through `Binacle.Data` by the lib
-algorithm tests and the api integration tests. Not used by ViPaq.
+tests, measure and bench projects and the api integration tests, and by the ViPaq packed-data generator, which
+packs them into `vipaq/data/packed/bischoff-suite/`.
 
 - **Source:** [`../or-library/`](../or-library/README.md) raw `thpack1..7.txt`.
 - **Origin:** E.E. Bischoff and M.S.W. Ratcliff, "Issues in the development of Approaches to Container

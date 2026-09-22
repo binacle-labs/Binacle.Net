@@ -1,21 +1,15 @@
 ---
-description: Orchestrator - measured results get a home in each slice, and the three tests kernels become Data and Testing projects first. Fourteen steps, one file each, the maintainer commits between them
+description: Orchestrator - steps 1 to 11 landed; what is left is the bench tooling rework, the findings from the review of steps 1 to 12, and the first keepers. The maintainer commits between steps
 state: ready
-waits-on: "nothing - shape agreed 2026-09-19. Step 1 can start; each step settles its open details with the maintainer before it touches a file"
+waits-on: "the maintainer picks the bench tooling shape in the findings file; the other findings can start now"
 horizon: next-release
 paths:
   - "shared/**"
   - "lib/**"
   - "vipaq/**"
-  - "api/test/**"
   - "tooling/**"
   - "results/**"
   - ".agents/**"
-  - "Binacle.Net.slnx"
-  - "Directory.Build.props"
-  - ".netconfig"
-  - ".gitignore"
-  - "justfile"
 ---
 
 # Measured results, and the projects that feed them
@@ -23,20 +17,15 @@ paths:
 One plan, too big for one file. The maintainer granted the topic folder on 2026-09-19; this file is the only
 one that points at every file in it.
 
-Two shapes, both settled, both in `measured-results/`:
+**Steps 1 to 11 landed 2026-09-20 to 2026-09-22 and their files are gone.** The three tests kernels became
+`Data` and `Testing` projects and `Binacle.Reporting`; both measure projects write `<slice>/results/`; the
+old vault stopped being current. Their lasting rules are in the general design record - the decision on
+the four project folders and the one on measured numbers. Step 12 is built, bar its tooling. Step 13, which
+converted the old `results/` folder, was dropped 2026-09-22 when the folder was deleted.
 
-- Support projects - the three tests kernels dissolved into a `Data` project per data folder, a `Testing`
-  project per slice and `Binacle.Reporting`. Steps 1 to 6, landed 2026-09-20; the shape file is gone and
-  its rules are the general design record's D9.
-- [`results.md`](measured-results/results.md) - deterministic numbers written by a harness into
-  `<slice>/results/`, timing keepers dated per family, one benchmark project per question with its tiers, two `just`
-  modules, the old vault converted in. Steps 7 to 14.
-
-Support projects go first because the bench split in step 12 multiplies every copy they remove.
-
-[`findings.md`](measured-results/findings.md) holds what the 2026-09-22 review of step 12 found: the tooling
-the maintainer wants reworked (no shell script, no BenchmarkDotNet categories), what must be fixed before the
-commit, and what can wait. A finding leaves it when fixed; the file goes when empty.
+- [`findings.md`](measured-results/findings.md) - what the 2026-09-22 reviews of steps 1 to 12 found: the
+  bench tooling the maintainer wants reworked, what broke or checks less, text the moves made false, and
+  drift from the shape. A finding leaves it when fixed; the file goes when empty.
 
 ## How a session works this plan
 
@@ -65,20 +54,8 @@ commit, and what can wait. A finding leaves it when fixed; the file goes when em
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 1 | [01-binacle-data](measured-results/01-binacle-data.md) | `shared/test/Binacle.TestsKernel` becomes `shared/data/Binacle.Data`, one reader; then demo-samples gets a provider and tests | `test -d shared/data/Binacle.Data` |
-| 2 | [02-binacle-lib-data](measured-results/02-binacle-lib-data.md) | `lib/test/Binacle.Lib.TestsKernel` becomes `lib/data/Binacle.Lib.Data`, no reader of its own | `test -d lib/data/Binacle.Lib.Data` |
-| 3 | [03-binacle-lib-testing](measured-results/03-binacle-lib-testing.md) | new `Binacle.Lib.Testing` takes the factories, the checks, the providers; `Binacle.Data` keeps only interfaces and enums from `Packing` | `test -d lib/test/Binacle.Lib.Testing` |
-| 4 | [04-binacle-vipaq-data-and-testing](measured-results/04-binacle-vipaq-data-and-testing.md) | the ViPaq kernel splits into `Binacle.ViPaq.Data` and `Binacle.ViPaq.Testing` | `test -d vipaq/data/Binacle.ViPaq.Data` |
-| 5 | [05-binacle-reporting](measured-results/05-binacle-reporting.md) | `Binacle.TestReporting` becomes `Binacle.Reporting` - small | `test -d shared/test/Binacle.Reporting` |
-| 6 | [06-support-projects-record](measured-results/06-support-projects-record.md) | the folder rules into the design record, the dependency docs redrawn, the shape file deleted | `test ! -f .agents/plans/measured-results/support-projects.md` |
-| 7 | [07-measure-projects](measured-results/07-measure-projects.md) | both PerformanceTests move to `<slice>/measure/` under their new names, point at `<slice>/results/`, get `measure.just`; the memory and D3 go | `test -f tooling/measure.just` |
-| 8 | [08-lib-packing-efficiency](measured-results/08-lib-packing-efficiency.md) | one run, many views: the runner, the bag, the reporters, the three lib files | `test -f lib/results/version-parity.md` |
-| 9 | [09-vipaq-gates-and-json](measured-results/09-vipaq-gates-and-json.md) | the two round-trip gates become unit tests over `ViPaq.Data`; the curated check stays | `test ! -f vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/ReportPathRoundTripCheck.cs` |
-| 10 | [10-vipaq-encoded-size](measured-results/10-vipaq-encoded-size.md) | JSON and compact encoders join protobuf; the ViPaq runner and reporters, `encoded-size.md` with its text columns, the README | `test -f vipaq/results/encoded-size.md` |
-| 11 | [11-the-vault](measured-results/11-the-vault.md) | every doc and config line that named the vault is rewritten; `results/` itself stays until step 14 | `grep -rn "curated vault\|hand-curated" --include=*.md .agents \| grep -v _index.md \| wc -l` is 0 |
-| 12 | [12-bench-split](measured-results/12-bench-split.md) | five benchmark projects with their tiers, the config in `shared/test/Binacle.Benchmarking`, `bench.just`, the two benchmark scripts gone | `test -f tooling/bench.just && test ! -f tooling/benchmarks.lib.sh` |
-| 13 | [13-convert-the-vault](measured-results/13-convert-the-vault.md) | every old keeper under its family with a date and its real class; both `benchmarks/README.md` | `test -f lib/results/benchmarks/README.md` |
-| 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, and its finding; then root `results/` goes | `test ! -d results` |
+| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. Open: the tooling rework in the findings file | `test ! -f tooling/bench.run.sh` |
+| 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, their benchmarks READMEs, and the bin-threshold finding | `test -f lib/results/benchmarks/README.md` |
 
 ## Done when
 

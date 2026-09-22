@@ -11,7 +11,7 @@ worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) 
 | `Binacle.Lib.Benchmarks.Algorithms` | Is v2 of each packing algorithm still faster than v1, and on which problems? Three tiers - smoke, sample, full. See [its README](Binacle.Lib.Benchmarks.Algorithms/README.md). |
 | `Binacle.Lib.Benchmarks.Racing` | When `Best` races several algorithms on one bin, is parallel faster than one after the other? See [its README](Binacle.Lib.Benchmarks.Racing/README.md). |
 | `Binacle.Lib.Benchmarks.Threshold` | Should the parallel processors be wired up, and from what size? Two families, three tiers. See [its README](Binacle.Lib.Benchmarks.Threshold/README.md). |
-| `Binacle.Lib.Benchmarks.ResultSelection` | Is v2 of each result selector still faster and allocation-free against v1? See [its README](Binacle.Lib.Benchmarks.ResultSelection/README.md). |
+| `Binacle.Lib.Benchmarks.ResultSelection` | How does v2 of each result selector compare with v1, in time and allocations? See [its README](Binacle.Lib.Benchmarks.ResultSelection/README.md). |
 
 ## 🛠️ How you use it
 

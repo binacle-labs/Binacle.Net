@@ -1,7 +1,7 @@
 # Binacle.ViPaq.Data
 
 The packed results of `vipaq/data/packed` as C#. It embeds them and reads them into placed scenarios the ViPaq
-harnesses run against. Not a test project: nothing in it asserts, no test SDK is referenced, and it does not
+unit tests, measure and bench projects run against. Not a test project: nothing in it asserts, no test SDK is referenced, and it does not
 reference `Binacle.ViPaq` - it holds the inputs, not the encoders.
 
 ## 📂 What is in it

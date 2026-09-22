@@ -62,8 +62,10 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/src/Binacle.ViPaq/` | C# reference implementation |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror (`$vipaq/typescript`) |
 | `vipaq/test-vectors/` | Language-neutral vectors read by both suites |
-| `vipaq/test/` | C# unit tests, `Binacle.ViPaq.Testing` (the harness's encoders and picks), benchmarks |
+| `vipaq/test/` | C# unit tests and `Binacle.ViPaq.Testing` (the harness's encoders and picks) |
 | `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` — encodes every pack and writes `vipaq/results/` |
+| `vipaq/results/` | What `Binacle.ViPaq.EncodedSize` writes; a change is a diff |
+| `vipaq/bench/` | `Binacle.ViPaq.Benchmarks` — the timings |
 | `vipaq/tools/` | `VectorGenerators` (writes `test-vectors/`) and `PackedDataGenerator` (writes `data/packed/`) |
 | `vipaq/data/` | `packed/` — the frozen placed results, `bischoff-suite/`, `custom-problems/`, `demo-samples/` — and `Binacle.ViPaq.Data`, which embeds them |
 
@@ -71,7 +73,7 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 
 | Project | Covers |
 |---|---|
-| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, and all 2,322 real packs round-tripped in every public mode and at forced 16-bit widths; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
+| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, every real pack round-tripped in every public mode and under gzip, and every non-empty pack at forced 16-bit widths in every codec (an empty pack keeps 8-bit widths); internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
 | `vipaq/measure/Binacle.ViPaq.EncodedSize` | the `IPreReportCheck` gate — every curated benchmark pick still names a real scenario — then every pack's size in ViPaq, protobuf, JSON and compact notation, written to `vipaq/results/` |
 | `vipaq/bench/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings: `Encode`, `Decode` over the curated picks and the synthetic curve, `CompressionCost` — `just bench vipaq` |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |

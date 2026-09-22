@@ -11,10 +11,10 @@ format shows up as a diff.
 |---|---|
 | `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `vipaq/results/`; runs the gate first |
 | `PreReportChecks/` | The gate: every curated benchmark pick still names a real pack. A failure stops the run |
-| `EncodingRunner.cs` | Encodes 2,322 packs in every format and fills the bag |
+| `EncodingRunner.cs` | Encodes every pack in every format and fills the bag |
 | `EncodingBag.cs` | What the runner measured; every reporter reads from here |
-| `ResultFiles.cs` | The two files and the header sentence they open with |
-| `Reporters/` | One class per file: the README summaries, the per-pack rows |
+| `ResultFiles.cs` | The file and the header sentence it opens with |
+| `Reporters/` | One class per file: the per-pack rows |
 
 ## 🛠️ How you use it
 
@@ -28,5 +28,5 @@ caused it.
 
 ## ⚠️ What will bite you
 
-It overwrites the tracked files every run. Timings are not measured here - they belong in
+It overwrites the tracked files every run, except `README.md`, which is written by hand. Timings are not measured here - they belong in
 `vipaq/bench/Binacle.ViPaq.Benchmarks`.

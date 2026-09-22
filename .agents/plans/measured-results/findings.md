@@ -1,16 +1,25 @@
 ---
-description: Findings from the 2026-09-22 review of step 12 as landed - the tooling the maintainer wants reworked, what must be fixed before the commit, and what can wait. A finding leaves here when it is fixed.
+description: Findings from the 2026-09-22 reviews of steps 1 to 12 as landed - the bench tooling the maintainer wants reworked, what broke or lost coverage, what text is false, where the build drifted from the shape. A finding leaves here when it is fixed.
 state: ready
-waits-on: "the maintainer picks the tooling shape; the before-commit list can start now"
+waits-on: "the maintainer picks the bench tooling shape; everything else can start now"
 horizon: now
-paths: ["tooling/bench.just", "tooling/bench.run.sh", "lib/bench/**", "vipaq/bench/**", "shared/test/Binacle.Benchmarking/**", ".agents/docs/**"]
+paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", "artifacts/README.md", ".agents/docs/**", ".agents/design/**", ".agents/memory/**", "Directory.Build.props", "Directory.Packages.props"]
 ---
 
-# Step 12 - findings
+# Steps 1 to 12 - findings
 
-Every claim below was confirmed with `just -n` or a `--list` run on 2026-09-22; nothing was benchmarked.
+Two reviews on 2026-09-22: one of step 12 alone, then one of steps 1 to 12 against the shapes as first
+written (`git show f7a5698c:.agents/plans/measured-results/results.md`, and the support-projects shape before
+step 6 deleted it). Every claim was checked by grep, `just -n` or a script over the committed files. Nothing
+was built, run or benchmarked.
 
-## 1. The tooling gets reworked - the maintainer's call, 2026-09-22
+**Was the idea carried out? Yes.** Every step's gate passes. The project graph matches the support-projects
+shape and its three grep lines come back empty. Every number in `lib/results/README.md` and
+`vipaq/results/README.md` recomputes from the detail files. Every benchmark case count matches the step 12
+tables. What is wrong is below: one thing that stopped working, test coverage that got thinner, and a lot of
+text that the moves made false.
+
+## 1. The bench tooling gets reworked - the maintainer's call, 2026-09-22
 
 He does not want **the shell script** (`tooling/bench.run.sh`) and does not want **BenchmarkDotNet categories**
 (`[BenchmarkCategory]` on the classes, `--allCategories` from the recipes) as the way a tier or a word selects
@@ -25,8 +34,9 @@ What the review found wrong with the shape as built, each one a thing a user wil
 - **`job="short"` cannot be typed.** It is `just`'s display form of a positional default; `just bench vipaq
   job=short` passes the literal string `job=short`. Every doc that shows `job="short"` teaches the broken form:
   `lib/bench/Binacle.Lib.Benchmarks.Algorithms/README.md`, `.../Threshold/README.md`, `tooling/README.md`,
-  `.agents/docs/commands.md`, `.agents/docs/tooling/README.md`, `tooling/bench.just` itself. Only
-  `vipaq/bench/Binacle.ViPaq.Benchmarks/README.md` writes the working form, `just bench vipaq short`.
+  `.agents/docs/commands.md`, `.agents/docs/tooling/README.md`, `.agents/docs/lib/tests.md`,
+  `tooling/bench.just` itself. Only `vipaq/bench/Binacle.ViPaq.Benchmarks/README.md` writes the working form,
+  `just bench vipaq short`.
 - **Every mistake is silent.** BDN exits 0 on an invalid job ("The provided base job "ffd" is invalid"), on a
   filter that matches nothing, and on a parse error. `Program.cs` in all five projects drops what `Run`
   returns. So a wrong word runs nothing and the recipe reports success.
@@ -34,7 +44,7 @@ What the review found wrong with the shape as built, each one a thing a user wil
   Algorithms; in Racing and Threshold the algorithm is a column, in ResultSelection and vipaq there is none.
   `just bench lib-racing bfd` runs nothing, exits 0.
 - **`just bench` lists alphabetically**, so `lib-algorithms` (the alias, no cost in its comment) sits above
-  `-full`, `-sample`, `-smoke`, and `default` shows as a recipe.
+  `-full`, `-sample`, `-smoke`, and `default` shows as a recipe. `just measure` has the same fault.
 - Three recipe shapes for one job (`*words`, `job="default" *words`, an alias), one inline path where the
   rest use variables, 25 lines of bash to put `--allCategories` in front of a list, and the full recipe's
   `&&` body echoing its own comment.
@@ -50,67 +60,90 @@ default tier, the tier in the class name) and drops the script and the categorie
   precedent in `tests.just`: `BDN_JOB=short just bench vipaq`, `BDN_ARGS='--iterationTime 100' ...`.
 - Each recipe is one `dotnet run -c Release --project <path> -- --job <job> --filter <globs>` line, the way
   `measure.just` writes its runs. No script.
-- `default` lists with `--unsorted`, so the file order is the tier order.
+- `default` lists with `--unsorted`, so the file order is the tier order. Same for `measure.just`.
 - `Program.cs` exits 1 when `Run` returns nothing, so an invalid job or an empty filter fails the recipe.
+- Lessons from the earlier script-to-recipe conversions: a script that only wraps a tool is absorbed into
+  the recipe, not kept beside it; one module per job, and where two need the same few lines, copy them;
+  module recipes need `set working-directory := '..'`.
+- A misspelled curated id throws a `KeyNotFoundException` in `[GlobalSetup]`, in BDN's child process. BDN
+  marks the case NA and goes on, so this is silent today too. The exit code above should catch it: fail
+  when any report has a failed case, not only when there is no report.
 
-## 2. Before the commit
+## 2. Broken, or checking less than before
 
-- [ ] `lib/bench/README.md` says ResultSelection v2 is "allocation-free"; the report from 2026-09-22 shows
-      24 B on every v2 case. Drop the word.
-      `grep -n "allocation-free" lib/bench/README.md` is empty.
-- [ ] `.agents/docs/build-topology.md` was re-verified today but says 51 projects and "three benchmark
-      projects"; the slnx has 56 and there are five. Fix the counts or put `verified:` back to 2026-09-20.
-      `grep -c "<Project " Binacle.Net.slnx` matches the number in the doc.
-- [ ] `.agents/docs/shared/dependencies.md` lists `Binacle.Benchmarking`'s consumers as "Lib.Benchmarks,
-      Lib.Benchmarks.ResultSelection, ViPaq.Benchmarks" - the first does not exist and three are missing.
-      **By eye**, against `grep -rl Binacle.Benchmarking --include=*.csproj lib vipaq`.
-- [ ] `.agents/docs/README.md` says thirteen just modules and "the benchmark scripts", and that benchmarks
-      live under `lib/test/` and `vipaq/test/`. Fourteen, no scripts, `bench/`.
-      `grep -n "thirteen\|benchmark scripts\|lib/test/Binacle.Lib.Benchmarks" .agents/docs/README.md` is empty.
-- [ ] `.agents/design/vipaq/findings.md` still says in the present tense that the benchmarks fan out over
-      `UncompressedNames` and names `CuratedEncodeBenchmarks`; the history went into `check:` instead of the
-      body. A dated note in the body; `check:` says only what to confirm now.
-      `grep -n "UncompressedNames\|CuratedEncodeBenchmarks" .agents/design/vipaq/findings.md` hits only inside a dated note.
-- [ ] `lib/test/Binacle.Lib.Testing/README.md` says a provider gives "the core count"; `ConcurrencyProvider`
-      is gone.
-      `grep -n "core count" lib/test/Binacle.Lib.Testing/README.md` is empty.
-- [ ] Every `job="short"` in a doc or recipe comment becomes the form that works, or goes with the rework
-      (section 1).
-      `grep -rn 'job="short"' lib/bench vipaq/bench tooling .agents/docs` is empty.
-- [ ] `.agents/docs/commands.md` and `tooling/README.md` claim a `-flag` passes through on every recipe; it is
-      eaten on the three `job=` recipes. Say so, or fix it with the rework.
-      **By eye.**
-- [ ] `lib/bench/*/Properties/launchSettings.json` - four copies of the old project's profile, named
-      `Benchmarks`; the vipaq project has none. One `git rm` line for the four, the maintainer's.
-      `ls lib/bench/*/Properties 2>/dev/null | wc -l` is 0.
-- [ ] `lib/bench/Binacle.Lib.Benchmarks.ResultSelection/Binacle.Lib.Benchmarks.ResultSelection.csproj`
-      references `Binacle.Lib.Testing` and uses nothing from it.
-      `grep -c Binacle.Lib.Testing lib/bench/Binacle.Lib.Benchmarks.ResultSelection/*.csproj` is 0, and the project builds.
+Fixed 2026-09-22, and the ViPaq unit tests pass (7,379): the Sonar data exclusion; gzip and the compressed
+forced-width case in the real-pack round trip; a test that every pack family loads. `just measure check` was
+removed - `just measure` is a local tool, not a guard. The harness no longer writes the results READMEs; the
+story they should tell is written apart from it. No check was added for the report's own encoder or for the
+lib benchmark picks - the maintainer's call: no tests of the test harness. A misspelled pick shows through
+the exit code in section 1.
 
-## 3. Later
+Nothing is open here.
 
-- [ ] The smoke classes have one baseline, `FFD_v1`, so every row's Ratio is against FFD and "did my WFD
-      change help" is two Means read by eye. `CompressionCost` has one baseline, `Encode_NoOp`, so the
-      `Decode_*` rows get a Ratio against an encode. Fix: the orderer groups by params plus a key, and each
-      algorithm or direction carries its own baseline (BDN allows one per logical group).
-      **By eye** in a smoke report: a Ratio of 1.00 on `WFD_v1` and `BFD_v1` as well as `FFD_v1`.
-- [ ] `vipaq/test/Binacle.ViPaq.Testing/Providers/BischoffCuratedProvider.cs` calls the FFD pack of
-      thpack1_65 (365 items) `largest real pack`; the BFD pack of the same problem has 371. Rename the column
-      or pick the BFD pack.
-- [ ] `shared/test/Binacle.Benchmarking/AttributeOrderer.cs` has a comment naming `NoOfItems`, a param that
-      exists nowhere, and two that restate the code.
-- [ ] `.agents/docs/vipaq/dependencies.md` says two things about what the bench references: the tree line
-      says `Testing, ViPaq.Data (BenchmarkDotNet)`, the table says `Benchmarking`.
-- [ ] `Directory.Build.props` and `tooling/ci/sonar-analysis.xml` carry history comments naming "twelve
-      projects", `BestBin_ResultSelection`, "performance suites".
-- [ ] `vipaq/test/Binacle.ViPaq.Testing/README.md` says "benchmarks and performance tests"; the measure
-      project has had its name since step 7.
+## 3. Text the moves made false
+
+The `.agents` docs, design records, READMEs and comments were fixed 2026-09-22, and root `results/` was
+deleted with its READMEs. What is left is in the code.
+
+### Left in the code
+
+- [ ] The largest real pack is 365 items in `BischoffCuratedProvider.cs` (the FFD pack of thpack1_65) and 371
+      in `SyntheticDataProvider.cs` (the BFD pack). Pick one pack; name the column for what it is.
+- [ ] `ViPaqHeader.Read`, `IsCompressed` and `UncompressedByteCount` have no callers.
+      `grep -rn "IsCompressed\|UncompressedByteCount\|ViPaqHeader.Read" vipaq --include=*.cs` hits only the definitions today.
 - [ ] `BischoffCuratedProblemsProvider.GetBenchmarkScenarios` - every sibling is `GetScenarioNames`.
-- [ ] `just agents all` - `.agents/docs/_index.md` still describes lib/tests with the old wording. The
-      maintainer's.
-- [ ] Not a bug, a finding for `design/lib/findings.md`: the 2026-09-22 ResultSelection report shows
-      BestAlgorithm v2 1.4-1.7x slower than v1 on the two scenarios where v1 stops at the first full result.
-      Nanoseconds at three candidates; worth one line.
+
+### Found on the way, outside this plan
+
+- [ ] `.agents/docs/api/tests.md` has about ten claims the code does not back (one-file folders, the v3
+      ByPreset tests, which test asserts the special presets, `InitializeAsync`, `Kernel.UnitTests` folders,
+      `NegativeRequest`'s signature). Its `verified:` was left at 2026-09-19 so it still reads as unchecked.
+      Needs its own pass against `api/test/**`.
+
+## 4. Where the build drifted from the shape
+
+- [ ] **The loader above the shared reader is still two copies.** `ScenarioCollectionsProvider.cs` and
+      `MultipleScenarioCollectionsProvider.cs` in `shared/data/Binacle.Data` and in
+      `lib/data/Binacle.Lib.Data/ResultSelection` have the same code over different types: each set's own
+      `Scenario`, `CollectionScenario` and `ScenarioReader`. One copy needs a generic loader in `Binacle.Data`
+      that takes the prefix and a read function. Merge, or record why two.
+      `find shared/data lib/data -name ScenarioCollectionsProvider.cs -not -path "*/obj/*" | wc -l` is 1.
+- [ ] **The set-in-the-namespace rule was not applied to the curated picks.** The shape wanted
+      `Curated.BischoffSuite`; the tree has `BischoffCuratedProvider`, `CustomProblemsCuratedProvider`,
+      `BischoffCuratedProblemsProvider`. D9 now says only "the curated picks are in `ViPaq.Testing`", with no
+      reason for dropping the rule. The maintainer wants consistent names, 2026-09-22: rename, once the names
+      are agreed. **By eye.**
+## 5. Small
+
+- [ ] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
+      project). It still shows a sixth namespace, but never says which project holds it.
+- [ ] `version-parity.md` prints an empty table for FFD and WFD. A line saying "no difference" reads better.
+- [ ] `packing-efficiency.md` says Margin is "top fill minus the next one"; on a two-way tie it is the gap to
+      the third (thpack1_4: 0.19). The code comment in `Wins.cs` says it right; copy that wording.
+- [ ] `MarkdownFileWriter` only overwrites. A dropped reporter leaves its old file behind.
+- [ ] `vipaq/results/encoded-size.md` is 1 MB, about half of it column padding; one longer scenario name
+      rewrites all 4,644 rows. Whether GitHub renders it is not checked.
+- [ ] `lib-racing-smoke` says about 2 minutes; 40 cases at `short` is about 3.
+- [ ] Smoke's `most item types` pick (thpack7_56, 20 types) ties with all 100 thpack7 problems. The label
+      is true; the "why" should say it stands for the set.
+- [ ] The smoke classes have one baseline, `FFD_v1`, so every row's Ratio is against FFD. `CompressionCost`
+      has one baseline, `Encode_NoOp`, so the `Decode_*` rows get a Ratio against an encode; it also has no
+      `[BenchmarkOrder]`. Fix: each algorithm or direction carries its own baseline.
+      **By eye** in a smoke report: a Ratio of 1.00 on `WFD_v1` and `BFD_v1` as well as `FFD_v1`.
+- [ ] `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` references `Binacle.Lib.Testing` and uses nothing from
+      it. Removing it makes two lines false: `lib/test/Binacle.Lib.Testing/README.md` ("every project under
+      `lib/bench/` references it") and `.agents/docs/lib/dependencies.md`.
+      `grep -c Binacle.Lib.Testing lib/bench/Binacle.Lib.Benchmarks.ResultSelection/*.csproj` is 0.
+- [ ] `Properties/launchSettings.json` - four copies under `lib/bench/*` and one under
+      `lib/measure/Binacle.Lib.PackingEfficiency`, all old profiles. One `git rm` line, the maintainer's.
+      `ls lib/bench/*/Properties lib/measure/*/Properties 2>/dev/null | wc -l` is 0.
+- [ ] `Binacle.Lib`'s grant to `Binacle.Lib.PackingEfficiency` may be unused; only a build says.
+- [ ] `lib/bench/README.md`, `vipaq/bench/README.md` and a comment in `tooling/bench.just` link to
+      `../results/benchmarks`, which step 14 creates. Dead until then.
+- [ ] `shared/test/Binacle.Reporting` and `shared/test/Binacle.Benchmarking` have no README; every sibling
+      support project has one. The shared README covers both, which the rule allows. Judgement.
+- [ ] `just agents all` - `.agents/plans/_index.md` has no row for this file, and `.agents/docs/_index.md`
+      still describes lib/tests with the old wording. The maintainer's.
 
 ## Done when
 

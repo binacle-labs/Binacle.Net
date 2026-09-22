@@ -6,8 +6,8 @@ package binacle.vipaq.benchmarks;
 
 // The outside baseline. Same logical data ViPaq stores: a count, a bin, and placed items. No ids, no
 // extra fields, so the comparison is fair. This is a plain "row" message (each item carries its own
-// dimensions and coordinates). A columnar variant is only worth adding if we later want the harder,
-// smaller protobuf baseline (see the plan's open questions).
+// dimensions and coordinates). A columnar variant would be the harder, smaller protobuf baseline; there
+// is none yet.
 
 message Vec3 {
   uint32 length = 1;

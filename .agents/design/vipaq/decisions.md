@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-09-20
+verified: 2026-09-22
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -54,15 +54,21 @@ physical bins. **Done:** the old `ViPaqLimits.MaxInteger` (2⁵³−1) is gone �
 ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2 racing. Two mechanisms replace it:
 - **Protobuf is the in-run anchor** — `[Benchmark(Baseline = true)]`. ViPaq is reported as a *ratio* to protobuf,
   so a rerun on another machine/day stays comparable; the anchor absorbs environment drift.
-- **Committed result files are the recorded baseline** — `vipaq/results/encoded-size.md` and its README. A *win* = a
-  diff showing smaller base64 / lower ns / lower allocs **while the protobuf anchor is unchanged**. Small
-  increments; keep only measured wins.
-- **The measure project writes the tracked file, and a win is a diff** (2026-09-20). `Binacle.ViPaq.EncodedSize`
-  writes its reports straight into `vipaq/results/`; run it, read `git diff`, commit what changed. From
-  2026-07-14 to 2026-09-20 it wrote to a gitignored scratch folder and a keeper was copied into a root
+- **Committed result files are the recorded baseline, and a size win is a diff** (2026-09-20).
+  `Binacle.ViPaq.EncodedSize` writes `vipaq/results/encoded-size.md` and its README straight into
+  `vipaq/results/`; run it, read `git diff`, commit what changed. A win is smaller ViPaq base64 **while the
+  protobuf columns are unchanged**. Small increments; keep only measured wins. Timing is not in these files: it
+  is machine-bound, so a benchmark report is a keeper, not a diff (`$decisions#D10`). From 2026-07-14 to
+  2026-09-20 the measure project wrote to a gitignored scratch folder and a keeper was copied into a root
   `results/` vault by hand; the copy step was where reports went stale, so it went.
 
 ### D4 — The permanent harness uses only the minimal public API (CONFIRMED 2026-07-07)
+
+**As of 2026-09-22 the harness no longer goes through `ViPaqSerializer`.** The codec race (D5) has to force
+every mode, so `Testing`'s `ViPaqEncoder` takes the width choice from `Header.Create` and drives the internal
+`ProtocolEncoder` directly, through `InternalsVisibleTo`. What still holds from the record below: the header is
+read through the internal `Header`, never re-parsed, and no public member of `ViPaqHeader` names a wire type.
+
 The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Serialize`/`Deserialize` only — that is
 what makes the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
 re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `ViPaqHeader`
@@ -88,12 +94,13 @@ Two consequences of the public-API rule, both still true:
 ### D5 — The codec race lives in the harness, permanently (CONFIRMED 2026-07-07)
 - **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio, and *observes* the shipped
   compression crossover by sweeping item count.
-- **The codec race is part of it, permanently.** The harness encodes every scenario in each mode — `Raw`, `NoOp`,
-  and deflate/gzip across both layouts — and mirrors each codec onto protobuf. The sizes are in
-  `vipaq/results/encoded-size.md`, the summaries in its README.
+- **The codec race is part of it, permanently.** The harness encodes every scenario with each codec — raw (the
+  `NoOp` codec), deflate and gzip — in both layouts, and mirrors each codec onto protobuf. The sizes are in
+  `vipaq/results/encoded-size.md`.
 
 Why it belongs in the permanent ruler, not a throwaway — **the race is not only about the codec:**
-- It also settles **row-major vs columnar**, which is unmeasured and is a permanent harness concern.
+- It also settles **row-major vs columnar**, which was unmeasured when this was decided and is a permanent
+  harness concern.
 - It fixes a real bug. The harness would otherwise compare a **compressed** ViPaq token against **raw** protobuf,
   so the gap it prints is mostly the compression, not the format. Mirroring each codec onto protobuf is the fix —
   the ruler being honest, not an experiment.

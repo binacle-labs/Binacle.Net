@@ -2,7 +2,7 @@
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator).
 verified: 2026-09-22
-check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gate matches vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes named below
+check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gate matches vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes and codecs named below
 paths:
   - "vipaq/**"
 ---
@@ -43,10 +43,10 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │              │   │                  ▲          ▲
    │              │   │                  │          └── Binacle.ViPaq.EncodedSize  [IVT]  exe (vipaq/measure)
    │              │   │                  │                  refs: Testing, ViPaq.Data, Reporting
-   │              │   │                  │                  runs the curated-picks gate, writes vipaq/results/ (README.md, encoded-size.md)
+   │              │   │                  │                  runs the curated-picks gate, writes vipaq/results/encoded-size.md
    │              │   │                  │
    │              │   │                  └───────────────── Binacle.ViPaq.Benchmarks    [IVT]  exe (vipaq/bench)
-   │              │   │                                          refs: Testing, ViPaq.Data (BenchmarkDotNet)
+   │              │   │                                          refs: Testing, ViPaq.Data, Benchmarking
    │              │   │
    │              │   └── Binacle.ViPaq.VectorGenerators  [IVT]  tool exe — regenerates test-vectors/
    │              │           refs: ViPaq, CompactNotation, Reporting
@@ -67,7 +67,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, ViPaq.Data, CompactNotation | yes | spec/correctness — vectors + curated inputs, plus every real pack round-tripped |
 | `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,322 real packs as scenarios, one class per family |
 | `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders - ViPaq, protobuf, JSON, compact - and the curated and synthetic picks |
-| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks gate, then `README.md` and `encoded-size.md` into `vipaq/results/` |
+| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks gate, then `encoded-size.md` into `vipaq/results/` |
 | `Binacle.ViPaq.Benchmarks` | exe (`vipaq/bench`) | Testing, ViPaq.Data, Benchmarking | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
@@ -91,7 +91,8 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    caller would.
 
 4. **Two doors into the internal `ProtocolEncoder`** — and they stay apart: the UnitTests fixture
-   (`ProtocolTestingFixture`, curated/vector inputs) and `Testing`'s `ViPaqEncoder` (real-pack inputs).
+   (`ProtocolTestingFixture` - curated and vector inputs, and the real packs in the forced-width theory) and
+   `Testing`'s `ViPaqEncoder` (the harness's real-pack inputs).
    The UnitTests fixtures are split by which door a test goes through: `ProtocolTestingFixture` drives
    `ProtocolEncoder` (a header is an input, so a test can force a columnar or wider blob) and
    `ViPaqSerializerTestingFixture` drives the public `ViPaqSerializer` (which picks its own header).
@@ -111,15 +112,17 @@ runs it every time:
 
 | Theory | What it sweeps |
 |---|---|
-| `Serializer_Round_Trips_In_Every_Mode` | all 2,322 packs through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for. Gzip is harness-only and is not part of this |
-| `Forced_Sixteen_Bit_Widths_Round_Trip` | the same packs forced to 16-bit widths through `ProtocolTestingFixture`, which hands `ProtocolEncoder` a header, so the 16-bit read path is exercised on real data the serializer would never widen |
+| `Serializer_Round_Trips_In_Every_Mode` | all 2,322 packs through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for |
+| `Gzip_Round_Trips_In_Both_Layouts` | all 2,322 packs through `ProtocolEncoder` with the gzip codec × both layouts. The serializer never picks gzip, but the size report compares it, so it is tested |
+| `Forced_Sixteen_Bit_Widths_Round_Trip` | the non-empty packs forced to 16-bit widths through `ProtocolTestingFixture`, which hands `ProtocolEncoder` a header, × raw, deflate and gzip × both layouts, so the 16-bit read path is exercised on real data the serializer would never widen |
+| `Every_Family_Loads` | a fact, not a theory: each family has at least one pack. A family whose resources are misnamed loads empty and would add no rows to the theories above |
 
 The forced-width theory **skips the nine empty packs** — six in custom-problems, three in demo-samples: §4 keeps
 both item widths `Eight` for an empty pack, so a forced-wide empty blob is something `Encode` rejects by
 design. Bischoff has none.
 
-Both theories use one oracle: the two header bytes must decode back to the header the serializer must produce
-(`Header.FromBytes`, `Header.ByteCount` is 2) **and** the pack must decode back to the input
+All three theories use one oracle: the two header bytes must decode back to the expected header - the one the
+serializer must produce, or the forced one (`Header.FromBytes`, `Header.ByteCount` is 2) - **and** the pack must decode back to the input
 (`BinContents.AssertSame`). Compressed bytes are never compared.
 
 The one `IPreReportCheck` left in `Binacle.ViPaq.EncodedSize/PreReportChecks/` is `CuratedPicksCheck`: every

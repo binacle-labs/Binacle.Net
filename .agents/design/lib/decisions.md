@@ -95,8 +95,8 @@ internal, so the grant is needed either way; borrowing the type would add a depe
 Since 2026-09-20 `Binacle.Lib.Data` references `Binacle.Data` anyway, for its reader - the argument now rests
 on the constructor alone.
 
-**One embedded-resource reader, and the caller names the assembly. Superseded 2026-09-19.** Until then each
-kernel owned a copy, because `Assembly.GetExecutingAssembly()` inside a shared reader resolves to the shared
+**One embedded-resource reader, and the caller names the assembly (since 2026-09-19).** It replaced the
+per-kernel copies. Until then each kernel owned one, because `Assembly.GetExecutingAssembly()` inside a shared reader resolves to the shared
 assembly, which embeds nothing. `Binacle.Data`'s `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)`
 takes the assembly instead, so that failure cannot happen, and hands the manifest name back unsplit so each
 data project keeps its own name shape. `Binacle.Lib.Data` reads through it since 2026-09-20.

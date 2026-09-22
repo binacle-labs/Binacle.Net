@@ -21,7 +21,7 @@
 
        - Build output: bin/, obj/, artifacts/, and the site equivalents sites/*/js and sites/*/media
          (webpack bundles and copied assets). All gitignored, so CI never sees them anyway.
-       - Measured results: lib/results/, vipaq/results/ and the old results/ records. Markdown, not code.
+       - Measured results: lib/results/ and vipaq/results/. Markdown, not code.
        - Vendored: assets/lib/ and its build-time copies under sites/*/lib - alpine, beercss,
          material-dynamic-colors, swagger-ui. 8157 ncloc and 274 issues in the 2026-08-08 run, none ours to fix,
          and 2329 uncovered lines that were most of the missing coverage.
@@ -29,7 +29,9 @@
          vendor/bundle before the scan. 3524 ncloc and 65 issues in the 2026-08-27 run, including every one of
          the 8 open security findings and 12 of the 34 HIGH. They are other people's gems: the gate was failing
          on kramdown's html fixtures and on unpinned actions in http_parser.rb's own workflows.
-       - Not code: shared/data/ and vipaq/test-vectors/, the two fixture corpora. shared/data was the whole
+       - Not code: the fixture corpora - the set folders under shared/data/, vipaq/data/packed/,
+         lib/data/result-selection/ and vipaq/test-vectors/. Listed by folder because each data/ folder also
+         holds a C# project that reads the set, and that code is analysed. shared/data was the whole
          json=14010 slice of that run, 28% of the project measured as data files.
        - Not code: ruby/*/spec/fixtures/, the gems' own fixture sites. Broken on purpose - a rspec case named
          nasty.html exists to feed the parser a stray </script>, and Sonar reported it as a defect.
@@ -42,7 +44,7 @@
        attack surface in the repo - 5e5f8c02 was an XSS fix in one of them. Back in scope: 6 hand-written js,
        15 scss, and the site yml and json. Fixing them is still not a coding session's job (CLAUDE.md);
        findings go in a plan for the session that owns those files. -->
-  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,lib/results/**,vipaq/results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
+  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,lib/results/**,vipaq/results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/bischoff-suite/**,shared/data/custom-problems/**,shared/data/demo-samples/**,shared/data/or-library/**,vipaq/data/packed/**,lib/data/result-selection/**,vipaq/test-vectors/**</Property>
 
   <!-- One flat file per suite in artifacts/coverage/sonar, split by extension: .xml from the C# collector,
        .info from jest. tooling/tests.just is what writes them and the only place that knows the suite list.
@@ -78,7 +80,7 @@
        debt and stays visible. -->
   <Property Name="sonar.cpd.exclusions">lib/src/Binacle.Lib/Algorithms/**,api/src/Binacle.Net/v3/**</Property>
 
-  <!-- Build tooling, not shipped code. The .NET support projects (data, benchmarks, performance suites,
+  <!-- Build tooling, not shipped code. The .NET support projects (data, measure, bench,
        tools and the test support libraries) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
        that takes them out of the coverage denominator and off the product rule set in one move.
 

@@ -1,7 +1,8 @@
 # Custom Problems
 
-Hand-authored packing problems, read through `Binacle.Data` by the lib algorithm tests and the api integration
-tests. Not used by ViPaq.
+Hand-authored packing problems, read through `Binacle.Data` by the lib tests, measure and bench projects and the
+api integration tests, and by the ViPaq packed-data generator, which packs them into
+`vipaq/data/packed/custom-problems/`.
 
 Unlike the Bischoff suite these have no OR-Library origin. They are small, deliberately-shaped cases we
 wrote to cover specific behaviours (a box that just fits, a tight multi-item pack, and so on). Grouped into:

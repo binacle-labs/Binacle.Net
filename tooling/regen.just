@@ -29,7 +29,7 @@ default:
 # Run every generator
 all: or-lib-scenarios vipaq-packed-data vipaq-interop-vectors demo-samples
 
-# OR-Library text -> the tests-kernel scenarios in shared/data/bischoff-suite
+# OR-Library text -> the scenario JSON in shared/data/bischoff-suite
 or-lib-scenarios:
     dotnet run --project shared/tools/Binacle.OrLibrary.Converter
 

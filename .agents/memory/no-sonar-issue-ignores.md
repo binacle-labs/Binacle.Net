@@ -37,7 +37,7 @@ delegate hop (a test reaching its assert through a `Dictionary<Type, Action>` sh
 is the count, this paragraph is the reasoning. That jwt.io JWT;
 **S2245 "use a cryptographically strong RNG"** on `getRandomInt.ts`, not a security context, where swapping in
 `RandomNumberGenerator` to pick a demo box would be cargo cult (the rule is `scope: MAIN`, so the same finding
-in a benchmark or test kernel disappears once that project is marked as test code) - it was also marked on
+in a benchmark or test support project disappears once that project is marked as test code) - it was also marked on
 `SampleDataService`, which the UIModule rebuild deleted; and **S2068 "hard-coded credential"** on
 `AccountGetResponse`'s OpenAPI example, where `PasswordHash` is the literal `"type::hash::salt"` - it documents
 the *shape* of a stored hash, and the rule fires on the property name, so any literal there would trip it.

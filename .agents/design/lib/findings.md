@@ -23,7 +23,7 @@ below are far outside the noise.
 
 **These numbers cannot be re-checked from a clone.** BenchmarkDotNet writes to `BenchmarkDotNet.Artifacts/`,
 which `.gitignore` excludes, so the reports behind them exist only on the machine that ran them. The old
-hand-kept records are `results/lib/benchmarks/`, and their newest entry is `2025-02-10.md` — no keeper was ever
+hand-kept records under a root `results/` folder (removed 2026-09-22) ended at 2025-11; no keeper was ever
 curated in for this run. So what a later session can confirm is that the harness still races what is quoted here, not that a
 re-run would land on the same microseconds. Re-running is a day's work on a quiet machine, and the ratios are
 what the decisions rest on, not the absolute times.
@@ -34,7 +34,7 @@ renamed on 2026-09-22 to say what each problem is for; the problems did not chan
 (thpack2_30), WFD weakness is `WFD falls over` (thpack2_35), Max complexity is `most item types` (thpack7_56).
 
 Racing benchmarks run **one bin** and race algorithms against each other. They say nothing about running many
-**bins** in parallel — that is a different axis, covered by the `Parallelization` benchmark.
+**bins** in parallel — that is a different axis, covered by the `Bins_*` classes in `Binacle.Lib.Benchmarks.Threshold`.
 
 ## F1 — WFD roughly triples the cost of a race
 
@@ -78,8 +78,8 @@ same decision that makes parallelising it pointless.**
 
 Not measured here: `ParallelBinProcessor` (many bins at once), which scales with bin count rather than with
 the number of algorithms. That is the one that might matter, and it has no finding yet — though the harness
-for it is already written and waiting to be run (`BinParallelizationThreshold_Packing_v1` / `_v2` over
-`BinParallelizationThresholdBenchmarkBase`).
+for it is already written and waiting to be run (`Bins_Packing_v1` / `_v2` over `BinsBase`, in
+`Binacle.Lib.Benchmarks.Threshold`).
 
 ## Note — the cancellation-token guard has no measurable cost
 
@@ -93,6 +93,15 @@ every scenario the same way. This is run-to-run variance, not a regression.
 **Caveat:** these are two separate runs on different days, not a controlled A/B, and the machine was in use
 during the second. Within-run error is ~1%, so the ±2% moves are between-run variance. If a definitive answer
 is ever needed, stash the guard and run both back to back.
+
+## Note — BestAlgorithm v2 is slower than v1 where v1 stops early (2026-09-22)
+
+`Binacle.Lib.Benchmarks.ResultSelection`, ShortRun job, three candidates per scenario, same machine as above
+on .NET 10.0.12. v1 returns the first `FullyPacked` result; v2 scores every candidate. So where a full result
+exists v1 is faster: `one full winner` 4.4 ns vs 6.0 ns (1.37×), `all full, first wins` 3.6 ns vs 6.2 ns
+(1.74×). With no full result v1 sorts and v2 wins: `all partial` 24.9 ns vs 6.1 ns. v2 allocates 24 B on every
+case. These are nanoseconds on three candidates, noise next to a packing run. In the same run BestBin and
+SmallestBin v2 are 2.4-9× faster than v1.
 
 ## F3 — v3 fitting on the packing lineage matches the old fitting family
 

@@ -1,7 +1,7 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-09-20
+verified: 2026-09-22
 check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/encoded-size.md exists
 paths:
   - "vipaq/**"
@@ -121,7 +121,9 @@ with a `with` expression:
   at large coordinates, so the three sections genuinely disagree (Bischoff packs to `16/8/16`).
   With no items both item widths stay `Eight`, which is what §4 requires.
 - **Layout** — the caller's choice through `ViPaqSerializationOptions`, default `RowMajor`. Both codecs ship and
-  the header bit records which was used, so the default can change without a version bump.
+  the header bit records which was used, so the default can change without a version bump. Measured over
+  every real pack in `vipaq/results/encoded-size.md`: raw is the same length in both layouts, and under deflate or
+  gzip columnar is smaller on average.
 - **Compressed** — the caller's choice too, default off. Not decided by the library: encoding both ways and
   keeping the shorter blob costs a second compression on every call, and that cost is unmeasured, so the call
   is handed to whoever knows their own trade-off.
@@ -182,8 +184,5 @@ the two could silently disagree in a mode neither would choose on its own.
 
 ## Open — do not assume
 
-- **Does columnar actually pay?** Both layouts were raced against both codecs — `vipaq/results/README.md`
-  carries the codec × layout table and `encoded-size.md` has every pack per layout. `RowMajor` remains the
-  default; treat columnar as available and measured, not as the better choice.
 - **Whether the library should choose `Compressed` for you.** It does not. Encoding both ways and keeping the
   shorter blob is still unmeasured for encode time, so the decision stays with the caller.

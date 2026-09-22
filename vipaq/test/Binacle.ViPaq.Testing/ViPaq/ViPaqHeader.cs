@@ -1,7 +1,7 @@
 namespace Binacle.ViPaq.Testing.ViPaq;
 
-// What the harness needs to know about a token, read off its header: did ViPaq compress (so the harness can
-// mirror that on protobuf), which width did it pick, and what would the token have cost raw.
+// The header the harness hands `ProtocolEncoder` for a scenario in a forced mode, and the widths a report
+// prints from it.
 //
 // The library's own `Header` does the parsing and the size arithmetic; this only prints the answers. `Header`,
 // `Width` and `Layout` are internal, so they cannot appear on a public member here - which is why the library

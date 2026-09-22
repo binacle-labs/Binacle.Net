@@ -9,7 +9,7 @@ referenced. Nothing outside the lib slice reads it.
 | Path | What it is |
 |---|---|
 | `ResultSelection/BestAlgorithm/`, `BestBin/`, `SmallestBin/` | One `Scenarios` class per set - its keys and every scenario by name |
-| `ResultSelection/All.cs` | Every scenario of every set, by name |
+| `ResultSelection/ScenarioReader.cs`, `ScenarioCollectionsProvider.cs`, `MultipleScenarioCollectionsProvider.cs` | Read the embedded JSON of a set into scenarios, keyed by file |
 | `ResultSelection/Scenario.cs` | A named case: the candidate results and which one should win |
 | `ResultSelection/Helpers/` | The parsers for the compact `OperationResult` and `AlgorithmInfo` strings |
 

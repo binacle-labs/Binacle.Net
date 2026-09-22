@@ -8,10 +8,12 @@ items, it works out whether they fit (**fit**) and packs as many as it can (**pa
 | Path | What it is |
 |---|---|
 | `src/Binacle.Lib` | The algorithms, processors, and result building. The only project in `src`. |
-| `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's tests only. |
+| `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's unit tests and result-selection benchmark only. |
 | `data/Binacle.Lib.Data` | The project that embeds those fixtures and reads them into models - see [its README](data/Binacle.Lib.Data/README.md). |
 | `measure/Binacle.Lib.PackingEfficiency` | Packs every scenario with every algorithm and writes the numbers to `results/` - see [its README](measure/Binacle.Lib.PackingEfficiency/README.md). |
 | `bench/` | The timings, one BenchmarkDotNet project per question - see [its README](bench/README.md). |
+| `test/` | The unit tests, and `Binacle.Lib.Testing`, the harness code they share with `measure/` and `bench/` - see [its README](test/Binacle.Lib.Testing/README.md). |
+| `results/` | What `measure/` writes. Tracked, so a change in the numbers shows up as a diff - see [its README](results/README.md). |
 
 ## ⚙️ How it works
 

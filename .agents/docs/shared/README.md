@@ -20,17 +20,12 @@ paths:
 
 ## Who uses Binacle.Data
 
-Nine project references, all support, test, bench or measure projects:
+Only support, test, bench and measure projects; nothing in `src` references it, in any slice. The list of
+consumers is in `$shared/dependencies`.
 
-- `lib/test/Binacle.Lib.Testing`, `Binacle.Lib.UnitTests`
-- `lib/bench/Binacle.Lib.Benchmarks.Algorithms`, `.Racing`, `.Threshold` (not `.ResultSelection`, which reads `Lib.Data` only)
-- `lib/measure/Binacle.Lib.PackingEfficiency`
-- `api/test/Binacle.Net.IntegrationTests`
-- `lib/data/Binacle.Lib.Data` and `vipaq/data/Binacle.ViPaq.Data`, for the embedded-resource reader only
-
-`Binacle.Net.ServiceModule.IntegrationTests` and `vipaq/test/Binacle.ViPaq.UnitTests` do **not** use it —
-they have their own self-contained fixtures (ServiceModule) or use Bogus fakers (ViPaq). Nothing in `src`
-references it, in any slice.
+`Binacle.Net.ServiceModule.IntegrationTests` does **not** use it - its fixtures are its own.
+`vipaq/test/Binacle.ViPaq.UnitTests` has no direct reference either: it reads the real packs through
+`Binacle.ViPaq.Data`, which uses the reader here, and writes its other inputs by hand.
 
 ## One area
 

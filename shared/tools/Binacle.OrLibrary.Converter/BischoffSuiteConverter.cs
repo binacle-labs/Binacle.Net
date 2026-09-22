@@ -9,7 +9,7 @@ using Binacle.Reporting;
 
 namespace Binacle.OrLibrary.Converter;
 
-// Converts the raw OR-Library text (thpack1..7, the Bischoff & Ratcliff instances) into the tests-kernel
+// Converts the raw OR-Library text (thpack1..7, the Bischoff & Ratcliff instances) into the
 // bischoff-suite JSON, one file per thpack. thpack8 and thpack9 are NOT part of the Bischoff suite - different
 // sources, a different problem class - so they are left out.
 //

@@ -12,8 +12,8 @@ packer shows up as a diff.
 | `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/` |
 | `PackingRunner.cs` | Packs 700 scenarios with six algorithm versions and fills the bag |
 | `PackingBag.cs` | What the runner measured; every reporter reads from here |
-| `ResultFiles.cs` | The three files and the header sentence they open with |
-| `Reporters/` | One class per file: the README summaries, the per-scenario rows, the v1/v2 differences |
+| `ResultFiles.cs` | The two files and the header sentence they open with |
+| `Reporters/` | One class per file: the per-scenario rows, the v1/v2 differences |
 
 ## 🛠️ How you use it
 
@@ -26,5 +26,5 @@ Run it after touching an algorithm. A diff is the finding; commit it with the ch
 
 ## ⚠️ What will bite you
 
-It overwrites the tracked files every run. Timings are not measured here on purpose - they vary by machine
+It overwrites the tracked files every run, except `README.md`, which is written by hand. Timings are not measured here on purpose - they vary by machine
 and belong in `lib/bench/`.

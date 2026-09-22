@@ -40,9 +40,9 @@ Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Ru
 ### 📄 `Binacle.Reporting`
 
 The runner-and-reporter loop behind the measure projects. Register a bag, `IRunner`s, `IReporter`s and an
-`IFileWriter` in DI; `Measure` runs every runner, then every reporter, and writes one file per reporter.
-Used by `lib/measure/Binacle.Lib.PackingEfficiency`, `vipaq/measure/Binacle.ViPaq.EncodedSize` and every data
-generator under `shared/tools/` and `vipaq/tools/`. The reports it writes are the ones committed under [`results/`](../results).
+`IFileWriter` in DI; `Measure` runs every runner, then every reporter, and writes one file per `ResultFile`.
+Used by `lib/measure/Binacle.Lib.PackingEfficiency` and `vipaq/measure/Binacle.ViPaq.EncodedSize`. The data
+generators under `shared/tools/` and `vipaq/tools/` use only its `RepositoryRoot`. The reports it writes are the ones committed under `lib/results/` and `vipaq/results/`.
 
 ### ⏱️ `Binacle.Benchmarking`
 

@@ -40,14 +40,16 @@ Binacle.FluxResults              leaf — BCL only, no Binacle deps
 
 shared/data/Binacle.Data         the three scenario sets — Bischoff, custom-problems, demo-samples — and
    refs: Binacle.Packing, Binacle.CompactNotation                      the one embedded-resource reader
-   consumers: api IntegrationTests, the three lib/test projects, Lib.PackingEfficiency, Binacle.Lib.Data and
+   consumers: api IntegrationTests, Lib.Testing, Lib.UnitTests, Lib.PackingEfficiency,
+              Lib.Benchmarks.Algorithms, .Racing and .Threshold, and Binacle.Lib.Data and
               Binacle.ViPaq.Data (the reader only)
 
-Binacle.Reporting            leaf — markdown report writer, no Binacle deps
+Binacle.Reporting            leaf — the measure loop, markdown writer and RepositoryRoot; no Binacle deps
    consumers: Lib.PackingEfficiency, ViPaq.EncodedSize, both ViPaq generators, OrLibrary.Converter
 
 Binacle.Benchmarking         leaf — the BDN config and the order attribute; refs BenchmarkDotNet, no Binacle deps
-   consumers: every bench project (Lib.Benchmarks, Lib.Benchmarks.ResultSelection, ViPaq.Benchmarks)
+   consumers: every bench project (Lib.Benchmarks.Algorithms, .Racing, .ResultSelection, .Threshold,
+              ViPaq.Benchmarks)
 
 shared/tools/Binacle.OrLibrary.Converter   exe tool
    refs: Binacle.CompactNotation, Binacle.Packing, Binacle.Reporting
@@ -63,7 +65,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.Data` | packing result models, identity, status enums |
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
-| `Binacle.Reporting` | library | — | — | markdown report writer for the measure projects and the tools |
+| `Binacle.Reporting` | library | — | — | the measure loop and markdown writer for the measure projects; `RepositoryRoot` for them and the tools |
 | `Binacle.Benchmarking` | library | — (BenchmarkDotNet only) | — | `BenchmarkConfig.Create()` and `[BenchmarkOrder]` for every bench project; the only project that references BenchmarkDotNet |
 | `Binacle.Data` | library | Packing, CompactNotation | — | the three scenario sets + the reader; no harness code (see notes 3, 4) |
 | `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, Reporting | — | converts OR-Library benchmark data |
@@ -95,8 +97,8 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    already declares — `Binacle.Packing` granting to `Binacle.Lib.Data` records that the data project leans on
    Packing's internals, not that Packing leans on the data project.
 
-6. **`Binacle.Reporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
-   `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.
+6. **`Binacle.Reporting` has no Binacle deps** — safe for any measure project or tool to reference. It owns
+   `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the measure projects and the tools use.
 
 7. **`Binacle.FluxResults` came in from the retired FluxResults NuGet package**, v1.0.0. Same copyright
    holder, and **it keeps that package's MIT licence rather than the repository's** — it carries its own

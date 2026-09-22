@@ -25,8 +25,8 @@ on its own, but is not read until its key is in that set's `Scenarios.Keys`.
 using Binacle.Data.BischoffSuite;
 
 foreach (var scenario in Scenarios.GetScenarios()) { ... }
-Scenarios.GetScenarioByName("orlib_thpack1_1");
-All.GetScenarioByName("baseline_1");   // any set
+Scenarios.GetScenarioByName("OrLibrary_thpack1_1");
+All.GetScenarioByName("Complex_FitsInSmall_1");   // any set
 ```
 
 A file that reads one set imports that set's namespace and writes `Scenarios`. A file that reads two writes the

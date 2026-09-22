@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Binacle.ViPaq.Testing.Json;
 
-// The JSON a user's token replaces: the bin and the placed items, nothing else. Same field names as the API,
-// camelCase, no whitespace. No IDs, algorithm or percentages - the token does not carry those, so counting
+// A plain JSON that holds just enough to redraw the pack: the bin and the placed items, nothing else. A general
+// baseline, not the API's response - the field names are not the API's. camelCase, no whitespace. No IDs, algorithm or percentages - the token does not carry those, so counting
 // them would overstate what it saves. Text, not base64: JSON is already its stored form.
 public static class JsonEncoder
 {

@@ -16,7 +16,6 @@ internal class Program
 
 		builder.Services.AddSingleton<PackingBag>();
 		builder.Services.AddTransient<IRunner, PackingRunner>();
-		builder.Services.AddTransient<IReporter, ReadmeReporter>();
 		builder.Services.AddTransient<IReporter, PackingEfficiencyReporter>();
 		builder.Services.AddTransient<IReporter, VersionParityReporter>();
 		builder.Services.AddTransient<Measure>();

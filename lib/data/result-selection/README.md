@@ -11,7 +11,8 @@ of already-computed results and the one the selector is expected to choose. One 
 - `BestBin/` - pick the best bin.
 - `SmallestBin/` - pick the smallest bin that still fits.
 
-Each folder has a single `baseline.json` today, so coverage is thin; a new JSON file dropped in is picked up without registration.
+Each folder has a single `baseline.json` today, so coverage is thin. A new JSON file is embedded on its own, but
+is not read until its key is added to that set's `Scenarios.Keys` in `Binacle.Lib.Data`.
 
 ## 🧾 Format
 

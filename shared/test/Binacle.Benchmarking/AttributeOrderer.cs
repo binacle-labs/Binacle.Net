@@ -22,7 +22,6 @@ public class AttributeOrderer : IOrderer
 
 	public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, Summary summary)
 	{
-		// First group by the parameters, then order within the group by BenchmarkOrder
 		return benchmarksCases
 			.GroupBy(b => b.Parameters.DisplayInfo)
 			.SelectMany(group => group.OrderBy(b => GetBenchmarkOrder(b)));
@@ -34,12 +33,11 @@ public class AttributeOrderer : IOrderer
 			.GetCustomAttributes(typeof(BenchmarkOrderAttribute), false)
 			.FirstOrDefault() as BenchmarkOrderAttribute;
 
-		return orderAttr?.Order ?? int.MaxValue; // Default to the end if no order specified
+		return orderAttr?.Order ?? int.MaxValue;
 	}
 
 	public string? GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
 	{
-		// Group by parameter (NoOfItems)
 		return benchmarkCase.Parameters.DisplayInfo;
 	}
 

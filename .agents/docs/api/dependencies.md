@@ -1,7 +1,7 @@
 ---
 id: api/dependencies
 description: API slice dependency tree — Binacle.Net as composition root, the Kernel floor, the always-compiled modules (Diagnostics, Service, UI), the ServiceModule clean-architecture split, the eight test projects, and who sees internals.
-verified: 2026-09-19
+verified: 2026-09-22
 check: ProjectReference and InternalsVisibleTo entries in api/**/*.csproj match the graph, the table and the walls below, including every test project and the entry point's Using Include items
 paths:
   - "api/**"
@@ -27,7 +27,7 @@ Binacle.Net  (Web SDK, entry / composition root)
       │
       ├── ServiceModule            → Kernel, ServiceModule.Domain, ServiceModule.Infrastructure
       │      [IVT → ServiceModule.UnitTests, ServiceModule.IntegrationTests]
-      │        ├── ServiceModule.Infrastructure → Kernel, ServiceModule.Domain   [IVT → SM.IntegrationTests]
+      │        ├── ServiceModule.Infrastructure → Kernel, ServiceModule.Domain   [IVT → SM.UnitTests, SM.IntegrationTests]
       │        └── ServiceModule.Domain         → Binacle.FluxResults            [IVT → SM.IntegrationTests]
       │
       └── UIModule  (Razor SDK)    → Kernel
@@ -62,7 +62,7 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.IntegrationTests` | xUnit exe | Binacle.Net, Packing, Binacle.Data | Binacle.Net | v3/v4 HTTP tests |
 | `Binacle.Net.Kernel.UnitTests` | xUnit exe | Kernel | Kernel | Kernel units |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | xUnit exe | DiagnosticsModule | DiagnosticsModule | log/telemetry units |
-| `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule | auth/accounts units |
+| `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule, Infrastructure | auth/accounts units |
 | `Binacle.Net.ServiceModule.IntegrationTests` | xUnit exe | ServiceModule, Binacle.Net | Binacle.Net, ServiceModule, Domain, Infrastructure | auth + rate-limit tests |
 | `Binacle.Net.UIModule.UnitTests` | xUnit exe | UIModule | UIModule | page models, applet list, error page |
 | `Binacle.Net.UIModule.IntegrationTests` | xUnit exe | Binacle.Net | Binacle.Net | which routes answer with a page, demo on and off |

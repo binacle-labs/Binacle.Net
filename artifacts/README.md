@@ -11,6 +11,5 @@ Build output lands here, one folder per thing that produced it:
 
 These are build artifacts, not source. Do not edit by hand; they are regenerated on each build.
 
-Not to be confused with repo-root `results/`, which holds committed measured evidence - benchmark output and
-packing-efficiency reports, kept so a change can be diffed against a known baseline. Those are records that
-outlive a build; everything here is regenerated and gitignored.
+Not to be confused with `lib/results/` and `vipaq/results/`, which hold committed measured results, kept so a
+change shows up as a diff. Those outlive a build; everything here is regenerated and gitignored.

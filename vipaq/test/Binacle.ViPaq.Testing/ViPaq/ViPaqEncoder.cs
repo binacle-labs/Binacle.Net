@@ -4,9 +4,9 @@ using Binacle.ViPaq.Compression;
 namespace Binacle.ViPaq.Testing.ViPaq;
 
 // The harness's door into ViPaq for the codec race. It drives the blind `ProtocolEncoder` directly, because
-// `ViPaqSerializer.Serialize` fixes the mode at row-major and uncompressed and the race has to force every
-// mode. It borrows the width choice from `Header.Create` (reachable through InternalsVisibleTo), flips
-// `Compressed` and `Layout`, and hands the encoder the mode's codec. It never re-derives a width.
+// `ViPaqSerializer` only pairs the compressed bit with deflate, and the race also runs gzip and prices the raw
+// size through NoOp. It borrows the width choice from `Header.Create` (reachable through InternalsVisibleTo),
+// sets `Compressed` and `Layout`, and hands the encoder the mode's codec. It never re-derives a width.
 //
 // Every scenario is ushort. Base64 is the real stored form, so a report reads size off `ToBase64`, while
 // BenchmarkDotNet measures the raw bytes `Encode` hands back.

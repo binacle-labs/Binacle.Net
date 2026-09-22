@@ -1,8 +1,9 @@
 # Binacle.Lib.Testing
 
 What the lib suites, the measure project and the bench projects share and nothing else needs. Not a test
-project: nothing in it asserts on its own, and no test SDK is referenced. Every project under `lib/test/`,
-`lib/measure/` and `lib/bench/` references it and imports it globally.
+project: nothing in it asserts on its own, and no test SDK is referenced. Every other project under
+`lib/test/`, `lib/measure/` and `lib/bench/` references it, and all but `Binacle.Lib.Benchmarks.ResultSelection`
+import it globally.
 
 ## 📂 What is in it
 
@@ -12,7 +13,7 @@ project: nothing in it asserts on its own, and no test SDK is referenced. Every 
 | `TestAlgorithmFactory.cs`, `TestOperationParameters.cs` | The delegate the factories are, and the parameters a test hands to `Execute` |
 | `ScenarioChecks.cs` | `EvaluateResult` on a scenario's metrics and on its expected result - throws on mismatch |
 | `OperationResultExtensions.cs` | Volume and count totals over an `OperationResult` |
-| `Providers/` | The benchmark picks - the smoke four, the 30-problem Bischoff sample, the five curated Bischoff scenarios, the cube and specialized scaling baselines, the core count |
+| `Providers/` | The benchmark picks - the smoke four, the 30-problem Bischoff sample, the five curated Bischoff scenarios, one cube baseline, and the bin and item ladders the threshold project climbs |
 
 ## 🛠️ How you use it
 

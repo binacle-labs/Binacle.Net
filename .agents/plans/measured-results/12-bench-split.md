@@ -1,14 +1,14 @@
 ---
 description: Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone
 state: ready
-waits-on: "step 11's gate"
+waits-on: "the maintainer picks the tooling shape in findings.md"
 horizon: next-release
 paths: ["lib/**", "vipaq/**", "tooling/**", "Binacle.Net.slnx", "justfile"]
 ---
 
 # Step 12 - the bench split
 
-Shape: [results.md](results.md), "Benchmark projects" and "Recipes". Protocol: the orchestrator.
+Shape: the general design record, the decision on measured numbers. Open: the tooling rework in [findings.md](findings.md). Protocol: the orchestrator.
 
 ## The step
 
@@ -64,8 +64,8 @@ hurt), **sample** (a middle set, only where the full run is hours), **full** (ev
 
 ## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Algorithms`
 
-Every fill below is from `lib/results/packing-efficiency.md` on 2026-09-21; every timing claim from a file under
-`results/lib/benchmarks/`. Re-run the table, do not trust this list, if either changes.
+Every fill below is from `lib/results/packing-efficiency.md` on 2026-09-21; every timing claim from the old records
+under root `results/` (deleted 2026-09-22; git history holds them). Re-run the table, do not trust this list, if either changes.
 
 | tier | classes | cases | at `short` |
 |---|---|---|---|
@@ -151,13 +151,13 @@ format and `ExpectedResult` do not change. The unit tests read the same files an
 ## Settled 2026-09-21 - `Binacle.Lib.Benchmarks.Racing`
 
 The question: when `Best` races several algorithms on one bin, is parallel faster than one after the other
-(`design/lib/findings.md` F2, decision O1). Rows `Loop` (baseline) and `Parallel`. Classes `Packing_v1` and
+(the lib findings record on parallel algorithm racing, and the lib decision not to wire it up). Rows `Loop` (baseline) and `Parallel`. Classes `Packing_v1` and
 `Packing_v2` (one per algorithm factory; v1 carries the deleted-with-v1 comment). No Fitting class in this step.
 
-- **Two algorithm sets, not four.** D1 says production races exactly `FFD,BFD` (multi-bin routes) and
+- **Two algorithm sets, not four.** The lib decision on what `Best` races says production races exactly `FFD,BFD` (multi-bin routes) and
   `FFD,WFD,BFD` (single-bin routes). `BFD,WFD` and `FFD,WFD` never run in production and cannot change the
-  answer; their side note is already in F2.
-- **The five curated scenarios stay**, under their new names. F2 spreads them from 0.93x to 1.48x.
+  answer; their side note is already in the lib findings record.
+- **The five curated scenarios stay**, under their new names. The racing finding spreads them from 0.93x to 1.48x.
 - **`ProcessorCount` goes.** The parallel processor runs `Parallel.For` over the algorithms, so a race of N
   algorithms uses at most N threads and the set already decides it. BDN's header prints the machine's cores.
 
@@ -169,16 +169,16 @@ findings rest on ratios like 1.08, which `short` would blur.
 
 Two families, both `Loop` (baseline) vs `Parallel`, both on the synthetic ladder in
 `SpecializedScalingProblemsProvider`. Production uses `Loop` everywhere; these are the evidence for whether the
-parallel processors should be wired up, and from what size (`design/lib/findings.md` F2, decision O1).
+parallel processors should be wired up, and from what size (the lib findings record on parallel racing, and the lib decision not to wire it up).
 
-What the old `MultipleBins` records show (`results/lib/benchmarks/results_net*/`, ratios recomputed per
+What the old `MultipleBins` records showed (the November 2025 runs, since deleted; ratios recomputed per
 algorithm by script): Parallel is under 1.0 from 2 bins up on every machine - about 0.85 at 2 bins, 0.65 at 8,
 flat after. They measured 2, 8, 14 .. 38 bins on one fixed item set; never 1 bin, never 3-7, never a change in
 per-bin weight. The ladder covers exactly that gap. Per-bin weight moves the low end (2 bins: FFD 0.82, WFD
 0.60), so the bins family needs every bin count and only three item levels.
 
-- **Algorithm sets: `FFD,BFD` and `FFD,WFD,BFD` only** - the two production races (D1).
-- **Bins family: FFD and BFD only** - the multi-bin routes never run WFD (D1).
+- **Algorithm sets: `FFD,BFD` and `FFD,WFD,BFD` only** - the two production races.
+- **Bins family: FFD and BFD only** - the multi-bin routes never run WFD.
 - **`ProcessorCount` goes from both.** In `ParallelBinProcessor` it only sizes a dictionary and never reaches
   `Parallel.For`; the old param changed nothing.
 - **The ladder's steps**, from the provider's volume table: 47 items fits every bin, 59 overflows the smallest,

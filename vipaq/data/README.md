@@ -1,8 +1,8 @@
 # ViPaq data
 
-The frozen packing results the ViPaq harnesses measure against, and the project that reads them. They live
-here and not in `shared/data` because ViPaq is their only reader, and because they carry placed items with
-coordinates, which the shared scenario format does not.
+The frozen packing results the ViPaq unit tests, measure and bench projects run against, and the project that
+reads them. They live here and not in `shared/data` because ViPaq is their only reader, and because they carry
+placed items with coordinates, which the shared scenario format does not.
 
 | Folder | What it is |
 |---|---|

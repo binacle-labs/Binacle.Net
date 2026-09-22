@@ -18,7 +18,6 @@ internal class Program
 		builder.Services.AddPreReportChecks();
 		builder.Services.AddSingleton<EncodingBag>();
 		builder.Services.AddTransient<IRunner, EncodingRunner>();
-		builder.Services.AddTransient<IReporter, ReadmeReporter>();
 		builder.Services.AddTransient<IReporter, EncodedSizeReporter>();
 		builder.Services.AddTransient<Measure>();
 
