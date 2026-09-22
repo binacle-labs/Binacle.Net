@@ -1,7 +1,7 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions.
-verified: 2026-09-22
+verified: 2026-09-23
 check: lib/bench/Binacle.Lib.Benchmarks.Racing (Packing_v2, its BenchmarkBase) and the five keys in BischoffCuratedProblemsProvider (typical container, BFD wins big, near tie, WFD falls over, many item types) still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone. The numbers themselves are not re-checkable from the repo - see Environment.
 also_update:
   - lib/decisions
@@ -78,8 +78,29 @@ same decision that makes parallelising it pointless.**
 
 Not measured here: `ParallelBinProcessor` (many bins at once), which scales with bin count rather than with
 the number of algorithms. That is the one that might matter, and it has no finding yet — though the harness
-for it is already written and waiting to be run (`Bins_Packing_v1` / `_v2` over `BinsBase`, in
-`Binacle.Lib.Benchmarks.Threshold`).
+for it is already written and waiting to be run (`Full_Bins_Packing_v1` / `_v2` over `BinsBase`, in
+`Binacle.Lib.Benchmarks.Threshold`). The old records below point the same way but do not settle it.
+
+## Note — the old `MultipleBins` records (November 2025, records deleted)
+
+Kept here because the files are gone. Ratios were recomputed per algorithm by script on 2026-09-21.
+`Parallel` was under 1.0 from 2 bins up on every machine: about 0.85 at 2 bins, 0.65 at 8, flat after. Per-bin
+weight moves the low end (2 bins: FFD 0.82, WFD 0.60). The runs measured 2, 8, 14 .. 38 bins on one fixed item
+set - never 1 bin, never 3 to 7, never a change in per-bin weight. The Threshold bins family covers exactly
+that gap: every bin count 1 to 7 at three item levels.
+
+## Note — why the Threshold and Racing benches are shaped as they are (2026-09-21)
+
+- **Racing has no `ProcessorCount` parameter.** The parallel processor runs `Parallel.For` over the
+  algorithms, so a race of N algorithms uses at most N threads; the set already decides it. BDN's header
+  prints the machine's cores.
+- **Threshold keeps the algorithms family** though it is lighter than Racing everywhere (ladder max 79 items;
+  the lightest curated problem is 126), and old records over 10 to 202 items were flat at 0.85 to 1.0. It
+  covers the small-request end (demo samples: median 13 items) and the 67 -> 79 step, where the algorithms
+  take unequal time. 3 items is the one place `Parallel` loses: thread cost dominates.
+- **Full keeps the whole item ladder** though the extra points only interpolate, so one record of the curve
+  exists.
+- **Param names are what BDN prints** - there is no display attribute.
 
 ## Note — the cancellation-token guard has no measurable cost
 

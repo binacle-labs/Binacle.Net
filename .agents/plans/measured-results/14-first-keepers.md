@@ -17,8 +17,9 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - `Json` joins protobuf as a row in `Binacle.ViPaq.Benchmarks` `Encode` (encode only - the encoder has no
   decode), using `JsonEncoder` from `Binacle.ViPaq.Testing`.
 - `just bench lib-algorithms-smoke` and `just bench vipaq-sample` - the maintainer's runs. The session copies each
-  report by hand from the project's `BenchmarkDotNet.Artifacts/results/` into its family folder as `<date>.md`;
-  nothing copies it yet.
+  run's reports by hand from the project's `BenchmarkDotNet.Artifacts/results/` into its family folder, as a
+  dated folder of the files unchanged; nothing copies them yet. The 2026-09-23 runs wait in the artifacts
+  folders to be the first baseline once the final shape is in.
 - `just bench lib-threshold-full precise` once, on a quiet machine, hours. The bin-parallelization question - does
   parallel bin processing pay, and from how many bins - gets its finding in the lib findings record with
   numbers, replacing "no finding yet". The algorithm-threshold family stays as the evidence for why parallel
@@ -45,9 +46,9 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - [ ] `grep -rln "SpecializedScalingProblemsProvider" lib/bench/Binacle.Lib.Benchmarks.Algorithms --include=*.cs`
       names a class with an item-count `[Params]`.
 - [ ] `grep -rn "JsonEncoder" vipaq/bench/Binacle.ViPaq.Benchmarks --include=*.cs` hits.
-- [ ] `ls lib/results/benchmarks/algorithms/ vipaq/results/benchmarks/encoding/` each has a dated `.md`.
-- [ ] `ls lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.
-- [ ] `ls lib/results/benchmarks/threshold/` has a dated file for the bin family.
+- [ ] `ls lib/results/benchmarks/algorithms/ vipaq/results/benchmarks/encoding/` each has a dated folder.
+- [ ] `ls -R lib/results/benchmarks/algorithms/` has a file whose table has an item-count parameter column.
+- [ ] `ls lib/results/benchmarks/threshold/` has a dated folder with the bin family's report.
 - [ ] `grep -n "Bins_Packing" .agents/design/lib/findings.md` is a section with numbers, not "no finding yet".
 - [ ] Both `benchmarks/README.md` exist, and every keeper has a trace row. That also brings to life the
       links in `lib/bench/README.md`, `vipaq/bench/README.md` and `tooling/bench.just`, dead until then.

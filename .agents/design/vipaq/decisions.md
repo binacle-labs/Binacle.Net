@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-09-22
+verified: 2026-09-23
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -147,6 +147,9 @@ The two things we measure depend on different properties of the data.
 
 The contrast itself (synthetic inflates, real saves 45–68%) is a keep-it finding, not a bug.
 
+**Since 2026-09-22** the synthetic counts are 1,000, 5,000 and 65,535, and the timing classes run the raw path
+(`NoOpCodec`); what compression costs is timed alone, in the two `Sample_CompressionCost_*` classes.
+
 ### D10 — ViPaq test kernel owns its file plumbing; no shared TestFiles (CONFIRMED 2026-07-09, SUPERSEDED 2026-09-19)
 **Superseded.** `shared/data/Binacle.Data` now holds one reader, `EmbeddedResourceFileProvider.ByPrefix(assembly,
 prefix)`, that takes the assembly to read from and hands the manifest name back unsplit. That is the shape this
@@ -258,6 +261,17 @@ sentence closes that door for one library. `Binacle.ViPaq.Data` is open - the pa
 
 Before 2026-09-20 the doc said "UnitTests never references the kernel", which also shut out the data, because
 the packs and the encoders were one project.
+
+### D19 — One bench project, one synthetic curve (2026-09-21)
+- **One project, `vipaq/bench/Binacle.ViPaq.Benchmarks`.** Splitting it builds no wall: size is written by
+  `Binacle.ViPaq.EncodedSize`, which never touches the synthetic provider; BDN only writes time and bytes to
+  its own folder; and both halves would reference `Binacle.ViPaq.Testing` anyway.
+- **One synthetic curve is enough.** The encoder is a per-item loop, so cost is linear by construction; the
+  curve runs past the real data (median 79 items, max 371) to the format's limit. 2,000 was dropped, and the
+  8-item real pack, which says the same as the 16-item one a step apart.
+- **No `Json` timing row yet.** It could only time encode: the test `JsonEncoder` has no decode.
+- **The production path is `Protobuf` against `ViPaq_Row`.** The api only encodes, row-major, uncompressed;
+  decoding happens in the browser.
 
 ## Open — decide with data
 

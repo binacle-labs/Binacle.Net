@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 12 landed; what is left is step 12's smoke runs, the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 12 landed; what is left is the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps"
   state: ready
-  waits-on: "the maintainer's smoke runs"
+  waits-on: "the maintainer's answers in the fixes file, and step 14's open details"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -98,11 +98,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/12-bench-split.md
-  description: "Step 12 - one benchmark project per question, five of them, each with its tiers and scenarios settled, the config in shared/test/Binacle.Benchmarking, bench.just, the two benchmark scripts gone"
-  state: ready
-  waits-on: "the maintainer runs the smoke recipes"
-  horizon: next-release
 - file: measured-results/14-first-keepers.md
   description: "Step 14 - the scaling class and the JSON timing are written, then the first keepers - lib-algorithms-smoke, vipaq, the bin threshold once on a quiet machine - their benchmarks README, and the bin-threshold finding"
   state: ready
@@ -117,6 +112,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Open fixes in the measure and bench tooling that wait on the maintainer's answer"
   state: proposed
   waits-on: "the maintainer's answer on each item. horizon was set by an agent, strike it"
+  horizon: undecided
+- file: measured-results/keeping-bench-reports.md
+  description: "How a bench run worth keeping gets from the project's gitignored artifacts folder into <slice>/results/benchmarks/, and in what shape"
+  state: proposed
+  waits-on: "the maintainer's answer on how, likely after more keepers are made by hand; the shape is picked, the copy waits on the final shape. horizon was set by an agent, strike it"
   horizon: undecided
 - file: measured-results/results-story.md
   description: "The results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"

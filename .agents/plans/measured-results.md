@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 12 landed; what is left is step 12's smoke runs, the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps
+description: Orchestrator - steps 1 to 12 landed; what is left is the fixes waiting on an answer, the results story, the provider names, and step 14, the first keepers. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer's smoke runs"
+waits-on: "the maintainer's answers in the fixes file, and step 14's open details"
 horizon: next-release
 paths:
   - "shared/**"
@@ -20,11 +20,14 @@ one that points at every file in it.
 **Steps 1 to 11 landed 2026-09-20 to 2026-09-22 and their files are gone.** The three tests kernels became
 `Data` and `Testing` projects and `Binacle.Reporting`; both measure projects write `<slice>/results/`; the
 old vault stopped being current. Their lasting rules are in the general design record - the decision on
-the four project folders and the one on measured numbers. Step 12 is built, its tooling reworked 2026-09-22. Step 13, which
-converted the old `results/` folder, was dropped 2026-09-22 when the folder was deleted.
+the four project folders and the one on measured numbers. Step 12, the bench split, landed 2026-09-23; its
+reasons are in the lib and ViPaq design records. Step 13, which converted the old `results/` folder, was
+dropped 2026-09-22 when the folder was deleted.
 
 - [`fixes.md`](measured-results/fixes.md) - fixes that wait on the maintainer's answer, settled together with
   the two plans below.
+- [`keeping-bench-reports.md`](measured-results/keeping-bench-reports.md) - how a bench run worth keeping gets
+  into `<slice>/results/benchmarks/`, and in what shape.
 - [`results-story.md`](measured-results/results-story.md) - the results READMEs as a story for a human.
 - [`consistent-provider-names.md`](measured-results/consistent-provider-names.md) - one naming rule for every
   scenario provider in the Data and Testing projects.
@@ -56,11 +59,10 @@ converted the old `results/` folder, was dropped 2026-09-22 when the folder was 
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 12 | [12-bench-split](measured-results/12-bench-split.md) | built: five benchmark projects, their tiers, the shared config, `bench.just`. the tooling reworked 2026-09-22; open: the maintainer's smoke runs | `test ! -f tooling/bench.run.sh` |
 | 14 | [14-first-keepers](measured-results/14-first-keepers.md) | the scaling class and the JSON timing; then `lib-algorithms-smoke`, `vipaq`, the bin threshold once, their benchmarks READMEs, and the bin-threshold finding | `test -f lib/results/benchmarks/README.md` |
 
 ## Done when
 
-- [ ] Step 14's last box is ticked, the four files above are done or deleted, and the maintainer has
+- [ ] Step 14's last box is ticked, the files above are done or deleted, and the maintainer has
       deleted the folder and this file.
       **By eye.** There is nothing left to check once the file is gone; the step files carried the checks.
