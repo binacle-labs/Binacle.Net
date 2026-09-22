@@ -3,7 +3,7 @@
 Written by `just measure lib` from `Binacle.Lib.PackingEfficiency` over the 700 Bischoff suite scenarios (thpack1..7). Do not edit.
 
 ## Fill per scenario
-Fill is the packed volume as a percentage of the bin. Best lists every algorithm that reached the top fill; Margin is the top fill minus the next one, in points.
+Fill is the packed volume as a percentage of the bin. Best lists every algorithm that reached the top fill; Margin is how far the top fill is ahead of the next lower fill, in points, and 0 when all three tie.
 
 | Scenario              | Types | Items | Ceiling % | FFD   | WFD   | BFD   | Best          | Margin |
 |-----------------------|-------|-------|-----------|-------|-------|-------|---------------|--------|

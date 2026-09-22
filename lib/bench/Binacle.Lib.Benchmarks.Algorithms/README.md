@@ -7,7 +7,7 @@ is the first word of the class name, so it is in the report file name too.
 
 | Path | What it is |
 |---|---|
-| `Smoke_Packing.cs`, `Smoke_Fitting.cs` | Six rows (FFD, WFD, BFD x v1, v2); the column is one of four scenarios: full bin, one type / small order / typical container / most item types |
+| `Smoke_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is one of four scenarios: full bin, one type / small order / typical container / most item types |
 | `Sample_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is one of 30 Bischoff problems, named `<category> (<id>)` |
 | `Full_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is every one of the 700 Bischoff problems |
 | `SmokeBase.cs`, `SampleBase.cs`, `FullBase.cs` | Where each tier gets its scenarios; the picks are in `lib/test/Binacle.Lib.Testing/Providers/` |

@@ -16,7 +16,7 @@ set no-exit-message := true
 
 # List the recipes
 default:
-    @just --list measure
+    @just --unsorted --list measure
 
 # Both slices
 all: lib vipaq

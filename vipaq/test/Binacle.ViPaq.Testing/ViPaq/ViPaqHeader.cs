@@ -3,7 +3,7 @@ namespace Binacle.ViPaq.Testing.ViPaq;
 // The header the harness hands `ProtocolEncoder` for a scenario in a forced mode, and the widths a report
 // prints from it.
 //
-// The library's own `Header` does the parsing and the size arithmetic; this only prints the answers. `Header`,
+// The library's own `Header` works out the widths; this only prints them. `Header`,
 // `Width` and `Layout` are internal, so they cannot appear on a public member here - which is why the library
 // grants `InternalsVisibleTo` to this project.
 public readonly record struct ViPaqHeader
@@ -14,10 +14,6 @@ public readonly record struct ViPaqHeader
 	{
 		this.Header = header;
 	}
-
-	// Throws ViPaqFormatException on a malformed header.
-	public static ViPaqHeader Read(byte[] token)
-		=> new(Header.FromBytes(token[0], token[1]));
 
 	// The header for a scenario in a forced mode, before any token exists. Widths come from `Header.Create`,
 	// then the mode is stamped on. The race always compresses - NoOp is how it prices the raw size - so
@@ -39,9 +35,6 @@ public readonly record struct ViPaqHeader
 		return new ViPaqHeader(modifiedHeader);
 	}
 
-	public bool IsCompressed 
-		=> this.Header.Compressed;
-
 	public int BinDimensionsBits 
 		=> Bits(this.Header.BinDimensionsWidth);
 
@@ -50,10 +43,6 @@ public readonly record struct ViPaqHeader
 
 	public int ItemCoordinatesBits 
 		=> Bits(this.Header.ItemCoordinatesWidth);
-
-	// Exact, not an estimate: the two header bytes plus a body of fixed-width fields.
-	public int UncompressedByteCount(int itemCount)
-		=> Header.ByteCount + this.Header.GetBodyLength(itemCount);
 
 	// How a report names the three widths, in wire order.
 	public string ToWidthsLabel()

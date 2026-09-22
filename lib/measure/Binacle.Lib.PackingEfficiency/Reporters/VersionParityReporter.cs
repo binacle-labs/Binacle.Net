@@ -32,12 +32,16 @@ internal sealed class VersionParityReporter : IReporter
 			);
 		}
 
+		var description = differing.Length == 0
+			? $"All {this.bag.Scenarios.Count} scenarios pack to the same fill under {family} v2 as under v1."
+			: $"{differing.Length} of {this.bag.Scenarios.Count} scenarios pack to a different fill under "
+				+ $"{family} v2 than under v1. Difference is v2 minus v1, in points.";
+
 		return new ReportSection
 		{
 			Title = family,
-			Description = $"{differing.Length} of {this.bag.Scenarios.Count} scenarios pack to a different fill under "
-				+ $"{family} v2 than under v1. Difference is v2 minus v1, in points.",
-			Table = table
+			Description = description,
+			Table = differing.Length == 0 ? null : table
 		};
 	}
 

@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-22
+verified: 2026-09-23
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -33,7 +33,7 @@ Binacle.Packing ─────────────────────�
    │      ├── Binacle.Lib.Benchmarks.Algorithms       BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
    │      ├── Binacle.Lib.Benchmarks.Racing           BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.Threshold        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
-   │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Testing, Lib.Data, Benchmarking   (lib/bench)
+   │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
    │
    └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
@@ -52,7 +52,7 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Benchmarks.Algorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, in three tiers |
 | `Binacle.Lib.Benchmarks.Racing` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race |
 | `Binacle.Lib.Benchmarks.Threshold` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel on the item and bin ladders |
-| `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Testing, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
+| `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
 | `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/` |
 
 `Binacle.Data` above is the shared scenario project in `shared/data` and `Benchmarking` is `shared/test/Binacle.Benchmarking`;

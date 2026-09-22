@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-22
+verified: 2026-09-23
 check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -48,6 +48,10 @@ One namespace per set, one static `Scenarios` class in each, and the set's keys 
 
 Data is embedded JSON, loaded by resource prefix. The manifest name is `Binacle.Data.<Set>.<name>.json`, and
 `ScenarioCollectionsProvider` splits it into the collection key `<set>/<name>` lowercased.
+
+`Binacle.Lib.Data` has its own copy of `ScenarioCollectionsProvider` and `MultipleScenarioCollectionsProvider`
+for the result-selection files. The two copies differ in two lines, the namespace and the prefix. They stay two:
+the maintainer's call of 2026-09-23, since the code has not changed since it was written.
 
 **Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
 packer, so `PackingDemoSamplesTests` proves the algorithms still land where they did, not that they are

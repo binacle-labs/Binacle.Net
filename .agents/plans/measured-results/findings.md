@@ -42,7 +42,6 @@ Left:
       (Racing does not build until they go), Threshold `Algorithms_Packing_v1.cs`, `_v2.cs`,
       `Bins_Packing_v1.cs`, `_v2.cs`, ViPaq `Encode.cs`, `Decode.cs`, `CompressionCost.cs`.
 - [ ] The maintainer runs each smoke recipe once; a wrong word fails; `just bench lib-algorithms-full` asks.
-- [ ] `measure.just`'s `default` lists with `--unsorted` too.
 
 ## 2. Broken, or checking less than before
 
@@ -62,8 +61,8 @@ deleted with its READMEs. What is left is in the code.
 
 ### Left in the code
 
-- [ ] `ViPaqHeader.Read`, `IsCompressed` and `UncompressedByteCount` have no callers.
-      `grep -rn "IsCompressed\|UncompressedByteCount\|ViPaqHeader.Read" vipaq --include=*.cs` hits only the definitions today.
+Nothing.
+
 ### Found on the way, outside this plan
 
 - [ ] `.agents/docs/api/tests.md` has about ten claims the code does not back (one-file folders, the v3
@@ -73,19 +72,18 @@ deleted with its READMEs. What is left is in the code.
 
 ## 4. Where the build drifted from the shape
 
-- [ ] **The loader above the shared reader is still two copies.** `ScenarioCollectionsProvider.cs` and
-      `MultipleScenarioCollectionsProvider.cs` in `shared/data/Binacle.Data` and in
-      `lib/data/Binacle.Lib.Data/ResultSelection` have the same code over different types: each set's own
-      `Scenario`, `CollectionScenario` and `ScenarioReader`. One copy needs a generic loader in `Binacle.Data`
-      that takes the prefix and a read function. Merge, or record why two.
-      `find shared/data lib/data -name ScenarioCollectionsProvider.cs -not -path "*/obj/*" | wc -l` is 1.
+Nothing.
+
 ## 5. Small
 
 - [ ] Step 12's namespace check prints `bench` for every project (the awk takes the folder, not the
       project). It still shows a sixth namespace, but never says which project holds it.
-- [ ] `version-parity.md` prints an empty table for FFD and WFD. A line saying "no difference" reads better.
+- [ ] `version-parity.md` prints an empty table for FFD and WFD. Fixed in the code 2026-09-23: a section's
+      table is optional, and parity leaves it out and says "All 700 scenarios pack to the same fill". Ticks
+      when the maintainer reruns `just measure lib`.
 - [ ] `packing-efficiency.md` says Margin is "top fill minus the next one"; on a two-way tie it is the gap to
       the third (thpack1_4: 0.19). The code comment in `Wins.cs` says it right; copy that wording.
+      Fixed in the code 2026-09-23; ticks when the maintainer reruns `just measure lib`.
 - [ ] `MarkdownFileWriter` only overwrites. A dropped reporter leaves its old file behind.
 - [ ] `vipaq/results/encoded-size.md` is 1 MB, about half of it column padding; one longer scenario name
       rewrites all 4,644 rows. Whether GitHub renders it is not checked.
@@ -96,10 +94,16 @@ deleted with its READMEs. What is left is in the code.
       has one baseline, `Encode_NoOp`, so the `Decode_*` rows get a Ratio against an encode; it also has no
       `[BenchmarkOrder]`. Fix: each algorithm or direction carries its own baseline.
       **By eye** in a smoke report: a Ratio of 1.00 on `WFD_v1` and `BFD_v1` as well as `FFD_v1`.
+      Lib smoke done 2026-09-23: one class per algorithm, `Smoke_<Alg>_<Op>`, like Sample and Full. The
+      maintainer deletes `Smoke_Packing.cs` and `Smoke_Fitting.cs` under `lib/bench/Binacle.Lib.Benchmarks.Algorithms`.
+      ViPaq done 2026-09-23: `Sample_CompressionCost_Encode` and `_Decode`, each with its own NoOp and row
+      order. The maintainer deletes `vipaq/bench/Binacle.ViPaq.Benchmarks/Sample_CompressionCost.cs`; until
+      then `vipaq-sample` runs its 12 cases twice.
 - [ ] `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` references `Binacle.Lib.Testing` and uses nothing from
       it. Removing it makes two lines false: `lib/test/Binacle.Lib.Testing/README.md` ("every project under
       `lib/bench/` references it") and `.agents/docs/lib/dependencies.md`.
       `grep -c Binacle.Lib.Testing lib/bench/Binacle.Lib.Benchmarks.ResultSelection/*.csproj` is 0.
+      Done 2026-09-23; builds without it.
 - [ ] `Properties/launchSettings.json` - four copies under `lib/bench/*` and one under
       `lib/measure/Binacle.Lib.PackingEfficiency`, all old profiles. One `git rm` line, the maintainer's.
       `ls lib/bench/*/Properties lib/measure/*/Properties 2>/dev/null | wc -l` is 0.

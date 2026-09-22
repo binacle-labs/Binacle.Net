@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the four bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-22
+verified: 2026-09-23
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -39,7 +39,7 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 
 The harness code the unit tests, the measure project and the bench projects share, imported globally
 (`<Using Include="Binacle.Lib.Testing" />` in each csproj except `Binacle.Lib.Benchmarks.ResultSelection`, which
-references it and imports nothing). `Binacle.Lib` grants it friend access, because
+does not reference it). `Binacle.Lib` grants it friend access, because
 it constructs the internal algorithm classes.
 
 - `AlgorithmFactories.cs` defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
@@ -126,7 +126,7 @@ written by hand, not by the harness. Not pass/fail; a change is a diff.
 In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds the scenario, loads it in
 `[GlobalSetup]` through the abstract `Load`, and `Run(factory)` executes it with the abstract `Operation`.
 
-- `Smoke_Packing`, `Smoke_Fitting` (`SmokeBase`): six rows `FFD_v1` (baseline) … `BFD_v2`, the column from
+- `Smoke_<FFD|WFD|BFD>_<Packing|Fitting>` (`SmokeBase`): rows `v1` (baseline) and `v2`, the column from
   `[ParamsSource]` over `SmokeProblemsProvider.GetScenarioNames`. 48 cases, `short` job.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
   `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, default job, `short` with `quick`.

@@ -37,7 +37,8 @@ internal sealed class PackingEfficiencyReporter : IReporter
 			{
 				Title = "Fill per scenario",
 				Description = "Fill is the packed volume as a percentage of the bin. Best lists every algorithm that "
-					+ "reached the top fill; Margin is the top fill minus the next one, in points.",
+					+ "reached the top fill; Margin is how far the top fill is ahead of the next lower fill, in points, "
+					+ "and 0 when all three tie.",
 				Table = table
 			}
 		];

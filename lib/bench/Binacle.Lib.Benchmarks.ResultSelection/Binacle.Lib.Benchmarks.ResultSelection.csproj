@@ -7,7 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\test\Binacle.Benchmarking\Binacle.Benchmarking.csproj" />
     <ProjectReference Include="..\..\src\Binacle.Lib\Binacle.Lib.csproj" />
-    <ProjectReference Include="..\..\test\Binacle.Lib.Testing\Binacle.Lib.Testing.csproj" />
     <ProjectReference Include="..\..\data\Binacle.Lib.Data\Binacle.Lib.Data.csproj" />
   </ItemGroup>
 

@@ -1,8 +1,8 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-09-22
-check: The numbers under "Size today" match vipaq/results/README.md and vipaq/results/encoded-size.md; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost), vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
+verified: 2026-09-23
+check: The numbers under "Size today" match vipaq/results/README.md and vipaq/results/encoded-size.md; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -149,7 +149,8 @@ merged `BischoffCuratedProvider` and `CustomProblemsCuratedProvider`) that inclu
 (`CustomProblemsCuratedProvider.UncompressedNames`: 1 / 8 / 16-item 8-bit packs) so the raw path was measured too —
 before this, all curated benchmarks compressed and the raw path had **no** performance number. The size report then
 showed two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto). Since 2026-09-22 the timing classes are `Encode`
-and `Decode`, which run every curated pick on the raw path, and `CompressionCost`, which prices the codec.
+and `Decode`, which run every curated pick on the raw path, and `CompressionCost`, which prices the codec. Since
+2026-09-23 that is two classes, `Sample_CompressionCost_Encode` and `_Decode`, each against its own NoOp.
 
 **Size (base64 chars).** 15 of 716 scenarios stay uncompressed (all tiny 8-bit customs); 701 compress (nearly all
 16-bit Bischoff).

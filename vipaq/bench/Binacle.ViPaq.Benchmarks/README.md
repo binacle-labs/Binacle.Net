@@ -12,7 +12,8 @@ compressing costs is a class of its own.
 | `Smoke_Encode.cs`, `Smoke_Decode.cs` | Three columns: one item, the typical container, the largest real pack |
 | `Sample_Encode.cs`, `Sample_Decode.cs` | Twelve columns: six real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
 | `EncodeBase.cs`, `DecodeBase.cs` | The three rows both tiers time |
-| `Sample_CompressionCost.cs` | NoOp against Deflate and Gzip, encode and decode, row-major, on the low and the high end of deflate's win |
+| `Sample_CompressionCost_Encode.cs`, `_Decode.cs` | NoOp against Deflate and Gzip, row-major, on the low and the high end of deflate's win; each compares to its own NoOp |
+| `CompressionCostBase.cs` | The two packs and the three codecs both classes use |
 | `BenchmarkBase.cs` | Loads the column's scenario before the run |
 | `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 

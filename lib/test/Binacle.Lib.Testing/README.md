@@ -2,8 +2,8 @@
 
 What the lib suites, the measure project and the bench projects share and nothing else needs. Not a test
 project: nothing in it asserts on its own, and no test SDK is referenced. Every other project under
-`lib/test/`, `lib/measure/` and `lib/bench/` references it, and all but `Binacle.Lib.Benchmarks.ResultSelection`
-import it globally.
+`lib/test/`, `lib/measure/` and `lib/bench/` references it and imports it globally, except
+`Binacle.Lib.Benchmarks.ResultSelection`, which needs none of it.
 
 ## 📂 What is in it
 
