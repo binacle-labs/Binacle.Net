@@ -1,7 +1,7 @@
 ---
-description: One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members
-state: proposed
-waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
+description: Three kinds with three endings - DataProvider holds a committed set, Set picks from one, Generator builds from a number - so a call site says which it got
+state: ready
+waits-on: "the maintainer says start. Every question is answered, 2026-09-24"
 horizon: undecided
 paths: ["lib/test/Binacle.Lib.Testing/**", "vipaq/test/Binacle.ViPaq.Testing/**", "shared/data/Binacle.Data/**", "lib/data/Binacle.Lib.Data/**", "vipaq/data/Binacle.ViPaq.Data/**", "lib/bench/**", "vipaq/bench/**", "vipaq/measure/**"]
 ---
@@ -22,39 +22,154 @@ The general design record's decision on the four project folders already states 
 projects: the set is in the namespace, so the class does not repeat it. It was never applied to the
 `Testing` projects, and nobody wrote down why.
 
-## The rule
+## The rule - settled 2026-09-23
 
-**The namespace says what kind of thing it is, the class says which one, and every class has the same
-members: `Names`, `GetByName(name)`, `All`.** `Binacle.ViPaq.Data.Packed.BischoffSuite` already works this way.
+**Three kinds of class, three endings, so a call site says which one it got.**
+
+| Ending | What it is | Shape |
+|---|---|---|
+| `DataProvider` | holds a whole committed set, reads it once, hands it out by name. Picks nothing, builds nothing | folder and namespace name the set, the class is `DataProvider`: `BischoffSuite.DataProvider` |
+| `Set` | names a handful of ids from a holder and gives each the column name a report prints | one class, `<Which>Set`: `SmokeSet` |
+| `Generator` | builds scenarios from a number. Nothing exists until it is asked for | one class, `<Which>Generator`: `LadderGenerator` |
+
+A `Set` and a `Generator` answer a benchmark the same two questions - what are the columns, give me this one -
+so both expose `Names` and `GetByName`. A generator that is asked for a size rather than a column keeps its own
+members (`GetItems`, `GetBins`). Nothing named `Provider` survives in the `Testing` projects; `DataProvider`
+lives only in the `Data` projects.
+
+**One class stays as it is:** `CubeGenerator`, one hand-written best case with one caller. The maintainer's
+call of 2026-09-23 - folding it into `SmokeSet` would make that set a generator too, and the rule is worth
+more than a 20-line file.
+
+**`BischoffCuratedProvider` splits in two** - the maintainer's call of 2026-09-23. One class holds two
+unrelated picks today: `TimingColumns` feeds Encode and Decode, `CompressionCostColumns` feeds CompressionCost,
+which is not a timing question. Any single name lies about one half. `BischoffTimingSet` and
+`CompressionCostSet` are each exactly true. `OrLibrary_thpack4_1.ffd` appears in both - the typical container
+for timing, the low win for compression - which is the same pack being interesting twice, not duplication.
+The curated gate then checks three sets instead of two.
+
+**Why not one word.** Calling the synthetic class a set says its data exists somewhere. Its own comment says
+the opposite - random packs report the reverse of real behaviour on size, and must never be used for it. The
+noun has to carry that.
 
 ## The renames
 
-| Today | Proposed | Used by |
+| Today | Becomes | Kind | Used by |
+|---|---|---|---|
+| `Binacle.Lib.Testing.Providers.SmokeProblemsProvider` | `SmokeSet` | set | Algorithms smoke |
+| `…Providers.BischoffSampleProblemsProvider` | `SampleSet` | set | Algorithms sample |
+| `…Providers.BischoffCuratedProblemsProvider` | `RacingSet` | set | Racing |
+| `…Providers.SpecializedScalingProblemsProvider` | `LadderGenerator` | generator | Threshold and Scaling |
+| `…Providers.CubeScalingProblemsProvider` | `CubeGenerator` | generator | `SmokeSet` only |
+| `Binacle.ViPaq.Testing.Providers.CuratedScenarioProvider` | `TimingSet` | set (joins the two below) | Encode, Decode |
+| `…Providers.BischoffCuratedProvider` | split: `BischoffTimingSet` + `CompressionCostSet` | two sets | Encode/Decode through `TimingSet`; CompressionCost; the curated gate |
+| `…Providers.CustomProblemsCuratedProvider` | `CustomProblemsTimingSet` | set | Encode/Decode through `TimingSet`; the curated gate |
+| `…Providers.SyntheticDataProvider` | `SyntheticGenerator` | generator | Encode, Decode |
+
+The `Providers/` folder in both `Testing` projects goes; the classes sit at the project root, since the ending
+already says what each is. `GetBenchmarkScenarios` on the Racing set becomes `Names`.
+
+## The holders - surveyed 2026-09-23
+
+**The rule, the maintainer's call of 2026-09-23:** the folder and namespace name the set, the class is
+`DataProvider`. `BischoffSuite.DataProvider.GetScenarioByName(name)` at the call site, with `using
+Binacle.Data`. The set is then visible on every line that takes a scenario, which is the point - today the
+set lives only in a `using` and the class is called `Scenarios`, so two files away the same word means a
+different set. Not started yet.
+
+Nine classes hold data. They take the rule in two amounts of work:
+
+| Class today | Under the rule | Work |
 |---|---|---|
-| `Binacle.Lib.Testing.Providers.SmokeProblemsProvider` | `Binacle.Lib.Testing.Picks.Smoke` | Algorithms smoke |
-| `…Providers.BischoffSampleProblemsProvider` | `Binacle.Lib.Testing.Picks.Sample` | Algorithms sample |
-| `…Providers.BischoffCuratedProblemsProvider` | `Binacle.Lib.Testing.Picks.Racing` | Racing |
-| `…Providers.SpecializedScalingProblemsProvider` | `Binacle.Lib.Testing.Synthetic.Ladder` | Threshold, and the scaling class to come |
-| `…Providers.CubeScalingProblemsProvider` | folded into `Picks.Smoke`, its only user | - |
-| `Binacle.ViPaq.Testing.Providers.CuratedScenarioProvider` | `Binacle.ViPaq.Testing.Picks.Timing` | Encode, Decode |
-| `…Providers.BischoffCuratedProvider` | `Binacle.ViPaq.Testing.Picks.BischoffSuite` | CompressionCost, `CuratedPicksCheck` |
-| `…Providers.CustomProblemsCuratedProvider` | `Binacle.ViPaq.Testing.Picks.CustomProblems` | `CuratedPicksCheck` |
-| `…Providers.SyntheticDataProvider` | `Binacle.ViPaq.Testing.Synthetic.Scale` | Encode, Decode |
+| `Binacle.Data.BischoffSuite.Scenarios` | `.BischoffSuite.DataProvider` | rename the class, rename the file |
+| `Binacle.Data.CustomProblems.Scenarios` | `.CustomProblems.DataProvider` | same |
+| `Binacle.Data.DemoSamples.Scenarios` | `.DemoSamples.DataProvider` | same |
+| `Binacle.Lib.Data.ResultSelection.BestBin.Scenarios` | `.BestBin.DataProvider` | same |
+| `…ResultSelection.BestAlgorithm.Scenarios` | `.BestAlgorithm.DataProvider` | same |
+| `…ResultSelection.SmallestBin.Scenarios` | `.SmallestBin.DataProvider` | same |
+| `Binacle.ViPaq.Data.Packed.BischoffSuite` | `.Packed.BischoffSuite.DataProvider` | a folder per set, so the file moves and the namespace grows a level |
+| `…Packed.CustomProblems` | `.Packed.CustomProblems.DataProvider` | same |
+| `…Packed.DemoSamples` | `.Packed.DemoSamples.DataProvider` | same |
 
-`GetBenchmarkScenarios` on the Racing picks becomes `Names`.
+The first six are already folder-per-set, so only the class name changes. The ViPaq three are class-per-set in
+one `Packed` namespace, so each needs its own folder - `git mv`, the maintainer's.
 
-## Open
+**Three classes are not sets and must not take the name:**
 
-- **Scope.** The data projects use `GetScenarioNames` and `GetScenarioByName` on every `Scenarios` class in
-  `Binacle.Data` and `Binacle.Lib.Data`. Renaming them to `Names` / `GetByName` / `All` makes one vocabulary
-  across the repo. It also touches `Binacle.Lib.UnitTests` and `Binacle.Net.IntegrationTests`, which call
-  them. The table alone touches only the bench projects, the ViPaq measure project and the two `Testing`
-  projects.
-- **Class per set, or namespace per set.** `Binacle.Data.BischoffSuite.Scenarios` and
-  `Binacle.ViPaq.Data.Packed.BischoffSuite` follow the rule in two shapes. Pick one, or keep both and say why.
-- **The largest real pack.** The timing column `largest real pack` is the FFD pack of thpack1_65 (365 items);
-  a comment in `SyntheticDataProvider.cs` says the largest is 371 (the BFD pack of the same problem). Pick one
-  pack, and name the column for what it is.
+- `Binacle.Data.All` - every scenario of every set, by name. It is an aggregate over the three, not a set, and
+  it has no folder of its own. It keeps its name. It does change inside: it reads
+  `BischoffSuite.Scenarios.Keys` today and would read `BischoffSuite.DataProvider.Keys`.
+- `Binacle.Data.ScenarioCollectionsProvider` and `Binacle.Lib.Data.ResultSelection.ScenarioCollectionsProvider`
+  - the embedded-resource readers the holders sit on, plus the two internal `MultipleScenarioCollectionsProvider`
+  classes beside them. **All four become `...Reader`, and both readers go internal** - the maintainer's call of
+  2026-09-23. `Reader` is already this repo's word for the layer: `ScenarioReader` sits next to them and ViPaq
+  has `PackedDataReader`.
+
+  The lib reader has no caller outside its project. The shared one does, and it is the only place in the repo
+  that goes around a holder: `PackingRunner` in `lib/measure` walks `BischoffSuite.Scenarios.Keys` for the
+  collection keys, then asks the reader for each collection's scenarios, because it labels every row with the
+  thpack it came from - and the holder flattens all 700 into one dictionary by name, losing the grouping. **The
+  holder gains a member that answers it** (a scenarios-by-collection-key lookup), `PackingRunner` uses that, and
+  the shared reader goes internal with the other.
+- `Binacle.Data.Files.EmbeddedResourceFileProvider` and ViPaq's `PackedDataReader` are plumbing, untouched.
+
+**Members are part of the same rename, sliced by set** - the maintainer's call of 2026-09-23. The six
+`Binacle.Data` and `Binacle.Lib.Data` holders expose `GetScenarioNames`, `GetScenarios`, `GetScenarioByName`,
+`Keys` and `ScenarioNames`; the ViPaq three already expose `Names`, `All`, `GetByName`, which is the target.
+One set per commit: rename the class, rename its members, fix its callers, done. No class is ever
+half-converted, and each commit reads. Measured 2026-09-23: 46 files in the repo call these members, 18 of
+them in `Binacle.Net.IntegrationTests` and 7 in `Binacle.Lib.UnitTests`.
+
+`Keys` and `ScenarioNames` exist for their consumers, not for the vocabulary - the resource reader and xUnit's
+`MemberData`. They keep their jobs whatever they end up called.
+
+`Binacle.Data.All` reads all three shared sets, so the first three slices each touch it - three lines in its
+constructor.
+
+**It propagates, one set at a time.** No file in the repo uses two of the nine, so the classes can be renamed
+in any order without anyone having to qualify a name. Bischoff first was the maintainer's pick; stopping
+part-way leaves `BischoffSuite.DataProvider` beside `CustomProblems.Scenarios`, which is a pause, not a
+destination.
+
+## The sets - surveyed 2026-09-23
+
+Nine classes in the two `Testing` projects. They are not one kind of thing; they are three, and one word
+cannot cover them honestly.
+
+**Five pick from a holder.** They name a handful by id and give each a column name the report prints.
+
+| Class | Picks | From |
+|---|---|---|
+| `SmokeProblemsProvider` | 4 columns | two ids out of Bischoff, two from the generators below |
+| `BischoffSampleProblemsProvider` | 30 ids | Bischoff |
+| `BischoffCuratedProblemsProvider` | 5 ids, with the fill each algorithm reaches | Bischoff, resolved by the caller |
+| `BischoffCuratedProvider` (ViPaq) | 3 packs | ViPaq packed Bischoff |
+| `CustomProblemsCuratedProvider` (ViPaq) | 4 packs | ViPaq packed custom problems |
+
+**Three build scenarios from a number.** Nothing is picked; the data does not exist until it is asked for.
+
+| Class | Builds |
+|---|---|
+| `CubeScalingProblemsProvider` | one cube baseline |
+| `SpecializedScalingProblemsProvider` | the item and bin ladders, by count |
+| `SyntheticDataProvider` (ViPaq) | deterministic random packs at a given item count |
+
+**One joins the others.** `CuratedScenarioProvider` (ViPaq) puts the two curated sets and the synthetic curve
+in report order; it holds no ids of its own.
+
+**What this means for the name.** A picked set and a generated one answer the same question to a benchmark -
+give me the columns, give me this one - so they can share the member names. They cannot share a noun: a
+generator picks nothing, and calling it a set says the data exists somewhere, which is the mistake the
+synthetic class's own comment warns about. Two nouns, one for each, with the joiner taking the picked one.
+
+## Settled, nothing open
+
+**The `largest real pack` column becomes `largest FFD pack`** - the maintainer's call of 2026-09-24. The label
+points at `OrLibrary_thpack1_65.ffd`, 365 items. Measured from the size results on 2026-09-23: the same problem
+packed by BFD holds 371 items and is the largest pack in the data, which is what the synthetic generator's
+comment means when it says 371. The pick stays FFD, because every ViPaq timing column is an FFD pack and
+mixing one in would stop the columns comparing; only the label was loose. It is one dictionary key, and it
+changes the column a kept run prints.
 
 ## What will bite
 
@@ -67,13 +182,19 @@ members: `Names`, `GetByName(name)`, `All`.** `Binacle.ViPaq.Data.Packed.Bischof
 
 ## Done when
 
-- [ ] No class under `lib/test/Binacle.Lib.Testing` or `vipaq/test/Binacle.ViPaq.Testing` ends in `Provider`.
+- [ ] No class under `lib/test/Binacle.Lib.Testing` or `vipaq/test/Binacle.ViPaq.Testing` ends in `Provider`;
+      every one ends in `Set` or `Generator`.
       `grep -rn "class [A-Za-z]*Provider\b" lib/test/Binacle.Lib.Testing vipaq/test/Binacle.ViPaq.Testing --include=*.cs`
       is empty.
+- [ ] Every holder is called `DataProvider`, and no `Scenarios` class is left in the three data projects.
+      `grep -rn "class Scenarios\b" shared/data lib/data vipaq/data --include=*.cs` is empty.
 - [ ] No `GetBenchmarkScenarios` anywhere.
       `grep -rn GetBenchmarkScenarios --include=*.cs .` is empty.
-- [ ] Every scenario class in scope exposes `Names` and `GetByName`.
-      **By eye**, one class per folder in the table.
+- [ ] Every `Set` and every `Generator` that answers columns exposes `Names` and `GetByName`.
+      **By eye**, one class per row in the renames table.
+- [ ] Every set names its holder on the line that takes a scenario - no set reads a holder through a `using`
+      that hides which set it is.
+      **By eye**, read the dictionary at the top of each set.
 - [ ] The design record's folder decision states the rule for `Testing` as well as `Data`.
       **By eye.**
 - [ ] Every project that moved builds; `just test cs_binacle-lib_unit` and `just test cs_binacle-vipaq_unit` pass.
