@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Presets;
 using Binacle.Data;
-using Binacle.Data.CustomProblems;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Presets.Get;
 
@@ -53,7 +52,7 @@ public class GetPresetBehavior
 	public async Task Get_ReturnsConfiguredBins()
 	{
 		var preset = await GetPreset(PresetKeys.CustomProblems);
-		preset.Bins.Select(x => x.ID).ShouldBe(Scenarios.GetDistinctBinIds());
+		preset.Bins.Select(x => x.ID).ShouldBe(CustomProblems.DataProvider.GetDistinctBinIds());
 	}
 
 	[Fact(DisplayName = $"GET {routePath}. Returns The Same Bins As The List Endpoint")]

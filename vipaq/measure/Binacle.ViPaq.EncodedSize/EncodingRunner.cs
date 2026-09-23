@@ -15,9 +15,9 @@ internal sealed class EncodingRunner : IRunner
 {
 	private static readonly (string Family, IReadOnlyCollection<Scenario> Packs)[] Families =
 	[
-		("bischoff-suite", BischoffSuite.All),
-		("custom-problems", CustomProblems.All),
-		("demo-samples", DemoSamples.All)
+		("bischoff-suite", BischoffSuite.DataProvider.All),
+		("custom-problems", CustomProblems.DataProvider.All),
+		("demo-samples", DemoSamples.DataProvider.All)
 	];
 
 	private static readonly (string Name, ICompressionCodec Codec)[] CodecList =

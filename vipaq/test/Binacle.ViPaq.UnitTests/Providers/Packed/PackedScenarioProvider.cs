@@ -11,7 +11,7 @@ internal static class PackedScenarioProvider
 	static PackedScenarioProvider()
 	{
 		scenarios = new Dictionary<string, Scenario>();
-		foreach (var scenario in BischoffSuite.All.Concat(CustomProblems.All).Concat(DemoSamples.All))
+		foreach (var scenario in BischoffSuite.DataProvider.All.Concat(CustomProblems.DataProvider.All).Concat(DemoSamples.DataProvider.All))
 		{
 			scenarios.Add(scenario.Name, scenario);
 		}

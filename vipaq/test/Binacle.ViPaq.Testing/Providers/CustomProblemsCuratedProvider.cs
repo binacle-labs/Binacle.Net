@@ -17,5 +17,5 @@ public static class CustomProblemsCuratedProvider
 
 	public static IEnumerable<string> Names => TimingColumns.Values;
 
-	public static Scenario GetByName(string name) => CustomProblems.GetByName(name);
+	public static Scenario GetByName(string name) => CustomProblems.DataProvider.GetByName(name);
 }

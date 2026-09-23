@@ -1,17 +1,17 @@
 using Binacle.Lib.Data.ResultSelection;
 using Binacle.Lib.ResultSelection;
-using Scenarios = Binacle.Lib.Data.ResultSelection.BestBin.Scenarios;
+using BestBinData = Binacle.Lib.Data.ResultSelection.BestBin.DataProvider;
 
 namespace Binacle.Lib.Benchmarks.ResultSelection;
 
 [MemoryDiagnoser]
 public class BestBin : BenchmarkBase
 {
-	[ParamsSource(typeof(Scenarios), nameof(Scenarios.GetScenarioNames))]
+	[ParamsSource(typeof(BestBinData), nameof(BestBinData.Names))]
 	public override string? ScenarioName { get; set; }
 
 	protected override Scenario Load(string name)
-		=> Scenarios.GetScenarioByName(name);
+		=> BestBinData.GetByName(name);
 
 	// Deleted with v1.
 	[Benchmark(Baseline = true)]

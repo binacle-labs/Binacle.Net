@@ -27,7 +27,7 @@ public sealed class CommonTestingFixture : IDisposable
 
 	// Arrange. The scenario carries both the input and what the result is measured against.
 	public Scenario GetScenarioByName(string scenarioName)
-		=> All.GetScenarioByName(scenarioName);
+		=> All.GetByName(scenarioName);
 
 	// Act. No checking, so a failure here is a broken run, not a failed expectation.
 	public OperationResult Run(

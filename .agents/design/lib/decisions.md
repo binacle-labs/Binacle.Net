@@ -2,7 +2,7 @@
 id: lib/decisions
 description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question.
 verified: 2026-09-20
-check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/Scenarios.cs and CustomProblems/Scenarios.cs
+check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/DataProvider.cs and CustomProblems/DataProvider.cs
 also_update:
   - lib/findings
 paths:
@@ -85,7 +85,7 @@ settled this shape with its own `vipaq/data/packed`.
 
 **`shared/data/demo-samples/` was added under the same rule.** The demo component generates its sample set
 from it and the ViPaq packed-data generator packs it. Until 2026-09-20 `Binacle.Data` embedded it with no key
-set, so nothing read the embed; it now has `DemoSamples.Scenarios`, is in `All`, and `PackingDemoSamplesTests`
+set, so nothing read the embed; it now has `DemoSamples.DataProvider`, is in `All`, and `PackingDemoSamplesTests`
 runs every version of every algorithm over it. Its `Result` came from the packer, so that class is a
 regression baseline, not an independent check.
 

@@ -9,8 +9,8 @@ public static class All
 		MultipleScenarioCollectionsReader[] readers =
 		[
 			new MultipleScenarioCollectionsReader(BischoffSuite.DataProvider.Keys),
-			new MultipleScenarioCollectionsReader(CustomProblems.Scenarios.Keys),
-			new MultipleScenarioCollectionsReader(DemoSamples.Scenarios.Keys)
+			new MultipleScenarioCollectionsReader(CustomProblems.DataProvider.Keys),
+			new MultipleScenarioCollectionsReader(DemoSamples.DataProvider.Keys)
 		];
 		scenarios = new Dictionary<string, Scenario>();
 		foreach (var reader in readers)
@@ -23,15 +23,17 @@ public static class All
 		}
 	}
 
-	public static IEnumerable<string> GetScenarioNames()
+	public static IEnumerable<string> Names
 		=> scenarios.Keys;
 
-	public static IEnumerable<object[]> ScenarioNames
-		=> GetScenarioNames().Select(name => new object[] { name });
+	// xUnit's MemberData takes one row per case, so the names come wrapped.
+	public static IEnumerable<object[]> TheoryNames
+		=> Names.Select(name => new object[] { name });
 
-	public static IEnumerable<Scenario> GetScenarios()
+	// Not `All`, which is this class.
+	public static IEnumerable<Scenario> Scenarios
 		=> scenarios.Values;
 
-	public static Scenario GetScenarioByName(string name)
+	public static Scenario GetByName(string name)
 		=> scenarios[name];
 }

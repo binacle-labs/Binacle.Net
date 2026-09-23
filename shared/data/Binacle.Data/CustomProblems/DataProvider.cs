@@ -1,6 +1,6 @@
 namespace Binacle.Data.CustomProblems;
 
-public static class Scenarios
+public static class DataProvider
 {
 	public static readonly string[] Keys =
 	[
@@ -12,7 +12,7 @@ public static class Scenarios
 	private static readonly Dictionary<string, Scenario> scenarios;
 	private static readonly List<ScenarioBin> distinctBins;
 
-	static Scenarios()
+	static DataProvider()
 	{
 		var collections = new MultipleScenarioCollectionsReader(Keys);
 		scenarios = new Dictionary<string, Scenario>();
@@ -28,16 +28,17 @@ public static class Scenarios
 			.ToList();
 	}
 
-	public static IEnumerable<string> GetScenarioNames()
+	public static IEnumerable<string> Names
 		=> scenarios.Keys;
 
-	public static IEnumerable<object[]> ScenarioNames
-		=> GetScenarioNames().Select(name => new object[] { name });
+	// xUnit's MemberData takes one row per case, so the names come wrapped.
+	public static IEnumerable<object[]> TheoryNames
+		=> Names.Select(name => new object[] { name });
 
-	public static IEnumerable<Scenario> GetScenarios()
+	public static IEnumerable<Scenario> All
 		=> scenarios.Values;
 
-	public static Scenario GetScenarioByName(string name)
+	public static Scenario GetByName(string name)
 		=> scenarios[name];
 
 	// The bins these scenarios run against, in the order the scenarios introduce them. The API test host

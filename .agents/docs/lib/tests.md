@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-23
+verified: 2026-09-24
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -74,7 +74,7 @@ OperationResult Run(TestAlgorithmFactory<IPackingAlgorithm> factory, Scenario sc
 void AssertResult(Scenario scenario, OperationResult result)
 ```
 
-`GetScenarioByName` resolves from `Binacle.Data.All`. `Run` builds the algorithm
+`GetScenarioByName` resolves from `Binacle.Data.All.GetByName`. `Run` builds the algorithm
 and calls `Execute(parameters)`, checking nothing. `AssertResult` does both checks — `Metrics` pins how the
 algorithm got there, `Result` pins where it landed — and is marked `[AssertionMethod]` so the analyser knows
 where the assertion lives:
@@ -105,8 +105,8 @@ Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `Packin
 string Select(Scenario scenario, IResultSelectionStrategy strategy, Func<OperationResult, string> resultSelector)
 ```
 
-Each test resolves its scenario itself, through its own set — `BestAlgorithm.GetScenarioByName(name)` with
-the set's `Scenarios` class aliased; the short names repeat across sets, so there is no all-sets lookup.
+Each test resolves its scenario itself, through its own set — `BestAlgorithm.GetByName(name)` with
+the set's `DataProvider` aliased to the set name; the short names repeat across sets, so there is no all-sets lookup.
 `Select` calls `strategy.Select(scenario.Results)` and applies `resultSelector`. There is no assert member here — the check
 is a single comparison, so the test makes it itself with `selected.ShouldBe(scenario.ExpectedResult)`.
 `ResultSelectionTests` runs both strategy versions: `BestAlgorithm_v1/v2` (selector
@@ -131,7 +131,7 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
   `[ParamsSource]` over `SmokeProblemsProvider.GetScenarioNames`. 48 cases, `short` job.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
   `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, default job, `short` with `quick`.
-- `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.Scenarios.GetScenarioNames`,
+- `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.DataProvider.Names`,
   all 700. 8,400 cases, `short` job, default with `precise`.
 
 Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<Tier>_*'`. Every `v1` method carries the deleted-with-v1 comment.
@@ -150,7 +150,7 @@ the scenario by the abstract `ScenarioName`, and holds the rows `Loop` (baseline
 
 In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per selector, `[MemoryDiagnoser]`, rows
 `v1` (baseline) and `v2`, the scenario name as the column from `[ParamsSource]` over the set's
-`Scenarios.GetScenarioNames`. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
+`DataProvider.Names`, aliased as `<Set>Data` because the bench class already carries the set's name. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
 abstract `Load`, which each class points at its own set, and `Run(strategy)`. 11 scenarios, 22 cases, always
 the `short` job.
 

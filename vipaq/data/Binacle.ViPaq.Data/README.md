@@ -8,7 +8,7 @@ reference `Binacle.ViPaq` - it holds the inputs, not the encoders.
 
 | Path | What it is |
 |---|---|
-| `Packed/` | One class per family - `BischoffSuite`, `CustomProblems`, `DemoSamples` - every pack of that family by name |
+| `Packed/` | One folder per family - `BischoffSuite`, `CustomProblems`, `DemoSamples` - each holding a `DataProvider` with every pack of that family by name |
 | `Scenario.cs` | A pack: the bin and its placed items, in `ushort` |
 | `PackedDataReader.cs` | Reads a family's embedded files into scenarios |
 
@@ -20,8 +20,8 @@ csproj; regenerate it there, never edit it. A new file is embedded and read on i
 ```csharp
 using Binacle.ViPaq.Data.Packed;
 
-foreach (var scenario in BischoffSuite.All) { ... }
-BischoffSuite.GetByName("OrLibrary_thpack1_2.ffd");
+foreach (var scenario in BischoffSuite.DataProvider.All) { ... }
+BischoffSuite.DataProvider.GetByName("OrLibrary_thpack1_2.ffd");
 ```
 
 A scenario's name is `<problem>.<algorithm>`, so the same problem under three algorithms is three scenarios.

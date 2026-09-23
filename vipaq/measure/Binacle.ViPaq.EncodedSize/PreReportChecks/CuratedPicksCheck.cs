@@ -9,8 +9,8 @@ internal sealed class CuratedPicksCheck : IPreReportCheck
 {
 	public void Run()
 	{
-		Assert(BischoffCuratedProvider.Names, BischoffSuite.Names, "Bischoff");
-		Assert(CustomProblemsCuratedProvider.Names, CustomProblems.Names, "custom");
+		Assert(BischoffCuratedProvider.Names, BischoffSuite.DataProvider.Names, "Bischoff");
+		Assert(CustomProblemsCuratedProvider.Names, CustomProblems.DataProvider.Names, "custom");
 	}
 
 	private static void Assert(IEnumerable<string> curated, IEnumerable<string> available, string family)

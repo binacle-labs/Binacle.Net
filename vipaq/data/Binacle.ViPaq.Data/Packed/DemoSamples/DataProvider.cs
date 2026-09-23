@@ -1,16 +1,16 @@
-namespace Binacle.ViPaq.Data.Packed;
+namespace Binacle.ViPaq.Data.Packed.DemoSamples;
 
-// Real placed results for the custom, hand-authored problems: the bin plus the placed items the packer
-// produced. Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under
-// vipaq/data/packed/custom-problems/ and read here as embedded resources. No token is stored - it is derivable,
+// Real placed results for the demo site's sample set: the bin plus the placed items the packer produced.
+// Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under
+// vipaq/data/packed/demo-samples/ and read here as embedded resources. No token is stored - it is derivable,
 // so the benchmark computes it. Do not hand-edit.
-public static class CustomProblems
+public static class DataProvider
 {
-	private const string Family = "custom-problems";
+	private const string Family = "demo-samples";
 
 	private static readonly Dictionary<string, Scenario> scenarios = new();
 
-	static CustomProblems()
+	static DataProvider()
 	{
 		foreach (var scenario in PackedDataReader.Read(Family))
 		{

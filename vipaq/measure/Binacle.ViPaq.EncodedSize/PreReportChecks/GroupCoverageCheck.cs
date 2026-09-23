@@ -10,9 +10,9 @@ internal sealed class GroupCoverageCheck : IPreReportCheck
 	{
 		var slugs = Groups.All.Select(group => group.Slug).ToHashSet();
 
-		Assert(Groups.BischoffFamily, BischoffSuite.Names, slugs);
-		Assert("custom-problems", CustomProblems.Names, slugs);
-		Assert("demo-samples", DemoSamples.Names, slugs);
+		Assert(Groups.BischoffFamily, BischoffSuite.DataProvider.Names, slugs);
+		Assert("custom-problems", CustomProblems.DataProvider.Names, slugs);
+		Assert("demo-samples", DemoSamples.DataProvider.Names, slugs);
 	}
 
 	private static void Assert(string family, IEnumerable<string> names, HashSet<string> slugs)

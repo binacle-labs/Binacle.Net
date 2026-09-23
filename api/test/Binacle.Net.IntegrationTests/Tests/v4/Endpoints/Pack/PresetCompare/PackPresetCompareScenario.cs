@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Pack;
 using Binacle.Data;
-using Binacle.Data.CustomProblems;
 using Binacle.Net.IntegrationTests.v4.ExtensionMethods;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetCompare;
@@ -22,13 +21,13 @@ public class PackPresetCompareScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 
 	private async Task RunTest(string scenarioName)
 	{
-		var scenario = All.GetScenarioByName(scenarioName);
+		var scenario = All.GetByName(scenarioName);
 		var url = routePath.Replace("{preset}", PresetKeys.CustomProblems);
 
 		var request = new PackPresetCompareRequest

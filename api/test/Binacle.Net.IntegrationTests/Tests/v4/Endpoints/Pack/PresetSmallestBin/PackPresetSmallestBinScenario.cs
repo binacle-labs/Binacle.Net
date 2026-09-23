@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Pack;
 using Binacle.Packing;
 using Binacle.Data;
-using Binacle.Data.CustomProblems;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetSmallestBin;
 
@@ -24,13 +23,13 @@ public class PackPresetSmallestBinScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 
 	private async Task RunTest(string scenarioName)
 	{
-		var scenario = All.GetScenarioByName(scenarioName);
+		var scenario = All.GetByName(scenarioName);
 		var url = routePath.Replace("{preset}", PresetKeys.CustomProblems);
 
 		var request = new PackPresetSmallestBinRequest
@@ -62,7 +61,7 @@ public class PackPresetSmallestBinScenario
 
 		result.ShouldNotBeNull();
 		result!.Bin.ShouldNotBeNull();
-		Scenarios.GetDistinctBinIds().ShouldContain(result.Bin.ID);
+		CustomProblems.DataProvider.GetDistinctBinIds().ShouldContain(result.Bin.ID);
 
 		var itemsCount = (result.PackedItems?.Count ?? 0)
 		                 + (result.UnpackedItems?.Sum(x => x.Quantity) ?? 0);

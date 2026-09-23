@@ -1,16 +1,16 @@
-namespace Binacle.ViPaq.Data.Packed;
+namespace Binacle.ViPaq.Data.Packed.BischoffSuite;
 
 // Real placed results for the Bischoff suite (thpack1..7): the bin plus the placed items the packer produced.
 // Generated offline by Binacle.ViPaq.PackedDataGenerator for every algorithm, committed under
 // vipaq/data/packed/bischoff-suite/ and read here as embedded resources. No token is stored - it is derivable,
 // so the benchmark computes it. Do not hand-edit.
-public static class BischoffSuite
+public static class DataProvider
 {
 	private const string Family = "bischoff-suite";
 
 	private static readonly Dictionary<string, Scenario> scenarios = new();
 
-	static BischoffSuite()
+	static DataProvider()
 	{
 		foreach (var scenario in PackedDataReader.Read(Family))
 		{

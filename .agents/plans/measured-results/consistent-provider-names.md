@@ -63,8 +63,31 @@ noun has to carry that.
 doc, the shared doc, and `shared/data/Binacle.Data/README.md`, all of which now say the sets are mid-rename.
 Not built and not tested - a benchmark was running.
 
-Left: custom problems, demo samples, the three result-selection sets, the three ViPaq holders, then the
-`Testing` classes.
+**Slice 2, custom problems in `Binacle.Data`, 2026-09-24.** Same shape, no `ByCollection` - nothing walks its
+collections. `GetDistinctBins`, `GetDistinctBinIds` and `GetSmallestBin` keep their names, since they answer
+about bins. 26 files swept, 24 of them API integration tests, plus the two lib unit test files and `All.cs`.
+Docs: the api tests doc, the shared doc, and the lib design record's `check:` line, which named the two files
+by path.
+
+**Slice 3, demo samples in `Binacle.Data`, 2026-09-24.** Two callers only. With it, every set in that project
+speaks one vocabulary.
+
+**`Binacle.Data.All`, 2026-09-24.** The aggregate follows the sets - `Names`, `GetByName`, `TheoryNames` - with
+one difference the maintainer settled: the values are `All.Scenarios`, because the class is already called
+`All` and `All.All` reads as a mistake. 19 files swept.
+
+**Slice 4, the three result-selection sets in `Binacle.Lib.Data`, 2026-09-24.** Taken together: they share a
+reader, which became `ScenarioCollectionsReader` and `MultipleScenarioCollectionsReader`, both `internal`, the
+same as the shared pair. Callers use a `using` alias, because the bench class and the data namespace both carry
+the set's name - `BestBinData` in the bench, the plain set name in `ResultSelectionTests`.
+
+**Slice 5, the three ViPaq packed sets, 2026-09-24.** These already spoke the target vocabulary - they are
+where the rule came from - so only the class and the namespace moved: a folder per set under `Packed/`, each
+holding a `DataProvider`. Eight files swept across the ViPaq measure project, the unit tests and the two
+`Testing` picks. `PackedDataReader` stays where it is; it sits in an ancestor namespace, so the holders still
+see it.
+
+Left: the `Testing` classes - the sets and the generators.
 
 ## The renames
 

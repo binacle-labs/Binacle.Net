@@ -43,8 +43,8 @@ One namespace per set, one static `Scenarios` class in each, and the set's keys 
 | Class | `Keys` | Count |
 |---|---|---|
 | `Binacle.Data.BischoffSuite.DataProvider` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` | 7 |
-| `Binacle.Data.CustomProblems.Scenarios` | `CustomProblems/baseline`, `/simple`, `/complex` | 3 |
-| `Binacle.Data.DemoSamples.Scenarios` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file | 21 |
+| `Binacle.Data.CustomProblems.DataProvider` | `CustomProblems/baseline`, `/simple`, `/complex` | 3 |
+| `Binacle.Data.DemoSamples.DataProvider` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file | 21 |
 
 Data is embedded JSON, loaded by resource prefix. The manifest name is `Binacle.Data.<Set>.<name>.json`, and
 `ScenarioCollectionsReader` splits it into the collection key `<set>/<name>` lowercased. It and
@@ -59,7 +59,7 @@ the maintainer's call of 2026-09-23, since the code has not changed since it was
 **Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
 packer, so `PackingDemoSamplesTests` proves the algorithms still land where they did, not that they are
 right. A new file under `shared/data/demo-samples/` is embedded on its own but is not read until its key is
-added to `DemoSamples.Scenarios.Keys`. The set is also read by the demo component in
+added to `DemoSamples.DataProvider.Keys`. The set is also read by the demo component in
 `packages/binacle-net-ui/` and by ViPaq, which reads the *packed* form from `vipaq/data/packed/demo-samples/`
 through `Binacle.ViPaq.Data`.
 
@@ -112,26 +112,30 @@ the actual `PackedBinVolumePercentage` must be ≤ expected, within a 0.1% toler
 
 ## The set classes
 
-Static, lazily built, keyed by scenario `Name`. They are mid-rename, so two shapes are live:
+Static, lazily built, keyed by scenario `Name`. One class per set, called `DataProvider`, so a caller imports
+`Binacle.Data` and writes the set on the line: `BischoffSuite.DataProvider.GetByName(name)`.
 
-- `Binacle.Data.BischoffSuite.DataProvider` - `Names`, `All`, `GetByName(name)`, `TheoryNames`
-  (`IEnumerable<object[]>` for xUnit `[MemberData]`), `ByCollection(key)` for one thpack at a time, and
-  `GetDistinctBins()`. A caller imports `Binacle.Data` and writes `BischoffSuite.DataProvider`, so the line
-  names the set.
-- `Binacle.Data.CustomProblems.Scenarios` and `Binacle.Data.DemoSamples.Scenarios` - the older shape:
-  `GetScenarioNames()`, `ScenarioNames`, `GetScenarios()`, `GetScenarioByName(name)`. A caller imports that
-  set's namespace and writes `Scenarios`. The result-selection sets in `lib/data/Binacle.Lib.Data` are the
-  same.
-- `Binacle.Data.All` - every set, the by-name lookup, older shape.
+Every one exposes `Names`, `All`, `GetByName(name)` and `TheoryNames` (`IEnumerable<object[]>`, for xUnit
+`[MemberData]`). On top of that:
+
+- `BischoffSuite.DataProvider` - `ByCollection(key)`, one thpack at a time, and `GetDistinctBins()`.
+- `CustomProblems.DataProvider` - `GetDistinctBins()`, `GetDistinctBinIds()` and `GetSmallestBin()`.
+- `Binacle.Data.All` - every set together, the by-name lookup. Same members, except that the values are
+  `All.Scenarios`: the class is already called `All`.
+
+The result-selection sets in `lib/data/Binacle.Lib.Data` are the same shape: a `DataProvider` per set, under
+`ResultSelection.BestBin`, `.BestAlgorithm` and `.SmallestBin`. The ViPaq packed sets in `vipaq/data/Binacle.ViPaq.Data` follow it too:
+`Packed.BischoffSuite.DataProvider` and its two siblings, with `Names`, `All` and `GetByName` - they were the
+shape the rule came from.
 
 ### The bins a set runs against
 
 The Bischoff and custom-problems classes also answer for their **bins**, because the API tests register exactly those as a preset
 and must not restate the list (see `$api/tests`):
 
-- `BischoffSuite.Scenarios.GetDistinctBins()` and `CustomProblems.Scenarios.GetDistinctBins()` — one
+- `BischoffSuite.DataProvider.GetDistinctBins()` and `CustomProblems.DataProvider.GetDistinctBins()` — one
   `ScenarioBin` per ID, in the order the scenarios introduce them.
-- `CustomProblems.Scenarios` adds `GetDistinctBinIds()` and `GetSmallestBin()` (least volume).
+- `CustomProblems.DataProvider` adds `GetDistinctBinIds()` and `GetSmallestBin()` (least volume).
 
 Add a scenario with a new bin and the set grows on its own — nothing else needs editing.
 

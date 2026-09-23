@@ -3,7 +3,6 @@ using Binacle.Net.IntegrationTests.v4.Abstractions;
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Pack;
 using Binacle.Data;
-using Binacle.Data.CustomProblems;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetCompare;
 
@@ -100,7 +99,7 @@ public class PackPresetCompareBehavior : BehaviourTestsBase
 	public Task Post_ReturnsOneResultPerPresetBin()
 		=> base.PackCompareRequest_Validate(UrlFor(PresetKeys.CustomProblems), this.sampleRequest, result =>
 			result.Results.Select(x => x.Bin.ID)
-				.ShouldBe(Scenarios.GetDistinctBinIds()));
+				.ShouldBe(CustomProblems.DataProvider.GetDistinctBinIds()));
 
 	[Fact(DisplayName = $"POST {routePath}. With Algorithm FFD, Returns AlgorithmUsed FFD For Every Bin")]
 	public async Task Post_WithAlgorithmFFD_ReturnsAlgorithmUsedFFD()

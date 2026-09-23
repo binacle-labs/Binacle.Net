@@ -27,7 +27,7 @@ public static class BischoffCuratedProvider
 	public static IEnumerable<string> Names
 		=> TimingColumns.Values.Concat(CompressionCostColumns.Values).Distinct();
 
-	public static Scenario GetByName(string name) => BischoffSuite.GetByName(name);
+	public static Scenario GetByName(string name) => BischoffSuite.DataProvider.GetByName(name);
 
 	public static IEnumerable<string> GetCompressionCostNames() => CompressionCostColumns.Keys;
 

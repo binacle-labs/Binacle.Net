@@ -170,9 +170,9 @@ scenario introduces a new bin, so the providers answer for it:
 
 | Call | Gives |
 |---|---|
-| `CustomProblems.Scenarios.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
-| `CustomProblems.Scenarios.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
-| `CustomProblems.Scenarios.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
+| `CustomProblems.DataProvider.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
+| `CustomProblems.DataProvider.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
+| `CustomProblems.DataProvider.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
 | `BischoffSuite.DataProvider.GetDistinctBins()` | Same, for `biscoff-suite` |
 
 `BinacleApi` builds both presets from `GetDistinctBins()`, so a test asserting on a preset reads the same
@@ -266,7 +266,7 @@ covered the day it is added; nobody has to remember.
 ## Test host config
 
 - `BinacleApi.cs` — `ConfigureTestServices` clears `BinPresetOptions.Presets`, then registers `custom-problems`
-  (bins from `Binacle.Data.CustomProblems.Scenarios`), `biscoff-suite` (from `Binacle.Data.BischoffSuite.DataProvider`),
+  (bins from `Binacle.Data.CustomProblems.DataProvider`), `biscoff-suite` (from `Binacle.Data.BischoffSuite.DataProvider`),
   and `special` (the three special bins). Presets come from `Binacle.Data` — see shared (`$shared`).
   Runs with default modules (ServiceModule off), carrying a `// TODO: Run the tests with all modules enabled`.
 - `BinacleApiWithoutPresets.cs` — same shape but only clears presets (no registration); tests the no-presets path.

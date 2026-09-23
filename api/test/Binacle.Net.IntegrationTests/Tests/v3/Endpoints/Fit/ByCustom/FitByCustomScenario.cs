@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v3.Contracts;
 using Binacle.Data;
-using Binacle.Data.CustomProblems;
 using Binacle.Net.IntegrationTests.v3.ExtensionMethods;
 
 namespace Binacle.Net.IntegrationTests.v3.Endpoints.Fit.ByCustom;
@@ -20,13 +19,13 @@ public class FitByCustomScenario
 	private const string routePath = "/api/v3/fit/by-custom";
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 
 	private async Task RunTest(string scenarioName)
 	{
-		var scenario = All.GetScenarioByName(scenarioName);
+		var scenario = All.GetByName(scenarioName);
 		var request = new FitByCustomRequest
 		{
 			Parameters = new()

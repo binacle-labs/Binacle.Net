@@ -60,7 +60,7 @@ public static class DataProvider
 		=> byCollection[collectionKey];
 
 	// The bins these scenarios run against, one entry per ID. The API test host registers exactly this set as the
-	// `biscoff-suite` preset. See the note on CustomProblems.Scenarios.GetDistinctBins.
+	// `biscoff-suite` preset. See the note on CustomProblems.DataProvider.GetDistinctBins.
 	public static IReadOnlyList<ScenarioBin> GetDistinctBins()
 		=> distinctBins;
 }

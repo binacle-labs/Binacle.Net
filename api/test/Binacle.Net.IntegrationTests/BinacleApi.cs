@@ -61,7 +61,7 @@ public class BinacleApi : WebApplicationFactory<IApiMarker>
 				
 				options.Presets.Add(PresetKeys.CustomProblems, new BinPresetOption()
 				{
-					Bins = ToBinOptions(Binacle.Data.CustomProblems.Scenarios.GetDistinctBins())
+					Bins = ToBinOptions(Binacle.Data.CustomProblems.DataProvider.GetDistinctBins())
 				});
 
 				options.Presets.Add(PresetKeys.BiscoffSuite, new BinPresetOption()

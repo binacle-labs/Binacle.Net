@@ -1,5 +1,4 @@
 using Binacle.Data;
-using Binacle.Data.DemoSamples;
 
 #pragma warning disable xUnit1007 
 
@@ -16,7 +15,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_FFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -27,7 +26,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_FFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -38,7 +37,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_WFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -49,7 +48,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_WFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -60,7 +59,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -71,7 +70,7 @@ public class PackingDemoSamplesTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(Scenarios.ScenarioNames), MemberType = typeof(Scenarios))]
+	[MemberData(nameof(DemoSamples.DataProvider.TheoryNames), MemberType = typeof(DemoSamples.DataProvider))]
 	public void DemoSamples_Packing_BFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);

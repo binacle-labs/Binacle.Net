@@ -31,7 +31,7 @@ public class PackedDataRoundTripTests
 	[Fact]
 	public void Every_Family_Loads()
 	{
-		var families = new[] { BischoffSuite.All, CustomProblems.All, DemoSamples.All };
+		var families = new[] { BischoffSuite.DataProvider.All, CustomProblems.DataProvider.All, DemoSamples.DataProvider.All };
 
 		var counts = families.Select(family => family.Count).ToArray();
 
