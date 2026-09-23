@@ -1,4 +1,3 @@
-using Binacle.Data.BischoffSuite;
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
 
@@ -25,7 +24,7 @@ public abstract class BenchmarkBase
 		var algorithms = this.Set.Split(',').Select(Enum.Parse<Algorithm>).ToArray();
 		this.loop = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
 		this.parallel = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory);
-		this.scenario = Scenarios.GetScenarioByName(
+		this.scenario = BischoffSuite.DataProvider.GetByName(
 			BischoffCuratedProblemsProvider.ScenarioDescriptions[this.ScenarioName!]);
 	}
 

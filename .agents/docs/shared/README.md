@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-23
+verified: 2026-09-24
 check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -42,15 +42,18 @@ One namespace per set, one static `Scenarios` class in each, and the set's keys 
 
 | Class | `Keys` | Count |
 |---|---|---|
-| `Binacle.Data.BischoffSuite.Scenarios` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` | 7 |
+| `Binacle.Data.BischoffSuite.DataProvider` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` | 7 |
 | `Binacle.Data.CustomProblems.Scenarios` | `CustomProblems/baseline`, `/simple`, `/complex` | 3 |
 | `Binacle.Data.DemoSamples.Scenarios` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file | 21 |
 
 Data is embedded JSON, loaded by resource prefix. The manifest name is `Binacle.Data.<Set>.<name>.json`, and
-`ScenarioCollectionsProvider` splits it into the collection key `<set>/<name>` lowercased.
+`ScenarioCollectionsReader` splits it into the collection key `<set>/<name>` lowercased. It and
+`MultipleScenarioCollectionsReader` beside it are `internal`: nothing outside the project reads them, since a
+set that needs one collection at a time asks its own class (`BischoffSuite.DataProvider.ByCollection`).
 
-`Binacle.Lib.Data` has its own copy of `ScenarioCollectionsProvider` and `MultipleScenarioCollectionsProvider`
-for the result-selection files. The two copies differ in two lines, the namespace and the prefix. They stay two:
+`Binacle.Lib.Data` has its own copy of both, still named `ScenarioCollectionsProvider` and
+`MultipleScenarioCollectionsProvider`, for the result-selection files. The copies differ in two lines, the
+namespace and the prefix. They stay two:
 the maintainer's call of 2026-09-23, since the code has not changed since it was written.
 
 **Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
@@ -109,14 +112,17 @@ the actual `PackedBinVolumePercentage` must be ≤ expected, within a 0.1% toler
 
 ## The set classes
 
-Static, lazily built, keyed by scenario `Name`. Each exposes `GetScenarioNames()`, `ScenarioNames`
-(`IEnumerable<object[]>` for xUnit `[MemberData]`), `GetScenarios()`, `GetScenarioByName(name)`.
+Static, lazily built, keyed by scenario `Name`. They are mid-rename, so two shapes are live:
 
-- `Binacle.Data.All` (every set, the by-name lookup), `Binacle.Data.BischoffSuite.Scenarios`,
-  `Binacle.Data.CustomProblems.Scenarios`, `Binacle.Data.DemoSamples.Scenarios`
-
-A file that reads one set imports its namespace and writes `Scenarios`; a file that reads two writes the full
-name. The result-selection sets in `lib/data/Binacle.Lib.Data` follow the same shape.
+- `Binacle.Data.BischoffSuite.DataProvider` - `Names`, `All`, `GetByName(name)`, `TheoryNames`
+  (`IEnumerable<object[]>` for xUnit `[MemberData]`), `ByCollection(key)` for one thpack at a time, and
+  `GetDistinctBins()`. A caller imports `Binacle.Data` and writes `BischoffSuite.DataProvider`, so the line
+  names the set.
+- `Binacle.Data.CustomProblems.Scenarios` and `Binacle.Data.DemoSamples.Scenarios` - the older shape:
+  `GetScenarioNames()`, `ScenarioNames`, `GetScenarios()`, `GetScenarioByName(name)`. A caller imports that
+  set's namespace and writes `Scenarios`. The result-selection sets in `lib/data/Binacle.Lib.Data` are the
+  same.
+- `Binacle.Data.All` - every set, the by-name lookup, older shape.
 
 ### The bins a set runs against
 

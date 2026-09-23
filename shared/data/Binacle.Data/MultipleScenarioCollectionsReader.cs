@@ -2,15 +2,15 @@ using System.Collections;
 
 namespace Binacle.Data;
 
-internal class MultipleScenarioCollectionsProvider : IEnumerable<CollectionScenario>
+internal class MultipleScenarioCollectionsReader : IEnumerable<CollectionScenario>
 {
 	private readonly List<CollectionScenario> scenarios;
-	internal MultipleScenarioCollectionsProvider(string[] collectionKeys)
+	internal MultipleScenarioCollectionsReader(string[] collectionKeys)
 	{
 		this.scenarios = new List<CollectionScenario>();
 		foreach (var collectionKey in collectionKeys)
 		{
-			var collectionScenarios = ScenarioCollectionsProvider.GetScenarios(collectionKey)
+			var collectionScenarios = ScenarioCollectionsReader.GetScenarios(collectionKey)
 				.Select(x => new CollectionScenario(collectionKey, x));
 			this.scenarios.AddRange(collectionScenarios);
 		}

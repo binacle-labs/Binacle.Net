@@ -1,5 +1,3 @@
-using Binacle.Data.BischoffSuite;
-
 namespace Binacle.Lib.Testing.Providers;
 
 // Thirty of the 700, picked from lib/results/packing-efficiency.md on 2026-09-21: every outcome the fills
@@ -47,5 +45,5 @@ public static class BischoffSampleProblemsProvider
 		=> scenarios.Keys;
 
 	public static Scenario GetScenarioByName(string name)
-		=> Scenarios.GetScenarioByName(scenarios[name]);
+		=> BischoffSuite.DataProvider.GetByName(scenarios[name]);
 }

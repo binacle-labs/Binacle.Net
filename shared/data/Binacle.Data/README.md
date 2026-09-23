@@ -8,7 +8,7 @@ names no packing result - the checks live with the lib tests.
 
 | Path | What it is |
 |---|---|
-| `BischoffSuite/`, `CustomProblems/`, `DemoSamples/` | One `Scenarios` class per set - its keys and every scenario by name; the first two also answer for their distinct bins |
+| `BischoffSuite/`, `CustomProblems/`, `DemoSamples/` | One class per set - its keys and every scenario by name; the first two also answer for their distinct bins. Bischoff is `DataProvider`, the other two are still `Scenarios` |
 | `All.cs` | Every scenario of every set, by name |
 | `Scenario.cs`, `ScenarioBin.cs`, `ScenarioItem.cs`, `ScenarioMetrics.cs`, `ScenarioResult.cs`, `AlgorithmResult.cs` | The models a scenario reads into |
 | `Helpers/` | The parsers for the compact `Metrics` and `Result` strings |
@@ -17,20 +17,22 @@ names no packing result - the checks live with the lib tests.
 
 The set folders you see in the IDE are not on disk. The JSON lives in the sibling folders (`../bischoff-suite`,
 `../custom-problems`, `../demo-samples`) and is linked in by the csproj; edit it there. A new file is embedded
-on its own, but is not read until its key is in that set's `Scenarios.Keys`.
+on its own, but is not read until its key is in that set's `Keys`.
 
 ## 🛠️ How you use it
 
 ```csharp
-using Binacle.Data.BischoffSuite;
+using Binacle.Data;
 
-foreach (var scenario in Scenarios.GetScenarios()) { ... }
-Scenarios.GetScenarioByName("OrLibrary_thpack1_1");
-All.GetScenarioByName("Complex_FitsInSmall_1");   // any set
+foreach (var scenario in BischoffSuite.DataProvider.All) { ... }
+BischoffSuite.DataProvider.GetByName("OrLibrary_thpack1_1");
+BischoffSuite.DataProvider.ByCollection("BischoffSuite/orlib_thpack1");   // one thpack
+All.GetScenarioByName("Complex_FitsInSmall_1");                           // any set
 ```
 
-A file that reads one set imports that set's namespace and writes `Scenarios`. A file that reads two writes the
-full name, `Binacle.Data.CustomProblems.Scenarios`.
+The sets are mid-rename. Bischoff is `DataProvider`: import `Binacle.Data` and write the set on the line, so
+you can see which one you read. The other two are still `Scenarios`, read by importing that set's namespace
+(`using Binacle.Data.CustomProblems;`) and writing `Scenarios`.
 
 ## ⚠️ What will bite you
 

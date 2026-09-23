@@ -31,9 +31,9 @@ public static class Scenarios
 
 	static Scenarios()
 	{
-		var dataProvider = new MultipleScenarioCollectionsProvider(Keys);
+		var collections = new MultipleScenarioCollectionsReader(Keys);
 		scenarios = new Dictionary<string, Scenario>();
-		foreach (var collectionScenario in dataProvider)
+		foreach (var collectionScenario in collections)
 		{
 			var scenario = collectionScenario.Scenario;
 			scenarios.Add(scenario.Name, scenario);

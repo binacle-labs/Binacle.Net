@@ -6,16 +6,16 @@ public static class All
 	private static readonly Dictionary<string, Scenario> scenarios;
 	static All()
 	{
-		MultipleScenarioCollectionsProvider[] dataProviders =
+		MultipleScenarioCollectionsReader[] readers =
 		[
-			new MultipleScenarioCollectionsProvider(BischoffSuite.Scenarios.Keys),
-			new MultipleScenarioCollectionsProvider(CustomProblems.Scenarios.Keys),
-			new MultipleScenarioCollectionsProvider(DemoSamples.Scenarios.Keys)
+			new MultipleScenarioCollectionsReader(BischoffSuite.DataProvider.Keys),
+			new MultipleScenarioCollectionsReader(CustomProblems.Scenarios.Keys),
+			new MultipleScenarioCollectionsReader(DemoSamples.Scenarios.Keys)
 		];
 		scenarios = new Dictionary<string, Scenario>();
-		foreach (var dataProvider in dataProviders)
+		foreach (var reader in readers)
 		{
-			foreach (var collectionScenario in dataProvider)
+			foreach (var collectionScenario in reader)
 			{
 				var scenario = collectionScenario.Scenario;
 				scenarios.Add(scenario.Name, scenario);

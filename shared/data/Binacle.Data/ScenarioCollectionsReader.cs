@@ -3,18 +3,18 @@ using Binacle.Data.Files;
 
 namespace Binacle.Data;
 
-public static class ScenarioCollectionsProvider
+internal static class ScenarioCollectionsReader
 {
 	private const string ResourcePrefix = "Binacle.Data.";
 
 	private static Dictionary<string, List<Scenario>> collections;
 
 	public static ReadOnlyDictionary<string, List<Scenario>> Collections => collections.AsReadOnly();
-	static ScenarioCollectionsProvider()
+	static ScenarioCollectionsReader()
 	{
 		collections = new Dictionary<string, List<Scenario>>();
 
-		var files = EmbeddedResourceFileProvider.ByPrefix(typeof(ScenarioCollectionsProvider).Assembly, ResourcePrefix);
+		var files = EmbeddedResourceFileProvider.ByPrefix(typeof(ScenarioCollectionsReader).Assembly, ResourcePrefix);
 
 		foreach (var file in files)
 		{

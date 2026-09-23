@@ -28,10 +28,10 @@ internal sealed class PackingRunner : IRunner
 
 	public void Run()
 	{
-		foreach (var collectionKey in Binacle.Data.BischoffSuite.Scenarios.Keys)
+		foreach (var collectionKey in BischoffSuite.DataProvider.Keys)
 		{
 			var set = SetLabel(collectionKey);
-			foreach (var scenario in ScenarioCollectionsProvider.GetScenarios(collectionKey))
+			foreach (var scenario in BischoffSuite.DataProvider.ByCollection(collectionKey))
 			{
 				var fills = new Dictionary<string, decimal>();
 				foreach (var (family, version, create) in algorithms)

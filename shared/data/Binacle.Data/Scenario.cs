@@ -3,7 +3,7 @@ using Binacle.Data.Helpers;
 namespace Binacle.Data;
 
 public record CollectionScenario(
-	string ConnectionKey,
+	string CollectionKey,
 	Scenario Scenario
 );
 

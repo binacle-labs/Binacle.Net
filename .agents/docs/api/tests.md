@@ -1,7 +1,7 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-09-23
+verified: 2026-09-24
 check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only endpoint folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
@@ -173,7 +173,7 @@ scenario introduces a new bin, so the providers answer for it:
 | `CustomProblems.Scenarios.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
 | `CustomProblems.Scenarios.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
 | `CustomProblems.Scenarios.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
-| `BischoffSuite.Scenarios.GetDistinctBins()` | Same, for `biscoff-suite` |
+| `BischoffSuite.DataProvider.GetDistinctBins()` | Same, for `biscoff-suite` |
 
 `BinacleApi` builds both presets from `GetDistinctBins()`, so a test asserting on a preset reads the same
 source it was registered from and the two cannot drift.
@@ -266,7 +266,7 @@ covered the day it is added; nobody has to remember.
 ## Test host config
 
 - `BinacleApi.cs` — `ConfigureTestServices` clears `BinPresetOptions.Presets`, then registers `custom-problems`
-  (bins from `Binacle.Data.CustomProblems.Scenarios`), `biscoff-suite` (from `Binacle.Data.BischoffSuite.Scenarios`),
+  (bins from `Binacle.Data.CustomProblems.Scenarios`), `biscoff-suite` (from `Binacle.Data.BischoffSuite.DataProvider`),
   and `special` (the three special bins). Presets come from `Binacle.Data` — see shared (`$shared`).
   Runs with default modules (ServiceModule off), carrying a `// TODO: Run the tests with all modules enabled`.
 - `BinacleApiWithoutPresets.cs` — same shape but only clears presets (no registration); tests the no-presets path.

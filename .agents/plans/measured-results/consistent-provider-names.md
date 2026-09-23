@@ -52,6 +52,20 @@ The curated gate then checks three sets instead of two.
 the opposite - random packs report the reverse of real behaviour on size, and must never be used for it. The
 noun has to carry that.
 
+## Landed
+
+**Slice 1, Bischoff in `Binacle.Data`, 2026-09-24.** `Scenarios` is `DataProvider`, with `Names`, `All`,
+`GetByName`, `TheoryNames` (the xUnit `MemberData` wrapper), `Keys` and `GetDistinctBins` unchanged, and a new
+`ByCollection(key)` that hands back one thpack. Nine call sites now write `BischoffSuite.DataProvider` and the
+`using Binacle.Data.BischoffSuite` imports are gone. The plumbing became `ScenarioCollectionsReader` and
+`MultipleScenarioCollectionsReader`, both `internal`, and `PackingRunner` stopped reaching past the holder.
+`CollectionScenario.ConnectionKey` was a typo for `CollectionKey` and is fixed. Docs rewritten: the api tests
+doc, the shared doc, and `shared/data/Binacle.Data/README.md`, all of which now say the sets are mid-rename.
+Not built and not tested - a benchmark was running.
+
+Left: custom problems, demo samples, the three result-selection sets, the three ViPaq holders, then the
+`Testing` classes.
+
 ## The renames
 
 | Today | Becomes | Kind | Used by |
