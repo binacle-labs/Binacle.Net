@@ -2,7 +2,7 @@
 
 Should the parallel processors be wired up, and from what size? Production runs `Loop` everywhere; this is
 the evidence. Two families, both rows `Loop` (baseline) and `Parallel`, on the synthetic ladder in
-`lib/test/Binacle.Lib.Testing/Providers/SpecializedScalingProblemsProvider.cs`:
+`lib/test/Binacle.Lib.Testing/LadderGenerator.cs`:
 
 - **Algorithms** - one bin, the two sets production races (`FFD,BFD`, `FFD,WFD,BFD`), the item ladder.
 - **Bins** - one algorithm (FFD or BFD, the multi-bin routes never run WFD), bins 1 to 7, the item ladder.

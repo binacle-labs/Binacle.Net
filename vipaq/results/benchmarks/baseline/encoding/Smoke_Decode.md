@@ -10,16 +10,16 @@ Job=ShortRun  IterationCount=3  LaunchCount=1
 WarmupCount=3  
 
 ```
-| Method         | ScenarioName      | Mean         | Error      | StdDev    | Ratio | RatioSD | Gen0   | Gen1   | Allocated | Alloc Ratio |
-|--------------- |------------------ |-------------:|-----------:|----------:|------:|--------:|-------:|-------:|----------:|------------:|
-| **Protobuf**       | **one item**          |     **88.30 ns** |  **25.281 ns** |  **1.386 ns** |  **1.00** |    **0.02** | **0.0564** |      **-** |     **472 B** |        **1.00** |
-| ViPaq_Row      | one item          |     85.48 ns |  10.815 ns |  0.593 ns |  0.97 |    0.01 | 0.0362 |      - |     304 B |        0.64 |
-| ViPaq_Columnar | one item          |     84.78 ns |   1.250 ns |  0.069 ns |  0.96 |    0.01 | 0.0362 |      - |     304 B |        0.64 |
-|                |                   |              |            |           |       |         |        |        |           |             |
-| **Protobuf**       | **typical container** |  **2,046.22 ns** | **355.583 ns** | **19.491 ns** |  **1.00** |    **0.01** | **0.8049** | **0.0153** |    **6760 B** |        **1.00** |
-| ViPaq_Row      | typical container |  2,438.59 ns | 568.991 ns | 31.188 ns |  1.19 |    0.02 | 0.5875 | 0.0038 |    4936 B |        0.73 |
-| ViPaq_Columnar | typical container |  2,569.58 ns | 280.185 ns | 15.358 ns |  1.26 |    0.01 | 0.5875 | 0.0038 |    4936 B |        0.73 |
-|                |                   |              |            |           |       |         |        |        |           |             |
-| **Protobuf**       | **largest real pack** | **10,947.62 ns** | **998.621 ns** | **54.738 ns** |  **1.00** |    **0.01** | **3.7537** | **0.3052** |   **31400 B** |        **1.00** |
-| ViPaq_Row      | largest real pack | 12,385.08 ns | 594.318 ns | 32.577 ns |  1.13 |    0.01 | 2.9449 | 0.1373 |   24705 B |        0.79 |
-| ViPaq_Columnar | largest real pack | 12,154.21 ns | 781.094 ns | 42.814 ns |  1.11 |    0.01 | 2.9449 | 0.1373 |   24705 B |        0.79 |
+| Method         | ScenarioName      | Mean         | Error      | StdDev    | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
+|--------------- |------------------ |-------------:|-----------:|----------:|------:|-------:|-------:|----------:|------------:|
+| **Protobuf**       | **one item**          |     **86.26 ns** |   **3.126 ns** |  **0.171 ns** |  **1.00** | **0.0564** |      **-** |     **472 B** |        **1.00** |
+| ViPaq_Row      | one item          |     83.27 ns |  26.180 ns |  1.435 ns |  0.97 | 0.0362 |      - |     304 B |        0.64 |
+| ViPaq_Columnar | one item          |     83.62 ns |   2.222 ns |  0.122 ns |  0.97 | 0.0362 |      - |     304 B |        0.64 |
+|                |                   |              |            |           |       |        |        |           |             |
+| **Protobuf**       | **typical container** |  **1,988.59 ns** |  **87.700 ns** |  **4.807 ns** |  **1.00** | **0.8049** | **0.0153** |    **6760 B** |        **1.00** |
+| ViPaq_Row      | typical container |  2,403.66 ns |  23.269 ns |  1.275 ns |  1.21 | 0.5875 | 0.0038 |    4936 B |        0.73 |
+| ViPaq_Columnar | typical container |  2,520.92 ns |  88.035 ns |  4.825 ns |  1.27 | 0.5875 | 0.0038 |    4936 B |        0.73 |
+|                |                   |              |            |           |       |        |        |           |             |
+| **Protobuf**       | **largest real pack** | **10,886.49 ns** | **764.222 ns** | **41.890 ns** |  **1.00** | **3.7537** | **0.3052** |   **31400 B** |        **1.00** |
+| ViPaq_Row      | largest real pack | 12,235.89 ns | 368.230 ns | 20.184 ns |  1.12 | 2.9449 | 0.1373 |   24705 B |        0.79 |
+| ViPaq_Columnar | largest real pack | 12,642.17 ns | 139.312 ns |  7.636 ns |  1.16 | 2.9449 | 0.1373 |   24705 B |        0.79 |

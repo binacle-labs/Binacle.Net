@@ -6,6 +6,9 @@ using Binacle.ViPaq.Testing.Json;
 using Binacle.ViPaq.Testing.Protobuf;
 using Binacle.ViPaq.Testing.ViPaq;
 using Microsoft.Extensions.Logging;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
+using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize;
 
@@ -15,9 +18,9 @@ internal sealed class EncodingRunner : IRunner
 {
 	private static readonly (string Family, IReadOnlyCollection<Scenario> Packs)[] Families =
 	[
-		("bischoff-suite", BischoffSuite.DataProvider.All),
-		("custom-problems", CustomProblems.DataProvider.All),
-		("demo-samples", DemoSamples.DataProvider.All)
+		("bischoff-suite", BischoffSuite.All),
+		("custom-problems", CustomProblems.All),
+		("demo-samples", DemoSamples.All)
 	];
 
 	private static readonly (string Name, ICompressionCodec Codec)[] CodecList =

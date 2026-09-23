@@ -168,12 +168,14 @@ The `custom-problems` and `biscoff-suite` presets are **not written down anywher
 whatever bins the scenarios use. That set is owned by the scenario data (`$shared`) and grows whenever a
 scenario introduces a new bin, so the providers answer for it:
 
+Each set is aliased at the top of the file, `using CustomProblems = Binacle.Data.CustomProblems.DataProvider;`.
+
 | Call | Gives |
 |---|---|
-| `CustomProblems.DataProvider.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
-| `CustomProblems.DataProvider.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
-| `CustomProblems.DataProvider.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
-| `BischoffSuite.DataProvider.GetDistinctBins()` | Same, for `biscoff-suite` |
+| `CustomProblems.GetDistinctBins()` | The bins, one per ID, in the order scenarios introduce them |
+| `CustomProblems.GetDistinctBinIds()` | Just the IDs — for asserting a preset's contents |
+| `CustomProblems.GetSmallestBin()` | The least roomy bin; an item that fits it fits them all |
+| `BischoffSuite.GetDistinctBins()` | Same, for `biscoff-suite` |
 
 `BinacleApi` builds both presets from `GetDistinctBins()`, so a test asserting on a preset reads the same
 source it was registered from and the two cannot drift.

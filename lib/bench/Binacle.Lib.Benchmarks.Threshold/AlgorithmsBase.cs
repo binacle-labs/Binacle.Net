@@ -25,8 +25,8 @@ public abstract class AlgorithmsBase
 		var algorithms = this.Set.Split(',').Select(Enum.Parse<Algorithm>).ToArray();
 		this.loop = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
 		this.parallel = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory);
-		this.bin = ScenarioBin.FromCompactString(SpecializedScalingProblemsProvider.MaxSizeBin);
-		this.items = SpecializedScalingProblemsProvider.GetItems(this.Items);
+		this.bin = ScenarioBin.FromCompactString(LadderGenerator.MaxSizeBin);
+		this.items = LadderGenerator.GetItems(this.Items);
 	}
 
 	[Benchmark(Baseline = true)]

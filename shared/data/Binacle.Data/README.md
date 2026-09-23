@@ -8,7 +8,7 @@ names no packing result - the checks live with the lib tests.
 
 | Path | What it is |
 |---|---|
-| `BischoffSuite/`, `CustomProblems/`, `DemoSamples/` | One class per set - its keys and every scenario by name; the first two also answer for their distinct bins. Bischoff is `DataProvider`, the other two are still `Scenarios` |
+| `BischoffSuite/`, `CustomProblems/`, `DemoSamples/` | One `DataProvider` per set - its keys and every scenario by name; the first two also answer for their distinct bins |
 | `All.cs` | Every scenario of every set, by name |
 | `Scenario.cs`, `ScenarioBin.cs`, `ScenarioItem.cs`, `ScenarioMetrics.cs`, `ScenarioResult.cs`, `AlgorithmResult.cs` | The models a scenario reads into |
 | `Helpers/` | The parsers for the compact `Metrics` and `Result` strings |
@@ -22,17 +22,18 @@ on its own, but is not read until its key is in that set's `Keys`.
 ## 🛠️ How you use it
 
 ```csharp
-using Binacle.Data;
+using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
 
-foreach (var scenario in BischoffSuite.DataProvider.All) { ... }
-BischoffSuite.DataProvider.GetByName("OrLibrary_thpack1_1");
-BischoffSuite.DataProvider.ByCollection("BischoffSuite/orlib_thpack1");   // one thpack
-All.GetScenarioByName("Complex_FitsInSmall_1");                           // any set
+foreach (var scenario in BischoffSuite.All) { ... }
+BischoffSuite.GetByName("OrLibrary_thpack1_1");
+BischoffSuite.ByCollection("BischoffSuite/orlib_thpack1");   // one thpack
+All.GetByName("Complex_FitsInSmall_1");                      // any set
 ```
 
-The sets are mid-rename. Bischoff is `DataProvider`: import `Binacle.Data` and write the set on the line, so
-you can see which one you read. The other two are still `Scenarios`, read by importing that set's namespace
-(`using Binacle.Data.CustomProblems;`) and writing `Scenarios`.
+**Alias the set at the top of the file.** Each set's class is `DataProvider`, one per namespace, so a bare
+`using Binacle.Data;` will not reach it - a using directive imports a namespace's types, not its nested
+namespaces. The alias puts the set's name on every line that takes a scenario, which is the point: two files
+away, the same class name means a different set.
 
 ## ⚠️ What will bite you
 

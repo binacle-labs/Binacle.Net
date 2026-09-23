@@ -1,7 +1,7 @@
 
-namespace Binacle.Lib.Testing.Providers;
+namespace Binacle.Lib.Testing;
 
-public static class CubeScalingProblemsProvider
+public static class CubeGenerator
 {
     public static Scenario GetBaseline()
     {

@@ -53,11 +53,12 @@ it constructs the internal algorithm classes.
   (**not** on `ScenarioResult`, which is the map). The `AlgorithmResult` one picks the packing or the fitting
   expected status by `result.AlgorithmOperation`, then throws on mismatch. `OperationResultExtensions` holds
   the volume and count totals they compare against.
-- `Providers/` — the benchmark picks. `SmokeProblemsProvider` (the four smoke scenarios by name: `full bin, one type`,
-  `small order`, `typical container`, `many item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
-  `<category> (<id>)`), `BischoffCuratedProblemsProvider` (five scenarios keyed `typical container`, `BFD wins big`,
-  `near tie`, `WFD falls over`, `many item types` — Racing reads the keys), `CubeScalingProblemsProvider` (one
-  cube baseline, `GetBaseline`), `SpecializedScalingProblemsProvider` (the ladders the threshold and scaling projects climb).
+- The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the four
+  smoke scenarios by name: `full bin, one type`, `small order`, `typical container`, `many item types`),
+  `SampleSet` (30 Bischoff problems, name `<category> (<id>)`), `RacingSet` (five scenarios keyed `typical
+  container`, `BFD wins big`, `near tie`, `WFD falls over`, `many item types`).
+- The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
+  and `LadderGenerator` (the bin and item ladders the threshold and scaling projects climb).
 
 ## Binacle.Lib.UnitTests
 
@@ -128,9 +129,9 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
 `[GlobalSetup]` through the abstract `Load`, and `Run(factory)` executes it with the abstract `Operation`.
 
 - `Smoke_<FFD|WFD|BFD>_<Packing|Fitting>` (`SmokeBase`): rows `v1` (baseline) and `v2`, the column from
-  `[ParamsSource]` over `SmokeProblemsProvider.GetScenarioNames`. 48 cases, `short` job.
+  `[ParamsSource]` over `SmokeSet.Names`. 48 cases, `short` job.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
-  `BischoffSampleProblemsProvider.GetScenarioNames`. 360 cases, default job, `short` with `quick`.
+  `SampleSet.Names`. 360 cases, default job, `short` with `quick`.
 - `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.DataProvider.Names`,
   all 700. 8,400 cases, `short` job, default with `precise`.
 
@@ -144,7 +145,7 @@ lib's **internal** `AlgorithmFactory_v1()` / `AlgorithmFactory_v2()` (`lib/src/B
 `ParallelAlgorithmProcessor` for the `Set` param (`FFD,BFD`, `FFD,WFD,BFD` - the two production races), loads
 the scenario by the abstract `ScenarioName`, and holds the rows `Loop` (baseline) and `Parallel`.
 `Smoke_Packing` (v2; `typical container`, `BFD wins big`) is 8 cases at `short`; `Sample_Packing_v1` and `_v2`
-(`BischoffCuratedProblemsProvider`'s five keys) are 40 cases at the default job. Every class is `[MemoryDiagnoser]`.
+(`RacingSet`'s five keys) are 40 cases at the default job. Every class is `[MemoryDiagnoser]`.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 
@@ -156,14 +157,14 @@ the `short` job.
 
 ## Binacle.Lib.Benchmarks.Scaling
 
-In `lib/bench/`. Packing time against item count, on the item ladder in `SpecializedScalingProblemsProvider`.
+In `lib/bench/`. Packing time against item count, on the item ladder in `LadderGenerator`.
 One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over all 11 steps (3 to 79 items), the bin fixed
 at `MaxSizeBin`, and six rows through the public `AlgorithmFactories` - `FFD_v1` (baseline), `FFD_v2`,
 `WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. 66 cases at the default job, `short` with `quick`.
 
 ## Binacle.Lib.Benchmarks.Threshold
 
-In `lib/bench/`. Loop against Parallel on the ladders in `SpecializedScalingProblemsProvider`, the evidence for
+In `lib/bench/`. Loop against Parallel on the ladders in `LadderGenerator`, the evidence for
 whether the parallel processors get wired up (`$lib/findings`). Two bases, each with rows `Loop` (baseline) and
 `Parallel`, the lib's **internal** factories, and abstract `Items` (and `Bins`) params so each tier picks its
 own steps:

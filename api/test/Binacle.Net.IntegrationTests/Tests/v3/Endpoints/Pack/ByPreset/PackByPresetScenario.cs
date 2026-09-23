@@ -6,6 +6,7 @@ using Binacle.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Binacle.Net.IntegrationTests.v3.ExtensionMethods;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Net.IntegrationTests.v3.Endpoints.Pack.ByPreset;
 
@@ -22,7 +23,7 @@ public class PackByPresetScenario
 	private const string routePath = "/api/v3/pack/by-preset/{preset}";
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 

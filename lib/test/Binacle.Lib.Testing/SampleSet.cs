@@ -1,8 +1,10 @@
-namespace Binacle.Lib.Testing.Providers;
+using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
+
+namespace Binacle.Lib.Testing;
 
 // Thirty of the 700, picked from lib/results/packing-efficiency.md on 2026-09-21: every outcome the fills
 // show, both size ends, both fit ends. The name printed is "<category> (<id>)".
-public static class BischoffSampleProblemsProvider
+public static class SampleSet
 {
 	private static readonly (string Category, string Id)[] picks =
 	[
@@ -41,9 +43,9 @@ public static class BischoffSampleProblemsProvider
 	private static readonly Dictionary<string, string> scenarios
 		= picks.ToDictionary(p => $"{p.Category} ({p.Id})", p => $"OrLibrary_{p.Id}");
 
-	public static IEnumerable<string> GetScenarioNames()
+	public static IEnumerable<string> Names
 		=> scenarios.Keys;
 
-	public static Scenario GetScenarioByName(string name)
-		=> BischoffSuite.DataProvider.GetByName(scenarios[name]);
+	public static Scenario GetByName(string name)
+		=> BischoffSuite.GetByName(scenarios[name]);
 }

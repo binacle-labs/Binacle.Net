@@ -12,7 +12,7 @@ public abstract class EncodeBase : BenchmarkBase
 	private ViPaqEncoder vipaqEncoder = null!;
 
 	protected override Scenario Load(string name)
-		=> CuratedScenarioProvider.GetScenarioByName(name);
+		=> TimingSet.GetByName(name);
 
 	public override void GlobalSetup()
 	{

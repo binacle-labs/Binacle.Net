@@ -24,8 +24,7 @@ public abstract class BenchmarkBase
 		var algorithms = this.Set.Split(',').Select(Enum.Parse<Algorithm>).ToArray();
 		this.loop = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
 		this.parallel = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory);
-		this.scenario = BischoffSuite.DataProvider.GetByName(
-			BischoffCuratedProblemsProvider.ScenarioDescriptions[this.ScenarioName!]);
+		this.scenario = RacingSet.GetByName(this.ScenarioName!);
 	}
 
 	[Benchmark(Baseline = true)]

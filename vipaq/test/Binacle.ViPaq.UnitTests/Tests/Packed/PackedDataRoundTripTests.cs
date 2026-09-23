@@ -1,6 +1,9 @@
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.Data.Packed;
 using Binacle.ViPaq.UnitTests.Providers;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
+using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.UnitTests;
 
@@ -31,7 +34,7 @@ public class PackedDataRoundTripTests
 	[Fact]
 	public void Every_Family_Loads()
 	{
-		var families = new[] { BischoffSuite.DataProvider.All, CustomProblems.DataProvider.All, DemoSamples.DataProvider.All };
+		var families = new[] { BischoffSuite.All, CustomProblems.All, DemoSamples.All };
 
 		var counts = families.Select(family => family.Count).ToArray();
 

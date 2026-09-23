@@ -9,7 +9,7 @@ compressing costs is a class of its own.
 
 | Path | What it is |
 |---|---|
-| `Smoke_Encode.cs`, `Smoke_Decode.cs` | Three columns: one item, the typical container, the largest real pack |
+| `Smoke_Encode.cs`, `Smoke_Decode.cs` | Three columns: one item, the typical container, the largest FFD pack |
 | `Sample_Encode.cs`, `Sample_Decode.cs` | Twelve columns: six real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
 | `EncodeBase.cs`, `DecodeBase.cs` | The rows both tiers time - four on encode, three on decode; the test `JsonEncoder` has no decode |
 | `Sample_CompressionCost_Encode.cs`, `_Decode.cs` | NoOp against Deflate and Gzip, row-major, on the low and the high end of deflate's win; each compares to its own NoOp |
@@ -17,7 +17,7 @@ compressing costs is a class of its own.
 | `BenchmarkBase.cs` | Loads the column's scenario before the run |
 | `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 
-The picks are in `vipaq/test/Binacle.ViPaq.Testing/Providers/`, keyed by the column name the report prints.
+The picks are in `vipaq/test/Binacle.ViPaq.Testing/`, keyed by the column name the report prints: `TimingSet` joins `BischoffTimingSet`, `CustomProblemsTimingSet` and `SyntheticGenerator`; `CompressionCostSet` stands on its own.
 
 ## 🛠️ How you use it
 

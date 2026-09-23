@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Fit;
 using Binacle.Data;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Fit.PresetSmallestBin;
 
@@ -23,7 +24,7 @@ public class FitPresetSmallestBinScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 
@@ -61,7 +62,7 @@ public class FitPresetSmallestBinScenario
 
 		result.ShouldNotBeNull();
 		result!.Bin.ShouldNotBeNull();
-		CustomProblems.DataProvider.GetDistinctBinIds().ShouldContain(result.Bin.ID);
+		CustomProblems.GetDistinctBinIds().ShouldContain(result.Bin.ID);
 
 		if (scenario.Result.For(request.Parameters.GetAlgorithm()!.Value).FittingStatus == OperationResultStatus.FullyPacked)
 		{

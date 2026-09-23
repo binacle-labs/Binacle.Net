@@ -1,4 +1,5 @@
 using Binacle.Data;
+using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -13,7 +14,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_FFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -24,7 +25,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_FFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -35,7 +36,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_WFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -46,7 +47,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_WFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -57,7 +58,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -68,7 +69,7 @@ public class PackingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuite.DataProvider.TheoryNames), MemberType = typeof(BischoffSuite.DataProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Packing_BFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);

@@ -112,8 +112,10 @@ the actual `PackedBinVolumePercentage` must be ≤ expected, within a 0.1% toler
 
 ## The set classes
 
-Static, lazily built, keyed by scenario `Name`. One class per set, called `DataProvider`, so a caller imports
-`Binacle.Data` and writes the set on the line: `BischoffSuite.DataProvider.GetByName(name)`.
+Static, lazily built, keyed by scenario `Name`. One class per set, called `DataProvider`, aliased at the top
+of each caller so every line says the set:
+`using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;` then `BischoffSuite.GetByName(name)`. The
+alias is required: a using directive imports a namespace's types, not its nested namespaces.
 
 Every one exposes `Names`, `All`, `GetByName(name)` and `TheoryNames` (`IEnumerable<object[]>`, for xUnit
 `[MemberData]`). On top of that:

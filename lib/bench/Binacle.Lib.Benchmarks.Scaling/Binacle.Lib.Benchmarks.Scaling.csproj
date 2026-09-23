@@ -15,7 +15,6 @@
     <Using Include="Binacle.Packing" />
     <Using Include="Binacle.Data" />
     <Using Include="Binacle.Lib.Testing" />
-    <Using Include="Binacle.Lib.Testing.Providers" />
     <Using Include="Binacle.Benchmarking" />
     <Using Include="BenchmarkDotNet.Attributes" />
   </ItemGroup>

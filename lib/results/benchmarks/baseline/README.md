@@ -8,7 +8,7 @@ renamed to its class.
 
 ## 🖥️ Where it ran
 
-Copied 2026-09-23, from runs made that day on one machine:
+Copied 2026-09-23 and 2026-09-24, from runs made on those days on one machine:
 
 - AMD Ryzen 9 9900X, 12 cores, Ubuntu 26.04.1
 - .NET 10.0.12 (SDK 10.0.112), BenchmarkDotNet 0.15.8

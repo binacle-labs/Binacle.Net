@@ -24,8 +24,8 @@ public abstract class BinsBase
 	{
 		this.loop = new LoopBinProcessor(this.AlgorithmFactory);
 		this.parallel = new ParallelBinProcessor(this.AlgorithmFactory);
-		this.bins = SpecializedScalingProblemsProvider.GetBins(this.Bins);
-		this.items = SpecializedScalingProblemsProvider.GetItems(this.Items);
+		this.bins = LadderGenerator.GetBins(this.Bins);
+		this.items = LadderGenerator.GetItems(this.Items);
 	}
 
 	[Benchmark(Baseline = true)]

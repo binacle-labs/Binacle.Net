@@ -18,10 +18,10 @@ csproj; regenerate it there, never edit it. A new file is embedded and read on i
 ## 🛠️ How you use it
 
 ```csharp
-using Binacle.ViPaq.Data.Packed;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
 
-foreach (var scenario in BischoffSuite.DataProvider.All) { ... }
-BischoffSuite.DataProvider.GetByName("OrLibrary_thpack1_2.ffd");
+foreach (var scenario in BischoffSuite.All) { ... }
+BischoffSuite.GetByName("OrLibrary_thpack1_2.ffd");
 ```
 
 A scenario's name is `<problem>.<algorithm>`, so the same problem under three algorithms is three scenarios.

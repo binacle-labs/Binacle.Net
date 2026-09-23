@@ -15,8 +15,8 @@ public class Sample_Packing
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
-		this.bin = ScenarioBin.FromCompactString(SpecializedScalingProblemsProvider.MaxSizeBin);
-		this.items = SpecializedScalingProblemsProvider.GetItems(this.Items);
+		this.bin = ScenarioBin.FromCompactString(LadderGenerator.MaxSizeBin);
+		this.items = LadderGenerator.GetItems(this.Items);
 	}
 
 	// Deleted with v1.

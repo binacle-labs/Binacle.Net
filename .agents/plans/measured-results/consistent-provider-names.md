@@ -87,7 +87,24 @@ holding a `DataProvider`. Eight files swept across the ViPaq measure project, th
 `Testing` picks. `PackedDataReader` stays where it is; it sits in an ancestor namespace, so the holders still
 see it.
 
-Left: the `Testing` classes - the sets and the generators.
+**Slice 6, `Binacle.Lib.Testing`, 2026-09-24.** `SmokeSet`, `SampleSet`, `RacingSet`, `CubeGenerator`,
+`LadderGenerator`, all at the project root - the `Providers/` folder is gone, and with it the
+`Binacle.Lib.Testing.Providers` global using in four bench csprojs. `RacingSet` gained `GetByName(column)` and
+made its column-to-id map private, so the Racing benchmark stopped doing the lookup itself.
+
+**Slice 7, `Binacle.ViPaq.Testing`, 2026-09-24.** `TimingSet`, `BischoffTimingSet`, `CustomProblemsTimingSet`,
+`CompressionCostSet` (the split) and `SyntheticGenerator`. One shape across all of them: `Names` is the report
+columns, `GetByName(column)` the scenario, `PackNames` the picks behind the columns for the curated gate -
+which now checks three sets. The `largest real pack` column became `largest FFD pack` in both smoke classes.
+
+**The alias, 2026-09-24.** The first build after slice 7 failed with `CS0103` in every consumer: a using
+directive imports a namespace's types, not its nested namespaces, so `using Binacle.Data;` never reached
+`BischoffSuite`. The data projects compiled because they sit inside that namespace. Fixed by aliasing the
+holder at the top of each caller - `using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;` - which
+also reads better: the line is `BischoffSuite.GetByName(...)`, not `BischoffSuite.DataProvider.GetByName(...)`.
+Every project builds.
+
+Everything in this plan has landed, builds and passes. The file can go.
 
 ## The renames
 
@@ -219,19 +236,21 @@ changes the column a kept run prints.
 
 ## Done when
 
-- [ ] No class under `lib/test/Binacle.Lib.Testing` or `vipaq/test/Binacle.ViPaq.Testing` ends in `Provider`;
+- [x] No class under `lib/test/Binacle.Lib.Testing` or `vipaq/test/Binacle.ViPaq.Testing` ends in `Provider`;
       every one ends in `Set` or `Generator`.
       `grep -rn "class [A-Za-z]*Provider\b" lib/test/Binacle.Lib.Testing vipaq/test/Binacle.ViPaq.Testing --include=*.cs`
       is empty.
-- [ ] Every holder is called `DataProvider`, and no `Scenarios` class is left in the three data projects.
+- [x] Every holder is called `DataProvider`, and no `Scenarios` class is left in the three data projects.
       `grep -rn "class Scenarios\b" shared/data lib/data vipaq/data --include=*.cs` is empty.
-- [ ] No `GetBenchmarkScenarios` anywhere.
+- [x] No `GetBenchmarkScenarios` anywhere.
       `grep -rn GetBenchmarkScenarios --include=*.cs .` is empty.
-- [ ] Every `Set` and every `Generator` that answers columns exposes `Names` and `GetByName`.
+- [x] Every `Set` and every `Generator` that answers columns exposes `Names` and `GetByName`.
       **By eye**, one class per row in the renames table.
-- [ ] Every set names its holder on the line that takes a scenario - no set reads a holder through a `using`
+- [x] Every set names its holder on the line that takes a scenario - no set reads a holder through a `using`
       that hides which set it is.
       **By eye**, read the dictionary at the top of each set.
-- [ ] The design record's folder decision states the rule for `Testing` as well as `Data`.
+- [x] The design record's folder decision states the rule for `Testing` as well as `Data`.
       **By eye.**
-- [ ] Every project that moved builds; `just test cs_binacle-lib_unit` and `just test cs_binacle-vipaq_unit` pass.
+- [x] Every project that moved builds; `just test cs_binacle-lib_unit` and `just test cs_binacle-vipaq_unit` pass.
+      Done 2026-09-24: every project built one at a time, lib unit passed 9,001 tests, the maintainer confirmed
+      the ViPaq suite passed.

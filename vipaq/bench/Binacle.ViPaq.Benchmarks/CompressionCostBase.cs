@@ -7,7 +7,7 @@ namespace Binacle.ViPaq.Benchmarks;
 // so `Deflate - NoOp` is what deflate's squeezing costs and `Gzip - Deflate` is gzip's extra framing. Row-major.
 public abstract class CompressionCostBase : BenchmarkBase
 {
-	[ParamsSource(typeof(BischoffCuratedProvider), nameof(BischoffCuratedProvider.GetCompressionCostNames))]
+	[ParamsSource(typeof(CompressionCostSet), nameof(CompressionCostSet.Names))]
 	public override string ScenarioName { get; set; } = "";
 
 	protected ViPaqEncoder NoOpEncoder { get; private set; } = null!;
@@ -15,7 +15,7 @@ public abstract class CompressionCostBase : BenchmarkBase
 	protected ViPaqEncoder GzipEncoder { get; private set; } = null!;
 
 	protected override Scenario Load(string name)
-		=> BischoffCuratedProvider.GetCompressionCostByName(name);
+		=> CompressionCostSet.GetByName(name);
 
 	public override void GlobalSetup()
 	{

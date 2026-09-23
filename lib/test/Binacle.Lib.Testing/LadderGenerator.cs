@@ -1,7 +1,7 @@
 
-namespace Binacle.Lib.Testing.Providers;
+namespace Binacle.Lib.Testing;
 
-public static class SpecializedScalingProblemsProvider
+public static class LadderGenerator
 {
 	public const string MaxSizeBin = "60x40x40";
 	

@@ -1,4 +1,7 @@
 using Binacle.ViPaq.Data.Packed;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
+using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize.PreReportChecks;
 
@@ -10,9 +13,9 @@ internal sealed class GroupCoverageCheck : IPreReportCheck
 	{
 		var slugs = Groups.All.Select(group => group.Slug).ToHashSet();
 
-		Assert(Groups.BischoffFamily, BischoffSuite.DataProvider.Names, slugs);
-		Assert("custom-problems", CustomProblems.DataProvider.Names, slugs);
-		Assert("demo-samples", DemoSamples.DataProvider.Names, slugs);
+		Assert(Groups.BischoffFamily, BischoffSuite.Names, slugs);
+		Assert("custom-problems", CustomProblems.Names, slugs);
+		Assert("demo-samples", DemoSamples.Names, slugs);
 	}
 
 	private static void Assert(string family, IEnumerable<string> names, HashSet<string> slugs)

@@ -14,7 +14,6 @@
     <Using Include="Binacle.Geometry" />
     <Using Include="Binacle.ViPaq.Data" />
     <Using Include="Binacle.ViPaq.Testing" />
-    <Using Include="Binacle.ViPaq.Testing.Providers" />
     <Using Include="Binacle.Benchmarking" />
     <Using Include="BenchmarkDotNet.Attributes" />
   </ItemGroup>

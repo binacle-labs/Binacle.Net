@@ -1,5 +1,8 @@
 using Binacle.ViPaq.Data;
 using Binacle.ViPaq.Data.Packed;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
+using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.UnitTests.Providers;
 
@@ -11,7 +14,7 @@ internal static class PackedScenarioProvider
 	static PackedScenarioProvider()
 	{
 		scenarios = new Dictionary<string, Scenario>();
-		foreach (var scenario in BischoffSuite.DataProvider.All.Concat(CustomProblems.DataProvider.All).Concat(DemoSamples.DataProvider.All))
+		foreach (var scenario in BischoffSuite.All.Concat(CustomProblems.All).Concat(DemoSamples.All))
 		{
 			scenarios.Add(scenario.Name, scenario);
 		}

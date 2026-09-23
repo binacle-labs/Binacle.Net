@@ -2,7 +2,7 @@
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
 verified: 2026-09-23
-check: The numbers under "Size today" match vipaq/results/README.md and the files under vipaq/results/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/Providers/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
+check: The numbers under "Size today" match vipaq/results/README.md and the files under vipaq/results/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -144,9 +144,9 @@ justify it (`$vipaq/decisions#D8`). No wire change.
 once the body passed ~255 bytes, so scenarios fell into two regimes. Today compression is a caller flag
 defaulting off (`$vipaq/decisions#D16`) and the harness forces it, so "which regime a scenario lands in" is now
 the caller's call rather than the library's. The two regimes still describe what the *data* does under
-compression, which is what makes the numbers worth keeping. The benchmarks then fanned out over a curated set (`CuratedScenarioProvider`, which
-merged `BischoffCuratedProvider` and `CustomProblemsCuratedProvider`) that included an uncompressed ladder
-(`CustomProblemsCuratedProvider.UncompressedNames`: 1 / 8 / 16-item 8-bit packs) so the raw path was measured too —
+compression, which is what makes the numbers worth keeping. The benchmarks then fanned out over a curated set (the class now called
+`TimingSet`, which merges what are now `BischoffTimingSet` and `CustomProblemsTimingSet`) that included an
+uncompressed ladder (an `UncompressedNames` member that no longer exists: 1 / 8 / 16-item 8-bit packs) so the raw path was measured too —
 before this, all curated benchmarks compressed and the raw path had **no** performance number. The size report then
 showed two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto). Since 2026-09-22 the timing classes are `Encode`
 and `Decode`, which run every curated pick on the raw path, and `CompressionCost`, which prices the codec. Since
@@ -180,7 +180,7 @@ except the 1-item token (520 B vs 368 B — noise at that size).
 
 **Coverage:** the uncompressed 16-bit path was measured by `Simple_16bit-4_FitIn_600x400x300` — 4 items whose
 bin and item dimensions force 16/16/16 widths, small enough to skip compression (raw b64 80, ~0.95× protobuf). It
-is still a timing column today (`CustomProblemsCuratedProvider.TimingColumns`).
+is still a timing column today (`CustomProblemsTimingSet`).
 
 ### Compression cost, isolated (2026-07-14)
 

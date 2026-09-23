@@ -4,6 +4,6 @@ namespace Binacle.ViPaq.Benchmarks;
 [MemoryDiagnoser]
 public class Smoke_Encode : EncodeBase
 {
-	[Params("one item", "typical container", "largest real pack")]
+	[Params("one item", "typical container", "largest FFD pack")]
 	public override string ScenarioName { get; set; } = "";
 }

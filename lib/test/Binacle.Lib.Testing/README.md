@@ -13,7 +13,8 @@ project: nothing in it asserts on its own, and no test SDK is referenced. Every 
 | `TestAlgorithmFactory.cs`, `TestOperationParameters.cs` | The delegate the factories are, and the parameters a test hands to `Execute` |
 | `ScenarioChecks.cs` | `EvaluateResult` on a scenario's metrics and on its expected result - throws on mismatch |
 | `OperationResultExtensions.cs` | Volume and count totals over an `OperationResult` |
-| `Providers/` | The benchmark picks - the smoke four, the 30-problem Bischoff sample, the five curated Bischoff scenarios, one cube baseline, and the bin and item ladders the threshold project climbs |
+| `SmokeSet.cs`, `SampleSet.cs`, `RacingSet.cs` | The benchmark picks - the smoke four, the 30-problem Bischoff sample, the five curated Bischoff scenarios. Each answers `Names` and `GetByName(name)` |
+| `CubeGenerator.cs`, `LadderGenerator.cs` | Scenarios built in code rather than picked - one cube baseline, and the bin and item ladders the threshold and scaling projects climb |
 
 ## 🛠️ How you use it
 

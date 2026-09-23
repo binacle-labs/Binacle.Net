@@ -1,4 +1,5 @@
 using Binacle.Data;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -12,7 +13,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Fitting_FFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -23,7 +24,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Fitting_FFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -34,7 +35,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_WFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -45,7 +46,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Fitting_WFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -56,7 +57,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Fitting_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -67,7 +68,7 @@ public class FittingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Fitting_BFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);

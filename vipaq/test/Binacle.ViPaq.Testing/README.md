@@ -13,17 +13,22 @@ The unit tests never reference it - they are the spec gate and must not lean on 
 | `Json/` | `JsonEncoder` - the bin and placed items as the JSON a user's token replaces; text, not base64 |
 | `Compact/` | `CompactEncoder` - the same in compact notation, items joined by `;`; text, not base64 |
 | `EncoderInfo.cs` | Which layout to encode with, handed out as two ready-made instances |
-| `Providers/` | The curated picks per family, the merged curated set, and the synthetic scenarios for the speed benchmarks |
+| `BischoffTimingSet.cs`, `CustomProblemsTimingSet.cs` | The packs the timing benchmarks run on, one set per family, keyed by the column the report prints |
+| `TimingSet.cs` | Those two plus the synthetic curve, joined in report order - what Encode and Decode run over |
+| `CompressionCostSet.cs` | The two packs the CompressionCost benchmarks run on: the low and the high end of deflate's win |
+| `SyntheticGenerator.cs` | Scenarios built from an item count, past any real pack. Speed and memory only, never size |
 
-The packs themselves are in `Binacle.ViPaq.Data`; the curated providers resolve their picks by name there.
+The packs themselves are in `Binacle.ViPaq.Data`; every set resolves its picks by name there, so a pick that
+no longer exists is caught by the gate in `Binacle.ViPaq.EncodedSize` rather than mid-run. Each set answers
+`Names` (the columns), `GetByName(column)` and `PackNames` (the picks behind them, for that gate).
 
 ## 🛠️ How you use it
 
 ```csharp
-using Binacle.ViPaq.Testing.Providers;
+using Binacle.ViPaq.Testing;
 using Binacle.ViPaq.Testing.ViPaq;
 
-var scenario = CuratedScenarioProvider.GetScenarioByName(name);
+var scenario = TimingSet.GetByName(column);
 var token = new ViPaqEncoder(codec).Encode(scenario, EncoderInfo.RowMajor);
 var header = ViPaqHeader.Create(scenario, EncoderInfo.RowMajor);
 ```

@@ -1,5 +1,8 @@
 using System.Globalization;
 using Binacle.ViPaq.Data.Packed;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
+using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize;
 
@@ -32,9 +35,9 @@ internal static class ResultFiles
 	{
 		var counts = new Dictionary<string, int>();
 
-		Count(Groups.BischoffFamily, BischoffSuite.DataProvider.Names);
-		Count("custom-problems", CustomProblems.DataProvider.Names);
-		Count("demo-samples", DemoSamples.DataProvider.Names);
+		Count(Groups.BischoffFamily, BischoffSuite.Names);
+		Count("custom-problems", CustomProblems.Names);
+		Count("demo-samples", DemoSamples.Names);
 
 		return counts;
 

@@ -1,6 +1,7 @@
 using Binacle.Data;
 using Binacle.Lib.Abstractions.Algorithms;
 using Microsoft.Extensions.Logging;
+using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
 
 namespace Binacle.Lib.PackingEfficiency;
 
@@ -28,10 +29,10 @@ internal sealed class PackingRunner : IRunner
 
 	public void Run()
 	{
-		foreach (var collectionKey in BischoffSuite.DataProvider.Keys)
+		foreach (var collectionKey in BischoffSuite.Keys)
 		{
 			var set = SetLabel(collectionKey);
-			foreach (var scenario in BischoffSuite.DataProvider.ByCollection(collectionKey))
+			foreach (var scenario in BischoffSuite.ByCollection(collectionKey))
 			{
 				var fills = new Dictionary<string, decimal>();
 				foreach (var (family, version, create) in algorithms)

@@ -4,6 +4,7 @@ using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Pack;
 using Binacle.Data;
 using Binacle.Net.IntegrationTests.v4.ExtensionMethods;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Pack.PresetBin;
 
@@ -20,7 +21,7 @@ public class PackPresetBinScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public Task Custom_Problems(string scenario) => RunTest(scenario);
 
 	private async Task RunTest(string scenarioName)

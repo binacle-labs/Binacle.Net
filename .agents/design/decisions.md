@@ -1,7 +1,7 @@
 ---
 id: decisions
 description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model, and the four project folders and what each may reference, and why measured numbers live in the slice - deterministic ones tracked and diffed, timing ones kept by hand.
-verified: 2026-09-22
+verified: 2026-09-24
 check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every raw file under lib/results and vipaq/results, and by neither measure project registering a README reporter
 paths:
   - "NOTICE"
@@ -317,11 +317,38 @@ became `Binacle.Reporting`. The reader lives once, in `Binacle.Data`, and the ca
 
 **The names.** `Data` is the folder the project sits in. `.Testing` is the .NET convention for "helpers for
 testing X" (`Mvc.Testing`, `TimeProvider.Testing`); `Fixtures` collides with xunit, `Harness` is what the
-measure projects are called. The set is in the namespace, so the class does not repeat it:
-`Binacle.Data.BischoffSuite.Scenarios`, and the two ViPaq "Bischoff" providers are told apart by where they
-sit - `ViPaq.Data.Packed.BischoffSuite` is every pack, the curated picks are in `ViPaq.Testing`. Not a project
-per set: every consumer of the shared sets reads them together, so two projects would be two builds nothing
-references apart.
+measure projects are called. Not a project per set: every consumer of the shared sets reads them together, so
+two projects would be two builds nothing references apart.
+
+**Three kinds of class, three endings** (2026-09-24). The ending says what a class does, so a call site does
+not have to be read twice:
+
+| Ending | What it holds | Shape |
+|---|---|---|
+| `DataProvider` | a whole committed set, read once and handed out by name. Picks nothing, builds nothing | folder and namespace name the set, the class is `DataProvider`: `Binacle.Data.BischoffSuite.DataProvider`, aliased at the top of each caller |
+| `Set` | a handful of ids named out of a holder, each carrying the column name a report prints | one class in a `Testing` project: `SmokeSet`, `TimingSet` |
+| `Generator` | scenarios built from a number - nothing exists until it is asked for | one class in a `Testing` project: `LadderGenerator`, `SyntheticGenerator` |
+
+A `Set` and a `Generator` answer a benchmark the same two questions, so both expose `Names` (the columns) and
+`GetByName(column)`; a set also exposes `PackNames`, the picks behind its columns, for the gate that checks
+they still exist. A holder exposes `Names`, `All`, `GetByName(name)` and `TheoryNames`, the `object[]` wrapper
+xUnit's `MemberData` needs. `Binacle.Data.All`, the every-set aggregate, is the one exception: its values are
+`All.Scenarios`, because the class is already called `All`.
+
+**Why the holder's name is not the set's name.** Before this, every set class was called `Scenarios` and the
+set lived only in a `using`, so a line reading `Scenarios.GetScenarioByName(...)` did not say which of nine
+sets it read, and two files away the same word meant a different set. Now the caller writes
+`using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;` and every line says the set:
+`BischoffSuite.GetByName(...)`. The alias is required, not a style choice - a using directive imports a
+namespace's types, not its nested namespaces, so `using Binacle.Data;` alone does not reach `BischoffSuite`.
+Inside `Binacle.Data` itself no alias is needed, which is why the data projects compiled while every consumer
+did not. The two ViPaq
+"Bischoff" classes are still told apart by where they sit - `ViPaq.Data.Packed.BischoffSuite` is every pack,
+the picks out of it are `BischoffTimingSet` in `ViPaq.Testing`.
+
+The embedded-resource readers under the holders end in `Reader`, matching `ScenarioReader` and
+`PackedDataReader`, and are `internal`: a caller that needs one collection at a time asks the holder
+(`BischoffSuite.DataProvider.ByCollection`) rather than reaching past it.
 
 **The check, three greps.** If a dependency lint ever exists, these are its first ruleset:
 

@@ -10,7 +10,7 @@ is the first word of the class name, so it is in the report file name too.
 | `Smoke_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is one of four scenarios: full bin, one type / small order / typical container / many item types |
 | `Sample_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is one of 30 Bischoff problems, named `<category> (<id>)` |
 | `Full_<Alg>_<Op>.cs` (six) | Rows v1 and v2; the column is every one of the 700 Bischoff problems |
-| `SmokeBase.cs`, `SampleBase.cs`, `FullBase.cs` | Where each tier gets its scenarios; the picks are in `lib/test/Binacle.Lib.Testing/Providers/` |
+| `SmokeBase.cs`, `SampleBase.cs`, `FullBase.cs` | Where each tier gets its scenarios; the picks are `SmokeSet`, `SampleSet` and the Bischoff data provider |
 | `BenchmarkBase.cs` | Loads the scenario before the run and runs one algorithm on it |
 | `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
 

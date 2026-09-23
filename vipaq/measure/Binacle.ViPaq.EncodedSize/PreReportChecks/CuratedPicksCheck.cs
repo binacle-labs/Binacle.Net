@@ -1,5 +1,7 @@
 using Binacle.ViPaq.Data.Packed;
-using Binacle.ViPaq.Testing.Providers;
+using Binacle.ViPaq.Testing;
+using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
+using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize.PreReportChecks;
 
@@ -9,8 +11,8 @@ internal sealed class CuratedPicksCheck : IPreReportCheck
 {
 	public void Run()
 	{
-		Assert(BischoffCuratedProvider.Names, BischoffSuite.DataProvider.Names, "Bischoff");
-		Assert(CustomProblemsCuratedProvider.Names, CustomProblems.DataProvider.Names, "custom");
+		Assert(BischoffTimingSet.PackNames.Concat(CompressionCostSet.PackNames), BischoffSuite.Names, "Bischoff");
+		Assert(CustomProblemsTimingSet.PackNames, CustomProblems.Names, "custom");
 	}
 
 	private static void Assert(IEnumerable<string> curated, IEnumerable<string> available, string family)

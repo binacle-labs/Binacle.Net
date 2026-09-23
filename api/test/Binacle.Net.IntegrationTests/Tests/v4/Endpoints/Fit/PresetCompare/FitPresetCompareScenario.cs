@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Fit;
 using Binacle.Data;
 using Binacle.Net.IntegrationTests.v4.ExtensionMethods;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Fit.PresetCompare;
 
@@ -21,7 +22,7 @@ public class FitPresetCompareScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblems.DataProvider.TheoryNames), MemberType = typeof(CustomProblems.DataProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public Task Custom_Problems(string scenario)
 		=> RunTest(scenario);
 

@@ -38,4 +38,4 @@ A table of widths, a byte layout, a measured number - those stay. A reader canno
 **A surviving agent comment is not damage.** When a review pass strips agent-written comments, the test is the
 one above, not who typed it. Several were kept on purpose because they were better than the line they replaced -
 the unchecked-multiply overflow note on the packing algorithms, the empty-catch explanation in
-`ConnectionString.cs`, the curated-scenario table in `BischoffCuratedProblemsProvider.cs`.
+`ConnectionString.cs`, the curated-scenario table in `RacingSet.cs`.

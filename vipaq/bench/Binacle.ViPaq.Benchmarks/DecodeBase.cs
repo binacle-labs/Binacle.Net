@@ -17,7 +17,7 @@ public abstract class DecodeBase : BenchmarkBase
 	private ViPaqHeader vipaqHeaderColumnar;
 
 	protected override Scenario Load(string name)
-		=> CuratedScenarioProvider.GetScenarioByName(name);
+		=> TimingSet.GetByName(name);
 
 	public override void GlobalSetup()
 	{
