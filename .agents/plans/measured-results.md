@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 12 landed; left are 14 the baseline, 15 the new bench classes, 16 the bin-threshold finding, 17 the measure output, 18 the results story, and the provider names. The maintainer commits between steps
+description: Orchestrator - steps 1 to 14 and 17 landed; left are 15 the new bench classes, 16 the bin-threshold finding, 18 the results story, and the provider names. The maintainer commits between steps
 state: ready
-waits-on: "nothing to start step 14"
+waits-on: "the maintainer runs the three recipes step 15 needs, and the long run step 16 needs"
 horizon: next-release
 paths:
   - "shared/**"
@@ -23,6 +23,15 @@ old vault stopped being current. Their lasting rules are in the general design r
 the four project folders and the one on measured numbers. Step 12, the bench split, landed 2026-09-23; its
 reasons are in the lib and ViPaq design records. Step 13, which converted the old `results/` folder, was
 dropped 2026-09-22 when the folder was deleted.
+
+**Step 17 landed 2026-09-23** and its file is gone. `encoded-size.md` became 54 files under
+`vipaq/results/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
+reporter's old file is deleted by hand; the general design record says so, and wanting a check for it is an
+idea in the shared plans.
+
+**Step 14 landed 2026-09-23** and its file is gone. The kept-run shape, the rule for what is worth keeping,
+and how a report is copied all live in the two `benchmarks/README.md`. Copying stays a hand job; the recipe
+that would do it is an idea in the tooling plans.
 
 - [`consistent-provider-names.md`](measured-results/consistent-provider-names.md) - one naming rule for every
   scenario provider in the Data and Testing projects. Not a numbered step: nothing depends on it, and it
@@ -55,13 +64,11 @@ dropped 2026-09-22 when the folder was deleted.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 14 | [14-baseline](measured-results/14-baseline.md) | the kept-run shape - `baseline/` and dated folders - its READMEs, and the 2026-09-23 runs kept as the baseline | `test -f lib/results/benchmarks/README.md` |
 | 15 | [15-new-bench-classes](measured-results/15-new-bench-classes.md) | the scaling class and the Json row, their first runs kept | `grep -rq JsonEncoder vipaq/bench --include=*.cs` |
 | 16 | [16-bin-threshold-finding](measured-results/16-bin-threshold-finding.md) | the long threshold run, and the bins finding in the lib design record | `! grep -q "no finding yet" .agents/design/lib/findings.md` |
-| 17 | [17-measure-output](measured-results/17-measure-output.md) | `encoded-size.md` split; the dropped-report file answered | `test -z "$(find vipaq/results -name '*.md' -size +100k)"` |
 | 18 | [18-results-story](measured-results/18-results-story.md) | the results READMEs as a story, from everything above | **by eye** - the READMEs open with sentences and numbers |
 
-The order is the work's: 15 and 16 keep their runs in the shape 14 sets; 18 reads what 14 to 17 leave.
+The order is the work's: 15 and 16 keep their runs in the shape 14 set; 18 reads what 15 to 17 left.
 
 ## Done when
 

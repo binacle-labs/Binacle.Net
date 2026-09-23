@@ -1,8 +1,8 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-09-22
-check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/encoded-size.md exists
+verified: 2026-09-23
+check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/encoded-size/ holds a folder per algorithm, and a file per layout per group inside it
 paths:
   - "vipaq/**"
 ---
@@ -122,7 +122,7 @@ with a `with` expression:
   With no items both item widths stay `Eight`, which is what §4 requires.
 - **Layout** — the caller's choice through `ViPaqSerializationOptions`, default `RowMajor`. Both codecs ship and
   the header bit records which was used, so the default can change without a version bump. Measured over
-  every real pack in `vipaq/results/encoded-size.md`: raw is the same length in both layouts, and under deflate or
+  every real pack in `vipaq/results/encoded-size/`: raw is the same length in both layouts, and under deflate or
   gzip columnar is smaller on average.
 - **Compressed** — the caller's choice too, default off. Not decided by the library: encoding both ways and
   keeping the shorter blob costs a second compression on every call, and that cost is unmeasured, so the call
@@ -159,7 +159,7 @@ them** — that page decodes in the browser through the TypeScript package, and 
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
 - **Racing the codecs needs internals**, and `Binacle.ViPaq.Testing` has them. The race is part of the
   permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The sizes are in
-  `vipaq/results/encoded-size.md`.
+  `vipaq/results/encoded-size/`.
 
 The public contract does not grow, yet tests can force any combination.
 

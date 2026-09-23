@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 12 landed; left are 14 the baseline, 15 the new bench classes, 16 the bin-threshold finding, 17 the measure output, 18 the results story, and the provider names. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 14 and 17 landed; left are 15 the new bench classes, 16 the bin-threshold finding, 18 the results story, and the provider names. The maintainer commits between steps"
   state: ready
-  waits-on: "nothing to start step 14"
+  waits-on: "the maintainer runs the three recipes step 15 needs, and the long run step 16 needs"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -98,26 +98,16 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/14-baseline.md
-  description: "Step 14 - the kept bench runs get their shape - a baseline folder holding the first kept run of every class, and a dated folder per later run that moved - their two READMEs, and how a run gets copied in"
-  state: ready
-  waits-on: "nothing to start; how a run gets copied is open and answered after more runs are kept by hand"
-  horizon: next-release
 - file: measured-results/15-new-bench-classes.md
   description: "Step 15 - two new bench classes - lib's time against item count, and a Json row beside protobuf in ViPaq's encode - and their first runs kept in the baseline"
   state: ready
-  waits-on: "the scaling class's name; the kept-run shape in place"
+  waits-on: "the maintainer runs lib-scaling and the two ViPaq encode recipes once"
   horizon: next-release
 - file: measured-results/16-bin-threshold-finding.md
   description: "Step 16 - one long threshold run on a quiet machine answers whether packing bins in parallel pays, and from how many bins; the answer becomes a finding in the lib design record"
   state: ready
   waits-on: "a quiet machine for hours, the maintainer's"
   horizon: next-release
-- file: measured-results/17-measure-output.md
-  description: "Step 17 - what the measure tools write - encoded-size.md is too big to read and gets split; a dropped report's old file stays behind, likely left as is"
-  state: proposed
-  waits-on: "the maintainer's answer on both items. horizon was set by an agent, strike it"
-  horizon: undecided
 - file: measured-results/18-results-story.md
   description: "Step 18 - the results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
   state: ready
@@ -145,6 +135,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
   paths: ["shared/**"]
+- file: shared/orphaned-result-files.md
+  description: "Nothing tells you a results file is stale - a dropped reporter's markdown stays on disk and git shows no change"
+  state: idea
+  waits-on: "nothing. Horizon picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
 ```
 
 ## Sites
@@ -170,6 +165,11 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "The just modules get the fixes the bench module got - recipes listed in file order, a word checked by just before anything runs, short scripts folded back into their recipe, one way to name a private recipe"
   state: proposed
   waits-on: "a yes from the maintainer, item by item. State picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
+- file: tooling/keep-a-bench-run.md
+  description: "A recipe that copies the reports of the last bench run into the kept-runs folder, instead of doing it by hand"
+  state: idea
+  waits-on: "nothing. Horizon picked by an agent to make the file legible; strike it if wrong"
   horizon: undecided
 - file: tooling/linting.md
   description: "Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does."

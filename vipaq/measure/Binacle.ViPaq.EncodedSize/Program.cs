@@ -18,7 +18,25 @@ internal class Program
 		builder.Services.AddPreReportChecks();
 		builder.Services.AddSingleton<EncodingBag>();
 		builder.Services.AddTransient<IRunner, EncodingRunner>();
-		builder.Services.AddTransient<IReporter, EncodedSizeReporter>();
+		// One reporter per group per algorithm per layout, because one reporter writes one file.
+		foreach (var group in Groups.All)
+		{
+			foreach (var algorithm in Algorithms.All)
+			{
+				foreach (var layout in Layouts.All)
+				{
+					var reporterGroup = group;
+					var reporterAlgorithm = algorithm;
+					var layoutName = layout.LayoutName;
+					builder.Services.AddTransient<IReporter>(serviceProvider
+						=> new EncodedSizeReporter(
+							serviceProvider.GetRequiredService<EncodingBag>(),
+							reporterGroup,
+							reporterAlgorithm,
+							layoutName));
+				}
+			}
+		}
 		builder.Services.AddTransient<Measure>();
 
 		IHost host = builder.Build();

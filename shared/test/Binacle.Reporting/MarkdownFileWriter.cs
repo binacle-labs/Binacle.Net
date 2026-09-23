@@ -1,7 +1,7 @@
 namespace Binacle.Reporting;
 
 // Writes <outputDirectory>/<Filename>.md: the title, the one-sentence header, then the sections. Overwritten
-// every run; the committed copy is what the next run is diffed against.
+// every run; the committed copy is what the next run is diffed against. A Filename may carry a folder.
 public class MarkdownFileWriter : IFileWriter
 {
 	private readonly string outputDirectory;
@@ -13,9 +13,9 @@ public class MarkdownFileWriter : IFileWriter
 
 	public async Task WriteAsync(ResultFile file, ReportSection[] sections)
 	{
-		Directory.CreateDirectory(this.outputDirectory);
-
 		var filepath = Path.Combine(this.outputDirectory, $"{file.Filename}.md");
+		Directory.CreateDirectory(Path.GetDirectoryName(filepath)!);
+
 		if (File.Exists(filepath))
 		{
 			File.Delete(filepath);

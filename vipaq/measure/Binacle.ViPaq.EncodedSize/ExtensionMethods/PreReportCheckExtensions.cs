@@ -11,6 +11,7 @@ public static class PreReportCheckExtensions
 	public static IServiceCollection AddPreReportChecks(this IServiceCollection services)
 	{
 		services.AddTransient<IPreReportCheck, CuratedPicksCheck>();
+		services.AddTransient<IPreReportCheck, GroupCoverageCheck>();
 		return services;
 	}
 

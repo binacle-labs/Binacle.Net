@@ -1,61 +1,67 @@
 namespace Binacle.ViPaq.EncodedSize.Reporters;
 
-// One row per pack per layout: every format's stored size side by side.
+// One instance per group per algorithm per layout; one table per codec, one row per pack, the four formats
+// side by side.
 internal sealed class EncodedSizeReporter : IReporter
 {
 	private readonly EncodingBag bag;
+	private readonly Group group;
+	private readonly string algorithm;
+	private readonly string layout;
 
-	public EncodedSizeReporter(EncodingBag bag)
+	public EncodedSizeReporter(EncodingBag bag, Group group, string algorithm, string layout)
 	{
 		this.bag = bag;
+		this.group = group;
+		this.algorithm = algorithm;
+		this.layout = layout;
 	}
 
-	public ResultFile File => ResultFiles.EncodedSize;
+	public ResultFile File => ResultFiles.EncodedSize(this.group, this.algorithm, this.layout);
 
 	public ReportSection[] Report()
-		=> Layouts.All.Select(layout => this.Section(layout.LayoutName)).ToArray();
+		=> Codecs.All.Select(this.Section).ToArray();
 
-	private ReportSection Section(string layout)
+	private ReportSection Section(string codec)
 	{
-		var table = new TableResult(
-			"Scenario", "Algorithm", "Items", "Widths",
-			"ViPaq raw", "ViPaq deflate", "ViPaq gzip",
-			"Proto raw", "Proto deflate", "Proto gzip",
-			"JSON", "Compact",
-			"ViPaq/Proto", "Best codec", "Saved %");
+		var table = new TableResult("Scenario", "Items", "Widths", "ViPaq", "Proto", "JSON", "Compact", "ViPaq/Proto");
 
-		foreach (var pack in this.bag.Packs)
+		foreach (var pack in this.Rows())
 		{
-			var vipaq = pack.ViPaq[layout];
-			var ratio = (double)vipaq.Deflate / pack.Protobuf.Deflate;
-			var saved = (vipaq.Raw - vipaq.Best) / (double)vipaq.Raw * 100;
+			var vipaq = pack.ViPaq[this.layout].Of(codec);
+			var protobuf = pack.Protobuf.Of(codec);
 
 			table.AddRow(
 				pack.Name,
-				pack.Algorithm,
 				pack.Items.ToString(),
 				pack.Widths,
-				vipaq.Raw.ToString(),
-				vipaq.Deflate.ToString(),
-				vipaq.Gzip.ToString(),
-				pack.Protobuf.Raw.ToString(),
-				pack.Protobuf.Deflate.ToString(),
-				pack.Protobuf.Gzip.ToString(),
-				pack.Json.ToString(),
-				pack.Compact.ToString(),
-				Format.Fixed(ratio),
-				vipaq.BestCodec,
-				Format.Fixed(saved, 0)
+				vipaq.ToString(),
+				protobuf.ToString(),
+				pack.Json.Of(codec).ToString(),
+				pack.Compact.Of(codec).ToString(),
+				Format.Fixed((double)vipaq / protobuf)
 			);
 		}
 
 		return new ReportSection
 		{
-			Title = $"{layout} layout",
-			Description = "ViPaq and protobuf are base64 lengths; JSON and compact are text lengths. Widths are the "
-				+ "bin / item / coordinate bits ViPaq picked. ViPaq/Proto compares the two under deflate. Best codec "
-				+ "is the smallest ViPaq token, raw winning ties; Saved % is what it saved against raw.",
+			Title = codec,
+			Description = Description(codec),
 			Table = table
 		};
 	}
+
+	private static string Description(string codec)
+	{
+		var stored = codec == Codecs.Raw
+			? "ViPaq and protobuf are base64 lengths; JSON and compact are text lengths, because text is its own stored form."
+			: $"Every column is the base64 length after {codec.ToLowerInvariant()}.";
+
+		return stored + " Widths are the bin / item / coordinate bits ViPaq picked. ViPaq/Proto compares those two"
+			+ " columns, in this codec.";
+	}
+
+	private IEnumerable<EncodedPack> Rows()
+		=> this.bag.Packs.Where(pack
+			=> pack.Algorithm == this.algorithm && Groups.Of(pack.Family, pack.Name) == this.group.Slug);
 }

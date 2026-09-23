@@ -361,6 +361,11 @@ reasoning behind a number goes in the slice's findings record.
 **One run, many views.** A measure project packs or encodes every scenario once into a bag, and one reporter per
 file reads it. The shared loop is `Binacle.Reporting`; the bag is typed per slice and lives in the slice.
 
+**Removing a reporter means deleting its file by hand.** The writer rewrites the files the code produces today
+and touches nothing else, so a dropped reporter's `.md` stays in `<slice>/results/`, never updated, and git
+shows no change. Deleting every other `.md` instead would take the files put there by hand. Whoever removes a
+reporter, or changes what the files are called, deletes the old ones in the same change (2026-09-23).
+
 **Only deterministic numbers are published.** Timing from one desktop is not a claim.
 
 **Why.** Until 2026-09-22 a root `results/` folder held both kinds under one rule, copied in by hand. It went

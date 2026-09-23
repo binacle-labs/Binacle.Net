@@ -1,3 +1,4 @@
+using System.Text;
 using Binacle.ViPaq.Compression;
 using Binacle.ViPaq.Data.Packed;
 using Binacle.ViPaq.Testing.Compact;
@@ -8,7 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Binacle.ViPaq.EncodedSize;
 
-// Encodes every real pack once: ViPaq per codec per layout, protobuf per codec, JSON and compact once.
+// Encodes every real pack once, every format through every codec: ViPaq per codec per layout, and protobuf,
+// JSON and compact per codec.
 internal sealed class EncodingRunner : IRunner
 {
 	private static readonly (string Family, IReadOnlyCollection<Scenario> Packs)[] Families =
@@ -67,8 +69,8 @@ internal sealed class EncodingRunner : IRunner
 			Name: ProblemOf(scenario.Name),
 			Items: scenario.ItemCount,
 			Widths: widths,
-			Json: JsonEncoder.Encode(scenario).Length,
-			Compact: CompactEncoder.Encode(scenario).Length,
+			Json: TextSizes(JsonEncoder.Encode(scenario)),
+			Compact: TextSizes(CompactEncoder.Encode(scenario)),
 			Protobuf: protobuf,
 			ViPaq: vipaq
 		);
@@ -80,8 +82,16 @@ internal sealed class EncodingRunner : IRunner
 		return new CodecSizes(lengths[Codecs.Raw], lengths[Codecs.Deflate], lengths[Codecs.Gzip]);
 	}
 
+	// Raw is the text itself; compressing it makes bytes, so those are base64 like every other format.
+	private static CodecSizes TextSizes(string text)
+	{
+		var bytes = Encoding.UTF8.GetBytes(text);
+		var lengths = CodecList.ToDictionary(x => x.Name, x => x.Codec.Compress(bytes).ToBase64().Length);
+		return new CodecSizes(text.Length, lengths[Codecs.Deflate], lengths[Codecs.Gzip]);
+	}
+
 	// "OrLibrary_thpack1_1.ffd" -> "FFD"
-	private static string AlgorithmOf(string name) => name[(name.LastIndexOf('.') + 1)..].ToUpperInvariant();
+	internal static string AlgorithmOf(string name) => name[(name.LastIndexOf('.') + 1)..].ToUpperInvariant();
 
 	// "OrLibrary_thpack1_1.ffd" -> "OrLibrary_thpack1_1"
 	private static string ProblemOf(string name) => name[..name.LastIndexOf('.')];
