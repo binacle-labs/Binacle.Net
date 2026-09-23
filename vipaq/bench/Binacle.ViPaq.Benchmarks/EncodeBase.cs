@@ -1,4 +1,5 @@
 using Binacle.ViPaq.Compression;
+using Binacle.ViPaq.Testing.Json;
 using Binacle.ViPaq.Testing.Protobuf;
 using Binacle.ViPaq.Testing.ViPaq;
 
@@ -34,4 +35,10 @@ public abstract class EncodeBase : BenchmarkBase
 	[BenchmarkOrder(30)]
 	public byte[] ViPaq_Columnar()
 		=> this.vipaqEncoder.Encode(this.Scenario, EncoderInfo.Columnar);
+
+	// Text, not bytes, and no codec - the same form the size results measure.
+	[Benchmark]
+	[BenchmarkOrder(40)]
+	public string Json()
+		=> JsonEncoder.Encode(this.Scenario);
 }

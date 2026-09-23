@@ -26,6 +26,8 @@ Shape: the general design record, the decision on measured numbers. Protocol: th
 - Families: lib `algorithms/`, `racing/`, `threshold/`, `result-selection/`; ViPaq `encoding/`.
 - A new class's first kept run joins `baseline/`. A dated folder holds only later runs that are significant,
   so the dates read as increments on the baseline.
+- **Significant, the maintainer's rule of 2026-09-23:** a ratio that moved by more than its own RatioSD and by
+  at least 5 percent, or Allocated changed. The 5 is a working number, open to argument later.
 - A run writes into the project's own `BenchmarkDotNet.Artifacts/results/`, which git ignores. The next run of
   the same class overwrites its report there, so a run worth keeping is copied before the next one.
 
@@ -36,17 +38,16 @@ every smoke recipe, `lib-result-selection`, and all of `vipaq-sample`. Each `bas
 
 ## The step
 
-- `lib/results/benchmarks/README.md` and `vipaq/results/benchmarks/README.md`: how to read the reports (Mean
-  does not compare across files; Ratio and Allocated do, and Loop against Parallel only on the same core
-  count), the shape above, and one row per entry: date, family, class, key ratio with its RatioSD, allocated.
-  What the numbers say, as a sentence for a person, is not this step.
-- A row for `benchmarks/` in `lib/results/README.md` and `vipaq/results/README.md`.
-- `tooling/bench.just`'s header comment says where a kept run goes.
+- Both `benchmarks/README.md` are written. Done 2026-09-23: how to read a report, the folder shape, one row
+  per family saying what it compares, and the significance rule. The per-file list stays in
+  `baseline/README.md` and the READMEs point at it - a row per file would restate it.
+  No key ratio per row: a file holds many cases, so it has many ratios and many Allocated values, and
+  picking one is step 18's job.
+- A row for `benchmarks/` in `lib/results/README.md` and `vipaq/results/README.md`. Done 2026-09-23.
+- `tooling/bench.just`'s header comment says where a kept run goes. Done 2026-09-23.
 
 ## Open
 
-- **What counts as significant.** A rule a person can apply, for example "a ratio moved by more than its
-  RatioSD, or Allocated changed". Without one, every run looks different.
 - **How a run gets copied.** By hand today. The choices, answered after more runs are kept by hand:
   - a `keep` recipe, e.g. `just bench keep lib-algorithms`, that copies a project's latest reports; nothing
     lands unless asked. The leaning, because most runs are smoke checks nobody keeps.
@@ -65,7 +66,7 @@ maintainer's call of 2026-09-23: noted, left for later.
 
 - [x] `ls lib/results/benchmarks/baseline vipaq/results/benchmarks/baseline` lists every family, and
       `ls vipaq/results/benchmarks/baseline/encoding` has `Sample_Encode.md`. Done 2026-09-23.
-- [ ] Both `benchmarks/README.md` exist, with a row for every file in `baseline/`, or pointing at the list in `baseline/README.md`. That also brings to life the
+- [x] Both `benchmarks/README.md` exist, pointing at the list in `baseline/README.md`. That also brings to life the
       links in `lib/bench/README.md`, `vipaq/bench/README.md` and `tooling/bench.just`, dead until then.
-      **By eye**, count the files and the rows.
-- [ ] Both results READMEs have a `benchmarks/` row.
+      **By eye**, count the files and the rows. Done 2026-09-23.
+- [x] Both results READMEs have a `benchmarks/` row. Done 2026-09-23.

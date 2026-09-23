@@ -1,6 +1,6 @@
 ---
 id: lib/tests
-description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the four bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
 verified: 2026-09-23
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
@@ -18,7 +18,7 @@ paths:
 # Lib Tests
 
 Two projects under `lib/test/`, one of them a support library rather than a suite, plus the measure project
-in `lib/measure/` and the four bench projects in `lib/bench/`. Algorithm scenario data
+in `lib/measure/` and the five bench projects in `lib/bench/`. Algorithm scenario data
 comes from the shared `Binacle.Data` project — see shared (`$shared`); the harness code every lib suite
 shares comes from `Binacle.Lib.Testing`, below. The **result-selection** fixtures come from this
 slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection` under the manifest prefix
@@ -34,6 +34,7 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing-smoke`, `-sample` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
 | `Binacle.Lib.Benchmarks.Threshold` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-threshold-smoke`, `-sample`, `-full` |
+| `Binacle.Lib.Benchmarks.Scaling` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-scaling` |
 
 ## Binacle.Lib.Testing
 
@@ -56,7 +57,7 @@ it constructs the internal algorithm classes.
   `small order`, `typical container`, `many item types`), `BischoffSampleProblemsProvider` (30 Bischoff problems, name
   `<category> (<id>)`), `BischoffCuratedProblemsProvider` (five scenarios keyed `typical container`, `BFD wins big`,
   `near tie`, `WFD falls over`, `many item types` — Racing reads the keys), `CubeScalingProblemsProvider` (one
-  cube baseline, `GetBaseline`), `SpecializedScalingProblemsProvider` (the ladders the threshold project climbs).
+  cube baseline, `GetBaseline`), `SpecializedScalingProblemsProvider` (the ladders the threshold and scaling projects climb).
 
 ## Binacle.Lib.UnitTests
 
@@ -152,6 +153,13 @@ In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per sel
 `Scenarios.GetScenarioNames`. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
 abstract `Load`, which each class points at its own set, and `Run(strategy)`. 11 scenarios, 22 cases, always
 the `short` job.
+
+## Binacle.Lib.Benchmarks.Scaling
+
+In `lib/bench/`. Packing time against item count, on the item ladder in `SpecializedScalingProblemsProvider`.
+One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over all 11 steps (3 to 79 items), the bin fixed
+at `MaxSizeBin`, and six rows through the public `AlgorithmFactories` - `FFD_v1` (baseline), `FFD_v2`,
+`WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. 66 cases at the default job, `short` with `quick`.
 
 ## Binacle.Lib.Benchmarks.Threshold
 

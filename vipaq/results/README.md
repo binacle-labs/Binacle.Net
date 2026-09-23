@@ -9,5 +9,6 @@ a diff.
 | File | What it is |
 |---|---|
 | [encoded-size.md](encoded-size.md) | One row per pack per layout: every format's size, the ratio, the best codec |
+| [benchmarks/](benchmarks) | Kept timing runs from `vipaq/bench`, and how to read them. Not written by `just measure` |
 
 The summary of what these numbers say is not written yet.

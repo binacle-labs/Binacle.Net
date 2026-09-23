@@ -26,10 +26,12 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Smoke_BFD_Packing.md` | `just bench lib-algorithms-smoke` | short | 8 |
 | `algorithms/Smoke_BFD_Fitting.md` | `just bench lib-algorithms-smoke` | short | 8 |
 | `racing/Smoke_Packing.md` | `just bench lib-racing-smoke` | short | 8 |
+| `racing/Sample_Packing_v1.md` | `just bench lib-racing-sample` | default | 20 |
+| `racing/Sample_Packing_v2.md` | `just bench lib-racing-sample` | default | 20 |
 | `threshold/Smoke_Algorithms_Packing.md` | `just bench lib-threshold-smoke` | short | 16 |
 | `threshold/Smoke_Bins_Packing.md` | `just bench lib-threshold-smoke` | short | 48 |
 | `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
 | `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |
 
-Not here yet: every sample and full tier of lib. Their first kept run joins this folder.
+Not here yet: algorithms and threshold sample and full tiers. Their first kept run joins this folder.

@@ -269,7 +269,8 @@ the packs and the encoders were one project.
 - **One synthetic curve is enough.** The encoder is a per-item loop, so cost is linear by construction; the
   curve runs past the real data (median 79 items, max 371) to the format's limit. 2,000 was dropped, and the
   8-item real pack, which says the same as the 16-item one a step apart.
-- **No `Json` timing row yet.** It could only time encode: the test `JsonEncoder` has no decode.
+- **`Json` times encode only.** Added 2026-09-23 to both encode classes; the test `JsonEncoder` has no
+  decode, so there is no decode row.
 - **The production path is `Protobuf` against `ViPaq_Row`.** The api only encodes, row-major, uncompressed;
   decoding happens in the browser.
 

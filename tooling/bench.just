@@ -6,8 +6,10 @@
 #   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
 # The tier is the class name's first word: Smoke_, Sample_, Full_. Any other word fails before a run starts.
-# Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored. A run worth keeping is copied
-# into <slice>/results/benchmarks/<family>/ by hand, dated.
+# Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
+# class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
+# - baseline/ instead when it is that class's first kept run. That folder's README says what counts as worth
+# keeping.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
@@ -96,6 +98,21 @@ lib-result-selection: (lib-result-selection-run 'short')
 [private]
 lib-result-selection-run job:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ResultSelection -- --job {{ job }} --filter '*'
+
+# FFD, WFD, BFD x v1, v2 over the 11-step item ladder: 66 cases, timed on its first run. Its one tier
+[arg('mode', pattern='|quick')]
+lib-scaling mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    job=default
+    if [ "{{ mode }}" = quick ]; then job=short; fi
+
+    just bench lib-scaling-run "$job"
+
+[private]
+lib-scaling-run job:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Scaling -- --job {{ job }} --filter '*'
 
 # Encode and Decode on three packs - protobuf against ViPaq's two layouts: 18 cases, about 3 minutes
 vipaq-smoke: (vipaq-run 'short' 'Smoke')
