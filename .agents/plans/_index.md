@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 14 and 17 landed; left are 15 the new bench classes, 16 the bin-threshold finding, 18 the results story, and the provider names. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 15 and 17 landed, and the provider names; left are 16 the bin-threshold finding and 18 the results story. The maintainer commits between steps"
   state: ready
-  waits-on: "the maintainer runs the three recipes step 15 needs, and the long run step 16 needs"
+  waits-on: "the long run step 16 needs, on a quiet machine"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -98,11 +98,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/15-new-bench-classes.md
-  description: "Step 15 - two new bench classes - lib's time against item count, and a Json row beside protobuf in ViPaq's encode - and their first runs kept in the baseline"
-  state: ready
-  waits-on: "the maintainer runs lib-scaling and the two ViPaq encode recipes once"
-  horizon: next-release
 - file: measured-results/16-bin-threshold-finding.md
   description: "Step 16 - one long threshold run on a quiet machine answers whether packing bins in parallel pays, and from how many bins; the answer becomes a finding in the lib design record"
   state: ready
@@ -112,11 +107,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Step 18 - the results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
   state: ready
   waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
-  horizon: undecided
-- file: measured-results/consistent-provider-names.md
-  description: "One naming rule for every scenario provider in the Data and Testing projects - the namespace says what kind, the class says which one, every class has the same members"
-  state: proposed
-  waits-on: "the maintainer picks the scope (the table only, or the data projects' members too); he wants consistent names, 2026-09-22"
   horizon: undecided
 ```
 

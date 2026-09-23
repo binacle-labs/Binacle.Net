@@ -32,6 +32,7 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `threshold/Smoke_Bins_Packing.md` | `just bench lib-threshold-smoke` | short | 48 |
 | `threshold/Sample_Algorithms_Packing.md` | `just bench lib-threshold-sample` | default | 44 |
 | `threshold/Sample_Bins_Packing.md` | `just bench lib-threshold-sample` | default | 84 |
+| `scaling/Sample_Packing.md` | `just bench lib-scaling` | default | 66 |
 | `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
 | `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |

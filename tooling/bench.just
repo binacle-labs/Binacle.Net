@@ -99,7 +99,7 @@ lib-result-selection: (lib-result-selection-run 'short')
 lib-result-selection-run job:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ResultSelection -- --job {{ job }} --filter '*'
 
-# FFD, WFD, BFD x v1, v2 over the 11-step item ladder: 66 cases, timed on its first run. Its one tier
+# FFD, WFD, BFD x v1, v2 over the 11-step item ladder: 66 cases, about 20 minutes. Its one tier
 [arg('mode', pattern='|quick')]
 lib-scaling mode='':
     #!/usr/bin/env bash

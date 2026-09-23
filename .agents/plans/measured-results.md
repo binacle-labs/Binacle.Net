@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 14 and 17 landed; left are 15 the new bench classes, 16 the bin-threshold finding, 18 the results story, and the provider names. The maintainer commits between steps
+description: Orchestrator - steps 1 to 15 and 17 landed, and the provider names; left are 16 the bin-threshold finding and 18 the results story. The maintainer commits between steps
 state: ready
-waits-on: "the maintainer runs the three recipes step 15 needs, and the long run step 16 needs"
+waits-on: "the long run step 16 needs, on a quiet machine"
 horizon: next-release
 paths:
   - "shared/**"
@@ -23,6 +23,10 @@ old vault stopped being current. Their lasting rules are in the general design r
 the four project folders and the one on measured numbers. Step 12, the bench split, landed 2026-09-23; its
 reasons are in the lib and ViPaq design records. Step 13, which converted the old `results/` folder, was
 dropped 2026-09-22 when the folder was deleted.
+
+**Step 15 landed 2026-09-24** and its file is gone. `Binacle.Lib.Benchmarks.Scaling` is a project of its own
+with one class, `Sample_Packing`, 66 cases over the item ladder; `Json` is a row in ViPaq's two encode
+classes. All three runs are kept in `baseline/`.
 
 **Step 17 landed 2026-09-23** and its file is gone. `encoded-size.md` became 54 files under
 `vipaq/results/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
@@ -64,11 +68,10 @@ that would do it is an idea in the tooling plans.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 15 | [15-new-bench-classes](measured-results/15-new-bench-classes.md) | the scaling class and the Json row, their first runs kept | `grep -rq JsonEncoder vipaq/bench --include=*.cs` |
 | 16 | [16-bin-threshold-finding](measured-results/16-bin-threshold-finding.md) | the long threshold run, and the bins finding in the lib design record | `! grep -q "no finding yet" .agents/design/lib/findings.md` |
 | 18 | [18-results-story](measured-results/18-results-story.md) | the results READMEs as a story, from everything above | **by eye** - the READMEs open with sentences and numbers |
 
-The order is the work's: 15 and 16 keep their runs in the shape 14 set; 18 reads what 15 to 17 left.
+The order is the work's: 16 keeps its run in the shape 14 set; 18 reads what 15 to 17 left.
 
 ## Done when
 
