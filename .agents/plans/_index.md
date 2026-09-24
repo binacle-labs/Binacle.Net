@@ -173,3 +173,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
   paths: ["tooling/**", "vipaq/test-vectors/**", ".github/workflows/**"]
 ```
+
+## ViPaq
+
+```yaml
+- file: vipaq/off-the-shelf-binary-formats.md
+  description: "Measure MessagePack and CBOR beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline"
+  state: idea
+  waits-on: "nobody - it is an idea. horizon: undecided, an agent did not judge the distance"
+  horizon: undecided
+  paths: ["vipaq/test/Binacle.ViPaq.Testing/**", "vipaq/measure/Binacle.ViPaq.EncodedSize/**", "vipaq/results/**"]
+```
