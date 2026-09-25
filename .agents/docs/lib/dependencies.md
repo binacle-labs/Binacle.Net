@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-23
+verified: 2026-09-25
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -53,7 +53,7 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Benchmarks.Racing` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race |
 | `Binacle.Lib.Benchmarks.Threshold` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel on the item and bin ladders |
 | `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
-| `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/` |
+| `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/measurements/` |
 
 `Binacle.Data` above is the shared scenario project in `shared/data` and `Benchmarking` is `shared/test/Binacle.Benchmarking`;
 `Lib.Data` and `Lib.Testing` are this slice's own.

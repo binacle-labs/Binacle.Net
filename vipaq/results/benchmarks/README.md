@@ -5,8 +5,8 @@ machine's number on one day - so only runs that say something are kept, and each
 
 Every file is a BenchmarkDotNet report, copied unchanged and renamed to the class that produced it.
 
-Size is a different thing and is not here: `just measure vipaq` writes it to the files listed in
-[`vipaq/results`](..).
+Size is a different thing and is not here: `just measure vipaq` writes it to
+[`vipaq/results/measurements`](../measurements).
 
 ## 📂 What is in it
 

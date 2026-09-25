@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-24
+verified: 2026-09-25
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -118,10 +118,10 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 
 Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs the 700 Bischoff-suite scenarios
 with all six algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
-file under `lib/results/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
+file under `lib/results/measurements/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
 the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, only rows where v1 and v2
-differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. `lib/results/README.md` is
-written by hand, not by the harness. Not pass/fail; a change is a diff.
+differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Everything else under `lib/results/`
+is written by hand, not by the harness. Not pass/fail; a change is a diff.
 
 ## Binacle.Lib.Benchmarks.Algorithms
 

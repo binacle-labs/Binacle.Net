@@ -1,7 +1,7 @@
 # Binacle.ViPaq.EncodedSize
 
 Encodes every frozen pack every way ViPaq can - each codec, each layout - and protobuf, JSON and compact
-notation through the same codecs beside it, and writes the sizes as markdown into [`vipaq/results/encoded-size/`](../../results) - a
+notation through the same codecs beside it, and writes the sizes as markdown into [`vipaq/results/measurements/encoded-size/`](../../results/measurements/encoded-size) - a
 folder per algorithm, one file per layout per group inside it. Not a test:
 nothing here passes or fails, and encoded size is deterministic, so the files are tracked and a change in the
 format shows up as a diff.
@@ -10,7 +10,7 @@ format shows up as a diff.
 
 | Path | What it is |
 |---|---|
-| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `vipaq/results/`; runs the gate first |
+| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `vipaq/results/measurements/`; runs the gate first |
 | `PreReportChecks/` | The gates: every curated benchmark pick still names a real pack, and every pack lands in a file. A failure stops the run |
 | `EncodingRunner.cs` | Encodes every pack in every format and fills the bag |
 | `EncodingBag.cs` | What the runner measured; every reporter reads from here |
@@ -22,7 +22,7 @@ format shows up as a diff.
 
 ```
 just measure vipaq
-git diff vipaq/results
+git diff vipaq/results/measurements
 ```
 
 Run it after touching the encoder or the packed data. A diff is the finding; commit it with the change that

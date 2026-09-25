@@ -119,15 +119,26 @@ nothing would notice if it broke.
 
 The signature promises a decision that is never made.
 
-**And the measurement argues against wiring it up.** On the set production actually uses (FFD+BFD), parallel
-*algorithm* racing runs **0.93× to 1.48×** — slower than `Loop` on the cheapest scenario, and only clearly
-ahead where the two algorithms take very unequal time (`$lib/findings#F2`). Two algorithms cap the win at 2×
-before overhead. **D1 is what makes this so: the decision that makes racing cheap is the decision that makes
-parallelising it pointless.**
+**And the measurement argues against wiring the algorithm one up.** On the set production actually uses
+(FFD+BFD), parallel *algorithm* racing runs **0.93× to 1.48×** on the curated problems (`$lib/findings#F2`) and
+**1.11× to 2.55× — always slower** over the whole item ladder (`$lib/findings#F2a`). It is only ahead where the
+two algorithms take very unequal time. Two algorithms cap the win at 2× before overhead. **D1 is what makes
+this so: the decision that makes racing cheap is the decision that makes parallelising it pointless.**
 
-The untested axis is `ParallelBinProcessor` — many *bins* at once, which scales with bin count rather than
-algorithm count. That is the one that could still pay, and it has no finding yet.
+**`ParallelBinProcessor` does pay, above a threshold, and the threshold is now measured**
+(`$lib/findings#F4`): 1 bin is always a loss (1.16× to 4.60×), 3 and 7 items never win at any bin count, and
+from 13 items the crossover walks in with size — FFD wins from 7 bins at 17 items, 5 at 23, 2 at 47; BFD about
+two bins earlier. At 79 items over 7 bins it reaches 0.60 (FFD) and 0.52 (BFD) on 12 cores, for 1.03× the
+allocation.
 
-**Undecided:** wire the threshold up, or delete the classes. Leaving three unreachable processors in place
-invites someone to "fix" a path that never runs in production. Also `ParallelBinProcessor.concurrencyLevel`
-only sizes the `ConcurrentDictionary` — it never reaches `MaxDegreeOfParallelism`, so the name overpromises.
+**So a threshold is defensible, and it is a surface, not a number.** It needs both a bin count and an item
+count, measured on the machine it will run on — a 12-core result says nothing about 4 cores, and F4 shows the
+threshold moving *outward* as the algorithms get faster (v1 crosses over earlier than v2 everywhere). A wrong
+threshold is worse than none: below it, parallel costs up to 4.6× on exactly the small requests the demo makes
+(median 13 items).
+
+**Undecided:** wire the bin threshold up, or delete the classes. F4 says what the threshold would have to be,
+not whether the routes are worth the branch. Leaving three
+unreachable processors in place invites someone to "fix" a path that never runs in production. Also
+`ParallelBinProcessor.concurrencyLevel` only sizes the `ConcurrentDictionary` — it never reaches
+`MaxDegreeOfParallelism`, so the name overpromises, and any wiring-up has to fix that first.

@@ -323,8 +323,8 @@ writes the numbers into the slice's tracked `results/` folder, so a change is a 
 
 ```bash
 just measure all       # both slices
-just measure lib       # lib/measure/Binacle.Lib.PackingEfficiency -> lib/results/
-just measure vipaq     # vipaq/measure/Binacle.ViPaq.EncodedSize   -> vipaq/results/
+just measure lib       # lib/measure/Binacle.Lib.PackingEfficiency -> lib/results/measurements/
+just measure vipaq     # vipaq/measure/Binacle.ViPaq.EncodedSize   -> vipaq/results/measurements/
 ```
 
 ## 📈 Benchmarks

@@ -1,7 +1,7 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-09-22
+verified: 2026-09-25
 check: Project list and test aliases match the solution
 also_update:
   - lib/tests
@@ -37,7 +37,7 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 | Project | Alias | What it covers |
 |---|---|---|
 | `lib/test/Binacle.Lib.UnitTests` | `cs_binacle-lib_unit` | All algorithm versions × all scenarios; result selection strategies |
-| `lib/measure/Binacle.Lib.PackingEfficiency` | (none) | Packing efficiency over every scenario (console runner, not xUnit), written to `lib/results/` — run via `just measure lib` |
+| `lib/measure/Binacle.Lib.PackingEfficiency` | (none) | Packing efficiency over every scenario (console runner, not xUnit), written to `lib/results/measurements/` — run via `just measure lib` |
 | `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` | (none) | The three result selectors, v1 against v2 — `just bench lib-result-selection` |
 | `lib/bench/Binacle.Lib.Benchmarks.Algorithms` | (none) | The three algorithms, v1 against v2, in three tiers — `just bench lib-algorithms-smoke|-sample|-full` |
 | `lib/bench/Binacle.Lib.Benchmarks.Racing` | (none) | Loop against Parallel for `Best`'s race — `just bench lib-racing-smoke|-sample` |

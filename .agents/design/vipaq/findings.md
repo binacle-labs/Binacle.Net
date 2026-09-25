@@ -1,8 +1,8 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-09-23
-check: The numbers under "Size today" match vipaq/results/README.md and the files under vipaq/results/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
+verified: 2026-09-25
+check: The numbers under "Size today" match vipaq/results/README.md and the files under vipaq/results/measurements/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -99,7 +99,7 @@ Measured on the 716-pack set under v1's automatic gzip; "Size today" above repla
 ## Compression crossover
 
 A controlled count ladder pins it: `Simple_5x5x5-N` (N = 5/13/50/200) in a fixed 50³ bin, only the count changing
-(measured 2026-07 by the codec crossover report, since replaced by the files under `vipaq/results/encoded-size/`, which
+(measured 2026-07 by the codec crossover report, since replaced by the files under `vipaq/results/measurements/encoded-size/`, which
 covers real packs only). For this uniform, maximally-repetitive family deflate
 already wins at the smallest rung — 5 items: raw 52 → deflate 36 b64 (31% saved) — and the saving climbs with count
 (45% / 64% / 66% at 13 / 50 / 200). Uniform data is gzip's best case; mixed real packs (Bischoff) are less

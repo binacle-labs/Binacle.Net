@@ -47,7 +47,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   description: "Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question."
   paths: ["lib/**"]
 - file: lib/findings.md
-  description: "Lib findings — the measured evidence (algorithm racing cost, parallel racing gain) behind the decisions."
+  description: "Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions."
   paths: ["lib/**"]
 ```
 

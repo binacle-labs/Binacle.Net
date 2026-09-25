@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 15 and 17 landed, and the provider names; left are 16 the bin-threshold finding and 18 the results story. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 17 landed, and the provider names; left is 18 the results story. The maintainer commits between steps"
   state: ready
-  waits-on: "the long run step 16 needs, on a quiet machine"
+  waits-on: "a session of its own for step 18 - the maintainer says when"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -98,11 +98,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/16-bin-threshold-finding.md
-  description: "Step 16 - one long threshold run on a quiet machine answers whether packing bins in parallel pays, and from how many bins; the answer becomes a finding in the lib design record"
-  state: ready
-  waits-on: "a quiet machine for hours, the maintainer's"
-  horizon: next-release
 - file: measured-results/18-results-story.md
   description: "Step 18 - the results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
   state: ready

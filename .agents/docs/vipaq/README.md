@@ -1,7 +1,7 @@
 ---
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
-verified: 2026-09-23
+verified: 2026-09-25
 check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects, the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ and the gate in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
 also_update:
   - vipaq/typescript
@@ -63,8 +63,8 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror (`$vipaq/typescript`) |
 | `vipaq/test-vectors/` | Language-neutral vectors read by both suites |
 | `vipaq/test/` | C# unit tests and `Binacle.ViPaq.Testing` (the harness's encoders and picks) |
-| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` — encodes every pack and writes `vipaq/results/` |
-| `vipaq/results/` | What `Binacle.ViPaq.EncodedSize` writes; a change is a diff |
+| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` — encodes every pack and writes `vipaq/results/measurements/` |
+| `vipaq/results/` | `measurements/` is what `Binacle.ViPaq.EncodedSize` writes, so a change is a diff; `benchmarks/` holds kept timing runs |
 | `vipaq/bench/` | `Binacle.ViPaq.Benchmarks` — the timings |
 | `vipaq/tools/` | `VectorGenerators` (writes `test-vectors/`) and `PackedDataGenerator` (writes `data/packed/`) |
 | `vipaq/data/` | `packed/` — the frozen placed results, `bischoff-suite/`, `custom-problems/`, `demo-samples/` — and `Binacle.ViPaq.Data`, which embeds them |

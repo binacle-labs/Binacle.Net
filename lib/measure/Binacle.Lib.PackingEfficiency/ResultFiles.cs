@@ -1,6 +1,6 @@
 namespace Binacle.Lib.PackingEfficiency;
 
-// The raw files under lib/results/; the README there is written by hand. Every one opens with the same sentence: tool, count, data set - never a date.
+// The raw files under lib/results/measurements/. Every one opens with the same sentence: tool, count, data set - never a date.
 internal static class ResultFiles
 {
 	private const string Header =

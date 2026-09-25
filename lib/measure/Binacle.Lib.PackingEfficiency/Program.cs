@@ -10,8 +10,8 @@ internal class Program
 	{
 		var builder = Host.CreateApplicationBuilder();
 
-		// The files are tracked: the writer overwrites lib/results/ and a change shows up as a diff.
-		var resultsDirectory = RepositoryRoot.Bind().Find("lib", "results");
+		// The files are tracked: the writer overwrites lib/results/measurements/ and a change shows up as a diff.
+		var resultsDirectory = RepositoryRoot.Bind().Find("lib", "results", "measurements");
 		builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(resultsDirectory));
 
 		builder.Services.AddSingleton<PackingBag>();

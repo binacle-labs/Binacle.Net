@@ -23,7 +23,7 @@ mod agents 'tooling/agents.just'
 # The committed generated data: `just regen all`, `just regen check` to prove it is in step.
 mod regen 'tooling/regen.just'
 
-# The measured results: `just measure all` rewrites lib/results and vipaq/results, `just measure check` proves they are in step.
+# The measured results: `just measure all` rewrites lib/results/measurements and vipaq/results/measurements.
 mod measure 'tooling/measure.just'
 
 # The timings: `just bench` lists every project and tier with its cost, `just bench lib-algorithms-smoke` runs one.

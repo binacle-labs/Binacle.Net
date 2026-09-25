@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 15 and 17 landed, and the provider names; left are 16 the bin-threshold finding and 18 the results story. The maintainer commits between steps
+description: Orchestrator - steps 1 to 17 landed, and the provider names; left is 18 the results story. The maintainer commits between steps
 state: ready
-waits-on: "the long run step 16 needs, on a quiet machine"
+waits-on: "a session of its own for step 18 - the maintainer says when"
 horizon: next-release
 paths:
   - "shared/**"
@@ -32,6 +32,12 @@ classes. All three runs are kept in `baseline/`.
 `vipaq/results/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
 reporter's old file is deleted by hand; the general design record says so, and wanting a check for it is an
 idea in the shared plans.
+
+**Step 16 landed 2026-09-25.** The maintainer ran `lib-threshold-full precise` and `lib-algorithms-full`; the
+ten reports are the first kept run of both full tiers, in `baseline/threshold/` and `baseline/algorithms/`. The
+answer is F4 in the lib findings record - parallel bin processing pays above a surface of bin count and item
+count, and loses badly below it - with F2a settling parallel algorithm racing against. O1 in the lib decisions
+record carries both, and what is still undecided. Its file is ticked and is the maintainer's to delete.
 
 **Step 14 landed 2026-09-23** and its file is gone. The kept-run shape, the rule for what is worth keeping,
 and how a report is copied all live in the two `benchmarks/README.md`. Copying stays a hand job; the recipe
@@ -68,10 +74,9 @@ that would do it is an idea in the tooling plans.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 16 | [16-bin-threshold-finding](measured-results/16-bin-threshold-finding.md) | the long threshold run, and the bins finding in the lib design record | `! grep -q "no finding yet" .agents/design/lib/findings.md` |
 | 18 | [18-results-story](measured-results/18-results-story.md) | the results READMEs as a story, from everything above | **by eye** - the READMEs open with sentences and numbers |
 
-The order is the work's: 16 keeps its run in the shape 14 set; 18 reads what 15 to 17 left.
+18 reads what 15 to 17 left.
 
 ## Done when
 

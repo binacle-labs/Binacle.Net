@@ -31,6 +31,12 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Sample_WFD_Fitting.md` | `just bench lib-algorithms-sample` | default | 60 |
 | `algorithms/Sample_BFD_Packing.md` | `just bench lib-algorithms-sample` | default | 60 |
 | `algorithms/Sample_BFD_Fitting.md` | `just bench lib-algorithms-sample` | default | 60 |
+| `algorithms/Full_FFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
+| `algorithms/Full_FFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
+| `algorithms/Full_WFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
+| `algorithms/Full_WFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
+| `algorithms/Full_BFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
+| `algorithms/Full_BFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `racing/Smoke_Packing.md` | `just bench lib-racing-smoke` | short | 8 |
 | `racing/Sample_Packing_v1.md` | `just bench lib-racing-sample` | default | 20 |
 | `racing/Sample_Packing_v2.md` | `just bench lib-racing-sample` | default | 20 |
@@ -38,9 +44,18 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `threshold/Smoke_Bins_Packing.md` | `just bench lib-threshold-smoke` | short | 48 |
 | `threshold/Sample_Algorithms_Packing.md` | `just bench lib-threshold-sample` | default | 44 |
 | `threshold/Sample_Bins_Packing.md` | `just bench lib-threshold-sample` | default | 84 |
+| `threshold/Full_Algorithms_Packing_v1.md` | `just bench lib-threshold-full precise` | default | 44 |
+| `threshold/Full_Algorithms_Packing_v2.md` | `just bench lib-threshold-full precise` | default | 44 |
+| `threshold/Full_Bins_Packing_v1.md` | `just bench lib-threshold-full precise` | default | 308 |
+| `threshold/Full_Bins_Packing_v2.md` | `just bench lib-threshold-full precise` | default | 308 |
 | `scaling/Sample_Packing.md` | `just bench lib-scaling` | default | 66 |
 | `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
 | `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |
 
-Not here yet: algorithms full and threshold full. Their first kept run joins this folder.
+Every lib bench class now has a kept run. A later run goes in a dated folder beside this one, holding only
+the reports that moved.
+
+The two full tiers ran at different jobs, which is why their case counts are the recipes' own: algorithms
+full ran the short job (8,400 cases, about 12 hours), threshold full the default one (`precise`, 704 cases,
+about 3 hours). A short-job time is a rougher number than a default-job one; the ratios still hold.

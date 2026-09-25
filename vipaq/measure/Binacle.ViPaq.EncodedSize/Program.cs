@@ -11,8 +11,8 @@ internal class Program
 	{
 		var builder = Host.CreateApplicationBuilder();
 
-		// The files are tracked: the writer overwrites vipaq/results/ and a change shows up as a diff.
-		var resultsDirectory = RepositoryRoot.Bind().Find("vipaq", "results");
+		// The files are tracked: the writer overwrites vipaq/results/measurements/ and a change shows up as a diff.
+		var resultsDirectory = RepositoryRoot.Bind().Find("vipaq", "results", "measurements");
 		builder.Services.AddSingleton<IFileWriter>(new MarkdownFileWriter(resultsDirectory));
 
 		builder.Services.AddPreReportChecks();

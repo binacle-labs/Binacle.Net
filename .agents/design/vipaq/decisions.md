@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-09-23
+verified: 2026-09-25
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -55,7 +55,7 @@ ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2
 - **Protobuf is the in-run anchor** — `[Benchmark(Baseline = true)]`. ViPaq is reported as a *ratio* to protobuf,
   so a rerun on another machine/day stays comparable; the anchor absorbs environment drift.
 - **Committed result files are the recorded baseline, and a size win is a diff** (2026-09-20).
-  `Binacle.ViPaq.EncodedSize` writes straight into `vipaq/results/encoded-size/`, one file per group per
+  `Binacle.ViPaq.EncodedSize` writes straight into `vipaq/results/measurements/encoded-size/`, one file per group per
   algorithm per layout; run it, read `git diff`, commit what changed. A win is smaller ViPaq base64 **while the
   protobuf columns are unchanged**. Small increments; keep only measured wins. Timing is not in these files: it
   is machine-bound, so a benchmark report is a keeper, not a diff (`$decisions#D10`). From 2026-07-14 to
@@ -96,7 +96,7 @@ Two consequences of the public-API rule, both still true:
   compression crossover by sweeping item count.
 - **The codec race is part of it, permanently.** The harness encodes every scenario with each codec — raw (the
   `NoOp` codec), deflate and gzip — in both layouts, and mirrors each codec onto protobuf. The sizes are in
-  `vipaq/results/encoded-size/`, one file per group per algorithm per layout.
+  `vipaq/results/measurements/encoded-size/`, one file per group per algorithm per layout.
 
 Why it belongs in the permanent ruler, not a throwaway — **the race is not only about the codec:**
 - It also settles **row-major vs columnar**, which was unmeasured when this was decided and is a permanent

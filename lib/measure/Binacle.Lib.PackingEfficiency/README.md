@@ -1,7 +1,7 @@
 # Binacle.Lib.PackingEfficiency
 
 Packs every Bischoff suite scenario with every algorithm version, once, and writes what came out - fill per
-algorithm, which won, where v1 and v2 differ - as markdown into [`lib/results/`](../../results). Not a test:
+algorithm, which won, where v1 and v2 differ - as markdown into [`lib/results/measurements/`](../../results/measurements). Not a test:
 nothing here passes or fails, and the numbers are deterministic, so the files are tracked and a change in the
 packer shows up as a diff.
 
@@ -9,7 +9,7 @@ packer shows up as a diff.
 
 | Path | What it is |
 |---|---|
-| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/` |
+| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/measurements/` |
 | `PackingRunner.cs` | Packs 700 scenarios with six algorithm versions and fills the bag |
 | `PackingBag.cs` | What the runner measured; every reporter reads from here |
 | `ResultFiles.cs` | The two files and the header sentence they open with |
@@ -19,12 +19,12 @@ packer shows up as a diff.
 
 ```
 just measure lib
-git diff lib/results
+git diff lib/results/measurements
 ```
 
 Run it after touching an algorithm. A diff is the finding; commit it with the change that caused it.
 
 ## ⚠️ What will bite you
 
-It overwrites the tracked files every run, except `README.md`, which is written by hand. Timings are not measured here on purpose - they vary by machine
+It overwrites the tracked files every run. Timings are not measured here on purpose - they vary by machine
 and belong in `lib/bench/`.

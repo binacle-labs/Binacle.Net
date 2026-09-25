@@ -6,7 +6,7 @@ using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize;
 
-// The raw files under vipaq/results/encoded-size/<algorithm>/; the README there is written by hand. One file per
+// The raw files under vipaq/results/measurements/encoded-size/<algorithm>/. One file per
 // group per algorithm per layout - the whole table in one file is more than GitHub will render, and one
 // algorithm per file lets a column be read straight down. Every one opens with the same sentence: tool, count,
 // group, algorithm - never a date. The count comes from the data, so it cannot drift when the packs are

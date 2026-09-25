@@ -123,6 +123,14 @@ i5 is an i5-4570 on Debian 12; i7 an i7-14700 on Windows 11; runs of November 20
 2026-09-23 `lib-algorithms-smoke` run, kept in `lib/results/benchmarks/baseline/algorithms/`, gives the v2/v1
 ratios and memory on .NET 10 to set beside the table above, and shows whether memory moved since November 2025.
 
+**A better source landed 2026-09-25.** The `lib-algorithms-full` run - 1,400 cases per class, all 700 Bischoff
+problems, v1 against v2, packing and fitting - is in the same folder as `Full_<alg>_<op>.md`. It carries the
+v2/v1 story over the whole suite instead of one synthetic case, so the story's speed numbers come from there
+and the smoke case is only the bridge back to the November table. It ran at the **short** job (3 iterations),
+so a single problem's mean is rough; an average over 700 is not. Beside it, `baseline/threshold/Full_*` holds
+the parallel numbers, already read out as F4 and F2a in the lib findings record - the story does not need to
+re-derive them.
+
 ## Not in this plan
 
 - A docs-site page copied from the READMEs, and a number on www.

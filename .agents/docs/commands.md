@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-22
+verified: 2026-09-25
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -236,8 +236,8 @@ what the code does shows up as a diff:
 
 ```bash
 just measure            # list
-just measure lib        # Binacle.Lib.PackingEfficiency -> lib/results/
-just measure vipaq      # Binacle.ViPaq.EncodedSize     -> vipaq/results/
+just measure lib        # Binacle.Lib.PackingEfficiency -> lib/results/measurements/
+just measure vipaq      # Binacle.ViPaq.EncodedSize     -> vipaq/results/measurements/
 just measure all
 ```
 

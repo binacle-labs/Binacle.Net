@@ -2,8 +2,8 @@ using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
 
 namespace Binacle.Lib.Testing;
 
-// Thirty of the 700, picked from lib/results/packing-efficiency.md on 2026-09-21: every outcome the fills
-// show, both size ends, both fit ends. The name printed is "<category> (<id>)".
+// Thirty of the 700, picked from lib/results/measurements/packing-efficiency.md on 2026-09-21: every outcome
+// the fills show, both size ends, both fit ends. The name printed is "<category> (<id>)".
 public static class SampleSet
 {
 	private static readonly (string Category, string Id)[] picks =
