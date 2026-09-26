@@ -67,8 +67,7 @@ searches for 3D bin packing, so that is the term used here.
 ├── /samples      # Docker Compose and Kubernetes deployment samples
 ├── /tooling      # Every task the repo can run - just modules, scripts, local compose
 ├── /assets       # Shared static assets copied into the sites at build time
-├── /artifacts    # Build output - published app, sites, OpenAPI, test results, coverage
-└── /results      # Benchmark and packing-efficiency output
+└── /artifacts    # Build output - published app, sites, OpenAPI, test results, coverage
 ```
 
 Each slice folder has its own `README.md` with details.

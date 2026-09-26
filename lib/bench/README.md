@@ -2,7 +2,8 @@
 
 The timings for `Binacle.Lib`: one BenchmarkDotNet project per question. Not tests - nothing here passes or
 fails - and not measurements either: a timing is one machine's number, so nothing here is tracked. A run
-worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) by hand, dated.
+worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) by hand: a class's first kept run
+into `baseline/`, a later one into a dated folder.
 
 ## 📂 What is in it
 
@@ -19,7 +20,7 @@ worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) 
 ```
 just bench                          # every recipe with its cost, in tier order
 just bench lib-algorithms-smoke     # one recipe; a project with tiers has one per tier
-just bench lib-result-selection     # a project with one tier has its plain name
+just bench lib-result-selection     # result selection and scaling have one tier and a plain name
 just bench lib-scaling              # the growth curve, 66 cases
 ```
 

@@ -120,8 +120,8 @@ Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) pack
 with all six algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
 file under `lib/results/measurements/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
 the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, only rows where v1 and v2
-differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Everything else under `lib/results/`
-is written by hand, not by the harness. Not pass/fail; a change is a diff.
+differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Nothing else under `lib/results/` is
+written by the harness. Not pass/fail; a change is a diff.
 
 ## Binacle.Lib.Benchmarks.Algorithms
 

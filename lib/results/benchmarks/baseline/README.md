@@ -57,6 +57,5 @@ Every lib bench class has a kept run except racing's `Cores_Packing`. The three 
 classes and recipes retired on 2026-09-26; they stay as the record and can no longer be re-run. A later run
 goes in a dated folder beside this one, holding only the reports that moved.
 
-The two full tiers ran at different jobs, which is why their case counts are the recipes' own: algorithms
-full ran the short job (8,400 cases, about 12 hours), threshold full the default one (`precise`, 704 cases,
-about 3 hours). A short-job time is a rougher number than a default-job one; the ratios still hold.
+The two full tiers ran at different jobs: algorithms full the short job (8,400 cases, about 16 hours), threshold
+full the default one (`precise`, 704 cases, about 5 hours). A short-job time is a rougher number than a default-job one; the ratios still hold.

@@ -23,8 +23,8 @@ The picks are in `vipaq/test/Binacle.ViPaq.Testing/`, keyed by the column name t
 ## 🛠️ How you use it
 
 ```
-just bench vipaq-smoke          # 18 cases, about 3 minutes: did my change help or hurt
-just bench vipaq-sample         # 84 cases at the default job, about 20 minutes: the one to keep
+just bench vipaq-smoke          # 21 cases, about 3 minutes: did my change help or hurt
+just bench vipaq-sample         # 96 cases at the default job, about 30 minutes: the one to keep
 just bench vipaq-sample quick   # the same at the short job, about 7 minutes
 ```
 
@@ -32,6 +32,6 @@ The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
 
 ## ⚠️ What will bite you
 
-The parity findings rest on ratios like 0.89 and 1.20, which the `short` job blurs - keep a default-job run.
+Several ratios sit close to 1.00, which the `short` job blurs - keep a default-job run.
 The synthetic columns are for time and memory only: random data has nothing for a codec to grip, so never read
 a size or a compression number off them. `Mean` is one machine's number; read `Ratio` and `Allocated`.

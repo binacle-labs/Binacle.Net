@@ -13,7 +13,7 @@ items, it works out whether they fit (**fit**) and packs as many as it can (**pa
 | `measure/Binacle.Lib.PackingEfficiency` | Packs every scenario with every algorithm and writes the numbers to `results/` - see [its README](measure/Binacle.Lib.PackingEfficiency/README.md). |
 | `bench/` | The timings, one BenchmarkDotNet project per question - see [its README](bench/README.md). |
 | `test/` | The unit tests, and `Binacle.Lib.Testing`, the harness code they share with `measure/` and `bench/` - see [its README](test/Binacle.Lib.Testing/README.md). |
-| `results/` | What `measure/` writes. Tracked, so a change in the numbers shows up as a diff - see [its README](results/README.md). |
+| `results/` | What `measure/` writes, the bench runs kept by hand, and one file per question read from them. Tracked, so a change in the numbers shows up as a diff - see [its README](results/README.md). |
 
 ## ⚙️ How it works
 

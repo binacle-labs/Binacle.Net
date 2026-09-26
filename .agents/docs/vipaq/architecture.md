@@ -1,7 +1,7 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-09-25
+verified: 2026-09-26
 check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/measurements/encoded-size/ holds a folder per algorithm, and a file per layout per group inside it
 paths:
   - "vipaq/**"
@@ -125,8 +125,9 @@ with a `with` expression:
   every real pack in `vipaq/results/measurements/encoded-size/`: raw is the same length in both layouts, and under deflate or
   gzip columnar is smaller on average.
 - **Compressed** — the caller's choice too, default off. Not decided by the library: encoding both ways and
-  keeping the shorter blob costs a second compression on every call, and that cost is unmeasured, so the call
-  is handed to whoever knows their own trade-off.
+  keeping the shorter blob costs a second compression on every call. What one compression adds is measured on
+  two packs only (`vipaq/results/benchmarks/baseline/encoding/Sample_CompressionCost_Encode.md`), not as a curve
+  over pack sizes, so the call is handed to whoever knows their own trade-off.
 
 `Deserialize` is the easy half: `Header.FromBytes` on the first two bytes — which already rejects a bad version,
 a set reserved bit and a reserved width code (§7, steps 2-3) — then hand the encoder the header plus the rest.
@@ -172,7 +173,7 @@ The public contract does not grow, yet tests can force any combination.
 - **The chooser is a checkable function** (phase 2). Enumerate the combinations through the blind layer and
   assert the choosing layer picked the **narrowest widths that hold each section**. **Not the smallest
   base64** — compression is the caller's choice and is deliberately not decided by the library, because
-  encoding both ways to compare costs a second compression on every call and that cost is unmeasured.
+  encoding both ways to compare costs a second compression on every call, measured on two packs only.
 - **A header that cannot hold its data throws.** The blind layer trusts the header but rejects the impossible —
   1 byte per number forced on a value of 300 (§8, encode side).
 
@@ -185,4 +186,4 @@ the two could silently disagree in a mode neither would choose on its own.
 ## Open — do not assume
 
 - **Whether the library should choose `Compressed` for you.** It does not. Encoding both ways and keeping the
-  shorter blob is still unmeasured for encode time, so the decision stays with the caller.
+  shorter blob is measured on two packs only, not across pack sizes, so the decision stays with the caller.

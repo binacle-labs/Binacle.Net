@@ -58,8 +58,8 @@ A fifth property is set **conditionally**: any project whose directory path cont
 `MSBuildProjectDirectory` is separator-native and the match would miss on Linux otherwise.
 
 The Scanner for .NET identifies a test project by its `Microsoft.NET.Test.Sdk` reference. That finds the xunit
-suites but **not** the seventeen support projects that have no such reference — the three data projects,
-`Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, `Binacle.Benchmarking`, the five benchmark projects, the two
+suites but **not** the eighteen support projects that have no such reference — the three data projects,
+`Binacle.Lib.Testing`, `Binacle.ViPaq.Testing`, `Binacle.Reporting`, `Binacle.Benchmarking`, the six benchmark projects, the two
 measure projects, and the three generator/converter tools. Without the property the scanner reads all of them as product code, which put 1203
 lines into the coverage denominator that no test will ever cover (measured when there were ten projects, so
 the real figure is now a little higher) and ran the product rule set over them (`S101` on benchmark class
@@ -182,9 +182,9 @@ into the solution (and travel with build output). There are seven: `assets/asset
 `api/requests/requests.proj` and `samples/kubernetes/minimal/minimal.proj`.
 The Docker samples use `Microsoft.Docker.Sdk` `.dcproj` files instead. None of these affect the C# build.
 
-**`lib/results/`, `vipaq/results/` and the old `results/` vault are deliberately not in the solution.** They are
-markdown - written by the measure projects, or hand-kept benchmark records - never built, so they carry no
-`.proj` and no solution folder. Open the markdown directly.
+**`lib/results/` and `vipaq/results/` are deliberately not in the solution.** They are markdown - written by
+the measure projects, benchmark reports kept by hand, and one file per question read from both - never built,
+so they carry no `.proj` and no solution folder. Open the markdown directly.
 
 ## Cross-slice edges, and the ones no project file declares
 

@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-09-25
+verified: 2026-09-26
 check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -79,7 +79,7 @@ boundary here** — `Header` is a frozen wire description, not an evolving API, 
 the harness *should* break. (This reading-via-internals rule replaced an earlier re-parse-the-bytes rule; the
 superseded version is in `$vipaq/history`.)
 
-Two consequences of the public-API rule, both still true:
+Two consequences of the public-API rule, true until 2026-09-22 while the harness went through `Serialize`:
 - **Layout-agnostic for free** — when v2 swaps row→columnar internally, the bytes change but the harness call
   sites don't. This is automatic from living at the public boundary, not something the harness engineers.
 - **It measures real behavior only** — the public `Serialize` chooses compression itself (D7), so the harness
@@ -92,8 +92,9 @@ Two consequences of the public-API rule, both still true:
   defeat the point. The codec race is part of the ruler, not a separate experiment (D5).
 
 ### D5 — The codec race lives in the harness, permanently (CONFIRMED 2026-07-07)
-- **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio, and *observes* the shipped
-  compression crossover by sweeping item count.
+- **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio. It once observed the shipped
+  compression crossover by sweeping item count; no such sweep is left - the synthetic 1,000, 5,000 and 65,535
+  item packs are timing only.
 - **The codec race is part of it, permanently.** The harness encodes every scenario with each codec — raw (the
   `NoOp` codec), deflate and gzip — in both layouts, and mirrors each codec onto protobuf. The sizes are in
   `vipaq/results/measurements/encoded-size/`, one file per group per algorithm per layout.

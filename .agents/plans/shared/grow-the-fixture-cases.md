@@ -60,14 +60,12 @@ so one addition serves both.
 
 - **8-bit coverage.** Every Bischoff pack is 16-bit, coordinates to ~587. The only 8-bit scenario is a custom
   pack, and ViPaq's curated Bischoff slice is all 16-bit, so a real, size-measured 8-bit problem has to come
-  from here. Benchmarks get 8-bit from `SyntheticDataProvider`; this is about real, measured data.
-- **Uncompressed 16-bit coverage.** ViPaq's uncompressed set is all 8-bit - every 16-bit problem is big enough
-  that ViPaq compresses it, so there is no uncompressed-16-bit scenario to size or benchmark. Author a small
-  16-bit problem: coordinates over 255 but few enough items to stay under the compression threshold. 16-bit
-  body is `2 + 6 + items*(3*2 + 3*2)` bytes and must be under 255, so about 20 items.
+  from here. Benchmarks get 8-bit from `SyntheticGenerator`; this is about real, measured data.
+- **Uncompressed 16-bit coverage.** One small 16-bit problem exists, `Simple_16bit-4_FitIn_600x400x300` in
+  custom-problems, and it is a timing pick. More would take coordinates over 255 but few enough items to stay
+  small: 16-bit body is `2 + 6 + items*(3*2 + 3*2)` bytes, so about 20 items stay under 255.
 - **A count ladder.** One problem family at ~5, ~13, ~50, ~200 items, with **only the item count changing**.
-  This pins ViPaq's compression-crossover report, which is otherwise provisional - "8-bit crosses somewhere
-  between 16 and 100 items".
+  It would show where compressing starts to pay by item count, which nothing measures today.
 - **Shape variety.** `simple`, `complex` and `baseline` are small and same-ish. Consider varied bin sizes, a
   single-item bin, and a near-perfect tessellation.
 

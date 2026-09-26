@@ -9,7 +9,7 @@ it, it belongs in that slice instead.
 |---|---|
 | `src/` | Four small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation, result types |
 | `data/` | The scenario corpus more than one slice reads, and `Binacle.Data`, which reads it - see [`data/README.md`](data/README.md) |
-| `test/` | Test infrastructure shared by several suites - the report writer, the unit tests of the libraries |
+| `test/` | Test infrastructure shared by several suites - the report writer, the benchmark config every bench project runs with, the unit tests of the libraries |
 | `tools/` | The OR-Library converter, which writes `data/bischoff-suite` |
 
 ## 📦 The libraries
@@ -42,7 +42,7 @@ Union, extension-method and typed-result tests for `src/Binacle.FluxResults`. Ru
 The runner-and-reporter loop behind the measure projects. Register a bag, `IRunner`s, `IReporter`s and an
 `IFileWriter` in DI; `Measure` runs every runner, then every reporter, and writes one file per `ResultFile`.
 Used by `lib/measure/Binacle.Lib.PackingEfficiency` and `vipaq/measure/Binacle.ViPaq.EncodedSize`. The data
-generators under `shared/tools/` and `vipaq/tools/` use only its `RepositoryRoot`. The reports it writes are the ones committed under `lib/results/` and `vipaq/results/`.
+generators under `shared/tools/` and `vipaq/tools/` use only its `RepositoryRoot`. The reports it writes are the ones committed under `lib/results/measurements/` and `vipaq/results/measurements/`.
 
 ### ⏱️ `Binacle.Benchmarking`
 

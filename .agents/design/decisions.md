@@ -1,8 +1,8 @@
 ---
 id: decisions
 description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model, and the four project folders and what each may reference, and why measured numbers live in the slice - deterministic ones tracked and diffed, timing ones kept by hand.
-verified: 2026-09-24
-check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every raw file under lib/results and vipaq/results, and by neither measure project registering a README reporter
+verified: 2026-09-26
+check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every file under lib/results/measurements and vipaq/results/measurements, and by neither measure project registering a README reporter
 paths:
   - "NOTICE"
   - "README.md"
@@ -368,29 +368,29 @@ The repo has two kinds of measured number, and they get two rules.
 | What | how full a bin gets, how many characters a token takes | BenchmarkDotNet runs |
 | Same on another machine? | yes, so a change is a change in the code | no - only the ratio between rows in one run holds |
 | Produced by | the slice's `measure/` project, `just measure <slice>` | the slice's `bench/` projects, `just bench <name>` |
-| Kept | written by the harness into `<slice>/results/`, tracked, overwritten every run | scratch; a run worth keeping is copied by hand to `<slice>/results/benchmarks/<family>/<date>.md` |
+| Kept | written by the harness into `<slice>/results/measurements/`, tracked, overwritten every run | scratch; a run worth keeping is copied by hand to `<slice>/results/benchmarks/baseline/<family>/<Class>.md` (a class's first kept run) or `<date>/<family>/<Class>.md` |
 | Compared by | `git diff` after a run | Ratio and Allocated across keepers, never Mean; Loop vs Parallel only on the same core count |
 
 **Measurements do not gate.** `just measure` is a local tool: run it, read the diff, commit what changed. No
 recipe fails on a changed number and no workflow runs it. A harness that fails on a changed number was
 rejected: a changed number is the thing being measured, not an error.
 
-**What a written file looks like.** Its title, then one sentence naming the recipe, the project, the count and
+**What a written file looks like.** Its title, then a sentence naming the recipe, the project, the count and
 the data set, then "Do not edit". Never a date or a commit - git has both.
 
-**The harness writes raw files; the README is the story.** A raw file is one row per scenario or pack, every
-number. The slice's `results/README.md` is for a person: what the numbers mean, as "X is N% smaller or faster
-than Y", every number found in or computed from a raw file beside it. It is written apart from the harness,
-by hand or by an AI session reading the raw files, and rewritten when they move. Until 2026-09-22 the harness
-wrote the README as summary tables; tables are not a story, and the reader still had to find the claim. The
-reasoning behind a number goes in the slice's findings record.
+**The harness writes raw files; one file per question reads them.** A raw file is one row per scenario or
+pack, every number - under `measurements/` from the harness, under `benchmarks/` copied by hand. At the root of
+`<slice>/results/`, one file per question reads one kind of raw file and answers it for a person. The slice's
+`results/README.md` indexes them and, last, sums them up; it computes nothing. None of these is written by the
+harness. Until 2026-09-22 the harness wrote the README as summary tables; tables are not a story, and the
+reader still had to find the claim. The reasoning behind a number goes in the slice's findings record.
 
 **One run, many views.** A measure project packs or encodes every scenario once into a bag, and one reporter per
 file reads it. The shared loop is `Binacle.Reporting`; the bag is typed per slice and lives in the slice.
 
 **Removing a reporter means deleting its file by hand.** The writer rewrites the files the code produces today
-and touches nothing else, so a dropped reporter's `.md` stays in `<slice>/results/`, never updated, and git
-shows no change. Deleting every other `.md` instead would take the files put there by hand. Whoever removes a
+and touches nothing else, so a dropped reporter's `.md` stays in `<slice>/results/measurements/`, never
+updated, and git shows no change. Whoever removes a
 reporter, or changes what the files are called, deletes the old ones in the same change (2026-09-23).
 
 **Only deterministic numbers are published.** Timing from one desktop is not a claim.

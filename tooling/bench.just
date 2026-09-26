@@ -5,12 +5,12 @@
 #   just bench lib-algorithms-sample quick   sample: the default job; `quick` runs the short one
 #   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
-# The tier is the class name's first word: Smoke_, Sample_, Full_, and Cores_ for racing. Any other word fails
-# before a run starts.
+# The tier is the class name's first word: Smoke_, Sample_, Full_, and Cores_ for racing. Result selection and
+# scaling have one tier and run every class.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
 # class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
-# - baseline/ instead when it is that class's first kept run. That folder's README says what counts as worth
-# keeping.
+# - baseline/ instead when it is that class's first kept run. <slice>/results/benchmarks/README.md says what
+# counts as worth keeping.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
@@ -37,9 +37,9 @@ lib-algorithms-sample mode='':
 
     just bench lib-algorithms-run "$job" Sample
 
-# v1 against v2 per algorithm on all 700 Bischoff problems: 8,400 cases, about 12 hours; `precise` about 30
+# v1 against v2 per algorithm on all 700 Bischoff problems: 8,400 cases, about 16 hours; `precise` about 30
 [arg('mode', pattern='|precise')]
-[confirm('lib-algorithms-full: 8,400 cases, about 12 hours (precise: about 30). Run?')]
+[confirm('lib-algorithms-full: 8,400 cases, about 16 hours (precise: about 30). Run?')]
 lib-algorithms-full mode='':
     #!/usr/bin/env bash
     set -euo pipefail
@@ -83,9 +83,9 @@ lib-threshold-sample mode='':
 
     just bench lib-threshold-run "$job" Sample
 
-# v1 and v2 over the whole ladder and bins 1-7: 704 cases, about 1 hour; `precise` about 3
+# v1 and v2 over the whole ladder and bins 1-7: 704 cases, about 1 hour; `precise` about 5
 [arg('mode', pattern='|precise')]
-[confirm('lib-threshold-full: 704 cases, about 1 hour (precise: about 3). Run?')]
+[confirm('lib-threshold-full: 704 cases, about 1 hour (precise: about 5). Run?')]
 lib-threshold-full mode='':
     #!/usr/bin/env bash
     set -euo pipefail
@@ -121,10 +121,10 @@ lib-scaling mode='':
 lib-scaling-run job:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Scaling -- --job {{ job }} --filter '*'
 
-# Encode and Decode on three packs - protobuf against ViPaq's two layouts: 18 cases, about 3 minutes
+# Encode and Decode on three packs - protobuf against ViPaq's two layouts, and JSON on encode: 21 cases, about 3 minutes
 vipaq-smoke: (vipaq-run 'short' 'Smoke')
 
-# Encode, Decode on twelve packs, and CompressionCost: 84 cases, about 20 minutes; about 7 with `quick`
+# Encode, Decode on twelve packs, and CompressionCost: 96 cases, about 30 minutes; about 7 with `quick`
 [arg('mode', pattern='|quick')]
 vipaq-sample mode='':
     #!/usr/bin/env bash

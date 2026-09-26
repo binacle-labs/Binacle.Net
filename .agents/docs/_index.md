@@ -192,7 +192,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: tooling/README.md
-  description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the bench module and its script, the wrangler configs, the local compose stacks, and emulator state"
+  description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the bench and measure modules, the wrangler configs, the local compose stacks, and emulator state"
   paths: ["tooling/**"]
 ```
 

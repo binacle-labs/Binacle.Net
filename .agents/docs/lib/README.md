@@ -1,7 +1,7 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-09-25
+verified: 2026-09-26
 check: Project list and test aliases match the solution
 also_update:
   - lib/tests
@@ -30,7 +30,7 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 - Processors (`$lib/processors`) — IAlgorithmProcessor, bin processors, factories, algorithm sets per path
 - Result Building (`$lib/result-building`) — OperationResultBuilder, status rules, volume percentages
 - Result Selection (`$lib/result-selection`) — BestAlgorithm, SmallestBin, BestBin strategies and scoring
-- Lib Tests (`$lib/tests`) — unit/perf/benchmark projects, AlgorithmFactories, fixtures
+- Lib Tests (`$lib/tests`) — unit, measure and benchmark projects, AlgorithmFactories, fixtures
 
 ## Related Tests
 
@@ -42,6 +42,7 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 | `lib/bench/Binacle.Lib.Benchmarks.Algorithms` | (none) | The three algorithms, v1 against v2, in three tiers — `just bench lib-algorithms-smoke|-sample|-full` |
 | `lib/bench/Binacle.Lib.Benchmarks.Racing` | (none) | Loop against Parallel for `Best`'s race, on 2 to 12 cores — `just bench lib-racing-cores` |
 | `lib/bench/Binacle.Lib.Benchmarks.Threshold` | (none) | Loop against Parallel on the item and bin ladders — `just bench lib-threshold-smoke|-sample|-full` |
+| `lib/bench/Binacle.Lib.Benchmarks.Scaling` | (none) | The three algorithms, v1 against v2, up the item ladder — `just bench lib-scaling` |
 
 See Lib Tests (`$lib/tests`) for fixtures and the test projects, and Shared (`$shared`) for the
 scenario data format and providers.

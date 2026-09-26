@@ -20,7 +20,9 @@ The unit tests never reference it - they are the spec gate and must not lean on 
 
 The packs themselves are in `Binacle.ViPaq.Data`; every set resolves its picks by name there, so a pick that
 no longer exists is caught by the gate in `Binacle.ViPaq.EncodedSize` rather than mid-run. Each set answers
-`Names` (the columns), `GetByName(column)` and `PackNames` (the picks behind them, for that gate).
+`Names` (the columns) and `GetByName(column)`; the three that pick real packs - `BischoffTimingSet`,
+`CustomProblemsTimingSet`, `CompressionCostSet` - also answer `PackNames` (the picks behind them, for that gate).
+`SyntheticGenerator` builds its packs, so it has none.
 
 ## 🛠️ How you use it
 

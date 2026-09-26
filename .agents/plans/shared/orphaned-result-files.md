@@ -9,9 +9,8 @@ paths: ["shared/test/Binacle.Reporting/**", "lib/results/**", "vipaq/results/**"
 # Nothing spots an orphaned results file
 
 `MarkdownFileWriter` rewrites the files the reporters produce today and touches nothing else. Remove a reporter,
-or rename what its files are called, and the old markdown stays in `<slice>/results/` forever: never updated,
+or rename what its files are called, and the old markdown stays in `<slice>/results/measurements/` forever: never updated,
 never diffed, and read by anyone who opens it as if it were current. It happened twice on 2026-09-23 when
-`encoded-size.md` was split, and both times the fix was a `git rm` typed by hand. Deleting every other `.md`
-in the folder is not the answer, because READMEs and kept benchmark reports live there too. Something that
+`encoded-size.md` was split, and both times the fix was a `git rm` typed by hand. Something that
 names what the run wrote and flags what it did not - a line at the end of the run, or a check in CI - would
 turn a silent stale file into a sentence.

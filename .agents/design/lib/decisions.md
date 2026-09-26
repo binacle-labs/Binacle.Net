@@ -1,7 +1,7 @@
 ---
 id: lib/decisions
 description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question.
-verified: 2026-09-20
+verified: 2026-09-26
 check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/DataProvider.cs and CustomProblems/DataProvider.cs
 also_update:
   - lib/findings
@@ -126,14 +126,15 @@ two algorithms take very unequal time. Two algorithms cap the win at 2× before 
 this so: the decision that makes racing cheap is the decision that makes parallelising it pointless.**
 
 **`ParallelBinProcessor` does pay, above a threshold, and the threshold is now measured**
-(`$lib/findings#F4`): 1 bin is always a loss (1.16× to 4.60×), 3 and 7 items never win at any bin count, and
+(`$lib/findings#F4`): 1 bin is always a loss (1.02× to 4.60×), 3 and 7 items never win at any bin count, and
 from 13 items the crossover walks in with size — FFD wins from 7 bins at 17 items, 5 at 23, 2 at 47; BFD about
 two bins earlier. At 79 items over 7 bins it reaches 0.60 (FFD) and 0.52 (BFD) on 12 cores, for 1.03× the
 allocation.
 
 **So a threshold is defensible, and it is a surface, not a number.** It needs both a bin count and an item
 count, measured on the machine it will run on — a 12-core result says nothing about 4 cores, and F4 shows the
-threshold moving *outward* as the algorithms get faster (v1 crosses over earlier than v2 everywhere). A wrong
+threshold moving *outward* as the algorithms get faster (at the small end v1 crosses over earlier than v2;
+FFD at 37 and 47 items crosses earlier in v2). A wrong
 threshold is worse than none: below it, parallel costs up to 4.6× on exactly the small requests the demo makes
 (median 13 items).
 

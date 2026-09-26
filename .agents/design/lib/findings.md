@@ -33,6 +33,11 @@ noise.
 `BenchmarkBase`, was deleted 2026-09-26; its five problems are all in `CoresSet`, which `Cores_Packing` races. **F2a and F4 were
 kept**: every number in them can be read out of `lib/results/benchmarks/baseline/threshold/`.
 
+**Some kept times may be slow processes.** Found 2026-09-26: BenchmarkDotNet runs each case in one process, and
+about 1 in 10 BFD processes runs about 1.7× slow from start to end, with a tight StdDev. The three-algorithm
+`Loop` runs 1.26× to 1.46× the sum of its parts in the threshold run. So a single BFD cell of F4, and every
+FFD,WFD,BFD ratio of F2a, may move on a rerun - and with them "BFD crosses about two bins earlier".
+
 **The scenario names below are the ones the run printed.** The keys in `RacingSet` (deleted 2026-09-26) were
 renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
 `typical container` (thpack1_7), BFD dominance is `BFD wins big` (thpack1_44), High efficiency is `near tie`
@@ -145,15 +150,15 @@ BFD:
 | 67 | 1.39 | 1.21 | **0.76** | 0.97 | 0.71 | 0.72 | 0.55 |
 | 79 | 1.46 | 0.87 | **0.84** | 0.70 | 0.74 | 0.56 | 0.52 |
 
-Bold is the first bin count on each row where parallel wins. `RatioSD` is 0.01 to 0.07 on every cell at 3 bins
-and up, so a ratio outside 0.95–1.05 is a real effect; the 1-bin column wobbles more (up to 0.17) because the
+Bold is the first bin count on each row where parallel wins. `RatioSD` is 0.08 or less on every cell at 3 bins
+and up from 7 items, and up to 0.13 at 3 items, so a ratio outside 0.95–1.05 is a real effect; the 1-bin column wobbles more (up to 0.17) because the
 parallel overhead is most of the measurement there.
 
 **There is one threshold, not two, and it is a surface.** Parallel's cost is a fixed thread setup of roughly
 1.3μs plus a share of the slowest bin; `Loop`'s cost is the sum of all bins. So parallel needs enough bins to
 divide *and* enough work per bin to be worth dividing, and either one alone is not enough:
 
-- **1 bin is always a loss** — 1.16× to 4.60×, worst on the smallest requests. This is the guard the harness
+- **1 bin is always a loss** — 1.02× to 4.60×, worst on the smallest requests. This is the guard the harness
   was built for, and it fires: wiring parallel up unconditionally would make every `fit/bin` and `pack/bin`
   request slower.
 - **3 and 7 items never win, at any bin count up to 7.** At 3 items parallel is still 1.7× to 1.9× slower with
@@ -182,8 +187,8 @@ and total work grow together and the parallel run is bounded by the largest bin.
 one size would divide better than this grid shows.
 
 **What the prior got wrong.** The November 2025 records below said `Parallel` was under 1.0 from 2 bins up on
-every machine, about 0.85 at 2 bins. The top end holds — 0.65 at 8 bins then is 0.60–0.68 at 7 bins now — but
-the small end does not. **At 2 bins parallel loses at every item count below 47 for FFD and below 79 for BFD**,
+every machine, about 0.85 at 2 bins. The top end holds — 0.65 at 8 bins then is 0.52–0.70 at 7 bins from 47 items now — but
+the small end does not. **At 2 bins parallel wins only at 47 items for FFD and only at 79 for BFD**,
 and **3 and 7 items lose at every bin count**. The old runs used one fixed item set, and it must have been a
 heavy one.
 
@@ -209,10 +214,11 @@ record above 7 bins.
   do it: .NET reads its CPU count once at start-up, so each count is a BDN job with an affinity mask and
   `DOTNET_PROCESSOR_COUNT`. On Linux BDN's mask reaches only the main thread, so the case pins every thread
   itself before it checks.
-- **Threshold keeps the algorithms family** though it is lighter than Racing everywhere (ladder max 79 items;
-  the lightest curated problem is 126), and old records over 10 to 202 items were flat at 0.85 to 1.0. It
+- **Threshold keeps the algorithms family** though it overlaps Racing only at its top (ladder max 79 items;
+  the lightest racing problem is 74), and old records over 10 to 202 items were flat at 0.85 to 1.0. It
   covers the small-request end (demo samples: median 13 items) and the 67 -> 79 step, where the algorithms
-  take unequal time. 3 items is the one place `Parallel` loses: thread cost dominates.
+  take unequal time. In the kept run `Parallel` loses at every step for FFD,BFD (1.11× to 2.55×), and
+  FFD,WFD,BFD wins only at 59 items (0.96).
 - **Full keeps the whole item ladder** though the extra points only interpolate, so one record of the curve
   exists.
 - **Param names are what BDN prints** - there is no display attribute.
@@ -235,7 +241,9 @@ is ever needed, stash the guard and run both back to back.
 `Binacle.Lib.Benchmarks.ResultSelection`, ShortRun job, three candidates per scenario, same machine as above
 on .NET 10.0.12. v1 returns the first `FullyPacked` result; v2 scores every candidate. So where a full result
 exists v1 is faster: `one full winner` 4.4 ns vs 6.0 ns (1.37×), `all full, first wins` 3.6 ns vs 6.2 ns
-(1.74×). With no full result v1 sorts and v2 wins: `all partial` 24.9 ns vs 6.1 ns. v2 allocates 24 B on every
+(1.74×). With no full result v1 sorts and v2 wins: `all partial` 24.9 ns vs 6.1 ns. The kept run of 2026-09-23
+(`lib/results/benchmarks/baseline/result-selection/BestAlgorithm.md`) reads 4.08 vs 6.16 ns (1.51×), 3.54 vs
+5.95 ns (1.68×) and 25.45 vs 6.03 ns. v2 allocates 24 B on every
 case. These are nanoseconds on three candidates, noise next to a packing run. In the same run BestBin and
 SmallestBin v2 are 2.4-9× faster than v1.
 

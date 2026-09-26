@@ -1,8 +1,8 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-09-25
-check: The numbers under "Size today" match vipaq/results/README.md and the files under vipaq/results/measurements/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Encode, Decode, CompressionCost_Encode, CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
+verified: 2026-09-26
+check: The numbers under "Size today" match the files under vipaq/results/measurements/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Smoke_Encode, Sample_Encode, Smoke_Decode, Sample_Decode, Sample_CompressionCost_Encode, Sample_CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -41,8 +41,8 @@ is noise. Measure everything in **base64 chars**.
 ## Size today (2026-09-22)
 
 `Binacle.ViPaq.EncodedSize` over **2,322 packs** - every problem in the Bischoff suite, custom-problems and
-demo-samples, packed by FFD, BFD and WFD. The tables are in `vipaq/results/README.md`; what the decisions lean
-on:
+demo-samples, packed by FFD, BFD and WFD. The raw numbers are in `vipaq/results/measurements/encoded-size/`; what the
+decisions lean on:
 
 - **ViPaq is never larger than protobuf under the same codec.** Raw, they are equal only on the nine empty packs;
   under deflate and gzip ViPaq is smaller on every pack.
@@ -150,7 +150,9 @@ uncompressed ladder (an `UncompressedNames` member that no longer exists: 1 / 8 
 before this, all curated benchmarks compressed and the raw path had **no** performance number. The size report then
 showed two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto). Since 2026-09-22 the timing classes are `Encode`
 and `Decode`, which run every curated pick on the raw path, and `CompressionCost`, which prices the codec. Since
-2026-09-23 that is two classes, `Sample_CompressionCost_Encode` and `_Decode`, each against its own NoOp.
+2026-09-23 that is two classes, `Sample_CompressionCost_Encode` and `_Decode`, each against its own NoOp, and
+the timing classes are split by tier: `Smoke_Encode` and `Smoke_Decode` run three picks, `Sample_Encode` and
+`Sample_Decode` every pick.
 
 **Size (base64 chars).** 15 of 716 scenarios stay uncompressed (all tiny 8-bit customs); 701 compress (nearly all
 16-bit Bischoff).

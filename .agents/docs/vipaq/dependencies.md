@@ -1,8 +1,8 @@
 ---
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator).
-verified: 2026-09-25
-check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the pre-report gate matches vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes and codecs named below
+verified: 2026-09-26
+check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the two pre-report gates match vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes and codecs named below
 paths:
   - "vipaq/**"
 ---
@@ -104,7 +104,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    fail the suite for a non-product reason. Shared grammar goes in the library both sides already reference
    (`Binacle.CompactNotation`), never across this line.
 
-## The real-pack round trips, and the one gate left
+## The real-pack round trips, and the two gates
 
 Every real pack is round-tripped in `Binacle.ViPaq.UnitTests/Tests/Packed/PackedDataRoundTripTests.cs`, one
 theory row per pack from `PackedScenarioProvider` (all three families through `ViPaq.Data`), so `just test`
@@ -125,7 +125,9 @@ All three theories use one oracle: the two header bytes must decode back to the 
 serializer must produce, or the forced one (`Header.FromBytes`, `Header.ByteCount` is 2) - **and** the pack must decode back to the input
 (`BinContents.AssertSame`). Compressed bytes are never compared.
 
-The one `IPreReportCheck` left in `Binacle.ViPaq.EncodedSize/PreReportChecks/` is `CuratedPicksCheck`: every
+Two `IPreReportCheck`s live in `Binacle.ViPaq.EncodedSize/PreReportChecks/`. `CuratedPicksCheck`: every
 curated benchmark pick still resolves to a generated scenario, so a stale pick fails in one sentence instead of
 deep inside a BenchmarkDotNet run. It stays in the measure project because the picks live in `Testing`, which
-the unit tests never reference. `RunPreReportChecks()` runs it before `Measure` runs the reporters.
+the unit tests never reference. `GroupCoverageCheck`: every pack lands in a group that has a file, so a new
+Bischoff set or a fourth algorithm is not encoded and then dropped. `RunPreReportChecks()` runs both, in that
+order, before `Measure` runs the reporters.

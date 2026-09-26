@@ -20,7 +20,7 @@ is the first word of the class name, so it is in the report file name too.
 just bench lib-algorithms-smoke            # 48 cases, about 6 minutes: did my change help or hurt
 just bench lib-algorithms-sample           # 360 cases at the default job
 just bench lib-algorithms-sample quick     # the same at the short job, about 30 minutes
-just bench lib-algorithms-full             # 8,400 cases at the short job, about 12 hours
+just bench lib-algorithms-full             # 8,400 cases at the short job, about 16 hours
 just bench lib-algorithms-full precise     # the same at the default job, about 30 hours
 ```
 

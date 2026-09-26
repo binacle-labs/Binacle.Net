@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-09-25
+verified: 2026-09-26
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -67,7 +67,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `shared/data/` | Fixture data more than one slice reads — `or-library/` (raw), `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
 | `assets/` | Shared images, js, css and fonts, copied into the three Jekyll sites and the UI module by `gulpfile.js` |
 | `LICENSE.GPL-3.0/` | The GPL-3.0 text, kept because images and tags published before v3.0.0 link to this path |
-| `lib/results/`, `vipaq/results/` | Measured results. `measurements/` is what the measure projects write and overwrite, so a change is a diff; `benchmarks/` holds bench runs kept by hand; files at the root are written by hand from both |
+| `lib/results/`, `vipaq/results/` | Measured results. `measurements/` is what the measure projects write and overwrite, so a change is a diff; `benchmarks/` holds bench runs kept by hand; each file at the root answers one question from those two |
 | `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `www/`, `openapi/`, `tests/`, `coverage/`. Never edit |
 
 ## Commands
