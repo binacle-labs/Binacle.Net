@@ -5,7 +5,8 @@
 #   just bench lib-algorithms-sample quick   sample: the default job; `quick` runs the short one
 #   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
-# The tier is the class name's first word: Smoke_, Sample_, Full_. Any other word fails before a run starts.
+# The tier is the class name's first word: Smoke_, Sample_, Full_, and Cores_ for racing. Any other word fails
+# before a run starts.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
 # class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
 # - baseline/ instead when it is that class's first kept run. That folder's README says what counts as worth
@@ -52,11 +53,17 @@ lib-algorithms-full mode='':
 lib-algorithms-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Algorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# Loop against Parallel, two sets x two problems, v2: 8 cases, under a minute
-lib-racing-smoke: (lib-racing-run 'short' 'Smoke')
+# Loop against Parallel for both sets and each algorithm alone, v2, 30 problems x 2, 4, 8, 12 cores: 840 cases, about 70 minutes; `precise` about 3.5 hours
+[arg('mode', pattern='|precise')]
+[confirm('lib-racing-cores: 840 cases, about 70 minutes (precise: about 3.5 hours). Run?')]
+lib-racing-cores mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# Loop against Parallel, two sets x five problems x v1, v2: 40 cases, about 10 minutes
-lib-racing-sample: (lib-racing-run 'default' 'Sample')
+    job=short
+    if [ "{{ mode }}" = precise ]; then job=default; fi
+
+    just bench lib-racing-run "$job" Cores
 
 [private]
 lib-racing-run job tier:

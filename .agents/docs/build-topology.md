@@ -1,8 +1,8 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-09-22
-check: Every solution folder and project count matches Binacle.Net.slnx (56 projects); the cross-slice edges against the three site Gemfiles, the four webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
+verified: 2026-09-26
+check: Every solution folder and project count matches Binacle.Net.slnx (57 projects); the cross-slice edges against the three site Gemfiles, the four webpack configs and gulpfile.js, and the global-Using count against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
   - samples
@@ -22,10 +22,10 @@ Docker build. For the commands themselves see `$commands`.
 
 ## Solution — `Binacle.Net.slnx`
 
-The repo uses the XML `.slnx` solution format. **56 projects** — 42 `.csproj`, eight `.proj`, five `.dcproj`, one `.rbproj` —
+The repo uses the XML `.slnx` solution format. **57 projects** — 43 `.csproj`, eight `.proj`, five `.dcproj`, one `.rbproj` —
 grouped by solution folder, mirroring the repo slices:
 
-- `/lib/src/`, `/lib/data/`, `/lib/test/`, `/lib/measure/`, `/lib/bench/` — `Binacle.Lib` (the only src project), `Binacle.Lib.Data` (the result-selection scenarios), `Binacle.Lib.UnitTests` + `Binacle.Lib.Testing`, `Binacle.Lib.PackingEfficiency`, and four benchmark projects (`Binacle.Lib.Benchmarks.Algorithms`, `.Racing`, `.ResultSelection`, `.Threshold`)
+- `/lib/src/`, `/lib/data/`, `/lib/test/`, `/lib/measure/`, `/lib/bench/` — `Binacle.Lib` (the only src project), `Binacle.Lib.Data` (the result-selection scenarios), `Binacle.Lib.UnitTests` + `Binacle.Lib.Testing`, `Binacle.Lib.PackingEfficiency`, and five benchmark projects (`Binacle.Lib.Benchmarks.Algorithms`, `.Racing`, `.ResultSelection`, `.Scaling`, `.Threshold`)
 - `/api/src/`, `/api/test/` — `Binacle.Net`, `Binacle.Net.Kernel`, the three modules (+ ServiceModule.Domain/.Infrastructure), three integration-test projects and five unit-test projects (one per source project that has unit tests: `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`)
 - `/vipaq/src/`, `/vipaq/data/`, `/vipaq/test/`, `/vipaq/measure/`, `/vipaq/bench/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + `Binacle.ViPaq.Data` + `Binacle.ViPaq.UnitTests` and `Binacle.ViPaq.Testing` + `Binacle.ViPaq.EncodedSize` + `Binacle.ViPaq.Benchmarks` + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.Reporting`, `Binacle.Benchmarking`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects

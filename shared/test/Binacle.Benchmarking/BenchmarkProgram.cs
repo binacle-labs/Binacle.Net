@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using System.Reflection;
 
@@ -7,11 +8,11 @@ namespace Binacle.Benchmarking;
 // the exit code is worked out here.
 public static class BenchmarkProgram
 {
-	public static int Run(Assembly assembly, string[] args)
+	public static int Run(Assembly assembly, string[] args, IConfig? config = null)
 	{
 		var summaries = BenchmarkSwitcher
 			.FromAssembly(assembly)
-			.Run(args, BenchmarkConfig.Create())
+			.Run(args, config ?? BenchmarkConfig.Create())
 			.ToList();
 
 		if (summaries.Count == 0)

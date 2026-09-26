@@ -1,52 +1,132 @@
 ---
-description: Step 18 - the results READMEs as a story for a human - "X is N% faster, cheaper or smaller than Y" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove
+description: Step 18 - the lib results files and README, every table shape locked with the maintainer 2026-09-25 to 2026-09-26; what to build, from which raw files, in what order, and the history the story can draw on
 state: ready
 waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
 horizon: undecided
-paths: ["lib/results/**", "vipaq/results/**"]
+paths: ["lib/results/**", ".agents/scripts/derive-lib-results.py"]
 ---
 
-# Step 18 - the results story
+# Step 18 - the lib results files
 
-Shape: the general design record, the decision on measured numbers. Protocol: the orchestrator.
+Shape: the general design record, the decision on measured numbers. Protocol, and the rules every results file
+keeps: the orchestrator, "The results files". This file says only what is particular to lib.
 
-`just measure` writes raw files: one row per scenario or pack, every number. That is evidence, not something
-a person reads. What a person reads, and what we present as a win, is a sentence with a number:
+## How the maintainer wants it worked
 
-- "BFD packs 8 points fuller than FFD on the 700 Bischoff problems."
-- "A ViPaq token is 7% of the JSON that carries the same picture."
-- "BFD v2 packs in under half the time of v1, with a third of the memory."
+- One table per turn: the pick, why, the trade-off, where it would be wrong - shown with example numbers,
+  even made-up ones. Plain short English. No menus.
+- Every number computed by script from the raw files. A session before this one printed three wrong numbers
+  typed by hand.
+- The shapes below are locked. Build them; argue with one only with evidence from the data, and stop to ask.
 
-Each results folder's `README.md` should be that story, backed by the raw files beside it. The harness does
-not write it; it would only ever print tables. The story is written from the raw files, perhaps by an AI
-session reading them, and rewritten when the numbers move.
+## The raw files
 
-Until then, each results README says only what the files are. The harness READMEs were removed 2026-09-22.
+| File | Holds |
+|---|---|
+| `lib/results/measurements/packing-efficiency.md` | per problem: Types, Items, Ceiling % (the items' volume over the bin's), fill for FFD, WFD, BFD (v2), Best, Margin |
+| `lib/results/measurements/version-parity.md` | the problems where v1 and v2 pack differently |
+| `lib/results/benchmarks/baseline/algorithms/Full_<alg>_<Packing|Fitting>.md` | v1 and v2 time and Allocated on all 700, short job |
+| `lib/results/benchmarks/baseline/result-selection/*.md` | the three selectors, v1 against v2 |
+| `lib/results/benchmarks/baseline/scaling/Sample_Packing.md` | the item ladder, 3 to 79 items, default job |
 
-## What the story compares
+## The root files
 
-- **Fill.** Which algorithm packs fullest, by how much, and what racing buys the caller.
-- **Size.** Four ways to store the same packing picture: a conventional JSON that holds just enough to
-  redraw it, compact notation, protobuf, ViPaq. The JSON is a general guide, not the API's own response;
-  its field names do not have to match the API.
-- **Speed and memory**, from the kept runs in `<slice>/results/benchmarks/`. v2 against v1 per algorithm; parallel against one-at-a-time; how cost grows with
-  item count and bin count. Ratios within one run only; see the next section.
-- **What is missing.** Whether a claim we want to make has no measurement behind it yet. That gap is a
-  finding for the measure or bench projects, not a sentence to write.
+Status: **exists** is in the tree and accepted; **add** is agreed, not built; **new** is a file that does not
+exist yet.
 
-## Rules the story keeps
+### `packing-efficiency-stats.md` - exists, add one table
 
-- A time claim is a ratio from one run on one machine. Mean never compares across machines or runtimes.
-  Memory (Allocated) and fill compare anywhere.
-- Every number in the README can be found in, or computed from, a raw file beside it.
-- The story reads the raw files it knows by name, not whatever sits in the folder. A stale file left by a
-  dropped reporter is never read (the maintainer, 2026-09-23).
-- Name the version. The fill numbers are v2, the shipped version.
-- Say how a number was made when it is not obvious: StdDev over all 700 (population); compact notation joins
-  the bin and the items with `;` because it has no whole-pack form; JSON and compact are counted in text
-  characters, the binary formats in base64 characters.
+How full each algorithm packs, per Bischoff set. Keeps its mean-fill table and one spread table per algorithm
+(rows thpack1..7 then All 700; Set, Item types, Min, Mean, Median, Max).
 
-## What the removed READMEs said (2026-09-22)
+**Add - headroom**, after the existing tables: rows thpack1..7 then All 700; columns Set, Item types, Ceiling,
+Best of three, Left (points). Mean ceiling is 99.45 and best of three 81.33, so about 18 points are left. Under
+it, a question: the ceiling is the items' volume, not the best packing possible, which nobody knows - so
+"Left" is not reachable points. Is fill the next thing to improve, and how would we know how much is
+reachable? Published results on the same problems would say; this plan leaves them out.
+
+### `algorithm-performance.md` - exists, add three tables
+
+Fill gained and time paid by BFD and WFD against FFD, per set, then one time spread table each.
+
+**Add - what racing buys.** It serves a function the maintainer will write: an automatic pick of the best
+balance of fill and cost for everyday use, with the caller keeping the choice. So it lays out every option
+with its fill and cost and argues for none.
+
+1. All 700, one row per option: FFD, WFD, BFD, Race FFD+BFD (loop), Race all three (loop). Columns Option,
+   Mean fill, Best or tied on (of 700), Time as × FFD. A race's fill is the best of its members per problem;
+   "best or tied" is fill equal to the best of all three; a loop race's time is the sum of its members per
+   problem, divided by FFD on that problem, then averaged. One line under it: parallel lowers the race rows,
+   see `parallel-racing.md`.
+2. Fill per set: rows thpack1..7 then All 700; columns Set, Item types, FFD, WFD, BFD, Race FFD+BFD, Race all
+   three.
+3. Time per set as × FFD: the same rows; columns Set, Item types, WFD, BFD, Race FFD+BFD, Race all three.
+
+Checked 2026-09-26: BFD alone 81.261 mean, best of FFD+BFD 81.297, best of three 81.33; FFD beats BFD on 23 of
+700.
+
+### `version-differences-packing.md`, `version-differences-fitting.md` - exist, no change
+
+They show the direction is sound.
+
+### `result-selection.md` - exists, rewritten in the script, not run
+
+The stop sign: picking a result is not worth optimizing. One table, one row per selector (Best bin, Smallest
+bin, Best algorithm): Scenarios, Slowest v2 pick, Share of the fastest pack (a percentage), Time v2 against v1,
+Memory v2 against v1 - the last two BenchmarkDotNet's own ratios, averaged. The fastest pack is the fastest v2
+pack of any algorithm over the 700 (FFD on thpack1_72, 7.0 μs). The maintainer accepted it printed on
+2026-09-26, with one caveat noted: Best algorithm's 1.14× averages 1.51×, 1.68× and 0.24×. The file in the tree
+is still the old three-table version.
+
+### `scaling.md` - new, three tables
+
+How time grows with size - an input to the cost function.
+
+1. v2 packing time by item-count band over the 700: columns Items, Problems, FFD median, WFD median, BFD median,
+   in μs, this machine only. Medians, because times inside a band vary a lot. The script picks band edges that
+   keep enough problems in each; items run 69 to 476, median 131.
+2. "Spread inside each band": BFD v2 only, the same bands; columns Items, Problems, Fastest, Median, Slowest,
+   Slowest as × fastest. It shows size alone cannot predict time; a question under it asks what does (th4_84
+   has 125 items and a long job). If FFD or WFD spread differently, the script says so and they get tables too.
+3. The small end, from the ladder run: rows 3, 13, 29, 47, 67 items; columns Items, Item types, FFD, WFD, BFD
+   (v2, μs). 79 is left out with a note - FFD and WFD no longer fit every item there and stop early. The file
+   says each ladder step adds items and an item type at once, so the ladder cannot separate the two.
+
+The scaling bench itself is sound (default job, tight error); it just cannot answer the cost question alone.
+
+### `parallel-racing.md`, `parallel-bins.md` - the maintainer's
+
+The tipping points, from steps 19 and 20. He is making them.
+
+### `README.md` - last
+
+Written once every root file above exists, the two parallel files included. A short summary of all, then the
+combinations, then open questions and gaps, then the index (which is what the tree holds today). An example
+shown 2026-09-26, wording to be revised: "Direction: v2 is sound" (version files, packing-efficiency-stats),
+"What to run by default" (algorithm-performance, parallel-racing), "What a cost function can use" (scaling,
+parallel-racing, parallel-bins), "What not to chase" (result-selection), then open questions (fill headroom,
+what predicts time).
+
+## Build order
+
+1. **Change the script to write tables only.** `.agents/scripts/derive-lib-results.py` writes whole files today,
+   sentences included, and the words are now written by hand. How it refreshes a table without touching the
+   words is open - settle it with the maintainer first. Then add the tables above.
+2. **The maintainer runs it**, never during a bench run. Then write the words for each changed or new file from
+   what its tables show: few words, the gaps and questions at the end.
+3. **The README**, once steps 19 and 20 have given the two parallel files.
+
+## Facts the words can use
+
+- **Why v2 allocates 0.08× of v1 (BFD) and 0.05× (WFD).** v1 BFD and WFD pick a space with
+  `availableSpace.OrderBy(...)`, which builds a new sorted copy of the free-space list for every item and every
+  orientation; v2 sorts the list in place. FFD never sorted spaces, so it only drops to 0.38×. "Allocated" is
+  memory handed out during one pack, garbage included - not peak memory.
+- **Say how a number was made when it is not obvious**: StdDev over all 700 is population.
+- **The dropped proposal:** one table of v2 packing times per algorithm (fastest, mean, median, slowest). The
+  spread was too wide, 7 to 725 μs. `scaling.md` shows that spread on purpose, as a finding.
+
+## What the removed lib README said (2026-09-22)
 
 **lib/results** - 700 Bischoff problems (thpack1..7), fill %, v2:
 
@@ -61,26 +141,6 @@ Until then, each results README says only what the files are. The harness README
 - BFD leads in every set, BR1 (3 types) to BR7 (20 types); FFD and WFD lose more as item types grow
   (WFD 74.78 at BR1, 67.41 at BR7).
 - v1 and v2 pack the same on 2,099 of 2,100 algorithm-problem pairs. The one: BFD on thpack7_45, 79.08 -> 79.73.
-
-**vipaq/results** - 2,322 real packs, lengths in characters:
-
-| Format | Mean | Max |
-|---|---|---|
-| JSON | 4,702 | 22,048 |
-| Compact notation | 1,669 | 7,904 |
-| Protobuf raw | 1,472 | 7,168 |
-| Protobuf deflate | 529 | 1,656 |
-| ViPaq deflate, row | 362 | 1,248 |
-| ViPaq deflate, columnar | 304 | 704 |
-
-- ViPaq deflate columnar as a share of: JSON 7% (1-22%), compact 21%, protobuf raw 24%, protobuf deflate 58%.
-- ViPaq over protobuf under the same codec: raw 0.65, deflate row 0.68, deflate columnar 0.58, gzip 0.60-0.70.
-- Deflate is smallest on 2,265 packs (row) and 2,275 (columnar); gzip never.
-- Every real pack deflates to at most 1,248 base64 characters (row) or 704 (columnar).
-- Compression pays from very small packs, but not always: raw still wins on some packs up to 6 items (row)
-  and 2 (columnar). The removed README said "1 item", which was base64 rounding on one demo pack - do not
-  repeat it.
-- Missing from the removed README: gzip rows in the per-format table.
 
 ## History - what the old `results/` folder proved
 
@@ -139,8 +199,8 @@ re-derive them.
 
 ## Done when
 
-- [ ] `lib/results/README.md` and `vipaq/results/README.md` each open with the story: sentences with numbers,
-      each naming what it compares.
-      **By eye.** Every number in the story is in, or computed from, a raw file in the same folder.
+- [ ] `lib/results/` holds every root file listed above with its locked tables, and its `README.md` opens
+      with the summary, then the combinations, then the open questions, then the index.
+      **By eye.** Every table is generated; every number in the words is in a table.
 - [ ] The history above is either used in the story or dropped with a reason.
       **By eye.**

@@ -37,9 +37,9 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Full_WFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
-| `racing/Smoke_Packing.md` | `just bench lib-racing-smoke` | short | 8 |
-| `racing/Sample_Packing_v1.md` | `just bench lib-racing-sample` | default | 20 |
-| `racing/Sample_Packing_v2.md` | `just bench lib-racing-sample` | default | 20 |
+| `racing/Smoke_Packing.md` | `just bench lib-racing-smoke` (retired) | short | 8 |
+| `racing/Sample_Packing_v1.md` | `just bench lib-racing-sample` (retired) | default | 20 |
+| `racing/Sample_Packing_v2.md` | `just bench lib-racing-sample` (retired) | default | 20 |
 | `threshold/Smoke_Algorithms_Packing.md` | `just bench lib-threshold-smoke` | short | 16 |
 | `threshold/Smoke_Bins_Packing.md` | `just bench lib-threshold-smoke` | short | 48 |
 | `threshold/Sample_Algorithms_Packing.md` | `just bench lib-threshold-sample` | default | 44 |
@@ -53,8 +53,9 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
 | `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |
 
-Every lib bench class now has a kept run. A later run goes in a dated folder beside this one, holding only
-the reports that moved.
+Every lib bench class has a kept run except racing's `Cores_Packing`. The three racing reports above are from
+classes and recipes retired on 2026-09-26; they stay as the record and can no longer be re-run. A later run
+goes in a dated folder beside this one, holding only the reports that moved.
 
 The two full tiers ran at different jobs, which is why their case counts are the recipes' own: algorithms
 full ran the short job (8,400 cases, about 12 hours), threshold full the default one (`precise`, 704 cases,

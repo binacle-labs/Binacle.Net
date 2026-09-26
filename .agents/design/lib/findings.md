@@ -2,7 +2,7 @@
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
 verified: 2026-09-25
-check: lib/bench/Binacle.Lib.Benchmarks.Racing (Packing_v2, its BenchmarkBase) and the five keys in RacingSet (typical container, BFD wins big, near tie, WFD falls over, many item types) still exist and still race the quoted algorithm sets; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
+check: the five keys in RacingSet (typical container, BFD wins big, near tie, WFD falls over, many item types) still exist, and BenchmarkBase in lib/bench/Binacle.Lib.Benchmarks.Racing still races the quoted algorithm sets over them (the classes that ran it were deleted 2026-09-26; their reports are in lib/results/benchmarks/baseline/racing/); Cores_Packing still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
 also_update:
   - lib/decisions
 paths:
@@ -201,9 +201,14 @@ record above 7 bins.
 
 ## Note — why the Threshold and Racing benches are shaped as they are (2026-09-21)
 
-- **Racing has no `ProcessorCount` parameter.** The parallel processor runs `Parallel.For` over the
+- **Racing had no `ProcessorCount` parameter.** The parallel processor runs `Parallel.For` over the
   algorithms, so a race of N algorithms uses at most N threads; the set already decides it. BDN's header
   prints the machine's cores.
+- **Racing varies the core count as jobs (2026-09-26).** At or above N cores the count should matter little;
+  below it - three algorithms on 2 cores - it does. `Cores_Packing` runs on 2, 4, 8 and 12. A parameter cannot
+  do it: .NET reads its CPU count once at start-up, so each count is a BDN job with an affinity mask and
+  `DOTNET_PROCESSOR_COUNT`. On Linux BDN's mask reaches only the main thread, so the case pins every thread
+  itself before it checks.
 - **Threshold keeps the algorithms family** though it is lighter than Racing everywhere (ladder max 79 items;
   the lightest curated problem is 126), and old records over 10 to 202 items were flat at 0.85 to 1.0. It
   covers the small-request end (demo samples: median 13 items) and the 67 -> 79 step, where the algorithms

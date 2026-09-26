@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-25
+verified: 2026-09-26
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -31,7 +31,7 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
 | `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms-smoke`, `-sample`, `-full` |
-| `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing-smoke`, `-sample` |
+| `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing-cores` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
 | `Binacle.Lib.Benchmarks.Threshold` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-threshold-smoke`, `-sample`, `-full` |
 | `Binacle.Lib.Benchmarks.Scaling` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-scaling` |
@@ -56,7 +56,9 @@ it constructs the internal algorithm classes.
 - The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the four
   smoke scenarios by name: `full bin, one type`, `small order`, `typical container`, `many item types`),
   `SampleSet` (30 Bischoff problems, name `<category> (<id>)`), `RacingSet` (five scenarios keyed `typical
-  container`, `BFD wins big`, `near tie`, `WFD falls over`, `many item types`).
+  container`, `BFD wins big`, `near tie`, `WFD falls over`, `many item types`; only the racing
+  `BenchmarkBase` reads it, and no class runs that), `CoresSet` (30 Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
+  e.g. `th1_72 (74i/3t)`).
 - The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
   and `LadderGenerator` (the bin and item ladders the threshold and scaling projects climb).
 
@@ -139,13 +141,30 @@ Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<T
 
 ## Binacle.Lib.Benchmarks.Racing
 
-In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`). The factory classes name the
-lib's **internal** `AlgorithmFactory_v1()` / `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`), so
-`Binacle.Lib` grants the project friend access. `BenchmarkBase` builds a `LoopAlgorithmProcessor` and a
-`ParallelAlgorithmProcessor` for the `Set` param (`FFD,BFD`, `FFD,WFD,BFD` - the two production races), loads
-the scenario by the abstract `ScenarioName`, and holds the rows `Loop` (baseline) and `Parallel`.
-`Smoke_Packing` (v2; `typical container`, `BFD wins big`) is 8 cases at `short`; `Sample_Packing_v1` and `_v2`
-(`RacingSet`'s five keys) are 40 cases at the default job. Every class is `[MemoryDiagnoser]`.
+In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on 2, 4, 8 and 12 cores.
+`Cores_Packing` names the lib's **internal** `AlgorithmFactory_v2()`
+(`lib/src/Binacle.Lib/AlgorithmFactories/`), so `Binacle.Lib` grants the project friend access.
+
+`Cores_Packing` is the one class that runs. v2, the column over `CoresSet.Names`, seven rows in three
+`[BenchmarkCategory]` blocks: `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline)
+and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
+baseline, so their Ratio is `?`. 30 x 7 x 4 core counts = 840 cases, `short` job, default with `precise`.
+`[MemoryDiagnoser]`.
+
+The core counts are four BDN jobs, built in `CoreJobs`. Each sets the affinity mask to the first N CPUs **and**
+`DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads its CPU count once at start-up.
+BDN adds a CLI `--job` beside declared jobs instead of applying it, so `Program.cs` takes `--job` out of the
+args and builds the four jobs from it; the recipe passes it as every other recipe does. The report has a
+`Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still says 12 CPUs.
+
+`CorePinning.PinAndCheck`, first in `[GlobalSetup]`, is Linux only. On Linux BDN's pin (`sched_setaffinity`
+on the pid) reaches only the main thread, so it pins every thread in `/proc/self/task` to the mask, then fails
+the case if `ProcessorCount` is not N or any thread's `Cpus_allowed` differs. A pinned run is kinder than a
+real small VM: the OS and the BDN host run on the spare CPUs.
+
+`BenchmarkBase` - `Loop` and `Parallel` over a `Set` param and `RacingSet` - is abstract and nothing derives
+from it, so it runs nothing. The reports of the classes that did are kept in
+`lib/results/benchmarks/baseline/racing/`.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 

@@ -1,5 +1,5 @@
 ---
-description: Measure MessagePack and CBOR beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline
+description: Measure MessagePack, CBOR and a columnar protobuf beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline
 state: idea
 waits-on: "nobody - it is an idea. horizon: undecided, an agent did not judge the distance"
 horizon: undecided
@@ -40,6 +40,14 @@ it was meant to support, and the results README could not hold both. Nothing bel
 - **Verify by size, against the specs.** An independent model of both specs - container headers, string
   headers, shortest integer forms - predicted all 2,322 packings to the character, twice. Neither encoder has a
   decoder, so nothing round-trips; that gap stays until one is written.
+
+## A columnar protobuf
+
+The protobuf baseline is a row message only - `vipaq/test/Binacle.ViPaq.Testing/Protobuf/packing.proto` says so
+in its own comment. ViPaq's compressed win is largest in the columnar layout, and protobuf never got that
+layout, so part of that win is the layout, not the format. A columnar message - one packed repeated field per
+dimension and per coordinate - is the harder, smaller baseline. Measure it beside the row one, through the same
+three codecs. Raised by the maintainer, 2026-09-26.
 
 ## Two smaller things that rode along
 

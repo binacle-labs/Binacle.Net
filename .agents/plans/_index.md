@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 17 landed, and the provider names; left is 18 the results story. The maintainer commits between steps"
+  description: "Orchestrator - steps 1 to 17 landed, and the provider names; left are 18 the lib results files, 19 the racing drop point, 20 the bins one and 21 the ViPaq results files, plus the rules both results slices share. The maintainer commits between steps"
   state: ready
-  waits-on: "a session of its own for step 18 - the maintainer says when"
+  waits-on: "a session of its own for step 18 and one for step 21 - the maintainer says when"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
 - file: testing-techniques.md
@@ -99,7 +99,22 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: measured-results/18-results-story.md
-  description: "Step 18 - the results READMEs as a story for a human - \"X is N% faster, cheaper or smaller than Y\" - written from the raw files the measure and bench projects produce, in a session of its own; holds what the removed READMEs said and what the old vault could still prove"
+  description: "Step 18 - the lib results files and README, every table shape locked with the maintainer 2026-09-25 to 2026-09-26; what to build, from which raw files, in what order, and the history the story can draw on"
+  state: ready
+  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+  horizon: undecided
+- file: measured-results/19-racing-drop-point.md
+  description: "Step 19 - a racing bench that finds the drop point where running the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems"
+  state: ready
+  waits-on: "a session of its own - the maintainer says when"
+  horizon: now
+- file: measured-results/20-bins-drop-point.md
+  description: "Step 20 - a bins bench that finds where packing many bins at the same time starts to pay, on bins of one size, 2 to 16 bins, 2 to 12 cores; shape agreed, not built"
+  state: blocked
+  waits-on: "step 19's run and what it teaches - the maintainer says when"
+  horizon: undecided
+- file: measured-results/21-vipaq-results.md
+  description: "Step 21 - the ViPaq results files and README, every table shape locked with the maintainer 2026-09-26; a Widths column on the bench and a rerun come first for the two cost files"
   state: ready
   waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
   horizon: undecided
@@ -173,7 +188,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: vipaq/off-the-shelf-binary-formats.md
-  description: "Measure MessagePack and CBOR beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline"
+  description: "Measure MessagePack, CBOR and a columnar protobuf beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline"
   state: idea
   waits-on: "nobody - it is an idea. horizon: undecided, an agent did not judge the distance"
   horizon: undecided

@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-25
+verified: 2026-09-26
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -34,6 +34,7 @@ Binacle.Packing ─────────────────────�
    │      ├── Binacle.Lib.Benchmarks.Racing           BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.Threshold        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Data, Benchmarking   (lib/bench)
+   │      ├── Binacle.Lib.Benchmarks.Scaling          BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
    │
    └── Binacle.Lib.Data ─────────────────┘   result-selection scenario hub (lib/data)
@@ -45,7 +46,7 @@ Binacle.Packing ─────────────────────�
 
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
-| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, `UnitTests`, `Benchmarks.Racing`, `Benchmarks.Threshold` and the measure project | the algorithms, processors, result selection |
+| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, `UnitTests`, `Benchmarks.Racing`, `Benchmarks.Threshold` | the algorithms, processors, result selection |
 | `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
 | `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
 | `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
@@ -53,7 +54,8 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Benchmarks.Racing` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race |
 | `Binacle.Lib.Benchmarks.Threshold` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel on the item and bin ladders |
 | `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
-| `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | yes | packs every scenario, writes `lib/results/measurements/` |
+| `Binacle.Lib.Benchmarks.Scaling` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, over the item ladder |
+| `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | no | packs every scenario, writes `lib/results/measurements/` |
 
 `Binacle.Data` above is the shared scenario project in `shared/data` and `Benchmarking` is `shared/test/Binacle.Benchmarking`;
 `Lib.Data` and `Lib.Testing` are this slice's own.
@@ -66,8 +68,8 @@ Binacle.Packing ─────────────────────�
    entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
    that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
 
-   **Nine projects reference it in total, counted 2026-09-22**, and the other eight are not consumers in the
-   sense this rule is about: the two `lib/test/*` projects, the four `lib/bench/*` projects,
+   **Ten projects reference it in total, counted 2026-09-26**, and the other nine are not consumers in the
+   sense this rule is about: the two `lib/test/*` projects, the five `lib/bench/*` projects,
    `lib/measure/Binacle.Lib.PackingEfficiency`, and `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
    which is a generator run by hand rather than anything that ships - the one accepted cross-slice reference,
    `$decisions#D9`.

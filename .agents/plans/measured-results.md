@@ -1,7 +1,7 @@
 ---
-description: Orchestrator - steps 1 to 17 landed, and the provider names; left is 18 the results story. The maintainer commits between steps
+description: Orchestrator - steps 1 to 17 landed, and the provider names; left are 18 the lib results files, 19 the racing drop point, 20 the bins one and 21 the ViPaq results files, plus the rules both results slices share. The maintainer commits between steps
 state: ready
-waits-on: "a session of its own for step 18 - the maintainer says when"
+waits-on: "a session of its own for step 18 and one for step 21 - the maintainer says when"
 horizon: next-release
 paths:
   - "shared/**"
@@ -29,7 +29,7 @@ with one class, `Sample_Packing`, 66 cases over the item ladder; `Json` is a row
 classes. All three runs are kept in `baseline/`.
 
 **Step 17 landed 2026-09-23** and its file is gone. `encoded-size.md` became 54 files under
-`vipaq/results/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
+`vipaq/results/measurements/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
 reporter's old file is deleted by hand; the general design record says so, and wanting a check for it is an
 idea in the shared plans.
 
@@ -37,15 +37,13 @@ idea in the shared plans.
 ten reports are the first kept run of both full tiers, in `baseline/threshold/` and `baseline/algorithms/`. The
 answer is F4 in the lib findings record - parallel bin processing pays above a surface of bin count and item
 count, and loses badly below it - with F2a settling parallel algorithm racing against. O1 in the lib decisions
-record carries both, and what is still undecided. Its file is ticked and is the maintainer's to delete.
+record carries both, and what is still undecided.
 
 **Step 14 landed 2026-09-23** and its file is gone. The kept-run shape, the rule for what is worth keeping,
 and how a report is copied all live in the two `benchmarks/README.md`. Copying stays a hand job; the recipe
 that would do it is an idea in the tooling plans.
 
-- [`consistent-provider-names.md`](measured-results/consistent-provider-names.md) - one naming rule for every
-  scenario provider in the Data and Testing projects. Not a numbered step: nothing depends on it, and it
-  depends on nothing.
+**The provider names landed** and their file is gone.
 
 ## How a session works this plan
 
@@ -70,13 +68,63 @@ that would do it is an idea in the tooling plans.
 - **Every step rewrites the doc lines it makes false**, in the same step. `just agents all` is the
   maintainer's; say when it is due.
 
+## The results files - rules for steps 18 and 21
+
+Settled with the maintainer on 2026-09-25 and 2026-09-26. Both slices build to them; the two step files say
+only what is particular to each.
+
+**What they are for.** The story is for the maintainer first: it shows him how the work is going and gives him
+data to decide on - v2 against v1 says whether the direction is sound, a tipping point feeds a cost function, a
+gap says what to improve. A file that drives no decision and shows no progress is a candidate to cut. The story
+for the outside world comes after, from the same files.
+
+**The layout, per slice:**
+
+| Path | Holds |
+|---|---|
+| `<slice>/results/measurements/` | raw results from `just measure` |
+| `<slice>/results/benchmarks/` | raw results - BenchmarkDotNet reports, copied by hand |
+| `<slice>/results/<file>.md` | derived: one file per question, which may read several raw files and supports decisions inside that area only |
+| `<slice>/results/README.md` | a short summary of every root file, then the combinations - facts from two or more root files, grouped by the decisions only a combination can make - then the open questions and gaps gathered from the root files. The folder index goes below. Written last, once every root file of the slice is done. Its wording is revised later |
+
+- **Each slice stays isolated.** No root file or README reads another slice's numbers. A decision that spans
+  slices - ViPaq's encode time against lib's pack time, what one request costs end to end - has no home yet;
+  the maintainer does not know where it goes, only that it is in neither slice.
+- **A script makes the tables; a person writes the words.** Every table is generated from the raw files, never
+  typed. Everything else is written by hand from what the tables show, and rewritten when they move. Root
+  files carry few words; the README may carry more. How the script refreshes tables without touching the
+  words is open - markers around each table are one way.
+- **The README computes nothing.** Every number in it comes from a root file and names it. When a root file is
+  rewritten, the README is reread.
+- **A difference is "×" the baseline**: v2 at 0.46× of v1, BFD at 4.2× of FFD. A share of a whole may be a
+  percentage.
+- **A ratio is per problem or per pack, then averaged.** Divide by the baseline on that same problem, then take
+  the mean (and min, median, max where the table says). Never mean A ÷ mean B, which lets big cases outweigh
+  small ones. BenchmarkDotNet's own Ratio is used where one run holds both rows.
+- **A loss must show.** Where 1.00× or more is the bad side, the average goes bold, and where an average can
+  hide single losses, a count column says how many.
+- **Every cell one number, every column labelled.** No blank cells, no "a / b" cells.
+- **Each file names its gaps and its open questions** in a line or two at the end. A gap is written down so it
+  can be added later; filling it is new measurement, not a table.
+- **v2 everywhere, except where v1 against v2 is the question.** Name the version.
+- **A time holds on one machine and runtime only; the file says which.** Ratios, memory, fill and size compare
+  anywhere.
+- **Build only when the maintainer says**, and run no script while a bench run is going - it disturbs the run.
+- **A script reads the raw files it knows by name**, never whatever sits in the folder: a stale file left by a
+  dropped reporter is never read.
+- **Open, his call:** whether the tables later come from the measure harness instead of a plan script.
+
 ## The steps
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 18 | [18-results-story](measured-results/18-results-story.md) | the results READMEs as a story, from everything above | **by eye** - the READMEs open with sentences and numbers |
+| 18 | [18-results-story](measured-results/18-results-story.md) | the lib results files and README, shapes locked | **by eye** - `lib/results/` holds every file in the step and the README opens with the summary |
+| 19 | [19-racing-drop-point](measured-results/19-racing-drop-point.md) | the racing drop point, on 2 to 12 cores, over 30 locked problems | `ls lib/results/benchmarks/*/racing/` shows the new report |
+| 20 | [20-bins-drop-point](measured-results/20-bins-drop-point.md) | the bins drop point, bins of one size, shape agreed, waits on 19 | `ls lib/results/benchmarks/*/threshold/` shows the new report |
+| 21 | [21-vipaq-results](measured-results/21-vipaq-results.md) | the ViPaq results files and README, shapes locked; a bench column and a rerun first | **by eye** - `vipaq/results/` holds every file in the step and the README opens with the summary |
 
-18 reads what 15 to 17 left.
+18 reads what 15 to 17 left. `python3 .agents/scripts/derive-lib-results.py`, run from the repo root, writes its
+derived result files.
 
 ## Done when
 

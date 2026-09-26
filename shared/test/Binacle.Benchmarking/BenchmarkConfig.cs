@@ -8,7 +8,7 @@ namespace Binacle.Benchmarking;
 // The one BDN config every bench project runs with.
 public static class BenchmarkConfig
 {
-	public static IConfig Create()
+	public static ManualConfig Create()
 	{
 		// The defaults, but the only export is the GitHub markdown report.
 		var defaults = DefaultConfig.Instance;

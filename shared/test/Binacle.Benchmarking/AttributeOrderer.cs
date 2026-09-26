@@ -17,14 +17,24 @@ public class AttributeOrderer : IOrderer
 
 	public string GetHighlightGroupKey(BenchmarkCase benchmarkCase)
 	{
-		return benchmarkCase.Parameters.DisplayInfo;
+		return GetGroupKey(benchmarkCase);
 	}
 
 	public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, Summary summary)
 	{
 		return benchmarksCases
 			.GroupBy(b => b.Parameters.DisplayInfo)
-			.SelectMany(group => group.OrderBy(b => GetBenchmarkOrder(b)));
+			.SelectMany(byParameters => byParameters
+				.GroupBy(b => b.Job.DisplayInfo)
+				.OrderBy(byJob => byJob.Key, StringComparer.Ordinal)
+				.SelectMany(byJob => byJob.OrderBy(b => GetBenchmarkOrder(b))));
+	}
+
+	// Each job and each category is a group of its own, so a ratio is taken against the baseline of its own job
+	// and category. Without the job, every job's ratios are taken against one job's baseline.
+	private static string GetGroupKey(BenchmarkCase benchmarkCase)
+	{
+		return $"{benchmarkCase.Parameters.DisplayInfo} | {benchmarkCase.Job.DisplayInfo} | {string.Join(",", benchmarkCase.Descriptor.Categories)}";
 	}
 
 	private static int GetBenchmarkOrder(BenchmarkCase benchmarkCase)
@@ -38,7 +48,7 @@ public class AttributeOrderer : IOrderer
 
 	public string? GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
 	{
-		return benchmarkCase.Parameters.DisplayInfo;
+		return GetGroupKey(benchmarkCase);
 	}
 
 	public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups, IEnumerable<BenchmarkLogicalGroupRule>? order = null)

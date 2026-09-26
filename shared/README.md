@@ -49,7 +49,9 @@ generators under `shared/tools/` and `vipaq/tools/` use only its `RepositoryRoot
 What every bench project runs with: `BenchmarkConfig.Create()` - the BenchmarkDotNet defaults, the GitHub
 markdown report as the only export, reports pinned beside the calling project - `[BenchmarkOrder(n)]`
 with the orderer that sorts a group's rows by it, and `BenchmarkProgram.Run`, every project's `Main`, which
-exits 1 when nothing ran or a case failed. The only project that references BenchmarkDotNet, so the
+exits 1 when nothing ran or a case failed. A group is one set of parameters on one job in one
+`[BenchmarkCategory]`, so each ratio is taken against its own baseline. A project that needs more than the
+shared config passes its own to `Run`, built on `BenchmarkConfig.Create()`. The only project that references BenchmarkDotNet, so the
 unit tests and the measure projects never restore it.
 
 ### 🔤 `Binacle.CompactNotation.UnitTests`
