@@ -8,8 +8,8 @@ renamed to its class.
 
 ## 🖥️ Where it ran
 
-Copied 2026-09-24. The encode and decode reports are from reruns made that day, after `Json` joined the
-encode classes; the rest are from 2026-09-23. All on one machine:
+Every report was replaced 2026-09-26 by a rerun that added the `Items` and `Widths` columns; the ViPaq code
+did not change since the run before. All on one machine:
 
 - AMD Ryzen 9 9900X, 12 cores, Ubuntu 26.04.1
 - .NET 10.0.12 (SDK 10.0.112), BenchmarkDotNet 0.15.8
@@ -29,6 +29,13 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 
 Every ViPaq bench class is here.
 
-The encode classes gained a `Json` row on 2026-09-24, which is why they carry more cases than their decode
-twins - the test `JsonEncoder` has no decode. These runs printed the column `largest real pack`; it was
-renamed to `largest FFD pack` after they ran, so the next kept run reads differently in that one cell.
+The encode classes carry a `Json` row, which is why they have more cases than their decode twins - the test
+`JsonEncoder` has no decode.
+
+## ⚠️ What will bite you
+
+**One process can run slow, and a report cannot show it.** Each case runs in one process. With no code change,
+`ViPaq_Row` on `5000 items, 8-bit` took 279 μs in the 2026-09-26 sample run against 183 μs in the one before it,
+each with a tight StdDev, while protobuf stayed at 230 μs: 1.21× protobuf instead of 0.80×. `ViPaq_Columnar` on
+`65535 items, 8-bit` went the other way, 0.77× to 0.64×. The protobuf baseline moved too: decode on `100 cubes, 8-bit`
+went from 2,361 to 2,550 ns. Read a surprising row as possibly one slow process.

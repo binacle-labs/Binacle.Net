@@ -1,19 +1,30 @@
 # Result selection
 
-**Not worth optimizing.** After the algorithms run, one result is picked to return. The slowest v2 pick
-takes 0.44% of the time of the fastest pack of the 700 Bischoff problems (FFD v2 on thpack1_72, 7.0 μs).
-Every request packs at least once before it picks, so making the pick faster cannot make a request
-noticeably faster.
+What does picking the result cost, and is v2 cheaper than v1 at it?
 
-...
+> Every number in this file is fake. The tables show the shape only.
 
 ## 📊 What a pick costs
 
-| Selector       | Scenarios | Slowest v2 pick | Share of the fastest pack | Time, v2 against v1 | Memory, v2 against v1 |
-  |----------------|-----------|-----------------|---------------------------|---------------------|-----------------------|
-| Best bin       | 4         | 25.3 ns         | 0.36%                     | 0.18×               | 0.11×                 |
-| Smallest bin   | 4         | 30.6 ns         | 0.44%                     | 0.24×               | 0.10×                 |
-| Best algorithm | 3         | 6.2 ns          | 0.09%                     | 1.14×               | 0.72×                 |
+<!--
+Table: the cost of each selector, v2 against v1.
+Reads: lib/results/benchmarks/baseline/result-selection/<BestBin|SmallestBin|BestAlgorithm>.md
+Rows: Best bin, Smallest bin, Best algorithm.
+Columns: Selector, Scenarios (count), Slowest v2 pick (ns), Time v2 against v1, Memory v2 against v1 - the last
+two × of v1.
+Notes: the last two are the v2 row's Ratio and Alloc Ratio, then the mean over the selector's scenarios. An average
+above 1.00× is bold. Where one selector's scenarios differ widely, the words under the table say why.
+The pick time holds on one machine and runtime; the file names them, read from the report header.
+-->
 
-Best algorithm is slower in v2 where a full result exists: v1 stops at the first fully packed result, v2
-scores every candidate. It is still a few nanoseconds.
+| Selector | Scenarios | Slowest v2 pick (ns) | Time v2 against v1 | Memory v2 against v1 |
+|---|---|---|---|---|
+| Best bin | 999 | 111 | 0.22× | 0.33× |
+| Smallest bin | 444 | 555 | 0.66× | 0.77× |
+| Best algorithm | 888 | 999 | **1.11×** | 0.22× |
+
+## Gaps and open questions
+
+<!--
+None set for this file yet.
+-->

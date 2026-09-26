@@ -15,7 +15,8 @@ compressing costs is a class of its own.
 | `Sample_CompressionCost_Encode.cs`, `_Decode.cs` | NoOp against Deflate and Gzip, row-major, on the low and the high end of deflate's win; each compares to its own NoOp |
 | `CompressionCostBase.cs` | The two packs and the three codecs both classes use |
 | `BenchmarkBase.cs` | Loads the column's scenario before the run |
-| `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking`, and fails when nothing ran |
+| `PackColumns.cs` | Adds `Items` and `Widths` beside each pack's name: its item count, and the bin / item / coordinate bits ViPaq picks, e.g. `16/8/16` |
+| `Program.cs` | Runs the classes with the config from `shared/test/Binacle.Benchmarking` plus those two columns, and fails when nothing ran |
 
 The picks are in `vipaq/test/Binacle.ViPaq.Testing/`, keyed by the column name the report prints: `TimingSet` joins `BischoffTimingSet`, `CustomProblemsTimingSet` and `SyntheticGenerator`; `CompressionCostSet` stands on its own.
 

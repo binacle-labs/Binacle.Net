@@ -1,22 +1,17 @@
 ---
-description: Step 21 - the ViPaq results files and README, every table shape locked with the maintainer 2026-09-26; a Widths column on the bench and a rerun come first for the two cost files
-state: ready
-waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+description: Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables
+state: blocked
+waits-on: "session 6 - how the numbers get in - and session 3 - the ViPaq sample rerun"
 horizon: undecided
-paths: ["vipaq/results/**", "vipaq/bench/Binacle.ViPaq.Benchmarks/**", ".agents/scripts/**"]
+paths: ["vipaq/results/**"]
 ---
 
-# Step 21 - the ViPaq results files
+# 7 - The ViPaq results files
 
-Protocol, and the rules every results file keeps: the orchestrator, "The results files". This file says only
-what is particular to ViPaq.
+## Where it stands
 
-## How the maintainer wants it worked
-
-- One table per turn: the pick, why, the trade-off, where it would be wrong - shown with example numbers,
-  even made-up ones. Plain short English. No menus.
-- Every number computed by script from the raw files.
-- The shapes below are locked. Build them; argue with one only with evidence from the data, and stop to ask.
+The seven files in `vipaq/results/` are placeholders, like lib's: a comment per table as its spec, a sample table
+with fake numbers under it. The numbers get in the way session 6 settled.
 
 ## The decisions the files serve
 
@@ -36,15 +31,19 @@ One file per question, or per layout and codec; the README combines them.
 | `.../Sample_Decode.md` | the same packs, no Json - the test JSON encoder cannot decode |
 | `.../Sample_CompressionCost_Encode.md`, `_Decode.md` | two real FFD packs, row-major: thpack4_1 (low win) and thpack1_2 (high win); NoOp (baseline), Deflate, Gzip |
 
-The cost files read the new run from step 1 of the build order, not `baseline/`.
+Two categories, and no file crosses them: **size** (`measurements/encoded-size/`) feeds `format-size.md` and
+the four codec files; **encoding** (`benchmarks/<run>/encoding/`) feeds `encode-cost.md` and `decode-cost.md`.
+
+The cost files read the sample run kept after session 3.
 
 ## Rules particular to ViPaq
 
 - **Size, per pack, then averaged.** ViPaq ÷ the other format on that one pack, then the mean per group. Rows
-  thpack1..7, custom problems, demo samples, All 2,322, with a Packs column. The three algorithms' packs are
-  pooled; if the script finds the algorithm moves a ratio, say so and ask.
+  thpack1..7, custom problems, demo samples, All, with a Packs column. **Algorithms are never
+  mixed** (the maintainer, 2026-09-26): each size file carries its tables once per algorithm - FFD, then WFD,
+  then BFD.
 - **A loss shows.** Any average above 1.00× is bold, and a column "ViPaq larger than protobuf on" counts the
-  packs where ViPaq lost. A JSON count only if the script finds a pack where ViPaq is larger than JSON. Agreed
+  packs where ViPaq lost. A JSON count only if some pack has ViPaq larger than JSON. Agreed
   "for now".
 - **Widths everywhere**, because width drives ViPaq's size and cost. `Widths` is bin / item / coordinate bits,
   e.g. `16/8/16`.
@@ -55,81 +54,33 @@ The cost files read the new run from step 1 of the build order, not `baseline/`.
 - **Say how a number was made when it is not obvious**: compact notation joins the bin and the items with `;`
   because it has no whole-pack form.
 
-## The root files
+## Open points in the shapes, found 2026-09-26
 
-### `format-size.md` - raw only
+Each is the maintainer's to settle, one per turn.
 
-ViPaq against JSON, compact notation and protobuf, from the `## Raw` tables of the row files. About size, never
-speed.
+- **The "All" row** of a size table now holds one algorithm's 774 packs, not all 2,322.
+- **Raw row and raw columnar are the same length** on all 2,322 packs (checked 2026-09-26). The question in
+  `format-size.md` is answered, and the Raw table of every `columnar-*` measurement file is an exact copy of the
+  row file's. Drop it from the measure output, or keep it so each layout has its own file?
+- **Unused measure columns:** Compact in the Deflate and Gzip tables, and ViPaq/Proto everywhere (a rounded copy
+  of what the tables compute). Drop, or keep? Items is unused too and stays as context.
+- **The protobuf gap in the codec files.** "Part of the win is the layout" fits the columnar files only; the row
+  files say "no columnar protobuf".
+- **Which file owns** "no MessagePack or CBOR" (now in all five size files) and "no earlier format" (now in
+  `format-size.md` only).
+- **The one-process gap** is named in `encode-cost.md` but not `decode-cost.md`. After sessions 1 to 3 it may go
+  from both.
+- **Kind** (real or synthetic) is not in the report; it comes from the pack name.
 
-1. By group: Group, Packs, × JSON, × compact, × protobuf, ViPaq larger than protobuf on.
-2. By widths: Widths, Packs, × JSON, × compact, × protobuf, ViPaq larger than protobuf on.
-
-Check before trusting it: the earlier README said raw row and raw columnar are the same length. Confirm by
-script; if they differ, ask.
-
-### `row-deflate.md`, `row-gzip.md`, `columnar-deflate.md`, `columnar-gzip.md`
-
-One file per layout and codec, from that layout's files and that codec's table. No raw; that is
-`format-size.md`. Rivals are protobuf and JSON - JSON travels gzipped over HTTP, so it is the real rival once
-compressed. Compact notation is dropped.
-
-1. By group: Group, Packs, × JSON, × protobuf, ViPaq larger than protobuf on.
-2. By widths: Widths, Packs, × JSON, × protobuf, ViPaq larger than protobuf on.
-
-Each names the protobuf gap in a line: protobuf is a row message only, so against columnar ViPaq part of the win
-is the layout.
-
-### `encode-cost.md` - three tables
-
-1. Encode time as × protobuf: one row per bench pack, smallest to largest, a line between the real sizes (up
-   to the largest FFD pack) and the synthetic ones; columns Pack, Items, Widths, ViPaq row, ViPaq columnar,
-   JSON. BenchmarkDotNet's own Ratio; above 1.00× bold; Error and RatioSD dropped.
-2. Encode memory as × protobuf: the same, from Alloc Ratio.
-3. What compressing adds to one encode: rows the two CompressionCost packs; columns Pack, Items, Widths,
-   Deflate time, Gzip time, Deflate memory, Gzip memory, all × no compression, above 1.00× bold.
-
-Under it, a question: two packs are not a curve - is it worth measuring compression cost across pack sizes, so
-the encoder can decide per pack whether to compress?
-
-### `decode-cost.md` - three tables
-
-The same three for decode, with no JSON column.
-
-### `README.md` - last
-
-The same shape as lib's: a short summary of all, then the combinations, then open questions and gaps, then the
-index (which is what the tree holds today). Wording to be revised later. An example shown 2026-09-26: "Is the
-format worth having" (format-size and the four codec files), "Should the default be columnar" (row against
-columnar files, encode-cost), "Compress, and with what" (the codec files, encode-cost), "Is the speed
-acceptable" (encode-cost, decode-cost).
-
-**It must not claim "smallest" from `format-size.md` alone.** A run on 2026-09-25, reverted the same day,
-measured canonical MessagePack at 938 mean characters against ViPaq's 954 raw; ViPaq won clearly only
-compressed and columnar (304 against 383 deflated). MessagePack is not in any file, so the README says what was
-measured and names the gap.
-
-## Build order
-
-1. **A `Widths` column on the ViPaq bench reports**, in `vipaq/bench/Binacle.ViPaq.Benchmarks`, the way the
-   racing bench got its `Cores` column (a custom BDN column in `lib/bench/Binacle.Lib.Benchmarks.Racing/CoreJobs.cs`).
-   The bench reports print no widths today, and the synthetic packs' names give only 8- or 16-bit, not all
-   three. Build the project and its consumers only.
-2. **The maintainer reruns `just bench vipaq-sample`** (about 20 minutes) and keeps it as a dated run beside
-   `baseline/`. The kept baseline printed `largest real pack`; the class now says `largest FFD pack`.
-3. **A script for the tables**, `.agents/scripts/derive-vipaq-results.py`, tables only - the same way the lib script
-   ends up refreshing its tables. The five size files need nothing from steps 1 and 2 and can go first.
-4. **The maintainer runs it**, never during a bench run. Then the words for each file, from its tables: few
-   words, gaps and questions at the end.
-5. **The README**, once every root file exists.
-
-## Gaps - each file names its own
+## Gaps each file names
 
 - Compression cost is measured on two packs only; nothing says from what size compressing pays for its time.
-- No columnar protobuf, MessagePack or CBOR - future measurements, not built here.
-- The bench reports carry no widths - step 1 above closes it.
-- ViPaq has no "before" to show its direction is sound, the way v1 against v2 does for lib. A question for the
-  maintainer: is there an earlier format worth measuring, or is "against protobuf" the whole story?
+- No columnar protobuf, MessagePack or CBOR.
+- ViPaq has no "before" to show its direction is sound, the way v1 against v2 does for lib. Is there an earlier
+  format worth measuring, or is "against protobuf" the whole story?
+- Session 8's README must not claim "smallest" from `format-size.md` alone. A run on 2026-09-25, reverted the same
+  day, measured canonical MessagePack at 938 mean characters against ViPaq's 954 raw; ViPaq won clearly only
+  compressed and columnar (304 against 383 deflated).
 
 ## What the removed ViPaq README said (2026-09-22)
 
@@ -226,6 +177,5 @@ stored. It is not the cheapest thing to produce.
 
 ## Done when
 
-- [ ] `vipaq/results/` holds every root file listed above with its locked tables, and its `README.md` opens
-      with the summary, then the combinations, then the open questions, then the index.
-      **By eye.** Every table is generated; every number in the words is in a table.
+- [ ] Every ViPaq results file has real numbers, and its words and gaps are written from them.
+      `! grep -l "is fake" vipaq/results/*.md`, then **by eye** - every number in the words is in a table.

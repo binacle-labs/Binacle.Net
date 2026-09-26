@@ -28,11 +28,23 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - steps 1 to 17 landed, and the provider names; left are 18 the lib results files, 19 the racing drop point, 20 the bins one and 21 the ViPaq results files, plus the rules both results slices share. The maintainer commits between steps"
+  description: "Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as eight sessions in order - slow runs, their fix, the reruns, the racing and bins drop points, the lib and ViPaq results files, and the results READMEs"
   state: ready
-  waits-on: "a session of its own for step 18 and one for step 21 - the maintainer says when"
+  waits-on: "the maintainer says when each session starts"
   horizon: next-release
-  paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", "results/**", ".agents/**"]
+  paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", ".agents/**"]
+- file: results-across-slices.md
+  description: "A home for results that compare two slices - ViPaq's encode time against lib's pack time, what one request costs end to end"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/results/**", "vipaq/results/**"]
+- file: results-story-for-others.md
+  description: "A results story for people outside the project, told from the same lib and ViPaq results files the maintainer's own story uses"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/results/**", "vipaq/results/**"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
@@ -98,25 +110,45 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/18-results-story.md
-  description: "Step 18 - the lib results files and README, every table shape locked with the maintainer 2026-09-25 to 2026-09-26; what to build, from which raw files, in what order, and the history the story can draw on"
+- file: measured-results/01-slow-runs.md
+  description: "Session 1 - some bench runs come out slow at random, a whole process at a time, and no report shows it; find why with a small test, then choose the fix with the maintainer"
   state: ready
-  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+  waits-on: "the maintainer says when"
   horizon: undecided
-- file: measured-results/19-racing-drop-point.md
-  description: "Step 19 - a racing bench that finds the drop point where running the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems"
-  state: ready
-  waits-on: "a session of its own - the maintainer says when"
-  horizon: now
-- file: measured-results/20-bins-drop-point.md
-  description: "Step 20 - a bins bench that finds where packing many bins at the same time starts to pay, on bins of one size, 2 to 16 bins, 2 to 12 cores; shape agreed, not built"
+- file: measured-results/02-fix-slow-runs.md
+  description: "Session 2 - build the slow-run fix chosen in session 1, and prove it with a small run before any long rerun"
   state: blocked
-  waits-on: "step 19's run and what it teaches - the maintainer says when"
+  waits-on: "session 1 - the cause and the chosen fix"
   horizon: undecided
-- file: measured-results/21-vipaq-results.md
-  description: "Step 21 - the ViPaq results files and README, every table shape locked with the maintainer 2026-09-26; a Widths column on the bench and a rerun come first for the two cost files"
-  state: ready
-  waits-on: "a session of its own - the maintainer says when. horizon was set by an agent, strike it"
+- file: measured-results/03-reruns.md
+  description: "Session 3 - after the slow-run fix, the maintainer reruns the benches whose times are wrong or suspect, and the session keeps the reports"
+  state: blocked
+  waits-on: "session 2 - the fix, proven by its small run"
+  horizon: undecided
+- file: measured-results/04-racing-drop-point.md
+  description: "Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems"
+  state: blocked
+  waits-on: "session 3 - the reruns after the slow-run fix"
+  horizon: undecided
+- file: measured-results/05-bins-drop-point.md
+  description: "Session 5 - build and run a bins bench that finds where packing many bins at the same time starts to pay, on bins of one size, 2 to 16 bins, 2 to 12 cores; shape agreed, not built"
+  state: blocked
+  waits-on: "session 4 - the racing run and what it teaches"
+  horizon: undecided
+- file: measured-results/06-lib-results.md
+  description: "Session 6 - decide how the tables get their numbers, then fill the seven lib results files and the two parallel files from the kept runs; the table shapes are in the files, as comments over fake sample tables"
+  state: blocked
+  waits-on: "sessions 3 to 5 - the reruns and the two drop points"
+  horizon: undecided
+- file: measured-results/07-vipaq-results.md
+  description: "Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables"
+  state: blocked
+  waits-on: "session 6 - how the numbers get in - and session 3 - the ViPaq sample rerun"
+  horizon: undecided
+- file: measured-results/08-results-readmes.md
+  description: "Session 8 - shape the summary of lib/results/README.md and vipaq/results/README.md with the maintainer, then write it from the filled results files"
+  state: blocked
+  waits-on: "sessions 6 and 7 - every results file filled"
   horizon: undecided
 ```
 

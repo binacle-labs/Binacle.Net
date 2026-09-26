@@ -1,56 +1,137 @@
 # Packing efficiency stats
 
-How full each algorithm packs the 700 Bischoff problems, per set. Fill is the packed volume as a percentage of the
-bin, version 2. Computed from [measurements/packing-efficiency.md](measurements/packing-efficiency.md).
+How full does each algorithm, and each race of them, pack the 700 Bischoff problems? Version 2.
+
+> Every number in this file is fake. The tables show the shape only.
 
 ## 📊 Mean fill per set
 
-| Set | Item types | FFD | BFD | WFD |
+<!--
+Table: mean fill per Bischoff set, per algorithm and per race.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: thpack1 to thpack7, then All 700.
+Columns: Set, Item types, FFD, WFD, BFD, Race FFD+BFD, Race all three - fill in % of the bin.
+Notes: a race's fill on one problem is the best fill of its members; then the mean per set.
+Item types come from the Types column (3, 5, 8, 10, 12, 15, 20 for thpack1 to thpack7; All 700 reads 3 to 20).
+-->
+
+| Set | Item types | FFD (%) | WFD (%) | BFD (%) | Race FFD+BFD (%) | Race all three (%) |
+|---|---|---|---|---|---|---|
+| thpack1 | 3 | 11.1 | 22.2 | 33.3 | 44.4 | 55.5 |
+| thpack2 | 5 | 66.6 | 77.7 | 88.8 | 99.9 | 11.1 |
+| thpack3 | 8 | 22.2 | 33.3 | 44.4 | 55.5 | 66.6 |
+| thpack4 | 10 | 77.7 | 88.8 | 99.9 | 11.1 | 22.2 |
+| thpack5 | 12 | 33.3 | 44.4 | 55.5 | 66.6 | 77.7 |
+| thpack6 | 15 | 88.8 | 99.9 | 11.1 | 22.2 | 33.3 |
+| thpack7 | 20 | 44.4 | 55.5 | 66.6 | 77.7 | 88.8 |
+| All 700 | 3 to 20 | 99.9 | 11.1 | 22.2 | 33.3 | 44.4 |
+
+## 📊 The options, all 700
+
+<!--
+Table: each option over all 700 problems.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: FFD, WFD, BFD, Race FFD+BFD, Race all three.
+Columns: Option, Mean fill (%), Best or tied on (count, of 700).
+Notes: "best or tied" means its fill equals the best of all three on that problem.
+-->
+
+| Option | Mean fill (%) | Best or tied on (of 700) |
+|---|---|---|
+| FFD | 55.5 | 666 |
+| WFD | 77.7 | 888 |
+| BFD | 99.9 | 111 |
+| Race FFD+BFD | 22.2 | 333 |
+| Race all three | 44.4 | 555 |
+
+## 📊 Headroom
+
+<!--
+Table: how far the best fill sits below the ceiling, per set.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: thpack1 to thpack7, then All 700.
+Columns: Set, Item types, Ceiling (%), Best of three (%), Left (points).
+Notes: Ceiling is the Ceiling % column - the items' volume as a share of the bin. Best of three is the best fill of
+FFD, WFD and BFD on each problem. Both are the mean per set; Left is Ceiling minus Best of three.
+Under it, the question in the last section.
+-->
+
+| Set | Item types | Ceiling (%) | Best of three (%) | Left (points) |
 |---|---|---|---|---|
-| thpack1 | 3 | 75.70 | 80.73 | 74.78 |
-| thpack2 | 5 | 74.56 | 81.62 | 70.43 |
-| thpack3 | 8 | 73.81 | 82.12 | 68.23 |
-| thpack4 | 10 | 73.29 | 81.60 | 68.19 |
-| thpack5 | 12 | 72.14 | 81.74 | 67.68 |
-| thpack6 | 15 | 72.71 | 80.83 | 67.76 |
-| thpack7 | 20 | 71.63 | 80.17 | 67.41 |
-| **All 700** | 3 to 20 | **73.41** | **81.26** | **69.21** |
+| thpack1 | 3 | 66.6 | 77.7 | 88.8 |
+| thpack2 | 5 | 99.9 | 11.1 | 22.2 |
+| thpack3 | 8 | 33.3 | 44.4 | 55.5 |
+| thpack4 | 10 | 66.6 | 77.7 | 88.8 |
+| thpack5 | 12 | 99.9 | 11.1 | 22.2 |
+| thpack6 | 15 | 33.3 | 44.4 | 55.5 |
+| thpack7 | 20 | 66.6 | 77.7 | 88.8 |
+| All 700 | 3 to 20 | 99.9 | 11.1 | 22.2 |
 
 ## 📊 FFD fill per set
 
-| Set | Item types | Min | Mean | Median | Max |
+<!--
+Table: the spread of FFD fill inside each set.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: thpack1 to thpack7, then All 700.
+Columns: Set, Item types, Min, Mean, Median, Max - fill in %.
+-->
+
+| Set | Item types | Min (%) | Mean (%) | Median (%) | Max (%) |
 |---|---|---|---|---|---|
-| thpack1 | 3 | 61.87 | 75.70 | 75.78 | 87.90 |
-| thpack2 | 5 | 59.82 | 74.56 | 75.03 | 87.75 |
-| thpack3 | 8 | 60.67 | 73.81 | 74.32 | 84.81 |
-| thpack4 | 10 | 59.20 | 73.29 | 73.38 | 84.00 |
-| thpack5 | 12 | 56.18 | 72.14 | 72.88 | 80.82 |
-| thpack6 | 15 | 61.60 | 72.71 | 72.53 | 80.64 |
-| thpack7 | 20 | 59.02 | 71.63 | 71.73 | 80.38 |
-| **All 700** | 3 to 20 | **56.18** | **73.41** | **73.47** | **87.90** |
+| thpack1 | 3 | 33.3 | 44.4 | 55.5 | 66.6 |
+| thpack2 | 5 | 77.7 | 88.8 | 99.9 | 11.1 |
+| thpack3 | 8 | 22.2 | 33.3 | 44.4 | 55.5 |
+| thpack4 | 10 | 66.6 | 77.7 | 88.8 | 99.9 |
+| thpack5 | 12 | 11.1 | 22.2 | 33.3 | 44.4 |
+| thpack6 | 15 | 55.5 | 66.6 | 77.7 | 88.8 |
+| thpack7 | 20 | 99.9 | 11.1 | 22.2 | 33.3 |
+| All 700 | 3 to 20 | 44.4 | 55.5 | 66.6 | 77.7 |
 
 ## 📊 BFD fill per set
 
-| Set | Item types | Min | Mean | Median | Max |
+<!--
+Table: the spread of BFD fill inside each set.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: thpack1 to thpack7, then All 700.
+Columns: Set, Item types, Min, Mean, Median, Max - fill in %.
+-->
+
+| Set | Item types | Min (%) | Mean (%) | Median (%) | Max (%) |
 |---|---|---|---|---|---|
-| thpack1 | 3 | 62.08 | 80.73 | 81.14 | 90.37 |
-| thpack2 | 5 | 68.06 | 81.62 | 81.94 | 90.66 |
-| thpack3 | 8 | 71.71 | 82.12 | 82.70 | 88.91 |
-| thpack4 | 10 | 73.25 | 81.60 | 82.12 | 87.44 |
-| thpack5 | 12 | 73.03 | 81.74 | 82.23 | 87.53 |
-| thpack6 | 15 | 69.72 | 80.83 | 81.26 | 87.42 |
-| thpack7 | 20 | 73.36 | 80.17 | 80.33 | 86.12 |
-| **All 700** | 3 to 20 | **62.08** | **81.26** | **81.48** | **90.66** |
+| thpack1 | 3 | 88.8 | 99.9 | 11.1 | 22.2 |
+| thpack2 | 5 | 33.3 | 44.4 | 55.5 | 66.6 |
+| thpack3 | 8 | 77.7 | 88.8 | 99.9 | 11.1 |
+| thpack4 | 10 | 22.2 | 33.3 | 44.4 | 55.5 |
+| thpack5 | 12 | 66.6 | 77.7 | 88.8 | 99.9 |
+| thpack6 | 15 | 11.1 | 22.2 | 33.3 | 44.4 |
+| thpack7 | 20 | 55.5 | 66.6 | 77.7 | 88.8 |
+| All 700 | 3 to 20 | 99.9 | 11.1 | 22.2 | 33.3 |
 
 ## 📊 WFD fill per set
 
-| Set | Item types | Min | Mean | Median | Max |
+<!--
+Table: the spread of WFD fill inside each set.
+Reads: lib/results/measurements/packing-efficiency.md
+Rows: thpack1 to thpack7, then All 700.
+Columns: Set, Item types, Min, Mean, Median, Max - fill in %.
+-->
+
+| Set | Item types | Min (%) | Mean (%) | Median (%) | Max (%) |
 |---|---|---|---|---|---|
-| thpack1 | 3 | 60.42 | 74.78 | 75.12 | 87.90 |
-| thpack2 | 5 | 49.15 | 70.43 | 71.29 | 87.40 |
-| thpack3 | 8 | 51.04 | 68.23 | 68.05 | 84.76 |
-| thpack4 | 10 | 52.26 | 68.19 | 68.12 | 84.05 |
-| thpack5 | 12 | 53.69 | 67.68 | 67.34 | 78.77 |
-| thpack6 | 15 | 54.76 | 67.76 | 68.40 | 77.13 |
-| thpack7 | 20 | 57.85 | 67.41 | 68.17 | 77.91 |
-| **All 700** | 3 to 20 | **49.15** | **69.21** | **69.05** | **87.90** |
+| thpack1 | 3 | 44.4 | 55.5 | 66.6 | 77.7 |
+| thpack2 | 5 | 88.8 | 99.9 | 11.1 | 22.2 |
+| thpack3 | 8 | 33.3 | 44.4 | 55.5 | 66.6 |
+| thpack4 | 10 | 77.7 | 88.8 | 99.9 | 11.1 |
+| thpack5 | 12 | 22.2 | 33.3 | 44.4 | 55.5 |
+| thpack6 | 15 | 66.6 | 77.7 | 88.8 | 99.9 |
+| thpack7 | 20 | 11.1 | 22.2 | 33.3 | 44.4 |
+| All 700 | 3 to 20 | 55.5 | 66.6 | 77.7 | 88.8 |
+
+## Gaps and open questions
+
+<!--
+Question, under the headroom table: the ceiling is the items' volume, not the best packing possible, which nobody
+knows. So "Left" is not points that can be reached. Is fill the next thing to improve, and how would we know how
+much is reachable?
+Gap: no comparison against published results on the Bischoff problems.
+-->

@@ -13,7 +13,6 @@ Bischoff problems from the smallest job to the largest, on 2, 4, 8 and 12 cores.
 | `CoreJobs.cs` | One job per core count, each pinned to the first N CPUs with `DOTNET_PROCESSOR_COUNT` set to N, and the `Cores` column |
 | `CorePinning.cs` | Run first in each case: pins every thread to the job's CPUs, and fails the case if any thread or the CPU count is off |
 | `Program.cs` | Takes `--job` out of the args, builds the core jobs from it, and runs with the config from `shared/test/Binacle.Benchmarking` |
-| `BenchmarkBase.cs` | The base of the old five-problem racing classes, which are deleted. Nothing derives from it, so it runs nothing. Their kept reports are in `lib/results/benchmarks/` |
 
 ## 🛠️ How you use it
 

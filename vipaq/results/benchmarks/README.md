@@ -47,6 +47,7 @@ what ran.
 **Keep a run only when it changed something.** A ratio counts as moved when it moves by more than its own
 `RatioSD` and by at least 5 percent, or when `Allocated` changes. Anything smaller is the machine breathing.
 The 5 percent is a working number and open to argument.
+A report that gained a column a results file reads counts as changed too; say so in the folder's README.
 
 **A new machine invalidates the times, not the ratios.** Nothing here yet says what to do when the machine
 changes - the times in `baseline/` stop being a fair target, while every `Ratio` and `Allocated` still holds.

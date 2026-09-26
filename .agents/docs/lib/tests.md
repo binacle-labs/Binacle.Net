@@ -55,9 +55,7 @@ it constructs the internal algorithm classes.
   the volume and count totals they compare against.
 - The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the four
   smoke scenarios by name: `full bin, one type`, `small order`, `typical container`, `many item types`),
-  `SampleSet` (30 Bischoff problems, name `<category> (<id>)`), `RacingSet` (five scenarios keyed `typical
-  container`, `BFD wins big`, `near tie`, `WFD falls over`, `many item types`; only the racing
-  `BenchmarkBase` reads it, and no class runs that), `CoresSet` (30 Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
+  `SampleSet` (30 Bischoff problems, name `<category> (<id>)`), `CoresSet` (30 Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
   e.g. `th1_72 (74i/3t)`).
 - The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
   and `LadderGenerator` (the bin and item ladders the threshold and scaling projects climb).
@@ -161,10 +159,6 @@ args and builds the four jobs from it; the recipe passes it as every other recip
 on the pid) reaches only the main thread, so it pins every thread in `/proc/self/task` to the mask, then fails
 the case if `ProcessorCount` is not N or any thread's `Cpus_allowed` differs. A pinned run is kinder than a
 real small VM: the OS and the BDN host run on the spare CPUs.
-
-`BenchmarkBase` - `Loop` and `Parallel` over a `Set` param and `RacingSet` - is abstract and nothing derives
-from it, so it runs nothing. The reports of the classes that did are kept in
-`lib/results/benchmarks/baseline/racing/`.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 

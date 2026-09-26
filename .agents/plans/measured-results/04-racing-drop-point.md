@@ -1,12 +1,15 @@
 ---
-description: Step 19 - a racing bench that finds the drop point where running the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems
-state: ready
-waits-on: "a session of its own - the maintainer says when"
-horizon: now
-paths: ["lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**", "tooling/bench.just"]
+description: Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems
+state: blocked
+waits-on: "session 3 - the reruns after the slow-run fix"
+horizon: undecided
+paths: ["lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/CoresSet.cs", "lib/results/benchmarks/**"]
 ---
 
-# Step 19 - the racing drop point
+# 4 - The racing drop point
+
+The bench is built: class `Cores_Packing`, recipe `lib-racing-cores`. Its precise run of 2026-09-26 failed its
+check - slow processes, session 1 - and is not kept.
 
 ## Why
 
@@ -14,7 +17,24 @@ Loop against parallel exists to find the drop point: where parallel starts to wi
 always wins by a meaningful amount. A cost function then picks loop or parallel at run time. Racing goes first;
 the bins test waits (the maintainer, 2026-09-25). The threshold benches stay as they are.
 
-## What the kept runs already say (checked by script, 2026-09-26)
+## What the session does
+
+1. The maintainer runs `just bench lib-racing-cores precise` - 840 cases, about 3.5 hours.
+2. Check it before keeping it. FFD+BFD Loop should be about 1.05× the sum of FFD and BFD alone, and the
+   three-algorithm Loop about 1.1× its three alone rows, on every problem and core count. The same algorithm
+   alone should not jump more than 1.3× between core counts. If any fails, stop: the fix did not hold.
+3. Keep the report as `lib/results/benchmarks/<baseline or date>/racing/Cores_Packing.md`, by the rules in
+   `lib/results/benchmarks/README.md`.
+4. Read the drop point: where Parallel starts to win, and whether from some point it always wins by a
+   meaningful amount - what "meaningful" means is the maintainer's. If there is no such point, say so; do not
+   force one.
+5. Fix the line in the lib findings record on when racing pays.
+6. The three old racing reports in `lib/results/benchmarks/baseline/racing/` (their classes are gone) may go
+   once this run is kept. The maintainer's call.
+
+`parallel-racing.md` is the maintainer's to shape; session 6 builds it.
+
+## What the old racing reports say (checked 2026-09-26)
 
 - **The 0.50 "near tie" racing win is a measuring fault.** Its v2 loop row is 656 us against FFD 36 + BFD 294
   run alone; the other four problems' loop is 1.11 to 1.19 times the sum. A normal row would give about 0.96.
@@ -44,43 +64,10 @@ the bins test waits (the maintainer, 2026-09-25). The threshold benches stay as 
   `[confirm]` with 840 cases.
 - The alone rows sit in the same class. Each block is a `[BenchmarkCategory]`, and the orderer's group key
   takes the category as well as the job, so each race has its own Loop baseline and the alone rows have none.
-- The 30 problems live in a new `CoresSet.cs` beside `RacingSet`, which stays as it was.
-- The old racing classes and their recipes are gone, so only `Cores_Packing` runs. `BenchmarkBase` and
-  `RacingSet` stay, unused.
+- The 30 problems live in `CoresSet.cs`.
+- The old racing classes, their recipes, `BenchmarkBase` and `RacingSet` are gone; only `Cores_Packing` runs.
 - Each case pins every thread itself before the check: on Linux BDN's mask reaches only
   the main thread, so a check alone would fail every case.
-
-## Where it stands, 2026-09-26
-
-Built; the racing project and `Binacle.Benchmarking` build clean. The other five bench projects have not been
-built against the shared change. The maintainer started the full test on 2026-09-26:
-
-```
-just bench lib-racing-cores precise      # 840 cases, about 3.5 hours
-```
-
-Two checks already ran. A dry run of the FFD+BFD rows (240 cases): every pinning check passed, every Loop is
-1.00 over its own Parallel, cores sort 2, 4, 8, 12. A short-job preview over five problems (th1_72, th1_44,
-th5_41, th2_30, th1_65 - th7_56 was in the filter but did not run; not looked into):
-
-```
-dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Racing -- --job short --filter '*"th1_72 *' '*"th1_44 *' '*"th5_41 *' '*"th7_56 *' '*"th2_30 *' '*"th1_65 *'
-```
-
-What the preview showed - short job, so a hint, not a result:
-
-- **The faulty Loop row is back, and it is not a one-off.** Loop runs on one thread, so core count should not
-  move it. th2_30's Loop FFD+BFD is about 360 us on 2, 4, 8 cores and 659 on 12; th1_65's about 810 and 1497
-  on 12. Also three-algorithm Loops: th1_44 297 / 452 / 288 / 424, th5_41 about 500 then 664 on 12. Every
-  large "win" (0.44 to 0.54) is one of these rows. 12 cores, the one job with no spare CPUs, is where it hits
-  most. If `precise` still shows it, find the cause before reading a drop point.
-- **The three-algorithm Loop is 1.4 to 1.6 times the sum of its three alone rows**, on every problem and core
-  count (sum/Loop 0.63 to 0.78). Too steady to be noise; the kept runs showed it too. It flatters Parallel for
-  FFD+WFD+BFD until explained. The FFD+BFD Loop is 0.92 to 0.96 of the sum - normal.
-- **FFD+BFD where the Loop is sane:** Parallel 0.89 to 0.97 from th1_44 up; on th1_72 it loses above 2 cores
-  (1.10, 1.56, 1.79). Fits "small win at best".
-
-The full run overwrites the preview report; the numbers above are the only copy.
 
 ## How cores are pinned
 
@@ -101,6 +88,9 @@ Picked by an agent from the v2 times in `lib/results/benchmarks/baseline/algorit
 FFD+BFD time from the smallest job to the largest, denser where the crossover should be, with an even and a
 lopsided problem in each band. The five problems of the kept racing run are in. Name is the problem, then items
 and item types. Times are the v2 short-job means the pick used.
+
+Three of these BFD times came from slow processes (session 1): th3_17, th4_2 and th3_23 are 1.45× to 1.53× their
+fast racing value. Their "Why" lines are off - th3_17 is not lopsided: BFD 59 us, WFD 56 us.
 
 | Name | Problem | FFD us | WFD us | BFD us | Why |
 |---|---|---|---|---|---|
@@ -137,11 +127,8 @@ and item types. Times are the v2 short-job means the pick used.
 
 ## Done when
 
-- [ ] The racing bench runs the test above and writes one report per class with a Cores column, and Loop is
-      1.00 within each problem and core count.
-      **By eye.** Open the report; every Parallel ratio sits under a Loop of its own core count.
-- [ ] The maintainer has run it and the report is kept under `lib/results/benchmarks/`.
-      `ls lib/results/benchmarks/*/racing/`
+- [ ] The precise run passed the check in step 2 and is kept.
+      `ls lib/results/benchmarks/*/racing/Cores_Packing.md`
 - [ ] The drop point is read out of it, or the report shows there is none, and the lib findings record says
       so - including the fixed line on when racing pays.
       **By eye.**

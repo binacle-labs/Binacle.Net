@@ -1,133 +1,101 @@
 ---
-description: Orchestrator - steps 1 to 17 landed, and the provider names; left are 18 the lib results files, 19 the racing drop point, 20 the bins one and 21 the ViPaq results files, plus the rules both results slices share. The maintainer commits between steps
+description: Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as eight sessions in order - slow runs, their fix, the reruns, the racing and bins drop points, the lib and ViPaq results files, and the results READMEs
 state: ready
-waits-on: "a session of its own for step 18 and one for step 21 - the maintainer says when"
+waits-on: "the maintainer says when each session starts"
 horizon: next-release
 paths:
   - "shared/**"
   - "lib/**"
   - "vipaq/**"
   - "tooling/**"
-  - "results/**"
   - ".agents/**"
 ---
 
-# Measured results, and the projects that feed them
+# Measured results
 
-One plan, too big for one file. The maintainer granted the topic folder on 2026-09-19; this file is the only
-one that points at every file in it.
+One plan in a topic folder, granted 2026-09-19. This file is the only one that points at the files in it.
 
-**Steps 1 to 11 landed 2026-09-20 to 2026-09-22 and their files are gone.** The three tests kernels became
-`Data` and `Testing` projects and `Binacle.Reporting`; both measure projects write `<slice>/results/`; the
-old vault stopped being current. Their lasting rules are in the general design record - the decision on
-the four project folders and the one on measured numbers. Step 12, the bench split, landed 2026-09-23; its
-reasons are in the lib and ViPaq design records. Step 13, which converted the old `results/` folder, was
-dropped 2026-09-22 when the folder was deleted.
+## What landed
 
-**Step 15 landed 2026-09-24** and its file is gone. `Binacle.Lib.Benchmarks.Scaling` is a project of its own
-with one class, `Sample_Packing`, 66 cases over the item ladder; `Json` is a row in ViPaq's two encode
-classes. All three runs are kept in `baseline/`.
+The bench and measure projects, their recipes, and the kept runs under `lib/results/` and `vipaq/results/`
+landed 2026-09-20 to 2026-09-26. Their lasting rules are in the general design record (the four project
+folders, measured numbers) and in the lib and ViPaq design records. The racing bench `Cores_Packing` is built;
+no run of it is kept.
 
-**Step 17 landed 2026-09-23** and its file is gone. `encoded-size.md` became 54 files under
-`vipaq/results/measurements/encoded-size/<algorithm>/`, three tables each, every format through every codec. A dropped
-reporter's old file is deleted by hand; the general design record says so, and wanting a check for it is an
-idea in the shared plans.
-
-**Step 16 landed 2026-09-25.** The maintainer ran `lib-threshold-full precise` and `lib-algorithms-full`; the
-ten reports are the first kept run of both full tiers, in `baseline/threshold/` and `baseline/algorithms/`. The
-answer is F4 in the lib findings record - parallel bin processing pays above a surface of bin count and item
-count, and loses badly below it - with F2a settling parallel algorithm racing against. O1 in the lib decisions
-record carries both, and what is still undecided.
-
-**Step 14 landed 2026-09-23** and its file is gone. The kept-run shape, the rule for what is worth keeping,
-and how a report is copied all live in the two `benchmarks/README.md`. Copying stays a hand job; the recipe
-that would do it is an idea in the tooling plans.
-
-**The provider names landed** and their file is gone.
+On 2026-09-26 the plan was reset. The table scripts were removed. Every results file became a placeholder: a
+comment per table saying what it holds, and a sample table with fake numbers under it. The two results READMEs
+were cut to an index.
 
 ## How a session works this plan
 
-- **A session takes one step or several; the maintainer commits between steps.** No session commits. A step
-  is sized to be one reviewable commit - a rename, a move, a split, a harness - never a line in three files
-  and never two ideas. Where a step says it is small, the maintainer may take it with the one before.
-- **A session says when it should stop.** Its judgement, not a count of steps: when its context is heavy, or
-  when the next step deserves a cold read. It says so at a step boundary, never in the middle of one, and
-  names the step a fresh session picks up. The maintainer decides whether to start a new session or go on.
-- **Pick up cold by running the gates.** Every row below has a gate: one command that is true once the step
-  landed. Run them top to bottom; the first that fails is the next step. There is no progress table - the
-  tree is the state, and a tick nobody verified is a claim.
-- **Settle the open details first.** Each step file lists what it leaves open. Work those out with the
-  maintainer, then start. A session that finds the shape wrong when it meets the code says so with the
-  evidence and stops; a wrong decision is cheaper to change than to obey.
-- **The sandbox denies `mv`, `rm` and `git mv`.** Hand the maintainer the lines; edit after they land.
-  History follows the bigger half of a split.
-- **Build only what moved.** `dotnet build <csproj>` on the project and each consumer. A solution build or a
-  long run is the maintainer's; both have crashed the machine.
-- **Every step leaves a working tree**: every project builds, every script or recipe that exists still runs.
-  A step that has to break something fixes it in the same step.
-- **Every step rewrites the doc lines it makes false**, in the same step. `just agents all` is the
-  maintainer's; say when it is due.
+- **One session, one file, in order.** Run the gates in the table below top to bottom; the first that fails is
+  the next session. The maintainer commits between sessions. No session commits.
+- **Do only what the file says.** A problem found on the way: say it in one plain sentence and stop. New work
+  becomes an idea plan, never a new step.
+- **No scripts in the repo** until session 6 decides how the tables get their numbers.
+- **The maintainer runs** every bench, every measure, and any build that starts the host. A session gives him
+  the one-line command. Long runs have crashed his machine.
+- **The sandbox denies `rm`, `mv` and `git rm`.** Hand the maintainer one line with every path on it.
+- **Every session rewrites the doc lines it makes false**, in the same session. `just agents all` is his.
+- **Plain short words**, in chat and in files. One decision per turn, shown with an example.
 
-## The results files - rules for steps 18 and 21
+## The results files - rules
 
-Settled with the maintainer on 2026-09-25 and 2026-09-26. Both slices build to them; the two step files say
-only what is particular to each.
+Settled with the maintainer 2026-09-25 and 2026-09-26. Both slices keep them.
 
-**What they are for.** The story is for the maintainer first: it shows him how the work is going and gives him
-data to decide on - v2 against v1 says whether the direction is sound, a tipping point feeds a cost function, a
-gap says what to improve. A file that drives no decision and shows no progress is a candidate to cut. The story
-for the outside world comes after, from the same files.
-
-**The layout, per slice:**
+**What they are for.** They show the maintainer how the work is going and give him data to decide on: v2
+against v1 says whether the direction is sound, a drop point feeds a cost function, a gap says what to
+improve. A file that drives no decision and shows no progress is a candidate to cut.
 
 | Path | Holds |
 |---|---|
 | `<slice>/results/measurements/` | raw results from `just measure` |
 | `<slice>/results/benchmarks/` | raw results - BenchmarkDotNet reports, copied by hand |
-| `<slice>/results/<file>.md` | derived: one file per question, which may read several raw files and supports decisions inside that area only |
-| `<slice>/results/README.md` | a short summary of every root file, then the combinations - facts from two or more root files, grouped by the decisions only a combination can make - then the open questions and gaps gathered from the root files. The folder index goes below. Written last, once every root file of the slice is done. Its wording is revised later |
+| `<slice>/results/<file>.md` | one file per question, read from the raw files |
+| `<slice>/results/README.md` | the index, and a summary written last |
 
-- **Each slice stays isolated.** No root file or README reads another slice's numbers. A decision that spans
-  slices - ViPaq's encode time against lib's pack time, what one request costs end to end - has no home yet;
-  the maintainer does not know where it goes, only that it is in neither slice.
-- **A script makes the tables; a person writes the words.** Every table is generated from the raw files, never
-  typed. Everything else is written by hand from what the tables show, and rewritten when they move. Root
-  files carry few words; the README may carry more. How the script refreshes tables without touching the
-  words is open - markers around each table are one way.
-- **The README computes nothing.** Every number in it comes from a root file and names it. When a root file is
-  rewritten, the README is reread.
-- **A difference is "×" the baseline**: v2 at 0.46× of v1, BFD at 4.2× of FFD. A share of a whole may be a
-  percentage.
-- **A ratio is per problem or per pack, then averaged.** Divide by the baseline on that same problem, then take
-  the mean (and min, median, max where the table says). Never mean A ÷ mean B, which lets big cases outweigh
-  small ones. BenchmarkDotNet's own Ratio is used where one run holds both rows.
-- **A loss must show.** Where 1.00× or more is the bad side, the average goes bold, and where an average can
-  hide single losses, a count column says how many.
-- **Every cell one number, every column labelled.** No blank cells, no "a / b" cells.
-- **Each file names its gaps and its open questions** in a line or two at the end. A gap is written down so it
-  can be added later; filling it is new measurement, not a table.
-- **v2 everywhere, except where v1 against v2 is the question.** Name the version.
+- **Each slice stays apart.** No file reads the other slice's numbers.
+- **A file reads one kind of raw result**: a slice's measurements, or one bench family (lib: algorithms,
+  result-selection, scaling, racing, threshold; ViPaq: encoding). Inputs - the problems under `shared/data/`,
+  the ladder in `LadderGenerator.cs` - are not results; any file may read them.
+- **Never average two algorithms together.** A race - the better of its members on each problem - is an option
+  of its own, not an average, and stays.
+- **A difference is "×" the baseline**: v2 at 0.46× of v1. A share of a whole may be a percentage.
+- **A ratio is per problem, then averaged.** Never mean A ÷ mean B. BenchmarkDotNet's own Ratio is used where one
+  run holds both rows.
+- **A loss must show.** Where above 1.00× is the bad side the average goes bold, and where an average can hide
+  single losses a count column says how many.
+- **Every cell one number, every column labelled.**
+- **Each file ends with its gaps and open questions.**
+- **v2 everywhere, except where v1 against v2 is the question.**
 - **A time holds on one machine and runtime only; the file says which.** Ratios, memory, fill and size compare
   anywhere.
-- **Build only when the maintainer says**, and run no script while a bench run is going - it disturbs the run.
-- **A script reads the raw files it knows by name**, never whatever sits in the folder: a stale file left by a
-  dropped reporter is never read.
-- **Open, his call:** whether the tables later come from the measure harness instead of a plan script.
+- **The comment above each table is its spec**, and the sample table under it shows the shape. Filling a table
+  replaces the fake numbers; the comment stays. The line "Every number in this file is fake" goes when the last
+  table of the file is filled.
+- **The README computes nothing.** Every number in it names the file it came from.
+- **Nothing runs while a bench runs** - it disturbs the run.
 
-## The steps
+## The sessions
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 18 | [18-results-story](measured-results/18-results-story.md) | the lib results files and README, shapes locked | **by eye** - `lib/results/` holds every file in the step and the README opens with the summary |
-| 19 | [19-racing-drop-point](measured-results/19-racing-drop-point.md) | the racing drop point, on 2 to 12 cores, over 30 locked problems | `ls lib/results/benchmarks/*/racing/` shows the new report |
-| 20 | [20-bins-drop-point](measured-results/20-bins-drop-point.md) | the bins drop point, bins of one size, shape agreed, waits on 19 | `ls lib/results/benchmarks/*/threshold/` shows the new report |
-| 21 | [21-vipaq-results](measured-results/21-vipaq-results.md) | the ViPaq results files and README, shapes locked; a bench column and a rerun first | **by eye** - `vipaq/results/` holds every file in the step and the README opens with the summary |
+| 1 | [01-slow-runs](measured-results/01-slow-runs.md) | find why some runs come out slow at random; choose the fix with the maintainer | **by eye** - the file records the cause, or "not found", and the fix he chose |
+| 2 | [02-fix-slow-runs](measured-results/02-fix-slow-runs.md) | build that fix; a small run proves it | **by eye** - the small run's numbers are in the file and show no slow run |
+| 3 | [03-reruns](measured-results/03-reruns.md) | the maintainer reruns the benches whose times are wrong, and keeps them | **by eye** - every run on its list is kept, or his word to keep the old one is written |
+| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run the racing bench, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/racing/Cores_Packing.md` |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | build and run the bins bench, read where packing bins at once starts to pay | **by eye** - a kept run of the new bins class under `lib/results/benchmarks/` |
+| 6 | [06-lib-results](measured-results/06-lib-results.md) | decide how the tables get their numbers; fill the lib results files | `! grep -l "is fake" lib/results/*.md` |
+| 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
+| 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
 
-18 reads what 15 to 17 left. `python3 .agents/scripts/derive-lib-results.py`, run from the repo root, writes its
-derived result files.
+The order comes from the work. A rerun before the fix hits the same fault. Racing and bins read the reruns.
+The results files read the kept runs. The READMEs read the results files.
+
+Kept as ideas, outside this plan: MessagePack, CBOR and a columnar protobuf; a results story for others; a home
+for comparisons across slices.
 
 ## Done when
 
-- [ ] Every step's last box is ticked, the provider names are done or dropped, and the maintainer has
-      deleted the folder and this file.
-      **By eye.** There is nothing left to check once the file is gone; the step files carried the checks.
+- [ ] Every session file's boxes are ticked, and the maintainer has deleted the folder and this file.
+      **By eye.** There is nothing left to check once the file is gone; the session files carried the checks.

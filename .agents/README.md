@@ -11,7 +11,6 @@ reviewable. Read this first to know where things are.
 | `docs/` | Stable reference docs for the codebase — slices, endpoints, modules, build. | Find the topic in `docs/_index.md` (or a task in `docs/README.md`), then read that file. |
 | `design/` | The settled design *behind* the docs — decisions (why) and findings (measured evidence). Permanent, but it can change. | Find it in `design/_index.md`. |
 | `plans/` | Work not yet done — from a rough idea nobody is waiting on to a plan that is ready to start. Each declares its `state:`. | Find the plan in `plans/_index.md`. Trim/delete an item once it lands. |
-| `scripts/` | One-off scripts an agent runs by hand, for special cases only. Nothing in the build runs them. | When a plan names one as a command. |
 | `memory/` | Durable "why" with no home in a doc or plan — gotchas, settled decisions, conventions. | Scan `memory/_index.md` at session start. Add a fact only if no doc/plan fits (`memory/README.md` says how). |
 | `release-v<version>.md` (+ companion) | The per-version release set, at root: the release plan, plus `post-release-v<version>.md` (right-after-release work). The GitHub release body is not here — it is the `## [Unreleased]` section of `CHANGELOG.md` at the repo root, which the release workflow extracts. | When cutting a release. The plan is deleted once the version is out; the post-release list goes when its own items are done. |
 

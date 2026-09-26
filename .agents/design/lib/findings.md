@@ -1,8 +1,8 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
-verified: 2026-09-25
-check: the five keys in RacingSet (typical container, BFD wins big, near tie, WFD falls over, many item types) still exist, and BenchmarkBase in lib/bench/Binacle.Lib.Benchmarks.Racing still races the quoted algorithm sets over them (the classes that ran it were deleted 2026-09-26; their reports are in lib/results/benchmarks/baseline/racing/); Cores_Packing still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
+verified: 2026-09-26
+check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are still in CoresSet; Cores_Packing still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
 also_update:
   - lib/decisions
 paths:
@@ -29,11 +29,11 @@ Within-run error is **0.3–1.0%** of the mean on the 2026-07-17 run, so the eff
 noise.
 
 **F1 and F2 cannot be re-checked from a clone.** BenchmarkDotNet writes to `BenchmarkDotNet.Artifacts/`, which
-`.gitignore` excludes, and nobody kept those reports - so what a later session can confirm is that the harness
-still races what is quoted here, not that a re-run would land on the same microseconds. **F2a and F4 were
+`.gitignore` excludes, and nobody kept those reports. The harness that ran them, `RacingSet` and the racing
+`BenchmarkBase`, was deleted 2026-09-26; its five problems are all in `CoresSet`, which `Cores_Packing` races. **F2a and F4 were
 kept**: every number in them can be read out of `lib/results/benchmarks/baseline/threshold/`.
 
-**The scenario names below are the ones the run printed.** The keys in `RacingSet` were
+**The scenario names below are the ones the run printed.** The keys in `RacingSet` (deleted 2026-09-26) were
 renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
 `typical container` (thpack1_7), BFD dominance is `BFD wins big` (thpack1_44), High efficiency is `near tie`
 (thpack2_30), WFD weakness is `WFD falls over` (thpack2_35), Max complexity is `many item types` (thpack7_56; called `most item types` until 2026-09-23).
