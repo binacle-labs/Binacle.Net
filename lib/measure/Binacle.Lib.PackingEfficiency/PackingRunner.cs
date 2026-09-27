@@ -14,8 +14,10 @@ internal sealed class PackingRunner : IRunner
 		("FFD", 2, AlgorithmFactories.FFD_v2),
 		("WFD", 1, AlgorithmFactories.WFD_v1),
 		("WFD", 2, AlgorithmFactories.WFD_v2),
+		("WFD", 3, AlgorithmFactories.WFD_v3),
 		("BFD", 1, AlgorithmFactories.BFD_v1),
-		("BFD", 2, AlgorithmFactories.BFD_v2)
+		("BFD", 2, AlgorithmFactories.BFD_v2),
+		("BFD", 3, AlgorithmFactories.BFD_v3)
 	];
 
 	private readonly PackingBag bag;

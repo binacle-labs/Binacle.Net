@@ -15,8 +15,10 @@ public sealed class CommonTestingFixture : IDisposable
 			AlgorithmFactories.FFD_v2,
 			AlgorithmFactories.WFD_v1,
 			AlgorithmFactories.WFD_v2,
+			AlgorithmFactories.WFD_v3,
 			AlgorithmFactories.BFD_v1,
-			AlgorithmFactories.BFD_v2
+			AlgorithmFactories.BFD_v2,
+			AlgorithmFactories.BFD_v3
 		};
 	}
 

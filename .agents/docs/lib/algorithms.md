@@ -1,8 +1,8 @@
 ---
 id: lib/algorithms
 description: Packing heuristics (FFD/WFD/BFD) — versions, operation types, trade-offs, and the fit/pack guarantee
-verified: 2026-09-04
-check: The six directories and their five-file layout match lib/src/Binacle.Lib/Algorithms/; v2 default confirmed in AlgorithmFactory.cs; both early-exit paths still read AlgorithmOperation.Fitting in every heuristic's AlgorithmOperation.cs
+verified: 2026-09-27
+check: The eight directories and their five-file layout match lib/src/Binacle.Lib/Algorithms/; v2 default confirmed in AlgorithmFactory.cs; both early-exit paths still read AlgorithmOperation.Fitting in every heuristic's AlgorithmOperation.cs
 also_update:
   - lib/algorithm-factory
 paths:
@@ -14,15 +14,15 @@ paths:
 
 ## Heuristics
 
-Three heuristics, each with two versions:
+Three heuristics, each with two versions, and a test-only v3 of two:
 
 | Heuristic | Versions |
 |---|---|
 | First Fit Decreasing (FFD) | v1, v2 |
-| Best Fit Decreasing (BFD) | v1, v2 |
-| Worst Fit Decreasing (WFD) | v1, v2 |
+| Best Fit Decreasing (BFD) | v1, v2, v3 (test only) |
+| Worst Fit Decreasing (WFD) | v1, v2, v3 (test only) |
 
-Each lives under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/`, and every one of the six holds the same
+Each lives under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/`, and every one of the eight holds the same
 five files:
 
 | File | Holds |
@@ -36,10 +36,15 @@ does the work, and a version's loop can be read without the setup around it.
 See Algorithm Factory (`$lib/algorithm-factory`) for the concrete class names (`FirstFitDecreasing_v2`, etc.).
 
 All versions of a heuristic produce the same results, and that is held up by the test suite rather than by
-convention: `CommonTestingFixture` puts all six factories in `AlgorithmsUnderTest[]` and asserts each against
+convention: `CommonTestingFixture` puts all eight factories in `AlgorithmsUnderTest[]` and asserts each against
 the same scenario expectations (`$lib/tests`). Newer versions are faster and use less memory.
 The API currently uses **v2 for all three heuristics** — this is set in `lib/src/Binacle.Lib/AlgorithmFactory.cs`.
-When writing new code, always use the latest version (currently v2).
+When writing new code, always use the latest shipped version (currently v2).
+
+**v3 is test-only.** No factory under `lib/src/` creates it, so the API cannot run it; the unit tests and the
+measure reach it through `AlgorithmFactories` in `lib/test/Binacle.Lib.Testing`. It differs from v2 in
+one method: `FindAvailableSpace` scans the free spaces once for the smallest (BFD) or largest (WFD) that fits,
+where v2 sorts the list first. A tie goes to the earliest space in the list, as in v1.
 Old versions are kept so you can benchmark without changing what the API uses — do not remove them.
 
 ## Trade-offs

@@ -49,6 +49,10 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "before editing anything under sites/"
   load: always
   paths: ["sites/**"]
+- file: numbers-only-where-they-are-the-point.md
+  description: "Write a number only where it is the point. A count the code already holds goes stale with the next change."
+  when: "writing a number into a doc, README, plan, comment or recipe"
+  load: on-trigger
 - file: one-fact-one-place.md
   description: "Put a fact in exactly one place and cross-link. A fact written twice will disagree."
   when: "adding a fact to any file under .agents/"

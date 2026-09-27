@@ -1,5 +1,5 @@
 ---
-description: Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as eight sessions in order - slow runs, their fix, the reruns, the racing and bins drop points, the lib and ViPaq results files, and the results READMEs
+description: Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as five sessions in order - the racing and bins drop points, the lib and ViPaq results files, and the results READMEs
 state: ready
 waits-on: "the maintainer says when each session starts"
 horizon: next-release
@@ -80,20 +80,21 @@ improve. A file that drives no decision and shows no progress is a candidate to 
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 1 | [01-slow-runs](measured-results/01-slow-runs.md) | find why some runs come out slow at random; choose the fix with the maintainer | **by eye** - the file records the cause, or "not found", and the fix he chose |
-| 2 | [02-fix-slow-runs](measured-results/02-fix-slow-runs.md) | build that fix; a small run proves it | **by eye** - the small run's numbers are in the file and show no slow run |
-| 3 | [03-reruns](measured-results/03-reruns.md) | the maintainer reruns the benches whose times are wrong, and keeps them | **by eye** - every run on its list is kept, or his word to keep the old one is written |
 | 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run the racing bench, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/racing/Cores_Packing.md` |
 | 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | build and run the bins bench, read where packing bins at once starts to pay | **by eye** - a kept run of the new bins class under `lib/results/benchmarks/` |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | decide how the tables get their numbers; fill the lib results files | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
 
-The order comes from the work. A rerun before the fix hits the same fault. Racing and bins read the reruns.
-The results files read the kept runs. The READMEs read the results files.
+The order comes from the work. The results files read the kept runs, racing and bins included. The READMEs
+read the results files. The sessions keep their numbers 4 to 8.
+
+**Slow processes are not chased here** (the maintainer, 2026-09-28). Some kept BFD times may be a process that
+ran slow from start to end; nothing is rerun for it. Every results file that reads a BFD time names that as a
+gap.
 
 Kept as ideas, outside this plan: MessagePack, CBOR and a columnar protobuf; a results story for others; a home
-for comparisons across slices.
+for comparisons across slices; slow processes under tiered PGO; the test-only v3 of BFD and WFD.
 
 ## Done when
 

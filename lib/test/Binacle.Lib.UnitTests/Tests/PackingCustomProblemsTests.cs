@@ -61,6 +61,17 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 
 	[Theory]
 	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
+	public void CustomProblems_Packing_WFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.WFD_v3, testScenario, AlgorithmOperation.Packing);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -77,6 +88,17 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
 
 		var result = this.Fixture.Run(AlgorithmFactories.BFD_v2, testScenario, AlgorithmOperation.Packing);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
+	public void CustomProblems_Packing_BFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.BFD_v3, testScenario, AlgorithmOperation.Packing);
 
 		this.Fixture.AssertResult(testScenario, result);
 	}

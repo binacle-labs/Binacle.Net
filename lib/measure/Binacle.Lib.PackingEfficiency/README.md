@@ -1,7 +1,7 @@
 # Binacle.Lib.PackingEfficiency
 
 Packs every Bischoff suite scenario with every algorithm version, once, and writes what came out - fill per
-algorithm, which won, where v1 and v2 differ - as markdown into [`lib/results/measurements/`](../../results/measurements). Not a test:
+algorithm, which won, where any version packs differently, including the test-only v3 of WFD and BFD - as markdown into [`lib/results/measurements/`](../../results/measurements). Not a test:
 nothing here passes or fails, and the numbers are deterministic, so the files are tracked and a change in the
 packer shows up as a diff.
 
@@ -10,10 +10,10 @@ packer shows up as a diff.
 | Path | What it is |
 |---|---|
 | `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/measurements/` |
-| `PackingRunner.cs` | Packs 700 scenarios with six algorithm versions and fills the bag |
+| `PackingRunner.cs` | Packs 700 scenarios with eight algorithm versions and fills the bag |
 | `PackingBag.cs` | What the runner measured; every reporter reads from here |
 | `ResultFiles.cs` | The two files and the header sentence they open with |
-| `Reporters/` | One class per file: the per-scenario rows, the v1/v2 differences |
+| `Reporters/` | One class per file: the per-scenario rows, the scenarios where versions differ |
 
 ## 🛠️ How you use it
 

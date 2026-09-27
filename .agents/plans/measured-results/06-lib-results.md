@@ -1,7 +1,7 @@
 ---
 description: Session 6 - decide how the tables get their numbers, then fill the seven lib results files and the two parallel files from the kept runs; the table shapes are in the files, as comments over fake sample tables
 state: blocked
-waits-on: "sessions 3 to 5 - the reruns and the two drop points"
+waits-on: "sessions 4 and 5 - the two drop points"
 horizon: undecided
 paths: ["lib/results/**"]
 ---
@@ -134,8 +134,8 @@ ratios and memory on .NET 10 to set beside the table above, and shows whether me
 problems, v1 against v2, packing and fitting - is in the same folder as `Full_<alg>_<op>.md`. It carries the
 v2/v1 story over the whole suite instead of one synthetic case, so the story's speed numbers come from there
 and the smoke case is only the bridge back to the November table. It ran at the **short** job (3 iterations),
-so a single problem's mean is rough; an average over 700 is not. Its BFD times hold slow processes and are
-retaken in session 3. Beside it, `baseline/threshold/Full_*` holds
+so a single problem's mean is rough; an average over 700 is not. Some of its BFD times are slow processes, and
+are not retaken. Beside it, `baseline/threshold/Full_*` holds
 the parallel numbers, already read out as F4 and F2a in the lib findings record - the story does not need to
 re-derive them.
 

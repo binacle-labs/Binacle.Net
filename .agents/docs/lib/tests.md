@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-26
+verified: 2026-09-27
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -43,8 +43,8 @@ The harness code the unit tests, the measure project and the bench projects shar
 does not reference it). `Binacle.Lib` grants it friend access, because
 it constructs the internal algorithm classes.
 
-- `AlgorithmFactories.cs` defines six `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
-  `WFD_v1/_v2`, `BFD_v1/_v2` — each constructing the algorithm directly
+- `AlgorithmFactories.cs` defines eight `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
+  `WFD_v1/_v2/_v3`, `BFD_v1/_v2/_v3` — each constructing the algorithm directly
   (`new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
   This keeps every version (including v1) under test without coupling it to the production factory.
 - `TestAlgorithmFactory<TAlgorithm>` — `delegate TAlgorithm (ScenarioBin bin, List<ScenarioItem> items)` — and
@@ -97,7 +97,7 @@ this.Fixture.AssertResult(testScenario, result);
 ```
 
 Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `PackingBischoffSuiteTests`,
-`PackingCustomProblemsTests`, `PackingDemoSamplesTests` (each a `[Theory]` × `[MemberData]` over all six versions), plus `CreationTests`,
+`PackingCustomProblemsTests`, `PackingDemoSamplesTests` (each a `[Theory]` × `[MemberData]` over all eight versions), plus `CreationTests`,
 `SanityTests`, `ResultSelectionTests`, `BinProcessingCancellationTests`.
 
 `ResultSelectionTestingFixture`:
@@ -117,10 +117,10 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 ## Binacle.Lib.PackingEfficiency
 
 Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs the 700 Bischoff-suite scenarios
-with all six algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
+with all eight algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
 file under `lib/results/measurements/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
-the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, only rows where v1 and v2
-differ). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Nothing else under `lib/results/` is
+the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, one column per version, only rows
+where any version differs). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Nothing else under `lib/results/` is
 written by the harness. Not pass/fail; a change is a diff.
 
 ## Binacle.Lib.Benchmarks.Algorithms

@@ -38,6 +38,30 @@ about 1 in 10 BFD processes runs about 1.7× slow from start to end, with a tigh
 `Loop` runs 1.26× to 1.46× the sum of its parts in the threshold run. So a single BFD cell of F4, and every
 FFD,WFD,BFD ratio of F2a, may move on a rerun - and with them "BFD crosses about two bins earlier".
 
+**The cause is tiered PGO, and it is not fixed.** Measured 2026-09-27 and 2026-09-28. With `DOTNET_TieredPGO=0`,
+80 BFD v2 processes and 80 test-only BFD v3 processes each ran at one speed, within 1.13×; the loop fault went
+too. With it on, BFD v2 had 2 slow processes in 40 on the racing bench. BFD v3, which has no sort in its loop,
+runs slow on 16 and 19 of 40 processes, 1.2× to 1.4× slower (thpack3_29: 32.5 or 41 us; thpack6_39: 24 or 29.5 us).
+So the space sort is not the whole cause, and which code PGO tunes badly is not known. PGO off is no fix: every
+time is 1.5× to 2× slower and allocates more. The maintainer set the spread aside on 2026-09-28: v3's speed gain
+is far larger than it.
+
+## F5 — test-only v3 of BFD and WFD: one scan instead of a sort (2026-09-27)
+
+v3 differs from v2 in one method: it finds the smallest (BFD) or largest (WFD) space that fits in one pass,
+where v2 sorts the free spaces on every placement. It fills all 700 Bischoff problems exactly as v2
+(`lib/results/measurements/version-parity.md`) and allocates the same.
+
+Smoke run, short job, one process per case - v3 time as × v2:
+
+| | full bin, one type | small order | typical container | many item types |
+|---|---|---|---|---|
+| BFD packing | 0.85× | 0.73× | 0.21× | 0.24× |
+| WFD packing | 0.21× | 0.70× | 0.31× | 0.16× |
+
+The gain grows with the number of free spaces. On packing, BFD v3 now takes 0.94× to 1.09× of FFD v2's time and WFD v3 1.07×
+to 1.65×. Four scenarios only; the full run over 700 is not done.
+
 **The scenario names below are the ones the run printed.** The keys in `RacingSet` (deleted 2026-09-26) were
 renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
 `typical container` (thpack1_7), BFD dominance is `BFD wins big` (thpack1_44), High efficiency is `near tie`

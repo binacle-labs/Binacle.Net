@@ -1,7 +1,7 @@
 ---
 description: Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems
-state: blocked
-waits-on: "session 3 - the reruns after the slow-run fix"
+state: ready
+waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/CoresSet.cs", "lib/results/benchmarks/**"]
 ---
@@ -9,7 +9,7 @@ paths: ["lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Test
 # 4 - The racing drop point
 
 The bench is built: class `Cores_Packing`, recipe `lib-racing-cores`. Its precise run of 2026-09-26 failed its
-check - slow processes, session 1 - and is not kept.
+check - slow processes - and is not kept.
 
 ## Why
 
@@ -22,7 +22,8 @@ the bins test waits (the maintainer, 2026-09-25). The threshold benches stay as 
 1. The maintainer runs `just bench lib-racing-cores precise` - 840 cases, about 3.5 hours.
 2. Check it before keeping it. FFD+BFD Loop should be about 1.05× the sum of FFD and BFD alone, and the
    three-algorithm Loop about 1.1× its three alone rows, on every problem and core count. The same algorithm
-   alone should not jump more than 1.3× between core counts. If any fails, stop: the fix did not hold.
+   alone should not jump more than 1.3× between core counts. Slow processes are not fixed, so this may fail;
+   if it does, stop and show the maintainer which rows.
 3. Keep the report as `lib/results/benchmarks/<baseline or date>/racing/Cores_Packing.md`, by the rules in
    `lib/results/benchmarks/README.md`.
 4. Read the drop point: where Parallel starts to win, and whether from some point it always wins by a
@@ -89,7 +90,7 @@ FFD+BFD time from the smallest job to the largest, denser where the crossover sh
 lopsided problem in each band. The five problems of the kept racing run are in. Name is the problem, then items
 and item types. Times are the v2 short-job means the pick used.
 
-Three of these BFD times came from slow processes (session 1): th3_17, th4_2 and th3_23 are 1.45× to 1.53× their
+Three of these BFD times came from slow processes: th3_17, th4_2 and th3_23 are 1.45× to 1.53× their
 fast racing value. Their "Why" lines are off - th3_17 is not lopsided: BFD 59 us, WFD 56 us.
 
 | Name | Problem | FFD us | WFD us | BFD us | Why |

@@ -1,7 +1,7 @@
 namespace Binacle.Lib.PackingEfficiency.Reporters;
 
-// One section per algorithm, listing only the scenarios where v2 packs differently from v1. A count, not a
-// proof of sameness.
+// One section per algorithm, one column per version, listing only the scenarios where any version packs
+// differently. A count, not a proof of sameness.
 internal sealed class VersionParityReporter : IReporter
 {
 	private readonly PackingBag bag;
@@ -18,24 +18,20 @@ internal sealed class VersionParityReporter : IReporter
 
 	private ReportSection Section(string family)
 	{
-		var table = new TableResult("Scenario", "v1", "v2", "Difference");
-		var differing = this.bag.Scenarios.Where(x => Differs(x, family)).ToArray();
+		var versions = Algorithms.Versions(family);
+		var names = string.Join(", ", versions.Select(v => $"v{v}"));
+
+		var table = new TableResult(["Scenario", .. versions.Select(v => $"v{v}")]);
+		var differing = this.bag.Scenarios
+			.Where(x => versions.Select(v => x.Fill(family, v)).Distinct().Count() > 1)
+			.ToArray();
 		foreach (var scenario in differing)
-		{
-			var previous = scenario.Fill(family, Algorithms.Previous);
-			var shipped = scenario.Fill(family, Algorithms.Shipped);
-			table.AddRow(
-				scenario.Name,
-				Format.Fixed(previous),
-				Format.Fixed(shipped),
-				Format.Fixed(shipped - previous)
-			);
-		}
+			table.AddRow([scenario.Name, .. versions.Select(v => Format.Fixed(scenario.Fill(family, v)))]);
 
 		var description = differing.Length == 0
-			? $"All {this.bag.Scenarios.Count} scenarios pack to the same fill under {family} v2 as under v1."
-			: $"{differing.Length} of {this.bag.Scenarios.Count} scenarios pack to a different fill under "
-				+ $"{family} v2 than under v1. Difference is v2 minus v1, in points.";
+			? $"All {this.bag.Scenarios.Count} scenarios pack to the same fill under {family} {names}."
+			: $"{differing.Length} of {this.bag.Scenarios.Count} scenarios pack to a different fill under at least one "
+				+ $"of {family} {names}.";
 
 		return new ReportSection
 		{
@@ -44,7 +40,4 @@ internal sealed class VersionParityReporter : IReporter
 			Table = differing.Length == 0 ? null : table
 		};
 	}
-
-	private static bool Differs(PackedScenario scenario, string family)
-		=> scenario.Fill(family, Algorithms.Previous) != scenario.Fill(family, Algorithms.Shipped);
 }

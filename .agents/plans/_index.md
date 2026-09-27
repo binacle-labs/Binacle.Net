@@ -28,7 +28,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as eight sessions in order - slow runs, their fix, the reruns, the racing and bins drop points, the lib and ViPaq results files, and the results READMEs"
+  description: "Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as five sessions in order - the racing and bins drop points, the lib and ViPaq results files, and the results READMEs"
   state: ready
   waits-on: "the maintainer says when each session starts"
   horizon: next-release
@@ -107,28 +107,36 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just", "tooling/image/**"]
 ```
 
+## Lib
+
+```yaml
+- file: lib/bfd-wfd-v3.md
+  description: "A test-only v3 of BFD and WFD finds a space in one scan instead of a sort - same fill as v2, far faster on the few cases timed; held for more testing before it could ship"
+  state: idea
+  waits-on: "the maintainer - held for more testing"
+  horizon: undecided
+  paths: ["lib/src/Binacle.Lib/Algorithms/**", "lib/src/Binacle.Lib/AlgorithmFactory.cs"]
+- file: lib/pgo-two-speeds.md
+  description: "Some bench processes run slow from start to end because of tiered PGO, and one process per case hides it; a code fix was tried and did not hold"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/src/Binacle.Lib/Algorithms/**", "lib/bench/**", "vipaq/bench/**"]
+- file: lib/versions-pack-the-same.md
+  description: "No test checks that two versions of one heuristic put every item in the same place; the tests and the measure compare status and fill only"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/test/**", "lib/measure/**", "lib/src/Binacle.Lib/Algorithms/**"]
+```
+
 ## Measured-results
 
 ```yaml
-- file: measured-results/01-slow-runs.md
-  description: "Session 1 - some bench runs come out slow at random, a whole process at a time, and no report shows it; find why with a small test, then choose the fix with the maintainer"
-  state: ready
-  waits-on: "the maintainer says when"
-  horizon: undecided
-- file: measured-results/02-fix-slow-runs.md
-  description: "Session 2 - build the slow-run fix chosen in session 1, and prove it with a small run before any long rerun"
-  state: blocked
-  waits-on: "session 1 - the cause and the chosen fix"
-  horizon: undecided
-- file: measured-results/03-reruns.md
-  description: "Session 3 - after the slow-run fix, the maintainer reruns the benches whose times are wrong or suspect, and the session keeps the reports"
-  state: blocked
-  waits-on: "session 2 - the fix, proven by its small run"
-  horizon: undecided
 - file: measured-results/04-racing-drop-point.md
   description: "Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems"
-  state: blocked
-  waits-on: "session 3 - the reruns after the slow-run fix"
+  state: ready
+  waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
   description: "Session 5 - build and run a bins bench that finds where packing many bins at the same time starts to pay, on bins of one size, 2 to 16 bins, 2 to 12 cores; shape agreed, not built"
@@ -138,12 +146,12 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/06-lib-results.md
   description: "Session 6 - decide how the tables get their numbers, then fill the seven lib results files and the two parallel files from the kept runs; the table shapes are in the files, as comments over fake sample tables"
   state: blocked
-  waits-on: "sessions 3 to 5 - the reruns and the two drop points"
+  waits-on: "sessions 4 and 5 - the two drop points"
   horizon: undecided
 - file: measured-results/07-vipaq-results.md
   description: "Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables"
   state: blocked
-  waits-on: "session 6 - how the numbers get in - and session 3 - the ViPaq sample rerun"
+  waits-on: "session 6 - how the numbers get in"
   horizon: undecided
 - file: measured-results/08-results-readmes.md
   description: "Session 8 - shape the summary of lib/results/README.md and vipaq/results/README.md with the maintainer, then write it from the filled results files"

@@ -1,7 +1,7 @@
 ---
 description: Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables
 state: blocked
-waits-on: "session 6 - how the numbers get in - and session 3 - the ViPaq sample rerun"
+waits-on: "session 6 - how the numbers get in"
 horizon: undecided
 paths: ["vipaq/results/**"]
 ---
@@ -34,7 +34,7 @@ One file per question, or per layout and codec; the README combines them.
 Two categories, and no file crosses them: **size** (`measurements/encoded-size/`) feeds `format-size.md` and
 the four codec files; **encoding** (`benchmarks/<run>/encoding/`) feeds `encode-cost.md` and `decode-cost.md`.
 
-The cost files read the sample run kept after session 3.
+The cost files read the kept sample run.
 
 ## Rules particular to ViPaq
 
@@ -68,8 +68,8 @@ Each is the maintainer's to settle, one per turn.
   files say "no columnar protobuf".
 - **Which file owns** "no MessagePack or CBOR" (now in all five size files) and "no earlier format" (now in
   `format-size.md` only).
-- **The one-process gap** is named in `encode-cost.md` but not `decode-cost.md`. After sessions 1 to 3 it may go
-  from both.
+- **The one-process gap** is named in `encode-cost.md` but not `decode-cost.md`. Slow processes are not
+  chased, so the gap stays.
 - **Kind** (real or synthetic) is not in the report; it comes from the pack name.
 
 ## Gaps each file names

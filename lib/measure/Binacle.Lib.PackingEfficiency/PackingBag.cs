@@ -24,7 +24,9 @@ internal static class Algorithms
 {
 	public static readonly string[] Families = ["FFD", "WFD", "BFD"];
 	public const int Shipped = 2;
-	public const int Previous = 1;
+
+	// v3 is test-only; the API cannot run it. FFD has none.
+	public static int[] Versions(string family) => family == "FFD" ? [1, 2] : [1, 2, 3];
 
 	public static string Key(string family, int version) => $"{family}_v{version}";
 }

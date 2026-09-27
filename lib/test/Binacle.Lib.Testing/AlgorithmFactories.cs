@@ -16,9 +16,15 @@ public static class AlgorithmFactories
 	public static TestAlgorithmFactory<IPackingAlgorithm> WFD_v2 = (bin, items)
 		=> new Binacle.Lib.Algorithms.WorstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items);
 
+	public static TestAlgorithmFactory<IPackingAlgorithm> WFD_v3 = (bin, items)
+		=> new Binacle.Lib.Algorithms.WorstFitDecreasing_v3<ScenarioBin, ScenarioItem>(bin, items);
+
 	public static TestAlgorithmFactory<IPackingAlgorithm> BFD_v1 = (bin, items)
 		=> new Binacle.Lib.Algorithms.BestFitDecreasing_v1<ScenarioBin, ScenarioItem>(bin, items);
 	
 	public static TestAlgorithmFactory<IPackingAlgorithm> BFD_v2 = (bin, items)
 		=> new Binacle.Lib.Algorithms.BestFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items);
+
+	public static TestAlgorithmFactory<IPackingAlgorithm> BFD_v3 = (bin, items)
+		=> new Binacle.Lib.Algorithms.BestFitDecreasing_v3<ScenarioBin, ScenarioItem>(bin, items);
 }
