@@ -30,12 +30,11 @@ the bins test waits (the maintainer, 2026-09-25). The threshold benches stay as 
    meaningful amount - what "meaningful" means is the maintainer's. If there is no such point, say so; do not
    force one.
 5. Fix the line in the lib findings record on when racing pays.
-6. The three old racing reports in `lib/results/benchmarks/baseline/racing/` (their classes are gone) may go
-   once this run is kept. The maintainer's call.
-
 `parallel-racing.md` is the maintainer's to shape; session 6 builds it.
 
 ## What the old racing reports say (checked 2026-09-26)
+
+The reports were deleted 2026-09-28; they are in git before that date.
 
 - **The 0.50 "near tie" racing win is a measuring fault.** Its v2 loop row is 656 us against FFD 36 + BFD 294
   run alone; the other four problems' loop is 1.11 to 1.19 times the sum. A normal row would give about 0.96.

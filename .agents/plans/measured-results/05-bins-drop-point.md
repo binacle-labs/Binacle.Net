@@ -38,6 +38,30 @@ stays as the record; the new test changes one thing at a time.
 - 12 x 4 bin counts x 2 algorithms x 2 x 4 core counts = 768 cases: about 1 hour at the short job, 3 to 4 at
   the default one.
 
+## The 12 problems - proposed 2026-09-28, not agreed
+
+The racing 30 cannot find the drop point alone. The old bins grid had parallel winning at about 5 to 18 us per
+bin on 2 bins, 2 to 3 us on 4 bins, 1.5 to 2 us on 7 bins. The smallest of the 30 is 7 us. So five smaller
+real problems come in from the demo samples and custom problems, and seven stay from the racing 30.
+
+Each bin gets the whole item list and, in packing, no bin stops early, so the work per bin is the problem's
+one-bin time. Rows 1 to 5 are estimated from item count; the rest are FFD / BFD from the Full_ reports.
+
+| # | Problem | Items | Time per bin |
+|---|---|---|---|
+| 1 | DemoSample_07_TallItems_40x40x30 | 4 | about 0.4 us |
+| 2 | DemoSample_11_SevenTypes_40x30x30 | 13 | about 1 us |
+| 3 | DemoSample_18_FourBinsBfdFullyPacks_45x35x30 | 20 | about 2 us |
+| 4 | DemoSample_13_TwentyFourCubes_40x30x25 | 24 | about 2.5 us |
+| 5 | Simple_5x5x5-50_FitIn_50x50x50 | 50 | about 4 us |
+| 6 | th1_72 | 74 | 7 / 22 us |
+| 7 | th4_22 | 111 | 16 / 60 us |
+| 8 | th1_44 | 142 | 22 / 48 us |
+| 9 | th3_67 | 169 | 33 / 61 us |
+| 10 | th4_84 | 125 | 23 / 201 us |
+| 11 | th7_56 | 162 | 39 / 145 us |
+| 12 | th1_65 | 476 | 77 / 665 us |
+
 ## Proposed, not agreed
 
 - **A mix test after it:** same problems, bin count and cores; only the bin sizes change - all one size, or
