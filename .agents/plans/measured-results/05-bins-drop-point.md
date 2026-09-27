@@ -9,12 +9,12 @@ paths: ["lib/bench/Binacle.Lib.Benchmarks.Threshold/**", "lib/bench/Binacle.Lib.
 # 5 - The bins drop point
 
 Same aim as the racing drop point, for `ParallelBinProcessor`: where packing the bins at the same time starts to
-win, and the point from which it always wins by a meaningful amount. Built after racing (the maintainer,
-2026-09-25).
+win, and the point from which it always wins by a meaningful amount. Built after racing - **decided (the
+maintainer, 2026-09-25):** "lets make the algo race first".
 
 ## What the session does
 
-1. Pick the 12 problems with the maintainer.
+1. Agree the 12 problems with the maintainer.
 2. Build the bins bench, pinned as the racing bench is.
 3. A small run first; then the maintainer runs the full one and the session keeps it.
 4. Read the drop point, or say there is none.
@@ -28,17 +28,21 @@ of that grid changed two things at once. One more bin was also a taller bin (60x
 59 items the ladder's total no longer fits the small bins, so some bins stop early and some do not. The grid
 stays as the record; the new test changes one thing at a time.
 
-## The shape agreed (2026-09-25)
+## The shape - leaning yes
+
+**(the maintainer, 2026-09-25):** "yes i think yes... but it does worry me how we can test reliably with
+different bin shapes when i failed with the ladder".
 
 - FFD and BFD, loop against parallel, v2 only, packing.
 - On 2, 4, 8 and 12 cores, pinned as the racing bench is.
 - 2, 4, 8 and 16 bins, **all one size**: the problem's own bin, copied. No 1 bin: the rule returns loop. 16 is
   more bins than cores.
-- Over 12 of the racing bench's 30 problems, so a racing and a bins result sit side by side. Which 12 is not picked.
+- Over 12 problems. **Suggested (agent, 2026-09-25):** 12 of the racing 30, so the two results sit side by
+  side. Dropped by the proposal below: the 30 are too big to show where parallel starts to win.
 - 12 x 4 bin counts x 2 algorithms x 2 x 4 core counts = 768 cases: about 1 hour at the short job, 3 to 4 at
   the default one.
 
-## The 12 problems - proposed 2026-09-28, not agreed
+## The 12 problems - suggested (agent, 2026-09-28), not agreed
 
 The racing 30 cannot find the drop point alone. The old bins grid had parallel winning at about 5 to 18 us per
 bin on 2 bins, 2 to 3 us on 4 bins, 1.5 to 2 us on 7 bins. The smallest of the 30 is 7 us. So five smaller
@@ -62,7 +66,13 @@ one-bin time. Rows 1 to 5 are estimated from item count; the rest are FFD / BFD 
 | 11 | th7_56 | 162 | 39 / 145 us |
 | 12 | th1_65 | 476 | 77 / 665 us |
 
-## Proposed, not agreed
+## Open - asked by the maintainer, not answered
+
+- **Does the new bins class replace the old bins classes and their kept reports?** He asked on 2026-09-28 why
+  the threshold bench changes, and whether the new is added to the old. The old are `Smoke_Bins_Packing`,
+  `Sample_Bins_Packing`, `Full_Bins_Packing_v1` and `Full_Bins_Packing_v2`.
+
+## Suggested (agent), not agreed
 
 - **A mix test after it:** same problems, bin count and cores; only the bin sizes change - all one size, or
   mixed (full, three-quarters, half). Parallel pays for the slowest bin, loop for all of them, so a mix comes

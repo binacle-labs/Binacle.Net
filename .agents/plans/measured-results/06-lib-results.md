@@ -24,10 +24,11 @@ typed by hand. Where that program lives and how it runs is open. A script refres
 until 2026-09-26; it was removed before anyone reviewed it. Put the choice to him with an
 example, then build it.
 
-**What the files are for:** the maintainer will write a function that picks the best balance of fill and cost
-for everyday use, with the caller keeping the choice. `packing-efficiency-stats.md` gives the fill half,
-`algorithm-performance.md` the time half; the README puts them side by side. Neither argues for dropping an
-option.
+**What the files are for** (the maintainer, 2026-09-26: "i aim to cvreate a functio nthat will optiomaly
+determine...but i also aim to provide choice"): he will write a function that picks the best balance of fill
+and cost for everyday use, with the caller keeping the choice. `packing-efficiency-stats.md` gives the fill
+half, `algorithm-performance.md` the time half; the README puts them side by side. Neither argues for dropping
+an option.
 
 ## The raw files, by category
 
@@ -52,7 +53,8 @@ Each is the maintainer's to settle, one per turn.
 - **It divides numbers from three reports**, run hours apart. That is weaker than a ratio taken inside one class.
 - **The version files** have no loss count, though a per-problem maximum above 1.00× shows single losses happen.
 - **`result-selection.md`** has no loss count, though its averages mix scenarios on both sides of 1.00×.
-- **`version-parity.md`** is a raw file of the fill kind, but no table reads it. It stays as a correctness check.
+- **`version-parity.md`** is a raw file of the fill kind, but no table reads it. Suggested: keep it as a
+  correctness check.
 - **Headroom:** Ceiling and Best of three per set are taken as means; the shape did not say.
 - **"Best or tied"** is counted from the Best column, which holds exact values, not from the rounded fills.
 - **`packing-efficiency.md` never says its fills are v2**; only the code does (`Algorithms.Shipped = 2`).
@@ -60,8 +62,8 @@ Each is the maintainer's to settle, one per turn.
   37 and 59.
 - **`packing-time-by-size.md`:** "do FFD and WFD spread differently inside a band" has no test yet.
 - **The time files name no gaps yet.**
-- **Unused raw columns:** Items and Margin in `packing-efficiency.md`, and the v1 rows of the ladder. They cost
-  nothing and stay unless he says.
+- **Unused raw columns:** Items and Margin in `packing-efficiency.md`, and the v1 rows of the ladder. Suggested:
+  keep them; they cost nothing.
 
 ## Facts the words can use
 

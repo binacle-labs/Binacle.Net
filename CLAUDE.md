@@ -2,7 +2,7 @@
 
 All guidance lives in `.agents/`, fetched on demand. This is the door and stays minimal on purpose.
 
-## Four rules that always apply
+## Six rules that always apply
 
 - **Never commit, stage or push.** Leave changes in the working tree. The human commits.
 - **Never edit anything under `sites/`.** Every published site lives there and goes to the internet; each is
@@ -11,6 +11,9 @@ All guidance lives in `.agents/`, fetched on demand. This is the door and stays 
   This file is the only exception. A path a tool operates on is an operand, not a pointer. The full matrix of
   what may reference what is `.agents/rules/who-references-whom.md`.
 - **Plain, short language everywhere** - chat, docs, comments. Cut any word that does not change the meaning.
+- **Only the maintainer decides.** A plan line is a suggestion unless it quotes him with a date. Never write
+  "decided", "locked" or "agreed" on his behalf.
+- **Keep a session small.** One session, one step. Tell him to start fresh before the session gets big.
 
 ## Fetch the rest when it applies
 

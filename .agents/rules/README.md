@@ -17,6 +17,8 @@ files hold the carve-outs.
 | [never-edit-published-sites](never-edit-published-sites.md) | Never edit anything under `sites/`. One carve-out, for security fixes to sample files. |
 | [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the four exceptions. |
 | [talking-to-the-maintainer](talking-to-the-maintainer.md) | In chat: plain English, no flattery, say when he is wrong. A question gets an answer, not work. |
+| [only-the-maintainer-decides](only-the-maintainer-decides.md) | A plan holds suggestions. "Decided" needs his words, quoted and dated. |
+| [keep-a-session-small](keep-a-session-small.md) | One session, one step. Warn him to start fresh before the session gets big. |
 
 ## Read when the trigger fires
 

@@ -43,8 +43,8 @@ FFD,WFD,BFD ratio of F2a, may move on a rerun - and with them "BFD crosses about
 too. With it on, BFD v2 had 2 slow processes in 40 on the racing bench. BFD v3, which has no sort in its loop,
 runs slow on 16 and 19 of 40 processes, 1.2× to 1.4× slower (thpack3_29: 32.5 or 41 us; thpack6_39: 24 or 29.5 us).
 So the space sort is not the whole cause, and which code PGO tunes badly is not known. PGO off is no fix: every
-time is 1.5× to 2× slower and allocates more. The maintainer set the spread aside on 2026-09-28: v3's speed gain
-is far larger than it.
+time is 1.5× to 2× slower and allocates more. The maintainer set it aside on 2026-09-28: "we wont chase that
+now its too much".
 
 ## F5 — test-only v3 of BFD and WFD: one scan instead of a sort (2026-09-27)
 

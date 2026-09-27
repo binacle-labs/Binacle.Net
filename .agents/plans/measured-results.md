@@ -41,11 +41,16 @@ were cut to an index.
 
 ## The results files - rules
 
-Settled with the maintainer 2026-09-25 and 2026-09-26. Both slices keep them.
+Both slices keep them. A line that quotes the maintainer is his; the rest are suggestions.
 
-**What they are for.** They show the maintainer how the work is going and give him data to decide on: v2
-against v1 says whether the direction is sound, a drop point feeds a cost function, a gap says what to
-improve. A file that drives no decision and shows no progress is a candidate to cut.
+**What they are for** (the maintainer, 2026-09-25: "iot needs to show me what we are doing has value and
+benefit"). They show him how the work is going and give him data to decide on: v2 against v1 says whether the
+direction is sound, a drop point feeds a cost function, a gap says what to improve. A file that drives no
+decision and shows no progress is a candidate to cut.
+
+The layout (the maintainer, 2026-09-26: "so the structure is this... /results/benchmarks/<rawresults>
+/results/measurements/<raw results> /results/<derived per file raw result> /results/README.md combination of
+derived files"):
 
 | Path | Holds |
 |---|---|
@@ -54,27 +59,34 @@ improve. A file that drives no decision and shows no progress is a candidate to 
 | `<slice>/results/<file>.md` | one file per question, read from the raw files |
 | `<slice>/results/README.md` | the index, and a summary written last |
 
-- **Each slice stays apart.** No file reads the other slice's numbers.
+- **Each slice stays apart** ("each result needs to be isolated ideally", 2026-09-26). No file reads the other
+  slice's numbers.
 - **A file reads one kind of raw result**: a slice's measurements, or one bench family (lib: algorithms,
   result-selection, scaling, racing, threshold; ViPaq: encoding). Inputs - the problems under `shared/data/`,
   the ladder in `LadderGenerator.cs` - are not results; any file may read them.
-- **Never average two algorithms together.** A race - the better of its members on each problem - is an option
-  of its own, not an average, and stays.
-- **A difference is "×" the baseline**: v2 at 0.46× of v1. A share of a whole may be a percentage.
-- **A ratio is per problem, then averaged.** Never mean A ÷ mean B. BenchmarkDotNet's own Ratio is used where one
-  run holds both rows.
-- **A loss must show.** Where above 1.00× is the bad side the average goes bold, and where an average can hide
-  single losses a count column says how many.
+- **Never average two algorithms together** ("no mixing algorithms.... separate etiher more table or more
+  ggiles", 2026-09-26). Suggested: a race - the better of its members on each problem - is an option of its
+  own, not an average, and stays.
+- **A difference is "×" the baseline**: v2 at 0.46× of v1 ("i prefer 0.46", 2026-09-25). A share of a whole
+  may be a percentage.
+- **A ratio is per problem, then averaged** ("setavg(diff(v1, v2)) and not diff( setavg(v1), setavg(v2))",
+  2026-09-25). Suggested: BenchmarkDotNet's own Ratio where one run holds both rows.
+- **A loss must show** - leaning yes, for ViPaq ("yes both.,,, i think for now", 2026-09-26). Where above
+  1.00× is the bad side the average goes bold, and where an average can hide single losses a count column says
+  how many.
 - **Every cell one number, every column labelled.**
 - **Each file ends with its gaps and open questions.**
-- **v2 everywhere, except where v1 against v2 is the question.**
+- **v2 everywhere, except where v1 against v2 is the question** ("the canonical is v2 everywhere else...
+  unless we do a version comparison", 2026-09-25).
 - **A time holds on one machine and runtime only; the file says which.** Ratios, memory, fill and size compare
   anywhere.
-- **The comment above each table is its spec**, and the sample table under it shows the shape. Filling a table
-  replaces the fake numbers; the comment stays. The line "Every number in this file is fake" goes when the last
-  table of the file is filled.
+- **The comment above each table is its spec**, and the sample table under it shows the shape ("the
+  placegolder should be sample tables with face looking data so i review the sahe easitly", 2026-09-26).
+  Filling a table replaces the fake numbers; the comment stays. The line "Every number in this file is fake"
+  goes when the last table of the file is filled.
 - **The README computes nothing.** Every number in it names the file it came from.
-- **Nothing runs while a bench runs** - it disturbs the run.
+- **Nothing runs while a bench runs** - it disturbs the run ("i am waiting on the benchmark to complete so
+  dont urn anything", 2026-09-26).
 
 ## The sessions
 
@@ -89,9 +101,9 @@ improve. A file that drives no decision and shows no progress is a candidate to 
 The order comes from the work. The results files read the kept runs, racing and bins included. The READMEs
 read the results files. The sessions keep their numbers 4 to 8.
 
-**Slow processes are not chased here** (the maintainer, 2026-09-28). Some kept BFD times may be a process that
-ran slow from start to end; nothing is rerun for it. Every results file that reads a BFD time names that as a
-gap.
+**Slow processes are not chased here** (the maintainer, 2026-09-28: "we wont chase that now its too much").
+Some kept BFD times may be a process that ran slow from start to end. Suggested: every results file that reads
+a BFD time names that as a gap.
 
 Kept as ideas, outside this plan: MessagePack, CBOR and a columnar protobuf; a results story for others; a home
 for comparisons across slices; slow processes under tiered PGO; the test-only v3 of BFD and WFD.

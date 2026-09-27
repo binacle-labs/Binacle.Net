@@ -14,7 +14,7 @@ reviewable. Read this first to know where things are.
 | `memory/` | Durable "why" with no home in a doc or plan — gotchas, settled decisions, conventions. | Scan `memory/_index.md` at session start. Add a fact only if no doc/plan fits (`memory/README.md` says how). |
 | `release-v<version>.md` (+ companion) | The per-version release set, at root: the release plan, plus `post-release-v<version>.md` (right-after-release work). The GitHub release body is not here — it is the `## [Unreleased]` section of `CHANGELOG.md` at the repo root, which the release workflow extracts. | When cutting a release. The plan is deleted once the version is out; the post-release list goes when its own items are done. |
 
-Nothing here is loaded up front. `CLAUDE.md` carries the four always-on rules and points at this file; you
+Nothing here is loaded up front. `CLAUDE.md` carries the always-on rules and points at this file; you
 fetch the rest on demand.
 
 **Every file declares when it is needed, so you can decide without opening it.** The front matter is the fetch

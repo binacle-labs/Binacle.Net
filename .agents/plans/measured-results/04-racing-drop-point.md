@@ -1,5 +1,5 @@
 ---
-description: Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems
+description: Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 Bischoff problems
 state: ready
 waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
 horizon: undecided
@@ -14,16 +14,18 @@ check - slow processes - and is not kept.
 ## Why
 
 Loop against parallel exists to find the drop point: where parallel starts to win, and the point from which it
-always wins by a meaningful amount. A cost function then picks loop or parallel at run time. Racing goes first;
-the bins test waits (the maintainer, 2026-09-25). The threshold benches stay as they are.
+always wins by a meaningful amount. A cost function then picks loop or parallel at run time.
+
+**Decided (the maintainer, 2026-09-25):** "lets make the algo race first and have that run... disable the rest
+and we decide later".
 
 ## What the session does
 
 1. The maintainer runs `just bench lib-racing-cores precise` - 840 cases, about 3.5 hours.
-2. Check it before keeping it. FFD+BFD Loop should be about 1.05× the sum of FFD and BFD alone, and the
-   three-algorithm Loop about 1.1× its three alone rows, on every problem and core count. The same algorithm
-   alone should not jump more than 1.3× between core counts. Slow processes are not fixed, so this may fail;
-   if it does, stop and show the maintainer which rows.
+2. Check it before keeping it. **Suggested (agent, 2026-09-26) pass marks:** FFD+BFD Loop about 1.05× the sum
+   of FFD and BFD alone, the three-algorithm Loop about 1.1× its three alone rows, on every problem and core
+   count; the same algorithm alone jumps no more than 1.3× between core counts. Slow processes are not fixed,
+   so this may fail; if it does, stop and show the maintainer which rows.
 3. Keep the report as `lib/results/benchmarks/<baseline or date>/racing/Cores_Packing.md`, by the rules in
    `lib/results/benchmarks/README.md`.
 4. Read the drop point: where Parallel starts to win, and whether from some point it always wins by a
@@ -58,13 +60,17 @@ The reports were deleted 2026-09-28; they are in git before that date.
 - Over the 30 problems below. Per core count: 30 x (2 races x 2 + 3 alone) = 210 cases; 840 for four core
   counts - about 70 minutes at the short job, 3.5 hours at the default job.
 
-## Settled with the maintainer, 2026-09-26
+## Decided
 
-- Class `Cores_Packing`, recipe `lib-racing-cores`: short job by default, `precise` for the default job,
-  `[confirm]` with 840 cases.
+- **(the maintainer, 2026-09-25):** class `Cores_Packing`, recipe `lib-racing-cores` - "yes but disabke the
+  rest". Short job by default, `precise` for the default job, `[confirm]` with 840 cases.
+- **(the maintainer, 2026-09-25):** the 30 problems live in `CoresSet.cs` - "yes, CoresSet".
+- **(the maintainer, 2026-09-25):** each problem is named like "th1_7 (126i/3t)".
+
+## Built
+
 - The alone rows sit in the same class. Each block is a `[BenchmarkCategory]`, and the orderer's group key
   takes the category as well as the job, so each race has its own Loop baseline and the alone rows have none.
-- The 30 problems live in `CoresSet.cs`.
 - The old racing classes, their recipes, `BenchmarkBase` and `RacingSet` are gone; only `Cores_Packing` runs.
 - Each case pins every thread itself before the check: on Linux BDN's mask reaches only
   the main thread, so a check alone would fail every case.
@@ -82,7 +88,7 @@ The reports were deleted 2026-09-28; they are in git before that date.
 - In `[GlobalSetup]`, fail the case if any thread escaped the mask or `ProcessorCount` does not match it.
 - A pinned run is kinder than a real small VM: the OS and the BDN host run on the spare CPUs.
 
-## The 30 problems - locked 2026-09-26
+## The 30 problems - suggested by an agent, not agreed
 
 Picked by an agent from the v2 times in `lib/results/benchmarks/baseline/algorithms/Full_*_Packing.md`, spread by
 FFD+BFD time from the smallest job to the largest, denser where the crossover should be, with an even and a

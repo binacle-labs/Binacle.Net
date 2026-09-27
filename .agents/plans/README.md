@@ -27,6 +27,8 @@ horizon: now | next-release | near | future | long | on-demand | undecided
 
 **There is no `doing` state.** The working tree says that.
 
+**Everything in a plan is a suggestion until the maintainer says yes to it.** The rules say how to mark each.
+
 **A state is not a priority and not an order** — those are the maintainer's, and an agent never writes one in.
 If you have to pick a state to make a file legible, say so in `waits-on:` so it can be struck.
 
@@ -58,7 +60,7 @@ index says how far out everything is. The body of the plan still carries no timi
   the release file if it gates a release.
 - **A plan too big for one file becomes a topic folder** - the maintainer grants it, case by case. An
   orchestrator file at the root points at the folder's shape files and one file per step; a step points at its
-  shape. It is the one place a plan may point at a plan; the reference rule names it.
+  shape. Each step is work one session can finish. It is the one place a plan may point at a plan; the reference rule names it.
 - **One master plan per topic**, holding what is done and what is left. When a review turns up issues, put them
   in **one findings file** beside it; a finding lives there until it is fixed, then moves into the master and is
   deleted from findings. Delete findings when it's empty. Don't let a topic sprawl into four overlapping plans,

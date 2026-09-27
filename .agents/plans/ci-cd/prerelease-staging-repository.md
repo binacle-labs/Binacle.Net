@@ -43,7 +43,8 @@ short sha: `features/release_v3-1` becomes `release-v3-1-<sha>`. A Docker tag ta
   to 4 read as tampered - they were signed under a tag ref. A prerelease from `main` is fine; a branch build
   is not. Either the branch build is unsigned and says so, or the run summary prints the identity that does
   verify it. **Do not publish one command that fails on half the images it appears to describe.**
-- **Staging images are never deleted - answered by the maintainer on 2026-09-14.** GHCR holds `3.0.0-beta.3`
+- **Staging images are never deleted - not confirmed.** Written on 2026-09-14 as the maintainer's answer; no
+  record of him saying it. Ask him. GHCR holds `3.0.0-beta.3`
   to `-beta.8`, `3.0.0`, a stale `latest` and `3.1.0-beta.1`, read the same day, and they stay. Nothing names
   them and nothing costs while they sit there. A branch build per dispatch changes the rate, and that is the
   one thing that could reopen it.

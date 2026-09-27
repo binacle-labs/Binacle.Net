@@ -298,7 +298,7 @@ while the moves are still being checked.
 
 **The sidebar order landed 2026-09-12**, in all three folders: Quick Start, Core Concepts, API, Generate a
 Client, Configuration (Basics first inside it), Samples, Integration Guide, ViPaq Protocol, Verifying a
-Release, Release Notes. Its plan, `plans/sites/docs-sidebar-order.md`, is ticked and waits for deletion.
+Release, Release Notes.
 
 **The 3.1.0 release notes are not a step here.** A `## v3.1.0` section at the top of `v3.x/release-notes.md`
 names a date and a link that exist only after the run is green, so on `main` before the tag they would be

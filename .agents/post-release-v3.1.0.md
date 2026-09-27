@@ -146,8 +146,8 @@ version.
 
 **What the beta leaves behind.** `ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` stays on GHCR - a
 prerelease's image stops there since 2026-09-14, `D3`. `beta.1` and `beta.2` have no git tag; from `beta.3`
-on, each has its tag and a GitHub prerelease, amended 2026-09-18. **The image stays there** - the
-maintainer said so on 2026-09-14; nothing deletes a staging image.
+on, each has its tag and a GitHub prerelease, amended 2026-09-18. **The image stays there**; nothing deletes
+a staging image. Whether it should is not confirmed - ask the maintainer.
 
 **Delete this file once the first two lists are clear.** What outlives it goes to the docs and the decision
 ledgers, not here.
