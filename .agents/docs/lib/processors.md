@@ -1,7 +1,7 @@
 ---
 id: lib/processors
 description: IAlgorithmProcessor, IBinProcessor, and IMultiAlgorithmBinProcessor — their factories and which algorithms each execution path uses
-verified: 2026-09-22
+verified: 2026-09-28
 check: Interface names and full Process() signatures, cancellation token included, match lib/src/Binacle.Lib/Abstractions/; the algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the result-selection table matches which selector methods BinacleService actually calls; a grep for the three Parallel* types shows no factory returning one
 also_update:
   - api/service
@@ -57,9 +57,10 @@ All three `Process` methods take the same trailing optional token, and all three
 **The three `Loop` processors** call `ThrowIfCancellationRequested()` at the top of their loop and nowhere
 else — `LoopAlgorithmProcessor`, `LoopBinProcessor` and `LoopMultiAlgorithmBinProcessor`, which are the only
 ones a factory returns. A cancelled token stops the next algorithm or the next bin; it never interrupts a
-packing run in progress. **The `Parallel` variants do not call it at all** — see *Parallel variants* below;
-nothing the API runs reaches them. That is
-deliberate — one bin's run is tens of milliseconds, and tearing it apart mid-run would cost more than it saves.
+packing run in progress. **The `Parallel` variants do not call it**; they pass the token to `Parallel.For`
+through `ParallelOptions`, which stops starting new units once it is cancelled. Nothing the API runs reaches
+them (see *Parallel variants* below). One bin's run is short - microseconds on the benchmark problems
+(`$lib/findings`) - so stopping it mid-run would save almost nothing.
 
 ## LoopAlgorithmProcessor
 
@@ -107,7 +108,7 @@ below. Pass the real counts anyway; the day a threshold lands, every call site i
 | `AlgorithmProcessorFactory` (single bin, auto) | FFD + WFD + BFD |
 | `BinProcessorFactory.CreateMultiAlgorithm` (multi bin, auto) | FFD + BFD |
 
-WFD is excluded from the multi-bin path. This is intentional.
+WFD is left out of the multi-bin path. Why is in `$lib/decisions#D1`.
 
 ## Diagnostics
 
@@ -143,6 +144,7 @@ benchmarks that measure them against the `Loop` versions - `lib/bench/Binacle.Li
 algorithm processor, `lib/bench/Binacle.Lib.Benchmarks.Threshold` for both - and by one
 cancellation test in `lib/test/Binacle.Lib.UnitTests`.
 
-**`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — checked 2026-09-04, the only file
-that names it is its own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be wired in is an open question with measured
-evidence behind it; do not settle it as a local change.
+**`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — the only file that names it is its
+own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be
+wired in is an open question with measured evidence behind it (`$lib/decisions#O1`); do not settle it as a
+local change.

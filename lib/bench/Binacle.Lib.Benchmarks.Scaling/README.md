@@ -1,7 +1,7 @@
 # Binacle.Lib.Benchmarks.Scaling
 
-How does packing time grow as the order grows? One class, six rows - FFD, WFD and BFD in v1 and v2 - run over
-the 11-step item ladder in `LadderGenerator`, from 3 items to 79. The bin is the largest one
+How does packing time grow as the order grows? One class; the rows are FFD, WFD and BFD in v1 and v2, run over
+the item ladder in `LadderGenerator`, from 3 items to 79. The bin is the largest one
 in that provider and never changes, so the item count is the only thing moving.
 
 Read it down the `Items` column: that is the curve. `Ratio` reads across, against FFD v1 at the same item count.
@@ -16,7 +16,7 @@ Read it down the `Items` column: that is the curve. `Ratio` reads across, agains
 ## 🛠️ How you use it
 
 ```
-just bench lib-scaling          # 66 cases at the default job
+just bench lib-scaling          # the default job
 just bench lib-scaling quick    # the same at the short job
 ```
 

@@ -1,5 +1,5 @@
 ---
-name: v3-frozen
+name: api-v3-frozen
 description: v3 API is frozen — never modify it; all new endpoints and contract work go in v4 only
 type: convention
 when: changing anything under api/src/Binacle.Net/v3

@@ -12,9 +12,11 @@ paths:
 Why the API is shaped the way it is where the shape is not obvious from the code. What it *does* is `$api` and
 the docs under it; this file is the reasoning, so a later session does not undo a deliberate choice.
 
-## Locked
+## Decided
 
 ### D1 — a module-off document must carry no `429`, and the metadata is what guarantees it
+
+**Not confirmed** - no quote from the maintainer on record.
 
 `RateLimiterResponseOperationTransformer` documents `429 Too Many Requests` when the operation carries
 `[EnableRateLimiting]`, and that single check is enough because **only `AddServiceModule` ever attaches it**.
@@ -56,6 +58,8 @@ the `429`; regenerating them takes it out and returns the v3 document to the sha
 carrying the auth paths and the `429` together. Do not approximate it by loosening this one.
 
 ### D2 — the API sends no HSTS header, and TLS is the proxy's job
+
+**Not confirmed** - no quote from the maintainer on record.
 
 **`UseHsts()` was deleted from `UseUIModule` on 2026-08-22.** Nothing in the API sends
 `Strict-Transport-Security` now, and nothing should add it back without reversing this entry.
@@ -110,13 +114,15 @@ into exactly that. Deleting the HSTS half removes one leg of it.
 
 ### D3 — DiagnosticsModule is always on, and the asymmetry is deliberate
 
-**Settled 2026-08-17.** `builder.AddDiagnosticsModule()` and `app.UseDiagnosticsModule()` are unconditional in
+**Not confirmed** - no quote from the maintainer on record.
+
+**Since 2026-08-17.** `builder.AddDiagnosticsModule()` and `app.UseDiagnosticsModule()` are unconditional in
 `Program.cs`, while ServiceModule and UIModule sit behind `Feature.IsEnabled`.
 
 **That is by design and is not evidence of anything.** An earlier draft of the architecture-check work read it
 as a sign a boundary was being crossed, and that argument is withdrawn. **So "every module is registered
-behind a feature check" is not a rule anyone should write** — it would be red on a decision that has been
-taken.
+behind a feature check" is not a rule anyone should write** — it would be red on the choice this entry
+records.
 
 **`IOptionalDependency<T>` is still doing real work**, which is a separate thing. The module is always
 registered; the packing log processor inside it is not — `ModuleDefinition.cs` registers that only when its
@@ -125,7 +131,9 @@ that abstraction covers.
 
 ### D4 — an unknown enum answers with the error a missing one gives, keyed the same way
 
-**Settled 2026-08-27.** A value the enum does not have is refused during binding, and the 422 it produces
+**Not confirmed** - no quote from the maintainer on record.
+
+**Since 2026-08-27.** A value the enum does not have is refused during binding, and the 422 it produces
 carries the same key and the same message the validator produces when the field is absent.
 
 **Refusing it is the first half.** Reading an unknown value as null would make it indistinguishable from
@@ -158,6 +166,8 @@ added, without anyone remembering to add a test. The integration suites assert t
 status, because the status was right while the key was wrong.
 
 ### D5 — the shipped image calls the experimental v4 API, and that is accepted
+
+**Decided (the maintainer, 2026-09-09):** "we do a gull rebuild from v3 to v4" (answering: move the demo UI to v4)
 
 **One caller ships in the image. Until 2026-09-10 there were two.**
 
@@ -199,6 +209,8 @@ deliberate v3 choice rather than as a stopgap. That rewrite landed as D6.
 entirely.
 
 ### D6 — the instance page renders its presets from a startup snapshot, not a live provider
+
+**Decided (the maintainer, 2026-09-10):** "on presets  we go route A" (answering: (a) fill the presets once at startup, or (c) a live provider)
 
 **Decided 2026-09-10.** `_js/instance.js` fetched `GET /api/v4/presets` from the browser and built the table
 in DOM calls. It now renders server-side and the file is deleted, along with its webpack entry and its script

@@ -1,7 +1,7 @@
 ---
 id: lib/tests
-description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the five bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-27
+description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
+verified: 2026-09-28
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -18,7 +18,7 @@ paths:
 # Lib Tests
 
 Two projects under `lib/test/`, one of them a support library rather than a suite, plus the measure project
-in `lib/measure/` and the five bench projects in `lib/bench/`. Algorithm scenario data
+in `lib/measure/` and the bench projects in `lib/bench/`. Algorithm scenario data
 comes from the shared `Binacle.Data` project — see shared (`$shared`); the harness code every lib suite
 shares comes from `Binacle.Lib.Testing`, below. The **result-selection** fixtures come from this
 slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection` under the manifest prefix
@@ -43,7 +43,7 @@ The harness code the unit tests, the measure project and the bench projects shar
 does not reference it). `Binacle.Lib` grants it friend access, because
 it constructs the internal algorithm classes.
 
-- `AlgorithmFactories.cs` defines eight `TestAlgorithmFactory<IPackingAlgorithm>` statics — `FFD_v1/_v2`,
+- `AlgorithmFactories.cs` defines one `TestAlgorithmFactory<IPackingAlgorithm>` static per version — `FFD_v1/_v2`,
   `WFD_v1/_v2/_v3`, `BFD_v1/_v2/_v3` — each constructing the algorithm directly
   (`new FirstFitDecreasing_v2<ScenarioBin, ScenarioItem>(bin, items)`), **not** through `IAlgorithmFactory`/DI.
   This keeps every version (including v1) under test without coupling it to the production factory.
@@ -53,9 +53,9 @@ it constructs the internal algorithm classes.
   (**not** on `ScenarioResult`, which is the map). The `AlgorithmResult` one picks the packing or the fitting
   expected status by `result.AlgorithmOperation`, then throws on mismatch. `OperationResultExtensions` holds
   the volume and count totals they compare against.
-- The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the four
+- The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the
   smoke scenarios by name: `full bin, one type`, `small order`, `typical container`, `many item types`),
-  `SampleSet` (30 Bischoff problems, name `<category> (<id>)`), `CoresSet` (30 Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
+  `SampleSet` (picked Bischoff problems, name `<category> (<id>)`), `CoresSet` (Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
   e.g. `th1_72 (74i/3t)`).
 - The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
   and `LadderGenerator` (the bin and item ladders the threshold and scaling projects climb).
@@ -67,7 +67,7 @@ Keeps its own `AssertionMethodAttribute`, the Sonar S2699 marker; ViPaq's unit t
 Both fixtures split arrange, act and assert into separate members, so a test body shows all three steps
 rather than handing them to one helper.
 
-`CommonTestingFixture` holds all six factories in `AlgorithmsUnderTest[]` and exposes:
+`CommonTestingFixture` holds every factory in `AlgorithmsUnderTest[]` and exposes:
 
 ```csharp
 Scenario GetScenarioByName(string scenarioName)
@@ -97,7 +97,7 @@ this.Fixture.AssertResult(testScenario, result);
 ```
 
 Test classes: `FittingBischoffSuiteTests`, `FittingCustomProblemsTests`, `PackingBischoffSuiteTests`,
-`PackingCustomProblemsTests`, `PackingDemoSamplesTests` (each a `[Theory]` × `[MemberData]` over all eight versions), plus `CreationTests`,
+`PackingCustomProblemsTests`, `PackingDemoSamplesTests` (each a `[Theory]` × `[MemberData]` over every version), plus `CreationTests`,
 `SanityTests`, `ResultSelectionTests`, `BinProcessingCancellationTests`.
 
 `ResultSelectionTestingFixture`:
@@ -116,8 +116,8 @@ is a single comparison, so the test makes it itself with `selected.ShouldBe(scen
 
 ## Binacle.Lib.PackingEfficiency
 
-Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs the 700 Bischoff-suite scenarios
-with all eight algorithm versions once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
+Console host (not xUnit), in `lib/measure/`. `PackingRunner` (an `IRunner`) packs every Bischoff-suite scenario
+with every algorithm version once and fills `PackingBag`; two `IReporter`s read the bag and each writes one
 file under `lib/results/measurements/` through `Binacle.Reporting`'s `Measure` + `MarkdownFileWriter`: `PackingEfficiencyReporter` (`packing-efficiency.md`, one row per scenario with
 the shipped fills, best and margin), `VersionParityReporter` (`version-parity.md`, one column per version, only rows
 where any version differs). `ResultFiles` holds the two `ResultFile`s and the shared header sentence. Nothing else under `lib/results/` is
@@ -129,11 +129,11 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
 `[GlobalSetup]` through the abstract `Load`, and `Run(factory)` executes it with the abstract `Operation`.
 
 - `Smoke_<FFD|WFD|BFD>_<Packing|Fitting>` (`SmokeBase`): rows `v1` (baseline) and `v2`, the column from
-  `[ParamsSource]` over `SmokeSet.Names`. 48 cases, `short` job.
+  `[ParamsSource]` over `SmokeSet.Names`. `short` job.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
-  `SampleSet.Names`. 360 cases, default job, `short` with `quick`.
+  `SampleSet.Names`. Default job, `short` with `quick`.
 - `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.DataProvider.Names`,
-  all 700. 8,400 cases, `short` job, default with `precise`.
+  every Bischoff problem. `short` job, default with `precise`.
 
 Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<Tier>_*'`. Every `v1` method carries the deleted-with-v1 comment.
 
@@ -143,17 +143,18 @@ In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on 2
 `Cores_Packing` names the lib's **internal** `AlgorithmFactory_v2()`
 (`lib/src/Binacle.Lib/AlgorithmFactories/`), so `Binacle.Lib` grants the project friend access.
 
-`Cores_Packing` is the one class that runs. v2, the column over `CoresSet.Names`, seven rows in three
+`Cores_Packing` is the one class that runs. v2, the column over `CoresSet.Names`, the rows in three
 `[BenchmarkCategory]` blocks: `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline)
 and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
-baseline, so their Ratio is `?`. 30 x 7 x 4 core counts = 840 cases, `short` job, default with `precise`.
+baseline, so their Ratio is `?`. `short` job, default with `precise`.
 `[MemoryDiagnoser]`.
 
-The core counts are four BDN jobs, built in `CoreJobs`. Each sets the affinity mask to the first N CPUs **and**
+Each core count is a BDN job, built in `CoreJobs`. Each sets the affinity mask to the first N CPUs **and**
 `DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads its CPU count once at start-up.
 BDN adds a CLI `--job` beside declared jobs instead of applying it, so `Program.cs` takes `--job` out of the
-args and builds the four jobs from it; the recipe passes it as every other recipe does. The report has a
-`Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still says 12 CPUs.
+args and builds the core jobs from it; the recipe passes it as every other recipe does. The report has a
+`Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still shows every CPU the
+machine has.
 
 `CorePinning.PinAndCheck`, first in `[GlobalSetup]`, is Linux only. On Linux BDN's pin (`sched_setaffinity`
 on the pid) reaches only the main thread, so it pins every thread in `/proc/self/task` to the mask, then fails
@@ -165,15 +166,14 @@ real small VM: the OS and the BDN host run on the spare CPUs.
 In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per selector, `[MemoryDiagnoser]`, rows
 `v1` (baseline) and `v2`, the scenario name as the column from `[ParamsSource]` over the set's
 `DataProvider.Names`, aliased as `<Set>Data` because the bench class already carries the set's name. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
-abstract `Load`, which each class points at its own set, and `Run(strategy)`. 11 scenarios, 22 cases, always
-the `short` job.
+abstract `Load`, which each class points at its own set, and `Run(strategy)`. Always the `short` job.
 
 ## Binacle.Lib.Benchmarks.Scaling
 
 In `lib/bench/`. Packing time against item count, on the item ladder in `LadderGenerator`.
-One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over all 11 steps (3 to 79 items), the bin fixed
-at `MaxSizeBin`, and six rows through the public `AlgorithmFactories` - `FFD_v1` (baseline), `FFD_v2`,
-`WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. 66 cases at the default job, `short` with `quick`.
+One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over every step (3 to 79 items), the bin fixed
+at `MaxSizeBin`, and v1 and v2 of each algorithm as rows, through the public `AlgorithmFactories` - `FFD_v1`
+(baseline), `FFD_v2`, `WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. Default job, `short` with `quick`.
 
 ## Binacle.Lib.Benchmarks.Threshold
 
@@ -184,10 +184,9 @@ own steps:
 
 - `AlgorithmsBase` — `LoopAlgorithmProcessor` / `ParallelAlgorithmProcessor`, param `Set` (`FFD,BFD`,
   `FFD,WFD,BFD`), one bin (`MaxSizeBin`). Classes `Smoke_Algorithms_Packing` (v2; items 3, 47, 67, 79),
-  `Sample_Algorithms_Packing` (v2; all 11 items), `Full_Algorithms_Packing_v1` and `_v2` (all 11 items).
+  `Sample_Algorithms_Packing` (v2; every item step), `Full_Algorithms_Packing_v1` and `_v2` (every item step).
 - `BinsBase` — `LoopBinProcessor` / `ParallelBinProcessor`, param `Algorithm` (FFD, BFD). Classes
-  `Smoke_Bins_Packing` (v2; bins 2, 3, 7), `Sample_Bins_Packing` (v2; items 3, 47, 79; bins 1-7),
-  `Full_Bins_Packing_v1` and `_v2` (all 11 items, bins 1-7).
+  `Smoke_Bins_Packing` (v2; items 3, 47, 67, 79; bins 2, 3, 7), `Sample_Bins_Packing` (v2; items 3, 47, 79; bins 1-7),
+  `Full_Bins_Packing_v1` and `_v2` (every item step, bins 1-7).
 
-Smoke 64 cases at `short`; sample 128 at the default job, `short` with `quick`; full 704 at `short`, default with
-`precise`.
+Smoke at `short`; sample at the default job, `short` with `quick`; full at `short`, default with `precise`.

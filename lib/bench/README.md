@@ -21,7 +21,7 @@ into `baseline/`, a later one into a dated folder.
 just bench                          # every recipe with its cost, in tier order
 just bench lib-algorithms-smoke     # one recipe; a project with tiers has one per tier
 just bench lib-result-selection     # result selection and scaling have one tier and a plain name
-just bench lib-scaling              # the growth curve, 66 cases
+just bench lib-scaling              # the growth curve
 ```
 
 Reports land in the project's `BenchmarkDotNet.Artifacts/results/`, gitignored.

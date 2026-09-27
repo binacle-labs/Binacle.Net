@@ -8,14 +8,14 @@ referenced. Nothing outside the lib slice reads it.
 
 | Path | What it is |
 |---|---|
-| `ResultSelection/BestAlgorithm/`, `BestBin/`, `SmallestBin/` | One `Scenarios` class per set - its keys and every scenario by name |
-| `ResultSelection/ScenarioReader.cs`, `ScenarioCollectionsProvider.cs`, `MultipleScenarioCollectionsProvider.cs` | Read the embedded JSON of a set into scenarios, keyed by file |
+| `ResultSelection/BestAlgorithm/`, `BestBin/`, `SmallestBin/` | One `DataProvider` class per set - its `Keys`, its `Names`, and every scenario by name |
+| `ResultSelection/ScenarioReader.cs`, `ScenarioCollectionsReader.cs`, `MultipleScenarioCollectionsReader.cs` | Read the embedded JSON of a set into scenarios, keyed by file |
 | `ResultSelection/Scenario.cs` | A named case: the candidate results and which one should win |
 | `ResultSelection/Helpers/` | The parsers for the compact `OperationResult` and `AlgorithmInfo` strings |
 
 The set folders you see in the IDE are not on disk. The JSON lives in `../result-selection` and is linked in by
 the csproj; edit it there. A new file is embedded on its own, but is not read until its key is in that set's
-`Scenarios.Keys`.
+`DataProvider.Keys`.
 
 The embedded-resource reader is `Binacle.Data`'s; this project passes its own assembly to it.
 
@@ -24,11 +24,12 @@ The embedded-resource reader is `Binacle.Data`'s; this project passes its own as
 ```csharp
 using Binacle.Lib.Data.ResultSelection.BestBin;
 
-foreach (var scenario in Scenarios.GetScenarios()) { ... }
+foreach (var scenario in DataProvider.All) { ... }
+var one = DataProvider.GetByName("one full winner");
 ```
 
-A file that reads one set imports that set's namespace and writes `Scenarios`. A file that reads several gives
-each an alias: `using BestBin = Binacle.Lib.Data.ResultSelection.BestBin.Scenarios;`.
+A file that reads one set imports that set's namespace and writes `DataProvider`. A file that reads several
+gives each an alias: `using BestBin = Binacle.Lib.Data.ResultSelection.BestBin.DataProvider;`.
 
 ## ⚠️ What will bite you
 

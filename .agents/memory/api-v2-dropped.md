@@ -1,5 +1,5 @@
 ---
-name: v2-dropped
+name: api-v2-dropped
 description: The v2 API does not exist on this branch — only v3 and v4; never add v2 code, docs, or references
 type: convention
 when: touching API versioning, routes or docs

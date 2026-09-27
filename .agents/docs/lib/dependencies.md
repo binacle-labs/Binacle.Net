@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-26
+verified: 2026-09-28
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -11,8 +11,8 @@ paths:
 
 The bin-packing algorithm layer. Which folder may reference which is the repo-wide rule, `$decisions#D9`; this
 file is where the lib projects sit on it. **`lib/src` holds one project, `Binacle.Lib`.** There is no separate
-abstractions assembly: the packing vocabulary that callers need moved down into `shared/src/Binacle.Packing`,
-and the engine interfaces folded into `Binacle.Lib` itself, under its `Abstractions/` folder.
+abstractions assembly: the packing vocabulary that callers need is in `shared/src/Binacle.Packing`, and the
+engine interfaces are in `Binacle.Lib` itself, under its `Abstractions/` folder (`$lib/decisions#D2` says why).
 
 ## The graph
 
@@ -64,12 +64,12 @@ Binacle.Packing ─────────────────────�
 ## Notes
 
 1. **Composition-root rule.** `Binacle.Net` is the only *application* project that references `Binacle.Lib`,
-   and only to wire the packer up. The api `Kernel`, both modules and the integration suite are all off lib
-   entirely — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
+   and only to wire the packer up. The api `Kernel`, the modules and the integration suite reference no lib project
+   directly — what they need is the result vocabulary, and that is `Binacle.Packing` in `shared/src`. Keep it
    that way: a new consumer should take `Binacle.Packing`, not `Binacle.Lib`.
 
-   **Ten projects reference it in total, counted 2026-09-26**, and the other nine are not consumers in the
-   sense this rule is about: the two `lib/test/*` projects, the five `lib/bench/*` projects,
+   The other projects that reference it are not consumers in the sense this rule is about: the `lib/test/*`
+   projects, the `lib/bench/*` projects,
    `lib/measure/Binacle.Lib.PackingEfficiency`, and `vipaq/tools/Binacle.ViPaq.PackedDataGenerator`,
    which is a generator run by hand rather than anything that ships - the one accepted cross-slice reference,
    `$decisions#D9`.
@@ -86,5 +86,4 @@ Binacle.Packing ─────────────────────�
    it does not add an edge, and nothing in `shared` depends on `lib` because of it.
 
 4. **Nothing enforces the abstractions boundary.** Only convention stops an interface under
-   `Binacle.Lib/Abstractions/` naming a concrete algorithm. That is the sharpest candidate rule for a
-   type-level architecture check.
+   `Binacle.Lib/Abstractions/` naming a concrete algorithm (`$lib/decisions#D2`).

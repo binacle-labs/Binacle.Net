@@ -1,7 +1,7 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
-verified: 2026-09-26
+verified: 2026-09-28
 check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are still in CoresSet; Cores_Packing still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
 also_update:
   - lib/decisions
@@ -45,22 +45,6 @@ runs slow on 16 and 19 of 40 processes, 1.2× to 1.4× slower (thpack3_29: 32.5 
 So the space sort is not the whole cause, and which code PGO tunes badly is not known. PGO off is no fix: every
 time is 1.5× to 2× slower and allocates more. The maintainer set it aside on 2026-09-28: "we wont chase that
 now its too much".
-
-## F5 — test-only v3 of BFD and WFD: one scan instead of a sort (2026-09-27)
-
-v3 differs from v2 in one method: it finds the smallest (BFD) or largest (WFD) space that fits in one pass,
-where v2 sorts the free spaces on every placement. It fills all 700 Bischoff problems exactly as v2
-(`lib/results/measurements/version-parity.md`) and allocates the same.
-
-Smoke run, short job, one process per case - v3 time as × v2:
-
-| | full bin, one type | small order | typical container | many item types |
-|---|---|---|---|---|
-| BFD packing | 0.85× | 0.73× | 0.21× | 0.24× |
-| WFD packing | 0.21× | 0.70× | 0.31× | 0.16× |
-
-The gain grows with the number of free spaces. On packing, BFD v3 now takes 0.94× to 1.09× of FFD v2's time and WFD v3 1.07×
-to 1.65×. Four scenarios only; the full run over 700 is not done.
 
 **The scenario names below are the ones the run printed.** The keys in `RacingSet` (deleted 2026-09-26) were
 renamed on 2026-09-22 to say what each problem is for; the problems did not change. Baseline is now
@@ -218,6 +202,22 @@ heavy one.
 
 Not covered: more than 7 bins, item counts above 79, and a machine with fewer cores. Loop-against-Parallel
 only compares on the same core count.
+
+## F5 — test-only v3 of BFD and WFD: one scan instead of a sort (2026-09-27)
+
+v3 differs from v2 in one method: it finds the smallest (BFD) or largest (WFD) space that fits in one pass,
+where v2 sorts the free spaces on every placement. It fills all 700 Bischoff problems exactly as v2
+(`lib/results/measurements/version-parity.md`) and allocates the same.
+
+Smoke run, short job, one process per case - v3 time as × v2:
+
+| | full bin, one type | small order | typical container | many item types |
+|---|---|---|---|---|
+| BFD packing | 0.85× | 0.73× | 0.21× | 0.24× |
+| WFD packing | 0.21× | 0.70× | 0.31× | 0.16× |
+
+The gain grows with the number of free spaces. On packing, BFD v3 now takes 0.94× to 1.09× of FFD v2's time and WFD v3 1.07×
+to 1.65×. Four scenarios only; the full run over 700 is not done.
 
 ## Note — the old `MultipleBins` records (November 2025, records deleted)
 

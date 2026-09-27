@@ -1,8 +1,8 @@
 ---
 id: lib
 description: Binacle.Lib — the algorithm layer, the only project in lib/src
-verified: 2026-09-26
-check: Project list and test aliases match the solution
+verified: 2026-09-28
+check: The src project and the lib/data paths match lib/
 also_update:
   - lib/tests
   - shared
@@ -34,18 +34,8 @@ Plus, in this slice: `lib/data/Binacle.Lib.Data` (the result-selection scenario 
 
 ## Related Tests
 
-| Project | Alias | What it covers |
-|---|---|---|
-| `lib/test/Binacle.Lib.UnitTests` | `cs_binacle-lib_unit` | All algorithm versions × all scenarios; result selection strategies |
-| `lib/measure/Binacle.Lib.PackingEfficiency` | (none) | Packing efficiency over every scenario (console runner, not xUnit), written to `lib/results/measurements/` — run via `just measure lib` |
-| `lib/bench/Binacle.Lib.Benchmarks.ResultSelection` | (none) | The three result selectors, v1 against v2 — `just bench lib-result-selection` |
-| `lib/bench/Binacle.Lib.Benchmarks.Algorithms` | (none) | The three algorithms, v1 against v2, in three tiers — `just bench lib-algorithms-smoke|-sample|-full` |
-| `lib/bench/Binacle.Lib.Benchmarks.Racing` | (none) | Loop against Parallel for `Best`'s race, on 2 to 12 cores — `just bench lib-racing-cores` |
-| `lib/bench/Binacle.Lib.Benchmarks.Threshold` | (none) | Loop against Parallel on the item and bin ladders — `just bench lib-threshold-smoke|-sample|-full` |
-| `lib/bench/Binacle.Lib.Benchmarks.Scaling` | (none) | The three algorithms, v1 against v2, up the item ladder — `just bench lib-scaling` |
-
-See Lib Tests (`$lib/tests`) for fixtures and the test projects, and Shared (`$shared`) for the
-scenario data format and providers.
+The test, measure and bench projects, and the recipe that runs each, are in Lib Tests (`$lib/tests`). Shared
+(`$shared`) holds the scenario data format and providers.
 
 ## Notes
 

@@ -30,6 +30,9 @@ Write "decided" only when he said yes to that exact thing. Quote him, with the d
   session too.
 - **Need a decision to go on? Ask him.** Do not pick one and write it down as his.
 
+**Decided is not forever.** Enough new evidence can reopen a decision - but only he reopens it. Bring him the
+evidence; do not change it yourself.
+
 ## When a plan and the maintainer disagree
 
 What he says now wins. Fix the line; do not argue from it. A line with no quote is a suggestion, whoever wrote

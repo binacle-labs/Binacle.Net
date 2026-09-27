@@ -10,7 +10,7 @@ packer shows up as a diff.
 | Path | What it is |
 |---|---|
 | `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/measurements/` |
-| `PackingRunner.cs` | Packs 700 scenarios with eight algorithm versions and fills the bag |
+| `PackingRunner.cs` | Packs every Bischoff scenario with every algorithm version and fills the bag |
 | `PackingBag.cs` | What the runner measured; every reporter reads from here |
 | `ResultFiles.cs` | The two files and the header sentence they open with |
 | `Reporters/` | One class per file: the per-scenario rows, the scenarios where versions differ |

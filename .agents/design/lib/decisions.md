@@ -1,7 +1,7 @@
 ---
 id: lib/decisions
-description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question.
-verified: 2026-09-26
+description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, and the open parallelization question.
+verified: 2026-09-28
 check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/DataProvider.cs and CustomProblems/DataProvider.cs
 also_update:
   - lib/findings
@@ -11,15 +11,20 @@ paths:
 
 # Lib — decisions ledger
 
-Locked decisions and open questions for `lib/src`, with the *why*. Measured evidence lives in `$lib/findings`.
-This file is the "what we settled and why", so a fresh session does not re-litigate it or "fix" a deliberate
+Decisions and open questions for `lib/src`, with the *why*. Measured evidence lives in `$lib/findings`.
+This file is the "what was built and why", so a fresh session does not re-litigate it or "fix" a deliberate
 choice.
+
+**D1 and D4 quote the maintainer.** The other entries under *Locked* record what the code does and the evidence
+for it; treat them as his decision only once he confirms them.
 
 ## Locked
 
 ### D1 — `Algorithm.Best` races a different set depending on the path
 
-**This is deliberate. Do not "align" the two.** The same parameter value means two things, on purpose:
+**Decided (the maintainer, 2026-09-28):** "because it runs many bins i did not deem it worthy running wfd, many
+algorithms x many bins, but this is subject to change if we find something better". Do not "align" the two
+without asking him. The same parameter value means two things:
 
 | `Best` on | Path | Races |
 |---|---|---|
@@ -74,7 +79,7 @@ a build after removal proves that.
 ### D3 — two data hubs, split by who reads the fixtures
 
 Split on 2026-08-13. `shared/data/Binacle.Data` (the shared tests kernel until 2026-09-19) keeps
-the algorithm fixtures, which the api integration suite reads in 25 files as well as the lib tests.
+the algorithm fixtures, which the api integration suite reads as well as the lib tests.
 `lib/data/Binacle.Lib.Data` (the lib tests kernel until 2026-09-20) holds result selection,
 which **nothing outside the lib slice reads**, so its fixtures live in `lib/data` rather than `shared/data`.
 
@@ -104,6 +109,15 @@ data project keeps its own name shape. `Binacle.Lib.Data` reads through it since
 **The manifest prefix names the purpose, not the assembly.** `ResultSelection.<case>.<file>`, following ViPaq's
 `PackedData.<family>.<file>`, so an assembly rename cannot silently break the manifest. A broken manifest name
 fails **silently** — verify with `strings <dll> | grep <prefix>` after any change here.
+
+### D4 — old algorithm versions are kept
+
+**Decided (the maintainer, 2026-09-28):** "old versions are kept. it shows my progress... when i need to start
+improving i copy from the last and iterate on that... until i gained enough evidence thats stable then i
+release it... if and when i decide to delete thats a different topic".
+
+So each version stays in `lib/src/Binacle.Lib/Algorithms/`, the next one starts as a copy of the latest, and it
+ships only once the evidence says it is stable. Deleting a version is a separate call, his.
 
 ## Open
 

@@ -74,7 +74,8 @@ index says how far out everything is. The body of the plan still carries no timi
 
 ## Done when - tick boxes, each with its check
 
-**Every plan ends in a `## Done when` section, and every clause is a checkbox.** Same shape the release set
+**Every plan ends in a `## Done when` section, and every clause is a checkbox.** An `idea` skips it until it is
+picked up (the maintainer, 2026-09-28: "ideas skip done when"). Same shape the release set
 already uses.
 
 ```markdown

@@ -15,9 +15,11 @@ says why, so a later pass does not undo a deliberate choice.
 
 **`sites/www` is not covered here.** It is being built in its own session and owns its own record.
 
-## Locked
+## Decided
 
 ### S1 — the link preview is a square logo and a small card, and the two change together
+
+**Not confirmed** - no quote from the maintainer on record.
 
 Every page on both sites emits `og:image` pointing at `media/logo/binacle-logo-512x512.png`, with
 `twitter:card` set to `summary`.
@@ -33,6 +35,8 @@ wiring is what takes the time — swapping the file later is one line per site.
 
 ### S2 — page first, brand last, separated by ` - `
 
+**Not confirmed** - no quote from the maintainer on record.
+
 `Packing Demo - Binacle.Net`, not `Binacle.Net | Packing Demo`.
 
 **Tabs and search results truncate at the end.** Brand-first makes every tab and every search row open with the
@@ -40,6 +44,8 @@ same characters, so a reader with several open can tell none of them apart. The 
 lead. A page may override the whole string with `seo_title` when the composed one would stutter.
 
 ### S3 — the demo host calls itself Binacle.Net Demo, and `site.title` stays the brand
+
+**Not confirmed** - no quote from the maintainer on record.
 
 `sites/demo/_config.yml` carries both: `title` is `Binacle.Net`, `display_title` is `Binacle.Net Demo`. The
 header bar and the index `h1` use `display_title`; the `<title>` suffix and `og:site_name` use `title`.
@@ -49,6 +55,8 @@ otherwise wear the same name and the nav's exit link off the demo is meaningless
 brand — `Packing Demo - Binacle.Net Demo` stutters, and the page half already says Demo where it matters.
 
 ### S4 — the demo site has no collections at all
+
+**Not confirmed** - no quote from the maintainer on record.
 
 The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser, both
 navs and the JSON-LD block all select on that flag.
@@ -67,6 +75,8 @@ sitemap.
 
 ### S5 — legacy swagger pages keep `nofollow`; every other legacy page gets `follow`
 
+**Not confirmed** - no quote from the maintainer on record.
+
 De-indexed version pages are served `noindex, follow` so their links still lead somewhere worth crawling.
 The swagger pages are the exception and stay `noindex, nofollow`, which is what they already were: a Swagger
 shell has no links a crawler benefits from following.
@@ -75,6 +85,8 @@ shell has no links a crawler benefits from following.
 following links that go nowhere, or dropping `follow` from seventy-four pages that have real ones.
 
 ### S6 — the demo footer carries a version badge and no stars badge
+
+**Not confirmed** - no quote from the maintainer on record.
 
 `sites/demo/_data/footer.yml` fetches one `img.shields.io` badge, for the published image version. The GitHub
 stars badge that sat beside it is gone.
@@ -89,6 +101,8 @@ one on either site.
 
 ### S7 — the demo's way out is Docs in the rail, the website in the top bar, and both in the footer
 
+**Not confirmed** - no quote from the maintainer on record.
+
 Someone who has just watched a box get packed has no path to the documentation or to the product page, and
 leaves through the back button. The exits are in three places on purpose: the left rail carries Docs alone,
 because it is the exit a developer mid-demo actually wants; the top bar carries the website beside the GitHub
@@ -98,6 +112,8 @@ four, because that is where someone who has finished looks.
 **The rail carries one exit, not two, for a measured reason** — the second label overflowed an 80px rail.
 
 ### S8 - quotes are typed straight and the build curls them
+
+**Not confirmed** - no quote from the maintainer on record.
 
 `sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`, and it stays. kramdown
 rewrites a straight `'` or `"` into its curly form when the page is built.
@@ -112,6 +128,8 @@ version folder, not just the current one**, so an older page is typed the same w
 
 ### S9 - a term is separated from its meaning by a colon, on every version
 
+**Not confirmed** - no quote from the maintainer on record.
+
 `` `Enabled` (_boolean_): turns the feature on `` - the colon tight against the term, one space after. It is
 the same list shape on every page of every version, so it gets one character.
 
@@ -125,6 +143,8 @@ two clauses became a full stop, and a dash inside a code block, a sample respons
 was left alone.
 
 ### S10 — the sites publish no CSS source map
+
+**Decided (the maintainer, 2026-09-03):** "no source maps fix this"
 
 **`sourcemap: never` in the `sass:` block of `sites/docs/_config.yml` and `sites/demo/_config.yml`**, set
 2026-09-04.
@@ -150,6 +170,8 @@ code this repository does not build.
 development build, not shipping the map.
 
 ### S11 - one folder per major, the current line at the site root, no common layer
+
+**Decided (the maintainer, 2026-09-11):** "1 ok ... 3 ok 4 ok but an agen will have to change and merge the changelog or mark whats 2.1.x only" (answering: no common layer, the six common pages move into `v3.x`, a selector on every page, `v2.0.x` and `v2.1.x` become one `v2.x`)
 
 **Set by the maintainer on 2026-09-11 and 2026-09-12; landed 2026-09-12** across `ruby/binacle-docs-versions`
 and `sites/docs`. Three rules replaced the old scheme: one folder per major (`v1.x`, `v2.x`, `v3.x`); the
@@ -177,8 +199,10 @@ is copied forward with it; the six moved in with their content merged from the `
 tree, and `generate-a-client`, written after the tag, into `v3.x` alone.
 
 **A closed line is named by what it shipped last, not by its folder - 2026-09-12.** The maintainer's first
-call was to leave the old URLs (`/version/v1.3.x/`) untouched; the second, the one that stands, is that a
-closed line renders at the highest version it produced, `/version/1.3.0/`, and the selector says `v1.3.0`.
+call was to leave the old URLs (`/version/v1.3.x/`) untouched ("yes", 2026-09-11, to keeping `v1.3.x` where it
+is); the second, the one that stands, is that a closed line renders at the highest version it produced,
+`/version/1.3.0/`, and the selector says `v1.3.0`: "the old versions must have the highest version url they
+produced  and so will the dropdown" (the maintainer, 2026-09-11).
 So every `versions.yml` entry carries four keys, nothing derived and the build stopping on a missing one:
 `id` (the folder, never in a URL), `url_segment` (`1.3.0`), `label` (`v1.3.0`), `version_tag` (what docker
 pulls - `1.3.0` for a closed line, a moving tag for the current one). The old URLs redirect through a
@@ -203,6 +227,8 @@ build for exactly that day - or a minor that turns out to change what an existin
 to it, which semver says does not happen.
 
 ### S12 - the last common page went, and with it the second layout; one sidebar order in every folder
+
+**Decided (the maintainer, 2026-09-12):** "rule release notes always after quick start ... version must go it has no place now ... configuration basics was because that was the same across versions... maybe we can collapse it into jsut configuration", then "now for the rest ececute in one pass" (answering the proposed structure, Integration Guide deleted and salvaged)
 
 **Set by the maintainer on 2026-09-12; landed the same day** in `sites/docs`. Three things, all one decision:
 every page is a `versions` document; the top level reads in one order in every folder; two pages that only

@@ -26,8 +26,9 @@ return the same result shape: packed items and unpacked items.
   it all fit.
 
 Packing uses three heuristics: First Fit Decreasing (FFD), Worst Fit Decreasing (WFD), and
-Best Fit Decreasing (BFD), each with two versions (v1 and v2; the API uses v2). A result selector
-then picks the best outcome across algorithms or across bins.
+Best Fit Decreasing (BFD), each in more than one version. The API uses v2; BFD and WFD also have a v3 that
+only the tests and the measure project run. A result selector then picks the best outcome across algorithms
+or across bins.
 
 ## 📂 Layout
 
@@ -36,9 +37,10 @@ then picks the best outcome across algorithms or across bins.
 | `Algorithms/` | The FFD / WFD / BFD heuristics and their versions |
 | `AlgorithmProcessing/` | Runs several algorithms against a single bin |
 | `BinProcessing/` | Runs algorithms across many bins |
-| `AlgorithmFactories/` | Creates algorithm instances |
+| `Abstractions/` | The engine interfaces - algorithm, processors, result selection |
+| `AlgorithmFactory.cs`, `AlgorithmFactories/` | Create algorithm instances. The API uses `AlgorithmFactory` (v2); the folder holds versions pinned for the benchmarks |
 | `ResultSelection/` | Picks the best result (best algorithm, smallest bin, best bin) |
-| `Models/` | Bin, Item, packed/unpacked result types |
+| `Models/` | `Bin`, `Item` and the result builder. The result types are in `shared/src/Binacle.Packing` |
 | `GuardClauses/` | Input checks - null, dimensions, volume, quantity |
 | `Exceptions/` | `DimensionException` |
 

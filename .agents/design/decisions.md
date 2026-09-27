@@ -19,9 +19,11 @@ paths:
 Decisions that belong to no single slice. What each area *is* lives in its own doc; this file is the reasoning,
 so a later session does not undo a deliberate choice.
 
-## Locked
+## Decided
 
 ### D1 — the repository moved to an organization, and copyright did not move with it
+
+**Not confirmed** - no quote from the maintainer on record.
 
 The repo has lived at `binacle-labs/Binacle.Net` since 2026-08-16.
 
@@ -46,6 +48,8 @@ list**, so the `Dockerfile` value is what reaches published images.
 lines are correct as they are. Do not tidy them.
 
 ### D6 — the licence file keeps its name, and two other things fix the badge
+
+**Not confirmed** - no quote from the maintainer on record.
 
 GitHub reported the repository's licence as `NOASSERTION`. **The cause was measured with `licensee`, the gem
 GitHub runs, not reasoned about** — an earlier plan blamed the GPL file's name and was wrong.
@@ -99,6 +103,8 @@ text with no context.
 
 ### D2 — a version's published page must match what that version's image serves
 
+**Not confirmed** - no quote from the maintainer on record.
+
 Each folder under `sites/docs/collections/_versions/` describes the image that shipped under that minor version.
 `2.1.1` really does serve `https://github.com/ChrisMavrommatis/Binacle.Net` in its OpenAPI documents and its
 UI, so rewriting v1.3.x, v2.0.x or v2.1.x to say `binacle-labs` would make the page disagree with the running
@@ -114,6 +120,8 @@ GitHub redirects them forever, and rewriting them makes them false.
 rule and the generator are in `$sites/docs`.
 
 ### D7 — an old docs version is de-indexed, and after that it is only ever bug-fixed
+
+**Not confirmed** - no quote from the maintainer on record.
 
 Four documentation versions are published and only one is current. Before 2026-08-23 all four were indexable,
 all four were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
@@ -137,12 +145,14 @@ alone safe rather than merely convenient.
 
 **It is deliberately cheap to reverse, and that is why the old versions have written descriptions.** Every
 legacy page carries a hand-written `meta_description` naming the version it documents, written on the same day
-the versions were de-indexed. **That was the maintainer's call and the reasoning is the point:** if indexing an
+the versions were de-indexed. **Whose call that was is not confirmed; the reasoning is the point:** if indexing an
 old line ever turns out to be worth it, flipping it back is a change to `current` and a sitemap, not a writing
 project across seventy-four pages. **De-index freely; do not also let the copy rot** — the two decisions look
 like one and are not.
 
 ### D3 — the signing identity moved with the repository, and there are three bands
+
+**Not confirmed** - no quote from the maintainer on record.
 
 cosign keyless writes the repository's full path into the certificate, so the published verify command names
 the owner. **GitHub redirects web links; it does not redirect a signing identity.** A stale one fails the
@@ -171,16 +181,18 @@ Which surfaces carry the invocation, and what else would change it, is `$ci-cd/d
 
 ### D4 — name a version where the version is the fact, never as a floor or an example
 
+**Not confirmed** - no quote from the maintainer on record.
+
 A floor ("signed from `X` onward") and a sample tag both go stale on their own. A record of what was signed
 does not. So a floor names the current released version, an example uses a placeholder the reader
 substitutes, and a concrete version survives only where the point is what happened to that version.
 
-**No public surface names a beta image at all** — decided 2026-08-17. A beta stays pullable long after it
+**No public surface names a beta image at all** — since 2026-08-17. A beta stays pullable long after it
 stops being the right thing to pull, and a published command that fails against it reads as our bug rather
 than as history. Agent docs under `.agents/` may name one, and have to: the bands in D3 mean nothing without
 the numbers.
 
-**A page under `sites/docs` also quotes no figure that expires** — settled 2026-08-31, and it is the sharper
+**A page under `sites/docs` also quotes no figure that expires** — since 2026-08-31, and it is the sharper
 form of the same rule. A versioned page names its own version explicitly, so a `v3.0.x` page names `3.0` and
 `3.0.0`. **What it does not carry is a digest, a package count or a run URL**, however real they were when
 they were pasted.
@@ -193,6 +205,8 @@ nothing** — the checks, the certificate, the index, the SBOM, the provenance r
 needed no edit when v3.0.0 shipped, which is the whole point. Confirmed against the live page 2026-09-02.
 
 ### D5 — the reference layer is checked by a dated query, and the query is the fragile part
+
+**Not confirmed** - no quote from the maintainer on record.
 
 Every file under `.agents/docs/` and `.agents/design/` carries `verified:` (when someone last confirmed it
 against the code) and `paths:` (the code it describes). A file whose `paths:` have been committed to since its
@@ -255,6 +269,8 @@ than restating splits that would need a re-run to be true. Re-dating a measureme
 
 ### D8 — identity is not geometry, and most model duplication is kept on purpose
 
+**Not confirmed** - no quote from the maintainer on record.
+
 The `Binacle.Geometry` extraction is finished: one leaf holds the `IWith*` geometry family and the generic
 concrete `Dimensions<T>` / `Coordinates<T>` / `Item<T>`.
 
@@ -268,7 +284,7 @@ internal result models (internal ctors, immutable) · algorithm working types (t
 (frozen) · UIModule ViewModels (DataAnnotations + computed ID) · lib **internal** readonly-struct `Dimensions` /
 `Coordinates` (value-type performance — they must stay structs).
 
-**That list is settled, not an open question.** A later "reduce the duplication" pass that does not read it
+**That list is an answer on record, not an open question** (not confirmed with the maintainer). A later "reduce the duplication" pass that does not read it
 will re-derive the same five answers from scratch, or take one of them the other way.
 
 **TypeScript duplicates the model shapes on purpose.** TS is structurally typed, so the duplicates already
@@ -276,6 +292,8 @@ interoperate and nothing is broken; there is simply no single source. Worth revi
 start to drift.
 
 ### D9 — four folders, and what each may reference (2026-09-20)
+
+**Decided (the maintainer, 2026-09-19):** "yes go with option 2 and write it in ... measure /. bench / tools are tools/executables that produce something auxl;iary./// nothing should referenc them.. .they  can reference src, shared tests, data"
 
 Every C# project sits in one of four kinds of folder, and the folder says what it may reference. Stated by the
 maintainer 2026-09-19; the tree matched it on 2026-09-20.
@@ -361,6 +379,8 @@ Where each slice's projects sit on this rule is drawn in `$shared/dependencies`,
 
 ### D10 — measured numbers live in the slice that produces them (2026-09-22)
 
+**Leaning yes (the maintainer, 2026-09-18):** "for now it stays at the repo in the slice they belong... each with their own structure". On gating, **Decided (the maintainer, 2026-09-22):** "3 we dont need measure check... this is a tool local not to ensure nothing changed"
+
 The repo has two kinds of measured number, and they get two rules.
 
 | | Deterministic | Timing |
@@ -432,5 +452,5 @@ explain.
 **It was a one-off cleanup, and since 2026-09-14 the policy exists.** A prerelease's image stops at GHCR
 after the smoke and never reaches Docker Hub - `$ci-cd/decisions#D3`. Nothing needs cleaning up after the next release.
 
-**Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no on
-2026-09-04 and the switch stays off; the reversal condition is in the CI/CD ledger under D26.
+**Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no - "its no for now"
+(the maintainer, 2026-09-03) - and the switch stays off; the reversal condition is in the CI/CD ledger under D26.

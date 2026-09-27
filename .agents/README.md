@@ -101,4 +101,4 @@ here. Two that shape how you use *this* directory:
 
 - **Find the layer first, then the file.** Each layer has an `_index.md` manifest; open that, not every file.
 - **A rule about the whole system belongs in `rules/`. A fact about one topic belongs in the doc or memory
-  that owns it** - v3-is-frozen in `memory/v3-frozen.md`, endpoint rules in `docs/api/`.
+  that owns it** - v3-is-frozen in `memory/api-v3-frozen.md`, endpoint rules in `docs/api/`.
