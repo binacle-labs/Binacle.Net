@@ -66,7 +66,7 @@ just test cs_binacle-net-service-module_integration Postgres
 Postgres and AzureStorage need their service up first (`just serve services-up -d`); with no argument the harness
 falls back to SQLite.
 
-The ten `rb_` tests are the Jekyll plugin gems. They need nothing brought up, they report coverage through
+The `rb_` tests are the Jekyll plugin gems. They need nothing brought up, they report coverage through
 simplecov, and they run on the site path only: a gem ships in the three sites and never in the Docker image.
 
 `image` and `sites` are for a laptop. CI names every test as its own step, so a red check names the suite.
@@ -114,7 +114,7 @@ The documents come out of the build, not out of a running server, so nothing has
 ---
 
 ## 🔄 Regenerating committed data
-`regen.just`, loaded as the `regen` module. Five tools write data that is **committed to the repo**, and this
+`regen.just`, loaded as the `regen` module. These tools write data that is **committed to the repo**, and this
 is the only place that says how to run them.
 
 ```bash
@@ -141,7 +141,7 @@ demo reads whatever is in it.
 Every run is deterministic, so `check` is just "run everything, then see whether the tree moved". It diffs only
 what the generators write - these folders also hold their own README, `vipaq/test-vectors` as a whole holds
 hand-authored vectors no generator touches, and the demo's package is otherwise hand-written. **Nothing in CI
-calls it**, and that is deliberate: it is for the maintainer who edited a tool or a source problem and wants
+calls it.** It is for the maintainer who edited a tool or a source problem and wants
 to know what fell out of step.
 
 ---

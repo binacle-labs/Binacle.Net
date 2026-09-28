@@ -7,7 +7,7 @@ it, it belongs in that slice instead.
 
 | Folder | What it is |
 |---|---|
-| `src/` | Four small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation, result types |
+| `src/` | Small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation, result types |
 | `data/` | The scenario corpus more than one slice reads, and `Binacle.Data`, which reads it - see [`data/README.md`](data/README.md) |
 | `test/` | Test infrastructure shared by several suites - the report writer, the benchmark config every bench project runs with, the unit tests of the libraries |
 | `tools/` | The OR-Library converter, which writes `data/bischoff-suite` |
@@ -74,5 +74,5 @@ inconsistent. It rewrites committed files - run it only when you meant to.
 
 ## 📊 Data
 
-[`data/`](data) holds the fixture corpus: the Bischoff suite, the custom problems, and the raw OR-Library
-source they come from. Each folder has its own README with the file format.
+[`data/`](data) holds the fixture corpus: the Bischoff suite, the custom problems, the demo samples, and the
+raw OR-Library source the Bischoff suite comes from. Each folder has its own README with the file format.

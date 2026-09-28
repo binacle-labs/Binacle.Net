@@ -101,11 +101,13 @@ just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorag
 # TypeScript
 just test ts_binacle-compact-notation_unit
 just test ts_binacle-vipaq_unit
+just test ts_binacle-net-client_unit
+just test ts_binacle-net-service-client_unit
 just test ts_binacle-net-ui_unit
 just test ts_cookies_unit
 just test ts_theme-switcher_unit
 
-# Ruby - the ten gems. `just test sites` and `just test all` run them.
+# Ruby - the gems. `just test sites` and `just test all` run them.
 just test rb_binacle-docs-versions_unit
 just test rb_binacle-robots_unit
 just test rb_jekyll-breadcrumb-trail_unit
@@ -392,7 +394,7 @@ becomes both the image tag and `BINACLE_VERSION` inside the container, which is 
 Then run it with `just image up`, which prepares the bind-mounted folders first.
 
 `docs`, `demo` and `www` are the build half of `just serve <site>` — same site, built once instead of
-served and watched. **The deploy workflows call these and hand `artifacts/<site>` straight to the host**, so
+served and watched. **The deploy workflow calls these and hands `artifacts/<site>` straight to the host**, so
 what they build is what gets served. Three steps in a fixed order: copy the assets, run webpack over `_js/`, then
 `jekyll build` with `_config.yml,_config.prod.yml`. **Skipping any of them still produces a site**, just one
 with no scripts and no logo, because `js/`, `lib/` and `media/` are gitignored and filled by the first two
@@ -434,7 +436,7 @@ the recipe stops with `No artifacts/docs` rather than checking nothing and passi
 because a source `href` is still Liquid at that point.
 
 `links` passes `--offline`, so it checks only the links that resolve inside the site — the ones a renamed page
-breaks. Both sites together answer in about a fifth of a second, which is why the deploy workflows run it as a
+breaks. Both sites together answer in about a fifth of a second, which is why the deploy workflow runs it as a
 pre-flight. `links-external` makes a real request per unique URL, takes ten seconds, and can fail on somebody
 else's outage; that is why it is a separate recipe rather than a flag, and why it is not a gate.
 
@@ -470,8 +472,7 @@ its `run:` line into a terminal. See `$ci-cd` for which workflow calls which.
 
 ## TypeScript packages
 
-Five tests — `ts_binacle-compact-notation_unit`, `ts_binacle-vipaq_unit`, `ts_binacle-net-ui_unit`, `ts_cookies_unit` and
-`ts_theme-switcher_unit`. They run jest from the repo root through the root `jest.config.js`, which is
+The `ts_*` tests run jest from the repo root through the root `jest.config.js`, which is
 what keeps the workspace folder in coverage paths and applies its `collectCoverageFrom`. Running `npm test`
 inside a package works but drives the run from that package's own config, so its numbers are not the ones CI
 or coverage report.

@@ -30,7 +30,7 @@ port or runtime. All packaging and wiring, none of it C# logic, which is why the
 than once per profile - the same assertions behind five different stacks answer the same question five times.
 It keeps the `.yaml` extension against the `.yml` stacks on purpose: it is the one file here docker never reads.
 
-## 📋 The five profiles
+## 📋 The profiles
 
 Real configurations, from nothing switched on to everything. They are declared in one place - the `profiles`
 variable at the top of `tooling/smoke.just` - which is what both the `all` loop and the unknown-name check read.

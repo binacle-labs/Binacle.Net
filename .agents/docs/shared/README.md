@@ -1,8 +1,8 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-24
-check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three Scenarios.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
+verified: 2026-09-28
+check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three DataProvider.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
   - api/tests
@@ -38,23 +38,23 @@ the benchmark picks are lib's, in `Binacle.Lib.Testing` (`$lib/tests`).
 
 ## Scenario sets
 
-One namespace per set, one static `Scenarios` class in each, and the set's keys are on that class:
+One namespace per set, one static `DataProvider` class in each, and the set's keys are on that class:
 
-| Class | `Keys` | Count |
-|---|---|---|
-| `Binacle.Data.BischoffSuite.DataProvider` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` | 7 |
-| `Binacle.Data.CustomProblems.DataProvider` | `CustomProblems/baseline`, `/simple`, `/complex` | 3 |
-| `Binacle.Data.DemoSamples.DataProvider` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file | 21 |
+| Class | `Keys` |
+|---|---|
+| `Binacle.Data.BischoffSuite.DataProvider` | `BischoffSuite/orlib_thpack1` … `orlib_thpack7` |
+| `Binacle.Data.CustomProblems.DataProvider` | `CustomProblems/baseline`, `/simple`, `/complex` |
+| `Binacle.Data.DemoSamples.DataProvider` | `DemoSamples/00-two-winners` … `20-wfd-wins`, one per file |
 
 Data is embedded JSON, loaded by resource prefix. The manifest name is `Binacle.Data.<Set>.<name>.json`, and
 `ScenarioCollectionsReader` splits it into the collection key `<set>/<name>` lowercased. It and
 `MultipleScenarioCollectionsReader` beside it are `internal`: nothing outside the project reads them, since a
 set that needs one collection at a time asks its own class (`BischoffSuite.DataProvider.ByCollection`).
 
-`Binacle.Lib.Data` has its own copy of both, still named `ScenarioCollectionsProvider` and
-`MultipleScenarioCollectionsProvider`, for the result-selection files. The copies differ in two lines, the
-namespace and the prefix. They stay two:
-the maintainer's call of 2026-09-23, since the code has not changed since it was written.
+`Binacle.Lib.Data` has its own copy of both, under the same names, for the result-selection files. The
+copies differ in two lines, the namespace and the prefix. A merge into one was built and undone. They stay two,
+for now - the maintainer, 2026-09-23, asked whether to keep two or merge: "for now 2 ... 2 thats why we
+undoed it".
 
 **Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
 packer, so `PackingDemoSamplesTests` proves the algorithms still land where they did, not that they are
@@ -80,7 +80,7 @@ consumer, so it lives in `lib/data`.
 given whose manifest name starts with the prefix. Each comes back as an `EmbeddedResourceFile` with the name
 after the prefix unsplit, and `OpenRead()` reads from that same assembly. **The caller names the assembly**
 (`typeof(SomeTypeInThatProject).Assembly`) and splits the name its own way, so one reader serves every data
-project however its manifest names are shaped. `Binacle.Lib.Data` is the first other caller.
+project however its manifest names are shaped.
 
 ## Compact-string formats
 

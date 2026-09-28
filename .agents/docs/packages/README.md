@@ -1,7 +1,7 @@
 ---
 id: packages
 description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-09-18
+verified: 2026-09-28
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
@@ -95,8 +95,8 @@ programmatically, and `storage` also accepts a `ThemeStorage` object.
 **`data-default-theme` on the element still wins over the host setting**, but no host uses it: the pre-paint
 script cannot read an attribute on an element the parser has not reached.
 
-**The element renders a real `<button>`.** A custom element takes no focus and answers no key, so before
-2026-08-24 the theme could not be changed from a keyboard on any host. `data-button-class` puts the host's
+**The element renders a real `<button>`.** A custom element takes no focus and answers no key, so without
+it the theme could not be changed from a keyboard. `data-button-class` puts the host's
 class on it. A `[data-theme-label]` child is kept in step as words; an empty element gets the material
 ligature the BeerCSS hosts expect.
 
@@ -110,8 +110,7 @@ domain cookie removes the host-only one first — otherwise both are sent under 
 can return the stale one forever.
 
 **`data-swap` makes something CSS cannot reach follow the theme** — `data-swap="src"` with
-`data-lighttheme` and `data-darktheme`. It was `data-theme` until 2026-08-24, which is now the theme itself.
-A missing value skips the element; it used to write the string `undefined`.
+`data-lighttheme` and `data-darktheme`. A missing value skips the element.
 
 **The BeerCSS hosts double `:root` in their token selectors on purpose.** BeerCSS stamps `light` or `dark`
 on `<body>` itself when it finds neither, from the machine's setting — so a reader who picks light on a dark
@@ -137,7 +136,7 @@ the server and the browser cannot disagree.
 The compact-notation alias is filed under **shared**, not packages, because that package mirrors a
 `shared/src` C# project; the others are named after the folder they live in.
 
-**All three new suites run on jsdom**, so their configs add `jest-environment-jsdom` (jest 29 does not
+**`binacle-net-ui`, `cookies` and `theme-switcher` run on jsdom**, so their configs add `jest-environment-jsdom` (jest 29 does not
 bundle it). `cookies` and `theme-switcher` also point jsdom at an `https` URL, because the cookies defaults
 include `secure` and jsdom hides a secure cookie from a document on an insecure origin.
 
@@ -145,8 +144,7 @@ include `secure` and jsdom hides a secure cookie from a document on an insecure 
 proves the theme survives a reload on an image served over plain http.
 
 **Coverage settings live only in the root `jest.config.js`.** In multi-project mode jest ignores a project's
-own `collectCoverageFrom`, and every test runs through the root config with `--selectProjects`. Five package
-configs carried a copy until 2026-08-22; all five were dead and one disagreed with the root.
+own `collectCoverageFrom`, and every test runs through the root config with `--selectProjects`.
 
 ## Dependencies
 

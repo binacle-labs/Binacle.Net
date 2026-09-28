@@ -124,7 +124,7 @@ cd ruby/jekyll-multi-sitemap && bundle exec rspec
 From the repo root each gem is a test, so `just test rb_jekyll-gtm_unit` runs one and `just test all` runs
 them with everything else. Coverage comes with them, through simplecov.
 
-For style there is `.rubocop.yml`, covering all ten gems. Nothing runs it - no recipe, no pipeline step. Run
+For style there is `.rubocop.yml`, covering every gem. Nothing runs it - no recipe, no pipeline step. Run
 it by hand from here:
 
 ```bash

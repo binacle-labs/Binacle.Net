@@ -11,7 +11,7 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 
 ```yaml
 - file: a-new-demo-sample-needs-two-edits.md
-  description: "A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data only if you also add it to the generator's hardcoded list - which fails silently"
+  description: "A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data and the lib tests only if you also add it to two hand-kept lists - both fail silently"
   when: "adding or renaming a file in shared/data/demo-samples"
   paths: ["shared/data/demo-samples/**", "vipaq/tools/Binacle.ViPaq.PackedDataGenerator/**", "vipaq/data/packed/**"]
 - file: algorithm-identifier-is-a-format.md

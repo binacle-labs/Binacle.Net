@@ -1,7 +1,7 @@
 ---
 id: packages/binacle-net-client
 description: packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together.
-verified: 2026-09-10
+verified: 2026-09-28
 check: The exported surface matches src/index.ts; the endpoint list matches the methods on BinacleClient; spec/v4.json is byte-identical to the docs site's copy for the current version; the ajv options and the schema names asserted still match tests/contract.test.ts; the recipes named here match tooling/openapi.just
 also_update:
   - packages
@@ -91,5 +91,5 @@ just test ts_binacle-net-client_unit
 
 `tests/client.test.ts` mocks `fetch` and covers the URL, method, headers and body sent, and what comes back on
 200, on a 4xx with a body, and on a 429 with none. `tests/contract.test.ts` is the spec check above, and
-includes two tests that break a fixture on purpose to prove the check can fail and names the field when it
-does.
+its `the check itself` group breaks a fixture on purpose to prove the check can fail and names the field when
+it does.

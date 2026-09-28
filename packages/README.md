@@ -14,7 +14,7 @@ from the repo root with `npm install`.
 | `cookies` | Cookie read/write helpers. A vendored fork of js-cookie v3.0.5, MIT, kept close to upstream |
 | `theme-switcher` | Light/dark theme toggle, as a `<theme-switcher>` custom element |
 
-All six have tests. From the repo root:
+Every package has tests. From the repo root:
 
 ```
 just test ts_binacle-compact-notation_unit                # binacle-compact-notation
@@ -33,9 +33,9 @@ between them. Its leaf is named after `shared` for that reason, not after this f
 
 The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
-the packing demo and the ViPaq decoder, those two and [`sites/www`](../sites/www) use `theme-switcher`, and
-the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`. Nothing is copied: the import
-resolves through the workspace. (`just assets` is a different job - it copies the static files in
+the packing demo and the ViPaq decoder, those two, [`sites/www`](../sites/www) and [`sites/docs`](../sites/docs)
+use `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`.
+Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 
 **None of them has a build step.** Each host compiles the TypeScript from source with its own webpack and

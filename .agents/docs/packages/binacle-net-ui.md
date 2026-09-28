@@ -1,8 +1,8 @@
 ---
 id: packages/binacle-net-ui
 description: packages/binacle-net-ui — Alpine.js apps and components plus a Three.js visualizer for the packing demo. The apps/components/shared split, the plugins, and the window.binacle global.
-verified: 2026-09-15
-check: Every Alpine.data name under src/apps/ and src/components/ appears in the table and vice versa; the two plugins register exactly what is listed; the apps/components/shared split matches src/ and no utils/ or core/ folder exists; apps/packingDemo/sampleData.ts still carries its generated-do-not-edit line and randomize still steps a sampleIndex rather than rolling; packingDemo.ts still reaches the API only through binacle-net-client; the suite/test/coverage figures still match `npx jest --selectProjects binacle-net-ui --coverage`
+verified: 2026-09-28
+check: Every Alpine.data name under src/apps/ and src/components/ appears in the table and vice versa; the two plugins register exactly what is listed; the apps/components/shared split matches src/ and no utils/ or core/ folder exists; apps/packingDemo/sampleData.ts still carries its generated-do-not-edit line and randomize still steps a sampleIndex rather than rolling; packingDemo.ts still reaches the API only through binacle-net-client; the coverage figure still matches `npx jest --selectProjects binacle-net-ui --coverage`
 also_update:
   - packages
 paths:
@@ -92,11 +92,11 @@ types and the `fetch` that uses them - see `$packages/binacle-net-client`.
 **Both files under `types/` are modules, so their `declare global` and `declare module` blocks only apply when
 the file is in the compilation** - and nothing imports them. `index.ts` therefore carries a
 `/// <reference path>` to each. **Delete those two lines and every host build reports `Window.binacle`,
-`$logger` and `_x_fieldPrefix` as missing properties** - 32 errors, which webpack emits through anyway.
+`$logger` and `_x_fieldPrefix` as missing properties**, which webpack emits through anyway.
 
 **This package's `tsconfig.json` is the one that governs, in every host.** ts-loader walks up from each `.ts`
-file it compiles, so it lands here rather than on the host's config - `sites/demo` has no tsconfig at all and
-compiles correctly, and an es5 target in a host's config changes nothing. This file's `target: es2016` is what
+file it compiles, so it lands here rather than on the host's config - an es5 target in a host's config changes
+nothing. This file's `target: es2016` is what
 lets `theme-switcher` emit a real `class`; on es5 a class extending `HTMLElement` throws `Illegal constructor`
 at load.
 
@@ -133,21 +133,20 @@ pick the same one, is in the packing-demo design record (`$sites/packing-demo-se
 - **`packing_demo_app` takes an options object** — `PackingDemoOptions`, `baseUrl` optional. Options rather than
   positional so a second value later is not a signature break.
 - **A signature change here lands on both hosts**, and neither can be updated without the other. The way through
-  is to widen first, move each host, then narrow: that is how the base URL went from positional to an object on
-  2026-08-22 without either page breaking in between.
+  is to widen first, move each host, then narrow, so neither page breaks in between.
 - No compile here — each host's webpack picks up changes via the workspace symlink.
 
 ## Tests
 
 `just test ts_binacle-net-ui_unit`. jsdom, because the components read `document` and `window` even where the
-logic under test does not. **21 suites, 387 tests, 72.03% of lines** — measured 2026-09-16.
+logic under test does not. **72.03% of lines** — measured 2026-09-16.
 
-`tests/model/` is the pure half — the samples, the view models, `ControlsManager`. `tests/components/` is
-the Alpine half: each component factory is a plain object, so a test calls it directly with a stub `$dispatch`
-and `$logger` rather than starting Alpine.
+The tests mirror `src/`: `tests/apps/` for each app and its models, `tests/components/` for each component,
+and `tests/plugins.test.ts` for the two plugins. A component factory is a plain object, so a test calls it
+directly with a stub `$dispatch` and `$logger` rather than starting Alpine.
 
-**What is uncovered is the Three.js half, and that is the intended answer** — `core/packingVisualizer.ts` and
-the scene helpers in `utils/` need a WebGL context, so a test there could only assert that a call happened.
+**What is uncovered is the Three.js half** — `packingVisualizer.ts` and the scene helpers in
+`src/components/visualizer/` need a WebGL context, so a test there could only assert that a call happened.
 They stay in the coverage denominator rather than being excluded from it: the number is meant to show the gap,
 not hide it. Only `.d.ts` files are excluded, in the root config, because they carry no runtime code.
 

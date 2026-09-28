@@ -2,7 +2,7 @@
 
 Problem datasets used by the benchmarks and performance/regression tests. A set lives here when **more than one
 slice reads it**; a set with a single consumer lives in that slice (result-selection is in `lib/data`, ViPaq's
-packed data in `vipaq/data`). Four data folders and the project that reads them:
+packed data in `vipaq/data`). The data folders and the project that reads them:
 
 | Folder | What | Consumer |
 | --- | --- | --- |

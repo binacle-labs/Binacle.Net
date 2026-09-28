@@ -39,7 +39,7 @@ One file per `thpack`, a JSON array of scenarios in the compact scenario format:
 Both fields need no packer. `Metrics` is pure arithmetic over `Bin` + `Items`. `Result` is a fixed baseline:
 every Bischoff instance fills the container to ~98% but never tessellates perfectly, so the outcome is always
 `PartiallyPacked`. The converter writes that for both operations, under every algorithm. The lib tests run
-the real packer against this baseline and asserts they match, so if an instance ever comes out `FullyPacked` or
+the real packer against this baseline and assert they match, so if an instance ever comes out `FullyPacked` or
 `NotPacked` (packed unusually well, or nothing fit), that test fails. So the converter has no dependency on the
 packing algorithms.
 

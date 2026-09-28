@@ -1,15 +1,16 @@
 ---
 id: ruby
 description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
-verified: 2026-09-12
-check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; every site under sites/ still loads jekyll-filters and jekyll-gtm through its Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
+verified: 2026-09-28
+check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; docs, demo and www still load jekyll-filters and jekyll-gtm through their Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
 ---
 
 # Gems
 
-Jekyll plugins for the three sites — `sites/docs/`, `sites/demo/` and `sites/www/`.
+Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` and `sites/www/`. The local-only
+`sites/admin/` also loads `jekyll-filters`, `jekyll-resource-tags` and `jekyll-page-meta`.
 
 | Gem | What it adds | Loaded by |
 |---|---|---|
@@ -46,7 +47,7 @@ word, so `API` becomes `Api`, and `String#capitalize` reaches only the first let
 becomes `Getting-started`. Runs of whitespace collapse to one space and the ends are trimmed.
 
 **`expand_year(input, placeholder = "{now}")`** — replaces the placeholder with the year of `site.time`.
-Added 24 Aug 2026. **All three footers pipe their copyright line through it**; `sites/docs` pipes its licence
+**All three footers pipe their copyright line through it**; `sites/docs` pipes its licence
 line too.
 
 Source: `ruby/jekyll-filters/lib/jekyll-filters/` — `sanitization.rb`, `capitalization.rb` and `dates.rb`.
@@ -61,8 +62,8 @@ a container id — `GTM-` and then letters and digits. The sites call them as `{
 `{% gtm_body site.gtm %}`, so the `gtm:` key in `_config.yml` is the *caller's* convention, not something the gem
 knows about. A bare `{% gtm_head %}` resolves to an empty id and injects nothing.
 
-**A variable that resolves to nothing renders nothing.** Before 24 Aug 2026 the fallback was unconditional, so a
-misspelt variable name wrote itself into the snippet as the container id and the tag silently never loaded.
+**A variable that resolves to nothing renders nothing**, so a misspelt variable name cannot write itself into the
+snippet as the container id.
 
 - **`{% gtm_head <id> %}`** — the GTM `<script>` snippet, for `<head>`.
 - **`{% gtm_body <id> %}`** — the `<noscript>` fallback, for the top of `<body>`.
@@ -125,7 +126,7 @@ writes the elements, `text.rb` is the description pipeline.
 ## jekyll-resource-tags
 
 **All three sites load it, and none of them has a links, scripts or prefetch include any more.** The favicon
-links, hardcoded in five layouts before, come from an `icons:` list in each site's `_data/includes.yml`.
+links come from an `icons:` list in each site's `_data/includes.yml`.
 
 Three tags, each taking one list and writing one element per item — `{% link_tags %}` reads `href`,
 `{% script_tags %}` reads `src`, `{% prefetch_tags %}` reads `src` and writes it as the `href` of a
@@ -169,16 +170,14 @@ Source: `ruby/jekyll-structured-data/lib/jekyll-structured-data/` — `graph.rb`
 
 ## jekyll-breadcrumb-trail
 
-**Built and wired into `sites/docs` on 24 Aug 2026.** The other two sites are flat, have no trail to draw,
-and load neither the gem nor the tag. 111 of the site's 118 trails came out byte-identical; the seven that
-moved are in `$sites/docs-and-demo-design#D6` and the site's own doc.
+**`sites/docs` only.** The other two sites are flat, have no trail to draw, and load neither the gem nor the
+tag.
 
 **A generator and a tag.** The generator resolves `page.breadcrumb_trail`, a list of `name` and `url` with
 the first crumb first; `{% breadcrumbs %}` renders the nav from it and works nothing out. `name` and `url`
-are schema.org `ListItem` words, and `jekyll-structured-data` has read that key since it shipped — its
-breadcrumb branch has been dead the whole time for want of a writer.
+are schema.org `ListItem` words, and `jekyll-structured-data` reads that key for its breadcrumb list.
 
-**The config keys are the ones the ecosystem already uses, not the ones the design file sketched.**
+**The config keys are the ones the ecosystem already uses.**
 `exclude` is Jekyll's own word for leaving things out. `title_from` defaults to `[crumbtitle, title]`, and
 `crumbtitle` is what the published `jekyll-breadcrumbs` reads, so a site moving off it works unchanged.
 There is no `separator`: the standard markup draws it in CSS.
@@ -207,8 +206,8 @@ Source: `ruby/jekyll-breadcrumb-trail/lib/jekyll-breadcrumb-trail/` — `trail.r
 
 ## jekyll-webmanifest
 
-**Built and wired into all three sites on 24 Aug 2026.** No site writes a manifest page any more; each has a
-`webmanifest:` block and nothing else. **None of them uses `{% webmanifest_link %}`** - the `rel="manifest"`
+**All three sites use it.** No site writes a manifest page; each has a `webmanifest:` block and nothing
+else. **None of them uses `{% webmanifest_link %}`** - the `rel="manifest"`
 link is already an entry under `icons:` in each site's `_data/includes.yml`, and the tag would write it
 twice.
 
@@ -253,8 +252,6 @@ Source: `ruby/jekyll-webmanifest/lib/jekyll-webmanifest/` — `config.rb` reads 
 reserved keys, `manifest.rb` builds the members, `json.rb` serialises, `generator.rb` writes the page.
 
 ## The shape every gem has
-
-Settled 24 Aug 2026, when the two oldest gems were moved onto what the other four already did.
 
 - **One entry file, named after the gem** — `lib/jekyll-gtm.rb`. Not a choice: a `plugins:` list runs
   `require "jekyll-gtm"`, so the name has to match.
@@ -317,15 +314,15 @@ and **prints the pages the previous version has that the current one lacks**, th
 **It never overwrites a key the page already set**, which is how the swagger pages keep `noindex, nofollow`
 from their `defaults:` scope.
 
-**The redirect stamps landed 24 Aug 2026 and closed the last head under `sites/` that composed its own.**
-`sites/docs/_layouts/redirect.html` built its title, canonical and `robots` inline, because its canonical
+**The redirect stamps are why no head under `sites/` composes its own.**
+`sites/docs/_layouts/redirect.html` would otherwise build its title, canonical and `robots` inline, because its canonical
 points at `/version/<current>/` rather than at itself and front matter cannot hold a value that moves. The
 generator computes that url once; the layout reads `page.redirect_to` for the script, the meta refresh and
 the visible link, and `jekyll-page-meta` reads `canonical` for the head. **Stamping only the canonical would
 have left the layout computing the same url a second time** - the exact split this design exists to stop.
 
 **`versions.current` has to name a version the site has, or the build stops.** A `current` that matches
-nothing would noindex all 118 pages while the sitemap still lists them, and nothing else would say so. A
+nothing would noindex every page while the sitemap still lists them, and nothing else would say so. A
 missing `current` stops the build too, for the mirror reason: it would leave every old version indexable.
 The suffix is stamped from the page's own `version` and does not read `current` at all.
 
@@ -333,15 +330,14 @@ The suffix is stamped from the page's own `version` and does not read `current` 
 (`{% vlink v2.x /index.md %}`), so a page links another line's page by file and the build fails if the file is
 not there; no page builds a `/version/` url by hand.
 
-**Deleting the include without this gem is a silent regression**: 74 pages lose their `noindex` and every
-versioned title loses its version. That is what the wiring pass measured before and after.
+**Removing this gem is a silent regression**: every old-version page loses its `noindex` and every versioned
+title loses its version.
 
 Source: `ruby/binacle-docs-versions/lib/binacle-docs-versions/` — `generator.rb` and `vlink_tag.rb`.
 
 ## Running the specs
 
 Each gem has an RSpec suite under `spec/` and declares `rspec` as a development dependency in its gemspec.
-All ten pass. The counts move as the gems grow, so they are not written down here.
 
 **One `Gemfile` covers every gem, at `ruby/`, and no gem has one of its own.** It names each gem with
 `gemspec path:`, which also pulls in that gemspec's development dependencies. `ruby/Gemfile.lock` is
@@ -351,12 +347,12 @@ committed, so every spec run uses the same Jekyll — 4.4.1 — rather than what
 by itself. Plain `rspec` also works and ignores the lock. `bundle exec rspec` from `ruby/` itself does not:
 each `spec/spec_helper.rb` is only on the load path when rspec runs from inside that gem.
 
-**Each gem is a test** — `just test rb_jekyll-gtm_unit`. All ten are in `just test sites` and in
+**Each gem is a test** — `just test rb_jekyll-gtm_unit`. All of them are in `just test sites` and in
 `just test all`, because they need nothing brought up. The test runs `bundle exec rspec` from inside the gem
 folder, which is the only place a `spec_helper` is on the load path.
 
-**They run on the site path, never on the image path.** `shared-site-tests.yml` names all ten as steps, and
-the pull request gate and all three site deploys call it. `shared-image-tests.yml` names none of them, because
+**They run on the site path, never on the image path.** `shared-site-tests.yml` names every one as a step, and
+the pull request workflow and `deploy-site.yml` call it. `shared-image-tests.yml` names none of them, because
 nothing under `ruby/` reaches the Docker image, so a gem must never be written in
 there.
 
@@ -372,9 +368,8 @@ none of it decided on:
 | 10 | `Gemspec/RequireMFA` |
 | 1 each | `Layout/EmptyLineAfterGuardClause`, `Style/FrozenStringLiteralComment`, `Style/RedundantRegexpEscape`, `Style/SafeNavigation`, `Style/StringConcatenation` |
 
-**It is on no pipeline and in no test group.** A test that fails on arrival is not a test. `just check
-ruby` ran it until 2026-08-27, when it was deleted - no linting is set up in this repository, so the recipe
-was the only thing pretending otherwise.
+**It is on no pipeline and in no test group.** A test that fails on arrival is not a test, and no linting is
+set up in this repository.
 
 ## Coverage
 
@@ -395,7 +390,7 @@ jest tests produce.
 **The setup file requires `bundler/setup` before simplecov.** On a laptop the gems are usually installed
 globally and it looks unnecessary; on CI the bundle is installed into `ruby/vendor/bundle`, so nothing is on
 the load path until bundler puts it there. Without that line the first gem dies with
-`cannot load such file -- simplecov`, which is what happened on the Sonar run of 2026-08-27.
+`cannot load such file -- simplecov`.
 
 **`sonar.ruby.coverage.reportPaths` is what makes Sonar read it.** Nothing in the analysis settings excludes
 `ruby/`, so without that line every gem line counts as uncovered.

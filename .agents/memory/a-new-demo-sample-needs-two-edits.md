@@ -1,6 +1,6 @@
 ---
 name: a-new-demo-sample-needs-two-edits
-description: A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data only if you also add it to the generator's hardcoded list - which fails silently
+description: A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data and the lib tests only if you also add it to two hand-kept lists - both fail silently
 type: gotcha
 when: adding or renaming a file in shared/data/demo-samples
 paths:
@@ -25,6 +25,10 @@ had picked it up, and `just regen vipaq-packed-data` would have written nothing 
 **Why the list is hand-written:** the generator takes no arguments and cannot half-run, which is what makes
 its output reproducible. Enumerating the folder instead is a real change to that design, not a tidy-up.
 
-**How to apply:** add the file name to the list in `Program.cs` in the same commit as the sample file. Then
+The lib tests have a third hand-kept list: `DemoSamples.DataProvider.Keys` in `Binacle.Data`. A file whose key
+is not there is embedded but never read, also silently.
+
+**How to apply:** add the file name to the list in `Program.cs`, and its key to `DemoSamples.DataProvider.Keys`,
+in the same commit as the sample file. Then
 check the output, not the exit code - `ls vipaq/data/packed/demo-samples | grep '^<prefix>'` returns one file
 per algorithm, three today.
