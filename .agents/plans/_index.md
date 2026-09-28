@@ -73,7 +73,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
   paths: ["api/**"]
 - file: api/servicemodule.md
-  description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
+  description: "How far ServiceModule is taken - one store, one project, refresh tokens. A suggestion waiting on a yes"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]

@@ -26,9 +26,8 @@ chosen**:
 Nothing here is a judgement call, so two names can never collide or sit a letter apart. The C# and TS twins
 line up on purpose - `cs_binacle-vipaq_unit` beside `ts_binacle-vipaq_unit`.
 
-**The tests are `[private]`.** Shell completion offers `all`, `image` and `sites`, not twenty-six tests. A
-private recipe still runs by name, which is how CI and `just test <name>` reach it. `just test` with no
-argument prints the test list.
+**The tests are `[private]`.** `just test` and shell completion offer the groups - `all`, `all-with-services`, `image`, `sites` - not every
+test. A private recipe still runs by name, which is how CI and `just test <name>` reach it.
 
 There is **one recipe per test**, listed by hand rather than generated. A CI step names the recipe it runs,
 so a red check names the suite.

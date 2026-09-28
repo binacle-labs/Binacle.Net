@@ -11,13 +11,13 @@
     </PropertyGroup>
 
     <!--
-        Tell Sonar which projects are support code. The Scanner for .NET spots a test project by its
-        Microsoft.NET.Test.Sdk reference, so without this it reads every project that lacks one - the data
-        projects, the test support libraries, the measure and bench projects and the generator tools - as
-        product code: their lines count against coverage and the product rule set runs over them.
+        Tell Sonar which projects are not product code. The Scanner for .NET spots a test project by a
+        Microsoft.NET.Test.Sdk reference, and no project here has one - the MTP suites do not need it - so
+        without this every project reads as product code: its lines count against coverage and the product
+        rule set runs over it.
 
-        Every project under a data/, test/, measure/, bench/ or tools/ folder is support code, so the layout
-        decides it and nothing has to be listed. Marking the xunit suites too is a no-op - the scanner already had them.
+        Every project under a data/, test/, measure/, bench/ or tools/ folder is marked, the xunit suites
+        included, so the layout decides it and nothing has to be listed.
 
         SonarQubeTestProject is read only by the scanner's targets, which are injected during a Sonar run and
         absent otherwise, so a normal build does not see this. Sonar still runs test-scope rules on these

@@ -13,9 +13,9 @@ day, and `3.1.0-beta.2` verified clean from the branch tip of that day.** Three 
 the admin site - **so the last clean beta is behind the branch, and a `beta.3` from the tip is the open box
 under stage 3.** `just test all` was green again on 2026-09-18, after those commits. The six CI edits landed on
 2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
-2026-09-11: **features first, then the changelog and the docs, then the rest.** Branch
-`release/v3-1-0`. **Every beta is dispatched from this branch and its image stops at GHCR** - decided
-2026-09-14; since 2026-09-18 a beta also gets its git tag and a GitHub prerelease - so nothing merges to
+2026-09-11: "first we finish all freatures then changelog/documentation and the rest". Branch
+`release/v3-1-0`. **Every beta is dispatched from this branch and its image stops at GHCR** - the maintainer,
+2026-09-14: "images remain on ghcr for beta thats it"; since 2026-09-18 a beta also gets its git tag and a GitHub prerelease - so nothing merges to
 `main` until the last beta is clean, and the changed `publish` job is first run by the real tag. **The steps from here to the tag are under *Before the tag*, and what happens after it is
 `post-release-v3.1.0.md`.**
 
@@ -72,7 +72,7 @@ written before the clients have moved.
 | 2 | no plan - release paperwork | **The `Best` algorithm, and the algorithm each result used.** `Best` is in the v4 enum and was unreachable from v3, so row 1 is what makes it offerable; `algorithmUsed` is on every v4 result and is rendered nowhere. **One feature, not two** - `Best` runs several heuristics and returns the winner, so without the display the visitor cannot tell what won. Both hosts' result rows. **Landed `a8050583`**, verified with the rebuild on 2026-09-10 |
 | 3 | plan trimmed - the ledger has the reasoning | **The unpacked-items tooltip. Landed on both hosts - UI module 2026-09-10, demo site 2026-09-11.** beercss's own `.tooltip`, on an info button inside the row the way the ViPaq delete button sits in its row. No directive and no TypeScript - one `:focus-within` rule covers the keyboard and touch, which beercss's hover-only tooltip does not. A first attempt built a native `popover` and rendered it at the top-left of the viewport; it was thrown away |
 | 4 | plan landed and deleted - the reasoning is `D6` in the API decisions ledger | **The whole plan. Landed 2026-09-10.** A `Kernel/Instance/` slice now holds what the instance reports about itself; `FeatureOptions` moved in as `InstanceOptions` with a closed value hierarchy, so the presets sit beside the switched-on features without being counted as one. `_js/instance.js`, its webpack entry and its script tag are gone, and with them the last v4 call made from a browser inside the image |
-| 5 | plan landed and deleted - the reasoning is `P3` in the packages decisions ledger | **The request panel. Landed 2026-09-15, UI module only - the maintainer's call on 2026-09-14, reworked the next day to a panel on the right.** A `Request` button on the results card opens a right-side dialog with one `curl` line against the page's own origin and a Copy button where the clipboard API exists. The component exposes `lastRequest` and nothing else changed in the shared package; the dialog and the formatting are the module's own `_js/packing_demo.js`. **Rebuilt into both bundles 2026-09-16; the by-eye paste is still the maintainer's** |
+| 5 | plan landed and deleted - the reasoning is `P3` in the packages decisions ledger | **The request panel. Landed 2026-09-15, UI module only - the maintainer, 2026-09-14: "we will only do it for UiModule"; reworked the next day to a panel on the right.** A `Request` button on the results card opens a right-side dialog with one `curl` line against the page's own origin and a Copy button where the clipboard API exists. The component exposes `lastRequest` and nothing else changed in the shared package; the dialog and the formatting are the module's own `_js/packing_demo.js`. **Rebuilt into both bundles 2026-09-16; the by-eye paste is still the maintainer's** |
 
 | 6 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **`Best` is the first algorithm in the list and the one selected on load**, both hosts. The UI moved to v4 for it, so it is what a visitor sees first. **Landed 2026-09-15** - the one table in `packingDemo.ts` reordered, two tests changed. **A third test was missed** and left `just test all` red until 2026-09-16; the suite is 387 green now |
 | 7 | no plan - release paperwork, the maintainer added it on 2026-09-15 | **One more worked example, and it loads first. Source landed 2026-09-15** as `shared/data/demo-samples/00-two-winners.json` - `00` so it sorts first without renaming the other twenty. Two bins, one item set: `Best` picks FFD on `45x30x25` and BFD on `40x30x30`, each fully packed where the other heuristic is not, measured on the API. WFD cannot win on `compare-bins` - `Best` runs FFD and BFD only there. **Both generators have run** - `demo-samples` 2026-09-15, `vipaq-packed-data` 2026-09-16 - and both bundles carry it |
@@ -122,7 +122,7 @@ release of their own. *(chosen by an agent)*
 |---|---|
 | `plans/api/integration-tests-cover-shipped-modules.md` | **the CORS assertion. Landed 2026-09-10** in `api/test/Binacle.Net.IntegrationTests` - four tests: preflight and simple request from a configured origin carry the header, an unconfigured origin does not, and with no `Cors.json` no origin is allowed. Proven by breaking `app.UseCors()` and watching the right two fail. **Turning the optional modules on is the larger half and is still open** |
 | `plans/ci-cd/ci-open-questions.md` | **the six findings he approved on 2026-09-11 - 1, 4, 5, 8, 10 and 12; 7 is rejected, `D29`.** The plan's answer table says what each yes takes. Two of them, 1 and 8, edit the release `publish` job, and **only a run proves that job** - and since the row below, only the `3.1.0` run itself reaches it. Finding 1 first needs the OIDC connection created on the Docker Hub org - the hand step under *Before the tag* |
-| no plan - the maintainer decided it on 2026-09-14, amended 2026-09-18 | **A prerelease never reaches Docker Hub, and gets its tag and a GitHub prerelease. Landed 2026-09-14, amended 2026-09-18.** `publish` skips on a hyphen and `page` skips with it; `release` carries its own condition and runs past the skip, so a beta leaves a smoked image on GHCR, the tag on its commit and a prerelease page - nothing on Docker Hub. `D3` has the reasoning and the cost, including that a beta tag is permanent under `D24`. `publish` and `page` are first run by the real tag; `release` is proved by `beta.3` |
+| no plan - the maintainer, 2026-09-14: "images remain on ghcr for beta thats it"; amended 2026-09-18 | **A prerelease never reaches Docker Hub, and gets its tag and a GitHub prerelease. Landed 2026-09-14, amended 2026-09-18.** `publish` skips on a hyphen and `page` skips with it; `release` carries its own condition and runs past the skip, so a beta leaves a smoked image on GHCR, the tag on its commit and a prerelease page - nothing on Docker Hub. `D3` has the reasoning and the cost, including that a beta tag is permanent under `D24`. `publish` and `page` are first run by the real tag; `release` is proved by `beta.3` |
 | no plan - the maintainer did it on 2026-09-17 and 2026-09-18 | **The ServiceModule CORS policy, `Cors` in the Kernel, `binacle-net-service-client` and `sites/admin`.** *(row added by an agent on 2026-09-18 - strike it if this is not release work)* Three commits after `beta.2`: the token and admin routes carry a `ServiceApi` policy, one `Cors` section in the Kernel with one file per module, and an experimental client plus a local-only admin page that nothing builds or deploys. The changelog carries all three under Overview, Service Module and Internal Work. Not in any beta yet |
 
 **Why CORS is the one to take even if the rest slips.** `Program.cs` always registers the policy and every
@@ -192,8 +192,7 @@ pull request, so the only thing left in it was this same half, and it now lives 
 
 ## Before the tag
 
-**Three stages, in the order the maintainer set on 2026-09-11: finish the features, then the changelog and
-the docs, then the rest.** Each step needs the one above it. A beta dispatches from this branch and a
+**Three stages, in the order the maintainer set on 2026-09-11** (quoted in the status above). Each step needs the one above it. A beta dispatches from this branch and a
 release from `main` only, so everything up to and including the last beta happens here, and everything from
 the merge on happens on `main`. **A beta can be dispatched at any point on the branch** - the run uses the
 branch's own workflow file, so it is the cheap way to see a CI change or a feature on a real image before it
@@ -214,7 +213,7 @@ is finished; only the last one has to be clean.
 - [x] **2026-09-15. Row 8, the ViPaq samples**, landed in the shared package and the module page; ledger `P4`.
       The by-eye check is the *Done when* box below.
 - [x] **2026-09-16.** Both bundles rebuilt. **Git cannot see this.** Both output folders are gitignored -
-      `.gitignore:73` for `api/src/Binacle.Net.UIModule/wwwroot` and `.gitignore:77` for `sites/demo/js` - so a
+      `.gitignore:72` for `api/src/Binacle.Net.UIModule/wwwroot` and `.gitignore:76` for `sites/demo/js` - so a
       `git diff` or `git status` over them is always empty and proves nothing either way. That is what the
       earlier reading of "no rebuild" was: the check, not the bundles.
       **Grep the built file instead.** `lastRequest`, `00-two-winners` and `Five boxes, packed full` each match
@@ -271,7 +270,7 @@ is finished; only the last one has to be clean.
       release-notes section waits for the tag - `post-release-v3.1.0.md` says why.
 - [x] **2026-09-14.** *(chosen by an agent - strike it)* `.github/dockerhub-overview.md` describes the `3`
       tag - a row in the tag table, and `{{MAJOR}}` filled by `just image dockerhub-overview`.
-      `just image dockerhub-overview 3.1.0 | grep -c '^| \`3\` |'` returns 1. **2026-09-15, the maintainer:**
+      `just image dockerhub-overview 3.1.0 | grep -c '^| \`3\` |'` returns 1. **2026-09-15, after the maintainer's "ok go with 3, service sample pins minor":**
       the quick start, the verify example and "Pin `{{MAJOR}}` for anything you keep" all say `3`; the minor
       row is for the Service Module, the one thing a minor may break.
 - [x] **2026-09-12.** `sites/README.md` names `Deploy Site`, not three workflows.
@@ -320,6 +319,13 @@ is finished; only the last one has to be clean.
       ghcr.io/binacle-labs/binacle-net` passes, `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.3`
       is green, the four UI pages answer 200 with `UI_MODULE=True`, and the six bundle greps from the `beta.2`
       box match. Docker Hub's tag list still has no `beta`.
+      **Found 2026-09-29:** the tag `v3.1.0-beta.3` exists, on `9829dd1b` of 2026-09-18. Nothing here records
+      whether its run was green or its image verified. Over fifty commits have landed on the branch since. Most
+      are agent files, plans, benches and results; the shipped code gained the internal `BestFitDecreasing_v3`
+      and `WorstFitDecreasing_v3` in `Binacle.Lib`, which nothing in `lib/src` or `api/src` calls yet.
+      `CHANGELOG.md` has not changed since the tag.
+- [ ] **`3.1.0-beta.4` dispatched from the branch tip, run green, and verified the same way as `beta.3`.** The
+      maintainer, 2026-09-29: "we will do a beta 4 at the end just for a case".
 - [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
       first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
       red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.

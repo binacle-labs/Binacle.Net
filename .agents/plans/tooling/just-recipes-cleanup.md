@@ -60,7 +60,7 @@ passing the last means typing all four.
 ## 6. One way to name a private recipe
 
 Four styles today: `_lychee`, `_build-site`, `_dotnet_test`, and bench's `lib-algorithms-run`. Pick one.
-Bench's follows the maintainer's call of 2026-09-22: every recipe starts with its slice.
+Bench's follows the maintainer, 2026-09-22: "all recipes should be prefixe with lib or vipaq even prvate".
 
 ## 7. Two silent failures
 

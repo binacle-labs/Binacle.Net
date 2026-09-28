@@ -76,7 +76,7 @@ first is off limits.
 ## Who may reference whom
 
 One table, one file: `rules/who-references-whom.md`. It covers every layer, the outward boundary, and the
-three exceptions. Nothing here restates it.
+exceptions. Nothing here restates it.
 
 ## How to reference — the `$` symbol scheme
 

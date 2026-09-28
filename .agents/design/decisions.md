@@ -1,8 +1,8 @@
 ---
 id: decisions
 description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model, and the four project folders and what each may reference, and why measured numbers live in the slice - deterministic ones tracked and diffed, timing ones kept by hand.
-verified: 2026-09-26
-check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every file under lib/results/measurements and vipaq/results/measurements, and by neither measure project registering a README reporter
+verified: 2026-09-29
+check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and every gemspec under ruby/, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every file under lib/results/measurements and vipaq/results/measurements, and by neither measure project registering a README reporter
 paths:
   - "NOTICE"
   - "README.md"
@@ -175,13 +175,13 @@ What was built and why. No quote from the maintainer covers these yet.
 The repo has lived at `binacle-labs/Binacle.Net` since 2026-08-16.
 
 **Copyright and authorship stay on the person, everywhere they appear** — `NOTICE` and `README.md`
-("Copyright (c) 2023-2026 Chris Mavrommatis"), `CONTENT-TERMS.md` ("© 2026"), the root `package.json`
-`author`, the copyright line in the UI module's `Pages/Shared/_Footer.cshtml`, and the `authors` in both
-`.gemspec` files. Moving a repository into a GitHub organization does not move copyright, and `binacle-labs`
+("Copyright (c) 2023-2026 Chris Mavrommatis"), `CONTENT-TERMS.md` ("© 2023-2026 Chris Mavrommatis"), the `author` in the root and site `package.json`
+files, the copyright line in the UI module's `Pages/Shared/_Footer.cshtml`, and the `authors` in every
+`.gemspec` under `ruby/`. Moving a repository into a GitHub organization does not move copyright, and `binacle-labs`
 is a namespace rather than a legal entity — there is nothing for it to hold. Writing the org name into a
 copyright line would make that line less true.
 
-**A `repository.url` is the opposite case and does carry the org**: both `package.json` files point at
+**A `repository.url` is the opposite case and does carry the org**: every `package.json` that has one points at
 `github.com/binacle-labs/Binacle.Net`, which is where the repository actually is. `packages/binacle-net-ui/package.json`
 has a `repository` and a `license` but **no author field at all**, so there is nothing on it to protect — do not
 add one to make the set look symmetrical.
@@ -231,8 +231,8 @@ root file that matches the pattern is a candidate even when its content matches 
 nothing" resolves to `other`, which counts as a second licence. That is the same mechanism `CONTENT-LICENSE.md`
 tripped above, with different files.
 
-**Subdirectories are invisible to licensee**, which is why the nineteen `LICENSE` files under `ruby/`,
-`samples/`, `tooling/`, the two wire-format libraries and their npm twins cost the badge nothing. Confirmed
+**Subdirectories are invisible to licensee**, which is why the `LICENSE` files in subfolders - `ruby/`,
+`samples/`, `tooling/`, `shared/`, `vipaq/`, `packages/`, `assets/lib/` - cost the badge nothing. Confirmed
 against the repository after they landed: `GPL-3.0`, 100%, exact matcher.
 
 **One trap in that: never create a `LICENSES/` folder.** licensee scans that name specifically, per the REUSE
@@ -248,10 +248,10 @@ text with no context.
 
 ### D2 — a version's published page must match what that version's image serves
 
-Each folder under `sites/docs/collections/_versions/` describes the image that shipped under that minor version.
+Each folder under `sites/docs/collections/_versions/` describes the images one major line shipped.
 `2.1.1` really does serve `https://github.com/ChrisMavrommatis/Binacle.Net` in its OpenAPI documents and its
-UI, so rewriting v1.3.x, v2.0.x or v2.1.x to say `binacle-labs` would make the page disagree with the running
-artifact. **Only v3.0.x changed**, because `3.0.0` is built after `Metadata.cs` moved and serves the new owner.
+UI, so rewriting `v1.x` or `v2.x` to say `binacle-labs` would make the page disagree with the running
+artifact. **Only `v3.x` changed**, because `3.0.0` is built after `Metadata.cs` moved and serves the new owner.
 How the site is versioned is `$sites/docs`.
 
 The same reason covers every other survivor of the move: the `v1.3.0...v2.0.0` compare link in `CHANGELOG.md`,
@@ -264,8 +264,8 @@ rule and the generator are in `$sites/docs`.
 
 ### D7 — an old docs version is de-indexed, and after that it is only ever bug-fixed
 
-Four documentation versions are published and only one is current. Before 2026-08-23 all four were indexable,
-all four were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
+Several documentation versions are published and only one is current. Before 2026-08-23 all of them were
+indexable, all were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
 title and a meta description with a sibling, and five said `Quick Start - Binacle.Net Docs`. A search engine
 had nothing to choose on, so readers landed on documentation for image tags that will never ship again.
 
@@ -330,11 +330,11 @@ than as history. Agent docs under `.agents/` may name one, and have to: the band
 the numbers.
 
 **A page under `sites/docs` also quotes no figure that expires** — since 2026-08-31, and it is the sharper
-form of the same rule. A versioned page names its own version explicitly, so a `v3.0.x` page names `3.0` and
+form of the same rule. A versioned page names its own version explicitly, so a `v3.x` page names `3.0` and
 `3.0.0`. **What it does not carry is a digest, a package count or a run URL**, however real they were when
 they were pasted.
 
-**This was learned by doing it twice.** `v3.0.x/verifying-a-release.md` quoted `3.0.0-beta.2`, a deleted tag
+**This was learned by doing it twice.** The v3 `verifying-a-release.md` quoted `3.0.0-beta.2`, a deleted tag
 signed under the old owner. It was rewritten as a record of `3.0.0-beta.5` carrying real figures, and that
 lasted a day: the betas are deleted once the release is live, so a record of a deleted image is the exact
 fault the first rewrite existed to fix. **The third version describes what the commands print and quotes
@@ -365,9 +365,10 @@ for f in $(find .agents/docs .agents/design -name "*.md" ! -name "_index.md" | s
 done
 ```
 
-A clean run prints exactly two lines, both deliberate: `design/README.md` (navigation, claims nothing about
-code) and `design/vipaq/history.md` (frozen at the date it was measured, and path-less on purpose so a live
-session is never handed superseded numbers). **Anything else in the skip list is a hole, not a result.**
+A clean run prints exactly three skip lines, all deliberate: `design/README.md` (navigation, claims nothing
+about code), `design/ci-cd/decisions/README.md` (a split ledger's opening text; each entry carries its own
+`paths:`) and `design/vipaq/history.md` (frozen at the date it was measured, and path-less on purpose so a
+live session is never handed superseded numbers). **Anything else in the skip list is a hole, not a result.**
 
 **This decision is not watched by its own query.** Its subject is the reference layer, and a `paths:` broad
 enough to cover that would fire on every edit to it. Some claims are not expressible as a pathspec; saying so

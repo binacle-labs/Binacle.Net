@@ -18,6 +18,9 @@ It lives in `lib/src/Binacle.Lib/Algorithms/<Heuristic> v3/`. The unit tests and
 factory under `lib/src/` creates it, so the API runs v2. No bench runs it; it was added to the algorithms bench
 by hand for the runs below and taken out.
 
+The maintainer, 2026-09-27: "no we hold v3 we need more testing", then "it needs to exist in lib and unit tests
+and in version parity... nmo benchmarks for now".
+
 **What is known.** It fills every Bischoff problem exactly as v2 (`lib/results/measurements/version-parity.md`)
 and allocates the same. On the four smoke scenarios, packing, it took well under half of v2's time where there
 are many free spaces; BFD v3 took about FFD's time. The numbers are in the lib findings record.

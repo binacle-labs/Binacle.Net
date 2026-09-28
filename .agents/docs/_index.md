@@ -15,7 +15,7 @@ table of [README.md](README.md).
   description: "Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects"
   paths: ["Binacle.Net.slnx", "Directory.*.props", "global.json", "**/*.csproj", "Dockerfile"]
 - file: commands.md
-  description: "How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image"
+  description: "How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image"
   paths: ["justfile", "tooling/**"]
 - file: concepts.md
   description: "Fit exits early on first failure; pack continues and returns positions. Both return the same result shape — packed items and unpacked items. Used by both Lib algorithms and API endpoints."

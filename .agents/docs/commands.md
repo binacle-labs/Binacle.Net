@@ -1,7 +1,7 @@
 ---
 id: commands
-description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-26
+description: How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image
+verified: 2026-09-29
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; measure recipes match tooling/measure.just; bench recipes match tooling/bench.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -24,18 +24,14 @@ human setting up a machine.
 Do not repeat any of it here, and do not answer a setup question from memory: read that file, or point the user
 at it. This section exists only to say where it is.
 
-The short version, for judging whether a command in this doc can run at all: .NET SDK 10.x, Node 22 (`.nvmrc`),
-Ruby 3.4.7 (`.ruby-version` in `sites/docs/`, `sites/demo/` and `sites/www/` — **all three** sites need it),
-`just`, and docker for anything touching the image.
-
 ## Set up a fresh clone
 
 ```bash
-just install                           # npm workspaces, the gems for all three sites and for ruby/, then the asset copy
+just install                           # npm workspaces, the gems for docs, demo, www and ruby/, then the asset copy
 just assets                            # only the asset copy - after changing anything under assets/
 ```
 
-`assets` copies `assets/**` into the three sites and into the UI module's `wwwroot/` via gulp. Each serves its
+`assets` copies `assets/**` into the docs, demo and www sites and into the UI module's `wwwroot/` via gulp. Each serves its
 own copy, so a changed logo does not show up until this runs. **`sites/www` gets a smaller set** — the gulp
 target skips `assets/lib/`, because that site runs no CSS framework; see `$sites/www`.
 
@@ -74,15 +70,15 @@ loaded as the `test` module. The same recipes are what CI calls, so a red step i
 package or gem name lowercased with dots turned to dashes, so `cs_binacle-net-kernel_unit` is
 `Binacle.Net.Kernel.UnitTests` and nothing else. `_` separates the segments, `-` belongs inside a name.
 
-**The tests are `[private]`**, so completion offers the four groups and not twenty-seven tests. A private
-recipe still runs by name. `just test` with no argument prints the whole list.
+**The tests are `[private]`**, so `just test` and completion offer the four groups, not every test. A private
+recipe still runs by name.
 
 ```bash
 just test all                  # every test that needs nothing brought up
 just test all-with-services    # the same, plus the two backends that need services up
-just test image                # the seventeen the Docker image ships
-just test sites                # the fifteen a Jekyll site ships
-just test                      # the four above, then every test name
+just test image                # every test the Docker image ships
+just test sites                # every test a Jekyll site ships
+just test                      # the four groups above
 
 # C#
 just test cs_binacle-lib_unit
@@ -120,16 +116,15 @@ just test rb_jekyll-structured-data_unit
 just test rb_jekyll-webmanifest_unit
 ```
 
-**Twenty-seven tests, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
+**`just test all` runs every test.** The Ruby ones go through `bundle exec rspec`
 from the gem's own folder, which is the only place a `spec_helper` is on the load path.
 
 **Four group recipes, and the three lists in `tooling/tests.just` are the only copy of the set of tests.**
 `just test image` is what the Docker image ships, `just test sites` is what a Jekyll site ships, and
-`just test all` is a third list, written out as the two of them with nothing run twice — five javascript
+`just test all` is a third list, written out as the two of them with nothing run twice — most javascript
 tests are in both.
 `just test all-with-services` is `all` plus the ServiceModule suite against Postgres and Azure Tables, which
-need `just serve services-up -d` first. Each group runs every test and reports all the failures, not just the
-first.
+need `just serve services-up -d` first. A group stops at the first failure, so the quick tests go first.
 
 **A group is for a laptop, with one exception — the Sonar workflow calls `all-with-services`, because
 coverage has to be a single run.** Every other workflow names every test as its own step, so a red check
@@ -182,7 +177,7 @@ drops whole trees that are in scope here. Use the rows to pick what to work on, 
 which it looks for in the directory it runs in. Both recipes share it. Only `targetdir` and `reporttypes`
 are on the command line, because that is all the two differ on.
 
-**A `sonar` run ends by merging the ten gem reports into one `ruby.json`**, in `tooling/coverage.run.sh`.
+**A `sonar` run ends by merging the gem reports into one `ruby.json`**, in `tooling/coverage.run.sh`.
 `sonar.ruby.coverage.reportPaths` is the only one of Sonar's three coverage settings that takes no wildcard,
 so it has to be handed a file name. That merge is what jq is needed for.
 
@@ -205,7 +200,7 @@ just openapi sync-all-copies           # generate, then write every committed co
 `sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`,
 `packages/binacle-net-client/spec/v4.json`, and `packages/binacle-net-service-client/spec/service.json`. The
 v4 client takes no copy of v3, and the service client takes only the service document. The current docs
-version is a variable at the top of `openapi.just` and moves with each minor; the frozen version folders below
+version is read from `current:` in `sites/docs/_data/versions.yml`; the frozen version folders below
 it are records of what those releases documented and are never compared. `shared-image-tests.yml` runs the
 check beside the lint.
 
@@ -256,8 +251,8 @@ just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also l
 just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-threshold-, vipaq-sample
 just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-threshold-full
 just bench lib-racing-cores precise      # racing on 2, 4, 8, 12 cores: asks first; short job, `precise` for default
-just bench lib-result-selection          # 22 cases, about 3 minutes; its one tier
-just bench lib-scaling quick             # 66 cases over the item ladder: default job, `quick` for short; its one tier
+just bench lib-result-selection          # about 3 minutes; its one tier
+just bench lib-scaling quick             # the item ladder, about 20 minutes: default job, `quick` for short; its one tier
 ```
 
 The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`, and racing's `Cores_`), picked with

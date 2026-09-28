@@ -25,15 +25,17 @@ whose manifest prefix is `ResultSelection.`.
 
 ### 2026-08-26 - the demo's sample set is fixture data
 
-`shared/data/demo-samples/` holds 20 files, one per sample, 51 entries. Every `Result` was measured against a
+`shared/data/demo-samples/` holds one file per sample. Every `Result` was measured against a
 live API on all three algorithms and both endpoints. ViPaq packs them too, into
 `vipaq/data/packed/demo-samples/`.
 
-**The direction settled the other way from what was first proposed.** The data is the source and the demo reads
+**The direction is the other way from what was first proposed.** The data is the source and the demo reads
 it: `just regen demo-samples` reassembles the files into
 `packages/binacle-net-ui/src/apps/packingDemo/sampleData.ts`. Nothing reads the demo package to write the data.
 
 ### 2026-08-27 - the maintainer said "not yet" on growing the cases
+
+Before the session logs, so the quote cannot be checked.
 
 Nothing here is wrong; it was deliberately not being done.
 

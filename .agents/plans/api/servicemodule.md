@@ -1,5 +1,5 @@
 ---
-description: How far ServiceModule is taken - answered. One store, one project, refresh tokens
+description: How far ServiceModule is taken - one store, one project, refresh tokens. A suggestion waiting on a yes
 state: proposed
 waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
 paths:
@@ -8,10 +8,13 @@ paths:
   - "api/src/Binacle.Net.ServiceModule.Infrastructure/**"
 ---
 
-# ServiceModule - answered 2026-08-31
+# ServiceModule - how far it is taken
 
-**The module is for the maintainer's own instance.** That answers the question this file used to ask and it
+**The module is for the maintainer's own instance.** The maintainer, 2026-08-31: "i only plan the service
+module for my use... for my api.binacle.net". That answers the question this file used to ask and it
 collapses the scope: one deployment, one database, no public documentation, no migration story owed to anyone.
+
+**Suggested (agent, 2026-08-31):** everything below. It waits on his yes, which is what `proposed` means.
 
 **Drop Azure Table Storage.** It is the one backend that cannot serve an admin screen - no secondary indexes,
 so it cannot sort by anything but `RowKey`, cannot skip, and cannot count without reading every row. The line

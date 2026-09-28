@@ -74,7 +74,8 @@ whole of what is left, and there is no CI work to do beyond whatever turning the
 
 ### 2026-08-27 - the maintainer agreed the split
 
-His word was *"agreed"* on splitting the investigation from the build.
+His word was *"agreed"* on splitting the investigation from the build. Before the session logs, so the quote
+cannot be checked.
 
 ### Date not recorded - what will bite
 

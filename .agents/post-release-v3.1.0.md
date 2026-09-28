@@ -69,10 +69,10 @@ two lists are clear** - the third is plans, and plans outlive it.
       `url_segment: 3.1.0`, `version_tag: "3"` (the major tag - it exists once this release publishes it, and
       then every page pulls with it and no later minor edits the line).
       `grep -A3 'id: v3.x' sites/docs/_data/versions.yml` shows the three values. Same commit: the sentence
-      under the `docker run` in `v3.x/quick-start.md` and in `v3.x/samples/index.md` says "the major tag", not
-      "the minor tag" - true only once the tag printed is `3`.
-      `grep -n 'minor tag' sites/docs/collections/_versions/v3.x/quick-start.md sites/docs/collections/_versions/v3.x/samples/index.md`
-      returns nothing.
+      in `v3.x/samples/index.md` says "the major tag", not "the minor tag", and the tag sentence under the
+      `docker run` in `v3.x/quick-start.md` no longer says the tag follows only the newest patch - both true
+      only once the tag printed is `3`.
+      `grep -n 'minor tag' sites/docs/collections/_versions/v3.x/samples/index.md` returns nothing.
 - [ ] `bundle exec jekyll build` passes in `sites/docs`, and `Deploy Site` is dispatched with `docs` and green.
       `docs.binacle.net/release-notes/` shows 3.1.0 at the top, and `docs.binacle.net/version/v3.0.x/` answers
       `301` to `/`.
@@ -89,10 +89,11 @@ the current one at the root. A minor is this section and nothing else.
 
 ### 2. Move the pins to `3` - a coding session
 
-**`3`, not `3.1` - the maintainer decided on 2026-09-11 and confirmed on 2026-09-15.** The major tag follows
+**`3`, not `3.1`.** The maintainer, 2026-09-11: "yeah sure we also add thje 3"; and 2026-09-15: "ok go with 3,
+service sample pins minor". The major tag follows
 every minor and patch in the line, so this move happens once and no later minor repeats it. An old minor tag
 gets no patches - `3.0` stays at `3.0.0` - so a sample pinned to a minor is a sample that stops getting fixes
-the day the next minor ships. **One exception, decided 2026-09-15: the `service` sample pins `3.1`**, because
+the day the next minor ships. **One exception, from that same answer: the `service` sample pins `3.1`**, because
 the Service Module is the one thing a minor may break, and that sample is for people who turned it on. It moves
 by hand at each minor. The release workflow publishes `3` for the first time with this release, which is why
 the move still waits for the run.
@@ -147,7 +148,7 @@ version.
 **What the beta leaves behind.** `ghcr.io/binacle-labs/binacle-net:3.1.0-beta.<n>` stays on GHCR - a
 prerelease's image stops there since 2026-09-14, `D3`. `beta.1` and `beta.2` have no git tag; from `beta.3`
 on, each has its tag and a GitHub prerelease, amended 2026-09-18. **The image stays there** for now. The
-maintainer does not delete staging images; how or when is not decided (2026-09-28).
+maintainer, 2026-09-28: "i dont delete them but i havent decided how or when to do that".
 
 **Delete this file once the first two lists are clear.** What outlives it goes to the docs and the decision
 ledgers, not here.

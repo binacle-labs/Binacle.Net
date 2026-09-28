@@ -23,7 +23,7 @@ they do.
 Two things that follow, both easy to get wrong:
 
 - **Old issues do not fail the gate.** Only new code is graded, and `new_maintainability_rating` sits at A.
-  509 open issues block nothing. Cleaning them up is housekeeping with a real gate cost attached, so it is
+  Open issues block nothing. Cleaning them up is housekeeping with a real gate cost attached, so it is
   worth doing deliberately rather than in passing.
 - **A rolling new code period forgives it.** New Code is "days = 30", so damage from a cleanup ages out
   about a month later with no action. Useful to know, and a warning: a gate that repairs itself by waiting
@@ -37,4 +37,4 @@ and S2325 ("make this method static") not, since the latter edits call sites ins
 and left it untested", which is exactly what happened, and exactly what it is for.
 
 **How to apply:** before a bulk fix of an old rule, check the coverage on the files it lands in. Sort the
-work by that, not by rule. See the memory on Sonar issue ignores for what to do with findings you will not fix.
+work by that, not by rule.

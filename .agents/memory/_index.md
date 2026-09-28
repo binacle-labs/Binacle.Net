@@ -57,10 +57,6 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "Test-host config goes through an env var the harness reads, never a .runsettings file — the MTP runner ignores VSTest runsettings"
   when: "changing ServiceModule test-host configuration"
   paths: ["api/test/Binacle.Net.ServiceModule.IntegrationTests/**"]
-- file: sonar-no-quality-profile.md
-  description: "Sonar rules cannot be switched off on this project - custom quality profiles start at the Team plan and this one is on Free, so \"Sonar way\" is read-only"
-  when: "someone proposes turning a Sonar rule off"
-  paths: ["tooling/ci/sonar-analysis.xml"]
 - file: sonar-ruby-coverage-paths.md
   description: "sonar.ruby.coverage.reportPaths takes no wildcard and resolves against the ruby/ module, not the repo root - the other two coverage properties beside it do neither"
   when: "changing a coverage report path in the Sonar settings, or adding a gem"

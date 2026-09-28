@@ -78,7 +78,7 @@ You need the .NET SDK, Node, Ruby, `just` and - for the container image only - D
 **[DEVELOPMENT.md](DEVELOPMENT.md)** has the versions, the pin files and the install commands.
 
 ```bash
-just install                     # npm workspaces, all three sites' gems, then the asset copy
+just install                     # npm workspaces, the docs, demo and www gems, then the asset copy
 just test all                    # every suite that needs nothing brought up
 just build image                 # publish, then tag binacle-net:local
 ```
@@ -97,6 +97,7 @@ This project carries more than one license. Which one applies depends on which p
 | The Ruby gems under [`ruby/`](ruby) | MIT |
 | Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
 | [`packages/theme-switcher`](packages/theme-switcher) | MIT |
+| [`packages/cookies`](packages/cookies) - adapted from js-cookie | MIT |
 | [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
 `SPDX-License-Identifier: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`
