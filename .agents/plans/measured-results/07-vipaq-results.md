@@ -11,7 +11,7 @@ paths: ["vipaq/results/**"]
 ## Where it stands
 
 The seven files in `vipaq/results/` are placeholders, like lib's: a comment per table as its spec, a sample table
-with fake numbers under it. The numbers get in the way session 6 settled.
+with fake numbers under it. The numbers get in the way the maintainer picks in session 6.
 
 ## The decisions the files serve
 

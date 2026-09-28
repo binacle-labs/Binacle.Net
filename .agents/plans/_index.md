@@ -139,7 +139,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
-  description: "Session 5 - build and run a bins bench that finds where packing many bins at the same time starts to pay, on bins of one size, 2 to 16 bins, 2 to 12 cores; shape agreed, not built"
+  description: "Session 5 - find where packing many bins at the same time starts to pay. All pending - bin-set categories from even to real, an item sweep, and a run in stages, each a suggestion"
   state: blocked
   waits-on: "session 4 - the racing run and what it teaches"
   horizon: undecided
