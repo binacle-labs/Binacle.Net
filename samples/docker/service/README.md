@@ -42,7 +42,8 @@ folder. It is a real choice for a single instance.
 Postgres and Azure Storage are commented in `docker-compose.yml`. Both point at infrastructure you already run
 - a production deployment should not start its own database in the same compose file, and neither commented
 line does. For Postgres the host is your server's name, not `localhost`, which inside a container means the
-container itself
+container itself.
+
 ## 🌍 CORS
 
 Only needed when a **browser** calls this API directly. `Cors.json` is not in the image - you supply it, and

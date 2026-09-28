@@ -134,7 +134,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: measured-results/04-racing-drop-point.md
-  description: "Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 locked Bischoff problems"
+  description: "Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 Bischoff problems"
   state: ready
   waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
   horizon: undecided

@@ -15,10 +15,7 @@ Decisions and open questions for `lib/src`, with the *why*. Measured evidence li
 This file is the "what was built and why", so a fresh session does not re-litigate it or "fix" a deliberate
 choice.
 
-**D1 and D4 quote the maintainer.** The other entries under *Locked* record what the code does and the evidence
-for it; treat them as his decision only once he confirms them.
-
-## Locked
+## Decided
 
 ### D1 — `Algorithm.Best` races a different set depending on the path
 
@@ -41,6 +38,19 @@ cost, and the multi-bin path refuses the same trade because the cost is no longe
 
 **Consequence for the docs:** any page describing `Best` must say **which set the route uses**, and why WFD is
 dropped. "Runs all algorithms" is wrong on the multi-bin routes.
+
+### D4 — old algorithm versions are kept
+
+**Decided (the maintainer, 2026-09-28):** "old versions are kept. it shows my progress... when i need to start
+improving i copy from the last and iterate on that... until i gained enough evidence thats stable then i
+release it... if and when i decide to delete thats a different topic".
+
+So each version stays in `lib/src/Binacle.Lib/Algorithms/`, the next one starts as a copy of the latest, and it
+ships only once the evidence says it is stable. Deleting a version is a separate call, his.
+
+## Pending
+
+What the code does and why. No quote from the maintainer covers these yet.
 
 ### D2 — the packing vocabulary lives in `shared`, and there is no abstractions assembly
 
@@ -109,15 +119,6 @@ data project keeps its own name shape. `Binacle.Lib.Data` reads through it since
 **The manifest prefix names the purpose, not the assembly.** `ResultSelection.<case>.<file>`, following ViPaq's
 `PackedData.<family>.<file>`, so an assembly rename cannot silently break the manifest. A broken manifest name
 fails **silently** — verify with `strings <dll> | grep <prefix>` after any change here.
-
-### D4 — old algorithm versions are kept
-
-**Decided (the maintainer, 2026-09-28):** "old versions are kept. it shows my progress... when i need to start
-improving i copy from the last and iterate on that... until i gained enough evidence thats stable then i
-release it... if and when i decide to delete thats a different topic".
-
-So each version stays in `lib/src/Binacle.Lib/Algorithms/`, the next one starts as a copy of the latest, and it
-ships only once the evidence says it is stable. Deleting a version is a separate call, his.
 
 ## Open
 

@@ -18,7 +18,364 @@ file is the reasoning, so a later session does not re-litigate a deliberate choi
 Several of these were argued out at length while the release pipeline was being rebuilt, in a working file that
 does not outlive the work. This is where that reasoning lives now.
 
-## Locked
+## Decided
+
+### D3 — a prerelease stays on GHCR, and still gets its tag and a GitHub prerelease
+
+**Decided (the maintainer, 2026-09-18):** "should i publish beta versions to giuthub?", then, to the answer
+yes: "do itand then scan what needs doing for release 3.1.0?"
+
+**Decided 2026-09-18 by the maintainer, amending the 2026-09-14 rule.** `publish` carries
+`if: ${{ !contains(inputs.version, '-') }}` and `page` skips with it through plain `needs`. `release` carries
+`if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}`, so it runs past the skipped `publish` and
+stops on a failed one. A beta runs `gate`, `test`, `build`, `smoke` and `release`, and leaves three things
+behind: the smoked, signed image on `ghcr.io/binacle-labs/binacle-net` under its immutable tag, the git tag
+on the run's commit, and a GitHub release flagged prerelease with the `[Unreleased]` section as its body. No
+Docker Hub copy, no Docker Hub page.
+
+**Why the tag and the release came back.** Four days under the 2026-09-14 rule produced `3.1.0-beta.1` and
+`beta.2` with nothing in git naming them: no tag to check out, no diff between them for the notes, no
+notification to anyone watching the repository, and the maintainer looking for tags that were never made.
+Every `3.0.0-beta.*` had a prerelease page, so the convention was already what readers expected. The
+plumbing was already there - `github-release.sh` flags a hyphenated tag `--prerelease` and
+`changelog-section.sh` maps one to `Unreleased` - and only the `needs` edge stopped it running.
+
+**The cost, and it is permanent.** D24's ruleset blocks deleting any `v*` tag, so every beta tag stays for
+good, eight of them for the 3.0 line's worth. That is accepted: a tag that names what a run built is the
+record, and the ruleset is what makes it trustworthy.
+
+**What a beta is for under this shape.** It proves the build and the smoke against the exact commit, and it
+gives a person an image to pull and click through before the real dispatch. Whoever checks it pulls from GHCR:
+`just smoke all ghcr.io/binacle-labs/binacle-net:<version>` and `docker run` against the same reference. The
+`release` job's run summary prints the reference, the digest, the release link and the GHCR form of the verify
+command.
+
+**What it does not prove, and the cost accepted with it.** `publish` and `page` never run for a prerelease,
+so the first run of any change to them is the real release. That is survivable by design: a red `publish`
+leaves Docker Hub untouched and creates no tag, and the tag check in `gate` lets the same version be
+dispatched again once fixed. The cost is a red release run rather than a red beta.
+
+**History - this is the fourth answer to the same question.** The skip was introduced on 2026-08-11 and
+reversed the same day, on two arguments: it was never a safety rule, because *nothing unsmoked reaches Docker
+Hub* comes from `smoke` running before `publish` and holds either way; and it cost deployability, because a
+host that cannot route to GitHub's AS36459 could not pull a beta from GHCR. Between then and 2026-09-05 the
+guard was metadata-action's alone - a prerelease reached Docker Hub with its immutable tag only, since
+`{{major}}.{{minor}}` is skipped for one and `latest=auto` withholds `latest` - observed on Docker Hub on
+2026-08-06 after `v3.0.0-beta.1`. **What the reversal underrated was the tag list**: eight `3.0.0-beta.*`
+tags sat beside the release until they were deleted by hand (D27), betas 1 to 4 failed the published verify
+command for anyone who tried it, and every beta was a second answer to "which image do I pull". The
+deployability argument still holds and is the price: a beta is pullable from GHCR only. **The 2026-09-14
+answer** went one step further and dropped the git tag and the release too, on plain `needs`; that is the
+step undone here.
+
+**The trap the 2026-08-11 reversal warned about now applies, and is handled.** It said a conditional job
+above `release` needs a status condition on `release` or a beta silently gets no GitHub release. That is
+exactly the `if:` `release` carries. `!cancelled()` rather than `always()` so a cancelled run does not tag,
+and `!contains(needs.*.result, 'failure')` rather than a check on `publish` alone so a red job anywhere above
+holds it.
+
+**A prerelease may be dispatched from a `release/*` branch** - the maintainer, 2026-09-14: "...any release in
+main mut be beta or normal and any release from branch can only be beta (for now) and only from this pattern
+release/*". The rule
+in full: `main` may dispatch a release or a prerelease; a `release/*` branch may dispatch a prerelease only;
+nothing else may dispatch anything. The release branch is where the betas of a version come from, and
+nothing merges to `main` until the last one is clean. Because a dispatch runs the workflow file at its own
+ref, the branch's CI changes are proved by its betas before they reach `main`. `check-release-ref.sh` takes
+the version and is the whole check. **Since 2026-09-18 the branch must be named after the version** -
+`release/v3-1-0` may dispatch `3.1.0-*` and nothing else, so a beta of one version cannot be built from
+another version's branch, and a branch that is not `release/v<x>-<y>-<z>` is refused outright. The
+maintainer, 2026-09-18: "if possible i'd like toalso gate the branch name to release/version so only those
+branched publish beta images instead of all", then "do it".
+
+**Branch builds with no version are not wanted - closed 2026-09-18.** Asked whether he needs them, the
+maintainer, 2026-09-18: "no what i might need is enforcing the image on main to either be beta or normal and
+then on brach only beta". The idea was an image from any branch under a slug-and-sha tag. A beta from the version's own `release/` branch is the way to try an image, and it
+comes with a version, a tag and a verify command that passes. A branch build would sign under a ref no
+published command names and leave an image on GHCR forever; the plan that held it was deleted the same day. "For now" on the branch half - a release from a branch is not ruled out
+forever, only not today. The image signs under the branch's ref, so
+checking it is `just image verify <version> all refs/heads/<branch> ghcr.io/...`; the published command,
+anchored on `main`, does not cover it and nothing published names it.
+
+**What the `gate` job still checks for a beta.** The ref, semver, the tag is free, and that
+`## [Unreleased]` exists and is not empty. The section check is worth keeping even though nothing publishes
+it: it fails in seconds when the changelog is not in shape, which is the cheapest place to learn that.
+
+**The staging push carries the immutable tag only.** The moving tags - `3.1`, `3` and `latest` - are computed
+in `publish`, the job that creates them, and `3` exists since 2026-09-12 so the samples and the docs can pin a
+line that follows every minor; `$sites/decisions#S11` has why.
+
+### D23 — one required check, and the maintainer bypasses it
+
+**Decided (the maintainer, 2026-08-31):** "yes record all three" - answering whether to write down the admin
+bypass on `Gate` as a deliberate choice, with the reason.
+
+**Branch protection on `main` requires exactly one status check, `Gate`.** That is the job name, and the job
+name is the whole context - not `Pull Request / Gate`. `pull-request.yml` says so above the job: *"`gate` is
+the only name branch protection holds."* Every job under it can be renamed freely; this is the last
+protection edit that should ever be needed.
+
+**`gate` reports whatever happens.** It is `if: always()` with `needs:` on every other job, so a skipped half
+still produces a verdict. A required check that can silently never report is what leaves a pull request
+pending forever, and that shape is designed out rather than watched for.
+
+**The repository-admin role bypasses it, deliberately.** `pull-request.yml` triggers on `pull_request` only.
+A commit pushed straight to `main` therefore has no `Gate` check and never will - not a slow one, an absent
+one. Without the bypass the maintainer's own push is rejected with nothing to wait for. **The bypass is not a
+weakening of a check that was working; it is an admission the check was never going to run for that path.**
+
+What the check actually binds is Dependabot, which opens up to ten pull requests per ecosystem across five of
+them. External pull requests are closed (`CONTRIBUTING.md`), so there is nobody else to bind.
+
+**The alternative, rejected for now:** add `push: branches: [main]` and drop the bypass. That makes the
+requirement honest for every commit, and costs a full CI run on every push while the workflow stops being
+about pull requests. **Revisit it when a second person can commit** - at that point the bypass is protecting
+a habit rather than describing a gap.
+
+**`strict_required_status_checks_policy` is off.** A pull request can merge without being up to date with
+`main`. With one committer the alternative forces a rebase before every Dependabot merge and buys little.
+
+### D26 — Docker Hub tag immutability stays off
+
+**Decided (the maintainer, 2026-09-03):** "fotget immutability", and later that day: "...dockerhub
+immutability...its no for now'"
+
+**Answered 2026-09-04: no, for now.** The switch is off. Recorded as a decision rather than left as an open
+question, because an open question with no value is worse than either answer.
+
+**What would reopen it.** A Docker Hub tag actually being overwritten - the risk this was weighed against has
+never happened, and one occurrence changes the arithmetic. Or a rehearsal on a throwaway repository proving a
+rule scoped to released versions behaves as documented, which is the safe path this entry names and nobody
+has walked.
+
+**What it would have bought:** a published release tag that cannot be overwritten. **What it costs is the
+reason not to.** There is no undo. An immutable tag cannot be deleted either, so a release tag pushed by
+mistake is permanent, and turning it on safely means rehearsing it on a throwaway repository first.
+
+**The stored rule is `.*`, and that is what makes the switch dangerous here rather than merely irreversible.**
+`.*` matches `latest` and `3.0`, the two tags every release moves. Enabling it against that rule would freeze
+the moving tags on the first release after it, which is exactly the mechanism D25 depends on. **If this is
+ever reopened, the rule is the first thing to correct** - released versions only, never the moving tags.
+
+**What already protects the release.** D24 - a tag ruleset that nobody bypasses, so a release tag cannot be
+moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
+the registry side has never gone wrong.
+
+### D28 — Sonar runs on every pull request that can carry the token, parallel and non-blocking
+
+**Decided (the maintainer, 2026-09-10):** "send an agent to do the sonar on pull request try to do it smarly so
+it saves time?" That covers Sonar running on pull requests. **Not confirmed:** that it stays out of `gate`'s
+`needs` - the agent chose that.
+
+`sonar-analysis.yml` gained `on: workflow_call`; `pull-request.yml` adds a `sonar`
+job off `changes`, calling it with `secrets: inherit`. `workflow_dispatch` stays, so a manual run is still
+possible.
+
+**Path-filtered the same as the other code jobs.** `if: needs.changes.outputs.code == 'yes'` - a docs-only or
+site-only pull request does not run it, the same trade-off the manual-only run already had. A site-only pull
+request still gets no PR-time Sonar even though the "sites in scope" reversal above means Sonar does read those
+files on `main` - the path filter this job reuses carries no `site` branch, and adding one is a later decision,
+not this one.
+
+**Not in `gate`'s `needs` - argued both ways, recorded rather than assumed.**
+
+*For blocking:* the read-only "Sonar way" gate already passes on `main` - 80% on new code, crossed 2026-08-31,
+O2 below - so blocking would cost nothing today, and it would catch a regression before merge instead of after.
+
+*For reporting only, which is what shipped:* whether coverage blocks a merge is a separate decision from
+whether Sonar runs on the merge candidate, and O2 below already reserves that call for the maintainer,
+unanswered. Blocking here would decide it by side effect. It is also the whole lever on wall-clock: `gate`
+finishes when its slowest required dependency does, and Sonar would become that dependency - see the
+measurement below - while reporting only lets `gate` finish on the jobs it already waits for, with Sonar's
+result landing a little later, read but never waited on.
+
+**Measured before choosing, not assumed.** Read off the public Actions API for `binacle-labs/Binacle.Net` on
+`main`, 2026-09-10. The nine most recent completed `sonar-analysis.yml` dispatches each ran one job, `Analyse
+and publish`, in 260-357 seconds (roughly 4.5-6 minutes). The fifteen most recent `pull-request.yml` runs'
+jobs: `Image tests` (`shared-image-tests.yml`, the current longest) at a 189-second median, up to 471 seconds
+under runner contention; `Site tests` similar; `Image build`, `Lint` and the three `Site build` jobs all
+faster. So Sonar typically becomes the slowest job in the fan-out, by about two minutes over the current
+longest, worse under contention. Blocking would add that to every pull request's time to merge; reporting only
+adds nothing, because `gate` does not wait for it.
+
+**Skips, never fails, when the token cannot be present.** Two blockers, one `if:`:
+
+```yaml
+if: >-
+  ${{ needs.changes.outputs.code == 'yes' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]' }}
+```
+
+`secrets.SONAR_TOKEN` reads empty on a `pull_request` run from a fork - the `head.repo.full_name` comparison
+catches that. A Dependabot pull request runs from a branch on this repository, not a fork, but reads from the
+Dependabot secret store rather than the Actions one - the actor check catches that case separately, because
+the fork check alone would not.
+
+**`pull_request_target` was ruled out, not merely passed over.** It would hand secrets to a run that checks
+out and can execute the pull request's own, possibly untrusted, code, on a public repository - a
+credential-exposure route. Skipping the job is the only shape considered.
+
+**`gate.sh` already reads a skipped dependency as passing** - `[[ "$result" != "success" ]] && [[ "$result" !=
+"skipped" ]]` - so this would have worked whichever way blocking went; it is not what decided blocking
+against.
+
+**The concurrency group could not stay `${{ github.workflow }}-${{ github.ref }}`.** `github.workflow`
+resolves to the *caller's* name when a workflow runs as a called (`workflow_call`) workflow, so under the old
+key a PR-triggered Sonar run would carry the same group string as `pull-request.yml`'s own top-level
+concurrency (`Pull Request-refs/pull/<n>/merge`) - colliding with a group already enforced one level up.
+Changed to a literal `sonar-analysis-${{ github.ref }}`, unique to this workflow whichever way it starts. The
+dispatch path is unaffected beyond the group's string changing.
+
+**Nothing shared with the `image` job's build.** `image` runs `just build image`, a multi-stage Docker build;
+Sonar runs a plain `dotnet build Binacle.Net.slnx --configuration Release` that the coverage run and the
+scanner both need un-containerised. They produce different artifacts for different consumers, and
+`shared-image-tests.yml` already runs its own separate `dotnet build` in parallel with both - a third
+independent build following the same, already-accepted shape. Caching one job's output for another would mean
+uploading and restoring a full solution build across jobs, for a step that costs on the order of a minute -
+not worth building.
+
+**Decided (the maintainer, 2026-09-11):** "Approve (Recommended)" - picked in a question prompt, to "Sonar -
+replace the hand-written five-minute poll loop with `/d:sonar.qualitygate.wait=true`?"
+
+**Amended 2026-09-12 — the job goes red on a failed gate, and still blocks nothing.** `sonar.qualitygate.wait`
+is set in `tooling/ci/sonar-analysis.xml`, so `Sonar end` blocks until SonarCloud has processed the analysis
+and exits non-zero when the gate is red. That replaced a hand-written sixty-turn poll in `sonar-summary.sh`
+that existed only to wait for the same thing; the summary step now carries `if: always()` so the table is
+written either way. The wait is the scanner's own setting, in the file it reads, rather than a loop we timed
+ourselves. **"Non-blocking" is unchanged**: the job is still outside `gate`'s `needs`, so a red Sonar is a red
+check on the pull request and nothing more. Whether it should become more is still O2.
+
+### D29 — the Docker Hub credential is not scoped to an environment
+
+**Decided (the maintainer, 2026-09-11):** "Reject (Recommended)" - picked in a question prompt, to "Put `publish`
+in a GitHub environment that admits `main` only, and move the Docker Hub secrets into it?"
+
+The `publish` job stays out of a GitHub environment with a `main`-only branch policy, and the two Docker Hub values
+stay repository secrets. `check-release-ref.sh` in `gate` remains the thing that keeps a release on `main`.
+
+**Why not.** Two reasons, and the first is the one that decides it. The long-lived registry token is leaving
+`publish` anyway: the Docker Hub login moves to an OIDC connection minted per run, so the credential the
+environment would have fenced stops existing in that job. What would be left to scope is the page job's
+token, which writes the repository description through the web API and has no OIDC path. Second, an
+environment that admits `main` only refuses a prerelease dispatched from anywhere else, and that door is
+worth keeping open while the prerelease staging repository is still undecided.
+
+**What this does not decide.** Whether a prerelease may ever be dispatched from a branch. It cannot today -
+`gate` refuses the ref, and a branch-built image signs under the branch and fails the published verify
+command - and nothing here changes that.
+
+### D30 — no job holds a git credential after checkout
+
+**Decided (the maintainer, 2026-09-11):** "Approve both (Recommended)" - picked in a question prompt, to
+"`push-tag.sh` - delete the two dead `git config` lines and replace the last `git push` with `gh api`, so every
+checkout can carry `persist-credentials: false`?"
+
+Every `actions/checkout` step in `.github/workflows/` - twenty-two then, eighteen once
+D32 folded the deploys into one file - carries
+`persist-credentials: false`, and nothing in CI runs `git push`. The last push, the deploy marker tag, became
+one `gh api` call (`create-tag.sh`, `POST repos/{repo}/git/refs`) taking `GH_TOKEN` for that step alone.
+
+**What it closes.** A compromised step inside any job could use the token checkout leaves behind. Checkout
+v6 already moved that token out of `.git/config` into `$RUNNER_TEMP`, so the older leak - the config file
+carried out inside an uploaded artifact - was closed before this; what this closes is use of the token by a
+later step in the same job. The advice comes from workflow auditors (zizmor's `artipacked`), not from GitHub's
+own pages, which do not mention the setting.
+
+**What it costs.** One line per checkout, and the API's "Reference already exists" where git said "tag
+already exists". `check-release-tag.sh` still reaches origin with `git ls-remote`, which works anonymously on
+a public repository, and the deploy `tag` job still checks out because `deploy-summary.sh` reads the subject
+with `git log`.
+
+### D31 — the site half of the path filter names the `.github/` files a site depends on
+
+**Decided (the maintainer, 2026-09-11):** "Approve, narrowed to site files (Recommended)" - picked in a question
+prompt, to "Narrow the site half of the path filter so a workflow edit stops building all three Jekyll sites?"
+
+`changed-paths.sh` used to set `site=yes` for anything under `.github/`, so a workflow-only pull request built all
+three Jekyll sites and ran the sixteen-test site suite. It now matches `.github/actions/` and the workflows a site
+build or test runs through - `pull-request.yml`, `shared-site-tests.yml` and `deploy-site.yml` - and nothing else
+there.
+
+**Why named files and not `.github/actions/` alone.** The narrower pattern leaves a hole: an edit to the site
+test workflow, or to the pull request workflow whose `site-build` job does the building, would not run the
+jobs it changed. Naming those files keeps the saving and closes the hole.
+
+**What it saves, honestly.** Three Jekyll builds with link checks and one test suite on a workflow-only pull
+request. The `code` half still matches every `.github/` file, so that pull request still runs the image tests,
+the image build, the lint job and Sonar. It does not become cheap; it stops doing the one thing that could
+not have found anything.
+
+### D32 — the three site deploys are one workflow with a site chosen at dispatch
+
+**Decided (the maintainer, 2026-09-12):** "do it" - to the offer to replace the shared workflow and its three
+callers with one `deploy-site.yml` taking a `choice` input.
+
+`deploy-site.yml` holds the three-job chain - site tests, build-check-deploy, tag - and its `workflow_dispatch`
+takes one `choice` input, `site`, from `docs`, `demo` and `www`. `deploy-docs-site.yml`, `deploy-demo-site.yml` and
+`deploy-www-site.yml` are gone. D17 is untouched: it is still by hand and never on a push.
+
+**Why one input.** The three files were diffed on 2026-09-11 and everything that differed came from the
+slug: the environment `binacle-net-<slug>`, the URL `https://<slug>.binacle.net`, the source `sites/<slug>`,
+the wrangler config `tooling/cloudflare/<slug>.wrangler.jsonc`, the marker tag `<slug>-<run>`, the link check.
+Three copies of that chain could not stay in step, and two of them had never run.
+
+**Why a choice input and not a called workflow.** The first draft was `shared-deploy-site.yml` plus three
+fifteen-line callers. The maintainer asked for the enum instead, and it is simpler on every count: one file
+rather than four, no `workflow_call`, no secrets handed across by name, no permissions cap on the caller, and
+none of the environment-secret precedence rules a called job with `environment:` brings.
+
+**What it costs.** `github.run_number` counts per workflow, so the marker tags share one sequence -
+`docs-40`, `demo-41`, `www-42` - where each site used to count on its own. A tag maps a site to the commit that
+is live, which it still does; only the per-site numbering is gone. The concurrency group carries the site,
+`${{ github.workflow }}-${{ inputs.site }}`, so one site still queues behind itself and two sites still deploy
+side by side, and `run-name` names the site so the run list stays readable.
+
+**What is unproved.** No site had deployed through this file when it was written. The demo deploy in the
+v3.1.0 release set is the first.
+
+### D33 — the release logs into Docker Hub with the run's OIDC token
+
+**Decided (the maintainer, 2026-09-11):** "Approve (Recommended)" - picked in a question prompt, to "Docker Hub
+OIDC login - drop the stored registry token from the release `publish` job?"
+
+The `publish` job's `docker/login-action` step keeps `username:` and drops `password:`;
+`DOCKERHUB_OIDC_CONNECTIONID` in its `env:` names the org's OIDC connection, and the job's `id-token: write` -
+already there for cosign - is what the exchange needs.
+
+**Why.** The credential that can push to the registry users pull from stops existing between runs. It is
+minted per run and expires with it - the property that made GHCR the staging registry (D14), applied to the
+registry that matters. Nothing to rotate, nothing to leak from a repository setting. This is also most of the
+reason D29 said no to an environment: the thing it would have fenced is gone.
+
+**What it does not close.** `shared-dockerhub-overview.yml` writes the repository description through the
+Docker Hub web API with `peter-evans/dockerhub-description`, which takes a username and password and has no
+OIDC path. So `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` survive for the `page` job alone. The token can be
+narrowed to what that job needs, which is not push.
+
+**What it depends on outside the repository - in place since 2026-09-14.** An OIDC connection on the
+`binacle` Docker Hub org and its id in the `DOCKERHUB_OIDC_CONNECTIONID` repository variable. Connections
+are offered to Team, Business, Hardened Images and Sponsored Open Source orgs.
+
+**The connection carries two rulesets, both on `binacle/binacle-net`, one per subject form.** This
+repository was transferred after 15 July 2026, so GitHub issues the immutable subject
+`repo:binacle-labs@189874141/Binacle.Net@607841255:ref:refs/heads/main` - the ids are the org's and the
+repository's from the GitHub API. The plain `repo:binacle-labs/Binacle.Net:ref:refs/heads/main` is the second
+ruleset. Whether Docker matches the immutable form, the plain one, or normalises between them is not
+documented, and a rule that never matches costs nothing; two rules mean the release cannot fail on that
+question. **Both are pinned to `main`** - the only ref `gate` lets through anyway.
+
+**A prerelease never reaches the login (D3), so the v3.1.0 release run is the first to exercise it.** A red
+there is after the build and the smoke and before anything is copied; Docker Hub is untouched and the same
+version is dispatched again.
+
+**`DOCKERHUB_TOKEN` is not narrowed.** Docker Hub's access-token screen offers scopes but no repository
+picker on this org, so the token the `page` job uses stays read/write/delete on the account. Do not go
+looking for the narrowing; it is not there.
+
+## Pending
+
+What the workflows do and why. No quote from the maintainer covers a whole entry here; a quote inside one
+covers only its own line.
 
 ### D1 — a release is dispatched with a version, and the tag and the release are its last job
 
@@ -119,83 +476,6 @@ pull from. It was argued as acceptable because nobody follows an exact pin on re
 free. The copy command did not change - `imagetools create` handles a cross-registry source as readily as a
 local one, which is what kept a third-party tool out of the job that moves the artifact users pull.
 
-### D3 — a prerelease stays on GHCR, and still gets its tag and a GitHub prerelease
-
-**Decided 2026-09-18 by the maintainer, amending the 2026-09-14 rule.** `publish` carries
-`if: ${{ !contains(inputs.version, '-') }}` and `page` skips with it through plain `needs`. `release` carries
-`if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}`, so it runs past the skipped `publish` and
-stops on a failed one. A beta runs `gate`, `test`, `build`, `smoke` and `release`, and leaves three things
-behind: the smoked, signed image on `ghcr.io/binacle-labs/binacle-net` under its immutable tag, the git tag
-on the run's commit, and a GitHub release flagged prerelease with the `[Unreleased]` section as its body. No
-Docker Hub copy, no Docker Hub page.
-
-**Why the tag and the release came back.** Four days under the 2026-09-14 rule produced `3.1.0-beta.1` and
-`beta.2` with nothing in git naming them: no tag to check out, no diff between them for the notes, no
-notification to anyone watching the repository, and the maintainer looking for tags that were never made.
-Every `3.0.0-beta.*` had a prerelease page, so the convention was already what readers expected. The
-plumbing was already there - `github-release.sh` flags a hyphenated tag `--prerelease` and
-`changelog-section.sh` maps one to `Unreleased` - and only the `needs` edge stopped it running.
-
-**The cost, and it is permanent.** D24's ruleset blocks deleting any `v*` tag, so every beta tag stays for
-good, eight of them for the 3.0 line's worth. That is accepted: a tag that names what a run built is the
-record, and the ruleset is what makes it trustworthy.
-
-**What a beta is for under this shape.** It proves the build and the smoke against the exact commit, and it
-gives a person an image to pull and click through before the real dispatch. Whoever checks it pulls from GHCR:
-`just smoke all ghcr.io/binacle-labs/binacle-net:<version>` and `docker run` against the same reference. The
-`release` job's run summary prints the reference, the digest, the release link and the GHCR form of the verify
-command.
-
-**What it does not prove, and the cost accepted with it.** `publish` and `page` never run for a prerelease,
-so the first run of any change to them is the real release. That is survivable by design: a red `publish`
-leaves Docker Hub untouched and creates no tag, and the tag check in `gate` lets the same version be
-dispatched again once fixed. The cost is a red release run rather than a red beta.
-
-**History - this is the fourth answer to the same question.** The skip was introduced on 2026-08-11 and
-reversed the same day, on two arguments: it was never a safety rule, because *nothing unsmoked reaches Docker
-Hub* comes from `smoke` running before `publish` and holds either way; and it cost deployability, because a
-host that cannot route to GitHub's AS36459 could not pull a beta from GHCR. Between then and 2026-09-05 the
-guard was metadata-action's alone - a prerelease reached Docker Hub with its immutable tag only, since
-`{{major}}.{{minor}}` is skipped for one and `latest=auto` withholds `latest` - observed on Docker Hub on
-2026-08-06 after `v3.0.0-beta.1`. **What the reversal underrated was the tag list**: eight `3.0.0-beta.*`
-tags sat beside the release until they were deleted by hand (D27), betas 1 to 4 failed the published verify
-command for anyone who tried it, and every beta was a second answer to "which image do I pull". The
-deployability argument still holds and is the price: a beta is pullable from GHCR only. **The 2026-09-14
-answer** went one step further and dropped the git tag and the release too, on plain `needs`; that is the
-step undone here.
-
-**The trap the 2026-08-11 reversal warned about now applies, and is handled.** It said a conditional job
-above `release` needs a status condition on `release` or a beta silently gets no GitHub release. That is
-exactly the `if:` `release` carries. `!cancelled()` rather than `always()` so a cancelled run does not tag,
-and `!contains(needs.*.result, 'failure')` rather than a check on `publish` alone so a red job anywhere above
-holds it.
-
-**A prerelease may be dispatched from a `release/*` branch - decided 2026-09-14, the same day.** The rule
-in full: `main` may dispatch a release or a prerelease; a `release/*` branch may dispatch a prerelease only;
-nothing else may dispatch anything. The release branch is where the betas of a version come from, and
-nothing merges to `main` until the last one is clean. Because a dispatch runs the workflow file at its own
-ref, the branch's CI changes are proved by its betas before they reach `main`. `check-release-ref.sh` takes
-the version and is the whole check. **Since 2026-09-18 the branch must be named after the version** -
-`release/v3-1-0` may dispatch `3.1.0-*` and nothing else, so a beta of one version cannot be built from
-another version's branch, and a branch that is not `release/v<x>-<y>-<z>` is refused outright. Decided by
-the maintainer, who wanted the rule mechanical rather than a naming convention.
-
-**Branch builds with no version are not wanted - closed 2026-09-18.** The idea was an image from any branch
-under a slug-and-sha tag. A beta from the version's own `release/` branch is the way to try an image, and it
-comes with a version, a tag and a verify command that passes. A branch build would sign under a ref no
-published command names and leave an image on GHCR forever; the plan that held it was deleted the same day. "For now" on the branch half - a release from a branch is not ruled out
-forever, only not today. The image signs under the branch's ref, so
-checking it is `just image verify <version> all refs/heads/<branch> ghcr.io/...`; the published command,
-anchored on `main`, does not cover it and nothing published names it.
-
-**What the `gate` job still checks for a beta.** The ref, semver, the tag is free, and that
-`## [Unreleased]` exists and is not empty. The section check is worth keeping even though nothing publishes
-it: it fails in seconds when the changelog is not in shape, which is the cheapest place to learn that.
-
-**The staging push carries the immutable tag only.** The moving tags - `3.1`, `3` and `latest` - are computed
-in `publish`, the job that creates them, and `3` exists since 2026-09-12 so the samples and the docs can pin a
-line that follows every minor; `$sites/decisions#S11` has why.
-
 ### D14 — GHCR is staging, and only the release workflow touches it
 
 Everything built lands on `ghcr.io/binacle-labs/binacle-net` first. Docker Hub receives only what has been
@@ -205,13 +485,13 @@ smoked there.
 where users pull from - `smoke` runs against the staging copy, and only a smoked digest is ever copied across. **GHCR is staging; Docker Hub is what users pull, and it carries released
 versions only - a prerelease stays on GHCR, D3.**
 
-**Only the release workflow writes GHCR - decided 2026-08-15 as "touches", narrowed to "writes" on
+**Only the release workflow writes GHCR - written 2026-08-15 as "touches", narrowed to "writes" on
 2026-09-14.** The staging registry exists so the workflow can push an image, smoke it and copy the smoked
 digest to Docker Hub. **No public surface names it, no local recipe queries it, and no deployment pulls from
 it. One image, one place anyone gets it from.** The one reader outside the workflow is the person checking a
 beta, who pulls it from GHCR by hand because since D3 a prerelease exists nowhere else.
 
-**What that changed, on the day it was decided.**
+**What that changed, on the day it was written.**
 
 - `SECURITY.md` and `CHANGELOG.md` stopped naming it. The docs-site verification page is written the same way
   at the next deploy.
@@ -240,7 +520,8 @@ Hub; since D3 a beta exists on GHCR only, so the package being public is what ma
 credential and nothing to rotate. Keeping Docker Hub free of anything unsmoked or unreleased is what the second
 registry buys, and it does that without adding a secret anywhere.
 
-**The package is public, and that is wanted - the maintainer's word, 2026-09-14.** Measured the same day:
+**The package is public, and that is wanted** - the maintainer, 2026-09-14: "and ghcr public yes thats
+wanted". Measured the same day:
 an anonymous token from `ghcr.io/token` lists the tags and pulls the `3.0.0-beta.8` manifest with a 200. This
 entry said the package was private from the move on 2026-08-16 and that nothing minded; the pipeline still
 does not - `build`, `publish` and `shared-smoke-image.yml` all log in with `GITHUB_TOKEN`. **Since D3 public
@@ -424,7 +705,7 @@ are `###`, so the file nests under a single `# Changelog`. `extract` shifts each
 heading returns to `##`, since a release body has no parent heading. Deriving the shift from the section's own
 minimum keeps relative depth intact and means nothing has to be recorded anywhere.
 
-**The docs site's release-notes page is hand-copied from this file, not generated from it — decided
+**The docs site's release-notes page is hand-copied from this file, not generated from it — since
 2026-08-14.** Each version folder on the docs site carries its own `release-notes.md`, and a version's section
 is copied into it by hand; a patch release appends a section rather than replacing the page. **The cost is
 known and accepted: the same notes live in two places and they drift.** v3.0.0 shipped with three additions the
@@ -766,7 +1047,7 @@ for that reason before anyone writes a line is a gate people learn to ignore.
 
 ### D17 — the site deploys are published by hand, and never on a push
 
-**Decided by the maintainer, 2026-08-19, and it covered `deploy-www-site.yml` too, added after.** The site
+**Dated 2026-08-19, and it covered `deploy-www-site.yml` too, added after.** The site
 deploy is `workflow_dispatch` and stays that way - `deploy-site.yml` since D32, three files before it. No
 `push` trigger on `sites/**`, and no scheduled run.
 
@@ -784,7 +1065,7 @@ last.
 
 ### D18 — two test suites, split by what ships
 
-**Decided by the maintainer, 2026-08-27.** `shared-image-tests.yml` runs the seventeen tests that end up in the
+**Dated 2026-08-27.** `shared-image-tests.yml` runs the seventeen tests that end up in the
 Docker image. `shared-site-tests.yml` runs the fifteen that end up in a Jekyll site. The release pipeline calls
 the first; the three site deploys call the second; the pull request gate calls both.
 
@@ -959,33 +1240,6 @@ SimpleCov sensor runs in `ruby/`, this project's folder, and said so —
 `SimpleCov report not found: 'artifacts/coverage/sonar/*.json'`. So that one property opens with `../` while
 the other two do not. Every report is still written to `artifacts/coverage/sonar`.
 
-### D23 — one required check, and the maintainer bypasses it
-
-**Branch protection on `main` requires exactly one status check, `Gate`.** That is the job name, and the job
-name is the whole context - not `Pull Request / Gate`. `pull-request.yml` says so above the job: *"`gate` is
-the only name branch protection holds."* Every job under it can be renamed freely; this is the last
-protection edit that should ever be needed.
-
-**`gate` reports whatever happens.** It is `if: always()` with `needs:` on every other job, so a skipped half
-still produces a verdict. A required check that can silently never report is what leaves a pull request
-pending forever, and that shape is designed out rather than watched for.
-
-**The repository-admin role bypasses it, deliberately.** `pull-request.yml` triggers on `pull_request` only.
-A commit pushed straight to `main` therefore has no `Gate` check and never will - not a slow one, an absent
-one. Without the bypass the maintainer's own push is rejected with nothing to wait for. **The bypass is not a
-weakening of a check that was working; it is an admission the check was never going to run for that path.**
-
-What the check actually binds is Dependabot, which opens up to ten pull requests per ecosystem across five of
-them. External pull requests are closed (`CONTRIBUTING.md`), so there is nobody else to bind.
-
-**The alternative, rejected for now:** add `push: branches: [main]` and drop the bypass. That makes the
-requirement honest for every commit, and costs a full CI run on every push while the workflow stops being
-about pull requests. **Revisit it when a second person can commit** - at that point the bypass is protecting
-a habit rather than describing a gap.
-
-**`strict_required_status_checks_policy` is off.** A pull request can merge without being up to date with
-`main`. With one committer the alternative forces a rebase before every Dependabot merge and buys little.
-
 ### D24 — release tags cannot be moved or deleted, and nobody bypasses that
 
 A tag ruleset on `refs/tags/v*` blocks **update** and **deletion**. It matches 48 tags, counted 2026-09-04,
@@ -1001,7 +1255,6 @@ the feature.
 **`v*` and not everything.** The 20 deploy marker tags - `docs-6`, `web-release-5`, `www-1` - are created by
 `create-tag.sh` on every site deploy and must stay free. Counted 2026-09-04; both numbers here grow on their
 own, so read them rather than trusting them.
-
 
 ### D25 — the moving tags were proven on the release itself, not on a scratch repository
 
@@ -1023,34 +1276,9 @@ any non-prerelease semver as latest. A rehearsal that avoids both is a rehearsal
 created. It has still never *moved* either name off an existing image — that happens for the first time on
 3.0.1.
 
-
-### D26 — Docker Hub tag immutability stays off
-
-**Answered 2026-09-04: no, for now.** The switch is off. Recorded as a decision rather than left as an open
-question, because an open question with no value is worse than either answer.
-
-**What would reopen it.** A Docker Hub tag actually being overwritten - the risk this was weighed against has
-never happened, and one occurrence changes the arithmetic. Or a rehearsal on a throwaway repository proving a
-rule scoped to released versions behaves as documented, which is the safe path this entry names and nobody
-has walked.
-
-**What it would have bought:** a published release tag that cannot be overwritten. **What it costs is the
-reason not to.** There is no undo. An immutable tag cannot be deleted either, so a release tag pushed by
-mistake is permanent, and turning it on safely means rehearsing it on a throwaway repository first.
-
-**The stored rule is `.*`, and that is what makes the switch dangerous here rather than merely irreversible.**
-`.*` matches `latest` and `3.0`, the two tags every release moves. Enabling it against that rule would freeze
-the moving tags on the first release after it, which is exactly the mechanism D25 depends on. **If this is
-ever reopened, the rule is the first thing to correct** - released versions only, never the moving tags.
-
-**What already protects the release.** D24 - a tag ruleset that nobody bypasses, so a release tag cannot be
-moved or deleted on the GitHub side. Immutability would have covered the registry side of the same risk, and
-the registry side has never gone wrong.
-
-
 ### D27 — a released version is never deleted, and prereleases stop reaching the public repository
 
-**The half that is settled: a released version stays, whatever happens to its line.**
+**A released version stays, whatever happens to its line.**
 `.github/dockerhub-overview.md` tells a reader that an exact version never moves, which they read as a promise
 that it is there tomorrow. Deleting one breaks the user who took that advice and pinned. A line that is no
 longer patched is retired in words, not by removing the images.
@@ -1065,8 +1293,9 @@ stops at GHCR (D3), so nothing ever lands in `binacle/binacle-net` that is not a
 delete afterwards. A second public Docker Hub repository for prereleases was the direction until then; GHCR
 already does that job, is public, and needs no new credential, so it is the staging repository. **Nothing
 about prerelease lifetime goes on the Docker Hub page** - the page describes the repository users pull from,
-and prereleases are no longer in it. **Old prerelease tags on GHCR stay** - decided by the maintainer on
-2026-09-14. Nothing deletes a staging image.
+and prereleases are no longer in it. **Old prerelease tags on GHCR stay.** The maintainer, 2026-09-14:
+"as for the beta tags agreed as long as it is documented thats ok" - what it answered is not on record.
+Nothing deletes a staging image.
 
 **Docker Hub has no lifecycle rules**, so no cleanup happens on its own. Deleting is the Hub API,
 `DELETE /v2/repositories/{repo}/tags/{tag}/` with a JWT - the sibling of the tag list `tooling/image/verify-tags.sh`
@@ -1074,197 +1303,6 @@ already reads. The registry delete verb is not accepted.
 
 **This is a second reason the D26 rule would have to be corrected before immutability is ever enabled.** An
 immutable tag cannot be deleted, so a rule of `.*` freezes any prerelease that does reach the repository.
-
-### D28 — Sonar runs on every pull request that can carry the token, parallel and non-blocking
-
-**Decided 2026-09-10.** `sonar-analysis.yml` gained `on: workflow_call`; `pull-request.yml` adds a `sonar`
-job off `changes`, calling it with `secrets: inherit`. `workflow_dispatch` stays, so a manual run is still
-possible.
-
-**Path-filtered the same as the other code jobs.** `if: needs.changes.outputs.code == 'yes'` - a docs-only or
-site-only pull request does not run it, the same trade-off the manual-only run already had. A site-only pull
-request still gets no PR-time Sonar even though the "sites in scope" reversal above means Sonar does read those
-files on `main` - the path filter this job reuses carries no `site` branch, and adding one is a later decision,
-not this one.
-
-**Not in `gate`'s `needs` - decided both ways, argument recorded rather than assumed.**
-
-*For blocking:* the read-only "Sonar way" gate already passes on `main` - 80% on new code, crossed 2026-08-31,
-O2 below - so blocking would cost nothing today, and it would catch a regression before merge instead of after.
-
-*For reporting only, which is what shipped:* whether coverage blocks a merge is a separate decision from
-whether Sonar runs on the merge candidate, and O2 below already reserves that call for the maintainer,
-unanswered. Blocking here would decide it by side effect. It is also the whole lever on wall-clock: `gate`
-finishes when its slowest required dependency does, and Sonar would become that dependency - see the
-measurement below - while reporting only lets `gate` finish on the jobs it already waits for, with Sonar's
-result landing a little later, read but never waited on.
-
-**Measured before choosing, not assumed.** Read off the public Actions API for `binacle-labs/Binacle.Net` on
-`main`, 2026-09-10. The nine most recent completed `sonar-analysis.yml` dispatches each ran one job, `Analyse
-and publish`, in 260-357 seconds (roughly 4.5-6 minutes). The fifteen most recent `pull-request.yml` runs'
-jobs: `Image tests` (`shared-image-tests.yml`, the current longest) at a 189-second median, up to 471 seconds
-under runner contention; `Site tests` similar; `Image build`, `Lint` and the three `Site build` jobs all
-faster. So Sonar typically becomes the slowest job in the fan-out, by about two minutes over the current
-longest, worse under contention. Blocking would add that to every pull request's time to merge; reporting only
-adds nothing, because `gate` does not wait for it.
-
-**Skips, never fails, when the token cannot be present.** Two blockers, one `if:`:
-
-```yaml
-if: >-
-  ${{ needs.changes.outputs.code == 'yes' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]' }}
-```
-
-`secrets.SONAR_TOKEN` reads empty on a `pull_request` run from a fork - the `head.repo.full_name` comparison
-catches that. A Dependabot pull request runs from a branch on this repository, not a fork, but reads from the
-Dependabot secret store rather than the Actions one - the actor check catches that case separately, because
-the fork check alone would not.
-
-**`pull_request_target` was ruled out, not merely passed over.** It would hand secrets to a run that checks
-out and can execute the pull request's own, possibly untrusted, code, on a public repository - a
-credential-exposure route. Skipping the job is the only shape considered.
-
-**`gate.sh` already reads a skipped dependency as passing** - `[[ "$result" != "success" ]] && [[ "$result" !=
-"skipped" ]]` - so this would have worked whichever way blocking went; it is not what decided blocking
-against.
-
-**The concurrency group could not stay `${{ github.workflow }}-${{ github.ref }}`.** `github.workflow`
-resolves to the *caller's* name when a workflow runs as a called (`workflow_call`) workflow, so under the old
-key a PR-triggered Sonar run would carry the same group string as `pull-request.yml`'s own top-level
-concurrency (`Pull Request-refs/pull/<n>/merge`) - colliding with a group already enforced one level up.
-Changed to a literal `sonar-analysis-${{ github.ref }}`, unique to this workflow whichever way it starts. The
-dispatch path is unaffected beyond the group's string changing.
-
-**Nothing shared with the `image` job's build.** `image` runs `just build image`, a multi-stage Docker build;
-Sonar runs a plain `dotnet build Binacle.Net.slnx --configuration Release` that the coverage run and the
-scanner both need un-containerised. They produce different artifacts for different consumers, and
-`shared-image-tests.yml` already runs its own separate `dotnet build` in parallel with both - a third
-independent build following the same, already-accepted shape. Caching one job's output for another would mean
-uploading and restoring a full solution build across jobs, for a step that costs on the order of a minute -
-not worth building.
-
-**Amended 2026-09-12 — the job goes red on a failed gate, and still blocks nothing.** `sonar.qualitygate.wait`
-is set in `tooling/ci/sonar-analysis.xml`, so `Sonar end` blocks until SonarCloud has processed the analysis
-and exits non-zero when the gate is red. That replaced a hand-written sixty-turn poll in `sonar-summary.sh`
-that existed only to wait for the same thing; the summary step now carries `if: always()` so the table is
-written either way. The wait is the scanner's own setting, in the file it reads, rather than a loop we timed
-ourselves. **"Non-blocking" is unchanged**: the job is still outside `gate`'s `needs`, so a red Sonar is a red
-check on the pull request and nothing more. Whether it should become more is still O2.
-
-### D29 — the Docker Hub credential is not scoped to an environment
-
-**Decided 2026-09-11, put to the maintainer as a yes or no.** The `publish` job stays out of a GitHub
-environment with a `main`-only branch policy, and the two Docker Hub values stay repository secrets.
-`check-release-ref.sh` in `gate` remains the thing that keeps a release on `main`.
-
-**Why not.** Two reasons, and the first is the one that decides it. The long-lived registry token is leaving
-`publish` anyway: the Docker Hub login moves to an OIDC connection minted per run, so the credential the
-environment would have fenced stops existing in that job. What would be left to scope is the page job's
-token, which writes the repository description through the web API and has no OIDC path. Second, an
-environment that admits `main` only refuses a prerelease dispatched from anywhere else, and that door is
-worth keeping open while the prerelease staging repository is still undecided.
-
-**What this does not decide.** Whether a prerelease may ever be dispatched from a branch. It cannot today -
-`gate` refuses the ref, and a branch-built image signs under the branch and fails the published verify
-command - and nothing here changes that.
-
-### D30 — no job holds a git credential after checkout
-
-**Decided 2026-09-11.** Every `actions/checkout` step in `.github/workflows/` - twenty-two then, eighteen once
-D32 folded the deploys into one file - carries
-`persist-credentials: false`, and nothing in CI runs `git push`. The last push, the deploy marker tag, became
-one `gh api` call (`create-tag.sh`, `POST repos/{repo}/git/refs`) taking `GH_TOKEN` for that step alone.
-
-**What it closes.** A compromised step inside any job could use the token checkout leaves behind. Checkout
-v6 already moved that token out of `.git/config` into `$RUNNER_TEMP`, so the older leak - the config file
-carried out inside an uploaded artifact - was closed before this; what this closes is use of the token by a
-later step in the same job. The advice comes from workflow auditors (zizmor's `artipacked`), not from GitHub's
-own pages, which do not mention the setting.
-
-**What it costs.** One line per checkout, and the API's "Reference already exists" where git said "tag
-already exists". `check-release-tag.sh` still reaches origin with `git ls-remote`, which works anonymously on
-a public repository, and the deploy `tag` job still checks out because `deploy-summary.sh` reads the subject
-with `git log`.
-
-### D31 — the site half of the path filter names the `.github/` files a site depends on
-
-**Decided 2026-09-11.** `changed-paths.sh` used to set `site=yes` for anything under `.github/`, so a
-workflow-only pull request built all three Jekyll sites and ran the sixteen-test site suite. It now matches
-`.github/actions/` and the workflows a site build or test runs through - `pull-request.yml`,
-`shared-site-tests.yml` and `deploy-site.yml` - and nothing else there.
-
-**Why named files and not `.github/actions/` alone.** The narrower pattern leaves a hole: an edit to the site
-test workflow, or to the pull request workflow whose `site-build` job does the building, would not run the
-jobs it changed. Naming those files keeps the saving and closes the hole.
-
-**What it saves, honestly.** Three Jekyll builds with link checks and one test suite on a workflow-only pull
-request. The `code` half still matches every `.github/` file, so that pull request still runs the image tests,
-the image build, the lint job and Sonar. It does not become cheap; it stops doing the one thing that could
-not have found anything.
-
-### D32 — the three site deploys are one workflow with a site chosen at dispatch
-
-**Decided 2026-09-12, by the maintainer.** `deploy-site.yml` holds the three-job chain - site tests,
-build-check-deploy, tag - and its `workflow_dispatch` takes one `choice` input, `site`, from `docs`, `demo`
-and `www`. `deploy-docs-site.yml`, `deploy-demo-site.yml` and `deploy-www-site.yml` are gone. D17 is
-untouched: it is still by hand and never on a push.
-
-**Why one input.** The three files were diffed on 2026-09-11 and everything that differed came from the
-slug: the environment `binacle-net-<slug>`, the URL `https://<slug>.binacle.net`, the source `sites/<slug>`,
-the wrangler config `tooling/cloudflare/<slug>.wrangler.jsonc`, the marker tag `<slug>-<run>`, the link check.
-Three copies of that chain could not stay in step, and two of them had never run.
-
-**Why a choice input and not a called workflow.** The first draft was `shared-deploy-site.yml` plus three
-fifteen-line callers. The maintainer asked for the enum instead, and it is simpler on every count: one file
-rather than four, no `workflow_call`, no secrets handed across by name, no permissions cap on the caller, and
-none of the environment-secret precedence rules a called job with `environment:` brings.
-
-**What it costs.** `github.run_number` counts per workflow, so the marker tags share one sequence -
-`docs-40`, `demo-41`, `www-42` - where each site used to count on its own. A tag maps a site to the commit that
-is live, which it still does; only the per-site numbering is gone. The concurrency group carries the site,
-`${{ github.workflow }}-${{ inputs.site }}`, so one site still queues behind itself and two sites still deploy
-side by side, and `run-name` names the site so the run list stays readable.
-
-**What is unproved.** No site had deployed through this file when it was written. The demo deploy in the
-v3.1.0 release set is the first.
-
-### D33 — the release logs into Docker Hub with the run's OIDC token
-
-**Decided 2026-09-12, put to the maintainer as a yes or no.** The `publish` job's `docker/login-action` step
-keeps `username:` and drops `password:`; `DOCKERHUB_OIDC_CONNECTIONID` in its `env:` names the org's OIDC
-connection, and the job's `id-token: write` - already there for cosign - is what the exchange needs.
-
-**Why.** The credential that can push to the registry users pull from stops existing between runs. It is
-minted per run and expires with it - the property that made GHCR the staging registry (D14), applied to the
-registry that matters. Nothing to rotate, nothing to leak from a repository setting. This is also most of the
-reason D29 said no to an environment: the thing it would have fenced is gone.
-
-**What it does not close.** `shared-dockerhub-overview.yml` writes the repository description through the
-Docker Hub web API with `peter-evans/dockerhub-description`, which takes a username and password and has no
-OIDC path. So `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` survive for the `page` job alone. The token can be
-narrowed to what that job needs, which is not push.
-
-**What it depends on outside the repository - in place since 2026-09-14.** An OIDC connection on the
-`binacle` Docker Hub org and its id in the `DOCKERHUB_OIDC_CONNECTIONID` repository variable. Connections
-are offered to Team, Business, Hardened Images and Sponsored Open Source orgs.
-
-**The connection carries two rulesets, both on `binacle/binacle-net`, one per subject form.** This
-repository was transferred after 15 July 2026, so GitHub issues the immutable subject
-`repo:binacle-labs@189874141/Binacle.Net@607841255:ref:refs/heads/main` - the ids are the org's and the
-repository's from the GitHub API. The plain `repo:binacle-labs/Binacle.Net:ref:refs/heads/main` is the second
-ruleset. Whether Docker matches the immutable form, the plain one, or normalises between them is not
-documented, and a rule that never matches costs nothing; two rules mean the release cannot fail on that
-question. **Both are pinned to `main`** - the only ref `gate` lets through anyway.
-
-**A prerelease never reaches the login (D3), so the v3.1.0 release run is the first to exercise it.** A red
-there is after the build and the smoke and before anything is copied; Docker Hub is untouched and the same
-version is dispatched again.
-
-**`DOCKERHUB_TOKEN` is not narrowed.** Docker Hub's access-token screen offers scopes but no repository
-picker on this org, so the token the `page` job uses stays read/write/delete on the account. Do not go
-looking for the narrowing; it is not there.
 
 ## Open
 

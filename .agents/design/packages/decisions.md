@@ -12,9 +12,13 @@ paths:
 Why the TypeScript packages are shaped the way they are where the shape is not obvious from the code. What
 they *are* is the docs under `$packages`; this file is the reasoning.
 
-## Locked
+## Decided
 
 ### P1 - the v4 client is hand-written, and a test holds it to the spec
+
+**Decided (the maintainer, 2026-09-09):** "however ido hate the generated dependency ... leaning on custom
+written package that can be testable against generated spec?", and on the copies: "check-all-copies = runs in
+CI / sync-all-copies = never runs in CI only humans run it once and the spec is commited".
 
 `packages/binacle-net-client` is written by hand. No generator, no codegen step, no generator in the
 dependency tree. A test validates the hand-written types against a committed copy of the v4 OpenAPI document
@@ -49,39 +53,15 @@ that our own UI stopped hand-rolling `fetch` calls in a component.
 committed source for some other reason - today they are build output, and the client's copy exists because
 the package should not reach into the documentation site to find one.
 
-### P2 - the visualizer owns its internals, and that is why there is no shared utils folder
-
-`packages/binacle-net-ui` is `apps/`, `components/` and `shared/`. There is no `utils/`, and that absence is
-the decision.
-
-**The measurement that produced it, taken 2026-09-09: of the 25 files in the old `src/utils/`, 19 were used
-only by the visualizer** or by another visualizer util - the scene helpers, camera maths, materials, origins
-and loading state. Of the remaining six, three belonged to the packing demo's sample data, one to `field`,
-one to the demo alone, and exactly one - `defineComponent` - was genuinely shared.
-
-**So there was never a shared utility layer to keep.** There was a visualizer with its implementation spread
-across a folder anything could import from, which is worse than a naming problem: nothing stopped an app
-reaching into visualizer internals, because they looked like general helpers.
-
-The visualizer now exposes its component and the `Binacle` contract type from its own `index.ts`, and
-nothing else. A third app consumes it without being able to reach inside.
-
-**The barrels went with the move.** The old `index.ts` in each of `core/`, `utils/`, `models/` and
-`viewModels/` re-exported nearly everything, so most imports named a barrel rather than a file and the
-dependency graph was invisible. A folder keeps a barrel only where it is that folder's public surface.
-
-**The cost, paid once and worth knowing:** about 50 file moves and every import rewritten, with no behaviour
-change. The test suite was the whole safety net - 348 tests passed before and after with no assertion edited.
-A restructure of this kind that needs an assertion changed has moved something wrong.
-
 ### P3 - the request panel is the UI module's, and the component only hands over the request
 
-**Decided 2026-09-14 by the maintainer: UI module only.** The packing page inside the image shows the call it
-just made; the demo site does not. `packing_demo_app` exposes `lastRequest` - method, path, body - and nothing
+**Decided (the maintainer, 2026-09-14):** "we will only do it for UiModule". The packing page inside the
+image shows the call it just made; the demo site does not. `packing_demo_app` exposes `lastRequest` - method, path, body - and nothing
 else changed in the shared package. The formatting and the host live in `_js/packing_demo.js`, the module's
 own entry, as a second Alpine component the page nests under the demo's scope.
 
-**A panel on the right, not under the results - the maintainer's call on 2026-09-15.** A `Request` button on
+**A panel on the right, not under the results** - the maintainer, 2026-09-15: "i was thinking a popover
+panel on the right". A `Request` button on
 the results card opens a beercss right `dialog`, the same overlay-and-dialog shape `_ErrorsDialog` already
 uses, so nothing new is styled ahead of the rebrand. The first shape was an article under the results; it
 pushed the page down by the height of the request every run, and the request is read once, not watched.
@@ -111,7 +91,11 @@ package as a method on the component, and the origin becomes an option the host 
 
 ### P4 - the decoder's samples are packed demo examples, held to the packed data by a test
 
-**Decided 2026-09-15 by the maintainer: the ViPaq decoder offers known-good strings.** Five, in
+**Decided (the maintainer, 2026-09-15):** "the samples of vipaq are ugl;y... i need properly filled bins not
+too large dimensions", then "lets do a sidebar with a samples buton below the + a full lenth button ... a copy
+button, and no add... we want to encourage the user to copy and paste it".
+
+The ViPaq decoder offers known-good strings. Five, in
 `src/apps/protocolDecoder/sampleData.ts`, and the component exposes them as `samples` and nothing else. The
 module page shows them in a right-side panel behind a full-width `Samples` button under the add button: each
 name, its string in a selectable block, and a Copy button. **No add button, on purpose** - the visitor is meant
@@ -135,3 +119,32 @@ generator would need the same list. If five stops being enough, the list moves t
 packed data.
 
 **The chips were also rejected** - too big and in the wrong place. The menu takes no space until opened.
+
+## Pending
+
+What the packages do and why. No quote from the maintainer covers these yet.
+
+### P2 - the visualizer owns its internals, and that is why there is no shared utils folder
+
+`packages/binacle-net-ui` is `apps/`, `components/` and `shared/`. There is no `utils/`, and that absence is
+the decision.
+
+**The measurement that produced it, taken 2026-09-09: of the 25 files in the old `src/utils/`, 19 were used
+only by the visualizer** or by another visualizer util - the scene helpers, camera maths, materials, origins
+and loading state. Of the remaining six, three belonged to the packing demo's sample data, one to `field`,
+one to the demo alone, and exactly one - `defineComponent` - was genuinely shared.
+
+**So there was never a shared utility layer to keep.** There was a visualizer with its implementation spread
+across a folder anything could import from, which is worse than a naming problem: nothing stopped an app
+reaching into visualizer internals, because they looked like general helpers.
+
+The visualizer now exposes its component and the `Binacle` contract type from its own `index.ts`, and
+nothing else. A third app consumes it without being able to reach inside.
+
+**The barrels went with the move.** The old `index.ts` in each of `core/`, `utils/`, `models/` and
+`viewModels/` re-exported nearly everything, so most imports named a barrel rather than a file and the
+dependency graph was invisible. A folder keeps a barrel only where it is that folder's public surface.
+
+**The cost, paid once and worth knowing:** about 50 file moves and every import rewritten, with no behaviour
+change. The test suite was the whole safety net - 348 tests passed before and after with no assertion edited.
+A restructure of this kind that needs an assertion changed has moved something wrong.

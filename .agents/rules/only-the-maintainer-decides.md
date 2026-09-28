@@ -42,6 +42,9 @@ it.
 
 A decision that is carried out leaves the plan. What is true now goes in a doc; why goes in design.
 
+In a design record, an entry that quotes him sits under `## Decided`; one that does not sits under
+`## Pending`. The maintainer, 2026-09-28: "if not decided then they must gi ti ## Penbding".
+
 ## Why
 
 On 2026-09-27 a session asked him whether racing and bins were out of the baseline. His next message was about

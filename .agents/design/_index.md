@@ -44,7 +44,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: lib/decisions.md
-  description: "Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, and the open parallelization question."
+  description: "Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, and the open parallelization question."
   paths: ["lib/**"]
 - file: lib/findings.md
   description: "Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions."
@@ -106,7 +106,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: vipaq/decisions.md
-  description: "ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions."
+  description: "ViPaq decisions ledger — the decisions and their reasons, plus the open questions."
   paths: ["vipaq/**"]
 - file: vipaq/findings.md
   description: "ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions."

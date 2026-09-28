@@ -1,7 +1,7 @@
 ---
 id: lib/result-selection
 description: IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them
-verified: 2026-09-26
+verified: 2026-09-28
 check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and lib/data/Binacle.Lib.Data/ResultSelection/Scenario.cs
 also_update:
   - api/service
@@ -34,8 +34,8 @@ Called by `LoopMultiAlgorithmBinProcessor` (per bin) and by `BinacleService` —
 
 `OperationResultStatus` includes `Unknown = -1` as a sentinel default. **None of the three strategies checks
 for it** — they only ever test `== FullyPacked`, so an `Unknown` result carrying a high percentage would score
-like any other partial one. They are safe because nothing produces `Unknown`, not because they defend against
-it. Keep that in mind before you make one reachable.
+like any other partial one. They are safe only because no result leaves the builder as `Unknown`
+(`$lib/result-building`). Keep that in mind before you make one reachable.
 
 ## DI Registration
 

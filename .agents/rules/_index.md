@@ -35,6 +35,10 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "adding a file under tooling/, or a file a just recipe reads"
   load: on-trigger
   paths: ["tooling/**"]
+- file: keep-a-session-small.md
+  description: "One session, one step. Read only what the step needs, tell the maintainer to start fresh before the session gets big, and split big work into files one session can finish."
+  when: "at the start of a session, when a task grows, and when planning work"
+  load: always
 - file: keep-verified-current.md
   description: "When you edit a doc, update its verified date and check its also_update list. One carve-out - a prose-only edit that checks nothing against code does not bump the date."
   when: "editing any doc or design record"
@@ -58,6 +62,10 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "adding a fact to any file under .agents/"
   load: on-trigger
   paths: [".agents/**"]
+- file: only-the-maintainer-decides.md
+  description: "A plan holds suggestions. Only the maintainer turns one into a decision, in his own words. A suggestion is never a reason to argue with him."
+  when: "writing into any file under .agents/, writing anything for the next session, or acting on what a plan says"
+  load: always
 - file: plain-ascii-for-user-text.md
   description: "Text that reaches a user stays plain ASCII - no em dashes, curly quotes, ellipsis characters or arrows."
   when: "writing text a user will see - validation and exception messages, log lines, OpenAPI descriptions, UI strings"

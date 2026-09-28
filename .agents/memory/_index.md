@@ -18,6 +18,14 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "The FFD_v2 / BFD_v1 string is a parsed data format, not a naming style - never tidy the underscore out of it"
   when: "renaming an algorithm class, enum member or identifier string"
   paths: ["lib/**", "shared/src/Binacle.Packing/**"]
+- file: api-v2-dropped.md
+  description: "The v2 API does not exist on this branch — only v3 and v4; never add v2 code, docs, or references"
+  when: "touching API versioning, routes or docs"
+  paths: ["api/**"]
+- file: api-v3-frozen.md
+  description: "v3 API is frozen — never modify it; all new endpoints and contract work go in v4 only"
+  when: "changing anything under api/src/Binacle.Net/v3"
+  paths: ["api/src/Binacle.Net/v3/**"]
 - file: bulk-rename-traps.md
   description: "Four traps when sweeping a namespace or type rename across this repo — spaces in Algorithms/ folder names, unstaged files and git mv, global usings that collide, and fully-qualified names"
   when: "sweeping a namespace or type rename across the repo"
@@ -75,14 +83,6 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "A test body shows arrange, act and assert as separate lines — never one helper that does all three"
   when: "writing a test body"
   paths: ["**/test/**"]
-- file: v2-dropped.md
-  description: "The v2 API does not exist on this branch — only v3 and v4; never add v2 code, docs, or references"
-  when: "touching API versioning, routes or docs"
-  paths: ["api/**"]
-- file: v3-frozen.md
-  description: "v3 API is frozen — never modify it; all new endpoints and contract work go in v4 only"
-  when: "changing anything under api/src/Binacle.Net/v3"
-  paths: ["api/src/Binacle.Net/v3/**"]
 - file: version-only-when-published.md
   description: "A component gets its own version number only once it is published independently; until then the docker image's BINACLE_VERSION is the only version."
   when: "adding a version number or a Directory.Build.props to a component"

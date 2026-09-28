@@ -52,7 +52,7 @@ real win was ~4–5×, not 10×). Two conclusions were left open at the time; ne
 
 ## Superseded decision framings
 
-Earlier versions of locked decisions in `$vipaq/decisions`, kept for the *why did it change* trail. The current
+Earlier versions of the decisions in `$vipaq/decisions`, kept for the *why did it change* trail. The current
 decision is always the one in the ledger — read these only for context.
 
 ### D4 original — the harness re-parsed the header bytes itself (2026-07-07, amended 2026-07-10)
