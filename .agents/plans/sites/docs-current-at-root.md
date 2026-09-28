@@ -37,8 +37,9 @@ Three rules replace the old ones:
    renders at `/version/<url_segment>/`. Every list entry carries four keys and the build stops on a missing
    one: `id` (the folder, never in a URL), `url_segment` (the highest version the line shipped - `2.1.1`,
    `1.3.0`), `label` (what the selector and every page call it - `v2.1.1`), `version_tag` (what docker pulls).
-   Nothing in a folder says where it renders. The maintainer set this on 2026-09-12: a closed line is named by
-   what it shipped last, not by its folder.
+   Nothing in a folder says where it renders. A closed line is named by what it shipped last, not by its
+   folder. The maintainer, 2026-09-11: "the old versions must have the highest version url they produced and
+   so will the dropdown".
 3. **No common layer.** Every page belongs to a line. A page that is true for every version lives in the
    current folder and is copied forward with it at the next major.
 
@@ -84,8 +85,8 @@ while the moves are still being checked.
 - [x] **1 - C.** `release-docker-image.yml` publishes a major tag next to the minor one:
       `type=semver,pattern={{major}}`. The docs then pull with `version_tag: "3"` and never name a minor. The
       moving-tag advice in `quick-start.md` and `samples/index.md` changes from "the minor tag" to "the
-      major tag" in step 11. **`samples/` at the repo root pins `3` too - the maintainer decided on
-      2026-09-11.** The pin, and the `"3"` in `versions.yml`, land only after the `3` tag exists - a pin on
+      major tag" in step 11. **`samples/` at the repo root pins `3` too.** The maintainer, 2026-09-11,
+      asked `3` or `3.0`-style pins: "yeah sure we also add thje 3". The pin, and the `"3"` in `versions.yml`, land only after the `3` tag exists - a pin on
       `main` must name an image that resolves. Both are in the post-release set.
       `grep -n 'pattern={{major}}' .github/workflows/release-docker-image.yml` matches.
 - [x] **2 - C.** `tooling/openapi.just` stops carrying `current_docs_version` and reads `current:` from
@@ -174,7 +175,8 @@ while the moves are still being checked.
       **Read the diff; do not assume it is only those.** `_redirects` gains `/version/v2.1.x/*` and
       `/version/v2.0.x/*` to `/version/2.1.1/:splat`, and the two exact swagger lines
       (`/version/v2.1.x/swagger/v2.html` → `/version/2.1.1/swagger/v2/`, same for `v3`).
-      **Also in this step, set by the maintainer on 2026-09-12:** no description names a version - the title
+      **Also in this step.** The maintainer, 2026-09-11: "a lot of descriptions say v2.x ... i dont want
+      that". So no description names a version - the title
       suffix and the URL carry it - so 64 descriptions across the three folders lost their "v2.x"/"v1.3.x"/
       "v3.x"; prose says `{{ page.version_label }}`, not `{{ page.version }}` (13 places); and `vlink` takes a
       version id first (`{% vlink v2.x /index.md %}`) so the four cross-line links resolve a file instead of
@@ -280,13 +282,13 @@ while the moves are still being checked.
 
 ### Open - the maintainer's
 
-- [x] **2026-09-12, the maintainer said no - it has no place now.** `version.html` is gone with the
+- [x] **2026-09-12, the maintainer: "version must go it has no place now".** `version.html` is gone with the
       `common_pages` collection, its `defaults` block, `pages.xml`, the second layout, sidebar and menu, the
       `📚 Versions` entry on the landing page and the link on `generate-a-client.md`. `/version/` redirects to
       `/`. `design/sites/decisions.md#S12` holds it.
       `ls sites/docs/collections/` prints `_versions` alone, and `ls sites/docs/_layouts sites/docs/_includes`
       shows no `versions/` folder.
-- [x] **2026-09-12, the maintainer said no.** The "Latest Version Docs" button is gone from both includes.
+- [x] **2026-09-12, the maintainer: "fix the sidebar no latest docs".** The "Latest Version Docs" button is gone from both includes.
       `grep -rn latest_version_link_text sites/docs` returns nothing. `_data/sidebar.yml` held only that
       key and is empty of use - delete it.
 

@@ -43,7 +43,8 @@ it.
 A decision that is carried out leaves the plan. What is true now goes in a doc; why goes in design.
 
 In a design record, an entry that quotes him sits under `## Decided`; one that does not sits under
-`## Pending`. The maintainer, 2026-09-28: "if not decided then they must gi ti ## Penbding".
+`## Pending`. The maintainer, 2026-09-28: "if not decided then they must gi ti ## Penbding". In a ledger split
+into one file per decision, the same test sets `status: decided` or `status: pending`.
 
 ## Why
 

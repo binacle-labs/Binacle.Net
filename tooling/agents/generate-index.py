@@ -111,12 +111,14 @@ def entry(directory, relative_path, index_name, config):
     keys = list(config["fields"]["always"])
     if index_name == "plans":
         keys += config["fields"]["plans_only"]
+    if index_name == "design":
+        keys += config["fields"]["design_only"]
 
     for key in keys:
         value = field(path, key)
         if not value:
             continue
-        if key in ("load", "state", "horizon"):
+        if key in ("load", "state", "horizon", "status"):
             lines.append(f"  {key}: {value}")
         else:
             lines.append('  %s: "%s"' % (key, value.replace('"', r"\"")))

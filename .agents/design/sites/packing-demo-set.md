@@ -1,8 +1,8 @@
 ---
 id: sites/packing-demo-set
 description: Why the packing demo sizes its items against the largest bin, and how sizingBin and addBin relate - the reasoning behind the numbers a visitor arrives to
-verified: 2026-09-09
-check: largestBin and randomItemFor in packages/binacle-net-ui/src/apps/packingDemo/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts - the bin each one picks is the claim that moves; the module's _sass/_theme.scss still matches sites/demo/_sass/_theme.scss once whitespace is stripped; components/visualizer/itemMaterial.ts is still one shared MeshNormalMaterial
+verified: 2026-09-29
+check: largestBin and randomItemFor in packages/binacle-net-ui/src/apps/packingDemo/samples.ts, and sizingBin and addBin in packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts - the bin each one picks is the claim that moves; the module's _sass/_theme.scss still matches sites/demo/_sass/_theme.scss apart from comments; components/visualizer/itemMaterial.ts is still one shared MeshNormalMaterial
 paths:
   - "packages/binacle-net-ui/**"
 ---
@@ -14,7 +14,7 @@ that a later session would otherwise re-decide.
 
 ## Items are sized against the largest bin
 
-`utils/samples.ts` `largestBin` picks the biggest bin by volume, and `randomItemFor` sizes each rolled item at
+`apps/packingDemo/samples.ts` `largestBin` picks the biggest bin by volume, and `randomItemFor` sizes each rolled item at
 half that bin's sides. **So the set always fits at least one candidate.**
 
 **That is the point, not a safety margin.** The smaller bins are the interesting result - the visitor is
@@ -24,7 +24,7 @@ show.
 
 ## `sizingBin` and `addBin` do not pick the same bin
 
-`core/packingDemo.ts` `sizingBin()` returns `largestBin(...)`, or a fresh roll when there are no bins, so
+`apps/packingDemo/packingDemo.ts` `sizingBin()` returns `largestBin(...)`, or a fresh roll when there are no bins, so
 nothing downstream has to handle an empty list. `addBin` copies the **last** bin instead, through
 `Bin.copyOf`, which keeps the dimensions and takes the next free copy number.
 
@@ -39,8 +39,8 @@ question nobody has answered** - not a bug.
 ## The module does not ship an old palette
 
 **Checked 26 Aug 2026.** A review said `Binacle.Net.UIModule` was still on a pre-contrast-pass dark palette
-while the sites had moved on. It is not. `api/src/Binacle.Net.UIModule/_sass/_theme.scss` is byte identical
-to `sites/demo/_sass/_theme.scss` once whitespace is stripped, `#3c5d8b` is also the dark `--primary` in
+while the sites had moved on. It is not. `api/src/Binacle.Net.UIModule/_sass/_theme.scss` matches
+`sites/demo/_sass/_theme.scss` apart from comments, `#3c5d8b` is also the dark `--primary` in
 `sites/www/_sass/_tokens.scss`, and the module's `_components.scss` carries the same four contrast overrides
 the demo site's does.
 

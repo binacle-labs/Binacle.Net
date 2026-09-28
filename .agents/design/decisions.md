@@ -316,7 +316,7 @@ printed in `SECURITY.md` passed verbatim from a clean shell; and the SLSA proven
 `github.com/binacle-labs/Binacle.Net/actions/runs/31970609518` — Fulcio's record of which workflow signed it,
 not a string this repo controls.
 
-Which surfaces carry the invocation, and what else would change it, is `$ci-cd/decisions#D15`.
+Which surfaces carry the invocation, and what else would change it, is `$ci-cd/decisions/D15`.
 
 ### D4 — name a version where the version is the fact, never as a floor or an example
 
@@ -438,7 +438,7 @@ anyone who pulled one got a failure with nothing anywhere to explain it.
 explain.
 
 **It was a one-off cleanup, and since 2026-09-14 the policy exists.** A prerelease's image stops at GHCR
-after the smoke and never reaches Docker Hub - `$ci-cd/decisions#D3`. Nothing needs cleaning up after the next release.
+after the smoke and never reaches Docker Hub - `$ci-cd/decisions/D3`. Nothing needs cleaning up after the next release.
 
 **Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no - "its no for now"
 (the maintainer, 2026-09-03) - and the switch stays off; the reversal condition is in the CI/CD ledger under D26.

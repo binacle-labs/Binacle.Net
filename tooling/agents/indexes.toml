@@ -47,5 +47,7 @@ vipaq = "ViPaq"
 always = ["when", "load"]
 # Where the work stands and roughly how far out. Every other index would carry three empty keys.
 plans_only = ["state", "waits-on", "horizon"]
+# Decided, pending or open - set only on a ledger split into one file per decision.
+design_only = ["status"]
 # Yaml lists, flattened to one line.
 lists = ["paths"]

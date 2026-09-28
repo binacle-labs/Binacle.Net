@@ -1,7 +1,7 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-09-26
+verified: 2026-09-29
 check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/measurements/encoded-size/ holds a folder per algorithm, and a file per layout per group inside it
 paths:
   - "vipaq/**"
@@ -59,8 +59,8 @@ whatever `Encode` writes, `Decode` must read back. Keeping them in one class kee
 **The codec is a constructor argument on `ProtocolEncoder`.** That is what makes the blind layer fully testable:
 hand it a `NoOpCodec` and every combination of widths, layout and compression becomes forceable *with the body
 still readable*, so framing can be checked byte for byte — impossible through a real codec, because compressed
-bytes must never be compared (§6.1). Racing DEFLATE against gzip is two encoders and nothing else. Once the race
-is settled the codec is pinned by `Version` (§6) and the constructor takes the winner.
+bytes must never be compared (§6.1). Racing DEFLATE against gzip is two encoders and nothing else. The wire codec is
+pinned by `Version` (§6); `ResolveCodec` hands the constructor raw DEFLATE.
 
 **Why the encoder, and not the serializer, owns the codec and the item count.** The count is a uint16 at the
 front of the *body* (§3), and the body is what gets compressed (§1). So the count cannot be read until after the
@@ -133,8 +133,7 @@ with a `with` expression:
 a set reserved bit and a reserved width code (§7, steps 2-3) — then hand the encoder the header plus the rest.
 
 That layer is what the public API calls. **The benchmark harness does not** — it constructs `ViPaqEncoder`
-and `ProtobufEncoder` and drives the blind layer directly, which is what the *Public surface* section below
-says and what this sentence used to contradict.
+and `ProtobufEncoder` and drives the blind layer directly (see *Public surface* below).
 
 **One codec rule, read the same way in both directions.** `ResolveCodec(header)` is the only place that maps the
 `Compressed` bit onto a codec — raw DEFLATE when set, `NoOpCodec` when clear — and both `Serialize` and

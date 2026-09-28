@@ -1,7 +1,7 @@
 ---
 id: ci-cd/release-pipeline
 description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease skips on its way to a GitHub prerelease, the CHANGELOG.md release body, and the Docker Hub page written last"
-verified: 2026-09-18
+verified: 2026-09-29
 check: "run-name names the version; the trigger is workflow_dispatch alone with a required version input; publish copies in two halves with the cosign sign and the just image verify step between them, and Move the tags that move carries the only if: in the job; build carries attestations: write and an actions/attest-build-provenance step; the signature retry is the only inline run: | block in the file; the seven jobs, their needs: edges and job outputs match release-docker-image.yml; the gate job still carries the ref, semver and tag checks before the changelog one; the release job makes the tag through gh release create --target and pushes none of its own; the concurrency block groups on github.workflow alone and still sets cancel-in-progress: false; `publish` carries the prerelease condition and `release` carries the `!cancelled() && !contains(needs.*.result, 'failure')` one that runs it past a skipped `publish`, while `page` carries none and skips through needs; release-summary takes the ref as its sixth argument and TAGS falls back to the staging reference; `page` is still the only job nothing needs; shared-image-tests.yml, shared-smoke-image.yml and shared-dockerhub-overview.yml still expose workflow_call; shared-image-tests.yml still names no gem test; `just changelog check` and `extract` still take a bare version or Unreleased"
 also_update:
   - ci-cd
@@ -82,17 +82,17 @@ being released passed CI — a direct push to `main` never sees the pull request
 runs after the gate job rather than beside it, so a bad version or a missing section is reported in seconds
 instead of after a full suite. It takes that file whole, so the release also gets its OpenAPI lint step.
 
-**The gems are not in it.** The ten Jekyll plugins under `ruby/` ship in the three sites and never in the
+**The gems are not in it.** The Jekyll plugins under `ruby/` ship in the three sites and never in the
 image, so they run in `shared-site-tests.yml`, which the site deploy calls and this pipeline does not. Every
-step added to the image suite is a step every release pays for — see `$ci-cd/decisions#D18`.
+step added to the image suite is a step every release pays for — see `$ci-cd/decisions/D18`.
 
-**`build`** — checkout, .NET, `just`, then `just build publish`. One `docker/metadata-action` step, a GHCR
+**`build`** — checkout, .NET, `just`, Node and `npm ci`, then `just build publish`. One `docker/metadata-action` step, a GHCR
 login with `GITHUB_TOKEN`, buildx, and one `docker/build-push-action` that pushes the immutable tag to GHCR
 with `provenance: mode=max` and `sbom: true`. `VERSION` is passed as a build arg from the metadata step's
 `version` output rather than from the input, so `BINACLE_VERSION` inside the container and the image tag cannot
 disagree. It ends by attesting the pushed digest with `actions/attest-build-provenance`, then signing it with
 cosign. **The attestation is a second provenance statement and the reason there are two** is that buildkit's
-inline one is signed by nothing of its own; see `$ci-cd/decisions#D15`. It needs `attestations: write`, and it
+inline one is signed by nothing of its own; see `$ci-cd/decisions/D15`. It needs `attestations: write`, and it
 binds to the digest, so the Docker Hub copy is covered without attesting again.
 
 **Both metadata steps — this one and `publish`'s — carry `value=${{ inputs.version }}` on every `type=semver`
@@ -117,12 +117,12 @@ signature in between**:
 | `Verify the published signature` | `just image verify <version> signature refs/heads/main <repo>` - the command `SECURITY.md` publishes. Retried five times, 15s apart, in the one inline `run:` block in the file: Docker Hub's referrers index is eventually consistent and this reads it seconds after the sign. The recipe itself stays one shot, because a reader running it wants an answer rather than a wait |
 | `Move the tags that move` | `just ci copy-tags` again, for `3.0`, `3` and `latest`. Conditional on the list being non-empty, which a release always is |
 
-**Why in halves.** All three tags used to be written before anything was signed, so a failed `cosign sign` left
-`latest` on an unsigned image with the run red and nothing saying so. **Why the split and not simply copying
+**Why in halves.** Written all at once before the sign, a failed `cosign sign` would leave `latest` on an
+unsigned image with the run red and nothing saying so. **Why the split and not simply copying
 the whole list twice**, which is simpler and idempotent: a frozen version tag would reject the second write.
-Both in `$ci-cd/decisions#D15` and `#D4`.
+Both in `$ci-cd/decisions/D15` and `$ci-cd/decisions/D4`.
 
-**It checks out now**, for `contents: read`, because it runs recipes out of the working copy. Job output:
+**It checks out**, for `contents: read`, because it runs recipes out of the working copy. Job output:
 `tags`, the public tag set, read by `release` for the run summary.
 
 **`release`** — checkout, `just`, then one call that makes the tag and the release together, with the body from
@@ -211,10 +211,9 @@ jobs declare `id-token: write` and why no signing key exists to store. The signa
 **digest**, so one signature covers `x.y.z`, `x.y` and `latest` alike.
 
 **The identity ends at the ref the run was on, and it is anchored.** A dispatch runs on `main`, so it reads
-`release-docker-image.yml@refs/heads/main`, and the published command closes it with a `$`. Unanchored it was a
-prefix match that took a signature from any ref in the repository. This entry used to say tightening it would
-break every published command at once; that was true of appending `refs/tags/`, and not of anchoring on the
-branch. `$ci-cd/decisions#D3` has the reversal and what it costs.
+`release-docker-image.yml@refs/heads/main`, and the published command closes it with a `$`. Unanchored it would
+be a prefix match that takes a signature from any ref in the repository. `$ci-cd/decisions/D3` has the history
+and what it costs.
 
 ## How a prerelease differs
 
@@ -247,10 +246,10 @@ anchored on `main` - does not cover a branch beta; nothing published names one.
 **The consequence for testing:** a prerelease proves `gate`, `test`, `build`, `smoke` and `release` against
 the exact commit. It does not run `publish` or `page`, so a change to either is first exercised by the real
 release. A red `publish` leaves Docker Hub untouched and makes no tag, and the same version can be dispatched
-again once fixed. The reasoning and the history are `$ci-cd/decisions#D3`.
+again once fixed. The reasoning and the history are `$ci-cd/decisions/D3`.
 
 **The moving-tag half was first proven on the v3.0.0 run, 2026-09-01**, which wrote `3.0.0`, `3.0` and
-`latest` after a green verify onto one digest. The design record is D25. **It has still never moved a name off
+`latest` after a green verify onto one digest - `$ci-cd/decisions/D25`. **It has still never moved a name off
 an existing image.** 3.0.0 created `3.0` and `latest`; the next release is the first run that repoints
 `latest`, and the first to write `{{major}}` at all.
 
@@ -295,7 +294,7 @@ image carries the same metadata shape a pushed one does.
 - **Writing the `[Unreleased]` section of `CHANGELOG.md`** as the work lands, and renaming that heading to the
   version before the real release.
 - **Checking a beta.** It stops on GHCR, so pulling it, smoking it and opening its pages is a person's job.
-- **Deploying the docs site**, which is its own `workflow_dispatch` workflow and is not chained to a release.
+- **Deploying a site**, which is `deploy-site.yml`, its own `workflow_dispatch`, and is not chained to a release.
 
 **What no longer happens by hand: the tag.** `git tag v3.0.0 && git push origin v3.0.0` builds nothing now, and
 neither does *Releases → Draft a new release → Create new tag on publish* — that route makes a tag and a

@@ -1,8 +1,8 @@
 ---
 id: vipaq/dependencies
 description: ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator).
-verified: 2026-09-26
-check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the pack count and the empty-pack count match the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the two pre-report gates match vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes and codecs named below
+verified: 2026-09-29
+check: ProjectReference and InternalsVisibleTo entries in vipaq/**/*.csproj match the graph and the boundary rules below; the empty-pack count matches the entries in vipaq/data/packed/**/*.json across all three families (bischoff-suite, custom-problems, demo-samples); the two pre-report gates match vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/; the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ cover every family and the modes and codecs named below
 paths:
   - "vipaq/**"
 ---
@@ -27,7 +27,7 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    │   │
    │   ├────── Binacle.ViPaq.Data  (no IVT)  library — the real packs
    │   │           refs: Binacle.Data (the embedded-resource reader), Geometry, CompactNotation
-   │   │           owns: the 2,322 frozen packs, Scenario, one class per family under Packed/
+   │   │           owns: the frozen packs, Scenario, one class per family under Packed/
    │   │              ▲
    │   └────── Binacle.ViPaq  [grants IVT]  the format (reference implementation)
    │              ▲   ▲   ▲   ▲
@@ -65,9 +65,9 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
 |---|---|---|---|---|
 | `Binacle.ViPaq` | library | Geometry | grants IVT | the format; everything but the public surface is `internal` |
 | `Binacle.ViPaq.UnitTests` | xUnit exe | ViPaq, ViPaq.Data, CompactNotation | yes | spec/correctness — vectors + curated inputs, plus every real pack round-tripped |
-| `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the 2,322 real packs as scenarios, one class per family |
+| `Binacle.ViPaq.Data` | library | Binacle.Data, Geometry, CompactNotation | **no** | the real packs as scenarios, one class per family |
 | `Binacle.ViPaq.Testing` | library | ViPaq, ViPaq.Data, Geometry, CompactNotation | yes | the harness's encoders - ViPaq, protobuf, JSON, compact - and the curated and synthetic picks |
-| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks and group-coverage gates, then 54 files into `vipaq/results/measurements/encoded-size/` |
+| `Binacle.ViPaq.EncodedSize` | exe (`vipaq/measure`) | Testing, ViPaq.Data, Reporting | yes | the curated-picks and group-coverage gates, then one file per group per algorithm per layout into `vipaq/results/measurements/encoded-size/` |
 | `Binacle.ViPaq.Benchmarks` | exe (`vipaq/bench`) | Testing, ViPaq.Data, Benchmarking | yes | BenchmarkDotNet timings |
 | `Binacle.ViPaq.VectorGenerators` | tool exe | ViPaq, CompactNotation, Reporting | yes | regenerates `test-vectors/` |
 | `Binacle.ViPaq.PackedDataGenerator` | tool exe | Lib, Packing, ViPaq, CompactNotation, Geometry, Reporting | **no** | packs problems offline, freezes `data/packed/` |
@@ -86,8 +86,8 @@ Binacle.Geometry                    leaf — geometry types + IWith[ReadOnly]Dim
    fair format comparison, same codec both sides), JSON and compact notation (the text a user's token replaces,
    bin and placed items only). Only Benchmarks and EncodedSize reference `Testing`.
 
-3. **PackedDataGenerator has no internals grant.** It produces the frozen data through the public surface and the
-   packing engine only. It must never reach into ViPaq internals — the data has to be generatable the way any
+3. **PackedDataGenerator has no internals grant.** It produces the frozen data through the packing engine; from
+   `Binacle.ViPaq` it uses only `Limits.EightBitsMax`, to label each sample's width family. It must never reach into ViPaq internals — the data has to be generatable the way any
    caller would.
 
 4. **Two doors into the internal `ProtocolEncoder`** — and they stay apart: the UnitTests fixture
@@ -112,8 +112,8 @@ runs it every time:
 
 | Theory | What it sweeps |
 |---|---|
-| `Serializer_Round_Trips_In_Every_Mode` | all 2,322 packs through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for |
-| `Gzip_Round_Trips_In_Both_Layouts` | all 2,322 packs through `ProtocolEncoder` with the gzip codec × both layouts. The serializer never picks gzip, but the size report compares it, so it is tested |
+| `Serializer_Round_Trips_In_Every_Mode` | every pack through the public `ViPaqSerializer`, raw and deflate × both layouts - the four modes a caller can ask for |
+| `Gzip_Round_Trips_In_Both_Layouts` | every pack through `ProtocolEncoder` with the gzip codec × both layouts. The serializer never picks gzip, but the size report compares it, so it is tested |
 | `Forced_Sixteen_Bit_Widths_Round_Trip` | the non-empty packs forced to 16-bit widths through `ProtocolTestingFixture`, which hands `ProtocolEncoder` a header, × raw, deflate and gzip × both layouts, so the 16-bit read path is exercised on real data the serializer would never widen |
 | `Every_Family_Loads` | a fact, not a theory: each family has at least one pack. A family whose resources are misnamed loads empty and would add no rows to the theories above |
 

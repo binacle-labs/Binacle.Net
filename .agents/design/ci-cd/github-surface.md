@@ -1,7 +1,7 @@
 ---
 id: ci-cd/github-surface
 description: What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly
-verified: 2026-08-31
+verified: 2026-09-29
 check: the What this repository uses today section against .github/ and the repo root - the workflow, action and health-file counts are what move. Every row under Platform settings is unverified: it was read from the working copy, not from the GitHub settings pages, so re-read the settings before trusting any of them; the Docker Hub page section against .github/dockerhub-overview.md, which must still carry the three-row tag policy table, no tag list, no GHCR mention, no committed version, and a cosign block matching SECURITY.md
 paths:
   - ".github/**"
@@ -43,7 +43,7 @@ be visible. Only a run of steps, and it can be an action, and it disappears.
 
 That is what makes them worth writing down rather than rediscovering.
 
-- **Secrets do not cross into a called workflow.** The caller needs `secrets: inherit`. The failure looks like
+- **Secrets do not cross into a called workflow.** The caller passes them by name or with `secrets: inherit`. The failure looks like
   an empty variable, not a permissions error.
 - **`environment:` is not supported in `on.workflow_call`.** A callable workflow cannot declare one, so the
   deployment URL has to stay with the caller.
@@ -67,7 +67,7 @@ That is what makes them worth writing down rather than rediscovering.
 **Answered 2026-08-19, and the answer was the bad one.** Dependabot's `github-actions` ecosystem with
 `directory: /` does **not** reach an `action.yml` in a subfolder, so every pin moved into a shared action
 stopped being updated silently - worse than an unpinned action, because nothing reports it. **The fix is one
-`dependabot.yml` entry per action folder**, which is the shape the file carries now. `decisions.md` D11 holds
+`dependabot.yml` entry per action folder**, which is the shape the file carries now. `$ci-cd/decisions/D11` holds
 the reasoning.
 
 ---
@@ -75,12 +75,12 @@ the reasoning.
 ## What this repository uses today
 
 `.github/` holds `dependabot.yml` (actions only, weekly, grouped minor and patch, with one entry per action
-folder that pins an outside SHA), **eleven workflows**, **nine composite actions** under `actions/`,
+folder that pins an outside SHA), the workflows, the composite actions under `actions/`,
 `ISSUE_TEMPLATE/` and `PULL_REQUEST_TEMPLATE.md`, and `dockerhub-overview.md` — the source the release
 pipeline renders onto the Docker Hub page. The root holds `README.md`, `SECURITY.md`, `CHANGELOG.md`,
 `DEVELOPMENT.md`, `CONTRIBUTING.md`, `CLAUDE.md`, `CONTENT-TERMS.md`, `NOTICE`, and **one licence file,
 `LICENSE.AGPL-3.0`**. `LICENSE.GPL-3.0` is a *directory* holding the old text and a `README.md`, and that
-shape is load-bearing - `decisions.md` D6 has why. Counted 2026-09-04.
+shape is load-bearing - `$decisions#D6` has why.
 
 **`CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` landed on 2026-08-30**, and they say the same
 thing: **code contributions are not being taken at the moment, issues are.** The stated reason is that
@@ -91,8 +91,8 @@ reversible in a way that merging a pull request without terms is not.
 
 **Issue templates landed 2026-09-04** - `bug_report.yml`, `packing_result.yml` and `config.yml` under
 `.github/ISSUE_TEMPLATE/`. **Still missing:** `CODE_OF_CONDUCT.md`, `CODEOWNERS`, `SUPPORT.md`, `FUNDING.yml`
-and `CITATION.cff` — the last three are absent on purpose per the table below, and `SUPPORT.md` is answered
-by `config.yml` linking out.
+and `CITATION.cff`. `SUPPORT.md` and `FUNDING.yml` are in the table below; `SUPPORT.md` is answered by
+`config.yml` linking out.
 
 **Two worth a decision and nothing more:**
 
@@ -125,7 +125,7 @@ repository.
   conduct, contributing, and issue and PR templates. **Worth loading once for the checklist**, then ignoring
   the parts that are not wanted.
 - **Merge settings** - squash-only, auto-delete head branches, allow auto-merge. Unverified.
-- **Environments** - all three site deploys declare one, which is what carries the deployment URL. Required
+- **Environments** - the site deploy declares one per site, which is what carries the deployment URL. Required
   reviewers and wait timers are available and unused.
 
 ---
@@ -133,7 +133,7 @@ repository.
 ## What the Docker Hub page carries, and what it deliberately does not
 
 `.github/dockerhub-overview.md` is the source; the release pipeline's `page` job renders and PATCHes it. Each
-of these was decided and each is easy to undo by accident.
+of these is easy to undo by accident.
 
 - **No tag list.** Fifteen hand-maintained entries duplicating a Tags tab that is always right, and it is what
   rotted the page the first time. The three-row policy table replaces it and answers the one thing neither tab
@@ -143,8 +143,7 @@ of these was decided and each is easy to undo by accident.
   support surface nobody meant to own.
 - **No concrete version committed into the file.** Placeholders and substitution, or the page is wrong the day
   the next minor ships. Same reason the tag list went.
-- **No service module, no ViPaq, no health endpoint.** The module is not advertised here, at the maintainer's
-  call. ViPaq belongs on the docs site: on a page where someone is deciding whether to run one command, a
+- **No service module, no ViPaq, no health endpoint.** The module is not advertised here. ViPaq belongs on the docs site: on a page where someone is deciding whether to run one command, a
   second format name is a reason to hesitate. The health endpoint is off by default and its path is
   configurable, so a line about it is wrong for most readers.
 - **The `cosign` block is copied verbatim from `SECURITY.md`, only the tag differs, and that file is the
@@ -166,7 +165,7 @@ pipeline's shape is what makes it true.
 
 **The one it argued hardest for is now in place, and this section was not updated.** A tag ruleset exists on
 `refs/tags/v*` - note the pattern, not the `v[0-9]*` argued for here - blocking update and deletion, creation
-still allowed, empty bypass list. `decisions.md` D24 is the record and it supersedes this paragraph. **That
+still allowed, empty bypass list. `$ci-cd/decisions/D24` is the record and it supersedes this paragraph. **That
 one row of this section is settled; every other row below is still unverified**, and one of them turning out
 to be stale is reason to suspect the rest.
 
@@ -192,11 +191,11 @@ mechanism that lets someone use it without falling back to email), and setting t
 to read-only - which changes nothing today, since every job declares its own, but means the next workflow
 added starts safe.
 
-**Artifact attestations are largely redundant here** - the pipeline already produces SLSA provenance and an
-SPDX SBOM through buildx, and signs the digest with keyless cosign in both registries.
+**Artifact attestations are in use** - `build` runs `actions/attest-build-provenance` beside buildx's own
+provenance and SBOM and the keyless cosign signature. `$ci-cd/decisions/D15` has why.
 
-**CodeQL is complementary to Sonar rather than overlapping**, and free on public repositories. It costs one
-more workflow file, which cuts against reducing the count.
+**CodeQL is complementary to Sonar rather than overlapping**, and free on public repositories. It runs as
+`codeql-analysis.yml` - `$ci-cd/decisions/D20`.
 
 ---
 

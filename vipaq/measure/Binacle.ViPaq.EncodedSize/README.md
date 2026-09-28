@@ -10,7 +10,7 @@ format shows up as a diff.
 
 | Path | What it is |
 |---|---|
-| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `vipaq/results/measurements/`; runs the gate first |
+| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `vipaq/results/measurements/`; runs the gates first |
 | `PreReportChecks/` | The gates: every curated benchmark pick still names a real pack, and every pack lands in a file. A failure stops the run |
 | `EncodingRunner.cs` | Encodes every pack in every format and fills the bag |
 | `EncodingBag.cs` | What the runner measured; every reporter reads from here |

@@ -1,7 +1,7 @@
 ---
 id: sites/demo
 description: The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/.
-verified: 2026-08-27
+verified: 2026-09-29
 check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; sites/demo/_includes/ still has no seo.html and pages/index.html still prints item.summary on the cards; the demo/prefetch script split still matches sites/demo/_data/includes.yml; the sitemaps: block in _config.yml still writes one file and /sitemap.xml still lists the three pages; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
 also_update:
   - packages
@@ -12,7 +12,7 @@ paths:
 # Demo Site
 
 **`$sites/demo` is the `sites/demo/` folder** — the published demo site. It is off limits from a coding
-session; see `.agents/README.md`.
+session.
 
 Jekyll site at `sites/demo/`. The public demo site for Binacle.Net.
 Built with Jekyll + webpack + TypeScript. Output goes to `../../artifacts/demo`.
@@ -34,14 +34,14 @@ just build demo   # the same site built once, into artifacts/demo
 | `pages/404.html` | `/404.html` | Error page |
 
 **There is no collection for the tools.** They are pages carrying `applet: true` and an `order`, and the
-chooser, the two navs and the JSON-LD block all key off that flag.
+chooser and the nav menu key off that flag.
 
 **There is no sitemap file and no sitemaps collection.** `jekyll-multi-sitemap` generates `/sitemap.xml` from
 the `sitemaps:` block in `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and
 `{% sitemap_links %}` for its `Sitemap:` line.
 
-**Its `robots.txt` gained a `nav: exclude: true` line** on 24 Aug 2026, so the three sites' files are one
-file. Only docs reads `nav.exclude`, and only for its sidebar, so the line does nothing here.
+**Its `robots.txt` carries `nav: exclude: true`** so the three sites' files are the same file. Only docs reads
+`nav.exclude`, and only for its sidebar, so the line does nothing here.
 
 ## JS Bundles
 
@@ -70,8 +70,7 @@ it.** `runtime.js`, `main.js` and `vendors.js` load on every page. `three.js`, `
 list, so arriving at a demo costs no download. Both halves read the one list, so they cannot drift apart.
 
 **`{% prefetch_tags %}` writes the prefetch links and `{% script_tags %}` executes them**, off that one
-`demo_scripts` list. The prefetch links carry the list's `type: text/javascript` as well, which the old
-hand-written include dropped.
+`demo_scripts` list. The prefetch links carry the list's `type: text/javascript` as well.
 
 ## Plugins
 
@@ -100,8 +99,7 @@ loaded**, as a stylesheet and a module in `sites/demo/_data/includes.yml`.
   docs site's swagger layout is the only thing that loads it, so it reaches `sites/docs/` alone. That map is
   also what keeps it out of the image.
 
-Alpine.js arrives as an npm dependency bundled by webpack, which is the copy the demo code uses — there is no
-vendored copy any more.
+Alpine.js arrives as an npm dependency bundled by webpack; there is no vendored copy.
 
 **Three.js is not in `vendors.js`** — it is its own bundle, for the reason in the table above.
 

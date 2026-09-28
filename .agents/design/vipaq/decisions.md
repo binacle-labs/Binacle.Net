@@ -1,7 +1,7 @@
 ---
 id: vipaq/decisions
 description: ViPaq decisions ledger — the decisions and their reasons, plus the open questions.
-verified: 2026-09-26
+verified: 2026-09-29
 check: Decided entries are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
@@ -15,28 +15,6 @@ paths:
 Decisions and open questions, with the *why*. Evidence lives in `$vipaq/findings` (superseded prototype
 numbers in `$vipaq/history`); design detail in `$vipaq/architecture`. This file is the "what was chosen and why"
 so a fresh session doesn't re-litigate it.
-
-## What we must reach (must-have)
-
-The target for v2. A change only ships if it keeps all of these true:
-
-- **Stays a small base64 text token.** Storage comes first. The stored form is the base64 string, and it must stay
-  small. Everything else is measured against that.
-- **Simpler than v1.** Two width tiers (8/16), not four. No huge value ceiling to reason about.
-- **Round-trips exactly, in both C# and TypeScript.** Decode must give back the input. When not compressed, the
-  bytes must be identical across the two languages.
-- **Reads at least as fast as v1**, ideally faster (that is the point of the decode span fix). Never slower.
-- **Keeps the public API small.** Do not grow the public surface. Anything needed only for tests stays internal.
-- **Only ships if measured.** Smaller base64, or faster / less memory, or a clear simplicity win. No measured gain,
-  no ship — the worth-it gate below.
-
-## The worth-it gate (governs every decision here)
-
-Every decision — a header bit, a codec, a layout, a feature — must answer **"is it worth it?"**, written as:
-- **Cost:** effort + risk + complexity + cross-language churn (C#, TS, interop vectors).
-- **Benefit:** measured, in the terms that matter — **base64 size** (the stored form), **encode/decode ms**, or a
-  concrete simplicity/maintenance gain. "Might be nice" is not a benefit.
-- **Verdict + why. Default to NO.** The format is already good; the bias is against churn.
 
 ## Decided
 
@@ -58,6 +36,28 @@ Every decision — a header bit, a codec, a layout, a feature — must answer **
 ## Pending
 
 What ViPaq does and why. No quote from the maintainer covers these yet.
+
+### What we must reach (must-have)
+
+The target for v2. A change only ships if it keeps all of these true:
+
+- **Stays a small base64 text token.** Storage comes first. The stored form is the base64 string, and it must stay
+  small. Everything else is measured against that.
+- **Simpler than v1.** Two width tiers (8/16), not four. No huge value ceiling to reason about.
+- **Round-trips exactly, in both C# and TypeScript.** Decode must give back the input. When not compressed, the
+  bytes must be identical across the two languages.
+- **Reads at least as fast as v1**, ideally faster (that is the point of the decode span fix). Never slower.
+- **Keeps the public API small.** Do not grow the public surface. Anything needed only for tests stays internal.
+- **Only ships if measured.** Smaller base64, or faster / less memory, or a clear simplicity win. No measured gain,
+  no ship — the worth-it gate below.
+
+### The worth-it gate (governs every decision here)
+
+Every decision — a header bit, a codec, a layout, a feature — must answer **"is it worth it?"**, written as:
+- **Cost:** effort + risk + complexity + cross-language churn (C#, TS, interop vectors).
+- **Benefit:** measured, in the terms that matter — **base64 size** (the stored form), **encode/decode ms**, or a
+  concrete simplicity/maintenance gain. "Might be nice" is not a benefit.
+- **Verdict + why. Default to NO.** The format is already good; the bias is against churn.
 
 ### D1 — v2 is `8/16 + reserved codes`, for simplicity (2026-07-05)
 
@@ -91,10 +91,10 @@ every mode, so `Testing`'s `ViPaqEncoder` takes the width choice from `Header.Cr
 `ProtocolEncoder` directly, through `InternalsVisibleTo`. What still holds from the record below: the header is
 read through the internal `Header`, never re-parsed, and no public member of `ViPaqHeader` names a wire type.
 
-The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Serialize`/`Deserialize` only — that is
-what makes the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
-re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `ViPaqHeader`
-holds `Header` in an `internal` field, exposing only `bool`/`int`/`string` publicly. Internal rather than
+Until 2026-09-22 the benchmark **encoded and decoded** through `ViPaqSerializer.Serialize`/`Deserialize` only —
+that is what made the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
+re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `Testing`'s
+`ViPaqHeader` holds `Header` in an `internal` field, exposing only `int` and `string` publicly. Internal rather than
 private because `Testing`'s own encoder reads it; what matters is that no *public* member names `Header`,
 `Width` or `Layout`. **One copy of the spec beats a clean
 boundary here** — `Header` is a frozen wire description, not an evolving API, so if it churns the format churned and
@@ -144,8 +144,11 @@ selection; don't try to benchmark widths v2 won't have.
 
 ### D7 — Compression trigger is **try-both-keep-smaller** (was O1; 2026-07-08)
 
+**Not what ships.** `Serialize` compresses only when the caller sets `Compress`, and nothing in the repo runs
+try-both (D16). The record below is the case for it.
+
 Compress, keep whichever is shorter, never inflate. Both sides were measured, and the fixed 255-byte threshold
-the lib ships today is **wrong in both directions**: it inflates random data (gzip saved −8% to −0%) and would miss
+the lib shipped then is **wrong in both directions**: it inflates random data (gzip saved −8% to −0%) and would miss
 small compressible data (real packed data saves 45–68%). A threshold cannot be tuned to fit both, because the right
 answer depends on the data, not its size. Try-both has no knob to get wrong and can never inflate.
 
@@ -216,7 +219,7 @@ Widths keep 2 bits, so each section has two spare codes: one for varint, one in 
 
 Both describe what the encoder did to *this* blob, so one decoder reads all four combinations. That makes them
 measurable — row/columnar × raw/compressed, raced on real packs instead of guessed at spec time. It is also the
-phase-1 switch. It does **not** re-open the threshold question (D7): try-both stays the default, and the spec
+phase-1 switch. It does **not** re-open the threshold question (D7): the spec
 makes the *bit* normative while the *policy* is not.
 
 ### D14 — Widths are policy too; only the header is normative (2026-07-09)
@@ -266,8 +269,8 @@ present and unused. **Baked in 2026-07-14:** `ViPaqSerializer.Serialize` now tak
 defaulting off / RowMajor. They set the header's `Compressed` and `Layout` bits; a single `ResolveCodec(header)`
 maps the bit to the codec (raw DEFLATE when set, a pass-through `NoOpCodec` when not), and the encoder just runs
 that codec — the same three lines for encode and decode. `Compress` is a straight on/off: it does not check
-whether compression paid, so a small pack can come out larger, which §6 allows (D7's try-both is **not** wired —
-it stays available in the harness for measurement, not in the serializer). `Deserialize` reads compressed blobs
+whether compression paid, so a small pack can come out larger, which §6 allows (D7's try-both is **not** wired;
+the harness races the codecs but does not pick one). `Deserialize` reads compressed blobs
 again; the old refusal is gone. `ProtocolEncoder` takes the codec as a **required** argument in both languages;
 `NoOpCodec` keeps the compressed path testable with the body readable.
 
@@ -297,11 +300,12 @@ sentence closes that door for one library. `Binacle.ViPaq.Data` is open - the pa
 Before 2026-09-20 the doc said "UnitTests never references the kernel", which also shut out the data, because
 the packs and the encoders were one project.
 
+### Ruled out — do not rebuild
+
+24-bit ladder (8/16/24/32) + coords-ride-bin · Brotli q11 as default · byte-plane/transpose layout · selling
+"20% smaller". See `$vipaq/findings` for the numbers behind each.
+
 ## Open — decide with data
 
-**Nothing is open.** Both questions closed: O1 (compression trigger) → **D7**, O2 (codec + level) → **D16**.
-Their original framings are in `$vipaq/history`.
-
-## Ruled out — do not rebuild
-24-bit ladder (8/16/24/32) + coords-ride-bin · Brotli q11 as default · byte-plane/transpose layout · raw Deflate
-as a third codec · selling "20% smaller". See `$vipaq/findings` for the numbers behind each.
+**Nothing else is open.** O1 (compression trigger) became **D7** and O2 (codec + level) **D16**; both are
+pending above. Their original framings are in `$vipaq/history`.

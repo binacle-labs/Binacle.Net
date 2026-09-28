@@ -17,6 +17,20 @@ cited as `$vipaq/decisions#D16`. Give every file a stable `id:` in its front mat
 *doc*; the decisions live in `$vipaq/decisions`. A citation like `$vipaq#D16` resolves to a real file and then
 to an anchor that is not in it, so it reads as valid and lands nowhere.
 
+## A ledger that grows long becomes a folder
+
+The maintainer, 2026-09-29: "deffinately over 1000 lines". Past that, a slice's `decisions.md` becomes a
+folder, `decisions/`, with one file per decision:
+
+- `decisions/README.md` keeps `id: <slice>/decisions` and the ledger's opening text.
+- Each entry is `d<n>-<slug>.md` (`o<n>-` for an open question) with `id: <slice>/decisions/D<n>`, its own
+  `description:`, `check:` and `paths:`, and a `status:` of `decided`, `pending` or `open` in place of the
+  `## Decided` / `## Pending` / `## Open` sections.
+- It is cited as `$ci-cd/decisions/D16`, and a section inside it as `$ci-cd/decisions/D8#sites-in-scope`.
+- The generated index is the list of entries. Do not keep a second one by hand.
+
+`design/ci-cd/decisions/` is the one ledger split this way.
+
 ## Index
 
 The manifest is generated — see [`_index.md`](_index.md). Regenerate with `just agents all` after adding,

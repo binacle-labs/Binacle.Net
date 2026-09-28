@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
 description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate.
-verified: 2026-09-12
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major, no permalink line and no _common_pages page but version.html, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
+verified: 2026-09-29
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose one collection is versions; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major and no permalink line, against sites/docs/collections/, which must hold _versions alone, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -13,7 +13,7 @@ paths:
 Why the two published sites are the way they are. `$sites/demo` and `$sites/docs` say what they *are*; this
 says why, so a later pass does not undo a deliberate choice.
 
-**`sites/www` is not covered here.** It is being built in its own session and owns its own record.
+**`sites/www` is not covered here.** Its record is `$sites/www-design`.
 
 ## Decided
 
@@ -167,7 +167,7 @@ lead. A page may override the whole string with `seo_title` when the composed on
 ### S3 — the demo host calls itself Binacle.Net Demo, and `site.title` stays the brand
 
 `sites/demo/_config.yml` carries both: `title` is `Binacle.Net`, `display_title` is `Binacle.Net Demo`. The
-header bar and the index `h1` use `display_title`; the `<title>` suffix and `og:site_name` use `title`.
+header bar uses `display_title`; the `<title>` suffix and `og:site_name` use `title`.
 
 **Two different jobs.** A visitor needs to know which host they are on, because the demo and the marketing site
 otherwise wear the same name and the nav's exit link off the demo is meaningless. A `<title>` suffix needs the
@@ -175,8 +175,8 @@ brand — `Packing Demo - Binacle.Net Demo` stutters, and the page half already 
 
 ### S4 — the demo site has no collections at all
 
-The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser, both
-navs and the JSON-LD block all select on that flag.
+The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser and the
+nav menu select on that flag.
 
 **They were an `apps` collection while the URLs were `/apps/:name/`.** Once the host became the index and the
 tools moved to `/packing/` and `/vipaq/`, a collection expressed nothing a front-matter flag does not.
@@ -187,8 +187,7 @@ which was the argument for keeping it a collection. `jekyll-multi-sitemap` remov
 `sitemaps:` block in `_config.yml` names the files and what each includes, and the gem generates them, so
 there is nothing on disk to inherit a default. `sites/demo/_config.yml` declares no `collections:` key.
 
-**`sites/docs` is the only site with collections** — `versions` and `common_pages` — and neither is a
-sitemap.
+**`sites/docs` is the only site with a collection** — `versions` — and it is not a sitemap.
 
 ### S5 — legacy swagger pages keep `nofollow`; every other legacy page gets `follow`
 
@@ -197,7 +196,7 @@ The swagger pages are the exception and stay `noindex, nofollow`, which is what 
 shell has no links a crawler benefits from following.
 
 **The inconsistency is deliberate and it is the smaller cost.** Making them uniform would mean either
-following links that go nowhere, or dropping `follow` from seventy-four pages that have real ones.
+following links that go nowhere, or dropping `follow` from every old page that has real ones.
 
 ### S6 — the demo footer carries a version badge and no stars badge
 
@@ -224,7 +223,7 @@ four, because that is where someone who has finished looks.
 
 ### S8 - quotes are typed straight and the build curls them
 
-`sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`, and it stays. kramdown
+`sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`. kramdown
 rewrites a straight `'` or `"` into its curly form when the page is built.
 
 **So type ASCII in the markdown.** `don't` in the source comes out as a curly apostrophe on the page. A curly
@@ -240,10 +239,9 @@ version folder, not just the current one**, so an older page is typed the same w
 `` `Enabled` (_boolean_): turns the feature on `` - the colon tight against the term, one space after. It is
 the same list shape on every page of every version, so it gets one character.
 
-**The site used an en dash on some pages and an em dash on others** until 31 Aug 2026, two characters for one
-job, and a reader moving between versions saw both. Neither dash survives anywhere under `sites/docs/`: not in
-`v1.3.x`, `v2.0.x`, `v2.1.x` or `v3.0.x`, not in the shared pages that render inside every version, not in the
-outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punctuate.**
+**The site used an en dash on some pages and an em dash on others**, two characters for one job, and a reader
+moving between versions saw both. Neither dash survives anywhere under `sites/docs/`: not in any version
+folder, not in the outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punctuate.**
 
 **A dash doing another job was not turned into a colon.** A pair around an aside became commas, a dash joining
 two clauses became a full stop, and a dash inside a code block, a sample response or a config block is data and

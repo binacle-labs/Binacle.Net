@@ -1,7 +1,7 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-09-26
+verified: 2026-09-29
 check: The numbers under "Size today" match the files under vipaq/results/measurements/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Smoke_Encode, Sample_Encode, Smoke_Decode, Sample_Decode, Sample_CompressionCost_Encode, Sample_CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
@@ -16,12 +16,12 @@ The measured evidence behind the decisions, on real data from the permanent harn
 run; the dated sections after it are the earlier harness runs the decisions were made on, kept with their own
 numbers. The throwaway-prototype numbers (2026-07-05) are superseded and live in `$vipaq/history`.
 
-## Context (confirmed)
+## Context (2026-07, before v2)
 - ViPaq = **storage-first** base64 text token for a packing result (bin dims + per-item dims + coords + count).
 - Unit **mm** at finest, **cm** typical; **no fractions** (unsigned integers); values **≤ ~16M** ("millions"),
-  billions never. **Coordinates ≤ the bin** (a position inside it). Base64 is the *stored* form (applied today
-  outside the spec).
-- v1 today: fixed ladder **8/16/32/64** (1/2/4/8 bytes), row layout, gzip-Optimal when body > 255 B, base64 wrap.
+  billions never. **Coordinates ≤ the bin** (a position inside it). Base64 is the *stored* form (then outside
+  the spec; `vipaq/PROTOCOL.md` §9 now covers it).
+- v1, the old format: fixed ladder **8/16/32/64** (1/2/4/8 bytes), row layout, gzip-Optimal when body > 255 B, base64 wrap.
 - Fit AND pack results **both carry coordinates** — there is no "drop coordinates" shortcut.
 
 ## The base64-quantization rule (drove most decisions)
@@ -35,7 +35,8 @@ is noise. Measure everything in **base64 chars**.
   A throwaway `V2Encoder` implemented this and was **never round-trip-verified** — dead; don't rebuild it.
 - **Brotli q11 as default:** 98 ms encode. Archival opt-in only.
 - **Byte-plane / transpose layout:** identical to plain columnar (Brotli already exploits it).
-- **Raw Deflate:** ~24 B better than gzip framing, but Brotli beats it — not worth a third codec.
+- **Raw Deflate as a third codec:** ~24 B better than gzip framing, but Brotli beat it. Superseded: raw DEFLATE
+  is now the only codec (`$vipaq/decisions#D16`).
 - **Selling "20% smaller":** it was a q11 artifact.
 
 ## Size today (2026-09-22)
@@ -75,7 +76,7 @@ This is the single most important thing the real-data harness established, and i
 | Real **packed** results | Saves **45–68%** (Bischoff); **64%** on a 100-item custom pack |
 
 Real packing results have structure — repeated item sizes, items on a coordinate grid. Random data gives gzip
-nothing to grip. So the shipped fixed **255-byte threshold is wrong in both directions**: it inflates random data
+nothing to grip. So v1's fixed **255-byte threshold is wrong in both directions**: it inflates random data
 and would miss small compressible data. This drives `$vipaq/decisions#D7`.
 
 ## Size vs protobuf, first run (2026-07; like-for-like: protobuf compressed only when ViPaq compressed)
@@ -206,6 +207,6 @@ framing.
 
 ## What the harness did *not* answer
 
-- **`$vipaq/decisions#O2` (codec + level)** — **resolved (`$vipaq/decisions#D16`):** one codec, raw DEFLATE. The compression cost is measured just above.
+- **O2 (codec + level)** — answered by `$vipaq/decisions#D16`, still pending: one codec, raw DEFLATE. The compression cost is measured just above.
 - Absolute allocation on synthetic data runs a little high (compression can't shrink a random buffer), but ViPaq
   and protobuf see the same sample, so the *ratio* stays valid.

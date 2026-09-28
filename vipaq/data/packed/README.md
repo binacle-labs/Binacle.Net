@@ -64,6 +64,5 @@ Each problem file is a JSON array of samples. One sample:
   fill ~98%, never tessellate perfectly), so not every source box appears here, only the placed ones.
 
 Only placed geometry is stored, no ViPaq token. The token is derivable from `Bin`+`Items`, and its compressed
-bytes vary by gzip encoder/runtime, so committing it would churn the files on every regen. The harness computes
-the token itself when it benchmarks. Every sample is still round-tripped (encode -> decode == input) at
-generation time, or the run fails.
+bytes vary by compressor and runtime, so committing it would churn the files on every regen. The harness computes
+the token itself when it benchmarks. The ViPaq unit tests round-trip every sample (encode -> decode == input).

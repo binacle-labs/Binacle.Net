@@ -33,8 +33,8 @@ wire itself is defined in [`../PROTOCOL.md`](../PROTOCOL.md), which stands alone
 ## 🔢 Integer range
 
 Every dimension and coordinate is in `[0, 65535]` (PROTOCOL.md §5). There is no wider width and no 32/64-bit tier.
-A value above 65,535 is an error, not a wider encoding. C# reads these scenarios as `int`, which holds the range
-and is the safe default `T`.
+A value above 65,535 is an error, not a wider encoding. C# reads these scenarios as `long`, which holds the range
+and pairs with JS `number`.
 
 ## 🧾 Header notation
 

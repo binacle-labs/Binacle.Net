@@ -1,7 +1,7 @@
 ---
 id: sites/site-theming-css
 description: The CSS side of the theme on all three sites - why the attribute is on html, why every dark block also lands on body, and the two rules that keep the switcher element from being a box or a dead control.
-verified: 2026-09-04
+verified: 2026-09-29
 check: T1 against the @media (prefers-color-scheme: dark) block in sites/www/_sass/_tokens.scss and the when-dark mixin in sites/docs/_sass/_theme-modes.scss and sites/demo/_sass/_theme-modes.scss; T2 against the body selectors inside that mixin, which must stay paired with the :root ones; T3 against :root[data-theme="light"] { color-scheme: light } on all three sites; T4 against theme-switcher and theme-switcher:not(:defined) in sites/www/_sass/_layout.scss and both _theme.scss files
 paths:
   - "sites/www/_sass/**"

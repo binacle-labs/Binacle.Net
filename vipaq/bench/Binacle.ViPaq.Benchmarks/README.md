@@ -10,7 +10,7 @@ compressing costs is a class of its own.
 | Path | What it is |
 |---|---|
 | `Smoke_Encode.cs`, `Smoke_Decode.cs` | Three columns: one item, the typical container, the largest FFD pack |
-| `Sample_Encode.cs`, `Sample_Decode.cs` | Twelve columns: six real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
+| `Sample_Encode.cs`, `Sample_Decode.cs` | The real packs by what each covers, then 1,000 / 5,000 / 65,535 items at 8 and 16 bit |
 | `EncodeBase.cs`, `DecodeBase.cs` | The rows both tiers time - four on encode, three on decode; the test `JsonEncoder` has no decode |
 | `Sample_CompressionCost_Encode.cs`, `_Decode.cs` | NoOp against Deflate and Gzip, row-major, on the low and the high end of deflate's win; each compares to its own NoOp |
 | `CompressionCostBase.cs` | The two packs and the three codecs both classes use |
@@ -23,8 +23,8 @@ The picks are in `vipaq/test/Binacle.ViPaq.Testing/`, keyed by the column name t
 ## 🛠️ How you use it
 
 ```
-just bench vipaq-smoke          # 21 cases, about 3 minutes: did my change help or hurt
-just bench vipaq-sample         # 96 cases at the default job, about 30 minutes: the one to keep
+just bench vipaq-smoke          # about 3 minutes: did my change help or hurt
+just bench vipaq-sample         # the default job, about 30 minutes: the one to keep
 just bench vipaq-sample quick   # the same at the short job, about 7 minutes
 ```
 

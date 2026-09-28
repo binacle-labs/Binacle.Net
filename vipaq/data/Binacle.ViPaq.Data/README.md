@@ -12,7 +12,7 @@ reference `Binacle.ViPaq` - it holds the inputs, not the encoders.
 | `Scenario.cs` | A pack: the bin and its placed items, in `ushort` |
 | `PackedDataReader.cs` | Reads a family's embedded files into scenarios |
 
-The `Packed/` folders you see in the IDE are not on disk. The JSON lives in `../packed` and is linked in by the
+The `Packed/bischoff-suite`-style folders you see in the IDE are not on disk. The JSON lives in `../packed` and is linked in by the
 csproj; regenerate it there, never edit it. A new file is embedded and read on its own.
 
 ## 🛠️ How you use it

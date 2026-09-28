@@ -15,8 +15,8 @@ one into a dated folder.
 ## 🛠️ How you use it
 
 ```
-just bench vipaq-smoke          # 21 cases, about 3 minutes: did my change help or hurt
-just bench vipaq-sample         # 96 cases at the default job, about 30 minutes: the one to keep
+just bench vipaq-smoke          # about 3 minutes: did my change help or hurt
+just bench vipaq-sample         # the default job, about 30 minutes: the one to keep
 just bench vipaq-sample quick   # the same at the short job, about 7 minutes
 ```
 

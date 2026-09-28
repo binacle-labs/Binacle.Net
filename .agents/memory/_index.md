@@ -88,7 +88,7 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   when: "adding a version number or a Directory.Build.props to a component"
   paths: ["**/Directory.Build.props", "**/*.csproj"]
 - file: vipaq-byte-vectors-agent-owned.md
-  description: "ViPaq byte-exact golden vectors carry a byte-by-byte comment — a wall of hex nobody can check is not a test"
+  description: "ViPaq byte-exact golden vectors lay their bytes out by wire segment — a wall of hex nobody can check is not a test"
   when: "editing ViPaq byte-exact golden vectors"
   paths: ["vipaq/test-vectors/**"]
 ```

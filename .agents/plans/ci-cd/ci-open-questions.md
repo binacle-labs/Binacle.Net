@@ -21,7 +21,7 @@ Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine compo
 | 1 | **yes** | check the org can create an OIDC connection first; the page job keeps its token |
 | 4 | **yes, both halves** | delete the two dead lines, tag through `gh api`, then `persist-credentials: false` on every checkout |
 | 5 | **yes** | one workflow, the site as a `choice` input at dispatch - his call on 2026-09-12, over the called workflow first proposed |
-| 7 | **no** | recorded as `D29` in the CI/CD decisions ledger |
+| 7 | **no** | recorded in the CI/CD decisions ledger |
 | 8 | **yes** | delete the step from `publish` |
 | 10 | **yes** | `qualitygate.wait=true` on `begin`, drop the loop, `if: always()` on the summary step |
 | 12 | **yes, narrowed** | not `^\.github/actions/` alone - also `shared-site-tests.yml` and the site deploy workflow, so a change to a site workflow still runs the site tests |
@@ -30,7 +30,7 @@ Read on 2026-08-28: the eleven workflows in `.github/workflows/`, the nine compo
 of a run proves that job. **Since 2026-09-14 a prerelease stops after `smoke` and never reaches `publish`**,
 so the proof is the first real release dispatched from `main` after the changes merge. A red there leaves
 Docker Hub untouched and makes no tag, and the same version is dispatched again once fixed. Everything up to
-`smoke` is proved earlier by a beta dispatched from the branch itself. The release set says when.
+`smoke` is proved earlier by a beta dispatched from the branch itself.
 
 **Every open finding was re-checked on 2026-09-11** and each carries a dated verdict line. Where a number in
 this file was measured and found wrong it has been corrected in place. One of those: `tooling/ci/` holds
@@ -93,7 +93,7 @@ from outside the org. The page half holds too - `shared-dockerhub-overview.yml` 
 ## 2. `gh release create` makes the tag itself, so the release job's tag step can be deleted
 
 **Done 2026-08-28.** `github-release.sh` takes the commit and passes `--target`; the "Push the release tag"
-step is gone. D1 was amended with it - the window in which the image is published and the tag does not exist
+step is gone. The ledger was amended with it - the window in which the image is published and the tag does not exist
 **closes** rather than narrows, because the tag and the release are one API call.
 
 **v3.0.0 is the real release that proved it**, 2026-09-01.
@@ -103,7 +103,7 @@ step is gone. D1 was amended with it - the window in which the image is publishe
 **Done 2026-08-28.** `just check scripts`, called by the lint job. Sixteen scripts, no errors. It also covers
 the four install scripts that came out of finding 11, so the unlinted shell in CI is now roughly zero.
 
-**It also forced one correction to D4** - see *Already decided*.
+**It also forced one correction to the ledger** - see *Already in the ledger*.
 
 ## 4. The identity lines in `push-tag.sh` do nothing, and the whole script has a first-party replacement
 
@@ -239,7 +239,7 @@ way.
 
 **Rejected 2026-09-11 by the maintainer.** With finding 1 the long-lived token leaves `publish` anyway, so
 most of what this would scope stops existing; what is left is the page job's token. And an environment that
-admits `main` only refuses any prerelease dispatched elsewhere, which is a door worth keeping open. `D29`.
+admits `main` only refuses any prerelease dispatched elsewhere, which is a door worth keeping open.
 
 **Verified 2026-09-11 - holds.** GitHub's docs are explicit on all three parts. An environment secret is
 readable only by a job that names that environment; a job cannot reach it until the environment's protection
@@ -326,7 +326,7 @@ The 80%-on-new-code gate is a SonarCloud setting and could not be read from here
 
 ## 11. The four `install-*` actions are one script written four times
 
-**Done 2026-08-28, and it settled the opposite of what this finding proposed.** Each action is a single
+**Done 2026-08-28, and it showed the opposite of what this finding proposed.** Each action is a single
 `run: tooling/ci/install-<tool>.sh` - **four scripts, one per tool, not one script taking the tool as an
 argument.** A repeated readable thing beat a shared clever one. The version and the checksum moved into the
 script too, rather than staying in the action's `env:` where a reader and Dependabot were said to look -
@@ -334,7 +334,7 @@ Dependabot never looked, because it rewrites `uses:` pins and these four are han
 
 **Nothing official replaces any of the four, and this is the reason not to check again.**
 container-structure-test and hurl publish no action, actionlint's own advice is the download script this
-already does by hand, and lychee's action is refused under D16.
+already does by hand, and the ledger records why lychee's action is not used.
 
 ## 12. A workflow edit builds all three Jekyll sites
 
@@ -410,39 +410,39 @@ so the next session does not check them again.
 - **`just check workflows` printing its file list and count.** actionlint would find the files on its own, but
   it says nothing on a clean run, so the count is what distinguishes a pass from a run that never started.
 
-## Already decided
+## Already in the ledger
 
-Things the ledger settled that this review would otherwise have raised. Entry numbers are given so the
-reasoning can be found; in every case the reason still holds.
+Things the CI/CD decisions ledger records that this review would otherwise have raised. In every case the
+reason still holds.
 
-- **D16 - lychee as a pinned binary rather than `lycheeverse/lychee-action`.** The action takes lychee's flags
+- **Lychee as a pinned binary rather than `lycheeverse/lychee-action`.** The action takes lychee's flags
   from YAML, so the check would stop being `just check links <site>`. Unchanged, and finding 11 is built on top
   of it rather than against it.
-- **D11 - SHA pinning, first-party actions included, with Dependabot moving them.** Nothing found argues with
-  it. The Dependabot glob question is settled above.
-- **D6 - `shared-smoke-image.yml` pinned to `ubuntu-24.04` because hurl links `libxml2.so.2`.** I looked for
+- **SHA pinning, first-party actions included, with Dependabot moving them.** Nothing found argues with
+  it. The Dependabot glob question is answered above.
+- **`shared-smoke-image.yml` pinned to `ubuntu-24.04` because hurl links `libxml2.so.2`.** I looked for
   the escape used for lychee: **hurl publishes no musl build.** The 8.0.1 release assets are gnu tarballs, two
   `.deb` packages and the mac and windows builds, and the `.deb` links the same library. Checked against the
   release on 2026-08-28. The only route that would remove the pin is running hurl from its official container
   image, `ghcr.io/orange-opensource/hurl`, which costs the smoke recipe its "same command on a laptop"
   property. **The pin is right. Do not re-open this without a new upstream asset.**
-- **D2 and D14 - build once, smoke the registry copy, copy by digest, GHCR as staging.** Finding 8 touches one
+- **Build once, smoke the registry copy, copy by digest, GHCR as staging.** Finding 8 touches one
   action inside `publish` and changes none of this.
-- **D1 - the release is dispatched with a version and the tag is made last.** Finding 2 strengthens it: the
-  residual risk D1 accepts - a window between publishing and tagging - closes rather than narrows.
-- **D4 - a step calls a recipe, and the shell lives in `tooling/ci/`.** One correction worth recording: the
+- **The release is dispatched with a version and the tag is made last.** Finding 2 strengthens it: the
+  residual risk the ledger accepts - a window between publishing and tagging - closes rather than narrows.
+- **A step calls a recipe, and the shell lives in `tooling/ci/`.** One correction worth recording: the
   stated reason includes "a `run:` block is invisible to shellcheck", and that half is **not true** - actionlint
   runs shellcheck over every `run:` block when shellcheck is present, and both are installed in the `workflows`
   job. The decision stands on its other leg, which is sound and is the stronger one anyway: a `.sh` file is a
   real filename in a stack trace and can be run on its own. Finding 3 is what makes the shellcheck half true
   for the scripts themselves.
-- **D12 - the framework-dependent publish flags.** The entry warns that the flags are written twice, in
+- **The framework-dependent publish flags.** The entry warns that the flags are written twice, in
   `tooling/build.just` and again in the release workflow's publish step. **They are not, any more** - the
   workflow calls `just build publish` and the flags appear once, in `build.just`. Nothing to do in CI; the
   warning is simply describing a shape that no longer exists.
-- **D18 - two test suites split by what ships, with five javascript tests in both.** Correct as written.
+- **Two test suites split by what ships, with the shipped javascript tests in both.** Correct as written.
   Finding 12 is about the path filter, not the split.
-- **D8 - Automatic Analysis stays off.** Finding 10 does not touch the trigger. The "runs by hand" half of
+- **Automatic Analysis stays off.** Finding 10 does not touch the trigger. The "runs by hand" half of
   that entry is out of date and the ledger needs it corrected: since 2026-08-28 `sonar-analysis.yml` has
   gained `workflow_call` and the pull request gate calls it on every code change.
 
@@ -468,12 +468,12 @@ that needed a run got it on 2026-09-11:
 
 - [x] **2026-09-14.** The Docker Hub plan question is answered - the org has an OIDC connection, and it exists.
       **The workflow edit landed 2026-09-12** - `grep -c 'password:' .github/workflows/release-docker-image.yml`
-      returns 2 outside comments, both GHCR. `D33`. **The maintainer created the connection and set
-      `DOCKERHUB_OIDC_CONNECTIONID` on 2026-09-14**; the release set records the shape. **The login is
+      returns 2 outside comments, both GHCR. **The maintainer created the connection and set
+      `DOCKERHUB_OIDC_CONNECTIONID` on 2026-09-14**. **The login is
       unproved until the first release run** - a prerelease never reaches it.
 - [x] The release workflow has no tag-push step, and the tag is created by the release itself.
       Done 2026-08-28. `github-release.sh` takes the commit and passes `--target`; the tag-push step is gone.
-      D1 amended. **Only a real release proves it.**
+      Ledger amended. **Only a real release proves it.**
 - [x] Every script in `tooling/ci/` is shellchecked by a pull request.
       Done 2026-08-28. `just check scripts`, called by the lint job. Sixteen scripts, no errors.
 - [x] `push-tag.sh` sets no git identity.
@@ -482,17 +482,16 @@ that needed a run got it on 2026-09-11:
       `grep -c 'persist-credentials: false' .github/workflows/*.yml` sums to 18, one per checkout - it was 22
       before the three deploy workflows became one - and
       `grep -rn 'git push' tooling/ci` returns nothing - the marker tag is `create-tag.sh`, through `gh api`.
-      `D30`. **The API call is unproved until a site deploys** - the demo deploy in the release set is the
-      first.
+      **The API call is unproved until a site deploys.**
 - [x] **2026-09-12.** The three deploy workflows share one body, or a line says why they should not.
       `.github/workflows/deploy-site.yml` exists with a `choice` input, and `ls .github/workflows/deploy-*`
-      lists nothing else. `just check workflows` - 9 workflows, no errors. `D32`. **Unproved until a site
-      deploys.** `sites/README.md:40-41` still names the three old workflows - the release set carries that
-      for a site session.
+      lists nothing else. `just check workflows` - 9 workflows, no errors. **Unproved until a site
+      deploys**, and `deploy-site.yml` can be dispatched only once it is on `main`. `sites/README.md:40-41`
+      still names the three old workflows; that is for a site session.
 - [x] The container-structure-test checksum names its upstream source.
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.
 - [x] **2026-09-11.** The Docker Hub credential is scoped, or the decision not to is recorded.
-      Not scoped; the decision is `D29` in the CI/CD decisions ledger.
+      Not scoped; the reason is in the CI/CD decisions ledger.
 - [ ] `docker/setup-buildx-action` is gone from `publish`, proved by the first release run from `main`.
       **The step was deleted 2026-09-11** - `grep -c setup-buildx .github/workflows/release-docker-image.yml`
       returns 1, the `build` job's. The box closes on the release run; a prerelease stops before `publish`.
@@ -502,12 +501,12 @@ that needed a run got it on 2026-09-11:
       Done 2026-08-28. Sixteen jobs get the line now instead of one.
 - [x] **2026-09-12.** The Sonar wait is decided.
       `grep -c qualitygate.wait tooling/ci/sonar-analysis.xml` returns 1, `grep -c 'for _' tooling/ci/sonar-summary.sh`
-      returns 0, and the summary step in `sonar-analysis.yml` carries `if: always()`. D28 amended.
+      returns 0, and the summary step in `sonar-analysis.yml` carries `if: always()`. Ledger amended.
       **Unproved until the next pull request runs it.**
 - [x] The four install actions hold no inline shell.
       Done 2026-08-28. Each is a door onto `tooling/ci/install-<tool>.sh`, called by path rather than through
       `just`. Four scripts, not one parameterised script - the argument list would read worse than the copies.
 - [x] **2026-09-11.** The site half of the path filter is decided.
-      Narrowed to the site's own `.github/` files - `D31`. `just check scripts` clean; the pattern was run by
+      Narrowed to the site's own `.github/` files. `just check scripts` clean; the pattern was run by
       hand against nine paths, and only the actions, `pull-request.yml`, `shared-site-tests.yml` and a deploy
       workflow match.

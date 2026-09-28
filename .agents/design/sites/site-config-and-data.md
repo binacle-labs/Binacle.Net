@@ -1,8 +1,8 @@
 ---
 id: sites/site-config-and-data
 description: What the three sites' _config.yml and _data files carry that a reader cannot recover - the version_tag trap, the cookie domain, the organisation block, and how the www exchange payloads are re-run.
-verified: 2026-09-04
-check: C1 against every version_tag in the defaults of sites/docs/_config.yml, each of which must be a tag that exists on Docker Hub; C2 against sites/docs/_data/versions.yml and the version scope blocks in that config, which must list the same folders; C3 against cookie_domain appearing in all three _config.prod.yml files and in no _config.yml; C4 against the structured_data.organization block being written out in full and identical in all three configs; C5 against the verified line on every block in sites/www/_data/exchange.yml; C6 against command.text in that file being a single line
+verified: 2026-09-29
+check: C1 against every version_tag in sites/docs/_data/versions.yml, each of which must be a tag that exists on Docker Hub; C2 against sites/docs/_data/versions.yml, which must have one entry per folder under collections/_versions/, and against sites/docs/_config.yml, which must carry no per-version defaults block; C3 against cookie_domain appearing in all three _config.prod.yml files and in no _config.yml; C4 against the structured_data.organization block being written out in full and identical in all three configs; C5 against the verified line on every block in sites/www/_data/exchange.yml; C6 against command.text in that file being a single line
 paths:
   - "sites/www/_config.yml"
   - "sites/docs/_config.yml"
@@ -15,7 +15,7 @@ paths:
 
 **These were comments in `_config.yml`, `_config.prod.yml` and `_data/` until 4 Sep 2026.**
 
-Two things here are already decisions and are not repeated: only the current docs version is indexable and
+Two things here are in a ledger and are not repeated: only the current docs version is indexable and
 swagger pages are out of every sitemap, which is `$decisions#D7`; the square `og_image` and the small twitter
 card are `$sites/decisions#S1`.
 
@@ -24,20 +24,21 @@ card are `$sites/decisions#S1`.
 Every versioned docs page pulls with `page.version_tag`. **"2.1.x" is not a tag that exists**, and writing the
 folder label there published a `docker run` command that failed for the reader.
 
-**A closed line carries its newest patch** - `1.3.0`, `2.0.1`, `2.1.1`. It will get no further release, and no
+**A closed line carries its newest patch** - `1.3.0`, `2.1.1`. It will get no further release, and no
 moving tag was ever published for it.
 
 **The current line carries the minor tag** - `3.0` - which the release workflow publishes and which resolves
 to the newest patch, so it needs no edit when 3.0.1 ships.
 
-## C2 - a docs version needs two edits or it is invisible
+## C2 - a docs version is one entry in `_data/versions.yml`
 
 `_data/versions.yml` is the source of truth for the list. **The order in that file is the render order, so
 keep it newest first** - Jekyll's own ordering sorts by path and would put v3.10.x before v3.2.x. `current`
-names the current folder, points the `latest` redirect, and decides which version is indexable.
+names the current folder and decides which version is indexable.
 
-**A version also needs its own `defaults` scope block in `_config.yml`**, carrying `version` and
-`version_tag`. Without it the pages have neither and the version does not appear in the selector.
+**There is no per-version `defaults` block in `_config.yml` any more.** `binacle-docs-versions` stamps
+`version` and `version_tag` from the list, and the build stops on a folder the list does not have. The keys
+are in `$sites/docs`.
 
 ## C3 - `cookie_domain` is production-only, and that is not an oversight
 
@@ -62,9 +63,9 @@ or: docker run ... binacle/binacle-net:<tag>   and POST to http://localhost:8080
 
 Paste the response back verbatim and update `verified` on the block that changed.
 
-**Open at 4 Sep 2026: every block says "source build of the 3.0.x line".** They were run against the working
-tree, not against a published tag. Re-run them against the tag `command.tag` names, so the page and the image
-a reader pulls agree.
+**Every block was re-run on 4 Sep 2026 against the published `3.0.0` image**, which is what its `verified`
+line says. Re-run them against the tag `command.tag` names whenever it moves, so the page and the image a
+reader pulls agree.
 
 Two payload choices are not obvious. The parcel-locker example carries **one item on purpose**: a multi-item
 order against a compartment nothing fits produces an empty `fittedItems` row that reads as a bug unless the

@@ -1,7 +1,7 @@
 ---
 id: sites/docs-and-demo-design
 description: Why the docs and demo templates are shaped this way - the beercss and Alpine traps, the contrast measurements behind the component overrides, and the asset budget.
-verified: 2026-08-27
+verified: 2026-09-29
 check: D6 against sites/docs/_sass/_breadcrumbs.scss, which must stay one rule; D1 against the progress elements in sites/demo/pages/packing.html and vipaq.html, which must both still carry value="0"; D2 against the four overrides in sites/demo/_sass/_components.scss; D4 against the prefetch list in sites/demo/_data/includes.yml
 paths:
   - "sites/demo/**"
@@ -13,9 +13,9 @@ paths:
 **These were template comments until 23 Aug 2026.** They are here because a comment in a published site is a
 comment in a public repository.
 
-**Two of them are not repeated here** because they are already decisions: the square `og_image` and
+**Two of them are not repeated here** because a ledger holds them: the square `og_image` and
 `twitter:card summary` pair is `$sites/decisions#S1`, and indexing only the `current` version is
-`$sites/decisions#S5`.
+`$decisions#D7`.
 
 ## D1 - `value="0"` on a progress element is not a default
 
@@ -51,7 +51,7 @@ whitespace and print it in the result.**
 
 ## D4 - three.js is the asset budget, and prefetch is why it costs nothing
 
-**three ships as 3 pre-bundled modules, 566 KiB minified, no tree shaking** - 601 KiB before minification. It
+**three ships as 3 pre-bundled modules, with no tree shaking** - the bundle size is in `$sites/demo`. It
 gets its own webpack chunk so it stays cached when app code or Alpine change.
 
 `demo: true` in a page's front matter loads the demo bundle; **every other page prefetches the same list**, so

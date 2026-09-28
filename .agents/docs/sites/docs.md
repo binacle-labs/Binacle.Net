@@ -1,7 +1,7 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-09-12
+verified: 2026-09-29
 check: Collections, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/ - one folder per major, named vN.x; every folder has an entry in sites/docs/_data/versions.yml carrying id, url_segment, label and version_tag, in the order the sidebar renders; collections/ holds _versions alone, pages/ holds 404.html and robots.txt alone, and _layouts and _includes have no versions/ subfolder; no file under collections/_versions/ carries a permalink; a built artifacts/docs renders the current folder at the root and every other under /version/<url_segment>/, has `noindex, follow` on every non-current version page and none on a root page, no sitemap listing a `noindex` URL, and a _redirects file at its root; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml writes version-current.xml alone under /sitemap/ with an index at /sitemap.xml; the top-level nav.order sequence is the same in every folder with Release Notes second
 paths:
   - "sites/docs/**"
@@ -10,7 +10,7 @@ paths:
 # Docs Site
 
 **`$sites/docs` is the `sites/docs/` folder** — the published site, not `.agents/docs/` (the agent docs you
-are reading). It is off limits from a coding session; see `.agents/README.md`.
+are reading). It is off limits from a coding session.
 
 Jekyll site at `sites/docs/`. The public API documentation for Binacle.Net users.
 Built with Jekyll + webpack + TypeScript. Output goes to `../../artifacts/docs`.
@@ -39,10 +39,8 @@ The current folder renders at the site root; every other folder under `/version/
 **Every page belongs to a line.** There is no page that renders once for every version, and no collection
 but `versions` - one layout (`default`, `swagger` for the embed), one sidebar, one menu. A page that is true
 for every version - what an algorithm does, how configuration files are laid out - lives in the current folder
-and is copied forward with it at the next major, like every other page. The six pages that used to sit outside
-the versions moved in on 2026-09-12; the ledger entry `$sites/decisions#S11` holds why, with what each of them
-had quietly come to say. The version list at `/version/` went the same day (`$sites/decisions#S12`); the
-selector in the sidebar is the list.
+and is copied forward with it at the next major, like every other page. Why: `$sites/decisions#S11`. There is
+no version list page; the selector in the sidebar is the list (`$sites/decisions#S12`).
 
 **Two consequences for a page in a version folder.** It may name real config keys, endpoint paths, API versions
 and whether a feature is experimental - the folder says which release those hold for. And it links another page
@@ -52,7 +50,8 @@ with `{% vlink %}`, never with `{% link %}` into some shared place, because ther
 
 The top level reads the same in every folder, minus the pages a line does not have: **Quick Start, Release
 Notes, Core Concepts, API, Generate a Client, Configuration, Samples, ViPaq Protocol, Verifying a Release.**
-Release Notes is always second - the maintainer's rule, 2026-09-12. `nav.order` in each page's front matter
+Release Notes is always second. The maintainer, 2026-09-12: "rule release notes always after quick start".
+`nav.order` in each page's front matter
 is the number; a new top-level page is slotted in and the numbers after it move. Under Configuration the
 Core page lists **one child page per file it reads** (`Presets.json`, `ForwardedHeaders.json`, `Cors.json`),
 the way Diagnostics already does. An in-page contents list appears only on the API reference pages; the
@@ -60,8 +59,7 @@ sidebar is the contents for everything else.
 
 ## Page metadata
 
-**Every page carries a written `description`** in its front matter - all 96 under `_versions/`, every line
-included - and **no description names a version**; see below.
+**Every page carries a written `description`** in its front matter, every line included, and **no description names a version**; see below.
 `jekyll-page-meta` still falls back to the excerpt and then the site description, cut at 160 characters,
 which severs mid-word; that fallback is a safety net for a page that forgets, not the mechanism.
 
@@ -125,8 +123,8 @@ Everything below reads `current`; nothing names a version.
 - **The sitemaps are generated, not written.** `jekyll-multi-sitemap` reads the `sitemaps:` block in
   `_config.yml`: one file, `version-current.xml`, selects the `versions` collection where `version` matches
   `site.data.versions.current` - root URLs only. It is served under `/sitemap/`, with an index over it at
-  `/sitemap.xml`. There is no `pages.xml` since 2026-09-12: `404.html` is excluded and nothing else lives
-  outside the collection, so it listed nothing.
+  `/sitemap.xml`. There is no `pages.xml`: `404.html` is excluded and nothing else lives outside the
+  collection.
 - Swagger pages are `noindex, nofollow` in every version, current included. A `**/swagger/**` defaults block
   in `_config.yml` sets that `robots` value in page data, where the stamp leaves it alone, and keeps them out
   of the sitemap. A submitted `noindex` URL is a Search Console error.
@@ -144,8 +142,8 @@ line is `{% vlink v2.x /path %}`, never a `/version/` url written by hand.
 mid-edit. Copy the current folder the moment a new line opens; that is the only sound source.
 
 **The `swagger/` json in a version folder is generated output**, not hand-written. `just openapi generate`
-writes `artifacts/openapi/Binacle.Net_v3.json` and `_v4.json`; they are copied in as `swagger/v3.json` and
-`swagger/v4.json`, so the rename is part of the copy. **Regenerate, never hand-edit** — a hand edit puts the
+writes `artifacts/openapi/Binacle.Net_v3.json` and `_v4.json`; `just openapi sync-all-copies` copies them into
+the current folder as `swagger/v3.json` and `swagger/v4.json`, and `check-all-copies` fails on drift. **Regenerate, never hand-edit** — a hand edit puts the
 published spec out of step with what the code serves, and the diff hides inside whatever else was edited.
 
 ### When a new major opens (standing rule)
@@ -191,18 +189,15 @@ neither takes `jekyll-breadcrumb-trail`, and only this one is versioned, so only
 | `binacle-docs-versions` | `ruby/binacle-docs-versions` |
 
 **There is no `sites/docs/_plugins/` directory.** `_config.yml` still declares `plugins_dir: _plugins` and
-Jekyll tolerates it being absent. VLink lived there and moved into `binacle-docs-versions` with the version
-stamps, which is where it gets a spec suite; nothing under `sites/` has one.
+Jekyll tolerates it being absent. VLink is in `binacle-docs-versions`, where it has a spec suite; nothing
+under `sites/` has one.
 
 **breadcrumbs** (`{% breadcrumbs %}`) — one call in `_includes/header.html` renders the trail for every
-page, versioned or not. The two thirty-line includes and the branch that chose between them went on
-24 Aug 2026. `breadcrumbs: exclude: ["version", "*.*"]` in `_config.yml` is what keeps a versioned trail
+page, versioned or not. `breadcrumbs: exclude: ["version", "*.*"]` in `_config.yml` is what keeps a versioned trail
 starting at its own version; **drop it and every breadcrumb on the site silently gains two crumbs.**
-A page still turns its trail off with `breadcrumbs: false`, which now works everywhere rather than only on
-versioned pages.
+A page turns its trail off with `breadcrumbs: false`.
 
-**`_layouts/redirect.html` has no page left.** It served `/version/latest/`, which went when the current line
-moved to the root - `/version/latest/*` is a line in `_redirects` now. The layout and the gem's
+**`_layouts/redirect.html` has no page left.** `/version/latest/*` is a line in `_redirects`. The layout and the gem's
 `redirect_to`/`canonical` stamps are still there for a page that sets `layout: redirect`; none does.
 
 **vlink** (`{% vlink path %}`) — resolves a path inside the current page's version folder to the URL the gem

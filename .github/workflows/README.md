@@ -42,7 +42,7 @@ manual trigger, because running one by hand is the point.
   tags the run's own commit once the image is published, so a run that goes red leaves nothing to delete.
 - **Never rebuild the image between build and publish.** The copy to Docker Hub is by digest, which is what
   makes the published image the exact one the smoke suite passed.
-- **The `publish` job never checks out**, so it is the one place a script still sits inline. Giving it a
-  checkout would put repository code beside the Docker Hub credential, which is the trade this shape avoids.
+- **The signature retry in `publish` is the one script still inline.** It waits around a recipe that stays
+  one shot for a person running it, so the wait belongs to CI and not to the recipe.
 
 The composite actions these call live next door in [`../actions`](../actions).
