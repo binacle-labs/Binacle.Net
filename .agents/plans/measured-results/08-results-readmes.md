@@ -13,12 +13,14 @@ paths: ["lib/results/README.md", "vipaq/results/README.md"]
 Both READMEs are an index and a line `<!-- Summary: shape not decided yet. -->`. The maintainer has not decided
 the summary's shape. Shape it with him first, one piece per turn, shown with made-up numbers; then write it.
 
-## What is known so far
+## Goal
 
-- **The README computes nothing.** Every number in it names the results file it came from.
+**(the maintainer, 2026-09-29):** each slice's README sums up its results files - "the readme will smarize
+them". Every number in it names the file it came from - leaning yes ("perhaps the read me", 2026-09-29).
+
+## Suggested (agent), to reinvestigate
+
 - **Facts from two or more files go here**, and only here, since a results file reads one kind of raw result.
-- **No other slice's numbers.** A comparison across slices has no home yet; it is an idea.
-- The wording is revised later, by the maintainer.
 
 Combinations seen so far, lib:
 

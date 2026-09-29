@@ -1,5 +1,5 @@
 ---
-description: Session 6 - decide how the tables get their numbers, then fill the seven lib results files and the two parallel files from the kept runs; the table shapes are in the files, as comments over fake sample tables
+description: Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included
 state: blocked
 waits-on: "sessions 4 and 5 - the two drop points"
 horizon: undecided
@@ -10,41 +10,24 @@ paths: ["lib/results/**"]
 
 ## Where it stands
 
-The seven files in `lib/results/` are placeholders. Above each table a comment is its spec - what it shows, the
+The files in `lib/results/` are placeholders. Above each table a comment is its spec - what it shows, the
 raw file it reads, its rows, its columns, how a number is made. Under it, a sample table with fake numbers shows
 the shape. The maintainer reviews the shapes before any number goes in.
 
-`parallel-racing.md` and `parallel-bins.md` do not exist yet. The maintainer shapes them from the runs of
-sessions 4 and 5; then they are built like the rest.
+`parallel-racing.md` and `parallel-bins.md` do not exist yet. They read the kept runs of sessions 4 and 5. The
+maintainer shapes them from those runs; then they are built like the rest.
 
-## First, the maintainer's call: how the numbers get in
+## Goal
 
-Every number comes from the raw files by a program, never typed - a session once printed three wrong numbers
-typed by hand. Where that program lives and how it runs is open. A script refreshed the tables between markers
-until 2026-09-26; it was removed before anyone reviewed it. Put the choice to him with an
-example, then build it.
+**(the maintainer, 2026-09-29):** fill the lib results files by hand - "6 is manual for now".
 
-**What the files are for** (the maintainer, 2026-09-26: "i aim to cvreate a functio nthat will optiomaly
-determine...but i also aim to provide choice"): he will write a function that picks the best balance of fill
-and cost for everyday use, with the caller keeping the choice. `packing-efficiency-stats.md` gives the fill
-half, `algorithm-performance.md` the time half; the README puts them side by side. Neither argues for dropping
-an option.
+**(the maintainer, 2026-09-29):** the shapes are not pinned down yet - "some sample files exist in /lib/results/
+but not pinned down same holsds true for vipaq". Pin each file's shape first, then fill it.
 
-## The raw files, by category
+**What the files are for** (the maintainer, 2026-09-26): "i aim to cvreate a functio nthat will optiomaly
+determine...but i also aim to provide choice".
 
-The inputs - `shared/data/bischoff-suite/orlib_thpack<N>.json`,
-one entry per problem with `Items` (one line per item type, `[n]` its count) and `Metrics` (third field is the
-item count) - are not results, and any file may read them.
-
-| Category | Raw files | Root files |
-|---|---|---|
-| fill | `lib/results/measurements/packing-efficiency.md` (per problem: Types, Items, Ceiling %, fill for FFD, WFD, BFD, Best, Margin), `version-parity.md` | `packing-efficiency-stats.md` |
-| algorithm time | `lib/results/benchmarks/baseline/algorithms/Full_<alg>_<Packing|Fitting>.md` (v1 and v2 time and Allocated on all 700, short job) | `algorithm-performance.md`, `version-differences-packing.md`, `version-differences-fitting.md`, `packing-time-by-size.md` |
-| result selection | `lib/results/benchmarks/baseline/result-selection/*.md` | `result-selection.md` |
-| ladder | `lib/results/benchmarks/baseline/scaling/Sample_Packing.md` (3 to 79 items, default job) | `scaling.md` |
-| racing, threshold | the kept runs of sessions 4 and 5 | `parallel-racing.md`, `parallel-bins.md` - the maintainer's |
-
-## Open points in the shapes, found 2026-09-26
+## Open points in the shapes - suggested (agent, 2026-09-26), to reinvestigate
 
 Each is the maintainer's to settle, one per turn.
 
@@ -65,7 +48,7 @@ Each is the maintainer's to settle, one per turn.
 - **Unused raw columns:** Items and Margin in `packing-efficiency.md`, and the v1 rows of the ladder. Suggested:
   keep them; they cost nothing.
 
-## Facts the words can use
+## Facts the words can use - suggested (agent), to reinvestigate
 
 - **Why v2 allocates 0.08× of v1 (BFD) and 0.05× (WFD).** v1 BFD and WFD pick a space with
   `availableSpace.OrderBy(...)`, which builds a new sorted copy of the free-space list for every item and every
@@ -75,7 +58,7 @@ Each is the maintainer's to settle, one per turn.
 - **The dropped proposal:** one table of v2 packing times per algorithm (fastest, mean, median, slowest). The
   spread was too wide, 7 to 725 μs. `packing-time-by-size.md` shows that spread on purpose, as a finding.
 
-## What the removed lib README said (2026-09-22)
+## What the removed lib README said (2026-09-22) - suggested (agent), to check new numbers against
 
 **lib/results** - 700 Bischoff problems (thpack1..7), fill %, v2:
 
@@ -91,7 +74,7 @@ Each is the maintainer's to settle, one per turn.
   (WFD 74.78 at BR1, 67.41 at BR7).
 - v1 and v2 pack the same on 2,099 of 2,100 algorithm-problem pairs. The one: BFD on thpack7_45, 79.08 -> 79.73.
 
-## History - what the old `results/` folder proved
+## History - what the old `results/` folder proved - suggested (agent), to check new numbers against
 
 Removed from the tree 2026-09-22. The files are in git before that date. Every number below was read out of
 them by script.
@@ -138,8 +121,8 @@ v2/v1 story over the whole suite instead of one synthetic case, so the story's s
 and the smoke case is only the bridge back to the November table. It ran at the **short** job (3 iterations),
 so a single problem's mean is rough; an average over 700 is not. Some of its BFD times are slow processes, and
 are not retaken. Beside it, `baseline/threshold/Full_*` holds
-the parallel numbers, already read out as F4 and F2a in the lib findings record - the story does not need to
-re-derive them.
+the parallel numbers, already read out in the lib findings record - the story does not need to re-derive
+them.
 
 ## Not in this plan
 
@@ -149,11 +132,11 @@ re-derive them.
 
 ## Done when
 
-- [ ] The maintainer chose how the numbers get in, written here, and it is built.
-      **By eye.**
-- [ ] Every lib results file has real numbers, and its words and gaps are written from them.
-      `! grep -l "is fake" lib/results/*.md`, then **by eye** - every number in the words is in a table.
+- [ ] The maintainer pinned each file's shape.
+      **By eye.** His yes for each file, quoted and dated, in this file.
+- [ ] Every lib results file has real numbers, filled by hand, and its words and gaps are written from them.
+      `! grep -l "is fake" lib/results/*.md`, then **by eye**.
 - [ ] `parallel-racing.md` and `parallel-bins.md` exist in the shape the maintainer gave.
       `ls lib/results/parallel-racing.md lib/results/parallel-bins.md`
-- [ ] The history above is used in the words or dropped with a reason.
+- [ ] The old numbers above are used to check the new ones, or dropped with a reason.
       **By eye.**

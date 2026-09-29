@@ -28,7 +28,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as five sessions in order - the racing and bins drop points, the lib and ViPaq results files, and the results READMEs"
+  description: "Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; six sessions in order"
   state: ready
   waits-on: "the maintainer says when each session starts"
   horizon: next-release
@@ -71,11 +71,13 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "The public image becomes packing-only and the Service Module moves to its own image"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
+  horizon: undecided
   paths: ["api/**"]
 - file: api/servicemodule.md
   description: "How far ServiceModule is taken - one store, one project, refresh tokens. A suggestion waiting on a yes"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
+  horizon: undecided
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
 - file: api/v4-stable.md
   description: "v4 - flip from experimental to stable"
@@ -92,6 +94,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
   state: ready
   waits-on: "the first release run from main - it is the first to run the changed publish job, since a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12, the OIDC connection exists since 2026-09-14, and 7 is rejected"
+  horizon: undecided
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
@@ -133,25 +136,30 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
+- file: measured-results/03-bench-structure.md
+  description: "Session 3 - find the structure of the racing and bins benches - the project names, and which class lives where - before sessions 4 and 5 use them"
+  state: ready
+  waits-on: "the maintainer says when - state set by an agent 2026-09-29, strike it if wrong"
+  horizon: undecided
 - file: measured-results/04-racing-drop-point.md
-  description: "Session 4 - run the racing bench, keep it, and read the drop point where racing the algorithms at the same time starts to beat running them one after another, on 2, 4, 8 and 12 cores, over 30 Bischoff problems"
+  description: "Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop"
   state: ready
   waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
   description: "Session 5 - find where packing many bins at the same time starts to pay. All pending - bin-set categories from even to real, an item sweep, and a run in stages, each a suggestion"
   state: blocked
-  waits-on: "session 4 - the racing run and what it teaches"
+  waits-on: "sessions 3 and 4 - the bench structure, and the racing run and what it teaches"
   horizon: undecided
 - file: measured-results/06-lib-results.md
-  description: "Session 6 - decide how the tables get their numbers, then fill the seven lib results files and the two parallel files from the kept runs; the table shapes are in the files, as comments over fake sample tables"
+  description: "Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included"
   state: blocked
   waits-on: "sessions 4 and 5 - the two drop points"
   horizon: undecided
 - file: measured-results/07-vipaq-results.md
-  description: "Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables"
+  description: "Session 7 - pin the shape of each ViPaq results file with the maintainer, then fill them by hand from the kept runs"
   state: blocked
-  waits-on: "session 6 - how the numbers get in"
+  waits-on: "sessions 3 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
   horizon: undecided
 - file: measured-results/08-results-readmes.md
   description: "Session 8 - shape the summary of lib/results/README.md and vipaq/results/README.md with the maintainer, then write it from the filled results files"
@@ -189,6 +197,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Two framework defaults on the docs site - code samples had no named mono face (fixed), and wide tables are still clipped rather than scrolled"
   state: proposed
   waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
+  horizon: undecided
   paths: ["sites/docs/**"]
 - file: sites/docs-current-at-root.md
   description: "The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL."
@@ -221,6 +230,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
   state: ready
   waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
+  horizon: undecided
   paths: ["tooling/**", "vipaq/test-vectors/**", ".github/workflows/**"]
 ```
 

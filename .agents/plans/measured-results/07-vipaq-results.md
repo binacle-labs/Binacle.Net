@@ -1,7 +1,7 @@
 ---
-description: Session 7 - fill the seven ViPaq results files from the kept runs, the same way the lib files were filled; the table shapes are in the files, as comments over fake sample tables
+description: Session 7 - pin the shape of each ViPaq results file with the maintainer, then fill them by hand from the kept runs
 state: blocked
-waits-on: "session 6 - how the numbers get in"
+waits-on: "sessions 3 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
 horizon: undecided
 paths: ["vipaq/results/**"]
 ---
@@ -10,10 +10,16 @@ paths: ["vipaq/results/**"]
 
 ## Where it stands
 
-The seven files in `vipaq/results/` are placeholders, like lib's: a comment per table as its spec, a sample table
-with fake numbers under it. The numbers get in the way the maintainer picks in session 6.
+The files in `vipaq/results/` are placeholders, like lib's: a comment per table as its spec, a sample table
+with fake numbers under it.
 
-## The decisions the files serve
+## Goal
+
+**(the maintainer, 2026-09-29):** the shapes are not pinned down yet - "some sample files exist in /lib/results/
+but not pinned down same holsds true for vipaq". Pin each file's shape first, then fill it by hand, as lib's
+("6 is manual for now").
+
+## The decisions the files serve - suggested (agent), to reinvestigate
 
 1. Is the format worth having - how much smaller than the alternatives?
 2. Is encode and decode speed acceptable, or worth work?
@@ -22,39 +28,28 @@ with fake numbers under it. The numbers get in the way the maintainer picks in s
 
 One file per question, or per layout and codec; the README combines them.
 
-## The raw files
+## Fact
 
-| File | Holds |
-|---|---|
-| `vipaq/results/measurements/encoded-size/<ffd|wfd|bfd>/<row|columnar>-<group>.md` | 54 files; groups `thpack1`..`thpack7`, `custom-problems`, `demo-samples`. Three tables each - `## Raw`, `## Deflate`, `## Gzip` - one row per pack: Scenario, Items, Widths, ViPaq, Proto, JSON, Compact, ViPaq/Proto. Lengths in characters: ViPaq and protobuf as base64, JSON and compact as text |
-| `vipaq/results/benchmarks/<run>/encoding/Sample_Encode.md` | 12 packs; Protobuf (baseline), ViPaq_Row, ViPaq_Columnar, Json |
-| `.../Sample_Decode.md` | the same packs, no Json - the test JSON encoder cannot decode |
-| `.../Sample_CompressionCost_Encode.md`, `_Decode.md` | two real FFD packs, row-major: thpack4_1 (low win) and thpack1_2 (high win); NoOp (baseline), Deflate, Gzip |
+**Row is the default layout** (`ViPaqSerializationOptions.Layout = RowMajor`) and the API sets no other, so row
+is what gets sent. The earlier README said the wire carries columnar; it was wrong.
 
-Two categories, and no file crosses them: **size** (`measurements/encoded-size/`) feeds `format-size.md` and
-the four codec files; **encoding** (`benchmarks/<run>/encoding/`) feeds `encode-cost.md` and `decode-cost.md`.
+## Rules particular to ViPaq - suggested (agent), to reinvestigate
 
-The cost files read the kept sample run.
-
-## Rules particular to ViPaq
+The main plan's rules hold the maintainer's own: algorithms never mixed, a loss shows.
 
 - **Size, per pack, then averaged.** ViPaq ÷ the other format on that one pack, then the mean per group. Rows
-  thpack1..7, custom problems, demo samples, All, with a Packs column. **Algorithms are never
-  mixed** (the maintainer, 2026-09-26): each size file carries its tables once per algorithm - FFD, then WFD,
-  then BFD.
-- **A loss shows.** Any average above 1.00× is bold, and a column "ViPaq larger than protobuf on" counts the
-  packs where ViPaq lost. A JSON count only if some pack has ViPaq larger than JSON. Leaning
-  yes (the maintainer, 2026-09-26: "yes both.,,, i think for now").
+  thpack1..7, custom problems, demo samples, All, with a Packs column. Each size file carries its tables once
+  per algorithm - FFD, then WFD, then BFD.
+- **A loss shows** this way: any average above 1.00× is bold, and a column "ViPaq larger than protobuf on"
+  counts the packs where ViPaq lost. A JSON count only if some pack has ViPaq larger than JSON.
 - **Widths everywhere**, because width drives ViPaq's size and cost. `Widths` is bin / item / coordinate bits,
   e.g. `16/8/16`.
-- **Row is the default layout** (`ViPaqSerializationOptions.Layout = RowMajor`) and the API sets no other, so
-  row is what gets sent. The earlier README said the wire carries columnar; it was wrong.
 - **Cost files hold cost only.** No size column in a cost file, even for the same pack; the README puts size
   saved beside time paid.
 - **Say how a number was made when it is not obvious**: compact notation joins the bin and the items with `;`
   because it has no whole-pack form.
 
-## Open points in the shapes, found 2026-09-26
+## Open points in the shapes - suggested (agent, 2026-09-26), to reinvestigate
 
 Each is the maintainer's to settle, one per turn.
 
@@ -72,7 +67,7 @@ Each is the maintainer's to settle, one per turn.
   chased, so the gap stays.
 - **Kind** (real or synthetic) is not in the report; it comes from the pack name.
 
-## Gaps each file names
+## Gaps each file names - suggested (agent), to reinvestigate
 
 - Compression cost is measured on two packs only; nothing says from what size compressing pays for its time.
 - No columnar protobuf, MessagePack or CBOR.
@@ -82,7 +77,7 @@ Each is the maintainer's to settle, one per turn.
   day, measured canonical MessagePack at 938 mean characters against ViPaq's 954 raw; ViPaq won clearly only
   compressed and columnar (304 against 383 deflated).
 
-## What the removed ViPaq README said (2026-09-22)
+## What the removed ViPaq README said (2026-09-22) - suggested (agent), to check new numbers against
 
 Kept as a check on the new numbers, not as a source. Every number here was typed; recompute before use.
 
@@ -106,5 +101,9 @@ Kept as a check on the new numbers, not as a source. Every number here was typed
 
 ## Done when
 
-- [ ] Every ViPaq results file has real numbers, and its words and gaps are written from them.
-      `! grep -l "is fake" vipaq/results/*.md`, then **by eye** - every number in the words is in a table.
+- [ ] The maintainer pinned each file's shape.
+      **By eye.** His yes for each file, quoted and dated, in this file.
+- [ ] Every ViPaq results file has real numbers, filled by hand, and its words and gaps are written from them.
+      `! grep -l "is fake" vipaq/results/*.md`, then **by eye**.
+- [ ] The old numbers above are used to check the new ones, or dropped with a reason.
+      **By eye.**

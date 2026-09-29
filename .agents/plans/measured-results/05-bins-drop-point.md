@@ -1,26 +1,29 @@
 ---
 description: Session 5 - find where packing many bins at the same time starts to pay. All pending - bin-set categories from even to real, an item sweep, and a run in stages, each a suggestion
 state: blocked
-waits-on: "session 4 - the racing run and what it teaches"
+waits-on: "sessions 3 and 4 - the bench structure, and the racing run and what it teaches"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.Threshold/**", "lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**"]
 ---
 
 # 5 - The bins drop point
 
-A request sends one item list and several bins. `ParallelBinProcessor` packs the items into each bin - one bin
-after another (loop) or all bins at the same time (parallel). Parallel costs extra to start, so it pays only
-when there is enough work.
+## Goal
 
-The point is a rule that picks loop or parallel for each request, from what the request shows: the number of
-bins, the item count, the item types, the bin sizes, the cores. The bench finds where parallel starts to win,
-and whether from some point it always wins by a meaningful amount. What "meaningful" means is the maintainer's.
+**(the maintainer, 2026-09-29):** measure the bins parallelisation threshold, or its cost function - when
+packing many bins in parallel beats packing them one after another. "the other the bins paralilizxation
+thresohold of their cost function".
 
 **Decided (the maintainer, 2026-09-25):** "lets make the algo race first".
 
-**Everything else in this file is pending.** The maintainer, 2026-09-29: "reword the plans as not decided but
-pending and just as suggestion". His worry from 2026-09-25 still stands: "it does worry me how we can test
-reliably with different bin shapes when i failed with the ladder".
+His worry (2026-09-25): "it does worry me how we can test reliably with different bin shapes when i failed with
+the ladder".
+
+**(the maintainer, 2026-09-29):** this session finds the problems the bins bench runs - "step 5 is finding the
+problems and keep suggestions will reinvestigate".
+
+**Everything else in this file is pending**, kept as suggestions to reinvestigate. The maintainer, 2026-09-29:
+"reword the plans as not decided but pending and just as suggestion".
 
 ## What the session does - suggested
 
@@ -41,7 +44,7 @@ of that grid changed two things at once. One more bin was also a taller bin (60x
 
 - **Packing never stops early.** It tries every item. A bin too small for the items is packed partly or not at
   all; only fitting exits early. In the fixtures the first word of a result is packing, the second fitting -
-  `$shared` has the format.
+  the shared slice doc has the format.
 - **The rule cannot see time.** It sees the request. A case has to be described in what the request carries;
   time is only how the case is measured.
 - **Real requests mix box sizes**, and some boxes are too small for the items. An all-equal set is the best

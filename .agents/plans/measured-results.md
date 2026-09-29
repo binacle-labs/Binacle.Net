@@ -1,5 +1,5 @@
 ---
-description: Orchestrator - the benchmarks, measurements and results files of lib and ViPaq, left as five sessions in order - the racing and bins drop points, the lib and ViPaq results files, and the results READMEs
+description: Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; six sessions in order
 state: ready
 waits-on: "the maintainer says when each session starts"
 horizon: next-release
@@ -15,100 +15,84 @@ paths:
 
 One plan in a topic folder, granted 2026-09-19. This file is the only one that points at the files in it.
 
-## What landed
+## Goal
 
-The bench and measure projects, their recipes, and the kept runs under `lib/results/` and `vipaq/results/`
-landed 2026-09-20 to 2026-09-26. Their lasting rules are in the general design record (the four project
-folders, measured numbers) and in the lib and ViPaq design records. The racing bench `Cores_Packing` is built;
-no run of it is kept.
+**(the maintainer, 2026-09-29)**, in his words, lightly joined:
 
-On 2026-09-26 the plan was reset. The table scripts were removed. Every results file became a placeholder: a
-comment per table saying what it holds, and a sample table with fake numbers under it. The two results READMEs
-were cut to an index.
+- `results/` is per slice. The repo-root `results/` is gone.
+- Each slice owns its `results/`. Benches live in `<slice>/bench/`, measures in `<slice>/measure/`.
+- A measure writes to `results/measurements/`. It gives the same result on every run and every machine, so any
+  change matters. It is not dated.
+- A benchmark has noise, and we accept it. `results/benchmarks/baseline/` is filled first. Dated snapshots come
+  after, and one can hold a single class instead of the whole suite.
+- One file per question at the root of `results/`. The README summarises them.
+- Compare per problem, then average: problem 1 in v1 against v2, then the mean. Never v1's mean against v2's.
+- Benchmarks and measures must answer questions and show how well we do.
+- Automation is not needed.
 
-## How a session works this plan
+## Where it stands
 
-- **One session, one file, in order.** Run the gates in the table below top to bottom; the first that fails is
-  the next session. The maintainer commits between sessions. No session commits.
-- **Do only what the file says.** A problem found on the way: say it in one plain sentence and stop. New work
-  becomes an idea plan, never a new step.
-- **No scripts in the repo** until session 6 decides how the tables get their numbers.
+Every root results file is a placeholder: a comment per table saying what it holds, and a sample table with
+fake numbers under it. Both results READMEs are an index.
+
+## Who runs what
+
 - **The maintainer runs** every bench, every measure, and any build that starts the host. A session gives him
-  the one-line command. Long runs have crashed his machine.
-- **The sandbox denies `rm`, `mv` and `git rm`.** Hand the maintainer one line with every path on it.
-- **Every session rewrites the doc lines it makes false**, in the same session. `just agents all` is his.
-- **Plain short words**, in chat and in files. One decision per turn, shown with an example.
+  the one-line command. Long runs have crashed his machine. ("the first is true", 2026-09-29)
 
 ## The results files - rules
 
-Both slices keep them. A line that quotes the maintainer is his; the rest are suggestions.
+Every line here quotes the maintainer.
 
-**What they are for** (the maintainer, 2026-09-25: "iot needs to show me what we are doing has value and
-benefit"). They show him how the work is going and give him data to decide on: v2 against v1 says whether the
-direction is sound, a drop point feeds a cost function, a gap says what to improve. A file that drives no
-decision and shows no progress is a candidate to cut.
-
-The layout (the maintainer, 2026-09-26: "so the structure is this... /results/benchmarks/<rawresults>
-/results/measurements/<raw results> /results/<derived per file raw result> /results/README.md combination of
-derived files"):
-
-| Path | Holds |
-|---|---|
-| `<slice>/results/measurements/` | raw results from `just measure` |
-| `<slice>/results/benchmarks/` | raw results - BenchmarkDotNet reports, copied by hand |
-| `<slice>/results/<file>.md` | one file per question, read from the raw files |
-| `<slice>/results/README.md` | the index, and a summary written last |
-
-- **Each slice stays apart** ("each result needs to be isolated ideally", 2026-09-26). No file reads the other
-  slice's numbers.
-- **A file reads one kind of raw result**: a slice's measurements, or one bench family (lib: algorithms,
-  result-selection, scaling, racing, threshold; ViPaq: encoding). Inputs - the problems under `shared/data/`,
-  the ladder in `LadderGenerator.cs` - are not results; any file may read them.
+- **What they are for** ("iot needs to show me what we are doing has value and benefit", 2026-09-25).
+- **Each slice stays apart** ("each result needs to be isolated ideally", 2026-09-26).
 - **Never average two algorithms together** ("no mixing algorithms.... separate etiher more table or more
-  ggiles", 2026-09-26). Suggested: a race - the better of its members on each problem - is an option of its
-  own, not an average, and stays.
-- **A difference is "×" the baseline**: v2 at 0.46× of v1 ("i prefer 0.46", 2026-09-25). A share of a whole
-  may be a percentage.
-- **A ratio is per problem, then averaged** ("setavg(diff(v1, v2)) and not diff( setavg(v1), setavg(v2))",
-  2026-09-25). Suggested: BenchmarkDotNet's own Ratio where one run holds both rows.
-- **A loss must show** - leaning yes, for ViPaq ("yes both.,,, i think for now", 2026-09-26). Where above
-  1.00× is the bad side the average goes bold, and where an average can hide single losses a count column says
-  how many.
-- **Every cell one number, every column labelled.**
-- **Each file ends with its gaps and open questions.**
+  ggiles", 2026-09-26).
+- **A difference is "×" the baseline**: v2 at 0.46× of v1 ("i prefer 0.46", 2026-09-25).
+- **BenchmarkDotNet's own Ratio** where it fits ("use BenchmarkDotNet's own Ratio sometimes is true",
+  2026-09-29).
+- **A loss must show** - leaning yes ("yes both.,,, i think for now", 2026-09-26).
 - **v2 everywhere, except where v1 against v2 is the question** ("the canonical is v2 everywhere else...
   unless we do a version comparison", 2026-09-25).
-- **A time holds on one machine and runtime only; the file says which.** Ratios, memory, fill and size compare
-  anywhere.
-- **The comment above each table is its spec**, and the sample table under it shows the shape ("the
-  placegolder should be sample tables with face looking data so i review the sahe easitly", 2026-09-26).
-  Filling a table replaces the fake numbers; the comment stays. The line "Every number in this file is fake"
-  goes when the last table of the file is filled.
-- **The README computes nothing.** Every number in it names the file it came from.
-- **Nothing runs while a bench runs** - it disturbs the run ("i am waiting on the benchmark to complete so
-  dont urn anything", 2026-09-26).
+- **Placeholders are sample tables with fake numbers** ("the placegolder should be sample tables with face
+  looking data so i review the sahe easitly", 2026-09-26). The line "Every number in this file is fake" goes
+  when the last table of the file is filled.
+- **The README computes nothing; every number in it names its file** - leaning yes ("perhaps the read me",
+  2026-09-29).
+- **Nothing runs while a bench runs** ("i am waiting on the benchmark to complete so dont urn anything",
+  2026-09-26).
 
 ## The sessions
 
 | # | File | In one line | Gate |
 |---|---|---|---|
+| 3 | [03-bench-structure](measured-results/03-bench-structure.md) | find the structure of the racing and bins benches ("step 3 is finding the structure for both 4 and 5", 2026-09-29) | **by eye** - the maintainer's pick quoted in the file |
 | 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run the racing bench, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/racing/Cores_Packing.md` |
-| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | build and run the bins bench, read where packing bins at once starts to pay | **by eye** - a kept run of the new bins class under `lib/results/benchmarks/` |
-| 6 | [06-lib-results](measured-results/06-lib-results.md) | decide how the tables get their numbers; fill the lib results files | `! grep -l "is fake" lib/results/*.md` |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | find the problems for the bins bench, build and run it, read the bins parallelisation threshold | **by eye** - a kept run of the new bins class under `lib/results/benchmarks/` |
+| 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
 
 The order comes from the work. The results files read the kept runs, racing and bins included. The READMEs
-read the results files. The sessions keep their numbers 4 to 8.
+read the results files. The sessions keep their numbers 3 to 8.
 
 **Slow processes are not chased here** (the maintainer, 2026-09-28: "we wont chase that now its too much").
-Some kept BFD times may be a process that ran slow from start to end. Suggested: every results file that reads
-a BFD time names that as a gap.
 
-Kept as ideas, outside this plan: MessagePack, CBOR and a columnar protobuf; a results story for others; a home
-for comparisons across slices; slow processes under tiered PGO; the test-only v3 of BFD and WFD.
+**Every results file that reads a BFD time names it as a gap** (the maintainer, 2026-09-29: "keep it, name it
+as a gap and name explicitly for what it is upfront its the optimization acting up"). Up front, in plain words:
+.NET's run-time optimization (tiered PGO) sometimes picks a worse version of the code and keeps it for a whole
+process, so that process runs slow from start to end. It still gains over PGO off, only less ("we steill get
+the boost from pgo-off but not as much", 2026-09-29).
 
 ## Done when
 
-- [ ] Every session file's boxes are ticked, and the maintainer has deleted the folder and this file.
-      **By eye.** There is nothing left to check once the file is gone; the session files carried the checks.
+- [ ] Every bench class has a kept run in `baseline/`, the bins bench included once it is built.
+      **By eye.** Each class under `lib/bench/` and `vipaq/bench/` has a report under
+      `<slice>/results/benchmarks/baseline/`.
+- [ ] Every measure has written its file.
+      **By eye.** Each measure under `lib/measure/` and `vipaq/measure/` has its file under
+      `<slice>/results/measurements/`.
+- [ ] Every root results file has real numbers.
+      `! grep -l "is fake" lib/results/*.md vipaq/results/*.md`
+- [ ] Each slice's README is written.
+      `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md`
