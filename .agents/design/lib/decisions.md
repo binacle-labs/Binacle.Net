@@ -1,7 +1,7 @@
 ---
 id: lib/decisions
 description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, and the open parallelization question.
-verified: 2026-09-28
+verified: 2026-09-30
 check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/DataProvider.cs and CustomProblems/DataProvider.cs
 also_update:
   - lib/findings
@@ -47,6 +47,18 @@ release it... if and when i decide to delete thats a different topic".
 
 So each version stays in `lib/src/Binacle.Lib/Algorithms/`, the next one starts as a copy of the latest, and it
 ships only once the evidence says it is stable. Deleting a version is a separate call, his.
+
+### D5 — one bench project per parallel question, every class pinned
+
+**Decided (the maintainer, 2026-09-29):** one project per question - `ParallelAlgorithms` for racing algorithms
+on one bin, `ParallelBins` for one algorithm on many bins - "a full restructure of both binaries is in order".
+Asked whether to pin every class in both, "yes common code to shared": `CoreJobs` and `CorePinning` live in
+`shared/test/Binacle.Benchmarking`. `Full_Algorithms_Packing_v1` and `_v2` were dropped ("2 yes"): v1 against
+v2 is the `Algorithms` project's question. The old bins classes were retired ("3 retire").
+
+**Decided (the maintainer, 2026-09-30):** a baseline holds runs of classes that exist, nothing else - "what
+eeds to run should not be in results besaline", "keeping the old in old". The retired threshold reports are
+in git at commit `59e9dfb3`.
 
 ## Pending
 

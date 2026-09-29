@@ -28,7 +28,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; six sessions in order"
+  description: "Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; five sessions"
   state: ready
   waits-on: "the maintainer says when each session starts"
   horizon: next-release
@@ -136,20 +136,15 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## Measured-results
 
 ```yaml
-- file: measured-results/03-bench-structure.md
-  description: "Session 3 - restructure the parallel benches, first part - the core pinning moves to shared, Racing and the ladder classes become ParallelAlgorithms, Threshold is retired. ParallelBins is session 5's"
-  state: ready
-  waits-on: "the maintainer starts it (2026-09-29: 'i wil lspawn the first to restructure common and 4')"
-  horizon: undecided
 - file: measured-results/04-racing-drop-point.md
   description: "Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop"
-  state: blocked
-  waits-on: "session 3 - the bench structure (the maintainer, 2026-09-29: 'yes 04 waits on step 3 too')"
+  state: ready
+  waits-on: "the maintainer runs the full bench"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
-  description: "Session 5 - find where packing many bins at the same time starts to pay. All pending - bin-set categories from even to real, an item sweep, and a run in stages, each a suggestion"
-  state: blocked
-  waits-on: "sessions 3 and 4 - the bench structure, and the racing run and what it teaches"
+  description: "Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions"
+  state: ready
+  waits-on: "session 4's racing run would teach it; the maintainer starts 5 anyway (2026-09-30: 'i will open a session to do #5')"
   horizon: undecided
 - file: measured-results/06-lib-results.md
   description: "Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included"
@@ -159,7 +154,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/07-vipaq-results.md
   description: "Session 7 - pin the shape of each ViPaq results file with the maintainer, then fill them by hand from the kept runs"
   state: blocked
-  waits-on: "sessions 3 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
+  waits-on: "sessions 4 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
   horizon: undecided
 - file: measured-results/08-results-readmes.md
   description: "Session 8 - shape the summary of lib/results/README.md and vipaq/results/README.md with the maintainer, then write it from the filled results files"

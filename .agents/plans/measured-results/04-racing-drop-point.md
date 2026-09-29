@@ -1,15 +1,16 @@
 ---
 description: Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop
-state: blocked
-waits-on: "session 3 - the bench structure (the maintainer, 2026-09-29: 'yes 04 waits on step 3 too')"
+state: ready
+waits-on: "the maintainer runs the full bench"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/**", "lib/test/Binacle.Lib.Testing/CoresSet.cs", "lib/results/benchmarks/**"]
 ---
 
 # 4 - The racing drop point
 
-Session 3 moves the bench into `ParallelAlgorithms`: class `Full_Packing` (was `Cores_Packing`), recipe
-`lib-parallel-algorithms-full`. No run of it is kept yet.
+The bench is `lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms`: class `Full_Packing` (was `Cores_Packing`),
+recipe `lib-parallel-algorithms-full`. No run of it is kept yet. `Smoke_Packing` has its first kept run, taken
+2026-09-29 on the short job.
 
 ## Goal
 
@@ -35,6 +36,14 @@ and we decide later".
 **Suggested (agent, 2026-09-29):** run and keep `lib-parallel-algorithms-sample` too. The ladder covers jobs
 smaller than the smallest Bischoff pick, so the drop point may sit there.
 
+**Left from session 3:**
+
+- A `lib-parallel-algorithms-sample` run was going 2026-09-30. Copy its report to
+  `lib/results/benchmarks/baseline/parallel-algorithms/Sample_Packing.md` and add its row to that folder's
+  README.
+- The smoke and sample recipes in `tooling/bench.just` say "time not measured yet". Ask the maintainer how long
+  each run took and put it in.
+
 `parallel-algorithms.md` is the maintainer's to shape; session 6 builds it.
 
 ## Reading it
@@ -48,3 +57,7 @@ This machine is a KVM guest; its CPUs are virtual, and the host decides where th
 - [ ] The threshold is read out of it, or the report shows there is none, and the lib findings record says
       so - including the fixed line on when racing pays.
       **By eye.**
+- [ ] The sample run is kept.
+      `ls lib/results/benchmarks/baseline/parallel-algorithms/Sample_Packing.md`
+- [ ] Every `lib-parallel-algorithms-` recipe states its cost.
+      `! grep -n "time not measured yet" tooling/bench.just`

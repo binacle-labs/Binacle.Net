@@ -1,5 +1,5 @@
 ---
-description: Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; six sessions in order
+description: Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; five sessions
 state: ready
 waits-on: "the maintainer says when each session starts"
 horizon: next-release
@@ -66,7 +66,6 @@ Every line here quotes the maintainer.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 3 | [03-bench-structure](measured-results/03-bench-structure.md) | move the core pinning to shared, build `ParallelAlgorithms` from Racing and the ladder classes, retire Threshold ("commen then the 1st to completion then the 5th with discovery", 2026-09-29) | `test ! -d lib/bench/Binacle.Lib.Benchmarks.Threshold && ls lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms` |
 | 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run `ParallelAlgorithms`, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Full_Packing.md` |
 | 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | find the problems for the bins bench, build `ParallelBins` and run it, read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
@@ -74,7 +73,7 @@ Every line here quotes the maintainer.
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
 
 The order comes from the work. The results files read the kept runs, racing and bins included. The READMEs
-read the results files. The sessions keep their numbers 3 to 8.
+read the results files. The sessions keep their numbers 4 to 8.
 
 **Slow processes are not chased here** (the maintainer, 2026-09-28: "we wont chase that now its too much").
 

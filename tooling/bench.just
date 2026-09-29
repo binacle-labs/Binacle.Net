@@ -83,6 +83,21 @@ lib-parallel-algorithms-full mode='':
 lib-parallel-algorithms-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
+# Loop against Parallel, FFD v2, identical bins and items, every item fits: 1 to 16 bins x 8 to 256 items x 2, 4, 8, 12 cores: time not measured yet; `dry` runs each case once
+[arg('mode', pattern='|dry')]
+lib-parallel-bins-even mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    job=short
+    if [ "{{ mode }}" = dry ]; then job=dry; fi
+
+    just bench lib-parallel-bins-run "$job" Even
+
+[private]
+lib-parallel-bins-run job category:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelBins -- --job {{ job }} --filter '*.{{ category }}_*'
+
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: about 3 minutes. Its one tier
 lib-result-selection: (lib-result-selection-run 'short')
 

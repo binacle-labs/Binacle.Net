@@ -56,6 +56,7 @@
   <Folder Name="/lib/bench/">
     <Project Path="lib/bench/Binacle.Lib.Benchmarks.Algorithms/Binacle.Lib.Benchmarks.Algorithms.csproj" />
     <Project Path="lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/Binacle.Lib.Benchmarks.ParallelAlgorithms.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ParallelBins/Binacle.Lib.Benchmarks.ParallelBins.csproj" />
     <Project Path="lib/bench/Binacle.Lib.Benchmarks.ResultSelection/Binacle.Lib.Benchmarks.ResultSelection.csproj" />
     <Project Path="lib/bench/Binacle.Lib.Benchmarks.Scaling/Binacle.Lib.Benchmarks.Scaling.csproj" />
   </Folder>

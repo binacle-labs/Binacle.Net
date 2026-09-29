@@ -1,7 +1,7 @@
 ---
 description: Session 7 - pin the shape of each ViPaq results file with the maintainer, then fill them by hand from the kept runs
 state: blocked
-waits-on: "sessions 3 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
+waits-on: "sessions 4 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
 horizon: undecided
 paths: ["vipaq/results/**"]
 ---
