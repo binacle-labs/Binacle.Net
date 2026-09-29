@@ -1,8 +1,8 @@
 ---
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
-verified: 2026-09-28
-check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are still in CoresSet; Cores_Packing still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; BinsBase and the four Full_ classes in Binacle.Lib.Benchmarks.Threshold still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in lib/results/benchmarks/baseline/threshold/.
+verified: 2026-09-30
+check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are still in CoresSet; Full_Packing in Binacle.Lib.Benchmarks.ParallelAlgorithms still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; the Full_Algorithms_ and Full_Bins_ reports at commit 59e9dfb3 still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in git at commit 59e9dfb3, under lib/results/benchmarks/baseline/threshold/.
 also_update:
   - lib/decisions
 paths:
@@ -30,8 +30,9 @@ noise.
 
 **F1 and F2 cannot be re-checked from a clone.** BenchmarkDotNet writes to `BenchmarkDotNet.Artifacts/`, which
 `.gitignore` excludes, and nobody kept those reports. The harness that ran them, `RacingSet` and the racing
-`BenchmarkBase`, was deleted 2026-09-26; its five problems are all in `CoresSet`, which `Cores_Packing` races. **F2a and F4 were
-kept**: every number in them can be read out of `lib/results/benchmarks/baseline/threshold/`.
+`BenchmarkBase`, was deleted 2026-09-26; its five problems are all in `CoresSet`, which `Full_Packing` in `Binacle.Lib.Benchmarks.ParallelAlgorithms` races. **F2a and F4 were
+kept**: every number in them can be read out of `lib/results/benchmarks/baseline/threshold/` at commit `59e9dfb3`. The
+reports left the tree 2026-09-30 with the classes that made them.
 
 **Some kept times may be slow processes.** Found 2026-09-26: BenchmarkDotNet runs each case in one process, and
 about 1 in 10 BFD processes runs about 1.7× slow from start to end, with a tight StdDev. The three-algorithm
@@ -100,7 +101,7 @@ the number of algorithms. That one is F4 below.
 ### F2a — and the ladder says it never pays on FFD+BFD (2026-09-25)
 
 `Full_Algorithms_Packing_v1` / `_v2`, the same Loop-against-Parallel question over the synthetic item ladder
-instead of the curated problems. Report: `lib/results/benchmarks/baseline/threshold/`. `Parallel` ratio, v2:
+instead of the curated problems. Report: `lib/results/benchmarks/baseline/threshold/` at commit `59e9dfb3`. `Parallel` ratio, v2:
 
 | Items | 3 | 7 | 13 | 17 | 23 | 29 | 37 | 47 | 59 | 67 | 79 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -121,7 +122,7 @@ where one algorithm is much slower than the other, and costs on every other.** v
 ## F4 — parallel *bins* pays, above a surface rather than a threshold (2026-09-25)
 
 `Full_Bins_Packing_v1` / `_v2`, one algorithm over bins 1 to 7 and the whole 11-step item ladder, 308 cases
-each at the default job. Reports: `lib/results/benchmarks/baseline/threshold/`. This is the axis F2 could not
+each at the default job. Reports: `lib/results/benchmarks/baseline/threshold/` at commit `59e9dfb3`. This is the axis F2 could not
 see, and it is the answer to `$lib/decisions#O1`.
 
 `Parallel` ratio against `Loop`, v2 — **the shipped version**. Under 1.00 means parallel is faster:

@@ -17,8 +17,8 @@ Inside either, a report sits under its family:
 | Family | What it compares |
 |---|---|
 | `algorithms/` | v2 of each packing algorithm against v1, packing and fitting |
-| `racing/` | Racing several algorithms on one bin: one after the other against in parallel |
-| `threshold/` | The same two, over a grid of item and bin counts, to find where parallel starts to pay |
+| `parallel-algorithms/` | Racing several algorithms on one bin: one after the other against in parallel, on each pinned core count |
+| `parallel-bins/` | Trying one algorithm on several bins: one after the other against in parallel |
 | `result-selection/` | v2 of each result selector against v1 |
 | `scaling/` | Packing time against item count, every algorithm in both versions |
 

@@ -8,7 +8,7 @@ renamed to its class.
 
 ## 🖥️ Where it ran
 
-Copied 2026-09-23 to 2026-09-25, from runs made on those days on one machine:
+Copied 2026-09-23 to 2026-09-30, from runs made 2026-09-23 to 2026-09-29 on one machine:
 
 - AMD Ryzen 9 9900X, 12 cores, Ubuntu 26.04.1
 - .NET 10.0.12 (SDK 10.0.112), BenchmarkDotNet 0.15.8
@@ -37,21 +37,13 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Full_WFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
-| `threshold/Smoke_Algorithms_Packing.md` | `just bench lib-threshold-smoke` | short | 16 |
-| `threshold/Smoke_Bins_Packing.md` | `just bench lib-threshold-smoke` | short | 48 |
-| `threshold/Sample_Algorithms_Packing.md` | `just bench lib-threshold-sample` | default | 44 |
-| `threshold/Sample_Bins_Packing.md` | `just bench lib-threshold-sample` | default | 84 |
-| `threshold/Full_Algorithms_Packing_v1.md` | `just bench lib-threshold-full precise` | default | 44 |
-| `threshold/Full_Algorithms_Packing_v2.md` | `just bench lib-threshold-full precise` | default | 44 |
-| `threshold/Full_Bins_Packing_v1.md` | `just bench lib-threshold-full precise` | default | 308 |
-| `threshold/Full_Bins_Packing_v2.md` | `just bench lib-threshold-full precise` | default | 308 |
+| `parallel-algorithms/Smoke_Packing.md` | `just bench lib-parallel-algorithms-smoke` | short | 64 |
 | `scaling/Sample_Packing.md` | `just bench lib-scaling` | default | 66 |
 | `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
 | `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |
 
-Every lib bench class has a kept run except racing's `Cores_Packing`. A later run
-goes in a dated folder beside this one, holding only the reports that moved.
+Only classes that exist today have a report here. A class with no row has no kept run yet.
 
-The two full tiers ran at different jobs: algorithms full the short job (8,400 cases, about 16 hours), threshold
-full the default one (`precise`, 704 cases, about 5 hours). A short-job time is a rougher number than a default-job one; the ratios still hold.
+Algorithms full ran the short job (8,400 cases, about 16 hours). A short-job time is a rougher number than a
+default-job one; the ratios still hold.

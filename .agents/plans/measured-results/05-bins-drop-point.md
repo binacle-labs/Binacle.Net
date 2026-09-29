@@ -25,9 +25,12 @@ problems and keep suggestions will reinvestigate".
 ## The bench - picked in session 3
 
 This session builds `lib/bench/Binacle.Lib.Benchmarks.ParallelBins/` - "then the 5th with discovery" (the
-maintainer, 2026-09-29). Session 3 retired the old bins classes ("3 retire"); their kept reports sit in
-`lib/results/benchmarks/baseline/parallel-bins/` as the record. Every class is pinned through `CoreJobs` in
+maintainer, 2026-09-29). Session 3 retired the old bins classes ("3 retire"); their reports left the baseline
+(in git at commit 59e9dfb3, `lib/results/benchmarks/baseline/threshold/`). Every class is pinned through `CoreJobs` in
 `shared/test/Binacle.Benchmarking` ("yes common code to shared").
+
+`LadderGenerator.GetBins` in `lib/test/Binacle.Lib.Testing/` lost its last caller with the old bins classes.
+Session 3 kept it for this one; delete it if this bench does not use it.
 
 **Leaning yes (the maintainer, 2026-09-29):** one class per bin-set category, and one recipe that takes the
 category. "i think so". A class each, because BenchmarkDotNet's `--filter` picks classes and methods, not

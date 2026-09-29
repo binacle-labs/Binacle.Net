@@ -247,10 +247,9 @@ question under `<slice>/bench/`, one recipe per project and tier:
 
 ```bash
 just bench                               # the list, in tier order, each recipe with its cost
-just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also lib-threshold-, vipaq-smoke
-just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-threshold-, vipaq-sample
-just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-threshold-full
-just bench lib-racing-cores precise      # racing on 2, 4, 8, 12 cores: asks first; short job, `precise` for default
+just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also lib-parallel-algorithms-, vipaq-smoke
+just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-parallel-algorithms-, vipaq-sample
+just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-parallel-algorithms-full
 just bench lib-result-selection          # about 3 minutes; its one tier
 just bench lib-scaling quick             # the item ladder, about 20 minutes: default job, `quick` for short; its one tier
 ```

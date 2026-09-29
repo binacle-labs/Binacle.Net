@@ -34,9 +34,11 @@ the `Algorithms` project's question. "2 yes".
 `Sample_Bins_Packing`, `Full_Bins_Packing_v1`, `Full_Bins_Packing_v2` and `BinsBase`. "3 retire". Their kept
 reports stay as the record.
 
-## What this session builds - suggested (agent, 2026-09-29)
+## What this session builds
 
-Shown to the maintainer 2026-09-29; he answered the open points on it, not each line.
+**Decided (the maintainer, 2026-09-29):** asked "Build step 3 with the suggested names and layout?" with the
+tree below, he picked "Yes, as suggested". That covers the names, the class placement, the report folders and
+the recipe names. The recipe bodies and the bullets under the tree are still suggestions.
 
 ```
 shared/test/Binacle.Benchmarking/
@@ -55,8 +57,7 @@ lib/bench/Binacle.Lib.Benchmarks.Racing/       gone
 lib/bench/Binacle.Lib.Benchmarks.Threshold/    gone
 
 lib/results/benchmarks/baseline/
-  parallel-algorithms/   <- threshold/*_Algorithms_Packing*.md, old names kept
-  parallel-bins/         <- threshold/*_Bins_Packing*.md, old names kept
+  parallel-algorithms/   new runs only
   racing/, threshold/    gone
 ```
 
@@ -103,20 +104,30 @@ The `bench.just` header loses its `Cores_ for racing` exception.
 - The maintainer runs every bench and any build that starts the host. A plain `dotnet build` of the bench
   project is not one.
 
+**Decided (the maintainer, 2026-09-30), replacing the report move above:** the old threshold reports leave the
+baseline - "what eeds to run should not be in results besaline", "keeping the old in old". They sit in the
+project's gitignored `BenchmarkDotNet.Artifacts/old/kept-baseline/`, and in git at commit 59e9dfb3.
+
+## Left open
+
+- The smoke and sample recipes say "time not measured yet". Put the time in after the first pinned run.
+- The old unkept runs of Racing and Threshold sit in the new project's gitignored
+  `BenchmarkDotNet.Artifacts/old/`.
+
 ## Done when
 
-- [ ] The maintainer picked the structure: the names, and which class lives where.
+- [x] The maintainer picked the structure: the names, and which class lives where.
       **By eye.** His words, quoted and dated, in this file.
-- [ ] The pinning code lives in shared.
+- [x] The pinning code lives in shared.
       `test -f shared/test/Binacle.Benchmarking/CoreJobs.cs && test -f shared/test/Binacle.Benchmarking/CorePinning.cs`
-- [ ] `ParallelAlgorithms` holds the three classes, each pinned, and builds.
+- [x] `ParallelAlgorithms` holds the three classes, each pinned, and builds.
       `ls lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/{Smoke,Sample,Full}_Packing.cs` and
       `dotnet build -c Release lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms`. Pinned: **by eye**, each
       class runs through `CoreJobs`.
-- [ ] Racing and Threshold are gone, and nothing names them.
+- [x] Racing and Threshold are gone, and nothing names them.
       `test ! -d lib/bench/Binacle.Lib.Benchmarks.Racing && test ! -d lib/bench/Binacle.Lib.Benchmarks.Threshold`
       and `! grep -rn "Benchmarks\.Racing\|Benchmarks\.Threshold\|lib-racing\|lib-threshold\|Cores_Packing" Binacle.Net.slnx lib tooling .agents/docs`
-- [ ] The kept reports moved.
-      `test ! -d lib/results/benchmarks/baseline/threshold && ls lib/results/benchmarks/baseline/parallel-algorithms lib/results/benchmarks/baseline/parallel-bins`
-- [ ] `just bench` lists the three `lib-parallel-algorithms-` recipes.
+- [x] The old reports left the baseline.
+      `test ! -d lib/results/benchmarks/baseline/threshold && test ! -d lib/results/benchmarks/baseline/parallel-bins && ! ls lib/results/benchmarks/baseline/parallel-algorithms | grep -q _Algorithms_`
+- [x] `just bench` lists the three `lib-parallel-algorithms-` recipes.
       `just --list bench | grep -c "lib-parallel-algorithms-"` prints 3.

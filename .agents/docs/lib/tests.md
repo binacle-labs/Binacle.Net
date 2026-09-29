@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-28
+verified: 2026-09-29
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -31,9 +31,8 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
 | `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms-smoke`, `-sample`, `-full` |
-| `Binacle.Lib.Benchmarks.Racing` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-racing-cores` |
+| `Binacle.Lib.Benchmarks.ParallelAlgorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-algorithms-smoke`, `-sample`, `-full` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
-| `Binacle.Lib.Benchmarks.Threshold` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-threshold-smoke`, `-sample`, `-full` |
 | `Binacle.Lib.Benchmarks.Scaling` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-scaling` |
 
 ## Binacle.Lib.Testing
@@ -58,7 +57,7 @@ it constructs the internal algorithm classes.
   `SampleSet` (picked Bischoff problems, name `<category> (<id>)`), `CoresSet` (Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
   e.g. `th1_72 (74i/3t)`).
 - The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
-  and `LadderGenerator` (the bin and item ladders the threshold and scaling projects climb).
+  and `LadderGenerator` (the bin and item ladders; the parallel-algorithms and scaling projects climb the item ladder, nothing reads the bin ladder).
 
 ## Binacle.Lib.UnitTests
 
@@ -137,29 +136,34 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
 
 Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<Tier>_*'`. Every `v1` method carries the deleted-with-v1 comment.
 
-## Binacle.Lib.Benchmarks.Racing
+## Binacle.Lib.Benchmarks.ParallelAlgorithms
 
-In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on 2, 4, 8 and 12 cores.
-`Cores_Packing` names the lib's **internal** `AlgorithmFactory_v2()`
-(`lib/src/Binacle.Lib/AlgorithmFactories/`), so `Binacle.Lib` grants the project friend access.
+In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on every core count in `CoreJobs`.
+Every class names the lib's **internal** `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`),
+so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagnoser]`.
 
-`Cores_Packing` is the one class that runs. v2, the column over `CoresSet.Names`, the rows in three
-`[BenchmarkCategory]` blocks: `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline)
-and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
-baseline, so their Ratio is `?`. `short` job, default with `precise`.
-`[MemoryDiagnoser]`.
+- `LadderBase` — `LoopAlgorithmProcessor` (baseline) / `ParallelAlgorithmProcessor` as rows `Loop` and
+  `Parallel`, param `Set` (`FFD,BFD`, `FFD,WFD,BFD`), one bin (`MaxSizeBin`), abstract `Items` so each tier
+  picks its own steps of the ladder in `LadderGenerator`. Classes `Smoke_Packing` (items 3, 47, 67, 79) and
+  `Sample_Packing` (every item step).
+- `Full_Packing` — the column over `CoresSet.Names`, the rows in three `[BenchmarkCategory]` blocks:
+  `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline) and `Parallel_FFD_WFD_BFD`;
+  and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no baseline, so their Ratio is `?`.
 
-Each core count is a BDN job, built in `CoreJobs`. Each sets the affinity mask to the first N CPUs **and**
-`DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads its CPU count once at start-up.
-BDN adds a CLI `--job` beside declared jobs instead of applying it, so `Program.cs` takes `--job` out of the
-args and builds the core jobs from it; the recipe passes it as every other recipe does. The report has a
-`Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still shows every CPU the
-machine has.
+Smoke at `short`; sample at the default job, `short` with `quick`; full at `short`, default with `precise`.
 
-`CorePinning.PinAndCheck`, first in `[GlobalSetup]`, is Linux only. On Linux BDN's pin (`sched_setaffinity`
-on the pid) reaches only the main thread, so it pins every thread in `/proc/self/task` to the mask, then fails
-the case if `ProcessorCount` is not N or any thread's `Cpus_allowed` differs. A pinned run is kinder than a
-real small VM: the OS and the BDN host run on the spare CPUs.
+Each core count is a BDN job, built in `CoreJobs` (`shared/test/Binacle.Benchmarking`). Each sets the affinity
+mask to the first N CPUs **and** `DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads
+its CPU count once at start-up. BDN adds a CLI `--job` beside declared jobs instead of applying it, so
+`Program.cs` takes `--job` out of the args and builds the core jobs from it; the recipe passes it as every other
+recipe does. The report has a `Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header
+still shows every CPU the machine has.
+
+`CorePinning.PinAndCheck` (`shared/test/Binacle.Benchmarking`), first in every class's `[GlobalSetup]`, is Linux
+only. On Linux BDN's pin (`sched_setaffinity` on the pid) reaches only the main thread, so it pins every thread
+in `/proc/self/task` to the mask, then fails the case if `ProcessorCount` is not N or any thread's
+`Cpus_allowed` differs. A pinned run is kinder than a real small VM: the OS and the BDN host run on the spare
+CPUs.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 
@@ -174,19 +178,3 @@ In `lib/bench/`. Packing time against item count, on the item ladder in `LadderG
 One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over every step (3 to 79 items), the bin fixed
 at `MaxSizeBin`, and v1 and v2 of each algorithm as rows, through the public `AlgorithmFactories` - `FFD_v1`
 (baseline), `FFD_v2`, `WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. Default job, `short` with `quick`.
-
-## Binacle.Lib.Benchmarks.Threshold
-
-In `lib/bench/`. Loop against Parallel on the ladders in `LadderGenerator`, the evidence for
-whether the parallel processors get wired up (`$lib/findings`). Two bases, each with rows `Loop` (baseline) and
-`Parallel`, the lib's **internal** factories, and abstract `Items` (and `Bins`) params so each tier picks its
-own steps:
-
-- `AlgorithmsBase` — `LoopAlgorithmProcessor` / `ParallelAlgorithmProcessor`, param `Set` (`FFD,BFD`,
-  `FFD,WFD,BFD`), one bin (`MaxSizeBin`). Classes `Smoke_Algorithms_Packing` (v2; items 3, 47, 67, 79),
-  `Sample_Algorithms_Packing` (v2; every item step), `Full_Algorithms_Packing_v1` and `_v2` (every item step).
-- `BinsBase` — `LoopBinProcessor` / `ParallelBinProcessor`, param `Algorithm` (FFD, BFD). Classes
-  `Smoke_Bins_Packing` (v2; items 3, 47, 67, 79; bins 2, 3, 7), `Sample_Bins_Packing` (v2; items 3, 47, 79; bins 1-7),
-  `Full_Bins_Packing_v1` and `_v2` (every item step, bins 1-7).
-
-Smoke at `short`; sample at the default job, `short` with `quick`; full at `short`, default with `precise`.

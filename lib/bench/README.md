@@ -10,8 +10,7 @@ into `baseline/`, a later one into a dated folder.
 | Project | The question |
 |---|---|
 | `Binacle.Lib.Benchmarks.Algorithms` | Is v2 of each packing algorithm still faster than v1, and on which problems? Three tiers - smoke, sample, full. See [its README](Binacle.Lib.Benchmarks.Algorithms/README.md). |
-| `Binacle.Lib.Benchmarks.Racing` | When `Best` races several algorithms on one bin, from what size is parallel faster than one after the other, on 2 to 12 cores? One tier. See [its README](Binacle.Lib.Benchmarks.Racing/README.md). |
-| `Binacle.Lib.Benchmarks.Threshold` | Should the parallel processors be wired up, and from what size? Two families, three tiers. See [its README](Binacle.Lib.Benchmarks.Threshold/README.md). |
+| `Binacle.Lib.Benchmarks.ParallelAlgorithms` | When `Best` races several algorithms on one bin, from what size is parallel faster than one after the other, and on how many cores? Three tiers, each pinned to every core count. See [its README](Binacle.Lib.Benchmarks.ParallelAlgorithms/README.md). |
 | `Binacle.Lib.Benchmarks.ResultSelection` | How does v2 of each result selector compare with v1, in time and allocations? See [its README](Binacle.Lib.Benchmarks.ResultSelection/README.md). |
 | `Binacle.Lib.Benchmarks.Scaling` | How does packing time grow as the item count grows? One tier. See [its README](Binacle.Lib.Benchmarks.Scaling/README.md). |
 

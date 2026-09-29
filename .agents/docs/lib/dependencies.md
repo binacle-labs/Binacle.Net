@@ -1,7 +1,7 @@
 ---
 id: lib/dependencies
 description: Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer).
-verified: 2026-09-28
+verified: 2026-09-29
 check: ProjectReference and InternalsVisibleTo entries in lib/**/*.csproj match the graph below
 paths:
   - "lib/**"
@@ -25,14 +25,13 @@ Binacle.Packing ─────────────────────�
    ▲   [IVT → Binacle.Lib, Binacle.Lib.Data]
    │
    ├── Binacle.Lib ──────────────────────┘   FFD/WFD/BFD algorithms, processors, result selection
-   │      ▲   [IVT → UnitTests, Benchmarks.Racing, Benchmarks.Threshold, Testing]
+   │      ▲   [IVT → UnitTests, Benchmarks.ParallelAlgorithms, Testing]
    │      │       only Binacle.Net references the packer (composition root)
    │      │
    │      ├── Binacle.Lib.Testing           library refs: Lib, Binacle.Data   the factories, checks, benchmark picks
    │      ├── Binacle.Lib.UnitTests         xUnit   refs: Lib, Lib.Testing, Binacle.Data, Lib.Data
    │      ├── Binacle.Lib.Benchmarks.Algorithms       BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
-   │      ├── Binacle.Lib.Benchmarks.Racing           BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
-   │      ├── Binacle.Lib.Benchmarks.Threshold        BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench, friend)
+   │      ├── Binacle.Lib.Benchmarks.ParallelAlgorithms BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Data, Benchmarking   (lib/bench)
    │      ├── Binacle.Lib.Benchmarks.Scaling          BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
@@ -46,13 +45,12 @@ Binacle.Packing ─────────────────────�
 
 | Project | Kind | References | Sees internals | Role |
 |---|---|---|---|---|
-| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, `UnitTests`, `Benchmarks.Racing`, `Benchmarks.Threshold` | the algorithms, processors, result selection |
+| `Binacle.Lib` | library | Packing | grants IVT to `Testing`, `UnitTests`, `Benchmarks.ParallelAlgorithms` | the algorithms, processors, result selection |
 | `Binacle.Lib.Data` | library | Binacle.Data, Packing, CompactNotation | sees Packing's | result-selection scenarios + set classes |
 | `Binacle.Lib.Testing` | library | Lib, Binacle.Data | yes | the one `AlgorithmFactories`, the scenario checks, the benchmark providers |
 | `Binacle.Lib.UnitTests` | xUnit exe | Lib, Lib.Testing, Binacle.Data, Lib.Data | yes | algorithm/result unit tests |
 | `Binacle.Lib.Benchmarks.Algorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, in three tiers |
-| `Binacle.Lib.Benchmarks.Racing` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race |
-| `Binacle.Lib.Benchmarks.Threshold` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel on the item and bin ladders |
+| `Binacle.Lib.Benchmarks.ParallelAlgorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race, on the item ladder and Bischoff picks, per core count |
 | `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
 | `Binacle.Lib.Benchmarks.Scaling` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, over the item ladder |
 | `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | no | packs every scenario, writes `lib/results/measurements/` |

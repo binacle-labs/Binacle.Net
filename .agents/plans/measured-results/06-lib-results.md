@@ -120,8 +120,8 @@ problems, v1 against v2, packing and fitting - is in the same folder as `Full_<a
 v2/v1 story over the whole suite instead of one synthetic case, so the story's speed numbers come from there
 and the smoke case is only the bridge back to the November table. It ran at the **short** job (3 iterations),
 so a single problem's mean is rough; an average over 700 is not. Some of its BFD times are slow processes, and
-are not retaken. Beside it, the old threshold `Full_*` reports - moved to `baseline/parallel-algorithms/` and
-`baseline/parallel-bins/` in session 3 - hold the parallel numbers, already read out in the lib findings record.
+are not retaken. Beside it, the old threshold `Full_*` reports - out of the baseline since 2026-09-30, in git at commit
+59e9dfb3 - hold the parallel numbers, already read out in the lib findings record.
 The story does not need to re-derive them.
 
 ## Not in this plan
