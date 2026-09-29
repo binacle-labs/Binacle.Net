@@ -1,7 +1,7 @@
 ---
 id: api/v4/contracts
 description: Request/response contract types, validators, and OpenAPI examples for v4 (v3 follows the same shape)
-verified: 2026-09-04
+verified: 2026-09-29
 check: Types and validators match api/src/Binacle.Net/v4/Contracts/; mappers match v4/ExtensionMethods/; every enum named here resolves to the assembly it is attributed to, and the BinResponseBase.From body matches field for field
 also_update:
   - api/v4
@@ -172,5 +172,5 @@ new PackCompareResponse
 
 **Derived, never typed:** both volume percentages come from `ExampleData.WithVolumePercentages()` and the
 ViPaq token from `WithViPaqData()`, each computed from the geometry beside it using the real formula
-(`$lib/result-building`). Hand-written numbers drift — the partially-packed examples had claimed 79.37/12.58
-for a layout the formula puts at 94.74/15.00. Add a new example by composing these, not by copying literals.
+(`$lib/result-building`). Hand-written numbers drift. Add a new example by composing these, not by copying
+literals.

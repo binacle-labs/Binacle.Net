@@ -1,7 +1,7 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-09-15
+verified: 2026-09-29
 check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds; `_js/packing_demo.js` still registers `request_panel` and Pages/Packing.cshtml still nests it inside the demo's x-data and reads `lastRequest`
 also_update:
   - packages
@@ -38,7 +38,7 @@ internal types. `Applet`, `AppletsService`, `UIModuleOptions` and every PageMode
 |---|---|---|
 | `/` | `Index` | Three cards, one per applet. The whole card is the link; the page has no button |
 | `/packing` | `Packing` | The packing demo. Calls the pack API from the browser, and prints the call it made as a `curl` line |
-| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. A `Samples` panel lists five known-good strings to copy. Calls nothing |
+| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. A `Samples` panel lists known-good strings to copy. Calls nothing |
 | `/instance` | `Instance` | Version, the switch list, the presets this instance loaded, and a link to GitHub Discussions |
 | `/error/{errorCode?}` | `Error` | The error page, and the `UseStatusCodePagesWithReExecute` target |
 
@@ -54,7 +54,7 @@ escaping.
 
 **An icon is a bare `<i>` with no class.** beercss sets `--font-icon` on the element itself, and neither
 `material-symbols` nor `material-symbols-outlined` is a selector it defines — the second appears in
-`beer.min.css` only as a woff2 filename. Both were on the pages until 2026-08-22 and both were inert.
+`beer.min.css` only as a woff2 filename.
 
 ## The build
 
@@ -125,8 +125,8 @@ presets into `InstanceOptions` in the Kernel's `Instance/` slice at startup, and
 them through `IOptions` the same way it reads the switch list. The page has no javascript of its own.
 
 **The presets are a snapshot taken at startup.** `BinPresetOptions.ReloadOnChange` is `true`, so an operator
-who edits `Presets.json` sees this page disagree with `GET /api/v4/presets` until the process restarts. That
-was chosen deliberately over a live provider; the reasoning is in the API decisions ledger.
+who edits `Presets.json` sees this page disagree with `GET /api/v4/presets` until the process restarts. Why a
+snapshot and not a live provider is `$api/decisions#D6`.
 
 ## Services
 
@@ -137,7 +137,7 @@ was chosen deliberately over a live provider; the reasoning is in the API decisi
 `Applet.Page` is a **page name for `asp-page`, not a path**. `AppletPageModel` takes a page's title and copy
 from the same list, so the index cards and the page cannot disagree.
 
-**`Models/FeatureSwitch.cs` is a second list, and it has to be.** `FeatureOptions` only records what is
+**`Models/FeatureSwitch.cs` is a second list, and it has to be.** `InstanceOptions` only records what is
 switched **on**, so the instance page cannot show a feature as off without knowing it exists. `FeatureSwitch.All`
 names four — Swagger UI, Scalar UI, the health check and the debug endpoint — with a display name and the
 setting that turns each one on. A new switch needs a row here or the page never mentions it.
@@ -145,7 +145,7 @@ setting that turns each one on. A new switch needs a row here or the page never 
 **Two are deliberately missing.** The service module is not advertised and the documentation site has no page
 for it. The demo UI is the page you are reading it on.
 
-**Paths are not in that list.** `FeatureOptions.PathFor` carries them, set by whoever switched the feature on —
+**Paths are not in that list.** `InstanceOptions.PathFor` carries them, set by whoever switched the feature on —
 the health path is configurable, so the module that owns it is the only thing that can know where it ended up.
 
 ## Error pages

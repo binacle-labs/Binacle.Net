@@ -1,8 +1,8 @@
 ---
 id: api/decisions
 description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, and why the instance page renders its presets from a startup snapshot rather than a live provider.
-verified: 2026-09-10
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must now return no call - the one remaining hit is a comment in Instance.cshtml.cs naming the endpoint this page can go stale against - and note this grep never saw the demo's v4 call, which reaches the image through the bundle rather than the module's source; D6 against the absence of api/src/Binacle.Net.UIModule/_js/instance.js and of an instance entry in that module's webpack.config.js, against InstanceOptions.EnabledFeatures filtering on FeatureValue rather than on a name list, and against Binacle.Net.Kernel.csproj referencing neither Binacle.Packing nor Binacle.Geometry; the BinOption-to-InstancePresetBin projection must live in api/src/Binacle.Net/ExtensionMethods/BinPresetOptionsExtensions.cs and nowhere else
+verified: 2026-09-29
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must now return no call - the one remaining hit is a comment in Instance.cshtml.cs naming the endpoint this page can go stale against - and note this grep never saw the demo's v4 call, which reaches the image through the bundle rather than the module's source; D6 against the absence of api/src/Binacle.Net.UIModule/_js/instance.js and of an instance entry in that module's webpack.config.js, against InstanceOptions.EnabledFeatures filtering on FeatureValue rather than on a name list, and against Binacle.Net.Kernel.csproj referencing Binacle.Packing neither directly nor through what it references; the BinOption-to-InstancePresetBin projection must live in api/src/Binacle.Net/ExtensionMethods/BinPresetOptionsExtensions.cs and nowhere else
 paths:
   - "api/**"
 ---
@@ -17,6 +17,7 @@ the docs under it; this file is the reasoning, so a later session does not undo 
 ### D5 — the shipped image calls the experimental v4 API, and that is accepted
 
 **Decided (the maintainer, 2026-09-09):** "we do a gull rebuild from v3 to v4" (answering: move the demo UI to v4)
+The maintainer, 2026-09-29: "D5 yes its used as a testing ground".
 
 **One caller ships in the image. Until 2026-09-10 there were two.**
 
@@ -31,7 +32,7 @@ the call still exists.
 The marketing site tells a reader v4 can change in a patch release and not to integrate against it by
 accident, so the image doing exactly that is worth writing down rather than leaving for someone to find.
 
-**Note the grep in `check:` does not see the second one.** It searches the module's own source, and the demo's
+**Note the grep in `check:` does not see the demo's call.** It searches the module's own source, and the demo's
 call lives in `packages/binacle-net-ui` and `packages/binacle-net-client`, reaching the image only through
 the bundle. Anyone re-verifying this record from the grep alone will count one caller and be wrong.
 
@@ -74,8 +75,9 @@ D5 above had to carry.
 **The route the obvious fix cannot take, measured 2026-08-22.** `BinPresetOptions` lives in the entry project,
 which references the UI module, so a project reference back is a cycle - `Instance.cshtml.cs` cannot inject
 `IOptions<BinPresetOptions>` the way it injects the switch list. **And the type cannot simply move**:
-`BinOption` implements `IIdentifiableBin` and `IWithDimensions`, from `Binacle.Packing` and `Binacle.Geometry`,
-and `Binacle.Net.Kernel` references neither. Pulling either in would have been the largest cost in the job by
+`BinOption` implements `IIdentifiableBin` and `IWithDimensions`, from `Binacle.Packing` and `Binacle.Geometry`.
+`Binacle.Net.Kernel` does not reach `Binacle.Packing`; it gets `Binacle.Geometry` only through
+`Binacle.CompactNotation`. Pulling `Binacle.Packing` in would have been the largest cost in the job by
 far, so `PresetsValue` carries a name and, per bin, an id and three ints. `BinPresetOptionsExtensions` in the
 entry project does the projection and is the one place a `Bin` type meets one that is not - it extends the
 nullable type, because the configuration section is optional and reads back null.

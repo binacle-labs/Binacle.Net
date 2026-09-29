@@ -46,7 +46,10 @@ short sha: `features/release_v3-1` becomes `release-v3-1-<sha>`. A Docker tag ta
 - **Staging images are kept for now.** The maintainer, 2026-09-28: "i dont delete them but i havent decided how
   or when to do that". GHCR held `3.0.0-beta.3` to `-beta.8`, `3.0.0`, a stale `latest` and `3.1.0-beta.1` on
   2026-09-14. Nothing names them and nothing costs while they sit there. A branch build per dispatch adds them
-  faster.
+  faster. The maintainer, 2026-09-29: "need to figure it out soon".
+  **Suggested (agent, 2026-09-29):** delete them automatically. Once a version is on Docker Hub, its betas
+  and its own staging copy on GHCR serve nothing, so a last job in the release run could delete them. Not
+  checked: whether `GITHUB_TOKEN` may delete package versions. The stale `latest` on GHCR goes by hand.
 
 ## Done when
 

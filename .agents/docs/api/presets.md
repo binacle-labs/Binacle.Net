@@ -1,7 +1,7 @@
 ---
 id: api/presets
 description: What presets are, where they're configured, how route params map to bins, and how to add one for tests
-verified: 2026-09-04
+verified: 2026-09-29
 check: Every {preset} and {preset}/{bin} route in v3/Endpoints and v4/Endpoints is accounted for; the flags, lookup methods and validator rules match BinPresetOptions.cs; the shipped preset tables match Presets.json
 also_update:
   - api/configuration
@@ -54,7 +54,8 @@ Two parameters, and which of them a route takes says which lookup it does:
 | Route shape | Lookup | Which routes |
 |---|---|---|
 | `{preset}/{bin}` | `TryGetPresetBin(preset, bin, out binOption)` — one named bin | v4 `fit/bin`, v4 `pack/bin` |
-| `{preset}` | `TryGetPreset(preset, out presetOption)` — every bin in the preset | v4 `compare-bins`, `smallest-bin`, `pack/best-bin`, `GET presets/{preset}`; all v3 `by-preset` routes |
+| `{preset}` | `TryGetPreset(preset, out presetOption)` — every bin in the preset | v4 `compare-bins`, `smallest-bin`, `pack/best-bin`, `GET presets/{preset}` |
+| `{preset}` | `Presets.TryGetValue(preset, ...)` directly — every bin in the preset | the two v3 `by-preset` routes |
 
 Examples: `POST /api/v4/fit/bin/rectangular-cuboids/Small`, `POST /api/v4/fit/smallest-bin/rectangular-cuboids`,
 `POST /api/v3/fit/by-preset/rectangular-cuboids`. The full route list is in `$api/v4` and `$api/v3`.

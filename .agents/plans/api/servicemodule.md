@@ -2,6 +2,7 @@
 description: How far ServiceModule is taken - one store, one project, refresh tokens. A suggestion waiting on a yes
 state: proposed
 waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
+horizon: undecided
 paths:
   - "api/src/Binacle.Net.ServiceModule/**"
   - "api/src/Binacle.Net.ServiceModule.Domain/**"

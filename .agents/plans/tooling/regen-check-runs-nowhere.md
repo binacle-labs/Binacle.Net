@@ -2,6 +2,7 @@
 description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
 state: ready
 waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
+horizon: undecided
 paths:
   - "tooling/**"
   - "vipaq/test-vectors/**"

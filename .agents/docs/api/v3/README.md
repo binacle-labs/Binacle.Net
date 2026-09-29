@@ -1,7 +1,7 @@
 ---
 id: api/v3
 description: v3 API — stable, do not modify. Endpoints, algorithm selection, response shape, field names, and enum values.
-verified: 2026-09-04
+verified: 2026-09-29
 check: The endpoint table matches every MapGet/MapPost under v3/Endpoints/; field names and enum values match v3/Contracts/; the pack EarlyFail_* claim still holds against PackResponse.MapResultStatus and the AlgorithmOperation.Fitting guard in the algorithms
 also_update:
   - api/v3/contracts
@@ -12,7 +12,8 @@ paths:
 
 # v3 API
 
-> **Do not modify v3. Do not add endpoints here.** It is stable and locked. All active development goes in v4.
+> **Do not change anything a v3 client can see, and do not add endpoints here.** All active development goes in
+> v4.
 
 Route prefix: `/api/v3`
 
@@ -77,25 +78,10 @@ v3 uses different field names from v4:
 | `packedItems` | `packedItems` | Pack — same name, includes coordinates |
 | `unpackedItems` | `unpackedItems` | Pack — same name |
 
-## Fit Status Enum (`BinFitResultStatus`)
+## Status Enums
 
-```
-AllItemsFit
-NotAllItemsFit
-EarlyFail_TotalVolumeExceeded
-EarlyFail_ItemDimensionExceeded
-```
-
-## Pack Status Enum (`BinPackResultStatus`)
-
-```
-Unknown
-NotPacked
-PartiallyPacked
-FullyPacked
-EarlyFail_ContainerVolumeExceeded    ← unreachable, see below
-EarlyFail_ContainerDimensionExceeded ← unreachable, see below
-```
+The values of `BinFitResultStatus` and `BinPackResultStatus` are in `$api/v3/contracts`. The two pack
+`EarlyFail_*` values are unreachable.
 
 `PackResponse.MapResultStatus` does have a branch that produces the two `EarlyFail_*` values, but nothing ever
 reaches it: every algorithm guards its early-exit checks with `parameters.Operation == AlgorithmOperation.Fitting`,

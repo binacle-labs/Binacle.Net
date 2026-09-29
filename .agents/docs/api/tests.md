@@ -1,7 +1,7 @@
 ---
 id: api/tests
 description: api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config
-verified: 2026-09-24
+verified: 2026-09-29
 check: Test folders mirror api/src/Binacle.Net/v{3,4}/Endpoints/ exactly, and the only endpoint folders with a single file are the three Presets ones; validBinId, PresetKeys, special bins, base-class asserts, and the ServiceModule fixture's seeding helpers match api/test/ source
 also_update:
   - shared
@@ -74,7 +74,8 @@ this — then constructs the framework middleware over a `DefaultHttpContext`, t
 whole job is to log something: `NullLogger` cannot answer "what did it say", and a mocking library would be a
 dependency for one interface.
 
-Both are xUnit over `WebApplicationFactory<IApiMarker>`, registered with `[assembly: AssemblyFixture(...)]`.
+The core and ServiceModule integration fixtures are xUnit over `WebApplicationFactory<IApiMarker>`, registered
+with `[assembly: AssemblyFixture(...)]`.
 The core fixture uses `UseEnvironment("Test")`, a camelCase `JsonSerializerOptions` with `JsonStringEnumConverter`,
 and a null logger factory.
 
@@ -273,7 +274,7 @@ covered the day it is added; nobody has to remember.
   Runs with default modules (ServiceModule off), carrying a `// TODO: Run the tests with all modules enabled`.
 - `BinacleApiWithoutPresets.cs` — same shape but only clears presets (no registration); tests the no-presets path.
 - `Binacle.Net.ServiceModule.IntegrationTests/BinacleApi.cs` — `IAsyncLifetime`; enables ServiceModule via
-  in-memory config (`SERVICE_MODULE=true`, an `AuthToken=NoLimiter::0` rate-limit rule, a connection string
+  in-memory config (`Features:SERVICE_MODULE=True`, an `AuthToken=NoLimiter::0` rate-limit rule, a connection string
   chosen by `ResolveTestInfrastructure()` from `BINACLE_TEST_INFRA`, JWT issuer and audience `"ForTestsOnly"`
   with a separate 70-plus-character `TokenSecret`). `DefaultAdminAccount`, set in
   `ConfigureTestServices`, makes the app seed an admin; `InitializeAsync` looks it up and creates a known user; `NonExistentId = EF81C267-A003-44B8-AD89-4B48661C4AA5` is hard-coded.

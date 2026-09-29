@@ -1,8 +1,7 @@
 namespace Binacle.Net.Kernel.Instance.Models;
 
-// Plain data, on purpose - Kernel references neither Binacle.Packing nor Binacle.Geometry, and a bin type
-// here would be the single largest cost in this slice. BinPresetOptionsExtensions in the entry project projects
-// BinPresetOptions into this shape; nothing in Kernel knows BinOption exists.
+// Plain data, on purpose - Kernel does not reference Binacle.Packing. BinPresetOptionsExtensions in the entry
+// project projects BinPresetOptions into this shape.
 public sealed class PresetsValue : InstanceValue
 {
 	public static PresetsValue Empty { get; } = new([]);

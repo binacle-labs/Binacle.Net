@@ -1,7 +1,7 @@
 ---
 id: api/endpoints
 description: Endpoint pattern, registration, request validation flow, and route groups for v3 and v4
-verified: 2026-09-18
+verified: 2026-09-29
 check: IGroupedEndpoint hierarchy matches api/src/Binacle.Net.Kernel/Endpoints/
 also_update:
   - api/kernel
@@ -72,7 +72,7 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
             // ... OpenAPI + produces declarations
     }
 
-    internal async Task<IResult> HandleAsync(
+    internal static async Task<IResult> HandleAsync(
         BindingResult<MyRequest> bindingResult,
         IBinacleService binacleService,
         ILogger<MyEndpoint> logger,

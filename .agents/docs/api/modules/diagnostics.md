@@ -1,8 +1,8 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-09-04
-check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the FeatureOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
+verified: 2026-09-29
+check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
 also_update:
   - api/configuration
 paths:
@@ -68,10 +68,10 @@ this is wired at all** and the path 404s:
 - Health status codes: `Healthy/Degraded → 200`, `Unhealthy → 503`
 - The `RestrictedChecks` allow-list is applied as the map's `Predicate`
 
-This module registers two `FeatureOptions` entries, each with the path it answers on. `DebugEndpoint` is added
+This module registers two `InstanceOptions` entries, each with the path it answers on. `DebugEndpoint` is added
 in the builder phase behind `DEBUG_ENDPOINT`, the same way `SWAGGER_UI` and `SCALAR_UI` do in `Program.cs`.
 `HealthChecks` cannot be, because it is switched on in a config file rather than by a flag — it is bound through
-`AddOptions<FeatureOptions>().Configure<IOptions<HealthCheckConfigurationOptions>>(...)` so it resolves after
+`AddOptions<InstanceOptions>().Configure<IOptions<HealthCheckConfigurationOptions>>(...)` so it resolves after
 build and carries the configured path, whatever it ended up being.
 
 ## Forwarded headers diagnostic
@@ -174,7 +174,7 @@ addresses. The server listens on a dual-mode socket, so an IPv4 caller arrives a
 entry would match without it.
 
 **Behind a proxy this list matches the proxy, not the caller** — it compares `Connection.RemoteIpAddress`, which
-is the proxy's address until forwarded headers resolve it. See [Forwarded headers](../configuration.md#forwarded-headers-forwardedheadersjson).
+is the proxy's address until forwarded headers resolve it. See `$api/configuration` (Forwarded headers).
 
 `RestrictedChecks` is an **allow-list**, not a skip-list. When empty (the default), all checks run.
 When non-empty, ONLY the checks whose name is in the list run — everything else is filtered out.
@@ -218,8 +218,7 @@ Default: **disabled**. Format: NDJSON. Config file: `Config_Files/DiagnosticsMod
 ### How it's wired
 
 The **generic** log pipeline lives in the Kernel — `ILogEntryConvertible<TLog>`, `LogsProcessor<TRequest, TLog>`,
-`LogsProcessorOptions`, and `AddLogProcessor<TChannelRequest, TLog>` (see
-[kernel.md](../kernel.md#logs-generic-pipeline)). The **concrete** packing feature lives here, in one file,
+`LogsProcessorOptions`, and `AddLogProcessor<TChannelRequest, TLog>` (see `$api/kernel`, Logs). The **concrete** packing feature lives here, in one file,
 `DiagnosticsModule/Logs/Models/AlgorithmOperationLogChannelRequest.cs`:
 
 - `AlgorithmOperationLogChannelRequest : ILogEntryConvertible<PackingLogEntry>` — the channel message. Carries

@@ -1,7 +1,7 @@
 ---
 id: api/openapi
 description: OpenAPI wiring — IOpenApiDocument, the Kernel transformers (JWT, 429, response descriptions, enum-as-string), what endpoint groups auto-wire, and the external OpenApiExamples package
-verified: 2026-09-18
+verified: 2026-09-29
 check: IOpenApiDocument, transformers, and OpenApiOptions extensions match api/src/Binacle.Net.Kernel/OpenApi/; group 500 wiring matches v4/ApiV4EndpointGroup.cs; RateLimiterResponseOperationTransformer checks the endpoint metadata only, and RateLimitedEndpointConvention in the ServiceModule is the only thing that attaches it
 also_update:
   - api/v4/add-endpoint

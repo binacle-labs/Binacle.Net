@@ -22,9 +22,7 @@ public class PackPresetBinScenario
 
 	[Theory]
 	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
-	public Task Custom_Problems(string scenario) => RunTest(scenario);
-
-	private async Task RunTest(string scenarioName)
+	public async Task Custom_Problems(string scenarioName)
 	{
 		var scenario = All.GetByName(scenarioName);
 		var url = routePath

@@ -1,7 +1,7 @@
 ---
 id: api/configuration
 description: Config file layout, env-var conventions, override precedence, and feature flag list
-verified: 2026-09-18
+verified: 2026-09-29
 check: The file tree matches api/src/Binacle.Net/Config_Files/ and the AddJsonConfiguration calls in Program.cs; the Cors and ForwardedHeaders keys match their options classes in Configuration/ and the mapping in ExtensionMethods/ForwardedHeadersExtensions.cs; the feature flag table matches every Feature.IsEnabled call site in api/src
 also_update:
   - api/modules/service
@@ -40,8 +40,11 @@ app
     │   └── Serilog.{Environment}.json           optional override
     └── ServiceModule
         ├── ConnectionStrings.json               optional — DB connection strings
+        ├── ConnectionStrings.{Environment}.json optional override
         ├── RateLimiter.json                     required when SERVICE_MODULE=True — rate limiter rules
+        ├── RateLimiter.{Environment}.json       optional override
         ├── JwtAuth.json                         optional — JWT issuer, audience, secret
+        ├── JwtAuth.{Environment}.json           optional override
         ├── Cors.json                            optional — the module's ServiceApi origins; same section as the root Cors.json
         └── Cors.{Environment}.json              optional override
 
@@ -164,7 +167,7 @@ Only include the keys you want to change. The rest come from the base file.
 
 Example: `DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413`
 
-The name must be uppercase. This maps to `ConnectionStrings.<Name>` in the config system.
+The name is uppercased. The variable is read only when `ConnectionStrings.<Name>` is empty in config.
 
 ## Precedence
 

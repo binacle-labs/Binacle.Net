@@ -2,6 +2,7 @@
 description: Two framework defaults on the docs site - code samples had no named mono face (fixed), and wide tables are still clipped rather than scrolled
 state: proposed
 waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
+horizon: undecided
 paths:
   - "sites/docs/**"
 ---

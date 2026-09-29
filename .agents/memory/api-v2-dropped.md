@@ -7,7 +7,7 @@ paths:
   - "api/**"
 ---
 
-`features/new_api_version` drops the v2 API entirely. There is no `api/src/Binacle.Net/v2/`.
+There is no v2 API on this branch and no `api/src/Binacle.Net/v2/`.
 
 **Why:** v4 is a major redesign, and v2 was removed while cleaning up legacy API versions. It is gone from the
 branch, not deprecated in place.

@@ -1,7 +1,7 @@
 ---
 id: api/modules/service
 description: ServiceModule — JWT auth, rate limiting, account/subscription management. Three projects using clean architecture.
-verified: 2026-09-18
+verified: 2026-09-29
 check: Routes, config file names, connection string name, the project reference direction in the three csproj files, every domain enum's values (AccountRole, AccountStatus, SubscriptionType, SubscriptionStatus), the entity base classes, the list endpoints' paging parameters, and the token endpoint's account-state codes match ServiceModule source
 also_update:
   - api/configuration

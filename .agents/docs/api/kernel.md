@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-09-18
+verified: 2026-09-29
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -21,7 +21,7 @@ Replaces the default model binding for endpoint handlers. It does two things in 
 JSON body and run FluentValidation. Handlers always receive a `BindingResult<T>` and call `ValidateAsync()`:
 
 ```csharp
-internal async Task<IResult> HandleAsync(
+internal static async Task<IResult> HandleAsync(
     BindingResult<MyRequest> bindingResult, ...)
 {
     return await bindingResult.ValidateAsync(async request => {
@@ -107,9 +107,12 @@ Used in `Program.cs` to conditionally call `AddServiceModule()` and `AddUIModule
 Flags checked in `Program.cs`: `SERVICE_MODULE`, `UI_MODULE`, `SWAGGER_UI`, `SCALAR_UI`.
 See `$api/modules` for what each flag enables and how modules use them.
 
-## FeatureOptions
+## InstanceOptions
 
-**`Feature.Manager` answers "is this switched on" before the container exists. `FeatureOptions` is the
+`Kernel/Instance/` holds what a running instance reports about itself: the features switched on, and the bin
+presets it loaded.
+
+**`Feature.Manager` answers "is this switched on" before the container exists. `InstanceOptions` is the
 in-container record of what actually got switched on**, and the two are separate on purpose: a flag can be set
 and the feature still not registered.
 
@@ -117,16 +120,22 @@ and the feature still not registered.
 options.AddFeature("SwaggerUI", "/swagger");   // name, and where it answers
 options.IsFeatureEnabled("SwaggerUI");
 options.PathFor("SwaggerUI");                  // null for a feature with no URL
+options.SetPresets(presets);                   // a PresetsValue, filled once at startup
 ```
+
+Every entry is an `InstanceValue`. A feature is a `FeatureValue` - `SwitchedOn`, or `PathValue` when it answers
+at a path. The presets are a `PresetsValue`, which is not a `FeatureValue`, so `EnabledFeatures` and
+`IsFeatureEnabled` never count it. `PresetsValue` holds plain names and ints, because the Kernel does not
+reference `Binacle.Packing`, where the bin interfaces live.
 
 **The path is recorded by whoever switches the feature on**, because some of them are configurable and nothing
 else can know where one ended up — the health check path comes from `HealthChecks.json`, so only the
 DiagnosticsModule can supply it. `AddFeature` is a dictionary write, so registering the same name twice
 replaces rather than duplicates.
 
-The UI module's instance page reads it one feature at a time, through `IsFeatureEnabled` and `PathFor`.
-`SystemHealthCheck` and `/_debug` list the lot: `EnabledFeatures` is the dictionary's key set, in no order, so
-both sort it before printing.
+The UI module's instance page reads it one feature at a time, through `IsFeatureEnabled` and `PathFor`, and
+lists `Presets`. `SystemHealthCheck` and `/_debug` list `EnabledFeatures`, which comes in no order, so both
+sort it before printing.
 
 ## ReservedPathOptions
 
