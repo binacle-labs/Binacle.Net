@@ -3,12 +3,13 @@ description: Session 4 - run the racing bench, keep it as the baseline, and read
 state: blocked
 waits-on: "session 3 - the bench structure (the maintainer, 2026-09-29: 'yes 04 waits on step 3 too')"
 horizon: undecided
-paths: ["lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/CoresSet.cs", "lib/results/benchmarks/**"]
+paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/**", "lib/test/Binacle.Lib.Testing/CoresSet.cs", "lib/results/benchmarks/**"]
 ---
 
 # 4 - The racing drop point
 
-The bench is built: class `Cores_Packing`, recipe `lib-racing-cores`. No run of it is kept yet.
+Session 3 moves the bench into `ParallelAlgorithms`: class `Full_Packing` (was `Cores_Packing`), recipe
+`lib-parallel-algorithms-full`. No run of it is kept yet.
 
 ## Goal
 
@@ -24,13 +25,17 @@ and we decide later".
 
 ## What the session does
 
-1. The maintainer runs `just bench lib-racing-cores precise` - about 3.5 hours.
-2. Keep the report as `lib/results/benchmarks/baseline/racing/Cores_Packing.md` - its first kept run.
+1. The maintainer runs `just bench lib-parallel-algorithms-full precise` - about 3.5 hours.
+2. Keep the report as `lib/results/benchmarks/baseline/parallel-algorithms/Full_Packing.md` - its first kept
+   run.
 3. Read the threshold: where Parallel starts to win, and whether from some point it always wins by a meaningful
    amount - what "meaningful" means is the maintainer's. If there is no such point, say so; do not force one.
 4. Fix the line in the lib findings record on when racing pays.
 
-`parallel-racing.md` is the maintainer's to shape; session 6 builds it.
+**Suggested (agent, 2026-09-29):** run and keep `lib-parallel-algorithms-sample` too. The ladder covers jobs
+smaller than the smallest Bischoff pick, so the drop point may sit there.
+
+`parallel-algorithms.md` is the maintainer's to shape; session 6 builds it.
 
 ## Reading it
 
@@ -39,7 +44,7 @@ This machine is a KVM guest; its CPUs are virtual, and the host decides where th
 ## Done when
 
 - [ ] The precise run is kept.
-      `ls lib/results/benchmarks/baseline/racing/Cores_Packing.md`
+      `ls lib/results/benchmarks/baseline/parallel-algorithms/Full_Packing.md`
 - [ ] The threshold is read out of it, or the report shows there is none, and the lib findings record says
       so - including the fixed line on when racing pays.
       **By eye.**

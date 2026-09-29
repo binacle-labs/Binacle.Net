@@ -137,14 +137,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: measured-results/03-bench-structure.md
-  description: "Session 3 - find the structure of the racing and bins benches - the project names, and which class lives where - before sessions 4 and 5 use them"
+  description: "Session 3 - restructure the parallel benches, first part - the core pinning moves to shared, Racing and the ladder classes become ParallelAlgorithms, Threshold is retired. ParallelBins is session 5's"
   state: ready
-  waits-on: "the maintainer says when - state set by an agent 2026-09-29, strike it if wrong"
+  waits-on: "the maintainer starts it (2026-09-29: 'i wil lspawn the first to restructure common and 4')"
   horizon: undecided
 - file: measured-results/04-racing-drop-point.md
   description: "Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop"
-  state: ready
-  waits-on: "the maintainer says when - state set by an agent 2026-09-28, strike it if wrong"
+  state: blocked
+  waits-on: "session 3 - the bench structure (the maintainer, 2026-09-29: 'yes 04 waits on step 3 too')"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
   description: "Session 5 - find where packing many bins at the same time starts to pay. All pending - bin-set categories from even to real, an item sweep, and a run in stages, each a suggestion"

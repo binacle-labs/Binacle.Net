@@ -3,7 +3,7 @@ description: Session 5 - find where packing many bins at the same time starts to
 state: blocked
 waits-on: "sessions 3 and 4 - the bench structure, and the racing run and what it teaches"
 horizon: undecided
-paths: ["lib/bench/Binacle.Lib.Benchmarks.Threshold/**", "lib/bench/Binacle.Lib.Benchmarks.Racing/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**"]
+paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**", "tooling/bench.just"]
 ---
 
 # 5 - The bins drop point
@@ -22,13 +22,50 @@ the ladder".
 **(the maintainer, 2026-09-29):** this session finds the problems the bins bench runs - "step 5 is finding the
 problems and keep suggestions will reinvestigate".
 
-**Everything else in this file is pending**, kept as suggestions to reinvestigate. The maintainer, 2026-09-29:
+## The bench - picked in session 3
+
+This session builds `lib/bench/Binacle.Lib.Benchmarks.ParallelBins/` - "then the 5th with discovery" (the
+maintainer, 2026-09-29). Session 3 retired the old bins classes ("3 retire"); their kept reports sit in
+`lib/results/benchmarks/baseline/parallel-bins/` as the record. Every class is pinned through `CoreJobs` in
+`shared/test/Binacle.Benchmarking` ("yes common code to shared").
+
+**Leaning yes (the maintainer, 2026-09-29):** one class per bin-set category, and one recipe that takes the
+category. "i think so". A class each, because BenchmarkDotNet's `--filter` picks classes and methods, not
+parameter values; one class could not run one stage alone.
+
+**Suggested (agent, 2026-09-29)**, shown to the maintainer:
+
+```
+lib/bench/Binacle.Lib.Benchmarks.ParallelBins/
+  Program.cs
+  BinSetBase.cs        the Loop and Parallel rows, the item sweep, the bin counts
+  Even_Packing.cs, Similar_Packing.cs, Uneven_Packing.cs, SimilarTooSmall_Packing.cs,
+  UnevenTooSmall_Packing.cs, NothingFits_Packing.cs, OneHeavy_Packing.cs, Real_Packing.cs
+  README.md
+```
+
+```just
+# Loop against Parallel on one bin-set category, FFD, v2
+[arg('category', pattern='even|similar|uneven|similartoosmall|uneventoosmall|nothingfits|oneheavy|real')]
+[arg('mode', pattern='|quick')]
+lib-parallel-bins category mode='':
+    ...
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelBins -- --job "$job" --filter '*.{{ category }}_*'
+```
+
+- The lowercase word assumes `--filter` ignores case; unchecked. If not, the recipe takes `Even`. The
+  maintainer, 2026-09-29: "ok dont care".
+- `similar` does not catch `SimilarTooSmall_` - the underscore stops it.
+- **How the recipe picks the cores is this session's to find.** The maintainer, 2026-09-29: "that is left to the
+  session when it makes i dont know yet". The stages below run 2 and 12 first, 4 and 8 only where they disagree.
+
+**Past this section, everything in this file is pending**, kept as suggestions to reinvestigate. The maintainer, 2026-09-29:
 "reword the plans as not decided but pending and just as suggestion".
 
 ## What the session does - suggested
 
 1. Go through the categories, the item sweep and the stages below with the maintainer. Each is pending.
-2. Build the bins bench, pinned as the racing bench is.
+2. Build `ParallelBins` and its recipe, pinned.
 3. The maintainer runs stage A. The session reads it. He says whether the next stage runs.
 4. Read the drop point, or say there is none.
 
@@ -123,9 +160,8 @@ The grid: FFD, v2, packing, loop against parallel. Items 4, 8, 16, 32, 64, 128. 
   worked out.
 - **Fitting.** This covers packing only. Fitting stops at the first item that does not fit, so its work varies by
   bin even more. If the bins processor also fits, that is its own drop point.
-- **Does the new bins class replace the old bins classes and their kept reports?** The maintainer asked on
-  2026-09-28 why the threshold bench changes, and whether the new is added to the old. The old are
-  `Smoke_Bins_Packing`, `Sample_Bins_Packing`, `Full_Bins_Packing_v1` and `Full_Bins_Packing_v2`.
+- **The multi-bin `Best` routes run `LoopMultiAlgorithmBinProcessor`**; its parallel twin is benched nowhere.
+  Whether it belongs in `ParallelBins` is open.
 
 ## Candidates for the Real set - suggested (agent, 2026-09-28), pending
 
@@ -159,6 +195,6 @@ list against several boxes, so each needs a box set as well.
 ## Done when
 
 - [ ] The bins bench runs the stages the maintainer picked, and he has run them and kept the reports.
-      **By eye.** A report of the new class under `lib/results/benchmarks/*/threshold/`.
+      **By eye.** A report of a new class under `lib/results/benchmarks/*/parallel-bins/`.
 - [ ] The drop point is read out of it, or the report shows there is none, and the lib findings record says so.
       **By eye.**

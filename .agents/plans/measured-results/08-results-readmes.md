@@ -25,10 +25,10 @@ them". Every number in it names the file it came from - leaning yes ("perhaps th
 Combinations seen so far, lib:
 
 - fill bought against time paid, per option - `packing-efficiency-stats.md`, `algorithm-performance.md`,
-  `parallel-racing.md`
+  `parallel-algorithms.md`
 - the pick is not worth optimizing: the slowest pick against the fastest pack - `result-selection.md`,
   `algorithm-performance.md`
-- what a cost function can use - `packing-time-by-size.md`, `scaling.md`, `parallel-racing.md`, `parallel-bins.md`
+- what a cost function can use - `packing-time-by-size.md`, `scaling.md`, `parallel-algorithms.md`, `parallel-bins.md`
 - whether the direction is sound - the two version files, `packing-efficiency-stats.md`
 
 Combinations seen so far, ViPaq:

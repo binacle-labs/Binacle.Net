@@ -14,7 +14,7 @@ The files in `lib/results/` are placeholders. Above each table a comment is its 
 raw file it reads, its rows, its columns, how a number is made. Under it, a sample table with fake numbers shows
 the shape. The maintainer reviews the shapes before any number goes in.
 
-`parallel-racing.md` and `parallel-bins.md` do not exist yet. They read the kept runs of sessions 4 and 5. The
+`parallel-algorithms.md` and `parallel-bins.md` do not exist yet. They read the kept runs of sessions 4 and 5. The
 maintainer shapes them from those runs; then they are built like the rest.
 
 ## Goal
@@ -120,9 +120,9 @@ problems, v1 against v2, packing and fitting - is in the same folder as `Full_<a
 v2/v1 story over the whole suite instead of one synthetic case, so the story's speed numbers come from there
 and the smoke case is only the bridge back to the November table. It ran at the **short** job (3 iterations),
 so a single problem's mean is rough; an average over 700 is not. Some of its BFD times are slow processes, and
-are not retaken. Beside it, `baseline/threshold/Full_*` holds
-the parallel numbers, already read out in the lib findings record - the story does not need to re-derive
-them.
+are not retaken. Beside it, the old threshold `Full_*` reports - moved to `baseline/parallel-algorithms/` and
+`baseline/parallel-bins/` in session 3 - hold the parallel numbers, already read out in the lib findings record.
+The story does not need to re-derive them.
 
 ## Not in this plan
 
@@ -136,7 +136,7 @@ them.
       **By eye.** His yes for each file, quoted and dated, in this file.
 - [ ] Every lib results file has real numbers, filled by hand, and its words and gaps are written from them.
       `! grep -l "is fake" lib/results/*.md`, then **by eye**.
-- [ ] `parallel-racing.md` and `parallel-bins.md` exist in the shape the maintainer gave.
-      `ls lib/results/parallel-racing.md lib/results/parallel-bins.md`
+- [ ] `parallel-algorithms.md` and `parallel-bins.md` exist in the shape the maintainer gave.
+      `ls lib/results/parallel-algorithms.md lib/results/parallel-bins.md`
 - [ ] The old numbers above are used to check the new ones, or dropped with a reason.
       **By eye.**

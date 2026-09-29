@@ -66,9 +66,9 @@ Every line here quotes the maintainer.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 3 | [03-bench-structure](measured-results/03-bench-structure.md) | find the structure of the racing and bins benches ("step 3 is finding the structure for both 4 and 5", 2026-09-29) | **by eye** - the maintainer's pick quoted in the file |
-| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run the racing bench, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/racing/Cores_Packing.md` |
-| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | find the problems for the bins bench, build and run it, read the bins parallelisation threshold | **by eye** - a kept run of the new bins class under `lib/results/benchmarks/` |
+| 3 | [03-bench-structure](measured-results/03-bench-structure.md) | move the core pinning to shared, build `ParallelAlgorithms` from Racing and the ladder classes, retire Threshold ("commen then the 1st to completion then the 5th with discovery", 2026-09-29) | `test ! -d lib/bench/Binacle.Lib.Benchmarks.Threshold && ls lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms` |
+| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run `ParallelAlgorithms`, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Full_Packing.md` |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | find the problems for the bins bench, build `ParallelBins` and run it, read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
