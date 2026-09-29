@@ -83,7 +83,7 @@ lib-parallel-algorithms-full mode='':
 lib-parallel-algorithms-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# Loop against Parallel, FFD v2, identical bins and items, every item fits: 1 to 16 bins x 8 to 256 items x 2, 4, 8, 12 cores: time not measured yet; `dry` runs each case once
+# Loop against Parallel, FFD v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: time not measured yet; `dry` runs each case once
 [arg('mode', pattern='|dry')]
 lib-parallel-bins-even mode='':
     #!/usr/bin/env bash

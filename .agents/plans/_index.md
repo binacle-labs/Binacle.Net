@@ -144,7 +144,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/05-bins-drop-point.md
   description: "Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions"
   state: ready
-  waits-on: "session 4's racing run would teach it; the maintainer starts 5 anyway (2026-09-30: 'i will open a session to do #5')"
+  waits-on: "the maintainer runs lib-parallel-bins-even - built 2026-09-30, not run"
   horizon: undecided
 - file: measured-results/06-lib-results.md
   description: "Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included"

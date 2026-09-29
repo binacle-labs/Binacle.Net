@@ -1,12 +1,31 @@
 ---
 description: Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions
 state: ready
-waits-on: "session 4's racing run would teach it; the maintainer starts 5 anyway (2026-09-30: 'i will open a session to do #5')"
+waits-on: "the maintainer runs lib-parallel-bins-even - built 2026-09-30, not run"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**", "tooling/bench.just"]
 ---
 
 # 5 - The bins drop point
+
+## Start here
+
+The last session ended 2026-09-30 with step 1 of "The steps" built and not run. The next session:
+
+1. Asks the maintainer to run, in this order, and waits - nothing else runs meanwhile:
+   - `just bench lib-parallel-bins-even dry` - each case once. It fails if any bin is not fully packed; if it does,
+     fix the sizes in `EvenBase` before the real run.
+   - `just bench lib-parallel-bins-even` - the real run, short job. About 570 cases; its time is not measured -
+     ask him how long it took and put it in the recipe's comment in `tooling/bench.just`.
+2. Keeps the reports by hand: from the project's `BenchmarkDotNet.Artifacts/results/` into
+   `lib/results/benchmarks/baseline/parallel-bins/`, with a row each in that folder's README - the first kept run
+   of each class.
+3. Reads them with the maintainer:
+   - Does Loop grow in step with the bins?
+   - What does Parallel cost on its own? Read the 2-bin row, not the 1-bin one.
+   - Where does Parallel start to win, on each core count?
+   - Is `Even_Lines_Packing` flat across lines? If so, the rule should get pieces, not lines.
+4. Picks the next step with him from "The steps" - each is built only after the one before has run.
 
 ## Goal
 
@@ -29,10 +48,12 @@ maintainer, 2026-09-29). Session 3 retired the old bins classes ("3 retire"); th
 (in git at commit 59e9dfb3, `lib/results/benchmarks/baseline/threshold/`). Every class is pinned through `CoreJobs` in
 `shared/test/Binacle.Benchmarking` ("yes common code to shared").
 
-The project has one class, `Even_Packing`: identical bins `160x120x80`, one line of `20x15x10` items, FFD v2,
-Loop against Parallel. Bins 1, 2, 4, 8, 16; pieces 8 to 256; all four core counts `CoreJobs` has. Recipe
-`lib-parallel-bins-even`, `dry` to check first. Its setup throws if any bin is not fully packed. The maintainer,
-2026-09-30: "yes make sure they always pack everything fully meaning 256 item fit int box". The other classes
+The project has `EvenBase` and two classes on it: identical bins `160x120x80`, `20x15x10` items, FFD v2, Loop
+against Parallel, all four core counts `CoreJobs` has. `Even_Packing`: bins 1 to 32, pieces 1 to 256, one line.
+`Even_Lines_Packing`: 4 bins, 64 and 256 pieces over 1, 4, 16 or 64 lines. Recipe `lib-parallel-bins-even` runs
+both, `dry` to check first. Setup throws if any bin is not fully packed. The maintainer, 2026-09-30: "yes make
+sure they always pack everything fully meaning 256 item fit int box", and on the bigger grid: "add them then i
+run it". The other classes
 were removed - "remove the classes we havent decided anything". Not run yet.
 
 `LadderGenerator.GetBins` in `lib/test/Binacle.Lib.Testing/` lost its last caller with the old bins classes.
@@ -53,15 +74,48 @@ count". Items count is the item lines; flattened count is read here as the piece
 derive the rest". Start with the ideal case, identical bins and identical items - "we can start with idea
 scenario identical bins nad items?". The other categories are to be reviewed - "we havent figured out the rest".
 
+**(the maintainer, 2026-09-30):** one step at a time - "i say we measure 1 step at a time and build the next...
+perhaps we can get some insight so prioritize them by what they need to run before them". Each step is built only
+after the one before it has run.
+
 **Past this section, everything in this file is pending**, kept as suggestions to reinvestigate. The maintainer, 2026-09-29:
 "reword the plans as not decided but pending and just as suggestion".
 
-## Next
+## The steps, in the order the work needs - suggested (agent, 2026-09-30), pending
 
-1. The maintainer runs `just bench lib-parallel-bins-even dry`, then `just bench lib-parallel-bins-even`.
-2. Read it: does Loop grow with the bins, what Parallel costs on its own, where Parallel starts to win on each
-   core count.
-3. Pick the next categories from what it shows.
+Ordered by what each needs measured before it. From the review below.
+
+**1. Even** - needs nothing. Built, not run.
+- Answers: what Parallel costs on its own, and the fastest a bin can pack.
+- Read it from the 2-bin row, not the 1-bin row: with one bin `Parallel.For` runs on the calling thread.
+- Bins 24 and 32, pieces 1, 2 and 4, and the lines run were added before it ran - "add them then i run it"
+  (the maintainer, 2026-09-30).
+- Its box is an exact multiple of the item, so every piece takes the first free space. Its time per piece is the
+  lowest any request can have - never read a piece count off it.
+- Run: `just bench lib-parallel-bins-even dry`, then `just bench lib-parallel-bins-even`.
+
+**2. Fit run** - needs 1, to compare against the floor.
+- Identical bins where none, 10%, 50%, 90% and all of the items fit. One row set with fitting as well as packing.
+- The bin must not be an exact multiple of the item, or pieces that do not fit cost nothing.
+- Answers: time per piece for each kind of fit. The 90% bin should be the slow one.
+
+**3. MixedItems** - needs 1. Can run beside 2.
+- Identical bins, several item shapes, fill kept about half to two-thirds - the bin grows with the pieces here.
+- One main shape plus a few others, or 3 to 20 shapes like Bischoff.
+- Answers: how far real time per piece sits above Even. Mixed shapes leave slivers every later piece scans past.
+
+**4. Spread** - needs 2 and 3. Built from their times.
+- Bins whose times differ by a known amount, up to one bin doing most of the work.
+- Answers: does "Loop is the sum, Parallel is setup plus the slowest bin" hold. If it does, the rule can be drafted.
+
+**5. ShopRange** - needs 4, a drafted rule to check.
+- 3, 5 and 8 boxes that nest, spaced like the DHL range; the largest fits everything.
+- Answers: does the rule hold on the request shape shops send.
+
+**6. Real** - needs 5.
+- The demo samples and presets. Scores the rule, never tunes it.
+
+**Late checks** - need the machine part from 1 to 4: a BFD row, a multi-algorithm row.
 
 `parallel-bins.md` is the maintainer's to shape; session 6 builds it.
 
@@ -241,6 +295,90 @@ The session's pick: FitsSomeMix, ShopRange, MixedItems.
 - **New:** the largest bin count real requests carry.
 - **New:** short job to find the drop point, default only to confirm?
 - **New:** may the rule do a cheap check first - bin volume against item volume - to guess fit and spread?
+
+## Review of the suggestions - agent, 2026-09-30, pending
+
+Read-only review with research. Everything here is its suggestion.
+
+### Categories
+
+- **Even** - keep. The machine part, and the best case for Parallel.
+- **VariedItems, MixedItems, the old 2:1:1 items** - merge into MixedItems. Even is the floor; mixed shapes are
+  the real cost per piece.
+- **Uneven, OneHeavy, Spread, FitsSomeMix, FitsNoneMix** - merge into Spread. Past Even, the only thing that hurts
+  Parallel is one bin taking much longer than the rest; all five sit on that one scale. Why not as first
+  written: a "known amount" of spread cannot be set before the time per bin is known.
+- **Similar** - drop. Close sizes where all fit give about the same work: Even with a little spread.
+- **SimilarTooSmall, UnevenTooSmall, OneBigItem** - merge into ShopRange. A real box range already has them.
+- **ShopRange** - keep. It is what the presets, demo samples and shops look like.
+- **NothingFits** - a row of the fit run, not a class. Cheap and easy to predict: its space list stays at one.
+- **ManyBins, TinyRequest** - more values of Even, not classes.
+- **Real** - keep, changed. No real request in the repo has several bins and many items: all 700 Bischoff
+  problems use one container, `587x233x220`. Pairing them with shop boxes is made up. Use the demo samples and
+  presets.
+
+### Items and bin size
+
+- **One shape, one bin for every step** - keep for Even. How full the bin is does not change Even's time.
+- **Lines run** - values of Even's `Lines`, not a stage. FFD v2 uses lines only in its constructor.
+- **Fit run** - keep, with 10%, 50% and 90%, and a bin that is not an exact multiple. A bin that fits most
+  items is slow; one that fits few is cheap.
+- **A bin that grows with the pieces** - drop for Even, keep for MixedItems, where slivers depend on the fill.
+
+### Layout and run order
+
+- **Eight classes** - drop. Four or five are enough. One recipe that takes the category - keep, once a second
+  class exists; pull a base class out then, not before.
+- **Stages A to E** - drop; built on the old category list.
+- **Cores 2 and 12 first** - needs a `CoreJobs` change. Not needed now: Even is 240 cases on the short job.
+- **BFD check** - keep, late. BFD v2 re-sorts the space list on every try, so its time per piece grows faster.
+
+### Open questions - its answers
+
+- **16 bins or 8?** 16, and add 32. Real ranges have 5 to 10 boxes.
+- **Does bin size change the work when all fit?** Not for identical items in an exact grid. It does for mixed
+  items, through slivers.
+- **Do too-small bins act like fewer bins?** Fitting: nearly - `Execute` returns at once when the items' volume
+  is more than the bin's, or an item is longer than its longest side. Packing: no - a bin that fits most items
+  can be the slowest.
+- **Must the bin sets grow with the items?** For ShopRange and MixedItems, yes. Check in setup that the largest
+  bin fits everything.
+- **Fitting?** One row set in the fit run before deciding it needs its own rule. Its early exits likely favour
+  Loop.
+- **The multi-algorithm route?** Later, one check row. Same machine rule, more time per bin.
+- **Should the rule get pieces?** Yes, from the code: 1 line of 500 and 1 line of 5 look the same to `Create`
+  today. Changing its signature is the maintainer's call.
+- **Short job to find, default to confirm?** Yes.
+- **A cheap volume check first?** Yes. It counts the bins clearly too small. It cannot predict how slow a
+  part-fit bin is.
+
+### Research
+
+- Demo samples: 1 to 5 bins, 2 to 24 pieces (one has 92), largest to smallest bin volume usually 2 to 9 times.
+  Usually only the largest fits everything. `shared/data/demo-samples/*.json`.
+- Presets: 3 bins each, one footprint with growing height, or cubes 10, 20, 30.
+  `api/src/Binacle.Net/Config_Files/Presets.json`.
+- Custom problems use the 60x40 footprint family, `shared/data/custom-problems/*.json`. The Bischoff suite is
+  one container, `shared/data/bischoff-suite/`.
+- Monaci: 3 or 5 bin types, sizes within 1.5 to 2.5 times.
+  https://www.researchgate.net/publication/222384866_Heuristics_for_the_variable_sized_bin-packing_problem
+- Pisinger and Sigurd: 5 bin types, each side from half to full, one type forced to full size so a solution
+  exists. https://www.sciencedirect.com/science/article/pii/S1572528605000216
+- Martello, Pisinger and Vigo: identical bins; most classes are one main item shape plus others.
+  https://hjemmesider.diku.dk/~pisinger/codes.html
+- Ivancic: 47 instances with one container type, 17 with 2 or 3 types.
+  https://eprints.soton.ac.uk/364226/1/A_20Comparative_20Review_20of_203D_20Container_20Loading_20Algorithms.pdf
+- Shops use 5 to 10 box sizes, 8 is common.
+  https://hub.shipium.com/playbook/how-to-decide-packaging-options-and-sizes-per-fulfillment-center/
+- DHL Express boxes 1 to 8: about 1 to 98 litres, neighbours 1.3 to 3 times apart, the first three flat.
+  https://www.easyship.com/blog/dhl-boxes-101
+
+### Unsure
+
+- Every cost claim is read from the code, not measured.
+- In Even, memory and garbage collection may cost more than the scan, and threads may compete for them.
+- The Crainic, Perboli and Tadei papers and the Ivancic multi-type instances could not be opened.
+- The shop numbers come from vendor blogs, not studies.
 
 ## Candidates for the Real set - suggested (agent, 2026-09-28), pending
 
