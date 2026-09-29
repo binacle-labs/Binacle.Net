@@ -139,7 +139,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: measured-results/04-racing-drop-point.md
   description: "Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop"
   state: ready
-  waits-on: "the maintainer runs the full bench"
+  waits-on: "the maintainer picks between the analysis below and the full run as it stands"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
   description: "Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions"
