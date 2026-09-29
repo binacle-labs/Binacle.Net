@@ -1,4 +1,4 @@
-namespace Binacle.Lib.Benchmarks.Racing;
+namespace Binacle.Lib.Benchmarks.ParallelAlgorithms;
 
 internal class Program
 {

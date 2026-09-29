@@ -5,8 +5,8 @@
 #   just bench lib-algorithms-sample quick   sample: the default job; `quick` runs the short one
 #   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
-# The tier is the class name's first word: Smoke_, Sample_, Full_, and Cores_ for racing. Result selection and
-# scaling have one tier and run every class.
+# The tier is the class name's first word: Smoke_, Sample_, Full_. Result selection and scaling have one tier
+# and run every class.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
 # class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
 # - baseline/ instead when it is that class's first kept run. <slice>/results/benchmarks/README.md says what
@@ -53,51 +53,35 @@ lib-algorithms-full mode='':
 lib-algorithms-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Algorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# Loop against Parallel for both sets and each algorithm alone, v2, the picked problems x 2, 4, 8, 12 cores: about 70 minutes; `precise` about 3.5 hours
-[arg('mode', pattern='|precise')]
-[confirm('lib-racing-cores: about 70 minutes (precise: about 3.5 hours). Run?')]
-lib-racing-cores mode='':
-    #!/usr/bin/env bash
-    set -euo pipefail
+# Loop against Parallel for both sets, v2, ladder 3, 47, 67, 79 x 2, 4, 8, 12 cores: time not measured yet
+lib-parallel-algorithms-smoke: (lib-parallel-algorithms-run 'short' 'Smoke')
 
-    job=short
-    if [ "{{ mode }}" = precise ]; then job=default; fi
-
-    just bench lib-racing-run "$job" Cores
-
-[private]
-lib-racing-run job tier:
-    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Racing -- --job {{ job }} --filter '*.{{ tier }}_*'
-
-# Loop against Parallel at four item counts, both sets; and over bins 2, 3, 7 for FFD and BFD: about 8 minutes
-lib-threshold-smoke: (lib-threshold-run 'short' 'Smoke')
-
-# The whole item ladder for the sets, and bins 1-7 at three item counts: about 11 minutes with `quick`
+# Loop against Parallel for both sets, v2, the whole ladder x 2, 4, 8, 12 cores: time not measured yet
 [arg('mode', pattern='|quick')]
-lib-threshold-sample mode='':
+lib-parallel-algorithms-sample mode='':
     #!/usr/bin/env bash
     set -euo pipefail
 
     job=default
     if [ "{{ mode }}" = quick ]; then job=short; fi
 
-    just bench lib-threshold-run "$job" Sample
+    just bench lib-parallel-algorithms-run "$job" Sample
 
-# v1 and v2 over the whole ladder and bins 1-7: about 1 hour; `precise` about 5
+# Loop against Parallel for both sets and each algorithm alone, v2, the picked problems x 2, 4, 8, 12 cores: about 70 minutes; `precise` about 3.5 hours
 [arg('mode', pattern='|precise')]
-[confirm('lib-threshold-full: about 1 hour (precise: about 5). Run?')]
-lib-threshold-full mode='':
+[confirm('lib-parallel-algorithms-full: about 70 minutes (precise: about 3.5 hours). Run?')]
+lib-parallel-algorithms-full mode='':
     #!/usr/bin/env bash
     set -euo pipefail
 
     job=short
     if [ "{{ mode }}" = precise ]; then job=default; fi
 
-    just bench lib-threshold-run "$job" Full
+    just bench lib-parallel-algorithms-run "$job" Full
 
 [private]
-lib-threshold-run job tier:
-    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Threshold -- --job {{ job }} --filter '*.{{ tier }}_*'
+lib-parallel-algorithms-run job tier:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: about 3 minutes. Its one tier
 lib-result-selection: (lib-result-selection-run 'short')

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Binacle.Lib.Benchmarks.Racing;
+namespace Binacle.Benchmarking;
 
 // Runs inside the benchmark process. On Linux, BDN's pin reaches only the main thread; threads the runtime
 // started before it keep every CPU. New threads copy the mask of the thread that starts them.
@@ -12,7 +12,7 @@ public static class CorePinning
 	public static void PinAndCheck()
 	{
 		var count = int.Parse(Environment.GetEnvironmentVariable("DOTNET_PROCESSOR_COUNT")
-			?? throw new InvalidOperationException("DOTNET_PROCESSOR_COUNT is not set. Run this class through the racing Program."));
+			?? throw new InvalidOperationException("DOTNET_PROCESSOR_COUNT is not set. Run this class through a Program that uses CoreJobs."));
 		var mask = (1UL << count) - 1;
 
 		if (!OperatingSystem.IsLinux())

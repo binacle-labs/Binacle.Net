@@ -342,8 +342,8 @@ just bench lib-algorithms-full precise   # full: hours, asks first; the short jo
 Three tiers. **Smoke** checks nothing broke, in minutes. **Sample** is the run to read, up to about an hour;
 where it runs long it takes `quick`. **Full** runs for hours, asks before it starts, and takes `precise` for
 the default job. The tier is the first word of the class name - `Smoke_`, `Sample_`, `Full_` - and the recipe
-picks it with `--filter`. Result selection and scaling have one recipe and no tiers, and run every class. Racing
-has one tier of its own, `Cores_`: every case on 2, 4, 8 and 12 cores, run like a full tier. A run that times
+picks it with `--filter`. Result selection and scaling have one recipe and no tiers, and run every class. Every
+`lib-parallel-algorithms-` case runs once per pinned core count. A run that times
 nothing, or has a failed case, exits 1.
 
 

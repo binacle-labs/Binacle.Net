@@ -1,9 +1,9 @@
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
 
-namespace Binacle.Lib.Benchmarks.Threshold;
+namespace Binacle.Lib.Benchmarks.ParallelAlgorithms;
 
-public abstract class AlgorithmsBase
+public abstract class LadderBase
 {
 	private LoopAlgorithmProcessor loop = null!;
 	private ParallelAlgorithmProcessor parallel = null!;
@@ -22,6 +22,8 @@ public abstract class AlgorithmsBase
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
+		CorePinning.PinAndCheck();
+
 		var algorithms = this.Set.Split(',').Select(Enum.Parse<Algorithm>).ToArray();
 		this.loop = new LoopAlgorithmProcessor(algorithms, this.AlgorithmFactory);
 		this.parallel = new ParallelAlgorithmProcessor(algorithms, this.AlgorithmFactory);

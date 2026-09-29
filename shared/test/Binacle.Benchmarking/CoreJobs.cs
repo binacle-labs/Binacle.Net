@@ -5,7 +5,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace Binacle.Lib.Benchmarks.Racing;
+namespace Binacle.Benchmarking;
 
 // One job per core count, each pinned to the first N CPUs.
 public static class CoreJobs

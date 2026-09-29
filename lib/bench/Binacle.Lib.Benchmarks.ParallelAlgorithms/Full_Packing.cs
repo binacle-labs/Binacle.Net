@@ -1,12 +1,12 @@
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
 
-namespace Binacle.Lib.Benchmarks.Racing;
+namespace Binacle.Lib.Benchmarks.ParallelAlgorithms;
 
 // The two races, and each algorithm alone, on every core count in CoreJobs. The category is the row's block: each
 // race has its own Loop baseline, and the alone rows have none.
 [MemoryDiagnoser]
-public class Cores_Packing
+public class Full_Packing
 {
 	private const string TwoAlgorithms = "FFD,BFD";
 	private const string ThreeAlgorithms = "FFD,WFD,BFD";
