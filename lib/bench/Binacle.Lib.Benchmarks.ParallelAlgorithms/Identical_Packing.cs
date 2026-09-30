@@ -6,7 +6,7 @@ namespace Binacle.Lib.Benchmarks.ParallelAlgorithms;
 // The two races, and each algorithm alone, on every core count in CoreJobs. The category is the row's block: each
 // race has its own Loop baseline, and the alone rows have none.
 [MemoryDiagnoser]
-public class Full_Packing
+public class Identical_Packing
 {
 	private const string TwoAlgorithms = "FFD,BFD";
 	private const string ThreeAlgorithms = "FFD,WFD,BFD";
@@ -20,10 +20,11 @@ public class Full_Packing
 	private IAlgorithmProcessor ffd = null!;
 	private IAlgorithmProcessor wfd = null!;
 	private IAlgorithmProcessor bfd = null!;
-	private Scenario? scenario;
+	private ScenarioBin bin = null!;
+	private List<ScenarioItem> items = null!;
 
-	[ParamsSource(typeof(CoresSet), nameof(CoresSet.Names))]
-	public string ScenarioName { get; set; } = null!;
+	[Params(1, 2, 4, 8, 16, 32, 64, 128, 256)]
+	public int Pieces { get; set; }
 
 	[GlobalSetup]
 	public void GlobalSetup()
@@ -42,7 +43,13 @@ public class Full_Packing
 		this.wfd = new LoopAlgorithmProcessor([Algorithm.WFD], this.algorithmFactory);
 		this.bfd = new LoopAlgorithmProcessor([Algorithm.BFD], this.algorithmFactory);
 
-		this.scenario = CoresSet.GetByName(this.ScenarioName);
+		this.bin = IdenticalCase.Bin();
+		this.items = IdenticalCase.Items(this.Pieces);
+
+		var results = this.Run(this.loopThree);
+		if (results.Count != three.Length
+			|| results.Values.Any(result => result.Status != OperationResultStatus.FullyPacked))
+			throw new InvalidOperationException($"{this.Pieces} items do not all fit in {IdenticalCase.BinSize}.");
 	}
 
 	[Benchmark(Baseline = true)]
@@ -89,7 +96,7 @@ public class Full_Packing
 
 	private IDictionary<string, OperationResult> Run(IAlgorithmProcessor processor)
 		=> processor.Process(
-			this.scenario!.Bin,
-			this.scenario.Items,
+			this.bin,
+			this.items,
 			new TestOperationParameters { Operation = AlgorithmOperation.Packing });
 }

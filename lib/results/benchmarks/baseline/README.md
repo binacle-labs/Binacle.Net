@@ -37,8 +37,9 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Full_WFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Packing.md` | `just bench lib-algorithms-full` | short | 1,400 |
 | `algorithms/Full_BFD_Fitting.md` | `just bench lib-algorithms-full` | short | 1,400 |
-| `parallel-algorithms/Smoke_Packing.md` | `just bench lib-parallel-algorithms-smoke` | short | 64 |
-| `parallel-algorithms/Sample_Packing.md` | `just bench lib-parallel-algorithms-sample` | default | 88 |
+| `parallel-algorithms/Identical_Packing.md` | `just bench lib-parallel-algorithms-identical` | short | 252 |
+| `parallel-bins/Identical_FFD_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short | 504 |
+| `parallel-bins/Identical_FFD_Lines_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short | 64 |
 | `scaling/Sample_Packing.md` | `just bench lib-scaling` | default | 66 |
 | `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
 | `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |

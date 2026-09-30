@@ -247,15 +247,18 @@ question under `<slice>/bench/`, one recipe per project and tier:
 
 ```bash
 just bench                               # the list, in tier order, each recipe with its cost
-just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also lib-parallel-algorithms-, vipaq-smoke
-just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also lib-parallel-algorithms-, vipaq-sample
-just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default; also lib-parallel-algorithms-full
+just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also vipaq-smoke
+just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also vipaq-sample
+just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default
 just bench lib-result-selection          # about 3 minutes; its one tier
 just bench lib-scaling quick             # the item ladder, about 20 minutes: default job, `quick` for short; its one tier
+just bench lib-parallel-algorithms-identical dry   # Loop against Parallel on one bin; `dry` runs each case once
+just bench lib-parallel-bins-identical FFD dry     # the same on many bins; also WFD and BFD
 ```
 
-The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`, and racing's `Cores_`), picked with
-`--filter`; result selection and scaling have one tier and run every class. A run that times nothing or has a
+The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with
+`--filter`; result selection and scaling have one tier and run every class; the parallel projects run their
+`Identical_` classes. A run that times nothing or has a
 failed case exits 1.
 
 ## Run the image

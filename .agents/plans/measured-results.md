@@ -66,13 +66,13 @@ Every line here quotes the maintainer.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | run `ParallelAlgorithms`, keep it, read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Full_Packing.md` |
-| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | find the problems for the bins bench, build `ParallelBins` and run it, read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
+| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | `ParallelAlgorithms`: rebuild to `Identical_Packing` only, same bin and items as `ParallelBins`; add and try; read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Identical_Packing.md` |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | `ParallelBins`: add and try, starting with `Identical`, one class per algorithm, FFD first; read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
 
-The order comes from the work. The results files read the kept runs, racing and bins included. The READMEs
+The order comes from the work. The results files read the kept runs, `ParallelAlgorithms` and `ParallelBins` included. The READMEs
 read the results files. The sessions keep their numbers 4 to 8.
 
 **Slow processes are not chased here** (the maintainer, 2026-09-28: "we wont chase that now its too much").
@@ -85,7 +85,7 @@ the boost from pgo-off but not as much", 2026-09-29).
 
 ## Done when
 
-- [ ] Every bench class has a kept run in `baseline/`, the bins bench included once it is built.
+- [ ] Every bench class has a kept run in `baseline/`, `ParallelBins` included.
       **By eye.** Each class under `lib/bench/` and `vipaq/bench/` has a report under
       `<slice>/results/benchmarks/baseline/`.
 - [ ] Every measure has written its file.

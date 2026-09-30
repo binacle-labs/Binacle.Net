@@ -137,14 +137,14 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: measured-results/04-racing-drop-point.md
-  description: "Session 4 - run the racing bench, keep it as the baseline, and read the algorithm parallelisation threshold - when racing algorithms on one bin in parallel beats a loop"
+  description: "Session 4 - ParallelAlgorithms - find when racing algorithms on one bin in parallel beats a loop. Add and try, one class at a time, starting with the same bin and items as ParallelBins"
   state: ready
-  waits-on: "the maintainer picks between the analysis below and the full run as it stands"
+  waits-on: "the maintainer reads the first runs and picks the next class"
   horizon: undecided
 - file: measured-results/05-bins-drop-point.md
-  description: "Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions"
+  description: "Session 5 - ParallelBins - find where packing many bins at the same time starts to pay. Add and try, starting with Identical - one class per algorithm, FFD run first; the other categories are pending suggestions"
   state: ready
-  waits-on: "the maintainer runs lib-parallel-bins-even - built 2026-09-30, not run"
+  waits-on: "the maintainer reads the FFD runs; WFD and BFD are not run yet"
   horizon: undecided
 - file: measured-results/06-lib-results.md
   description: "Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included"

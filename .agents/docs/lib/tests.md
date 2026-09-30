@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-09-29
+verified: 2026-10-01
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -31,7 +31,8 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.UnitTests` | xUnit | `just test cs_binacle-lib_unit` |
 | `Binacle.Lib.PackingEfficiency` (`lib/measure/`) | console host (writes markdown reports) | `just measure lib` |
 | `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms-smoke`, `-sample`, `-full` |
-| `Binacle.Lib.Benchmarks.ParallelAlgorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-algorithms-smoke`, `-sample`, `-full` |
+| `Binacle.Lib.Benchmarks.ParallelAlgorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-algorithms-identical` |
+| `Binacle.Lib.Benchmarks.ParallelBins` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-bins-identical FFD` (or `WFD`, `BFD`) |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
 | `Binacle.Lib.Benchmarks.Scaling` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-scaling` |
 
@@ -54,10 +55,11 @@ it constructs the internal algorithm classes.
   the volume and count totals they compare against.
 - The benchmark picks, at the project root, each answering `Names` and `GetByName(name)`: `SmokeSet` (the
   smoke scenarios by name: `full bin, one type`, `small order`, `typical container`, `many item types`),
-  `SampleSet` (picked Bischoff problems, name `<category> (<id>)`), `CoresSet` (Bischoff problems spread by FFD+BFD time, name `<problem> (<items>i/<types>t)`,
-  e.g. `th1_72 (74i/3t)`).
+  `SampleSet` (picked Bischoff problems, name `<category> (<id>)`).
 - The generators beside them, which build rather than pick: `CubeGenerator` (one cube baseline, `GetBaseline`)
-  and `LadderGenerator` (the bin and item ladders; the parallel-algorithms and scaling projects climb the item ladder, nothing reads the bin ladder).
+  and `LadderGenerator` (the item ladder the scaling project climbs, and the smoke set's small order).
+- `IdenticalCase` — the bin `160x120x80` and item `20x15x10` of the Identical benchmarks, and `Items(pieces, lines)`.
+  The parallel-algorithms and parallel-bins projects both read it, so the two cannot drift.
 
 ## Binacle.Lib.UnitTests
 
@@ -142,15 +144,12 @@ In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on e
 Every class names the lib's **internal** `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`),
 so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagnoser]`.
 
-- `LadderBase` — `LoopAlgorithmProcessor` (baseline) / `ParallelAlgorithmProcessor` as rows `Loop` and
-  `Parallel`, param `Set` (`FFD,BFD`, `FFD,WFD,BFD`), one bin (`MaxSizeBin`), abstract `Items` so each tier
-  picks its own steps of the ladder in `LadderGenerator`. Classes `Smoke_Packing` (items 3, 47, 67, 79) and
-  `Sample_Packing` (every item step).
-- `Full_Packing` — the column over `CoresSet.Names`, the rows in three `[BenchmarkCategory]` blocks:
-  `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline) and `Parallel_FFD_WFD_BFD`;
-  and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no baseline, so their Ratio is `?`.
+- `Identical_Packing` — one bin and one item from `IdenticalCase`, param `Pieces`. Rows in three
+  `[BenchmarkCategory]` blocks: `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline)
+  and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
+  baseline, so their Ratio is `?`. Setup throws unless every algorithm packs every piece.
 
-Smoke at `short`; sample at the default job, `short` with `quick`; full at `short`, default with `precise`.
+The short job; `dry` runs each case once.
 
 Each core count is a BDN job, built in `CoreJobs` (`shared/test/Binacle.Benchmarking`). Each sets the affinity
 mask to the first N CPUs **and** `DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads
@@ -164,6 +163,14 @@ only. On Linux BDN's pin (`sched_setaffinity` on the pid) reaches only the main 
 in `/proc/self/task` to the mask, then fails the case if `ProcessorCount` is not N or any thread's
 `Cpus_allowed` differs. A pinned run is kinder than a real small VM: the OS and the BDN host run on the spare
 CPUs.
+
+## Binacle.Lib.Benchmarks.ParallelBins
+
+In `lib/bench/`. Loop against Parallel for a request of many bins, on every core count in `CoreJobs`, pinned as
+above. `IdenticalBase` takes the algorithm and holds the rows `Loop` (baseline) and `Parallel`, params `Bins`,
+`Lines` and `Pieces`, the bin and item from `IdenticalCase`; setup throws unless every bin is fully packed.
+`Identical_FFD_Packing`, `Identical_WFD_Packing` and `Identical_BFD_Packing` sweep bins and pieces on one line;
+`Identical_FFD_Lines_Packing` sweeps lines. The recipe `lib-parallel-bins-identical` takes the algorithm and `dry`.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 

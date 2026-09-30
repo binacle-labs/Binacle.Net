@@ -1,8 +1,10 @@
 namespace Binacle.Lib.Benchmarks.ParallelBins;
 
 [MemoryDiagnoser]
-public class Even_Packing : EvenBase
+public class Identical_BFD_Packing : IdenticalBase
 {
+	protected override Algorithm Algorithm => Algorithm.BFD;
+
 	[Params(1, 2, 4, 8, 16, 24, 32)]
 	public override int Bins { get; set; }
 

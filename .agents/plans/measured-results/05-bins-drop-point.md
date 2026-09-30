@@ -1,31 +1,29 @@
 ---
-description: Session 5 - find where packing many bins at the same time starts to pay. The ideal case is built and not run; the other categories are pending suggestions
+description: Session 5 - ParallelBins - find where packing many bins at the same time starts to pay. Add and try, starting with Identical - one class per algorithm, FFD run first; the other categories are pending suggestions
 state: ready
-waits-on: "the maintainer runs lib-parallel-bins-even - built 2026-09-30, not run"
+waits-on: "the maintainer reads the FFD runs; WFD and BFD are not run yet"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**", "tooling/bench.just"]
 ---
 
-# 5 - The bins drop point
+# 5 - ParallelBins drop point
 
 ## Start here
 
-The last session ended 2026-09-30 with step 1 of "The steps" built and not run. The next session:
+The `Identical` classes replaced `Even` (the maintainer, 2026-09-30: "only theese classes should remain and we
+build from there"). `Identical_FFD_Packing` and `Identical_FFD_Lines_Packing` are run and kept. WFD and BFD passed
+`dry` only. The next session:
 
-1. Asks the maintainer to run, in this order, and waits - nothing else runs meanwhile:
-   - `just bench lib-parallel-bins-even dry` - each case once. It fails if any bin is not fully packed; if it does,
-     fix the sizes in `EvenBase` before the real run.
-   - `just bench lib-parallel-bins-even` - the real run, short job. About 570 cases; its time is not measured -
-     ask him how long it took and put it in the recipe's comment in `tooling/bench.just`.
-2. Keeps the reports by hand: from the project's `BenchmarkDotNet.Artifacts/results/` into
-   `lib/results/benchmarks/baseline/parallel-bins/`, with a row each in that folder's README - the first kept run
-   of each class.
-3. Reads them with the maintainer:
+1. Reads the FFD runs with the maintainer:
    - Does Loop grow in step with the bins?
    - What does Parallel cost on its own? Read the 2-bin row, not the 1-bin one.
    - Where does Parallel start to win, on each core count?
-   - Is `Even_Lines_Packing` flat across lines? If so, the rule should get pieces, not lines.
-4. Picks the next step with him from "The steps" - each is built only after the one before has run.
+   - Is the lines class flat across lines? If so, the rule should get pieces, not lines.
+   - Step 4's `Identical_Packing` uses the same bin and item. Read the two side by side.
+2. Asks him to run WFD, then BFD - `just bench lib-parallel-bins-identical WFD`, then `BFD` - one at a time,
+   nothing else running meanwhile. Keep each report under `lib/results/benchmarks/baseline/parallel-bins/`, with a
+   row in `lib/results/benchmarks/baseline/README.md`, and put its time in the recipe's comment.
+3. Picks the next step with him from "The steps" - each is built only after the one before has run.
 
 ## Goal
 
@@ -38,26 +36,32 @@ thresohold of their cost function".
 His worry (2026-09-25): "it does worry me how we can test reliably with different bin shapes when i failed with
 the ladder".
 
-**(the maintainer, 2026-09-29):** this session finds the problems the bins bench runs - "step 5 is finding the
+**(the maintainer, 2026-09-29):** this session finds the problems ParallelBins runs - "step 5 is finding the
 problems and keep suggestions will reinvestigate".
 
-## The bench
+**(the maintainer, 2026-09-30):** add and try - "we agreed to take a more simple add and try approach".
 
-This session builds `lib/bench/Binacle.Lib.Benchmarks.ParallelBins/` - "then the 5th with discovery" (the
-maintainer, 2026-09-29). Session 3 retired the old bins classes ("3 retire"); their reports left the baseline
+**Leaning yes (the maintainer, 2026-09-30):** the first step uses the same bin and the same items here and in
+ParallelAlgorithms - "same bin msame items on both ideally this should give us the perfect results".
+
+**Decided (the maintainer, 2026-09-30):** one class per algorithm - "for bins we need 3 one for each algotirhm to
+see how algorithms change behaviour". The shape, with FFD run first - "But the shape is good... we will initially
+choose to run FFD only". The name - "identical write it into the plans".
+
+## The project
+
+`lib/bench/Binacle.Lib.Benchmarks.ParallelBins/` is built - "then the 5th with discovery" (the maintainer,
+2026-09-29). Session 3 retired the old bins classes ("3 retire"); their reports left the baseline
 (in git at commit 59e9dfb3, `lib/results/benchmarks/baseline/threshold/`). Every class is pinned through `CoreJobs` in
 `shared/test/Binacle.Benchmarking` ("yes common code to shared").
 
-The project has `EvenBase` and two classes on it: identical bins `160x120x80`, `20x15x10` items, FFD v2, Loop
-against Parallel, all four core counts `CoreJobs` has. `Even_Packing`: bins 1 to 32, pieces 1 to 256, one line.
-`Even_Lines_Packing`: 4 bins, 64 and 256 pieces over 1, 4, 16 or 64 lines. Recipe `lib-parallel-bins-even` runs
-both, `dry` to check first. Setup throws if any bin is not fully packed. The maintainer, 2026-09-30: "yes make
-sure they always pack everything fully meaning 256 item fit int box", and on the bigger grid: "add them then i
-run it". The other classes
-were removed - "remove the classes we havent decided anything". Not run yet.
-
-`LadderGenerator.GetBins` in `lib/test/Binacle.Lib.Testing/` lost its last caller with the old bins classes.
-Session 3 kept it for this one; delete it if this bench does not use it.
+The project has `IdenticalBase` and a class per algorithm on it: identical bins and items from `IdenticalCase` in
+`lib/test/Binacle.Lib.Testing`, Loop against Parallel, all four core counts `CoreJobs` has.
+`Identical_FFD_Packing`, `Identical_WFD_Packing`, `Identical_BFD_Packing`: bins 1 to 32, pieces 1 to 256, one line.
+`Identical_FFD_Lines_Packing`: 4 bins, 64 and 256 pieces over 1, 4, 16 or 64 lines. Recipe
+`lib-parallel-bins-identical` takes the algorithm, and `dry` to check first. Setup throws if any bin is not fully
+packed. The maintainer, 2026-09-30: "yes make sure they always pack everything fully meaning 256 item fit int box".
+The suggestions below were written when it was called `Even`.
 
 **Leaning yes (the maintainer, 2026-09-29):** one class per bin-set category, and one recipe that takes the
 category. "i think so". A class each, because BenchmarkDotNet's `--filter` picks classes and methods, not parameter
@@ -85,14 +89,14 @@ after the one before it has run.
 
 Ordered by what each needs measured before it. From the review below.
 
-**1. Even** - needs nothing. Built, not run.
+**1. Identical** (was `Even`) - needs nothing. Built; FFD run and kept, WFD and BFD passed `dry` only.
 - Answers: what Parallel costs on its own, and the fastest a bin can pack.
 - Read it from the 2-bin row, not the 1-bin row: with one bin `Parallel.For` runs on the calling thread.
 - Bins 24 and 32, pieces 1, 2 and 4, and the lines run were added before it ran - "add them then i run it"
   (the maintainer, 2026-09-30).
 - Its box is an exact multiple of the item, so every piece takes the first free space. Its time per piece is the
   lowest any request can have - never read a piece count off it.
-- Run: `just bench lib-parallel-bins-even dry`, then `just bench lib-parallel-bins-even`.
+- Run: `just bench lib-parallel-bins-identical`, FFD first, `dry` before the real run.
 
 **2. Fit run** - needs 1, to compare against the floor.
 - Identical bins where none, 10%, 50%, 90% and all of the items fit. One row set with fitting as well as packing.
@@ -208,7 +212,7 @@ The session's pick: FitsSomeMix, ShopRange, MixedItems.
   grid had parallel winning at about 5 to 18 us per bin on 2 bins, 2 to 3 us on 4, 1.5 to 2 us on 7.
 - **Old:** every case gets a one-bin row, like the alone rows in racing, so the work per bin is measured in the
   same run.
-- **Built:** one shape `20x15x10`, one line, 8 to 256 pieces. Bins 1 to 16 - the one-bin row is `Bins = 1`.
+- **Built:** one shape `20x15x10`, one line, 1 to 256 pieces. Bins 1 to 32 - the one-bin row is `Bins = 1`.
 - **New:** a lines run - the same pieces over 1, 4, 16 or 64 lines of one item. Should come out flat. If so, the
   rule should get pieces, not lines.
 - **New:** a fit run - all fit, half fit, none fit, at a few piece and bin counts. Gives time per piece for each.
@@ -254,7 +258,7 @@ The session's pick: FitsSomeMix, ShopRange, MixedItems.
 
   The lowercase word assumes `--filter` ignores case; unchecked (the maintainer, 2026-09-29: "ok dont care").
   `similar` does not catch `SimilarTooSmall_` - the underscore stops it.
-- **Built:** one recipe per class so far, `lib-parallel-bins-even`.
+- **Built:** one recipe, `lib-parallel-bins-identical`, takes the algorithm.
 
 ### 5. Run order
 
@@ -330,7 +334,7 @@ Read-only review with research. Everything here is its suggestion.
 - **Eight classes** - drop. Four or five are enough. One recipe that takes the category - keep, once a second
   class exists; pull a base class out then, not before.
 - **Stages A to E** - drop; built on the old category list.
-- **Cores 2 and 12 first** - needs a `CoreJobs` change. Not needed now: Even is 240 cases on the short job.
+- **Cores 2 and 12 first** - needs a `CoreJobs` change. Not needed now: Even runs all four core counts on the short job.
 - **BFD check** - keep, late. BFD v2 re-sorts the space list on every try, so its time per piece grows faster.
 
 ### Open questions - its answers
@@ -411,7 +415,9 @@ list against several boxes, so each needs a box set as well.
 
 ## Done when
 
-- [ ] The bins bench runs the stages the maintainer picked, and he has run them and kept the reports.
+- [x] Only the `Identical` classes are left in ParallelBins.
+      `ls lib/bench/Binacle.Lib.Benchmarks.ParallelBins/*.cs`, then **by eye**.
+- [ ] ParallelBins runs the stages the maintainer picked, and he has run them and kept the reports.
       **By eye.** A report of a new class under `lib/results/benchmarks/*/parallel-bins/`.
 - [ ] The drop point is read out of it, or the report shows there is none, and the lib findings record says so.
       **By eye.**

@@ -2,8 +2,10 @@ namespace Binacle.Lib.Benchmarks.ParallelBins;
 
 // The same pieces over more lines. Flat if lines cost nothing once they are turned into pieces.
 [MemoryDiagnoser]
-public class Even_Lines_Packing : EvenBase
+public class Identical_FFD_Lines_Packing : IdenticalBase
 {
+	protected override Algorithm Algorithm => Algorithm.FFD;
+
 	[Params(4)]
 	public override int Bins { get; set; }
 

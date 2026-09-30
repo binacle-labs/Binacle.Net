@@ -21,36 +21,6 @@ public static class LadderGenerator
 		);
 	}
 	
-    // Keyed by bin count - each entry is the one before it plus the next taller bin.
-    //
-    //   bin        volume
-    //   60x40x10    24000
-    //   60x40x15    36000
-    //   60x40x20    48000
-    //   60x40x25    60000
-    //   60x40x30    72000
-    //   60x40x35    84000
-    //   60x40x40    96000   <- MaxSizeBin
-    private static Dictionary<int, string[]> binsByQuantity = new Dictionary<int, string[]>()
-    {
-        {1, ["60x40x10"]},
-        {2, ["60x40x10", "60x40x15"]},
-        {3, ["60x40x10", "60x40x15", "60x40x20"]},
-        {4, ["60x40x10", "60x40x15", "60x40x20", "60x40x25"]},
-        {5, ["60x40x10", "60x40x15", "60x40x20", "60x40x25", "60x40x30"]},
-        {6, ["60x40x10", "60x40x15", "60x40x20", "60x40x25", "60x40x30", "60x40x35"]},
-        {7, ["60x40x10", "60x40x15", "60x40x20", "60x40x25", "60x40x30", "60x40x35", "60x40x40"]}
-    };
-    
-    public static List<ScenarioBin> GetBins(int binCount)
-	{
-		if (!binsByQuantity.TryGetValue(binCount, out var bins))
-		{
-			throw new ArgumentException($"Invalid bin count. Value {binCount} should be between 1 and 7.");
-		}
-		return bins.Select(ScenarioBin.FromCompactString).ToList();
-	}
-
     // Keyed by the running item count - each entry is the one before it plus the next item type,
     // which is why the keys look arbitrary. The last two columns are those running totals.
     //

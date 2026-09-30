@@ -6,7 +6,7 @@
 #   just bench lib-algorithms-full precise   full: hours, asks first; the short job unless `precise`
 #
 # The tier is the class name's first word: Smoke_, Sample_, Full_. Result selection and scaling have one tier
-# and run every class.
+# and run every class. The parallel projects have no tiers: one recipe per project runs its Identical_ classes.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
 # class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
 # - baseline/ instead when it is that class's first kept run. <slice>/results/benchmarks/README.md says what
@@ -53,50 +53,36 @@ lib-algorithms-full mode='':
 lib-algorithms-run job tier:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.Algorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
 
-# Loop against Parallel for both sets, v2, ladder 3, 47, 67, 79 x 2, 4, 8, 12 cores: time not measured yet
-lib-parallel-algorithms-smoke: (lib-parallel-algorithms-run 'short' 'Smoke')
-
-# Loop against Parallel for both sets, v2, the whole ladder x 2, 4, 8, 12 cores: time not measured yet
-[arg('mode', pattern='|quick')]
-lib-parallel-algorithms-sample mode='':
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    job=default
-    if [ "{{ mode }}" = quick ]; then job=short; fi
-
-    just bench lib-parallel-algorithms-run "$job" Sample
-
-# Loop against Parallel for both sets and each algorithm alone, v2, the picked problems x 2, 4, 8, 12 cores: about 70 minutes; `precise` about 3.5 hours
-[arg('mode', pattern='|precise')]
-[confirm('lib-parallel-algorithms-full: about 70 minutes (precise: about 3.5 hours). Run?')]
-lib-parallel-algorithms-full mode='':
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    job=short
-    if [ "{{ mode }}" = precise ]; then job=default; fi
-
-    just bench lib-parallel-algorithms-run "$job" Full
-
-[private]
-lib-parallel-algorithms-run job tier:
-    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
-
-# Loop against Parallel, FFD v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: time not measured yet; `dry` runs each case once
+# Loop against Parallel for both sets and each algorithm alone, v2, identical bin and items, 1 to 256 pieces x 2, 4, 8, 12 cores: about 20 to 30 minutes; `dry` runs each case once
 [arg('mode', pattern='|dry')]
-lib-parallel-bins-even mode='':
+lib-parallel-algorithms-identical mode='':
     #!/usr/bin/env bash
     set -euo pipefail
 
     job=short
     if [ "{{ mode }}" = dry ]; then job=dry; fi
 
-    just bench lib-parallel-bins-run "$job" Even
+    just bench lib-parallel-algorithms-run "$job" Identical
 
 [private]
-lib-parallel-bins-run job category:
-    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelBins -- --job {{ job }} --filter '*.{{ category }}_*'
+lib-parallel-algorithms-run job tier:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms -- --job {{ job }} --filter '*.{{ tier }}_*'
+
+# Loop against Parallel, one algorithm, v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines on FFD, x 2, 4, 8, 12 cores: about 1 hour for FFD, not measured for WFD and BFD; `dry` runs each case once
+[arg('algorithm', pattern='FFD|WFD|BFD')]
+[arg('mode', pattern='|dry')]
+lib-parallel-bins-identical algorithm mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    job=short
+    if [ "{{ mode }}" = dry ]; then job=dry; fi
+
+    just bench lib-parallel-bins-run "$job" "Identical_{{ algorithm }}"
+
+[private]
+lib-parallel-bins-run job prefix:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelBins -- --job {{ job }} --filter '*.{{ prefix }}_*'
 
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: about 3 minutes. Its one tier
 lib-result-selection: (lib-result-selection-run 'short')

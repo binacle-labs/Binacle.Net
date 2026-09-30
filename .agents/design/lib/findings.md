@@ -2,7 +2,7 @@
 id: lib/findings
 description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
 verified: 2026-09-30
-check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are still in CoresSet; Full_Packing in Binacle.Lib.Benchmarks.ParallelAlgorithms still races both sets and each algorithm alone on the four core jobs in CoreJobs; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; the Full_Algorithms_ and Full_Bins_ reports at commit 59e9dfb3 still carry the item ladder and bins 1 to 7, and LadderGenerator still grows the bin taller per step. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in git at commit 59e9dfb3, under lib/results/benchmarks/baseline/threshold/.
+check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are in the Bischoff suite, and CoresSet and Full_Packing are still in git at commit 16560b6f; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; the Full_Algorithms_ and Full_Bins_ reports at commit 59e9dfb3 still carry the item ladder and bins 1 to 7. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in git at commit 59e9dfb3, under lib/results/benchmarks/baseline/threshold/.
 also_update:
   - lib/decisions
 paths:
@@ -30,7 +30,7 @@ noise.
 
 **F1 and F2 cannot be re-checked from a clone.** BenchmarkDotNet writes to `BenchmarkDotNet.Artifacts/`, which
 `.gitignore` excludes, and nobody kept those reports. The harness that ran them, `RacingSet` and the racing
-`BenchmarkBase`, was deleted 2026-09-26; its five problems are all in `CoresSet`, which `Full_Packing` in `Binacle.Lib.Benchmarks.ParallelAlgorithms` races. **F2a and F4 were
+`BenchmarkBase`, was deleted 2026-09-26; its five problems were in `CoresSet`, which `Full_Packing` in `Binacle.Lib.Benchmarks.ParallelAlgorithms` raced; both left the tree 2026-09-30 and are in git at commit `16560b6f`. **F2a and F4 were
 kept**: every number in them can be read out of `lib/results/benchmarks/baseline/threshold/` at commit `59e9dfb3`. The
 reports left the tree 2026-09-30 with the classes that made them.
 

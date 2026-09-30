@@ -13,8 +13,9 @@ project: nothing in it asserts on its own, and no test SDK is referenced. Every 
 | `TestAlgorithmFactory.cs`, `TestOperationParameters.cs` | The delegate the factories are, and the parameters a test hands to `Execute` |
 | `ScenarioChecks.cs` | `EvaluateResult` on a scenario's metrics and on its expected result - throws on mismatch |
 | `OperationResultExtensions.cs` | Volume and count totals over an `OperationResult` |
-| `SmokeSet.cs`, `SampleSet.cs`, `CoresSet.cs` | The benchmark picks - the smoke scenarios, the Bischoff sample, and the Bischoff problems `ParallelAlgorithms` runs on every core count. Each answers `Names` and `GetByName(name)` |
-| `CubeGenerator.cs`, `LadderGenerator.cs` | Scenarios built in code rather than picked - one cube baseline, and the bin and item ladders; the parallel-algorithms and scaling projects climb the item ladder |
+| `SmokeSet.cs`, `SampleSet.cs` | The benchmark picks - the smoke scenarios and the Bischoff sample. Each answers `Names` and `GetByName(name)` |
+| `CubeGenerator.cs`, `LadderGenerator.cs` | Scenarios built in code rather than picked - one cube baseline, and the item ladder the scaling project climbs |
+| `IdenticalCase.cs` | The bin and item of the Identical benchmarks in `ParallelAlgorithms` and `ParallelBins`, so the two cannot drift |
 
 ## 🛠️ How you use it
 

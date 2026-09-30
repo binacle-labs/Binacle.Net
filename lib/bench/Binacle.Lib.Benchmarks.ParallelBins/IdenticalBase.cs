@@ -3,16 +3,14 @@ using Binacle.Lib.Abstractions;
 namespace Binacle.Lib.Benchmarks.ParallelBins;
 
 // The best case for Parallel: every bin the same, every item the same, and every item fits.
-public abstract class EvenBase
+public abstract class IdenticalBase
 {
-	// Eight by eight by eight items; 256 fills half of it.
-	private const string BinSize = "160x120x80";
-	private const string ItemSize = "20x15x10";
-
 	private LoopBinProcessor loop = null!;
 	private ParallelBinProcessor parallel = null!;
 	private List<ScenarioBin> bins = null!;
 	private List<ScenarioItem> items = null!;
+
+	protected abstract Algorithm Algorithm { get; }
 
 	public abstract int Bins { get; set; }
 
@@ -30,19 +28,15 @@ public abstract class EvenBase
 		this.loop = new LoopBinProcessor(factory);
 		this.parallel = new ParallelBinProcessor(factory);
 
-		var dimensions = ScenarioBin.FromCompactString(BinSize);
+		var dimensions = IdenticalCase.Bin();
 		this.bins = Enumerable.Range(1, this.Bins)
 			.Select(i => new ScenarioBin($"bin{i}", dimensions))
 			.ToList();
-
-		var perLine = this.Pieces / this.Lines;
-		this.items = Enumerable.Range(1, this.Lines)
-			.Select(_ => ScenarioItem.FromCompactString($"{ItemSize} [{perLine}]"))
-			.ToList();
+		this.items = IdenticalCase.Items(this.Pieces, this.Lines);
 
 		var results = this.Run(this.loop);
 		if (results.Values.Any(result => result.Status != OperationResultStatus.FullyPacked))
-			throw new InvalidOperationException($"{this.Pieces} items do not all fit in {BinSize}.");
+			throw new InvalidOperationException($"{this.Pieces} items do not all fit in {IdenticalCase.BinSize}.");
 	}
 
 	[Benchmark(Baseline = true)]
@@ -57,7 +51,7 @@ public abstract class EvenBase
 
 	private IDictionary<string, OperationResult> Run(IBinProcessor processor)
 		=> processor.Process(
-			Algorithm.FFD,
+			this.Algorithm,
 			this.bins,
 			this.items,
 			new TestOperationParameters { Operation = AlgorithmOperation.Packing });
