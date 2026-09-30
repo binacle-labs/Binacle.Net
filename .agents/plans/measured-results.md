@@ -66,8 +66,8 @@ Every line here quotes the maintainer.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | `ParallelAlgorithms`: rebuild to `Identical_Packing` only, same bin and items as `ParallelBins`; add and try; read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Identical_Packing.md` |
-| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | `ParallelBins`: add and try, starting with `Identical`, one class per algorithm, FFD first; read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
+| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | `ParallelAlgorithms`: `Identical_Packing` is run on the short job; re-run it on the default job, then add and try; read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Identical_Packing.md` |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | `ParallelBins`: `Identical`, one class per algorithm - FFD is run, WFD and BFD next; then add and try; read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |
