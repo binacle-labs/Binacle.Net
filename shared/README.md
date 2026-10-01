@@ -51,8 +51,8 @@ markdown report as the only export, reports pinned beside the calling project - 
 with the orderer that sorts a group's rows by it, and `BenchmarkProgram.Run`, every project's `Main`, which
 exits 1 when nothing ran or a case failed. A group is one set of parameters on one job in one
 `[BenchmarkCategory]`, so each ratio is taken against its own baseline. A project that needs more than the
-shared config passes its own to `Run`, built on `BenchmarkConfig.Create()`. `CoreJobs` builds one such config: one
-job per core count, each pinned to the first N CPUs; `CorePinning.PinAndCheck`, first in a class's setup, pins
+shared config passes its own to `Run`, built on `BenchmarkConfig.Create()`. `JobsByCoreCount` builds one such config: one
+job per core count, each pinned to the first N CPUs; its `SetCoreCountAndCheck`, first in a class's setup, pins
 every thread to them and fails the case if one is off. Linux only. The only project that references BenchmarkDotNet, so the
 unit tests and the measure projects never restore it.
 

@@ -15,6 +15,7 @@ files hold the carve-outs.
 |---|---|
 | [never-commit](never-commit.md) | Never commit, stage or push. Leave changes in the working tree. |
 | [never-edit-published-sites](never-edit-published-sites.md) | Never edit anything under `sites/`. One carve-out, for security fixes to sample files. |
+| [never-run-long-commands](never-run-long-commands.md) | The maintainer runs every suite, bench and measure. An agent never does. |
 | [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the four exceptions. |
 | [talking-to-the-maintainer](talking-to-the-maintainer.md) | In chat: plain English, no flattery, say when he is wrong. A question gets an answer, not work. |
 | [only-the-maintainer-decides](only-the-maintainer-decides.md) | A plan holds suggestions. "Decided" needs his words, quoted and dated. |

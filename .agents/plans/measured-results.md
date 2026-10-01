@@ -38,7 +38,7 @@ fake numbers under it. Both results READMEs are an index.
 ## Who runs what
 
 - **The maintainer runs** every bench, every measure, and any build that starts the host. A session gives him
-  the one-line command. Long runs have crashed his machine. ("the first is true", 2026-09-29)
+  the one-line command. A long run takes the whole machine while it runs. ("the first is true", 2026-09-29)
 
 ## The results files - rules
 

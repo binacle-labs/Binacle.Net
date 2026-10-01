@@ -52,7 +52,7 @@ ships only once the evidence says it is stable. Deleting a version is a separate
 
 **Decided (the maintainer, 2026-09-29):** one project per question - `ParallelAlgorithms` for racing algorithms
 on one bin, `ParallelBins` for one algorithm on many bins - "a full restructure of both binaries is in order".
-Asked whether to pin every class in both, "yes common code to shared": `CoreJobs` and `CorePinning` live in
+Asked whether to pin every class in both, "yes common code to shared": `JobsByCoreCount` lives in
 `shared/test/Binacle.Benchmarking`. `Full_Algorithms_Packing_v1` and `_v2` were dropped ("2 yes"): v1 against
 v2 is the `Algorithms` project's question. The old bins classes were retired ("3 retire").
 

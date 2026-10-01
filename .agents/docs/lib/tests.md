@@ -33,6 +33,7 @@ slice's own `lib/data/Binacle.Lib.Data`, which embeds `lib/data/result-selection
 | `Binacle.Lib.Benchmarks.Algorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-algorithms-smoke`, `-sample`, `-full` |
 | `Binacle.Lib.Benchmarks.ParallelAlgorithms` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-algorithms-identical` |
 | `Binacle.Lib.Benchmarks.ParallelBins` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-bins-identical FFD` (or `WFD`, `BFD`) |
+| `Binacle.Lib.Benchmarks.ParallelOverhead` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-parallel-overhead` |
 | `Binacle.Lib.Benchmarks.ResultSelection` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-result-selection` |
 | `Binacle.Lib.Benchmarks.Scaling` (`lib/bench/`) | BenchmarkDotNet, config from `shared/test/Binacle.Benchmarking` | `just bench lib-scaling` |
 
@@ -140,7 +141,7 @@ Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<T
 
 ## Binacle.Lib.Benchmarks.ParallelAlgorithms
 
-In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on every core count in `CoreJobs`.
+In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on every core count in `JobsByCoreCount`.
 Every class names the lib's **internal** `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`),
 so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagnoser]`.
 
@@ -151,14 +152,14 @@ so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagno
 
 The short job; `dry` runs each case once.
 
-Each core count is a BDN job, built in `CoreJobs` (`shared/test/Binacle.Benchmarking`). Each sets the affinity
+Each core count is a BDN job, built in `JobsByCoreCount` (`shared/test/Binacle.Benchmarking`). Each sets the affinity
 mask to the first N CPUs **and** `DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads
 its CPU count once at start-up. BDN adds a CLI `--job` beside declared jobs instead of applying it, so
-`Program.cs` takes `--job` out of the args and builds the core jobs from it; the recipe passes it as every other
-recipe does. The report has a `Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header
+`JobOption.Extract` takes `--job` out of the args and returns the job it names, and `Program.cs` builds the core
+jobs from that; the recipe passes it as every other recipe does. The report has a `Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header
 still shows every CPU the machine has.
 
-`CorePinning.PinAndCheck` (`shared/test/Binacle.Benchmarking`), first in every class's `[GlobalSetup]`, is Linux
+`JobsByCoreCount.SetCoreCountAndCheck`, first in every class's `[GlobalSetup]`, is Linux
 only. On Linux BDN's pin (`sched_setaffinity` on the pid) reaches only the main thread, so it pins every thread
 in `/proc/self/task` to the mask, then fails the case if `ProcessorCount` is not N or any thread's
 `Cpus_allowed` differs. A pinned run is kinder than a real small VM: the OS and the BDN host run on the spare
@@ -166,11 +167,45 @@ CPUs.
 
 ## Binacle.Lib.Benchmarks.ParallelBins
 
-In `lib/bench/`. Loop against Parallel for a request of many bins, on every core count in `CoreJobs`, pinned as
+In `lib/bench/`. Loop against Parallel for a request of many bins, on every core count in `JobsByCoreCount`, pinned as
 above. `IdenticalBase` takes the algorithm and holds the rows `Loop` (baseline) and `Parallel`, params `Bins`,
 `Lines` and `Pieces`, the bin and item from `IdenticalCase`; setup throws unless every bin is fully packed.
 `Identical_FFD_Packing`, `Identical_WFD_Packing` and `Identical_BFD_Packing` sweep bins and pieces on one line;
 `Identical_FFD_Lines_Packing` sweeps lines. The recipe `lib-parallel-bins-identical` takes the algorithm and `dry`.
+
+## Binacle.Lib.Benchmarks.ParallelOverhead
+
+In `lib/bench/`. The only bench project that does not pack: what parallelising costs, measured straight rather
+than as the gap between two packing rows. No friend access - the one real result it needs comes from the public
+`AlgorithmFactories.FFD_v2` in `Binacle.Lib.Testing`, run once in setup, because `OperationResult` has an
+internal constructor.
+
+All three classes are `[MemoryDiagnoser]` and run the same rows: `Loop` (baseline), `Parallel_OneThread`
+(`maxDegreeOfParallelism: 1`, so `Parallel.For` runs on the calling thread) and `Parallel`. Both have a `Bytes`
+param, `0` and `65536`.
+
+- `FakeRaceBase` — abstract, the algorithm processors. Subclasses give only the `Algorithms` array. Setup
+  throws unless the race returns one result per algorithm.
+- `Fake_TwoAlgorithms` and `Fake_ThreeAlgorithms` — `FFD,BFD` and `FFD,WFD,BFD`, the races the multi-bin and
+  single-bin routes run. One class each rather than a param, because a race's width is fixed by production.
+- `Fake_Bins` — the bin processors, param `Bins` 1, 2, 8 or 32. A param rather than a class because a request
+  carries any number. Setup throws unless one result comes back per bin.
+- `FakeAlgorithmFactory` (in `lib/test/Binacle.Lib.Testing`) — an `IAlgorithmFactory` whose algorithms return
+  the result passed to it. `Create` still allocates, `Execute` is still a virtual call and the identifier name
+  is still built, so only the packing is absent. Its `bytes` argument is how much memory each instance walks,
+  a cache line at a time, from a buffer of its own - the stand-in for a real algorithm's working set.
+
+The default job, not the short one: the gaps it measures are small enough that a short run blurs them. `quick`
+runs the short job, `dry` runs each case once. Recipe `lib-parallel-overhead`.
+
+Its `Program` passes `JobsByCoreCount.CreateConfig` an explicit `[1, 2, 4, 8, 12]`, so it adds a 1-CPU job to
+the set every other project runs. `JobsByCoreCount.Counts` stays `[2, 4, 8, 12]`, so no other project's kept
+runs move.
+
+**Read the gaps, not the rows.** `Loop` to `Parallel_OneThread` is what `Parallel.For` costs to set up, measured
+flat across every core count; `Parallel_OneThread` to `Parallel` is what handing work to another CPU costs, and
+that one moves with the machine. **1 CPU is the dear end, not the cheap one** - `Parallel.For` still hands the
+work to a worker, which then waits for the caller to come off the single CPU.
 
 ## Binacle.Lib.Benchmarks.ResultSelection
 

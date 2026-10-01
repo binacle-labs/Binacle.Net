@@ -2,9 +2,11 @@
 
 All guidance lives in `.agents/`, fetched on demand. This is the door and stays minimal on purpose.
 
-## Six rules that always apply
+## Seven rules that always apply
 
 - **Never commit, stage or push.** Leave changes in the working tree. The human commits.
+- **Never run a suite, a bench or a measure.** They take the whole machine. Build it, run the one project the
+  change touches, then hand him the command and wait. A `dry` bench run is fine.
 - **Never edit anything under `sites/`.** Every published site lives there and goes to the internet; each is
   written in its own session. (`.agents/docs/` is a different thing - editing it is fine.)
 - **Nothing outside `.agents/` may point a reader into it.** Not a filename, not a `$ref`, not a bare `D16`.

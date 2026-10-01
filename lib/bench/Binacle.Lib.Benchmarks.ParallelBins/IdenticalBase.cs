@@ -22,7 +22,7 @@ public abstract class IdenticalBase
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
-		CorePinning.PinAndCheck();
+		JobsByCoreCount.SetCoreCountAndCheck();
 
 		var factory = new AlgorithmFactory_v2();
 		this.loop = new LoopBinProcessor(factory);

@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-29
+verified: 2026-10-01
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; measure recipes match tooling/measure.just; bench recipes match tooling/bench.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -254,6 +254,7 @@ just bench lib-result-selection          # about 3 minutes; its one tier
 just bench lib-scaling quick             # the item ladder, about 20 minutes: default job, `quick` for short; its one tier
 just bench lib-parallel-algorithms-identical dry   # Loop against Parallel on one bin; `dry` runs each case once
 just bench lib-parallel-bins-identical FFD dry     # the same on many bins; also WFD and BFD
+just bench lib-parallel-overhead dry               # what starting a race costs, with no packing in it
 ```
 
 The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with

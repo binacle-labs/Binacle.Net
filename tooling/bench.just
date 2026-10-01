@@ -84,6 +84,24 @@ lib-parallel-bins-identical algorithm mode='':
 lib-parallel-bins-run job prefix:
     dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelBins -- --job {{ job }} --filter '*.{{ prefix }}_*'
 
+# What parallelising costs, with algorithms that do no packing: a two- and a three-algorithm race, and 1 to 32
+# bins, each walking 0 or 64 KB, x 1, 2, 4, 8, 12 cores: about 50 minutes, `quick` about 15; `dry` runs each
+# case once
+[arg('mode', pattern='|dry|quick')]
+lib-parallel-overhead mode='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    job=default
+    if [ "{{ mode }}" = quick ]; then job=short; fi
+    if [ "{{ mode }}" = dry ]; then job=dry; fi
+
+    just bench lib-parallel-overhead-run "$job"
+
+[private]
+lib-parallel-overhead-run job:
+    dotnet run -c Release --project lib/bench/Binacle.Lib.Benchmarks.ParallelOverhead -- --job {{ job }} --filter '*'
+
 # BestAlgorithm, BestBin, SmallestBin - v1 against v2: about 3 minutes. Its one tier
 lib-result-selection: (lib-result-selection-run 'short')
 

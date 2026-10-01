@@ -35,6 +35,6 @@ finished in one session, split it again.
 ## Why
 
 Measured 2026-09-28 over a week of sessions on one plan. Each read the whole plan folder first, 80k to 120k
-tokens before its first answer, and grew to 150k to 450k. The biggest are the ones where he said "too much",
-"plain english" and "stop" the most. Prompts written by one session for the next carried its guesses in as his
-words.
+tokens before its first answer, and grew to 150k to 450k. The biggest are the ones where "too much",
+"plain english" and "stop" came back the most. Prompts written by one session for the next carried its guesses
+in as the maintainer's words.

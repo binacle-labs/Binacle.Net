@@ -3,8 +3,8 @@ using Binacle.Lib.AlgorithmProcessing;
 
 namespace Binacle.Lib.Benchmarks.ParallelAlgorithms;
 
-// The two races, and each algorithm alone, on every core count in CoreJobs. The category is the row's block: each
-// race has its own Loop baseline, and the alone rows have none.
+// The two races, and each algorithm alone, on every core count in JobsByCoreCount. The category is the row's
+// block: each race has its own Loop baseline, and the alone rows have none.
 [MemoryDiagnoser]
 public class Identical_Packing
 {
@@ -29,7 +29,7 @@ public class Identical_Packing
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
-		CorePinning.PinAndCheck();
+		JobsByCoreCount.SetCoreCountAndCheck();
 
 		Algorithm[] two = [Algorithm.FFD, Algorithm.BFD];
 		Algorithm[] three = [Algorithm.FFD, Algorithm.WFD, Algorithm.BFD];

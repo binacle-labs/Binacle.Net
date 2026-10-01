@@ -4,7 +4,7 @@ internal class Program
 {
 	static int Main(string[] args)
 	{
-		var config = CoreJobs.CreateConfig(args, out var rest);
+		var config = JobsByCoreCount.CreateConfig(args, out var rest);
 		if (config is null)
 		{
 			Console.Error.WriteLine("Unknown --job. Use dry, short, medium, long, verylong or default.");

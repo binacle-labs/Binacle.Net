@@ -6,15 +6,15 @@ namespace Binacle.Lib;
 public class ParallelBinProcessor : IBinProcessor
 {
 	private readonly IAlgorithmFactory algorithmFactory;
-	private readonly int concurrencyLevel;
+	private readonly int? maxDegreeOfParallelism;
 
 	public ParallelBinProcessor(
 		IAlgorithmFactory algorithmFactory,
-		int? concurrencyLevel = null
+		int? maxDegreeOfParallelism = null
 		)
 	{
 		this.algorithmFactory = algorithmFactory;
-		this.concurrencyLevel = concurrencyLevel ?? Environment.ProcessorCount;
+		this.maxDegreeOfParallelism = maxDegreeOfParallelism;
 	}
 	
 	public IDictionary<string, OperationResult> Process<TBin, TItem>(
@@ -31,9 +31,16 @@ public class ParallelBinProcessor : IBinProcessor
 			.StartActivity($"Process Bins: Parallel");
 		activity?.SetTag("Operation", parameters.Operation);
 
-		var results =  new ConcurrentDictionary<string, OperationResult>(this.concurrencyLevel, bins.Count);
+		// One bin per thread, and the bin count is only known here, so the default cap resolves here too.
+		var degree = this.maxDegreeOfParallelism ?? ParallelLimits.Degree(bins.Count);
+		var concurrencyLevel = ParallelLimits.ConcurrencyLevel(bins.Count, degree);
+		var results = new ConcurrentDictionary<string, OperationResult>(concurrencyLevel, bins.Count);
 
-		var parallelOptions = new ParallelOptions { CancellationToken = cancellationToken };
+		var parallelOptions = new ParallelOptions
+		{
+			CancellationToken = cancellationToken,
+			MaxDegreeOfParallelism = degree
+		};
 		Parallel.For(0, bins.Count, parallelOptions, i =>
 		{
 			var bin = bins[i];

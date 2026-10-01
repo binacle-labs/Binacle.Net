@@ -13,6 +13,24 @@ paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "lib/test/Binacle.Li
 `Identical_FFD_Packing` and `Identical_FFD_Lines_Packing` are run and kept, short job. WFD and BFD passed `dry`
 only.
 
+**Two things changed under this plan on 2026-10-02 - read these before running anything here.**
+
+**1. The kept FFD run no longer matches the code at two cells.** `ParallelBinProcessor` now caps
+`maxDegreeOfParallelism` at `min(bins, cores)` by default instead of running unlimited. So `Bins = 1` resolves
+to a degree of 1 and `Parallel.For` runs the body inline - previously it paid a dispatch and got nothing for
+it, which is what "Parallel never wins on 1 bin" in this plan was measuring. And 32 bins on the 2-core job is
+capped at 2, where before the thread pool could inject more. Everything from 2 bins up on 4 cores and above is
+unchanged.
+
+The call site was left on the default on purpose: this project's question is whether parallel pays in
+production, and the cap is production now. **Decided by nobody** - if the kept run should stay row-for-row
+comparable instead, the class has to pass `ParallelLimits.NoLimit` and that is his call. What to do with the
+stale baseline is also open; the racing plan records the three options he was given.
+
+**2. The lines class has answered its question.** Its kept run is flat across 1 to 64 lines, so lines cost
+nothing once they are pieces. **Suggested (agent, 2026-10-02):** drop `Identical_FFD_Lines_Packing`. It is run
+time now, not a measurement. Its kept report would go with it, or to a dated folder.
+
 1. The maintainer runs `just bench lib-parallel-bins-identical WFD`, then `BFD` - one at a time, nothing else
    running meanwhile. Keep each report under `lib/results/benchmarks/baseline/parallel-bins/`, with a row in
    `lib/results/benchmarks/baseline/README.md`, and put its time in the recipe's comment.
@@ -33,6 +51,32 @@ against Loop.
 - **Loop is the sum of the bins**, and lines cost nothing: the lines class is flat across 1 to 64 lines.
 - **Parallel never wins on 1 bin.** It starts to win once Loop would take about 4 to 8 µs on 2 and 4 cores, and
   about 16 µs on 12. More cores need a bigger request.
+
+## What the overhead project measured for bins - agent, 2026-10-02
+
+`Fake_Bins` in `Binacle.Lib.Benchmarks.ParallelOverhead` runs the bin processors with algorithms that do not
+pack, so it gives the cost side of this plan's rule without any packing in it. Short job, 2026-10-02.
+
+**What handing a bin to another CPU costs, 12 cores** - the gap between `Parallel` and `Parallel_OneThread`:
+
+| Bins | walking nothing | walking 64 KB |
+|---|---|---|
+| 1 | 556 ns | 1,265 ns |
+| 2 | 871 ns | 3,137 ns |
+| 8 | 2,003 ns | 15,134 ns |
+| 32 | 4,644 ns | 54,111 ns |
+
+**The second column is the finding.** Most of the cost is the bin's own working set being fetched to whichever
+CPU the bin landed on, not the dispatch. With nothing to fetch the cost is small and grows slowly; with a real
+working set it grows much faster than the bin count.
+
+Two cautions on that table. The 32-bin, 64 KB row allocates about 2 MB an operation and is where two cells came
+back `NA`, so part of it is garbage collection rather than fetching - the racing plan carries the fix. And the
+1-CPU rows of that run are not usable at all.
+
+**What it means for the rule here:** `C` is not one number per machine. It rises with the bin count and with
+how much memory a bin touches, so "Parallel costs its setup plus the slowest bin" understates it - the setup
+term is itself a function of the request. That is a suggestion from one short run, not a settled rule.
 
 ## Goal
 
@@ -60,10 +104,10 @@ choose to run FFD only". The name - "identical write it into the plans".
 ## The project
 
 `lib/bench/Binacle.Lib.Benchmarks.ParallelBins/` - "then the 5th with discovery" (the maintainer, 2026-09-29).
-Every class is pinned through `CoreJobs` in `shared/test/Binacle.Benchmarking` ("yes common code to shared").
+Every class is pinned through `JobsByCoreCount` in `shared/test/Binacle.Benchmarking` ("yes common code to shared").
 
 The project has `IdenticalBase` and a class per algorithm on it: identical bins and items from `IdenticalCase` in
-`lib/test/Binacle.Lib.Testing`, Loop against Parallel, all four core counts `CoreJobs` has.
+`lib/test/Binacle.Lib.Testing`, Loop against Parallel, all four core counts `JobsByCoreCount` has.
 `Identical_FFD_Packing`, `Identical_WFD_Packing`, `Identical_BFD_Packing`: bins 1 to 32, pieces 1 to 256, one line.
 `Identical_FFD_Lines_Packing`: 4 bins, 64 and 256 pieces over 1, 4, 16 or 64 lines. Recipe
 `lib-parallel-bins-identical` takes the algorithm, and `dry` to check first. Setup throws if any bin is not fully
@@ -74,7 +118,7 @@ The suggestions below were written when it was called `Even`.
 category. "i think so". A class each, because BenchmarkDotNet's `--filter` picks classes and methods, not parameter
 values.
 
-**How the cores are picked:** `CoreJobs` runs every class on 2, 4, 8 and 12 cores. Running only some needs a
+**How the cores are picked:** `JobsByCoreCount` runs every class on 2, 4, 8 and 12 cores. Running only some needs a
 change in `shared/test/Binacle.Benchmarking`; not made.
 
 **(the maintainer, 2026-09-30)** - what each case records: "cores... bins count and items count ... flattened
@@ -273,7 +317,7 @@ The session's pick: FitsSomeMix, ShopRange, MixedItems.
 
 - **Old:** cores 2 and 12 first - if both give the same drop point, cores barely matter. FFD only; the BFD check
   shows whether the drop point, in us, lands in the same place.
-- **Built:** all four core counts in one run; `CoreJobs` has no way to pick some.
+- **Built:** all four core counts in one run; `JobsByCoreCount` has no way to pick some.
 - **New:** a dry run, then Even, then the lines run, the fit run, VariedItems, Spread, Real. Each only if the one
   before gave a clean answer. Real data never tunes the rule.
 
@@ -331,7 +375,8 @@ Read-only review with research. Everything here is its suggestion.
 - **Eight classes** - drop. Four or five are enough. One recipe that takes the category - keep, once a second
   class exists; pull a base class out then, not before.
 - **Stages A to E** - drop; built on the old category list.
-- **Cores 2 and 12 first** - needs a `CoreJobs` change. Not needed now: Even runs all four core counts on the short job.
+- **Cores 2 and 12 first** - needs a `JobsByCoreCount` change. Not needed now: Even runs all four core counts
+  on the short job.
 - **BFD check** - keep, late. BFD v2 re-sorts the space list on every try, so its time per piece grows faster.
 
 ### Open questions - its answers
@@ -406,9 +451,12 @@ list against several boxes, so each needs a box set as well.
 
 ## Also suggested (agent), pending
 
-- **`MaxDegreeOfParallelism` as a knob the rule turns**, tested here. It does not imitate a smaller machine.
-  `ParallelBinProcessor` takes a `concurrencyLevel` that only sizes its dictionary and never reaches
-  `MaxDegreeOfParallelism`; fix that before any rule relies on it.
+- **`MaxDegreeOfParallelism` as a knob the rule turns**, tested here. It does not imitate a smaller machine: the
+  .NET documentation says it limits how many run at once, not which CPU they land on.
+  **The constructor part is done** (agent, 2026-10-02): `ParallelBinProcessor` and
+  `ParallelMultiAlgorithmBinProcessor` now take `maxDegreeOfParallelism` and pass it to `Parallel.For`, and the
+  old `concurrencyLevel` argument is gone - the lock count is worked out as one writer per bin, capped by the
+  threads that can run. Nothing turns the knob yet, and no bins run has measured it.
 
 ## Done when
 

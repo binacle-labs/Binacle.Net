@@ -33,6 +33,7 @@ Binacle.Packing ─────────────────────�
    │      ├── Binacle.Lib.Benchmarks.Algorithms       BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
    │      ├── Binacle.Lib.Benchmarks.ParallelAlgorithms BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking (lib/bench, friend)
    │      ├── Binacle.Lib.Benchmarks.ParallelBins     BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking (lib/bench, friend)
+   │      ├── Binacle.Lib.Benchmarks.ParallelOverhead BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking (lib/bench)
    │      ├── Binacle.Lib.Benchmarks.ResultSelection  BDN exe refs: Lib, Lib.Data, Benchmarking   (lib/bench)
    │      ├── Binacle.Lib.Benchmarks.Scaling          BDN exe refs: Lib, Lib.Testing, Binacle.Data, Benchmarking   (lib/bench)
    │      └── Binacle.Lib.PackingEfficiency exe     refs: Lib, Lib.Testing, Binacle.Data, Reporting   (lib/measure)
@@ -53,6 +54,7 @@ Binacle.Packing ─────────────────────�
 | `Binacle.Lib.Benchmarks.Algorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, in three tiers |
 | `Binacle.Lib.Benchmarks.ParallelAlgorithms` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel for `Best`'s race, on the identical bin and items, per core count |
 | `Binacle.Lib.Benchmarks.ParallelBins` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | yes | Loop against Parallel over many identical bins, one class per algorithm, per core count |
+| `Binacle.Lib.Benchmarks.ParallelOverhead` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | what starting a race costs, with algorithms that do no packing, per core count |
 | `Binacle.Lib.Benchmarks.ResultSelection` | exe (`lib/bench`) | Lib, Lib.Data, Benchmarking | no | the three result selectors, v1 against v2 |
 | `Binacle.Lib.Benchmarks.Scaling` | exe (`lib/bench`) | Lib, Lib.Testing, Binacle.Data, Benchmarking | no | the three algorithms, v1 against v2, over the item ladder |
 | `Binacle.Lib.PackingEfficiency` | exe (`lib/measure`) | Lib, Lib.Testing, Binacle.Data, Reporting | no | packs every scenario, writes `lib/results/measurements/` |
