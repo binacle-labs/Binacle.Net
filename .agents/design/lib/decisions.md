@@ -1,7 +1,7 @@
 ---
 id: lib/decisions
-description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, and the open parallelization question.
-verified: 2026-09-30
+description: Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, the parallel bench shape (a class per thing raced, one grid per scenario kind, why the line classes measure an expected nothing), how a kept baseline run is removed or replaced rather than dated and what a skip mark carries, and the open parallelization question.
+verified: 2026-10-03
 check: Algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the project and fixture layout matches lib/ and shared/, and the folders embedded by shared/data/Binacle.Data/Binacle.Data.csproj match the Keys arrays in its BischoffSuite/DataProvider.cs and CustomProblems/DataProvider.cs
 also_update:
   - lib/findings
@@ -59,6 +59,108 @@ v2 is the `Algorithms` project's question. The old bins classes were retired ("3
 **Decided (the maintainer, 2026-09-30):** a baseline holds runs of classes that exist, nothing else - "what
 eeds to run should not be in results besaline", "keeping the old in old". The retired threshold reports are
 in git at commit `59e9dfb3`.
+
+**"Keeping the old in old" is superseded by D7** (2026-10-03): there is no dated folder. A superseded report
+is removed, and what it showed is written out in prose before it goes.
+
+### D6 — the Identical scenario is one grid, and a class per thing raced
+
+**Decided (the maintainer, 2026-10-03):** `ParallelAlgorithms` holds five classes - "we will split the alones
+as well / 5 clases / FFD alone / WFD alone / BFD Alone / FFD & BFD / FFD & BFD & WFD / all wll have 2 methods
+loop and paralel". `ParallelBins` holds six - "and for paralel bins / 6 / FFD Pieces / WFD Pieces / BFD Pieces
+/ FFD Lines / BFD Lines / WFD Lines". Algorithm order in a name follows the code, FFD then WFD then BFD -
+"algorithm = same as code".
+
+**Why a class and not a row:** BenchmarkDotNet's `--filter` picks classes, not rows. As one class, the
+two-algorithm race could not be run without paying for WFD, which costs about seven times FFD at 256 pieces.
+`ParallelOverhead` already split by race width for the same reason.
+
+**The cost of the split, measured 2026-10-03:** the alone rows used to share a report with the race rows, so
+`Loop` against the sum of its algorithms could be checked under one run's conditions. **The split broke that
+check as an equality.** `Loop` on a race class runs 1.10 to 1.21 times the sum of the alone classes, steadily
+across the whole grid, while the allocation is additive to the kilobyte - same arrays, same work, 10 to 21 per
+cent more time. An alone class's process only ever constructs one algorithm, so its factory and `Execute` call
+sites are monomorphic and get devirtualized; the race's cannot be. **The alone classes therefore measure a
+faster algorithm than the race contains.**
+
+It is still the test of whether a run is clean, read as a ratio rather than an equality: about 1.2 is normal,
+and a cell at 1.5 or more is a slow process. It only holds while every class of a scenario comes from one
+invocation, which is why the recipes filter them all in.
+
+**A one-algorithm class's `Parallel` row is not a race.** `ParallelLimits.Degree(1)` is 1, so `Parallel.For`
+runs the body inline and nothing is dispatched: the row is what `Parallel.For` costs to set up, which
+`$lib/findings` has measured straight in `ParallelOverhead`. It is kept because every class reading the same way
+is worth more than three cheap rows cost - read it as the cap's receipt.
+
+**Decided (the maintainer, 2026-10-03):** one grid for the whole scenario - "no for identical the params need
+to be identiacal to all we need to measrrue Under the same Ideal conditions" - and, asked whether that meant a
+cross product of every axis, "yes within each kind". So the three bins Pieces classes share a grid and the
+three Lines classes share another. The grid lives on a base class, not on the leaves, so three classes of a
+kind cannot drift apart and stop being comparable.
+
+**Decided (the maintainer, 2026-10-03):** the classes sit in a folder per scenario and the namespace stays at
+the project root - "we can put them in a folder and keep the namespace at root just for not cluttering".
+`IDE0130` is `none` in `.editorconfig`. The scenario stays in the type name as well as the folder, because
+BenchmarkDotNet names the report file after the type.
+
+**Why the line classes exist when the answer is expected to be nothing:** they hand the same pieces over twice,
+as one line of many and as many lines of one - "the idea is to provide same items in piece and as in lines to
+see if they differ at all". They should come out flat, since the algorithm's constructor flattens quantity into
+one array before sorting. He chose to measure it rather than read it off the code - "the way to go is add
+them... see and proove tjhey do nothing... sometimes having proof it doesnt work is better" - because a measured
+flat is what lets a parallelisation rule read pieces instead of lines, and an answered question still regresses.
+
+### D7 — a kept run is removed or replaced, never dated, and a skip carries its reason
+
+**Decided (the maintainer, 2026-10-03):** `baseline/` carries every bench class at the shape the code has now -
+"in baseline we do no skip bnaseline must carryuy all and updated to the latest shapoe". Two acts and no third:
+a class or shape that is gone has its report **removed**, and a class whose shape moved is **re-run and its
+report replaced** - "if a report exist in the baseline forlder in which we have no shape it must be removed and
+if a report exist and isnt ot in the right shape it must be run and be replaces".
+
+**No dated folder for the superseded ones** - "folder = no delete or fold into plans for history if we need
+them". What a removed report showed is written out in prose first, where it is still wanted. This reverses the
+dated-folder half of D5 and the agent preference recorded with it. Applied on 2026-10-03: all three parallel
+packing reports were removed when the two projects were reshaped.
+
+**Decided (the maintainer, 2026-10-03):** a class whose question is answered can be marked skip, and the mark
+carries a reason - "sure no skip flag and do skip with a reason". There is no flag that includes the skipped
+ones, because `baseline/` never skips, so the run mode is the only switch needed.
+
+`SkipAttribute` is built and **nothing reads it** (2026-10-03, on his "build the skip attribute do not wire
+it"). When it is wired, three things follow from the decisions above: a `baseline` run must ignore the mark,
+a `dry` run must ignore it too or a skipped class rots unnoticed - it still compiles, then fails at
+`GlobalSetup` - and the reader is where an empty reason should be rejected, not the attribute's constructor,
+which would throw during reflection. **Suggested (agent, 2026-10-03):** a `baseline` mode word carrying the
+default job, since `JobsByCoreCount` puts the mode word into the job id and a kept report's header would then
+say what it is.
+
+### D8 — ParallelOverhead is fake algorithms and fake bins, read as gaps
+
+**Decided (the maintainer, 2026-10-02):** the project is "paralel ovehear = fake algoirithms + bins we test
+both... we start with no work and some work?", and the names have to be plain - "make sure u use names that are
+clear and people undersntand what theu do". So `Fake_TwoAlgorithms`, `Fake_ThreeAlgorithms` and `Fake_Bins`,
+three rows each - `Loop`, `Parallel_OneThread`, `Parallel` - over a working set of 0 or 64 KB. Core counts 1,
+2, 4, 8 and 12: the set every other project runs, plus 1, which stays on his word - "2 keep it we need a
+baseline maybe the run was noisy maybe it was a dry run".
+
+**The rows are read as gaps, not as times.** `Loop` to `Parallel_OneThread` is what `Parallel.For` costs to
+set up and does not move with the machine; `Parallel_OneThread` to `Parallel` is what handing work to another
+CPU costs, and that one does. A `Mean` here is not a packing time - it is scaffolding around work that does
+not exist.
+
+**A class per race width, a parameter for bins:** a production race is only ever 2 or 3 wide, and `--filter`
+picks classes rather than parameter values, so each width can be run alone. A request carries any number of
+bins, so that has to be a parameter.
+
+**Names rejected on the way**, so they are not revisited: `Stub_` (jargon, and it describes how the double is
+built rather than what the case is), `NoPacking_` (collides with `OperationResultStatus.NotPacked`, a real
+result), `Empty_` (reads as an empty bin or an empty request), `NoWork_` (accurate until the algorithms started
+walking memory, which made no-work one value of a sweep rather than the case).
+
+**Why the project exists at all:** the cost of parallelising used to be read as the gap between two packing
+rows, and subtracting two numbers of similar size is the least reliable way to get one. Here it is measured
+straight. What it found is in `$lib/findings`.
 
 ## Pending
 
@@ -167,6 +269,22 @@ threshold is worse than none: below it, parallel costs up to 4.6× on exactly th
 
 **Undecided:** wire the bin threshold up, or delete the classes. F4 says what the threshold would have to be,
 not whether the routes are worth the branch. Leaving three
-unreachable processors in place invites someone to "fix" a path that never runs in production. Also
-`ParallelBinProcessor.concurrencyLevel` only sizes the `ConcurrentDictionary` — it never reaches
-`MaxDegreeOfParallelism`, so the name overpromises, and any wiring-up has to fix that first.
+unreachable processors in place invites someone to "fix" a path that never runs in production.
+
+**The processors were guarded on 2026-10-02**, which changes what wiring up still needs. `concurrencyLevel`
+left all three constructors and is worked out instead — one writer per work item, capped by the threads that
+can run — and `maxDegreeOfParallelism` is now the one optional argument, defaulting to `ParallelLimits.Degree`,
+which is `min(work items, Environment.ProcessorCount)` and never below 1. Pass `ParallelLimits.NoLimit` to lift
+it. So the old objection, that `concurrencyLevel` never reached `MaxDegreeOfParallelism`, is answered.
+
+**It is a cap, not a decision** (the maintainer, 2026-10-02: "the factory will choose but that we better guard
+the processors"). No processor branches to a loop on its own; whether to parallelise at all stays with the
+factory, in one place. What the cap prevents is the pathological case: on one CPU an uncapped race measured
+1,231 ns against the loop's 74, so parallel was 16 times dearer than not bothering, and capped it is 296 ns —
+still dearer than looping, which is why the factory and not the cap is what keeps production off that path.
+
+**What a threshold still cannot see.** `BinProcessorFactory.Create` takes `binCount` and `itemCount`, and
+`itemCount` is the item *lines* — one line of 500 pieces and one line of 2 look identical to it. Every drop
+point measured so far is in pieces, so wiring one up means either giving `Create` the piece count (summing
+quantities is a handful of nanoseconds against a 300 ns algorithm) or accepting that the case parallel wins
+hardest is the case the rule cannot detect. **Suggested (agent, 2026-10-03):** the first.

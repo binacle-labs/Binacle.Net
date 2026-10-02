@@ -1,15 +1,16 @@
 ---
-description: Session 4 - ParallelAlgorithms - find when racing algorithms on one bin in parallel beats a loop. Add and try, one class at a time, starting with the same bin and items as ParallelBins
+description: Session 4 - ParallelAlgorithms - find when racing algorithms on one bin in parallel beats a loop. Five Identical classes, one per alone algorithm and one per race width, all on the same params
 state: ready
-waits-on: "the maintainer decides the two fixes below, then runs ParallelOverhead on the default job"
+waits-on: "the maintainer runs the five classes - built and dry-checked 2026-10-03. The grid values are a suggestion until he picks them"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/**", "lib/bench/Binacle.Lib.Benchmarks.ParallelOverhead/**", "shared/test/Binacle.Benchmarking/**", "lib/test/Binacle.Lib.Testing/IdenticalCase.cs", "lib/results/benchmarks/**", "tooling/bench.just"]
 ---
 
 # 4 - ParallelAlgorithms drop point
 
-The project is `lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms`. `Identical_Packing` is its only class. The
-ladder classes, `Full_Packing`, `CoresSet` and their reports are gone; they are in git at commit 16560b6f.
+The project is `lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms`. It holds five `Identical` classes on a
+shared base - the shape section below. The ladder classes, `Full_Packing`, `CoresSet` and their reports are
+gone; they are in git at commit 16560b6f.
 
 ## Goal
 
@@ -30,14 +31,60 @@ classes should remain and we build from there", "remove the results we added".
 ParallelAlgorithms and ParallelBins - "the first step is to start with the same ladder? or same bin msame items on
 both ideally this should give us the perfect results".
 
-## What is left - suggested (agent, 2026-10-01)
+## The shape - five classes
 
-`Identical_Packing` has one kept run, on the short job, and is unchanged. The question of why starting a race
-gets dearer with cores moved to its own project - see "Why the win comes later on more cores" below.
+**Built and dry-checked 2026-10-03**, in `lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/Identical/`:
+each algorithm alone, then `FFD,BFD` and `FFD,WFD,BFD`, two methods each. The class set, the single grid, the
+folder, and why the split was worth making are decided and written up in the lib decisions ledger under
+`.agents/design/lib/`; what each class is now is in the lib tests doc under `.agents/docs/lib/`. **Nothing
+about the shape is open here.**
 
-Five overhead runs are done and read - see "What the overhead runs showed". **The missing cost is found**: it
-is the work being fetched to a cold CPU, and the `Bytes` axis measures it. That closes the question this plan
-opened. The rig is settled as of 2026-10-02; what is left is one clean run of it.
+Three things from it bite whoever runs this, so they stay:
+
+- **Run all five in one invocation**, and read the sum check as a ratio, not an equality. Measured 2026-10-03:
+  `Loop` on a race class is 1.10 to 1.21 times the sum of the alone classes while the allocation is additive, so
+  about 1.2 is normal and a cell at 1.5 or more is a slow process. The recipe's filter already takes all five.
+- **An alone class's `Parallel` row is not a race** - the cap resolves to 1 and `Parallel.For` runs the body
+  inline. Read it as the cap's receipt: a flat step above `Loop` on every core count, and something is wrong
+  with the cap if it is not.
+- **The grid is nobody's decision yet.** `Pieces` 1 to 256 on 2, 4, 8 and 12 cores, 360 cases, carried over
+  from the removed run. **Suggested (agent, 2026-10-03):** leave it until a run says otherwise.
+
+## Beyond Identical - the next scenario
+
+**Not touched this session** (the maintainer, 2026-10-03): "we wont toch the more advances this session". What
+follows is written so the next session can pick it up.
+
+**(the maintainer, 2026-10-03):** Identical is the ideal scenario, where every item packs. What makes a harder
+one here is that one algorithm may fail to pack - "now the identical is the ideal scenario / all items pack /
+but it may be that on algorithms 1 may bnot pack".
+
+**Suggested (agent, 2026-10-03):** that is the one axis this project is missing, and it matters more than
+another grid value. Parallel costs its setup plus the **slowest** algorithm; Loop costs their sum. In Identical
+the racers sit close together, so Parallel's cost is setup plus about the average and the spread never enters.
+A scenario where one algorithm does not pack puts the spread on the table, and the spread is what decides
+whether racing pays.
+
+It is also the reason `Algorithm.Best` races at all: a race is run because one algorithm may pack better, not
+because racing is quick.
+
+**Suggested (agent, 2026-10-03):** it gets its own folder beside `Identical/`, carrying the same five classes,
+so `--filter` picks a whole scenario. The name is his; it has to say that not everything packs.
+
+## What is left - agent, 2026-10-03
+
+**The project has no kept run.** `Identical_Packing` had one, on the short job; the class split into five on
+2026-10-03 and the report was removed under the baseline rule in the orchestrator. What it showed is written out
+below and is the only record of it. The question of why starting a race gets dearer with cores moved to its own
+project - see "Why the win comes later on more cores" below.
+
+The overhead runs are done and read - see "What the overhead runs showed". **The missing cost is found**: it is
+the work being fetched to a cold CPU, and the `Bytes` axis measures it. That closes the question this plan
+opened, and the rig has its clean run.
+
+**The five classes are built and dry-checked** (2026-10-03). What is left here is the run itself:
+`just bench lib-parallel-algorithms-identical`, all five in one invocation, 360 cases, no measured time at this
+grid.
 
 **Both rig faults are settled (the maintainer, 2026-10-02).** They were faults in the rig, not findings.
 
@@ -60,20 +107,52 @@ opened. The rig is settled as of 2026-10-02; what is left is one clean run of it
    It is also the only row that shows the case `ParallelLimits.Degree` exists to prevent, so dropping it would
    have cost the proof behind the cap.
 
-Then: one run on the default job, kept under `lib/results/benchmarks/baseline/parallel-overhead/`, with a row
-in `lib/results/benchmarks/baseline/README.md` and its real time in the recipe's comment.
+**That run is done - 2026-10-02, the default job, 150 cases in 58 minutes.** All three reports are kept under
+`lib/results/benchmarks/baseline/parallel-overhead/`, with their rows in
+`lib/results/benchmarks/baseline/README.md` and the real time in the recipe's comment. Every earlier overhead
+number in this plan came from jobs that were later deleted; **this run is the first that can be re-read from
+the repository**, so it is the one to quote.
 
-**Undecided, and waiting on him**: what to do with `lib/results/benchmarks/baseline/parallel-bins/`. Two of its
-cells no longer describe the code - see the record in the bins plan. Three options were put to him on
-2026-10-02 - delete the stale reports, overwrite them as new runs arrive, or move the parallel set to a dated
-folder and rebuild `baseline/` - and he has picked none. The agent's preference was the dated folder, because
-the existing bins run is the only measurement of the uncapped behaviour and the findings quote it.
+**Keeping the 1-CPU job was right, and the junk cells were the short job.** Not one `NA` cell, and every row
+on every core count has `Loop` below `Parallel_OneThread` below `Parallel`, which is the ordering that has to
+hold. The two cells this plan called untrustworthy are both clean: 1 bin at 64 KB now reads 1,067 / 1,343 /
+2,403 ns where `Loop` had come out above `Parallel_OneThread`, and 8 bins at 0 bytes reads 132.59 ns with
+StdDev at 2.5 per cent of mean where it had been 58. StdDev is under 4 per cent of mean in every row of all
+three reports.
+
+**The curve is U-shaped with its floor at 2 cores**, 0 bytes, `Parallel`:
+
+| Cores | Two algorithms | Three algorithms |
+|---|---|---|
+| 1 | 1,244 ns | 1,292 ns |
+| 2 | 693 ns | 827 ns |
+| 4 | 781 ns | 1,019 ns |
+| 8 | 1,078 ns | 1,381 ns |
+| 12 | 1,131 ns | 1,442 ns |
+
+So 1 CPU is dearer than 12, and the short job had put it at 2,666 ns - roughly twice the truth.
+
+**`Parallel_OneThread` is flat and `Loop` is flat.** 290, 292, 291, 290, 297 ns across the five core counts for
+two algorithms, StdDev about 0.5 per cent; `Loop` 73 to 76 ns. Both are deaf to the core count, which is what
+makes `Parallel_OneThread` the reference line the other rows are read against.
+
+**The three-way split holds, with new numbers**: the loop itself about 37 ns per algorithm, `Parallel.For`'s own
+setup about +218 ns, and handing the work to another CPU +400 ns at 2 cores rising to +834 at 12. The earlier
+figures in "What the overhead runs showed" below were 45, +190 and +571, from the deleted jobs. Same structure,
+different numbers - **prefer the ones here.**
+
+**Answered**: what to do with `lib/results/benchmarks/baseline/parallel-bins/`. Two of its cells no longer
+describe the code. Three options were put to him on 2026-10-02 - delete the stale reports, overwrite them as
+new runs arrive, or move the parallel set to a dated folder and rebuild `baseline/`. He took none of them; the
+bins plan holds the decision and what follows from it.
 
 `parallel-algorithms.md` is the maintainer's to shape; session 6 builds it.
 
 ## What the first run shows - agent, 2026-10-01
 
-Read from `baseline/parallel-algorithms/Identical_Packing.md`, short job.
+Read from `baseline/parallel-algorithms/Identical_Packing.md` before it was removed on 2026-10-03, short
+job. **The report is gone and this is the record of it** - the numbers below cannot be re-derived until the
+five classes have run.
 
 - **FFD,BFD: Parallel's best Ratio is 0.61** (2 cores, 256 pieces). The ideal for two algorithms that take the
   same time is 0.50. ParallelBins stops near 0.55 too (step 5).
@@ -95,7 +174,7 @@ Read from `baseline/parallel-algorithms/Identical_Packing.md`, short job.
 
 ## Why the win comes later on more cores - agent, 2026-10-01
 
-Read off `baseline/parallel-algorithms/Identical_Packing.md`. **The drop point moving is not itself a puzzle - it
+Read off the removed `baseline/parallel-algorithms/Identical_Packing.md`. **The drop point moving is not itself a puzzle - it
 follows from one number.** Starting a race costs more the more cores the process can see, while the packing
 itself does not change at all.
 
@@ -206,7 +285,7 @@ to 4,000 ns; the machinery alone gave 1,135; with a 64 KB working set it measure
 never machinery - it is the second thread fetching data the CPU it landed on does not hold.
 
 **And 64 KB is not an arbitrary size.** FFD on the identical case allocates 1.66 KB at 1 piece rising to 69.02
-KB at 256, read from `baseline/parallel-algorithms/Identical_Packing.md`. The size that reproduces the real
+KB at 256, read from the removed `baseline/parallel-algorithms/Identical_Packing.md`. The size that reproduces the real
 drop point is the size the real algorithm uses, which is what makes the axis worth having rather than a knob
 that happens to fit.
 
@@ -284,42 +363,19 @@ out, not to confirm.
 pieces there are. Each algorithm builds its own piece array, so this looks like the threads getting in each
 other's way over memory. Not the same question.
 
-## The shape ParallelOverhead settled on - the maintainer, 2026-10-02
+## ParallelOverhead, and the case both projects share
 
-His words: "paralel ovehear = fake algoirithms + bins we test both... we start with no work and some work?",
-and on the naming, "make sure u use names that are clear and people undersntand what theu do".
+Both are built, run and documented, so only the live parts stay here.
 
-| Class | What it is |
-|---|---|
-| `Fake_TwoAlgorithms` | the race the multi-bin routes run |
-| `Fake_ThreeAlgorithms` | the race the single-bin routes run |
-| `Fake_Bins` | 1, 2 or 8 bins through the bin processors |
+`ParallelOverhead`'s shape and the reasoning behind it are in the lib decisions ledger under
+`.agents/design/lib/`; what it is now is in the lib tests doc and the project's own README. **Read its rows as
+gaps**: `Loop` to `Parallel_OneThread` is `Parallel.For`'s setup and is flat across core counts;
+`Parallel_OneThread` to `Parallel` is the cost of handing work to another CPU, and that one moves.
 
-Three rows on each: `Loop`, `Parallel_OneThread` (`maxDegreeOfParallelism: 1`), `Parallel`. `Bytes` is 0 and
-65,536. Core counts 1, 2, 4, 8, 12 - the set every other project runs, plus 1, which stays on his word.
-
-**Read the gaps, not the rows.** `Loop` to `Parallel_OneThread` is what `Parallel.For` costs to set up and does
-not move with the machine; `Parallel_OneThread` to `Parallel` is what handing work to another CPU costs, and
-that one does.
-
-**Why a class per race width but a parameter for bins:** a race is only ever 2 or 3 wide in production, and
-BenchmarkDotNet's `--filter` picks classes rather than parameter values, so each can be run alone. A request
-carries any number of bins, so that has to be a parameter.
-
-**Names that were rejected on the way**, so they are not revisited: `Stub_` (jargon, and it describes how the
-double is built rather than what the case is), `NoPacking_` (collides with `OperationResultStatus.NotPacked`,
-a real result), `Empty_` (reads as an empty bin or an empty request), `NoWork_` (accurate until the algorithms
-started walking memory, which made no-work one value of a sweep rather than the case).
-
-## The class
-
-**Decided (the maintainer, 2026-09-30):** its shape - "But the shape is good" - and its name - "identical write it
-into the plans". The docs describe it. Why it looks the way it does - agent, 2026-09-30:
-
-- **The alone rows** show how far apart the algorithms are, and check that Loop is their sum.
-- **The same bin, item and piece values as ParallelBins' `Identical_FFD_Packing`.** Its one-bin Loop row does the
-  same work as the FFD alone row here, so the two reports check each other.
-- **No lines sweep.** ParallelBins' lines class answers it.
+**The case here is the same bin, item and piece values as ParallelBins' `Identical_FFD_Pieces_Packing`.** Its
+one-bin `Loop` row does the same work as the `FFD` alone class here, so the two reports check each other -
+that is the one cross-project reading to make when both have run. There is no lines sweep here; the ParallelBins
+Lines classes answer it.
 
 ## Two more shape changes - suggested (agent, 2026-10-01), pending
 
@@ -350,7 +406,7 @@ and at what piece counts.
 
 **Split the rule in two, as step 5 does:**
 
-- **The machine part** - what Parallel costs to set up, per core count. `Identical_Packing` answers it.
+- **The machine part** - what Parallel costs to set up, per core count. The five `Identical` classes answer it.
 - **The request part** - how uneven the algorithms are. Loop costs the sum of the algorithms; Parallel costs
   setup plus the slowest. The gain shrinks as one algorithm takes most of the time. A class where one algorithm
   is made slow on purpose - a bin that fits only part of the items - measures it.
@@ -369,8 +425,15 @@ problems then checks the rule; `Full_Packing` at commit 16560b6f is one to start
 
 ## Done when
 
-- [ ] `Identical_Packing` has a default-job run kept.
-      **By eye.** A report of it in a dated folder under `lib/results/benchmarks/`.
+- [ ] `ParallelAlgorithms` holds the five classes, each with `Loop` and `Parallel`, in a folder.
+      `ls lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/Identical/` lists the five and their base.
+- [x] `Identical_Packing` and its kept report are gone.
+      `test ! -f lib/results/benchmarks/baseline/parallel-algorithms/Identical_Packing.md`
+- [ ] The five have a kept baseline run, made in one invocation.
+      **By eye.** Five reports under `lib/results/benchmarks/baseline/parallel-algorithms/`, every one carrying
+      the same job header, and a row each in that folder's README.
+- [ ] `Loop` is the sum of its algorithms, checked across the alone and race reports of that one run.
+      **By eye.** It is the test of whether the run is clean, so a failing check reopens the run, not the plan.
 - [ ] The threshold is read out of the runs, or they show there is none, and the lib findings record says
       so - including the fixed line on when racing pays.
       **By eye.**

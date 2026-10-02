@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-10-02
+verified: 2026-10-03
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -146,10 +146,18 @@ In `lib/bench/`. Loop against Parallel for `Best`'s race (`$lib/findings`), on e
 Every class names the lib's **internal** `AlgorithmFactory_v2()` (`lib/src/Binacle.Lib/AlgorithmFactories/`),
 so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagnoser]`.
 
-- `Identical_Packing` — one bin and one item from `IdenticalCase`, param `Pieces`. Rows in three
-  `[BenchmarkCategory]` blocks: `Loop_FFD_BFD` (baseline) and `Parallel_FFD_BFD`; `Loop_FFD_WFD_BFD` (baseline)
-  and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
-  baseline, so their Ratio is `?`. Setup throws unless every algorithm packs every piece.
+`Identical/` holds `IdenticalBase` and five classes on it. The base holds the rows `Loop` (baseline) and
+`Parallel`, the param `Pieces`, and the bin and item from `IdenticalCase`; setup throws unless every algorithm
+packs every piece. The namespace stays at the project root. Each class names only the algorithms it races:
+
+- `Identical_FFD_Packing`, `Identical_WFD_Packing`, `Identical_BFD_Packing` — one algorithm each. `Parallel`
+  there is not a race: the default cap resolves to 1, so `Parallel.For` runs the body inline.
+- `Identical_FFD_BFD_Packing` — the race the multi-bin routes run.
+- `Identical_FFD_WFD_BFD_Packing` — the race the single-bin routes run.
+
+The `Pieces` values live on the base, so all five sweep one grid and their reports can be read side by side.
+The recipe filters all five in, because `Loop` against the sum of the alone classes only holds within one
+invocation.
 
 The short job by default.
 
@@ -165,6 +173,10 @@ whose process started badly. It is applied with `WithLaunchCount` only when give
 non-positive value is rejected as an unknown `--job` is. The report has a `Cores` column, read from the affinity
 mask, and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still shows every CPU the machine has.
 
+`SkipAttribute` marks a bench class whose question is answered: `[Skip("why")]`, the reason a required
+argument. Classes only, and not inherited, so a mark on a base does not reach the classes on it. **Nothing
+reads it** - no run honours it and no class carries one, so marking a class today changes nothing.
+
 `JobsByCoreCount.SetCoreCountAndCheck`, first in every class's `[GlobalSetup]`, is Linux
 only. On Linux BDN's pin (`sched_setaffinity` on the pid) reaches only the main thread, so it pins every thread
 in `/proc/self/task` to the mask, then fails the case if `ProcessorCount` is not N or any thread's
@@ -174,10 +186,15 @@ CPUs.
 ## Binacle.Lib.Benchmarks.ParallelBins
 
 In `lib/bench/`. Loop against Parallel for a request of many bins, on every core count in `JobsByCoreCount`, pinned as
-above. `IdenticalBase` takes the algorithm and holds the rows `Loop` (baseline) and `Parallel`, params `Bins`,
-`Lines` and `Pieces`, the bin and item from `IdenticalCase`; setup throws unless every bin is fully packed.
-`Identical_FFD_Packing`, `Identical_WFD_Packing` and `Identical_BFD_Packing` sweep bins and pieces on one line;
-`Identical_FFD_Lines_Packing` sweeps lines. The recipe `lib-parallel-bins-identical` takes the algorithm, then the word. Short job by default.
+above. `Identical/` holds `IdenticalBase`, two bases for the grids, and six classes. `IdenticalBase` takes the
+algorithm and holds the rows `Loop` (baseline) and `Parallel`, the abstract params `Bins`, `Lines` and `Pieces`,
+and the bin and item from `IdenticalCase`; setup throws unless every bin is fully packed. `PiecesBase` sweeps
+bins and pieces on one line, `LinesBase` sweeps the same pieces over more lines, and the grid sits on the base
+so the three classes of a kind cannot drift apart. `Identical_FFD_Pieces_Packing`, `Identical_WFD_Pieces_Packing`
+and `Identical_BFD_Pieces_Packing` sit on the first; `Identical_FFD_Lines_Packing`,
+`Identical_WFD_Lines_Packing` and `Identical_BFD_Lines_Packing` on the second. The namespace stays at the
+project root. The recipe `lib-parallel-bins-identical` takes the algorithm, then the word, and its filter picks
+both kinds for that algorithm. Short job by default.
 
 ## Binacle.Lib.Benchmarks.ParallelOverhead
 

@@ -183,7 +183,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: lib/decisions.md
-  description: "Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, and the open parallelization question."
+  description: "Lib decisions ledger — why Algorithm.Best races a different set per path, where the packing vocabulary lives, why there are two data hubs, why old algorithm versions are kept, the parallel bench shape (a class per thing raced, one grid per scenario kind, why the line classes measure an expected nothing), how a kept baseline run is removed or replaced rather than dated and what a skip mark carries, and the open parallelization question."
   paths: ["lib/**"]
 - file: lib/findings.md
   description: "Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions."

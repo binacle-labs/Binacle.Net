@@ -3,6 +3,7 @@ using Binacle.Lib.Abstractions;
 namespace Binacle.Lib.Benchmarks.ParallelBins;
 
 // The best case for Parallel: every bin the same, every item the same, and every item fits.
+[MemoryDiagnoser]
 public abstract class IdenticalBase
 {
 	private LoopBinProcessor loop = null!;

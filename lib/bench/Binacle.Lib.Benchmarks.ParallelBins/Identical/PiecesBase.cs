@@ -1,10 +1,9 @@
 namespace Binacle.Lib.Benchmarks.ParallelBins;
 
-[MemoryDiagnoser]
-public class Identical_BFD_Packing : IdenticalBase
+// The grid every Pieces class runs. It lives here so the three cannot drift apart - their reports are only
+// comparable while the values match.
+public abstract class PiecesBase : IdenticalBase
 {
-	protected override Algorithm Algorithm => Algorithm.BFD;
-
 	[Params(1, 2, 4, 8, 16, 24, 32)]
 	public override int Bins { get; set; }
 

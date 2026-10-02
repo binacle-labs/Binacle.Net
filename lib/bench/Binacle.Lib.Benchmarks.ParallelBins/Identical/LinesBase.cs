@@ -1,11 +1,9 @@
 namespace Binacle.Lib.Benchmarks.ParallelBins;
 
-// The same pieces over more lines. Flat if lines cost nothing once they are turned into pieces.
-[MemoryDiagnoser]
-public class Identical_FFD_Lines_Packing : IdenticalBase
+// The grid every Lines class runs: the same pieces handed over as one line of many, then as many lines of
+// one. Flat means lines cost nothing once they are pieces.
+public abstract class LinesBase : IdenticalBase
 {
-	protected override Algorithm Algorithm => Algorithm.FFD;
-
 	[Params(4)]
 	public override int Bins { get; set; }
 

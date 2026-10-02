@@ -42,17 +42,16 @@ Read out of each kept report's own header, not from the recipe comments: a short
 `RunStrategy=ColdStart`. Dates and case counts live in `lib/results/benchmarks/baseline/README.md` and
 `vipaq/results/benchmarks/baseline/README.md`; this table does not repeat them.
 
-**The times are the recipes' own estimates, not measured wall clock.** Nothing records how long a run actually
-took.
+**Most times are the recipes' own estimates, not measured wall clock.** Two are measured and say so.
 
 | Recipe | Kept | Job | Time | No kept run |
 |---|---|---|---|---|
 | `lib-algorithms-smoke` | 6 classes | quick | about 6 min | - |
 | `lib-algorithms-sample` | 6 classes | precise | about 30 min | - |
 | `lib-algorithms-full` | 6 classes | quick | about 16 hrs | precise, about 30 hrs |
-| `lib-parallel-algorithms-identical` | `Identical_Packing` | quick | 20 to 30 min | precise |
-| `lib-parallel-bins-identical` | `Identical_FFD_Packing`, `Identical_FFD_Lines_Packing` | quick | about 1 hr for FFD | WFD, BFD |
-| `lib-parallel-overhead` | nothing | - | about 40 min precise, 12 quick - an estimate, no run at this grid | all three classes |
+| `lib-parallel-algorithms-identical` | 5 classes | quick | about 40 min, measured 2026-10-03 | precise; and more launches for the three-algorithm class |
+| `lib-parallel-bins-identical` | nothing | - | about 1 hr for FFD, an estimate | all six of the 2026-10-03 shape |
+| `lib-parallel-overhead` | 3 classes | precise | 58 min, measured 2026-10-02 | - |
 | `lib-result-selection` | 3 classes | quick | about 3 min | precise |
 | `lib-scaling` | `Sample_Packing` | precise | about 20 min | - |
 | `vipaq-smoke` | 2 classes | quick | about 3 min | precise |
@@ -66,32 +65,42 @@ machine, so there is no quick or precise for it and no noise to average out. `ju
 files under `lib/results/measurements/`; `just measure vipaq` wrote all of `vipaq/results/measurements/`.
 Neither recipe states a time.
 
-## Kept reports that no longer match the code
+## The parallel packing reports are gone
 
-The parallel processors changed on 2026-10-02: `concurrencyLevel` left the constructors and
-`maxDegreeOfParallelism` now defaults to `ParallelLimits.Degree`. That reaches three kept reports.
+**All three were removed on 2026-10-03** - `parallel-algorithms/Identical_Packing.md`,
+`parallel-bins/Identical_FFD_Packing.md` and `parallel-bins/Identical_FFD_Lines_Packing.md`. Two things had
+made them unreadable: the processors changed on 2026-10-02, when `concurrencyLevel` left the constructors and
+`maxDegreeOfParallelism` began defaulting to `ParallelLimits.Degree`; and the two projects were reshaped on
+2026-10-03 into five and six classes. Neither `baseline/` folder exists now, and **eleven classes are waiting
+on their first run.**
 
-- **`parallel-bins/Identical_FFD_Packing.md` - two cells are stale.** `Bins = 1` now resolves to a degree of 1,
-  so `Parallel.For` runs the body inline where it used to pay a dispatch and get nothing for it. And 32 bins on
-  the 2-core job is now capped at 2, where the thread pool could previously inject more. Everything from 2 bins
-  up on 4 cores and above is unchanged. **Undecided:** the three options put to the maintainer on 2026-10-02 -
-  delete the stale reports, overwrite them as new runs arrive, or move the parallel set to a dated folder and
-  rebuild `baseline/`.
-- **`parallel-bins/Identical_FFD_Lines_Packing.md` - its 2-core rows may have moved the same way**, since it
-  holds 4 bins against a 2-CPU job. Its 4-, 8- and 12-core rows are unaffected. Suggested (agent, 2026-10-02):
-  the class goes, because its question is answered - its kept run is flat across 1 to 64 lines, which was
-  checked line by line (64 pieces reads 15.6 to 16.9 us across all four line counts).
-- **`parallel-algorithms/Identical_Packing.md` - its `Allocated` column predates the lock-array change.** A
-  race of two used to size its result dictionary for 12 writers and now sizes it for 2. The times are
-  unaffected. The size of the drop is read from the plan's own research, about 500 B, and **has not been
-  re-measured**; the next run of this class settles it.
+**What was read off them before they went**, so none of it has to be re-derived:
 
-**The three ParallelOverhead reports in the project's ignored artifacts folder are now of a shape that no
-longer exists** - they carry the 32-bin rows that left the grid on 2026-10-02. They are the only evidence
-behind this plan's memory findings, and `.gitignore` excludes the folder they sit in.
+- **The cap reached two cells of the FFD bins run.** `Bins = 1` resolves to a degree of 1, so `Parallel.For`
+  runs the body inline where it used to pay a dispatch and get nothing for it; and 32 bins on the 2-core job is
+  capped at 2 where the thread pool could previously inject more. Everything from 2 bins up on 4 cores and
+  above was unaffected.
+- **The lines run was flat across 1 to 64 lines**, checked line by line - 64 pieces read 15.6 to 16.9 us across
+  all four line counts. That is the finding the six Lines classes now re-measure on all three algorithms.
+- **The racing run's `Allocated` column predated the lock-array change.** A race of two used to size its result
+  dictionary for 12 writers and now sizes it for 2. The times were unaffected, and the size of the drop - about
+  500 B, from research rather than measurement - was never confirmed. The next racing run settles it.
 
-**Every future report's header will differ from every kept one**, because the job word is now part of the job
-id - `short 02 cores` where a kept report reads `02 cores`. That is a label, not a measurement.
+Plans 4 and 5 hold the rest of what those runs showed, in prose. **Nothing else cites them by path.**
+
+**Every future report's header will differ from every one of them**, because the job word is now part of the job
+id - `short 02 cores` where they read `02 cores`. That is a label, not a measurement.
+
+## The baseline folder, and skip
+
+Both rules are settled and both have left this plan. **The baseline rule** - every class at the current shape,
+a gone shape removed, a moved shape re-run and replaced, no dated folder - is stated at the top of
+`lib/results/benchmarks/baseline/README.md`, which is where anyone copying a report will be. **The skip mark**
+and the reasoning behind both are in the lib decisions ledger under `.agents/design/lib/`, and what the
+attribute is today is in the lib tests doc under `.agents/docs/lib/`.
+
+What is left here is only the judgement: **nothing is marked skip, and no class has earned a mark yet**,
+because a mark says a run proved an answer and none of the eleven has run.
 
 ## Who runs what
 
@@ -124,8 +133,8 @@ Every line here quotes the maintainer.
 
 | # | File | In one line | Gate |
 |---|---|---|---|
-| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | `ParallelAlgorithms`: `Identical_Packing` is run on the short job; re-run it on the default job, then add and try; read where racing starts to pay | `ls lib/results/benchmarks/*/parallel-algorithms/Identical_Packing.md` |
-| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | `ParallelBins`: `Identical`, one class per algorithm - FFD is run, WFD and BFD next; then add and try; read the bins parallelisation threshold | **by eye** - a kept run of a new class under `lib/results/benchmarks/*/parallel-bins/` |
+| 4 | [04-racing-drop-point](measured-results/04-racing-drop-point.md) | `ParallelAlgorithms`: five `Identical` classes - one per algorithm alone, one per race width - on one set of params; then read where racing starts to pay | `ls lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/Identical/` lists five classes and a base |
+| 5 | [05-bins-drop-point](measured-results/05-bins-drop-point.md) | `ParallelBins`: six `Identical` classes - a Pieces and a Lines one per algorithm, same params within a kind; then read the bins parallelisation threshold | `ls lib/bench/Binacle.Lib.Benchmarks.ParallelBins/Identical/` lists six classes and a base |
 | 6 | [06-lib-results](measured-results/06-lib-results.md) | fill the lib results files by hand ("6 is manual for now", 2026-09-29) | `! grep -l "is fake" lib/results/*.md` |
 | 7 | [07-vipaq-results](measured-results/07-vipaq-results.md) | fill the ViPaq results files the same way | `! grep -l "is fake" vipaq/results/*.md` |
 | 8 | [08-results-readmes](measured-results/08-results-readmes.md) | shape and write the summary of both results READMEs | `! grep -l "shape not decided" lib/results/README.md vipaq/results/README.md` |

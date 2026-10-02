@@ -1,45 +1,87 @@
 ---
-description: Session 5 - ParallelBins - find where packing many bins at the same time starts to pay. Add and try, starting with Identical - one class per algorithm, FFD run first; the other categories are pending suggestions
+description: Session 5 - ParallelBins - find where packing many bins at the same time starts to pay. Six Identical classes, a Pieces and a Lines one per algorithm, same params within a kind
 state: ready
-waits-on: "the maintainer runs WFD and BFD"
+waits-on: "the maintainer runs the six classes - built and dry-checked 2026-10-03. The grid values are a suggestion until he picks them"
 horizon: undecided
 paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "lib/test/Binacle.Lib.Testing/**", "shared/test/Binacle.Benchmarking/**", "tooling/bench.just"]
 ---
 
 # 5 - ParallelBins drop point
 
-## What is left - suggested (agent, 2026-10-01)
+## What is left - agent, 2026-10-03
 
-`Identical_FFD_Packing` and `Identical_FFD_Lines_Packing` are run and kept, short job. WFD and BFD passed `dry`
-only.
+**The project has no kept run.** `Identical_FFD_Packing` and `Identical_FFD_Lines_Packing` had short-job runs;
+both reports were removed on 2026-10-03 with the reshape, under the baseline rule in the orchestrator. What
+they showed is written out below and is the only record of it.
 
-**Two things changed under this plan on 2026-10-02 - read these before running anything here.**
-
-**1. The kept FFD run no longer matches the code at two cells.** `ParallelBinProcessor` now caps
+**Read this before reading any number further down.** `ParallelBinProcessor` changed on 2026-10-02: it now caps
 `maxDegreeOfParallelism` at `min(bins, cores)` by default instead of running unlimited. So `Bins = 1` resolves
-to a degree of 1 and `Parallel.For` runs the body inline - previously it paid a dispatch and got nothing for
-it, which is what "Parallel never wins on 1 bin" in this plan was measuring. And 32 bins on the 2-core job is
-capped at 2, where before the thread pool could inject more. Everything from 2 bins up on 4 cores and above is
-unchanged.
+to a degree of 1 and `Parallel.For` runs the body inline, where before it paid a dispatch and got nothing for
+it - which is what "Parallel never wins on 1 bin" below was measuring. And 32 bins on the 2-core job is capped
+at 2, where before the thread pool could inject more. **Those two cells of the old numbers are dead; from 2
+bins up on 4 cores and above they still describe the code.**
 
-The call site was left on the default on purpose: this project's question is whether parallel pays in
-production, and the cap is production now. **Decided by nobody** - if the kept run should stay row-for-row
-comparable instead, the class has to pass `ParallelLimits.NoLimit` and that is his call. What to do with the
-stale baseline is also open; the racing plan records the three options he was given.
+**Open, and his call:** the classes call `ParallelBinProcessor` on its default cap, because this project asks
+whether parallel pays in production and the cap is production now. Passing `ParallelLimits.NoLimit` instead
+would measure the uncapped dispatch, which is what `ParallelOverhead` is for.
 
-**2. The lines class has answered its question.** Its kept run is flat across 1 to 64 lines, so lines cost
-nothing once they are pieces. **Suggested (agent, 2026-10-02):** drop `Identical_FFD_Lines_Packing`. It is run
-time now, not a measurement. Its kept report would go with it, or to a dated folder.
+**The six classes are built and dry-checked** (2026-10-03). What is left here is the runs.
 
-1. The maintainer runs `just bench lib-parallel-bins-identical WFD`, then `BFD` - one at a time, nothing else
-   running meanwhile. Keep each report under `lib/results/benchmarks/baseline/parallel-bins/`, with a row in
-   `lib/results/benchmarks/baseline/README.md`, and put its time in the recipe's comment.
-2. Read them with him: do WFD and BFD stop near the same Ratio as FFD, and where do they start to win?
-3. Pick the next step with him from "The steps" - each is built only after the one before has run.
+**The lines question is now asked on all three algorithms.** The FFD run was flat across 1 to 64 lines, so lines
+cost nothing once they are pieces. The 2026-10-02 suggestion to drop the class is **superseded** - see the shape
+section: he chose a Lines class per algorithm, to prove the negative rather than argue it.
+
+What is left, in order:
+
+1. The runs, one at a time with nothing else running: `just bench lib-parallel-bins-identical FFD`, then
+   `WFD`, then `BFD`. Each report goes under `lib/results/benchmarks/baseline/parallel-bins/`, with a row in
+   `lib/results/benchmarks/baseline/README.md`, and its time in the recipe's comment. The questions they
+   answer: do WFD and BFD stop near the same Ratio as FFD, where do they start to win, and is each Lines class
+   flat against its Pieces twin?
+2. Read them with him, then pick the next step from "The steps" below. Each is built only after the one before
+   has run, so only one can be built at a time.
+
+## The shape - six classes
+
+**Built and dry-checked 2026-10-03**, in `lib/bench/Binacle.Lib.Benchmarks.ParallelBins/Identical/`: a Pieces
+and a Lines class for each of FFD, WFD and BFD, two methods each. The class set, one grid per kind, the folder,
+and why the Lines classes measure an expected nothing are decided and written up in the lib decisions ledger
+under `.agents/design/lib/`; what each class is now is in the lib tests doc under `.agents/docs/lib/`.
+**Nothing about the shape is open here.**
+
+What bites whoever runs this:
+
+- **The grids are nobody's decision yet.** Pieces kind: bins 1 to 32 by pieces 1 to 256 on one line, 504
+  cases. Lines kind: 4 bins, 64 and 256 pieces over 1, 4, 16 and 64 lines, 64 cases. Both carried over from
+  the removed runs. **Suggested (agent, 2026-10-03):** leave them until a run says otherwise.
+- **If a Lines class is not flat, there is one place to look.** The algorithm's constructor calls
+  `CalculateVolume` and `CalculateLongestDimension` once per line, outside the quantity loop, so N lines of
+  one pays N and one line of N pays one. Two multiplies and a comparison each, so it would only show at the
+  small piece counts.
+- **The call site uses the default cap**, because this project asks whether parallel pays in production.
+  `ParallelLimits.NoLimit` would be asking `ParallelOverhead`'s question instead, and switching is his call.
+
+## Beyond Identical - the next scenario
+
+**Not touched this session** (the maintainer, 2026-10-03): "we wont toch the more advances this session". What
+follows is written so the next session can pick it up.
+
+**(the maintainer, 2026-10-03):** for bins, the harder scenario is the same items against different bins - "on
+binms usually means same items but different bins".
+
+**Suggested (agent, 2026-10-03):** this is the axis the Identical classes cannot show, and it is the `Spread`
+category the suggestions further down already name. Every bin in Identical is a copy, so every bin takes the
+same time and Parallel's cost comes out as its setup plus about the average bin. Parallel really costs its setup
+plus the **slowest** bin. Bins of different sizes are what put those two apart, and that is what can stop
+parallel paying even when there are plenty of bins and plenty of cores.
+
+**Suggested (agent, 2026-10-03):** own folder beside `Identical/`, carrying the same six classes, so `--filter`
+picks a whole scenario. The name is his.
 
 ## What the FFD run shows - agent, 2026-10-01
 
-Read from `baseline/parallel-bins/Identical_FFD_Packing.md`, short job. Ratio is BenchmarkDotNet's, Parallel
+Read from `baseline/parallel-bins/Identical_FFD_Packing.md` before it was removed on 2026-10-03, short job.
+**The report is gone and this is the record of it.** Ratio is BenchmarkDotNet's, Parallel
 against Loop.
 
 - **Parallel's best Ratio is about 0.55, on every core count.** On the big jobs - 4 or more bins, Loop at 30 µs or
@@ -107,11 +149,9 @@ choose to run FFD only". The name - "identical write it into the plans".
 Every class is pinned through `JobsByCoreCount` in `shared/test/Binacle.Benchmarking` ("yes common code to shared").
 
 The project has `IdenticalBase` and a class per algorithm on it: identical bins and items from `IdenticalCase` in
-`lib/test/Binacle.Lib.Testing`, Loop against Parallel, all four core counts `JobsByCoreCount` has.
-`Identical_FFD_Packing`, `Identical_WFD_Packing`, `Identical_BFD_Packing`: bins 1 to 32, pieces 1 to 256, one line.
-`Identical_FFD_Lines_Packing`: 4 bins, 64 and 256 pieces over 1, 4, 16 or 64 lines. Recipe
-`lib-parallel-bins-identical` takes the algorithm, and `dry` to check first. Setup throws if any bin is not fully
-packed. The maintainer, 2026-09-30: "yes make sure they always pack everything fully meaning 256 item fit int box".
+`lib/test/Binacle.Lib.Testing`, Loop against Parallel, all four core counts `JobsByCoreCount` has. **The class
+set and its grids are the shape section above.** Recipe `lib-parallel-bins-identical` takes the algorithm, and
+`dry` to check first. Setup throws if any bin is not fully packed. The maintainer, 2026-09-30: "yes make sure they always pack everything fully meaning 256 item fit int box".
 The suggestions below were written when it was called `Even`.
 
 **Leaning yes (the maintainer, 2026-09-29):** one class per bin-set category, and one recipe that takes the
@@ -140,7 +180,7 @@ after the one before it has run.
 
 Ordered by what each needs measured before it. From the review below.
 
-**1. Identical** (was `Even`) - needs nothing. FFD run and kept; WFD and BFD to run.
+**1. Identical** (was `Even`) - needs nothing. FFD run and kept; WFD and BFD built but held, see above.
 - Answers: what Parallel costs on its own, and the fastest a bin can pack.
 - Its box is an exact multiple of the item, so every piece takes the first free space. Its time per piece is the
   lowest any request can have - never read a piece count off it.
@@ -460,7 +500,14 @@ list against several boxes, so each needs a box set as well.
 
 ## Done when
 
-- [ ] ParallelBins runs the stages the maintainer picked, and he has run them and kept the reports.
-      **By eye.** A report of a new class under `lib/results/benchmarks/*/parallel-bins/`.
+- [ ] `ParallelBins` holds the six classes, each with `Loop` and `Parallel`, in a folder.
+      `ls lib/bench/Binacle.Lib.Benchmarks.ParallelBins/Identical/` lists the six and their base.
+- [x] `Identical_FFD_Packing` and its kept report are gone.
+      `test ! -f lib/results/benchmarks/baseline/parallel-bins/Identical_FFD_Packing.md`
+- [ ] The six have a kept baseline run.
+      **By eye.** Six reports under `lib/results/benchmarks/baseline/parallel-bins/`, with a row each in that
+      folder's README and the real time in the recipe's comment.
+- [ ] Each Lines class is read against its Pieces twin: flat, or the difference is named and explained.
+      **By eye.** Flat is the expected answer, and a negative is the point of running them.
 - [ ] The drop point is read out of it, or the report shows there is none, and the lib findings record says so.
       **By eye.**
