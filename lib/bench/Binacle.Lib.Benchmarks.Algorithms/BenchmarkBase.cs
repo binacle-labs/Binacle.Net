@@ -6,7 +6,6 @@ public abstract class BenchmarkBase
 {
 	private Scenario? scenario;
 
-	// Each tier gets its scenarios from its own provider.
 	protected abstract Scenario Load();
 
 	protected abstract AlgorithmOperation Operation { get; }

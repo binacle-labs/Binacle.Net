@@ -37,19 +37,28 @@ gets dearer with cores moved to its own project - see "Why the win comes later o
 
 Five overhead runs are done and read - see "What the overhead runs showed". **The missing cost is found**: it
 is the work being fetched to a cold CPU, and the `Bytes` axis measures it. That closes the question this plan
-opened. What is left is tidying the rig and then getting one clean run of it.
+opened. The rig is settled as of 2026-10-02; what is left is one clean run of it.
 
-**Two things to fix first - suggested (agent, 2026-10-02), not decided.** Both are faults in the rig, not
-findings:
+**Both rig faults are settled (the maintainer, 2026-10-02).** They were faults in the rig, not findings.
 
-1. **Cap how much the fake work allocates.** At 32 bins by 64 KB each operation allocates and walks about 2 MB,
-   and two cells came back `NA` - the run exited non-zero. Either hold `Bins * Bytes` under a limit, or drop
-   the largest pair. A real algorithm's working set is tens of KB (see below), so megabytes per operation is
-   past anything the rig needs to imitate.
-2. **Drop the 1-CPU job.** Its rows cannot be trusted: dispatch gaps come out negative, one `Loop` cell has
-   StdDev at 58 per cent of its Mean, and a `Parallel_OneThread` cell reads 116 us against 38 on its
-   neighbours. One CPU shared with the operating system and BenchmarkDotNet's own host does not hold still. It
-   was added as a check on a prediction that turned out to be wrong anyway (see below), so nothing needs it.
+1. **The allocation is capped - done.** `Fake_Bins` now sweeps 1, 2 and 8 bins, on his "yes do it". At 32 bins
+   by 64 KB each operation walked about 2 MB, which measured garbage collection rather than dispatch, and two
+   cells came back `NA`. 8 bins by 64 KB is 512 KB and still shows the effect. The grid is 150 cases.
+2. **The 1-CPU job stays - he said keep it**: "2 keep it we need a baseline maybe the run was noisy maybe it was
+   a dry run" (2026-10-02).
+
+   **And this plan's reason for dropping it was too broad.** It said the 1-CPU rows "cannot be trusted" as a
+   whole. Read row by row, they split by class. `Fake_TwoAlgorithms` at 0 bytes is tight - Loop 75.6 ns,
+   `Parallel_OneThread` 301 ns, `Parallel` 2,666 ns, StdDev at 0.5, 0.5 and 4.8 per cent of mean - and that is
+   the row carrying the finding, 2,666 ns against about 750 at 2 CPUs. What is broken is `Fake_Bins`: at 1 bin
+   and 64 KB, `Loop` reads 3,504 ns against `Parallel_OneThread` at 1,393, which is impossible; at 8 bins and 0
+   bytes, `Loop` has StdDev at 58 per cent of its mean. With many bins or 64 KB to walk, the thread pool and the
+   garbage collector fight over the single CPU; with a 2- or 3-wide race and nothing to walk they do not. The
+   run that produced those cells was the short job, not dry - its header reads `IterationCount=3 LaunchCount=1
+   WarmupCount=3`.
+
+   It is also the only row that shows the case `ParallelLimits.Degree` exists to prevent, so dropping it would
+   have cost the proof behind the cap.
 
 Then: one run on the default job, kept under `lib/results/benchmarks/baseline/parallel-overhead/`, with a row
 in `lib/results/benchmarks/baseline/README.md` and its real time in the recipe's comment.
@@ -284,11 +293,10 @@ and on the naming, "make sure u use names that are clear and people undersntand 
 |---|---|
 | `Fake_TwoAlgorithms` | the race the multi-bin routes run |
 | `Fake_ThreeAlgorithms` | the race the single-bin routes run |
-| `Fake_Bins` | 1, 2, 8 or 32 bins through the bin processors |
+| `Fake_Bins` | 1, 2 or 8 bins through the bin processors |
 
 Three rows on each: `Loop`, `Parallel_OneThread` (`maxDegreeOfParallelism: 1`), `Parallel`. `Bytes` is 0 and
-65,536. Core counts 1, 2, 4, 8, 12 - the set every other project runs, plus 1, which the first fix above
-removes again.
+65,536. Core counts 1, 2, 4, 8, 12 - the set every other project runs, plus 1, which stays on his word.
 
 **Read the gaps, not the rows.** `Loop` to `Parallel_OneThread` is what `Parallel.For` costs to set up and does
 not move with the machine; `Parallel_OneThread` to `Parallel` is what handing work to another CPU costs, and
@@ -332,6 +340,11 @@ spin two threads for 100 and 100, then 100 and 10, then 100 and 1.
 launch, so the report cannot see process-to-process variance at all - which is the one thing that is actually
 wrong with the base run. 5 piece values at 3 launches costs about what 9 at 1 launch costs, and BenchmarkDotNet's
 own StdDev would then include the variance instead of hiding it.
+
+**The mechanism exists as of 2026-10-02:** every bench recipe takes an optional launch count after the word, so
+`just bench lib-parallel-algorithms-identical quick 3` runs each case in three processes. It is ours, not
+BenchmarkDotNet's `--launchCount`. What is still open is only whether to spend this project's budget that way,
+and at what piece counts.
 
 ## The steps after - suggested (agent, 2026-09-30), pending
 

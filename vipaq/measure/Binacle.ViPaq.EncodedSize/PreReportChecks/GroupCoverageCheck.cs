@@ -1,12 +1,10 @@
-using Binacle.ViPaq.Data.Packed;
 using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
 using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
 using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize.PreReportChecks;
 
-// Every pack must land in a file. A new Bischoff set or a fourth algorithm would otherwise be encoded and then
-// silently dropped, because the file list is fixed.
+// Every pack must land in a file: a new Bischoff set or algorithm would otherwise be encoded, then dropped.
 internal sealed class GroupCoverageCheck : IPreReportCheck
 {
 	public void Run()

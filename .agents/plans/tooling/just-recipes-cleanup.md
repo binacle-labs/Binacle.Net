@@ -8,8 +8,9 @@ paths: ["tooling/*.just", "tooling/*.sh", "tooling/image/*.sh", "justfile"]
 
 # Just recipes cleanup
 
-The bench module was reworked on 2026-09-22. A review of the other modules found the same faults. Nothing
-here was run; every line comes from reading the files.
+The bench module was reworked on 2026-09-22 and again on 2026-10-02, when its ten private per-project recipes
+became one shared one. A review of the other modules found the same faults. Nothing here was run; every line
+comes from reading the files.
 
 The rule the work follows: a short body - set a variable or two, then run one command - stays in the recipe.
 Loops, `case` tables and many steps go in a `.sh` file, so shellcheck reads them. No script is better than a
@@ -59,8 +60,14 @@ passing the last means typing all four.
 
 ## 6. One way to name a private recipe
 
-Four styles today: `_lychee`, `_build-site`, `_dotnet_test`, and bench's `lib-algorithms-run`. Pick one.
-Bench's follows the maintainer, 2026-09-22: "all recipes should be prefixe with lib or vipaq even prvate".
+Three styles today: `_lychee`, `_build-site`, `_dotnet_test`, plus bench's `_bench_run`. Pick one.
+
+**Bench answered the shared case, and it is the module name rather than the slice.** Until 2026-10-02 bench had
+one private recipe per project, `lib-algorithms-run` and the rest, following the maintainer, 2026-09-22: "all
+recipes should be prefixe with lib or vipaq even prvate". Those ten are now one shared recipe that both slices
+call, so it belongs to neither and can carry neither prefix. **Decided (the maintainer, 2026-10-02):** it is
+named `_bench_run` - "yes change to _bench_run". So a recipe shared across slices takes an underscore and the
+module name; the 2026-09-22 rule still holds for the per-slice ones, which bench no longer has.
 
 ## 7. Two silent failures
 

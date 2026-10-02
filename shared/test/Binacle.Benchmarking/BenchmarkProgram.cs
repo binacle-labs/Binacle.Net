@@ -10,9 +10,19 @@ public static class BenchmarkProgram
 {
 	public static int Run(Assembly assembly, string[] args, IConfig? config = null)
 	{
+		if (config is null)
+		{
+			config = JobOption.CreateConfig(args, out args);
+			if (config is null)
+			{
+				Console.Error.WriteLine($"Bad --job or --launches. {JobOption.Usage}");
+				return 1;
+			}
+		}
+
 		var summaries = BenchmarkSwitcher
 			.FromAssembly(assembly)
-			.Run(args, config ?? BenchmarkConfig.Create())
+			.Run(args, config)
 			.ToList();
 
 		if (summaries.Count == 0)

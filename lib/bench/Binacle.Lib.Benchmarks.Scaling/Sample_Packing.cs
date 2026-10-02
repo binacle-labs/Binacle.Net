@@ -8,7 +8,7 @@ public class Sample_Packing
 	private ScenarioBin bin = null!;
 	private List<ScenarioItem> items = null!;
 
-	// Every step of the ladder, so the curve has no gap. The bin is the largest one and never changes.
+	// The bin is the largest one and never changes.
 	[Params(3, 7, 13, 17, 23, 29, 37, 47, 59, 67, 79)]
 	public int Items { get; set; }
 

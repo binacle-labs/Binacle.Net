@@ -30,8 +30,7 @@ public class AttributeOrderer : IOrderer
 				.SelectMany(byJob => byJob.OrderBy(b => GetBenchmarkOrder(b))));
 	}
 
-	// Each job and each category is a group of its own, so a ratio is taken against the baseline of its own job
-	// and category. Without the job, every job's ratios are taken against one job's baseline.
+	// Each job and category is its own group, so a ratio is taken against its own baseline.
 	private static string GetGroupKey(BenchmarkCase benchmarkCase)
 	{
 		return $"{benchmarkCase.Parameters.DisplayInfo} | {benchmarkCase.Job.DisplayInfo} | {string.Join(",", benchmarkCase.Descriptor.Categories)}";

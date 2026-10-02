@@ -1,16 +1,12 @@
 using System.Globalization;
-using Binacle.ViPaq.Data.Packed;
 using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
 using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
 using DemoSamples = Binacle.ViPaq.Data.Packed.DemoSamples.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize;
 
-// The raw files under vipaq/results/measurements/encoded-size/<algorithm>/. One file per
-// group per algorithm per layout - the whole table in one file is more than GitHub will render, and one
-// algorithm per file lets a column be read straight down. Every one opens with the same sentence: tool, count,
-// group, algorithm - never a date. The count comes from the data, so it cannot drift when the packs are
-// regenerated.
+// The raw files under vipaq/results/measurements/encoded-size/<algorithm>/, one per group per algorithm per
+// layout. Each opens with the same sentence: tool, count, group, algorithm - never a date.
 internal static class ResultFiles
 {
 	private static readonly Dictionary<string, int> PackCounts = CountByGroup();

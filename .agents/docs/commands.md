@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image
-verified: 2026-10-01
+verified: 2026-10-02
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; measure recipes match tooling/measure.just; bench recipes match tooling/bench.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -247,15 +247,21 @@ question under `<slice>/bench/`, one recipe per project and tier:
 
 ```bash
 just bench                               # the list, in tier order, each recipe with its cost
-just bench lib-algorithms-smoke          # smoke: minutes, takes nothing; also vipaq-smoke
-just bench lib-algorithms-sample quick   # sample: default job, `quick` for short; also vipaq-sample
-just bench lib-algorithms-full precise   # full: asks first; short job, `precise` for default
+just bench lib-algorithms-smoke          # smoke: minutes; also vipaq-smoke
+just bench lib-algorithms-sample quick   # sample; also vipaq-sample
+just bench lib-algorithms-full precise   # full: asks first, except for dry
 just bench lib-result-selection          # about 3 minutes; its one tier
-just bench lib-scaling quick             # the item ladder, about 20 minutes: default job, `quick` for short; its one tier
-just bench lib-parallel-algorithms-identical dry   # Loop against Parallel on one bin; `dry` runs each case once
+just bench lib-scaling quick             # the item ladder, about 20 minutes; its one tier
+just bench lib-parallel-algorithms-identical dry   # Loop against Parallel on one bin
 just bench lib-parallel-bins-identical FFD dry     # the same on many bins; also WFD and BFD
 just bench lib-parallel-overhead dry               # what starting a race costs, with no packing in it
+just bench lib-parallel-overhead precise 3         # the same, each case in 3 processes
 ```
+
+Every recipe takes the same two optional arguments: a word - `dry` (each case once), `quick` (the short job) or
+`precise` (the default job) - and then a launch count, which runs each case in that many processes so a
+run-to-run spread shows. With no word a recipe runs the job on its own line, which its comment also names.
+Reports name the job in the header: `short 02 cores`.
 
 The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with
 `--filter`; result selection and scaling have one tier and run every class; the parallel projects run their

@@ -47,7 +47,7 @@ shared/data/Binacle.Data         the three scenario sets — Bischoff, custom-pr
 Binacle.Reporting            leaf — the measure loop, markdown writer and RepositoryRoot; no Binacle deps
    consumers: Lib.PackingEfficiency, ViPaq.EncodedSize, both ViPaq generators, OrLibrary.Converter
 
-Binacle.Benchmarking         leaf — the BDN config, the order attribute, the --job option and the core pinning;
+Binacle.Benchmarking         leaf — the BDN config, the order attribute, the --job and --launches options and the core pinning;
    refs BenchmarkDotNet, no Binacle deps                JobsByCoreCount builds one pinned job per core count, and
    consumers: every bench project (Lib.Benchmarks.Algorithms, .ParallelAlgorithms,   takes the counts to use
               .ParallelBins, .ParallelOverhead, .ResultSelection, .Scaling, ViPaq.Benchmarks)

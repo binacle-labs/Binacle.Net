@@ -1,12 +1,9 @@
-using Binacle.ViPaq.Data.Packed;
-using Binacle.ViPaq.Testing;
 using BischoffSuite = Binacle.ViPaq.Data.Packed.BischoffSuite.DataProvider;
 using CustomProblems = Binacle.ViPaq.Data.Packed.CustomProblems.DataProvider;
 
 namespace Binacle.ViPaq.EncodedSize.PreReportChecks;
 
-// Confirms every curated benchmark pick still resolves to a real generated scenario, so a stale pick is caught
-// here in a sentence rather than deep in a BenchmarkDotNet run.
+// Every curated benchmark pick must still resolve to a real generated scenario.
 internal sealed class CuratedPicksCheck : IPreReportCheck
 {
 	public void Run()

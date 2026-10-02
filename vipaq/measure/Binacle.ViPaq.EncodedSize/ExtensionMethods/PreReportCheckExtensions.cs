@@ -5,9 +5,8 @@ namespace Binacle.ViPaq.EncodedSize.ExtensionMethods;
 
 public static class PreReportCheckExtensions
 {
-	// The fail-fast gate that runs before the reports (see IPreReportCheck). Pair with RunPreReportChecks: register
-	// on the builder, then run from the built provider before the reporters run, so a broken premise stops the run
-	// rather than skewing a table. The real-pack round trips are unit tests (PackedDataRoundTripTests).
+	// Pair with RunPreReportChecks: register on the builder, run from the built provider before the reporters,
+	// so a broken premise stops the run rather than skewing a table.
 	public static IServiceCollection AddPreReportChecks(this IServiceCollection services)
 	{
 		services.AddTransient<IPreReportCheck, CuratedPicksCheck>();

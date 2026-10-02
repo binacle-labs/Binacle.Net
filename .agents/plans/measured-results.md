@@ -35,6 +35,64 @@ One plan in a topic folder, granted 2026-09-19. This file is the only one that p
 Every root results file is a placeholder: a comment per table saying what it holds, and a sample table with
 fake numbers under it. Both results READMEs are an index.
 
+## What has run, and with which job
+
+Read out of each kept report's own header, not from the recipe comments: a short-job report carries
+`IterationCount=3  LaunchCount=1`, a default-job one prints no characteristics line at all, and a dry one says
+`RunStrategy=ColdStart`. Dates and case counts live in `lib/results/benchmarks/baseline/README.md` and
+`vipaq/results/benchmarks/baseline/README.md`; this table does not repeat them.
+
+**The times are the recipes' own estimates, not measured wall clock.** Nothing records how long a run actually
+took.
+
+| Recipe | Kept | Job | Time | No kept run |
+|---|---|---|---|---|
+| `lib-algorithms-smoke` | 6 classes | quick | about 6 min | - |
+| `lib-algorithms-sample` | 6 classes | precise | about 30 min | - |
+| `lib-algorithms-full` | 6 classes | quick | about 16 hrs | precise, about 30 hrs |
+| `lib-parallel-algorithms-identical` | `Identical_Packing` | quick | 20 to 30 min | precise |
+| `lib-parallel-bins-identical` | `Identical_FFD_Packing`, `Identical_FFD_Lines_Packing` | quick | about 1 hr for FFD | WFD, BFD |
+| `lib-parallel-overhead` | nothing | - | about 40 min precise, 12 quick - an estimate, no run at this grid | all three classes |
+| `lib-result-selection` | 3 classes | quick | about 3 min | precise |
+| `lib-scaling` | `Sample_Packing` | precise | about 20 min | - |
+| `vipaq-smoke` | 2 classes | quick | about 3 min | precise |
+| `vipaq-sample` | 4 classes | precise | about 30 min | - |
+
+Every kept report belongs to a class that still exists - checked file by file against `lib/bench/` and
+`vipaq/bench/`. There are no orphans.
+
+**The measures have all run, and they take no job.** A measure gives the same result on every run and every
+machine, so there is no quick or precise for it and no noise to average out. `just measure lib` wrote both
+files under `lib/results/measurements/`; `just measure vipaq` wrote all of `vipaq/results/measurements/`.
+Neither recipe states a time.
+
+## Kept reports that no longer match the code
+
+The parallel processors changed on 2026-10-02: `concurrencyLevel` left the constructors and
+`maxDegreeOfParallelism` now defaults to `ParallelLimits.Degree`. That reaches three kept reports.
+
+- **`parallel-bins/Identical_FFD_Packing.md` - two cells are stale.** `Bins = 1` now resolves to a degree of 1,
+  so `Parallel.For` runs the body inline where it used to pay a dispatch and get nothing for it. And 32 bins on
+  the 2-core job is now capped at 2, where the thread pool could previously inject more. Everything from 2 bins
+  up on 4 cores and above is unchanged. **Undecided:** the three options put to the maintainer on 2026-10-02 -
+  delete the stale reports, overwrite them as new runs arrive, or move the parallel set to a dated folder and
+  rebuild `baseline/`.
+- **`parallel-bins/Identical_FFD_Lines_Packing.md` - its 2-core rows may have moved the same way**, since it
+  holds 4 bins against a 2-CPU job. Its 4-, 8- and 12-core rows are unaffected. Suggested (agent, 2026-10-02):
+  the class goes, because its question is answered - its kept run is flat across 1 to 64 lines, which was
+  checked line by line (64 pieces reads 15.6 to 16.9 us across all four line counts).
+- **`parallel-algorithms/Identical_Packing.md` - its `Allocated` column predates the lock-array change.** A
+  race of two used to size its result dictionary for 12 writers and now sizes it for 2. The times are
+  unaffected. The size of the drop is read from the plan's own research, about 500 B, and **has not been
+  re-measured**; the next run of this class settles it.
+
+**The three ParallelOverhead reports in the project's ignored artifacts folder are now of a shape that no
+longer exists** - they carry the 32-bin rows that left the grid on 2026-10-02. They are the only evidence
+behind this plan's memory findings, and `.gitignore` excludes the folder they sit in.
+
+**Every future report's header will differ from every kept one**, because the job word is now part of the job
+id - `short 02 cores` where a kept report reads `02 cores`. That is a label, not a measurement.
+
 ## Who runs what
 
 - **The maintainer runs** every bench, every measure, and any build that starts the host. A session gives him

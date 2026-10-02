@@ -2,8 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace Binacle.ViPaq.EncodedSize;
 
-// One output file holds one group in one layout. The Bischoff suite is split by its seven problem sets, because
-// 2,100 packs in one table is more than GitHub will render.
+// One output file holds one group in one layout. The Bischoff suite is split by problem set: one
+// table is more than GitHub will render.
 internal static partial class Groups
 {
 	public const string BischoffFamily = "bischoff-suite";

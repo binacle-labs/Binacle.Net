@@ -10,19 +10,17 @@ using BenchmarkDotNet.Running;
 
 namespace Binacle.Benchmarking;
 
-// One BDN job per core count, each pinned to the first N CPUs, so one run measures the same code as if the
-// machine were that size. Both ends of that live here: CreateConfig builds the jobs, and
+// One BDN job per core count, each pinned to the first N CPUs. CreateConfig builds the jobs;
 // SetCoreCountAndCheck is what a class calls first in its setup to make the pin stick and prove it did.
 public static class JobsByCoreCount
 {
-	// What a project gets unless it asks for something else. Changing this moves every kept run's job set, so
-	// a project that wants a different sweep passes its own instead.
+	// Changing this moves every kept run's job set.
 	public static readonly int[] Counts = [2, 4, 8, 12];
 
-	// Null when --job named a job BDN does not know.
+	// Null when --job or --launches is bad, as JobOption.Extract says.
 	public static ManualConfig? CreateConfig(string[] args, out string[] rest, int[]? counts = null)
 	{
-		var baseJob = JobOption.Extract(args, out rest);
+		var baseJob = JobOption.Extract(args, out rest, out var word);
 		if (baseJob is null)
 			return null;
 
@@ -37,16 +35,15 @@ public static class JobsByCoreCount
 			config.AddJob(baseJob
 				.WithAffinity((IntPtr)((1L << count) - 1))
 				.WithEnvironmentVariable("DOTNET_PROCESSOR_COUNT", count.ToString())
-				// Zero-padded so the report sorts 02, 04, 08, 12.
-				.WithId($"{count:D2} cores"));
+				// The job word leads, so a kept report's header says which job made it. Zero-padded so it sorts 02, 04, 08, 12.
+				.WithId($"{word} {count:D2} cores"));
 		}
 
 		return config;
 	}
 
-	// Runs inside the benchmark process, first in every pinned class's [GlobalSetup]. On Linux, BDN's pin
-	// reaches only the main thread; threads the runtime started before it keep every CPU, and new threads copy
-	// the mask of the thread that starts them - so every thread is pinned here and then checked.
+	// Runs first in every pinned class's [GlobalSetup]. On Linux, BDN's pin reaches only the main thread; threads
+	// started earlier keep every CPU and new threads copy their starter's mask - so every thread is pinned, then checked.
 	public static void SetCoreCountAndCheck()
 	{
 		var count = int.Parse(Environment.GetEnvironmentVariable("DOTNET_PROCESSOR_COUNT")

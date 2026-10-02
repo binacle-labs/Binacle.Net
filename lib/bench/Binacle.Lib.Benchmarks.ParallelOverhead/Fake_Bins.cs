@@ -1,20 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
-using Binacle.Benchmarking;
-using Binacle.Data;
 using Binacle.Lib.Abstractions;
-using Binacle.Lib.Testing;
-using Binacle.Packing;
 
 namespace Binacle.Lib.Benchmarks.ParallelOverhead;
 
-// What packing many bins at once costs, with algorithms that do not pack. The same three rows as the race
-// classes, over the bin processors instead of the algorithm ones.
-//
-// Bins is a parameter rather than a class because a request carries any number of them, where a race is only
-// ever 2 or 3 wide.
+// The three race rows over the bin processors. Bins is a parameter: a request carries any number of them.
 [MemoryDiagnoser]
 public class Fake_Bins
 {
@@ -24,7 +12,9 @@ public class Fake_Bins
 	private List<ScenarioBin> bins = null!;
 	private List<ScenarioItem> items = null!;
 
-	[Params(1, 2, 8, 32)]
+	// Stops at 8: at 32 bins of 64 KB one operation walks about 2 MB, which measured garbage collection,
+	// and two cells came back NA.
+	[Params(1, 2, 8)]
 	public int Bins { get; set; }
 
 	[Params(0, 65_536)]
@@ -46,7 +36,7 @@ public class Fake_Bins
 
 		var factory = new FakeAlgorithmFactory(oneResult, this.Bytes);
 		this.loop = new LoopBinProcessor(factory);
-		// -1 lifts the processor's default cap, which is min(bins, cores) - see FakeRaceBase for why.
+		// -1 lifts the processor's default cap, min(bins, cores); see FakeRaceBase.
 		this.parallel = new ParallelBinProcessor(factory, maxDegreeOfParallelism: -1);
 		this.parallelOneThread = new ParallelBinProcessor(factory, maxDegreeOfParallelism: 1);
 

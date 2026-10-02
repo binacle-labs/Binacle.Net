@@ -1,18 +1,10 @@
-using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
-using Binacle.Benchmarking;
-using Binacle.Data;
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.AlgorithmProcessing;
-using Binacle.Lib.Testing;
-using Binacle.Packing;
 
 namespace Binacle.Lib.Benchmarks.ParallelOverhead;
 
-// What racing algorithms costs, with algorithms that do not pack. The three rows, and the setup every race
-// class shares. `Bytes` is how much memory each fake algorithm walks: 0 is the pure machinery cost, above 0
-// stands in for a real algorithm's working set.
+// The three race rows and their shared setup. `Bytes` is how much memory each fake algorithm walks: 0 is the
+// pure machinery cost, above 0 stands in for a real algorithm's working set.
 [MemoryDiagnoser]
 public abstract class FakeRaceBase
 {
@@ -33,7 +25,7 @@ public abstract class FakeRaceBase
 	{
 		JobsByCoreCount.SetCoreCountAndCheck();
 
-		// The smallest case there is. Nothing here packs it; the processors only carry it through.
+		// The smallest case there is; the processors only carry it.
 		this.bin = IdenticalCase.Bin();
 		this.items = IdenticalCase.Items(1);
 
@@ -44,9 +36,8 @@ public abstract class FakeRaceBase
 
 		var factory = new FakeAlgorithmFactory(oneResult, this.Bytes);
 		this.loop = new LoopAlgorithmProcessor(this.Algorithms, factory);
-		// -1 lifts the processor's default cap, which is min(work, cores). The cap is the right production
-		// default and it is what the packing projects measure; this project is measuring what a dispatch costs,
-		// so it has to ask for the uncapped path or there is nothing left to measure at 1 CPU.
+		// -1 lifts the processor's default cap, min(work, cores). This project measures what a dispatch costs,
+		// so it needs the uncapped path or there is nothing left to measure at 1 CPU.
 		this.parallel = new ParallelAlgorithmProcessor(this.Algorithms, factory, maxDegreeOfParallelism: -1);
 		this.parallelOneThread = new ParallelAlgorithmProcessor(this.Algorithms, factory, maxDegreeOfParallelism: 1);
 

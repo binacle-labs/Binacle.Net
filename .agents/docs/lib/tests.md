@@ -1,7 +1,7 @@
 ---
 id: lib/tests
 description: lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases
-verified: 2026-10-01
+verified: 2026-10-02
 check: Project list, AlgorithmFactories/CommonTestingFixture/ResultSelectionTestingFixture and what AssertResult calls, and the aliases, match lib/test/, lib/measure/, lib/bench/ and tooling/tests.just + tooling/measure.just + tooling/bench.just
 also_update:
   - shared
@@ -131,12 +131,13 @@ In `lib/bench/`. Three tiers, the tier in the class name. `BenchmarkBase` holds 
 `[GlobalSetup]` through the abstract `Load`, and `Run(factory)` executes it with the abstract `Operation`.
 
 - `Smoke_<FFD|WFD|BFD>_<Packing|Fitting>` (`SmokeBase`): rows `v1` (baseline) and `v2`, the column from
-  `[ParamsSource]` over `SmokeSet.Names`. `short` job.
+  `[ParamsSource]` over `SmokeSet.Names`. `short` job by default.
 - `Sample_<FFD|WFD|BFD>_<Packing|Fitting>` (`SampleBase`): rows `v1` (baseline) and `v2`, the column over
-  `SampleSet.Names`. Default job, `short` with `quick`.
+  `SampleSet.Names`. Default job by default.
 - `Full_<Alg>_<Op>` (`FullBase`): the same rows, the column over `Binacle.Data.BischoffSuite.DataProvider.Names`,
-  every Bischoff problem. `short` job, default with `precise`.
+  every Bischoff problem. `short` job by default.
 
+Every recipe takes `dry`, `quick` or `precise`: the dry job, the short job, the default job.
 Every class is `[MemoryDiagnoser]`. The recipe picks a tier with `--filter '*.<Tier>_*'`. Every `v1` method carries the deleted-with-v1 comment.
 
 ## Binacle.Lib.Benchmarks.ParallelAlgorithms
@@ -150,14 +151,19 @@ so `Binacle.Lib` grants the project friend access. Every class is `[MemoryDiagno
   and `Parallel_FFD_WFD_BFD`; and `FFD`, `WFD`, `BFD` alone, each a `LoopAlgorithmProcessor` of one, with no
   baseline, so their Ratio is `?`. Setup throws unless every algorithm packs every piece.
 
-The short job; `dry` runs each case once.
+The short job by default.
 
 Each core count is a BDN job, built in `JobsByCoreCount` (`shared/test/Binacle.Benchmarking`). Each sets the affinity
 mask to the first N CPUs **and** `DOTNET_PROCESSOR_COUNT=N`: BDN pins the child after it starts, and .NET reads
 its CPU count once at start-up. BDN adds a CLI `--job` beside declared jobs instead of applying it, so
-`JobOption.Extract` takes `--job` out of the args and returns the job it names, and `Program.cs` builds the core
-jobs from that; the recipe passes it as every other recipe does. The report has a `Cores` column and hides `Job`, `Affinity` and `EnvironmentVariables`; the header
-still shows every CPU the machine has.
+`JobOption.Extract` takes `--job` and `--launches` out of the args and returns the job they name, and the word
+it resolved; `Program.cs` builds the core jobs from that. Each job id is the word then the core count, as
+`short 02 cores`, so the report header says which job made it. `JobOption.CreateConfig` does the same for the
+projects that do not pin: the id is the word. `--launches N` is ours, not BDN's `--launchCount`: every job runs
+one process per case, so `StdDev` only covers that process, and more launches is the only way to see a case
+whose process started badly. It is applied with `WithLaunchCount` only when given, and a non-numeric or
+non-positive value is rejected as an unknown `--job` is. The report has a `Cores` column, read from the affinity
+mask, and hides `Job`, `Affinity` and `EnvironmentVariables`; the header still shows every CPU the machine has.
 
 `JobsByCoreCount.SetCoreCountAndCheck`, first in every class's `[GlobalSetup]`, is Linux
 only. On Linux BDN's pin (`sched_setaffinity` on the pid) reaches only the main thread, so it pins every thread
@@ -171,7 +177,7 @@ In `lib/bench/`. Loop against Parallel for a request of many bins, on every core
 above. `IdenticalBase` takes the algorithm and holds the rows `Loop` (baseline) and `Parallel`, params `Bins`,
 `Lines` and `Pieces`, the bin and item from `IdenticalCase`; setup throws unless every bin is fully packed.
 `Identical_FFD_Packing`, `Identical_WFD_Packing` and `Identical_BFD_Packing` sweep bins and pieces on one line;
-`Identical_FFD_Lines_Packing` sweeps lines. The recipe `lib-parallel-bins-identical` takes the algorithm and `dry`.
+`Identical_FFD_Lines_Packing` sweeps lines. The recipe `lib-parallel-bins-identical` takes the algorithm, then the word. Short job by default.
 
 ## Binacle.Lib.Benchmarks.ParallelOverhead
 
@@ -188,15 +194,17 @@ param, `0` and `65536`.
   throws unless the race returns one result per algorithm.
 - `Fake_TwoAlgorithms` and `Fake_ThreeAlgorithms` — `FFD,BFD` and `FFD,WFD,BFD`, the races the multi-bin and
   single-bin routes run. One class each rather than a param, because a race's width is fixed by production.
-- `Fake_Bins` — the bin processors, param `Bins` 1, 2, 8 or 32. A param rather than a class because a request
+- `Fake_Bins` — the bin processors, param `Bins` 1, 2 or 8. It stops at 8: at 32 bins of 64 KB one operation allocates and walks about 2 MB,
+  which measured garbage collection and came back `NA` in two cells. A param rather than a class because a request
   carries any number. Setup throws unless one result comes back per bin.
 - `FakeAlgorithmFactory` (in `lib/test/Binacle.Lib.Testing`) — an `IAlgorithmFactory` whose algorithms return
   the result passed to it. `Create` still allocates, `Execute` is still a virtual call and the identifier name
   is still built, so only the packing is absent. Its `bytes` argument is how much memory each instance walks,
   a cache line at a time, from a buffer of its own - the stand-in for a real algorithm's working set.
 
-The default job, not the short one: the gaps it measures are small enough that a short run blurs them. `quick`
-runs the short job, `dry` runs each case once. Recipe `lib-parallel-overhead`.
+The default job, not the short one: the gaps it measures are small enough that a short run blurs them. Recipe
+`lib-parallel-overhead` takes the word, then an optional launch count (`just bench lib-parallel-overhead precise 3`),
+the only recipe that does.
 
 Its `Program` passes `JobsByCoreCount.CreateConfig` an explicit `[1, 2, 4, 8, 12]`, so it adds a 1-CPU job to
 the set every other project runs. `JobsByCoreCount.Counts` stays `[2, 4, 8, 12]`, so no other project's kept
@@ -212,11 +220,11 @@ work to a worker, which then waits for the caller to come off the single CPU.
 In `lib/bench/`. `BestAlgorithm`, `BestBin`, `SmallestBin` — one class per selector, `[MemoryDiagnoser]`, rows
 `v1` (baseline) and `v2`, the scenario name as the column from `[ParamsSource]` over the set's
 `DataProvider.Names`, aliased as `<Set>Data` because the bench class already carries the set's name. `BenchmarkBase` holds the name, loads the scenario in `[GlobalSetup]` through the
-abstract `Load`, which each class points at its own set, and `Run(strategy)`. Always the `short` job.
+abstract `Load`, which each class points at its own set, and `Run(strategy)`. `short` job by default.
 
 ## Binacle.Lib.Benchmarks.Scaling
 
 In `lib/bench/`. Packing time against item count, on the item ladder in `LadderGenerator`.
 One class, `Sample_Packing`, `[MemoryDiagnoser]`: `[Params]` over every step (3 to 79 items), the bin fixed
 at `MaxSizeBin`, and v1 and v2 of each algorithm as rows, through the public `AlgorithmFactories` - `FFD_v1`
-(baseline), `FFD_v2`, `WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. Default job, `short` with `quick`.
+(baseline), `FFD_v2`, `WFD_v1`, `WFD_v2`, `BFD_v1`, `BFD_v2`. Default job by default.

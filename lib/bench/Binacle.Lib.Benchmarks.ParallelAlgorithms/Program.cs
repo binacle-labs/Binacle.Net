@@ -7,7 +7,7 @@ internal class Program
 		var config = JobsByCoreCount.CreateConfig(args, out var rest);
 		if (config is null)
 		{
-			Console.Error.WriteLine("Unknown --job. Use dry, short, medium, long, verylong or default.");
+			Console.Error.WriteLine($"Bad --job or --launches. {JobOption.Usage}");
 			return 1;
 		}
 

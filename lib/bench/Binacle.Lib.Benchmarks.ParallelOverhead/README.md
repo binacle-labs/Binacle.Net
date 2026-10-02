@@ -16,7 +16,7 @@ similar size is the least reliable way to get one. Here it is measured straight.
 | `FakeRaceBase.cs` | The three rows, and the setup the race classes share |
 | `Fake_TwoAlgorithms.cs` | A two-algorithm race, the one the multi-bin routes run |
 | `Fake_ThreeAlgorithms.cs` | A three-algorithm race, the one the single-bin routes run |
-| `Fake_Bins.cs` | 1, 2, 8 or 32 bins through the bin processors |
+| `Fake_Bins.cs` | 1, 2 or 8 bins through the bin processors |
 | `Program.cs` | Takes `--job` out of the args, builds the core jobs from it over 1, 2, 4, 8 and 12 CPUs, and runs with the config from `shared/test/Binacle.Benchmarking` |
 
 `FakeAlgorithmFactory`, whose algorithms do not pack, lives in `lib/test/Binacle.Lib.Testing` with the other
@@ -32,6 +32,7 @@ is a parameter.
 just bench lib-parallel-overhead dry      # each case once: checks the pinning
 just bench lib-parallel-overhead quick    # the short job
 just bench lib-parallel-overhead          # the default job
+just bench lib-parallel-overhead precise 3  # the default job, each case in 3 processes
 ```
 
 `just bench` lists it with its cost. The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
@@ -75,6 +76,10 @@ one CPU that worker waits for the caller to be taken off it. Measured dearer tha
 `Parallel_OneThread` is not a production path. It passes `maxDegreeOfParallelism: 1`, which makes `Parallel.For`
 run the body on the calling thread.
 
-The pinning is Linux only, and a class run outside `Program` fails at setup. This project asks for 1 CPU as well
-as the 2, 4, 8 and 12 every other project runs, so its core counts line up with the `ParallelAlgorithms` and
-`ParallelBins` reports and the three can be read side by side.
+The pinning is Linux only, and a class run outside `Program` fails at setup. The 2, 4, 8 and 12 CPU jobs are the
+set every other project runs, so the three reports can be read side by side; this one adds 1 CPU.
+
+**The 1-CPU rows of `Fake_Bins` are not usable, and the race rows are.** At one CPU the thread pool and the
+garbage collector contend with the benchmark for it, which a 2- or 3-wide race walking nothing does not
+provoke. A race row there is tight. A bins row there can read `Loop` slower than `Parallel_OneThread`, which
+cannot happen, or carry a StdDev over half its own mean. Read a 1-CPU bins row only as a sign the case ran.
