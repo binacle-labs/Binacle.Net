@@ -1,8 +1,8 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-09-29
-check: The numbers under "Size today" match the files under vipaq/results/measurements/encoded-size/; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Smoke_Encode, Sample_Encode, Smoke_Decode, Sample_Decode, Sample_CompressionCost_Encode, Sample_CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
+verified: 2026-10-04
+check: The numbers under "Size today" match the files under vipaq/results/measurements/encoded-size/ - the per-format table, the share figures, the codec counts and the raw-wins packs were all recomputed from those files on 2026-10-04; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Smoke_Encode, Sample_Encode, Smoke_Decode, Sample_Decode, Sample_CompressionCost_Encode, Sample_CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -51,6 +51,30 @@ decisions lean on:
   deflate is 68% (57% to 88%). Raw is the same length in both layouts.
 - **Deflate beats raw on every Bischoff pack.** The smallest has 39 items, so the Bischoff crossover sits below
   anything the suite holds.
+
+**What each format costs, in stored characters.** Mean and max over the 2,322 packs. ViPaq and protobuf are
+base64 lengths; JSON and compact notation are text lengths, because text is its own stored form.
+
+| Format | Mean | Max |
+|---|--:|--:|
+| JSON | 4,702 | 22,048 |
+| Compact notation | 1,669 | 7,904 |
+| Protobuf raw | 1,472 | 7,168 |
+| ViPaq raw (either layout) | 954 | 4,468 |
+| Protobuf deflate | 529 | 1,656 |
+| ViPaq deflate, row | 362 | 1,248 |
+| ViPaq deflate, columnar | 304 | 704 |
+
+- **ViPaq deflate columnar as a share of the others**, per pack then averaged: JSON **7%** (1% to 22%), compact
+  notation **21%**, protobuf raw **24%**, protobuf deflate **58%**.
+- **ViPaq over protobuf under the same codec**: raw **0.65**, deflate row **0.68**, deflate columnar **0.58**,
+  gzip **0.60** columnar to **0.70** row.
+- **Deflate is the smallest of the three codecs on 2,265 packs in row and 2,275 in columnar. Gzip is never the
+  smallest** — it is deflate plus framing, so it loses on size as well as on time.
+- **Every real pack deflates to at most 1,248 base64 characters in row, 704 in columnar.** That is the ceiling a
+  caller has to budget for.
+- **Compression pays from very small packs, but not always.** Raw still wins on 57 packs in row and 47 in
+  columnar, and the largest of those is 6 items in row and 2 in columnar.
 
 ## The first harness runs (2026-07) - real data, shipped v1 library
 

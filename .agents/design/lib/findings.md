@@ -1,8 +1,8 @@
 ---
 id: lib/findings
-description: Lib findings — the measured evidence (algorithm racing cost, parallel algorithm racing, parallel bin processing) behind the decisions.
-verified: 2026-09-30
-check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are in the Bischoff suite, and CoresSet and Full_Packing are still in git at commit 16560b6f; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; the Full_Algorithms_ and Full_Bins_ reports at commit 59e9dfb3 still carry the item ladder and bins 1 to 7. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in git at commit 59e9dfb3, under lib/results/benchmarks/baseline/threshold/.
+description: Lib findings — the measured evidence (fill, version gains, algorithm racing cost, parallel algorithm racing, parallel bin processing, parallel overhead) behind the decisions.
+verified: 2026-10-04
+check: the five problems of F1 and F2 (thpack1_7, thpack1_44, thpack2_30, thpack2_35, thpack7_56) are in the Bischoff suite, and CoresSet and Full_Packing are still in git at commit 16560b6f; 8a7580f3 is still the commit that added ThrowIfCancellationRequested to the lib processors; the fitting family under lib/src/Binacle.Lib/Fitting/ is still gone; the Full_Algorithms_ and Full_Bins_ reports at commit 59e9dfb3 still carry the item ladder and bins 1 to 7. F1, F2 and the notes are not re-checkable from the repo - see Environment. F2a and F4 are: their reports are in git at commit 59e9dfb3, under lib/results/benchmarks/baseline/threshold/. F6 to F11 re-read from the kept files: the two measures under lib/results/measurements/, the Full_<alg>_Packing reports under lib/results/benchmarks/baseline/algorithms/, the three reports under baseline/parallel-overhead/, and the two FFD reports under baseline/parallel-bins/. F8's mechanism is the OrderBy in the v1 BFD and WFD AlgorithmOperation against List.Sort in v2; F11's is CalculateVolume and CalculateLongestDimension sitting outside the quantity loop in the v2 Algorithm constructors.
 also_update:
   - lib/decisions
 paths:
@@ -17,13 +17,20 @@ Ranges show the effect, not a guarantee.
 
 ## Environment
 
-Two runs, both on an AMD Ryzen 9 9900X with 12 physical cores, Linux Ubuntu 26.04, BenchmarkDotNet v0.15.8.
-Times compare within one run only; ratios and `Allocated` compare across both.
+Every run is on an AMD Ryzen 9 9900X with 12 physical cores, Linux Ubuntu 26.04, BenchmarkDotNet v0.15.8.
+Times compare within one run only; ratios and `Allocated` compare across runs.
 
 | Run | What it produced | Runtime |
 |---|---|---|
 | 2026-07-17, `AlgorithmRacing_Packing_v2` | F1, F2 | .NET 10.0.9 |
 | 2026-09-25, `just bench lib-threshold-full precise` | F2a, F4 | .NET 10.0.12, default job |
+| 2026-09-25, `just bench lib-algorithms-full` | F8 | .NET 10.0.12, short job |
+| 2026-10-02, `just bench lib-parallel-overhead` | F9 | .NET 10.0.12, default job |
+| 2026-10-03, `just bench lib-parallel-bins-identical FFD` | F10, F11 | .NET 10.0.12, short job |
+| `just measure lib` | F6, F7 | no job — a measure has no noise |
+
+A measure gives the same result on every run and every machine, so F6 and F7 carry no error bars and are not
+dated: any change in them is a real change.
 
 Within-run error is **0.3–1.0%** of the mean on the 2026-07-17 run, so the effects below are far outside the
 noise.
@@ -219,6 +226,176 @@ Smoke run, short job, one process per case - v3 time as × v2:
 
 The gain grows with the number of free spaces. On packing, BFD v3 now takes 0.94× to 1.09× of FFD v2's time and WFD v3 1.07×
 to 1.65×. Four scenarios only; the full run over 700 is not done.
+
+## F6 — fill per algorithm over the 700 Bischoff problems
+
+`lib/results/measurements/packing-efficiency.md`, written by `just measure lib`. Fill is the packed volume as
+a share of the bin, v2.
+
+| Algorithm | Min | Mean | Median | Max |
+|---|---|---|---|---|
+| FFD | 56.18 | 73.41 | 73.47 | 87.90 |
+| WFD | 49.15 | 69.21 | 69.05 | 87.90 |
+| BFD | 62.08 | 81.26 | 81.48 | 90.66 |
+
+- **Best of FFD and BFD — the pair the API races — is 81.30 mean. Best of all three is 81.33.** WFD adds
+  0.03 points. This is the fill side of `$lib/decisions#D1`: F1 says WFD multiplies the cost of a race by 2.3
+  to 4.7, and this says it buys three hundredths of a point.
+- **Best or tied: BFD on 669 of the 700, FFD on 35, WFD on 35.**
+- **BFD leads in every set**, BR1 (3 item types) through BR7 (20): 80.17 to 82.12. FFD and WFD lose ground as
+  item types grow — FFD 75.70 at BR1 down to 71.63 at BR7, WFD 74.78 down to 67.41.
+
+## F7 — v1 and v2 pack the same, with one exception
+
+`lib/results/measurements/version-parity.md`: all 700 problems pack to the same fill under FFD v1 and v2, and
+under WFD v1, v2 and v3. BFD differs on one — `OrLibrary_thpack7_45`, 79.08 in v1 against 79.73 in v2 and v3.
+So the v2 rewrite is a speed and memory change, not a packing change.
+
+## F8 — v2's memory gain is the free-space sort (2026-09-25)
+
+`lib/results/benchmarks/baseline/algorithms/Full_FFD_Packing.md`, `Full_WFD_Packing.md` and
+`Full_BFD_Packing.md` — every Bischoff problem, v1 against v2, packing, short job. Mean of BenchmarkDotNet's
+per-problem `Alloc Ratio`:
+
+| Algorithm | v2 allocation as × v1 |
+|---|---|
+| FFD | 0.38 |
+| WFD | 0.05 |
+| BFD | 0.08 |
+
+**WFD and BFD gain twenty times what FFD gains, and the reason is one line.** BFD v1 and WFD v1 pick a space
+with `availableSpace.OrderBy(...)` in
+`lib/src/Binacle.Lib/Algorithms/Best Fit Decreasing v1/AlgorithmOperation.cs` and
+`lib/src/Binacle.Lib/Algorithms/Worst Fit Decreasing v1/AlgorithmOperation.cs`, which builds a new sorted copy
+of the free-space list for every item and every orientation. v2 sorts the list in place with `List.Sort`. FFD
+never sorted spaces at all, so it only drops to 0.38×.
+
+`Allocated` is memory handed out during one pack, garbage included — not peak memory.
+
+## F9 — what `Parallel.For` costs around a race (2026-10-02)
+
+`Binacle.Lib.Benchmarks.ParallelOverhead` runs the processors with algorithms that take no measurable time, so
+a row is what the processor costs around them rather than the gap between two packing rows of similar size.
+Built on the maintainer's "lets make the first and 3rd theese we can measure cleanly and get them down
+properly" (2026-10-01). Reports: `lib/results/benchmarks/baseline/parallel-overhead/`, default job.
+
+Read the rows as gaps: `Loop` to `Parallel_OneThread` is `Parallel.For`'s own setup; `Parallel_OneThread` to
+`Parallel` is the cost of handing the work to another CPU.
+
+**The curve is U-shaped and its floor is 2 cores.** `Parallel`, nothing to walk:
+
+| Cores | Two algorithms | Three algorithms |
+|---|---|---|
+| 1 | 1,244 ns | 1,292 ns |
+| 2 | 693 ns | 827 ns |
+| 4 | 781 ns | 1,019 ns |
+| 8 | 1,078 ns | 1,381 ns |
+| 12 | 1,131 ns | 1,442 ns |
+
+**One CPU is the dearest, not the cheapest.** `Parallel.For` still hands the work to a worker thread, and with
+one CPU that worker waits for the caller to be taken off it. The maintainer kept the 1-CPU job for this —
+"2 keep it we need a baseline maybe the run was noisy maybe it was a dry run" (2026-10-02) — and it is the one
+row that shows the case the degree cap exists to prevent: there an uncapped two-algorithm race costs 1,244 ns
+against the loop's 76.
+
+**The cost splits three ways**, two algorithms: the loop itself about 37 ns per algorithm, `Parallel.For`'s own
+setup +218 ns, and handing the work to another CPU +400 ns at 2 cores rising to +834 ns at 12. **Only the third
+moves with the core count.**
+
+**`Parallel_OneThread` and `Loop` are both deaf to the core count** — 290, 292, 291, 290, 297 ns and 76, 73,
+73, 73, 74 ns across the five counts. That is what makes `Parallel_OneThread` the reference line the other two
+rows are read against.
+
+**Most of the hand-off is the work's memory, not the dispatch.** With a 64 KB working set the
+`Parallel_OneThread`-to-`Parallel` gap goes from 401 to 1,368 ns at 2 cores, and from 834 to 2,994 ns at 12.
+With bins it grows faster still — `Fake_Bins` at 12 cores reads 635 ns at 1 bin and 2,167 ns at 8 bins with
+nothing to walk, against 1,227 ns and 13,684 ns with 64 KB per bin. **So the setup term is a function of the
+request**, not one number per machine: "parallel costs its setup plus the slowest bin" understates it.
+
+`Loop` is below `Parallel_OneThread` is below `Parallel` in every row of all three reports, which is the
+ordering that has to hold, and no cell came back `NA`.
+
+Noise: the worst StdDev is 5.6 per cent of mean in `Fake_TwoAlgorithms`, 7.3 in `Fake_ThreeAlgorithms` and 8.6
+in `Fake_Bins` — all of them `Parallel` rows, which is the row that varies. `Loop` and `Parallel_OneThread` sit
+near 1 per cent throughout.
+
+Not covered: where the work lands. `maxDegreeOfParallelism` caps how many concurrent tasks run, not which CPU
+runs them, and .NET has no managed way to place work that runs on pooled threads.
+
+## F10 — parallel *bins*: the drop point is a surface and the ceiling is about 2× (2026-10-03)
+
+`Identical_FFD_Pieces_Packing` — identical bins, identical items, FFD, bins 1 to 32 by pieces 1 to 256, on 2,
+4, 8 and 12 cores. Report: `lib/results/benchmarks/baseline/parallel-bins/Identical_FFD_Pieces_Packing.md`,
+short job. Ratio is BenchmarkDotNet's, `Parallel` against `Loop`. This is the axis `$lib/decisions#O1` asks
+about, measured on a synthetic case instead of F4's item ladder.
+
+The piece count where `Parallel` first wins:
+
+| Bins | 2 cores | 4 cores | 8 cores | 12 cores |
+|---|---|---|---|---|
+| 1 | never | never | never | 128 |
+| 2 | 32 | 32 | 32 | 32 |
+| 4 | 8 | 16 | 16 | 32 |
+| 8 | 4 | 4 | 16 | 32 |
+| 16 | 2 | 2 | 8 | 16 |
+| 24 | 1 | 1 | 4 | 8 |
+| 32 | 1 | 1 | 4 | 4 |
+
+**More bins win earlier; more cores win later**, with no exception in either direction. The 1-bin row is the
+control — there is nothing to parallelise, and its single cell at 0.97 is noise.
+
+**`Parallel` never captures more than about 2×, however many bins.** Best ratio at 12 cores:
+
+| Bins | best ratio | perfect scaling | what it got |
+|---|---|---|---|
+| 2 | 0.63 | 0.50 | 1.6× of a possible 2× |
+| 4 | 0.61 | 0.25 | 1.6× of a possible 4× |
+| 8 | 0.57 | 0.12 | 1.8× of a possible 8× |
+| 16 | 0.54 | 0.08 | 1.9× of a possible 12× |
+| 24 | 0.58 | 0.08 | 1.7× of a possible 12× |
+| 32 | 0.53 | 0.08 | 1.9× of a possible 12× |
+
+Across all four core counts the best cell of each bin count runs 0.50 to 0.62. **The ceiling does not move with
+the bin count**: 2 bins and 32 bins both stop near 0.55, so going wider buys an earlier drop point and nothing
+else. It is not the bin count, the core count or the request size that stops it there; nothing measures the
+cause yet.
+
+**`Bins = 1` is the degree cap's receipt.** With one bin the cap resolves to 1 and `Parallel.For` runs the body
+inline, so `Parallel` sits a small step above `Loop` that does not grow with the core count — **230 to 302 ns
+up to 16 pieces**. Read it only there. At 32 pieces the step already scatters from 98 to 338 ns because it is
+becoming small next to the baseline, and past 64 pieces it is under the noise and goes negative. Do not read
+the row as a ratio either: the same step is 1.79 to 1.98 at one piece, where the baseline is only 264 to
+294 ns.
+
+Noise: `Loop` StdDev is 0.33 per cent of mean at the median, 0.89 at the 90th percentile, worst 6.99.
+`Parallel` is 1.72, 5.49 and 14.00.
+
+**Read the drop point in time per bin, not in pieces.** The case's box is an exact multiple of the item, so
+every piece takes the first free space — the cheapest work per piece any request can have. A piece count read
+off it sits too low for mixed items.
+
+Not covered: WFD and BFD, more than 32 bins, more than 256 pieces, and anything but identical bins and items.
+
+## F11 — lines cost almost nothing once they are pieces (2026-10-03)
+
+`Identical_FFD_Lines_Packing` — 4 bins, 64 and 256 pieces spread over 1, 4, 16 and 64 lines. Report:
+`lib/results/benchmarks/baseline/parallel-bins/Identical_FFD_Lines_Packing.md`, short job. A class per
+algorithm exists to prove this negative rather than argue it — the maintainer, 2026-09-30: "for bins we need 3
+one for each algotirhm to see how algorithms change behaviour".
+
+`Loop`, 64 lines against the same pieces in one line:
+
+- **At 256 pieces: flat** — −0.9 to +1.8 per cent across the four core counts, inside the noise.
+- **At 64 pieces: +3.6 to +10.3 per cent**, or +0.6 to +1.6 μs on a 16 μs baseline. `Loop` StdDev is 0.8 per
+  cent of mean at the median and 2.0 at the 90th percentile, so this one is above the noise.
+
+**It is exactly where it was predicted.** The v2 algorithm constructor calls `CalculateVolume` and
+`CalculateLongestDimension` once per line, outside the quantity loop (`Algorithm.cs` in each v2 family under
+`lib/src/Binacle.Lib/Algorithms/`), so 64 lines of quantity 1 pays 64 of them where one line of 64 pays one.
+It shows only at the small piece count, where there is nothing else to hide it.
+
+So a rule can read pieces — lines do not change the shape of the answer. But lines are not free: a request of
+many single-quantity lines costs a few per cent more than the same pieces in one line.
 
 ## Note — the old `MultipleBins` records (November 2025, records deleted)
 
