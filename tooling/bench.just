@@ -62,7 +62,7 @@ lib-algorithms-full mode='' launches='':
 lib-parallel-algorithms-identical mode='' launches='':
     just bench _bench_run 'lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms' '*.Identical_*' short "{{ mode }}" "{{ launches }}"
 
-# Loop against Parallel, one algorithm, v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: about 70 minutes for FFD quick, measured 2026-10-03; default: quick
+# Loop against Parallel, one algorithm, v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: about 70 minutes quick, measured 2026-10-05; default: quick
 [arg('algorithm', pattern='FFD|WFD|BFD')]
 [arg('mode', pattern='|dry|quick|precise')]
 [arg('launches', pattern='|[1-9][0-9]*')]

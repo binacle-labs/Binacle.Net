@@ -48,6 +48,8 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `parallel-algorithms/Identical_FFD_WFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
 | `parallel-bins/Identical_FFD_Pieces_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short |
 | `parallel-bins/Identical_FFD_Lines_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short |
+| `parallel-bins/Identical_WFD_Pieces_Packing.md` | `just bench lib-parallel-bins-identical WFD` | short |
+| `parallel-bins/Identical_WFD_Lines_Packing.md` | `just bench lib-parallel-bins-identical WFD` | short |
 | `parallel-overhead/Fake_TwoAlgorithms.md` | `just bench lib-parallel-overhead` | default |
 | `parallel-overhead/Fake_ThreeAlgorithms.md` | `just bench lib-parallel-overhead` | default |
 | `parallel-overhead/Fake_Bins.md` | `just bench lib-parallel-overhead` | default |

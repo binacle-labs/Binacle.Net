@@ -90,7 +90,7 @@ Read out of each kept report's own header, not from the recipe comments: a short
 | `lib-algorithms-sample` | 6 classes | precise | about 30 min | - |
 | `lib-algorithms-full` | 6 classes | quick | about 16 hrs | precise, about 30 hrs |
 | `lib-parallel-algorithms-identical` | 5 classes | quick, 3 launches | about 2 hrs, measured 2026-10-04 | precise |
-| `lib-parallel-bins-identical` | FFD, 2 classes | quick | about 70 min, measured 2026-10-03 | WFD and BFD, 4 classes |
+| `lib-parallel-bins-identical` | FFD and WFD, 4 classes | quick | about 63 min per algorithm, measured 2026-10-05 | BFD, 2 classes |
 | `lib-parallel-overhead` | 3 classes | precise | 58 min, measured 2026-10-02 | - |
 | `lib-result-selection` | 3 classes | precise | about 5 min | - |
 | `lib-scaling` | `Sample_Packing` | precise | about 20 min | - |
@@ -442,11 +442,11 @@ section: he chose a Lines class per algorithm, to prove the negative rather than
 
 What is left, in order:
 
-1. The WFD and BFD runs, one at a time with nothing else running: `just bench lib-parallel-bins-identical WFD`,
-   then `BFD`. Each report goes under `lib/results/benchmarks/baseline/parallel-bins/`, with a row in
-   `lib/results/benchmarks/baseline/README.md`, and its time in the recipe's comment. The questions they
-   answer: do WFD and BFD stop near the same Ratio as FFD, where do they start to win, and is each Lines class
-   flat against its Pieces twin?
+1. The BFD run, with nothing else running: `just bench lib-parallel-bins-identical BFD`. Both reports go under
+   `lib/results/benchmarks/baseline/parallel-bins/`, with a row each in
+   `lib/results/benchmarks/baseline/README.md`, and the time in the recipe's comment. The questions it
+   answers: does BFD stop near the same Ratio as FFD and WFD, where does it start to win, and is its Lines
+   class flat against its Pieces twin?
 2. Read them with him, then pick the next step with him. Each is built only after the one before has run, so
    only one can be built at a time.
 
