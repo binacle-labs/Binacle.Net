@@ -15,7 +15,7 @@ format shows up as a diff.
 | `EncodingRunner.cs` | Encodes every pack in every format and fills the bag |
 | `EncodingBag.cs` | What the runner measured; every reporter reads from here |
 | `ResultFiles.cs` | One file per group per algorithm per layout, and the header sentence each opens with |
-| `Groups.cs` | Which file a pack goes in - the Bischoff suite splits by its seven sets, the other two families are one each |
+| `Groups.cs` | Which file a pack goes in - the Bischoff suite splits by its sets, the other two families are one each |
 | `Reporters/` | The per-pack rows, one table per codec. One instance per file, registered in `Program.cs` |
 
 ## 🛠️ How you use it
@@ -30,6 +30,6 @@ caused it.
 
 ## ⚠️ What will bite you
 
-It overwrites the tracked files every run. Adding a Bischoff set means adding it to `Groups.All`, and a fourth algorithm means adding it to
+It overwrites the tracked files every run. Adding a Bischoff set means adding it to `Groups.All`, and a new algorithm means adding it to
 `Algorithms.All`; the gate stops the run rather than dropping those packs silently. Timings are not measured here - they belong in
 `vipaq/bench/Binacle.ViPaq.Benchmarks`.

@@ -11,8 +11,8 @@ of already-computed results and the one the selector is expected to choose. One 
 - `BestBin/` - pick the best bin.
 - `SmallestBin/` - pick the smallest bin that still fits.
 
-Each folder has a single `baseline.json` today, so coverage is thin. A new JSON file is embedded on its own, but
-is not read until its key is added to that set's `DataProvider.Keys` in `Binacle.Lib.Data`.
+A new JSON file is embedded on its own, but is not read until its key is added to that set's
+`DataProvider.Keys` in `Binacle.Lib.Data`.
 
 ## 🧾 Format
 
@@ -31,7 +31,7 @@ A JSON array of scenarios. Each scenario names the expected winner and the candi
 ```
 
 - `Name` - short, and the benchmark's column header as is. Names repeat across folders, so a name is looked
-  up through its folder's `DataProvider` class, never across all three.
+  up through its folder's `DataProvider` class, never across folders.
 - `ExpectedResult` - the bin key the selector under test must choose.
 - `Results` - candidate results keyed by bin; each value is a compact operation result
   `Bin Algorithm PackingStatus <metric> <metric>`.

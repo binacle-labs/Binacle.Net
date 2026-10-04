@@ -3,8 +3,7 @@
 The timings for `Binacle.ViPaq`: one BenchmarkDotNet project. Not tests - nothing here passes or fails - and
 not measurements either: a timing is one machine's number, so nothing here is tracked. Size is measured by
 [`vipaq/measure`](../measure) and written to [`vipaq/results`](../results); a timing run worth keeping is copied
-into [`vipaq/results/benchmarks/`](../results/benchmarks) by hand: a class's first kept run into `baseline/`, a later
-one into a dated folder.
+by hand into `baseline/` under [`vipaq/results/benchmarks/`](../results/benchmarks).
 
 ## 📂 What is in it
 

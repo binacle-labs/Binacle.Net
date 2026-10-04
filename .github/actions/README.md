@@ -20,7 +20,7 @@ steps in an `action.yml`, no packaging and no publishing. A workflow uses one by
 
 ## 📥 Installing a pinned binary
 
-Four one-step actions. Each calls `tooling/ci/install-<tool>.sh`, which downloads a release, checks it against
+One-step actions. Each calls `tooling/ci/install-<tool>.sh`, which downloads a release, checks it against
 a **pinned SHA-256** and puts it on `PATH`. A changed checksum fails the step rather than running an unknown
 binary.
 
@@ -40,6 +40,6 @@ for each version and nothing to keep in step.
 
 ## 🏗️ Building
 
-`build-jekyll-site` builds one of the three sites as a pre-flight check - it takes the site name and its
+`build-jekyll-site` builds one of the sites as a pre-flight check - it takes the site name and its
 directory, and calls the same `just build <site>` recipe you would run locally. **Deploying is the caller's
 job**; this action only proves the site builds.

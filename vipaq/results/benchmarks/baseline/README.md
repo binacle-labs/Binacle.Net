@@ -1,7 +1,9 @@
 # Baseline - ViPaq benchmarks
 
-The first kept run of every ViPaq bench class. A later run that moved goes in a dated folder beside this one,
-holding only the reports that moved.
+Every ViPaq bench class, at the shape the code has now.
+
+`baseline/` is the only folder here while the benchmarking is still going on. Dated folders start once it
+is finished.
 
 Each file is a BenchmarkDotNet report copied unchanged from the project's `BenchmarkDotNet.Artifacts/results/`,
 renamed to its class.
@@ -18,19 +20,16 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 
 ## 📂 What was copied
 
-| File | Recipe | Job | Cases |
-|---|---|---|---|
-| `encoding/Smoke_Encode.md` | `just bench vipaq-smoke` | default | 12 |
-| `encoding/Smoke_Decode.md` | `just bench vipaq-smoke` | default | 9 |
-| `encoding/Sample_Encode.md` | `just bench vipaq-sample` | default | 48 |
-| `encoding/Sample_Decode.md` | `just bench vipaq-sample` | default | 36 |
-| `encoding/Sample_CompressionCost_Encode.md` | `just bench vipaq-sample` | default | 6 |
-| `encoding/Sample_CompressionCost_Decode.md` | `just bench vipaq-sample` | default | 6 |
+| File | Recipe | Job |
+|---|---|---|
+| `encoding/Smoke_Encode.md` | `just bench vipaq-smoke` | default |
+| `encoding/Smoke_Decode.md` | `just bench vipaq-smoke` | default |
+| `encoding/Sample_Encode.md` | `just bench vipaq-sample` | default |
+| `encoding/Sample_Decode.md` | `just bench vipaq-sample` | default |
+| `encoding/Sample_CompressionCost_Encode.md` | `just bench vipaq-sample` | default |
+| `encoding/Sample_CompressionCost_Decode.md` | `just bench vipaq-sample` | default |
 
-Every ViPaq bench class is here.
-
-The encode classes carry a `Json` row, which is why they have more cases than their decode twins - the test
-`JsonEncoder` has no decode.
+The encode classes carry a `Json` row that the decode twins do not - the test `JsonEncoder` has no decode.
 
 ## ⚠️ What will bite you
 

@@ -16,9 +16,8 @@
 # The tier is the class name's first word: Smoke_, Sample_, Full_. Result selection and scaling have one tier
 # and run every class. The parallel projects have no tiers: one recipe per project runs its Identical_ classes.
 # Reports land in the project's BenchmarkDotNet.Artifacts/results/, gitignored, and the next run of the same
-# class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/<date>/<family>/
-# - baseline/ instead when it is that class's first kept run. <slice>/results/benchmarks/README.md says what
-# counts as worth keeping.
+# class overwrites them. A run worth keeping is copied by hand into <slice>/results/benchmarks/baseline/<family>/.
+# <slice>/results/benchmarks/README.md says what counts as worth keeping.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
@@ -57,20 +56,20 @@ lib-algorithms-full mode='' launches='':
 
     just bench _bench_run 'lib/bench/Binacle.Lib.Benchmarks.Algorithms' '*.Full_*' short "{{ mode }}" "{{ launches }}"
 
-# Loop against Parallel for both races and for each algorithm alone, v2, identical bin and items, 1 to 256 pieces x 2, 4, 8, 12 cores: 360 cases, about 40 minutes quick, measured 2026-10-03; default: quick. The filter takes all five classes on purpose - Loop against the sum of the alone classes only holds within one invocation
+# Loop against Parallel for both races and for each algorithm alone, v2, identical bin and items, 1 to 256 pieces x 2, 4, 8, 12 cores: about 40 minutes quick, measured 2026-10-03; default: quick. The filter takes every class on purpose - Loop against the sum of the alone classes only holds within one invocation
 [arg('mode', pattern='|dry|quick|precise')]
 [arg('launches', pattern='|[1-9][0-9]*')]
 lib-parallel-algorithms-identical mode='' launches='':
     just bench _bench_run 'lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms' '*.Identical_*' short "{{ mode }}" "{{ launches }}"
 
-# Loop against Parallel, one algorithm, v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: 568 cases, about 70 minutes for FFD quick, measured 2026-10-03; not measured for WFD and BFD; default: quick
+# Loop against Parallel, one algorithm, v2, identical bins and items, every item fits: 1 to 32 bins x 1 to 256 pieces, then 64 and 256 pieces over 1 to 64 lines, x 2, 4, 8, 12 cores: about 70 minutes for FFD quick, measured 2026-10-03; default: quick
 [arg('algorithm', pattern='FFD|WFD|BFD')]
 [arg('mode', pattern='|dry|quick|precise')]
 [arg('launches', pattern='|[1-9][0-9]*')]
 lib-parallel-bins-identical algorithm mode='' launches='':
     just bench _bench_run 'lib/bench/Binacle.Lib.Benchmarks.ParallelBins' '*.Identical_{{ algorithm }}_*' short "{{ mode }}" "{{ launches }}"
 
-# What parallelising costs, with algorithms that do no packing: a two- and a three-algorithm race, and 1 to 8 bins, each walking 0 or 64 KB, x 1, 2, 4, 8, 12 cores: 150 cases, about 1 hour, `quick` about 12; default: precise
+# What parallelising costs, with algorithms that do no packing: a two- and a three-algorithm race, and 1 to 8 bins, each walking 0 or 64 KB, x 1, 2, 4, 8, 12 cores: about 1 hour, `quick` about 12; default: precise
 [arg('mode', pattern='|dry|quick|precise')]
 [arg('launches', pattern='|[1-9][0-9]*')]
 lib-parallel-overhead mode='' launches='':

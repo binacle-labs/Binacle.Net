@@ -1,6 +1,6 @@
 # .config
 
-The .NET local tool manifest, and nothing else. `dotnet-tools.json` pins the two command-line tools this repo
+The .NET local tool manifest, and nothing else. `dotnet-tools.json` pins the command-line tools this repo
 installs into itself rather than expecting on your machine:
 
 | Tool | Command | Used by |

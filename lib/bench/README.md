@@ -2,8 +2,7 @@
 
 The timings for `Binacle.Lib`: one BenchmarkDotNet project per question. Not tests - nothing here passes or
 fails - and not measurements either: a timing is one machine's number, so nothing here is tracked. A run
-worth keeping is copied into [`lib/results/benchmarks/`](../results/benchmarks) by hand: a class's first kept run
-into `baseline/`, a later one into a dated folder.
+worth keeping is copied by hand into `baseline/` under [`lib/results/benchmarks/`](../results/benchmarks).
 
 ## 📂 What is in it
 

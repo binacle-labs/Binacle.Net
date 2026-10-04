@@ -22,7 +22,7 @@ all` instead - it does both, in that order.
 The run is deterministic: a no-change re-run is byte-identical, so it produces no git noise. `just regen check`
 regenerates everything and fails if any generated file moved.
 
-## 📂 Layout
+## 📂 What is in it
 
 Split by source family, mirroring `shared/data`:
 

@@ -2,8 +2,6 @@
 
 What the lib's measure and bench projects found.
 
-<!-- Summary: shape not decided yet. -->
-
 ## 📂 What is in it
 
 | Path | What it is |

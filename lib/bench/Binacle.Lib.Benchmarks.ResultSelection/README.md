@@ -1,6 +1,6 @@
 # Binacle.Lib.Benchmarks.ResultSelection
 
-Times the three result selectors, v1 against v2, on the scenarios in
+Times the result selectors, v1 against v2, on the scenarios in
 [`lib/data/result-selection/`](../../data/result-selection). v1 is LINQ - a filter, a sort, and a second pass
 when nothing packed fully; v2 is one loop. `Ratio` and `Allocated` are what to read: a v2 that grows an
 iterator or a second pass back shows there first.

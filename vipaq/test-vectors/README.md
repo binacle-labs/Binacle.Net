@@ -42,7 +42,7 @@ The header's text form, used wherever a vector needs to name a full header:
 `v{N}_{raw|comp}_{row|col}_{binWidth}_{itemDimWidth}_{itemCoordWidth}`, e.g. `v1_raw_row_8_8_8` or
 `v1_comp_col_16_8_16`. Six tokens in wire order. Mirrors C# `HeaderNotation` / TS `src/headerNotation.ts`.
 
-## 📂 Files
+## 📂 What is in it
 
 | File | Shape | Read by |
 |---|---|---|

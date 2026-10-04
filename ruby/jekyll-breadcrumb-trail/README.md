@@ -118,7 +118,7 @@ section they are reading.
 **The current page is never excluded**, whatever it matches. Row two is that rule: `v1.0.x` matches `*.*`
 and it is still the crumb you are standing on.
 
-## ⚠️ What will bite
+## ⚠️ What will bite you
 
 **A page with no path segments gets no trail.** The site root renders nothing rather than a lone home crumb.
 

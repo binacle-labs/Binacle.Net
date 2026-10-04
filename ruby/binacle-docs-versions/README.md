@@ -127,7 +127,7 @@ the way a page links its counterpart in another line without knowing where that 
 the argument is rendered first, so a page can build the path from its own front matter. A path that resolves
 to nothing fails the build rather than writing a link to a 404.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - The generator never overwrites a key the page already set. That is how a swagger page keeps
   `noindex, nofollow` while the rest of its version is `noindex, follow`.

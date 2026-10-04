@@ -1,21 +1,21 @@
 # Binacle.Lib.Benchmarks.ParallelBins
 
 When a request holds many bins, is packing them in parallel faster than packing them one after the other? It
-runs Loop against Parallel, v2, on identical bins and identical items. Six classes: a piece sweep and a line
-sweep for each of the three algorithms.
+runs Loop against Parallel, v2, on identical bins and identical items: a piece sweep and a line sweep for each
+algorithm.
 
 ## 📂 What is in it
 
 | Path | What it is |
 |---|---|
-| `Identical/IdenticalBase.cs` | The `Loop` and `Parallel` rows and the setup all six share. Identical bins and items, every item fits - the best case for Parallel. Setup throws if a bin is not fully packed |
-| `Identical/PiecesBase.cs` | The grid the three piece classes run: bin counts by piece counts, one line |
-| `Identical/LinesBase.cs` | The grid the three line classes run: the same pieces over more lines |
+| `Identical/IdenticalBase.cs` | The `Loop` and `Parallel` rows and the setup they all share. Identical bins and items, every item fits - the best case for Parallel. Setup throws if a bin is not fully packed |
+| `Identical/PiecesBase.cs` | The grid the piece classes run: bin counts by piece counts, one line |
+| `Identical/LinesBase.cs` | The grid the line classes run: the same pieces over more lines |
 | `Identical/Identical_FFD_Pieces_Packing.cs`, `..._WFD_...`, `..._BFD_...` | One algorithm each |
 | `Identical/Identical_FFD_Lines_Packing.cs`, `..._WFD_...`, `..._BFD_...` | One algorithm each |
 | `Program.cs` | Takes `--job` out of the args, builds the core jobs from it, and runs with the config from `shared/test/Binacle.Benchmarking` |
 
-The grids sit on the two kind bases, not on the classes, so the three reports of a kind stay comparable.
+The grids sit on the two kind bases, not on the classes, so the reports of a kind stay comparable.
 
 The bin and the item live in `IdenticalCase` in `lib/test/Binacle.Lib.Testing`.
 

@@ -1,21 +1,21 @@
 # Binacle.Lib.Benchmarks.ParallelAlgorithms
 
 When `Best` races several algorithms on one bin, from what size is running them in parallel faster than one
-after the other, and on how many cores? Five classes on one bin and one item, both the same as in
-`Binacle.Lib.Benchmarks.ParallelBins`: the two races production runs, and each algorithm on its own. Loop
-against Parallel, v2, on each core count in `JobsByCoreCount`.
+after the other, and on how many cores? One class per race that production runs, plus one per algorithm on its
+own, all on the same bin and item as `Binacle.Lib.Benchmarks.ParallelBins`. Loop against Parallel, v2, on each
+core count in `JobsByCoreCount`.
 
 ## 📂 What is in it
 
 | Path | What it is |
 |---|---|
-| `Identical/IdenticalBase.cs` | The `Loop` and `Parallel` rows, the piece sweep, and the setup the five share. Setup throws if an item does not fit |
+| `Identical/IdenticalBase.cs` | The `Loop` and `Parallel` rows, the piece sweep, and the setup they all share. Setup throws if an item does not fit |
 | `Identical/Identical_FFD_Packing.cs`, `..._WFD_...`, `..._BFD_...` | One algorithm each, racing nothing |
 | `Identical/Identical_FFD_BFD_Packing.cs` | The race the multi-bin routes run |
 | `Identical/Identical_FFD_WFD_BFD_Packing.cs` | The race the single-bin routes run |
 | `Program.cs` | Takes `--job` out of the args, builds the core jobs from it, and runs with the config from `shared/test/Binacle.Benchmarking` |
 
-Every class sweeps the same piece counts, so the five reports can be read side by side. The grid lives on the
+Every class sweeps the same piece counts, so the reports can be read side by side. The grid lives on the
 base for that reason.
 
 The bin and the item live in `IdenticalCase` in `lib/test/Binacle.Lib.Testing`. The pinning itself,
@@ -32,11 +32,11 @@ just bench lib-parallel-algorithms-identical        # the short job
 
 ## ⚠️ What will bite you
 
-**Run the five together, and read the sum check as a ratio.** `Loop` on a race class comes out at about 1.2
+**Run them together, and read the sum check as a ratio.** `Loop` on a race class comes out at about 1.2
 times the sum of the alone classes at the same piece count - not 1.0. The allocation is additive, so it is the
 same work: an alone class's process constructs one algorithm and its call sites get devirtualized, which the
 race's cannot. **About 1.2 is normal; 1.5 or more is a slow process**, and that is how a clean run is told from
-a dirty one. It only holds while all five come from one invocation.
+a dirty one. It only holds while they all come from one invocation.
 
 **A one-algorithm class's `Parallel` row is not a race.** The default cap resolves to 1, so `Parallel.For` runs
 the body inline and nothing is handed to another CPU: the row is what `Parallel.For` costs to set up.

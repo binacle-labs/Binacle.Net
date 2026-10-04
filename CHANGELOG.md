@@ -11,9 +11,9 @@
 - **The ServiceModule's routes can be called from a browser.** A `ServiceApi` CORS policy covers the token and admin routes, configured beside the existing `CoreApi` one. Nothing is allowed until you list an origin.  
 
 ### 🎨 UI Module
-- **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin you give it and still lets you click between the results — the endpoint with the same shape, on the newer version. Nothing about the page's behaviour changed with it.  
+- **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin you give it and still lets you click between the results - the endpoint with the same shape, on the newer version. Nothing about the page's behaviour changed with it.  
 - **The algorithm list gained `Best`.** It runs more than one heuristic and returns whichever packed best, and it exists only on V4, so the demo could not offer it before. It is listed as **Try all, keep the best**, to keep it apart from **Best Fit Decreasing**, which is one specific heuristic.  
-- **Each result now says which algorithm actually ran**, shown only when you asked for `Best` — with a single heuristic selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.  
+- **Each result now says which algorithm actually ran**, shown only when you asked for `Best` - with a single heuristic selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.  
 - **The demo no longer builds its own HTTP calls.** It goes through the new client package, which owns the request and response shapes.  
 - **A rate-limited request now says so.** Hitting the demo too often used to show a message about a response that could not be parsed. It now tells you that you have been rate limited and to wait a moment before trying again.  
 - **A result that could not fit everything now says what was left out.** An info button on the result row opens a small panel listing the items that did not fit and how many of each. It opens on hover, on tap and from the keyboard, and it floats over the row rather than making it taller.  
@@ -32,14 +32,14 @@
 
 ### 🏗️ Internal Work
 
-- **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy — so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
-- **Restructured `binacle-net-ui` into apps, components and shared code.** It was three flat folders, and 19 of the 25 files in `utils/` turned out to be the visualizer's own internals sitting where any file could import them. The visualizer now owns them and offers an app its component and one contract type. No behaviour changed — the same 348 tests passed before and after, with no assertion edited.  
-- **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync — a person runs it and commits what it writes.  
+- **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the hand-written types against that copy - so a contract change in the API fails a test rather than reaching a page. It covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI documents are still what an integrator generates their own client from.  
+- **Restructured `binacle-net-ui` into apps, components and shared code.** It was three flat folders, and 19 of the 25 files in `utils/` turned out to be the visualizer's own internals sitting where any file could import them. The visualizer now owns them and offers an app its component and one contract type. No behaviour changed - the same 348 tests passed before and after, with no assertion edited.  
+- **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every pull request and on release, as it did before. Nothing calls the sync - a person runs it and commits what it writes.  
 - **Added an integration test for CORS.** Nothing asserted `Access-Control-Allow-Origin` before. A preflight from an allowed origin now has a test that fails the way the 2026-09-01 break did, and a second proves that with no `Cors.json` present no origin is allowed at all.  
 - **A prerelease never reaches Docker Hub.** A beta is built, signed and smoke tested on GHCR, gets its git tag and a GitHub release marked prerelease, and stops there. `binacle/binacle-net` now only ever receives a released version, and nothing sits beside a release waiting to be deleted.  
 - **A prerelease can be dispatched from the `release/` branch named after it.** `release/v3-1-0` may dispatch `3.1.0-beta.*` and no other version; a release still runs from `main` only. The betas of a version come from its branch, so a change to the workflow is proved by a beta before it reaches `main`.  
 - **The release logs into Docker Hub with the run's own identity token.** No long-lived registry token is stored for the job that pushes the image; the token is minted per run and expires with it. The Docker Hub page is the one job that still uses a stored token, because the page is written through a different API.  
-- **One fewer third-party action runs in the job that holds the registry credential.** Copying the image between registries is a registry call, not a build, and the runner already carries the tool it needs — so the job no longer sets up a builder first.  
+- **One fewer third-party action runs in the job that holds the registry credential.** Copying the image between registries is a registry call, not a build, and the runner already carries the tool it needs - so the job no longer sets up a builder first.  
 - **No job holds a git credential after checkout.** The one tag CI pushed, the site deploy marker, is now created through the GitHub API, so every checkout runs with `persist-credentials: false`.  
 - **The three site deploy workflows are one**, with the site chosen at dispatch. Deploys are still by hand.  
 - **Sonar waits for its own result** through the scanner's quality gate flag instead of a polling loop, and a workflow-only pull request no longer builds all three documentation sites.  
@@ -72,15 +72,15 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 - **V4 endpoints** were introduced as experimental.  
 - **V3 endpoints** remain stable and unchanged, and are the recommended version.  
 - **ViPaq** was rebuilt with a smaller, simpler format. Strings from earlier versions no longer decode.  
-- **ViPaq** left experimental status — the format is stable as of this release.  
-- **Algorithms** were unified — fitting and packing now share one implementation.  
+- **ViPaq** left experimental status - the format is stable as of this release.  
+- **Algorithms** were unified - fitting and packing now share one implementation.  
 - **Packing Logs** configuration was flattened, with breaking changes for existing integrations.  
 - **Forwarded headers** are now supported, so the real caller is resolved when running behind a proxy or CDN.  
 - **Health check IP restrictions** are matched differently, with breaking changes for existing allow-lists.  
 - **The demo UI was rebuilt**, its page addresses changed, and it gained a page describing the instance you are on.  
 - **The image creates `/app/data`** and gives it to the app user, so a volume mounted there is writable.  
 - **The image is signed**, and carries an SBOM and build provenance, so you can verify what you pull.  
-- **The image is about a third smaller** — it uses the .NET runtime from its base image instead of bundling a second copy.  
+- **The image is about a third smaller** - it uses the .NET runtime from its base image instead of bundling a second copy.  
 - The project was **restructured**, separating the API, library, and ViPaq into their own roots.  
 - **Versioned documentation** now covers every minor line, so older images keep their docs.  
 - **The project moved** to the `binacle-labs` organization. Links redirect; the signing identity does not.  
@@ -90,28 +90,28 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 ### ⚙️ Core Changes
 - Removal of all V2 endpoints.  
 - Added **16 experimental V4 endpoints**, covering everything V3 does.  
-- V4 splits a request into three shapes. **One bin, one answer** — `fit/bin`, `pack/bin`, and their `{preset}/{bin}` variants.  
-- **Many bins, one answer** — `pack/smallest-bin`, `pack/smallest-bin/{preset}`, `fit/smallest-bin`, and `fit/smallest-bin/{preset}` return the smallest bin that works; `pack/best-bin` and `pack/best-bin/{preset}` return the bin the items fill the most.  
-- **Many bins, every answer** — `fit/compare-bins`, `pack/compare-bins`, and their `{preset}` variants return one result per bin, in the order the bins were sent.  
+- V4 splits a request into three shapes. **One bin, one answer** - `fit/bin`, `pack/bin`, and their `{preset}/{bin}` variants.  
+- **Many bins, one answer** - `pack/smallest-bin`, `pack/smallest-bin/{preset}`, `fit/smallest-bin`, and `fit/smallest-bin/{preset}` return the smallest bin that works; `pack/best-bin` and `pack/best-bin/{preset}` return the bin the items fill the most.  
+- **Many bins, every answer** - `fit/compare-bins`, `pack/compare-bins`, and their `{preset}` variants return one result per bin, in the order the bins were sent.  
 - Presets can be **listed** with `presets` or **fetched one at a time** with `presets/{preset}`.  
 - V4 is **experimental and can change at any time**. V3 remains stable and is the recommended version.  
 - V3 endpoints are unchanged and remain stable, apart from the ViPaq payload.  
-- **A non-string `algorithm` value now answers 422 rather than 400.** `"algorithm": 1`, `true` or a list used to come back as `Invalid JSON Format` with no field named. It now comes back as a validation error naming the field — the same answer a misspelled name such as `"FFDD"` has always given. Both statuses were already declared on these endpoints, so the contract has not moved; what changed is which one you get.  
+- **A non-string `algorithm` value now answers 422 rather than 400.** `"algorithm": 1`, `true` or a list used to come back as `Invalid JSON Format` with no field named. It now comes back as a validation error naming the field - the same answer a misspelled name such as `"FFDD"` has always given. Both statuses were already declared on these endpoints, so the contract has not moved; what changed is which one you get.  
 - **ViPaq is no longer experimental.** The format is settled as of this release, where it carried an experimental warning through v2.1.1. A future format change takes a new `Version` code rather than altering the current one, so an older decoder rejects a newer string outright instead of misreading it.  
 - Added **forwarded headers** support, configured in `Config_Files/ForwardedHeaders.json`. **Disabled by default.**  
 - When enabled, the caller's address and scheme are resolved from `X-Forwarded-For` and `X-Forwarded-Proto` before anything reads them, so rate limiting and health check IP restrictions see the real caller rather than the proxy.  
-- Trust is explicit — a proxy on loopback or a private network is trusted by default, anything else must be named. The app **refuses to start** if nothing is trusted, because that would make every caller's header believable.  
-- A different header can be read instead, for CDNs that send one — `CF-Connecting-IP`, `X-Real-IP`, `X-Azure-ClientIP`.  
+- Trust is explicit - a proxy on loopback or a private network is trusted by default, anything else must be named. The app **refuses to start** if nothing is trusted, because that would make every caller's header believable.  
+- A different header can be read instead, for CDNs that send one - `CF-Connecting-IP`, `X-Real-IP`, `X-Azure-ClientIP`.  
 - `ASPNETCORE_FORWARDEDHEADERS_ENABLED` is **ignored**. It switches the underlying middleware on with no proxy verification, which lets any caller choose their own address.  
 - `TrustedProxies` entries are **read exactly as written**, the same rule as health check `RestrictedIPs`. `010.10.10.10` used to be read as octal and trust `8.10.10.10`, and `172.17.1` used to mean `172.17.0.1`; both now fail startup validation rather than trusting a host you did not name.  
-- Added a **`/_debug` endpoint**, off by default, enabled with `DEBUG_ENDPOINT=True`. It echoes the caller's own request — connection address and headers — for working out what a proxy is sending.  
+- Added a **`/_debug` endpoint**, off by default, enabled with `DEBUG_ENDPOINT=True`. It echoes the caller's own request - connection address and headers - for working out what a proxy is sending.  
 - A **startup warning** when a forwarding header arrives and does not take effect, either because the feature is off or because the trust list does not name your proxy. Logged once. Without it both states are silent and the app quietly reads the proxy as the caller.  
 - **No `Strict-Transport-Security` header is sent.** The `UseHsts` call arrived with the demo UI's template and only ever ran when that UI was on. The image terminates no TLS, so the proxy or CDN in front of it is the only thing that knows whether HSTS is safe to pin, and a browser honours it until it expires.  
 - **The image now creates `/app/data` and gives it to the app user.** A volume mounted there is writable with no extra setup. Previously docker created the mount point as root, the app does not run as root, and packing logs and the SQLite database could not be written to a fresh named volume.  
-- The image ships `libgssapi-krb5-2`, so Npgsql stops printing `Cannot load library libgssapi_krb5.so.2` at every start. Nothing was broken — the app authenticates with a password, not Kerberos — but the message read like a fatal error.  
-- The image carries **OCI labels** — title, description, source, url, documentation, vendor, licence and base image — plus version, revision and created per build.  
+- The image ships `libgssapi-krb5-2`, so Npgsql stops printing `Cannot load library libgssapi_krb5.so.2` at every start. Nothing was broken - the app authenticates with a password, not Kerberos - but the message read like a fatal error.  
+- The image carries **OCI labels** - title, description, source, url, documentation, vendor, licence and base image - plus version, revision and created per build.  
 - **The description at the top of every API document changed.** The same one-line summary now appears in Swagger UI, Scalar and the image's `description` label.  
-- **The image is signed, and ships an SBOM and build provenance.** Signing is keyless, so there is no public key to fetch — the signature is checked against the workflow that produced it — and it covers the digest, so it holds for every tag pointing at that image:
+- **The image is signed, and ships an SBOM and build provenance.** Signing is keyless, so there is no public key to fetch - the signature is checked against the workflow that produced it - and it covers the digest, so it holds for every tag pointing at that image:
 
   ```bash
   cosign verify binacle/binacle-net:3.0.0 \
@@ -120,29 +120,29 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
   ```
 
   The SPDX SBOM and SLSA provenance travel inside the image index; `docker buildx imagetools inspect binacle/binacle-net:3.0.0` lists them.  
-- **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is written into the signature and does not redirect — a stale one fails the check rather than warning.  
-- **The image is smaller — 100 to 110 MB, where the same image built the old way was 150 to 160 MB.** The app is published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead of carrying a second copy of it. Nothing about running the container changes.  
-- **One environment variable was removed — `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the demo at another API host. The rebuilt module reads no configuration and always calls the API it is served from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went with it, and the image no longer ships a `UiModule` config folder.  
+- **The project moved to the `binacle-labs` organization, and the signing identity moved with it.** The command above names the new organization. GitHub redirects a moved repository's links, but a certificate identity is written into the signature and does not redirect - a stale one fails the check rather than warning.  
+- **The image is smaller - 100 to 110 MB, where the same image built the old way was 150 to 160 MB.** The app is published framework-dependent, so it runs on the .NET runtime already in the `aspnet:10.0` base image instead of carrying a second copy of it. Nothing about running the container changes.  
+- **One environment variable was removed - `BINACLEAPI_CONNECTION_STRING`.** The UI module used it to point the demo at another API host. The rebuilt module reads no configuration and always calls the API it is served from, so the variable is now ignored rather than rejected. `Config_Files/UiModule/ConnectionStrings.json` went with it, and the image no longer ships a `UiModule` config folder.  
 - Every other environment variable is unchanged.  
 
 ### 🧪 Diagnostics Module
-- Packing Logs configuration was **flattened** — `Path`, `FileName`, `DateFormat`, and `ChannelLimit` now sit directly under `PackingLogs`.  
+- Packing Logs configuration was **flattened** - `Path`, `FileName`, `DateFormat`, and `ChannelLimit` now sit directly under `PackingLogs`.  
 - Removed the **fitting** configuration block, now that fitting and packing share one log.  
 - Implementations depending on the old nested shape must be updated, or startup validation will fail.  
 - The default log path changed from `data/pack-logs/packing/` to `data/pack-logs/`.  
 - Packing log entries now include a `Timestamp` field.  
-- Added **`RetentionDays`** to `PackingLogs`. When set, packing log files older than that many days are deleted once a day, and each deletion is logged. **Off by default** (`null`) — files are kept until you remove them yourself. Only files matching the configured `FileName` pattern in the configured `Path` are touched, and only at the top level.  
-- **`/_health` now reports what the instance is running.** Its `System` entry carried only `Processors`. It now also carries `Version`, `Environment`, `StartedAt` and `Uptime`, plus `Features` — the names of everything switched on, such as `HealthChecks`, `UIModule` or `SwaggerUI` — and `ReservedPaths`, the path prefixes that never answer with a web page. `Processors` is unchanged, so an existing parser keeps working; the new keys are there to check that a configuration arrived the way you meant it to.  
+- Added **`RetentionDays`** to `PackingLogs`. When set, packing log files older than that many days are deleted once a day, and each deletion is logged. **Off by default** (`null`) - files are kept until you remove them yourself. Only files matching the configured `FileName` pattern in the configured `Path` are touched, and only at the top level.  
+- **`/_health` now reports what the instance is running.** Its `System` entry carried only `Processors`. It now also carries `Version`, `Environment`, `StartedAt` and `Uptime`, plus `Features` - the names of everything switched on, such as `HealthChecks`, `UIModule` or `SwaggerUI` - and `ReservedPaths`, the path prefixes that never answer with a web page. `Processors` is unchanged, so an existing parser keeps working; the new keys are there to check that a configuration arrived the way you meant it to.  
 - Health check **`RestrictedIPs` now uses CIDR notation correctly**. The value after `/` was previously read as an address mask, so `192.168.1.0/24` covered nearly the whole IPv4 range instead of 256 addresses. Existing CIDR entries are now **much narrower** than they were.  
-- Health check `RestrictedIPs` now matches **IPv4 callers in containers**. Addresses arriving in IPv4-mapped IPv6 form are unmapped before comparison, which they previously were not — no IPv4 entry could match.  
+- Health check `RestrictedIPs` now matches **IPv4 callers in containers**. Addresses arriving in IPv4-mapped IPv6 form are unmapped before comparison, which they previously were not - no IPv4 entry could match.  
 - Removed the **`start-end` range form** from `RestrictedIPs`. Entries such as `192.168.1.0-192.168.1.255` now fail startup validation. Use CIDR instead.  
-- `RestrictedIPs` entries are now **read exactly as written**. An IPv4 address must be four plain decimal parts with no leading zeros, and an IPv6 address must be in its short, lowercase form. `010.10.10.10` used to be read as octal and admit `8.10.10.10`; `10.1` used to mean `10.0.0.1`; `167772161` meant the same. All of these now fail startup validation instead of quietly admitting a host you did not name. `192.168.1.1/24` still means the whole `192.168.1.0/24` — that is what CIDR notation means — but the startup log now says so.  
+- `RestrictedIPs` entries are now **read exactly as written**. An IPv4 address must be four plain decimal parts with no leading zeros, and an IPv6 address must be in its short, lowercase form. `010.10.10.10` used to be read as octal and admit `8.10.10.10`; `10.1` used to mean `10.0.0.1`; `167772161` meant the same. All of these now fail startup validation instead of quietly admitting a host you did not name. `192.168.1.1/24` still means the whole `192.168.1.0/24` - that is what CIDR notation means - but the startup log now says so.  
 
 ### 🔌 Service Module
 - **The Service Module has no public documentation.** Changes to it are listed here like anything else, but no migration steps are given for them. Changes before v3.0.0 were not listed at all. A breaking change to it does not force a major version: a **minor** release can break it, a **patch** will not. If you self-host with `SERVICE_MODULE` enabled, read every minor release before upgrading.  
 - **Breaking. The auth token rate limit no longer reads `X-Forwarded-For`.** It partitions on the connection's remote address. Before this, varying the header reset your own login throttle. Behind a proxy with `ForwardedHeaders` off, which is the shipped default, every caller now shares one bucket.  
 - **Breaking. An unrecognised enum value in an admin request body is rejected with 422.** It used to be dropped silently, so a `PATCH` carrying a bad `Status` or `Role` returned 204 and applied the rest of the body.  
-- **Breaking. SQLite date columns are written in a new format** — UTC, invariant culture. Rows written by an earlier version under a non-invariant culture will not read back.  
+- **Breaking. SQLite date columns are written in a new format** - UTC, invariant culture. Rows written by an earlier version under a non-invariant culture will not read back.  
 - **Three new admin endpoints.** `GET /api/admin/accounts` and `GET /api/admin/subscriptions`, both paged, and `GET /api/admin/account/{id}/subscription`.  
 - **The `Location` header on subscription create now resolves.** It pointed at a route that never existed.  
 - **Startup configuration errors say what a valid value looks like.** One error per setting instead of up to three, naming the accepted formats and echoing what was supplied. No configuration that started before stops starting.  
@@ -152,42 +152,42 @@ Binacle.Net v3.0.0 is a major update from v2.1.1.
 
 ### 🎨 UI Module
 - **The demo UI was rebuilt.** It was Blazor with an interactive server render mode; it is now Razor Pages, with everything interactive running in the browser. **No SignalR circuit and no WebSocket**, so the demo works behind a proxy or CDN that does not forward one.  
-- **The page addresses changed** — `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and `/Error` is now `/error/{errorCode?}`. Old links no longer resolve.  
+- **The page addresses changed** - `/PackingDemo` is now `/packing`, `/ProtocolDecoder` is now `/vipaq`, and `/Error` is now `/error/{errorCode?}`. Old links no longer resolve.  
 - **The demo's static files moved under `/_content/Binacle.Net.UIModule/`.** `/favicon.ico`, `/css/main.css`, `/js/`, `/vendor/` and `/assets/` no longer answer at the root.  
 - **API paths never answer with the demo's error page.** A miss under `/api`, `/openapi`, `/swagger`, `/scalar`, `/_health`, `/_debug` or `/_content` returns the bare status or the JSON the endpoint wrote. Only `/api`, `/swagger` and `/scalar` were exempt before, so a miss on `/openapi` or a diagnostics path answered a caller with a web page.  
 - **The Protocol Decoder is now the ViPaq Decoder.** Same tool. It reads the **new ViPaq format only**, and strings from earlier versions are rejected.  
-- **A new page, `/instance`.** The version and environment this container is running, which features are switched on and where each one answers, and the presets it loaded — so you can see whether your configuration arrived the way you meant it to. It also links to **GitHub Discussions**.  
-- **The footer is one line** — copyright, version, licence, GitHub and Docker Hub. The Swagger UI and Scalar links that used to be footer badges are on the instance page, which also says whether each one is switched on.  
+- **A new page, `/instance`.** The version and environment this container is running, which features are switched on and where each one answers, and the presets it loaded - so you can see whether your configuration arrived the way you meant it to. It also links to **GitHub Discussions**.  
+- **The footer is one line** - copyright, version, licence, GitHub and Docker Hub. The Swagger UI and Scalar links that used to be footer badges are on the instance page, which also says whether each one is switched on.  
 - **Nothing on a page is fetched from the internet.** The footer's `img.shields.io` badges are gone, and the stylesheet, the icon font, the logos and the 3D library are all served from the image. An air-gapped install renders the same as any other.  
-- **The Packing Demo carries 20 worked examples instead of one**, and its two randomize buttons are now one. The same example always loads, so a link to the page shows everyone the same thing; Randomize moves to a different one. Every example was run against all three algorithms, and each is a set where the bins genuinely disagree — which is the comparison the page exists to show.  
+- **The Packing Demo carries 20 worked examples instead of one**, and its two randomize buttons are now one. The same example always loads, so a link to the page shows everyone the same thing; Randomize moves to a different one. Every example was run against all three algorithms, and each is a set where the bins genuinely disagree - which is the comparison the page exists to show.  
 - **Add bin copies the bin above it, and Add item is sized to the bins you already have.** Both used to roll a fresh random box, which could add an item no bin on the page could hold.  
 - **The Packing Demo and ViPaq Decoder descriptions were rewritten.** What each tool does is unchanged.  
 - **Validation errors from the API are listed again.** The dialog built its message list wrong and always came up empty, so a rejected request opened a dialog with nothing in it.  
 - **A decoded bin with a zero side reads `0%` rather than `NaN%`** in the ViPaq Decoder. The bin comes out of a string a visitor pastes in, so a zero side is reachable.  
-- **The error page names the problem** — a separate line for 404, 403 and 500 instead of one sentence for all of them — and links back to the home page. **It also answers with the status it names.** Opening it directly used to answer `200`, so a monitor pointed at that address was told the instance was fine.  
+- **The error page names the problem** - a separate line for 404, 403 and 500 instead of one sentence for all of them - and links back to the home page. **It also answers with the status it names.** Opening it directly used to answer `200`, so a monitor pointed at that address was told the instance was fine.  
 - **The demo follows your machine's light or dark setting on a first visit.** It used to start in light mode whatever the machine was set to. The switcher in the header still overrides it, and the choice is still kept in the same `theme` cookie, so anyone who already picked one keeps it.  
 - **The theme now sticks on an instance served over plain http.** The `theme` cookie was always written `Secure`, which a browser drops off https, so the demo reset to the default on every page load. It is marked `Secure` only where the page is served over https.  
-- **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup — see Core Changes for the variable that went.  
+- **The module reads no configuration at all.** `UI_MODULE=True` is the whole setup - see Core Changes for the variable that went.  
 
 ### 📈 Algorithms
 - **Fitting and packing now share one algorithm.** Fitting stops early on the first item that does not fit.  
-- Packing results are unchanged — the shared algorithm is the previous packing implementation.  
+- Packing results are unchanged - the shared algorithm is the previous packing implementation.  
 - The separate fitting algorithm family was retired.  
 
 ### 🏗️ Internal Work
 
 Work on the repository, the build and the dependencies. The dependency patches, the Binacle.Geometry extraction, the FluxResults move, the packing log rework and the licence label are inside the image; nothing else here reaches it.
 
-- Patched two **high-severity advisories** in transitive dependencies — `Microsoft.OpenApi` and the bundled **SQLite** native library.  
+- Patched two **high-severity advisories** in transitive dependencies - `Microsoft.OpenApi` and the bundled **SQLite** native library.  
 - Extracted **Binacle.Geometry** into its own library.  
 - **Took `FluxResults` in-tree** as `shared/src/Binacle.FluxResults`, dropping the NuGet package reference. Only the parts the API uses came over, the namespace changed, and no behaviour did. It has its own unit suite, which the package never had.  
 - Reworked the packing log pipeline, moving the generic parts into the Kernel.  
 - **Every part of the repository now names its own licence.** A `LICENSE` file now sits beside every part that has its own, `NOTICE` became the full map, and the image's `org.opencontainers.image.licenses` label lists all four. The ten Ruby gems declared MIT with no licence text anywhere, which they now ship, and the image now carries `NOTICE` and the licence text itself rather than only a label.  
-- Restructured the repository — the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
+- Restructured the repository - the API, library, ViPaq, and shared test data now live in their own roots. No route, contract or configuration moved with it, which is why it is listed here rather than as a change above.  
 - Added benchmark suites for algorithms, bin processing, result selection, and ViPaq.  
 - Added cross-language ViPaq interop tests between C# and TypeScript.  
-- **Rebuilt the release pipeline.** A release is dispatched with a version. It builds the image once, smoke tests it in a staging registry, copies the tested digest to Docker Hub, and creates the git tag and the GitHub release last — so what is published is bit for bit what passed, a failure anywhere leaves Docker Hub untouched, and no tag exists for a release that did not finish. The release body is this changelog, extracted by the workflow.  
-- Renamed two top-level folders — `config/` is now `tooling/`, and build output goes to `artifacts/` instead of `build/`.  
+- **Rebuilt the release pipeline.** A release is dispatched with a version. It builds the image once, smoke tests it in a staging registry, copies the tested digest to Docker Hub, and creates the git tag and the GitHub release last - so what is published is bit for bit what passed, a failure anywhere leaves Docker Hub untouched, and no tag exists for a release that did not finish. The release body is this changelog, extracted by the workflow.  
+- Renamed two top-level folders - `config/` is now `tooling/`, and build output goes to `artifacts/` instead of `build/`.  
 - **Added `CONTRIBUTING.md` and a pull request template.** Issues, bug reports and documentation corrections are welcome and the file names them first. Code contributions are not being taken while the contribution terms are written, and the file says that will change.  
 - Every GitHub Action is pinned to a commit SHA, kept current by Dependabot.  
 
@@ -195,7 +195,7 @@ Work on the repository, the build and the dependencies. The dependency patches, 
 
 Work on the documentation site. Nothing here changes the image you pull.
 
-- Documentation is now versioned per minor line — `v1.3.x`, `v2.0.x`, `v2.1.x`, `v3.0.x` — so any image can be matched to its docs.  
+- Documentation is now versioned per minor line - `v1.3.x`, `v2.0.x`, `v2.1.x`, `v3.0.x` - so any image can be matched to its docs.  
 - Backfilled the `v2.0.x` and `v2.1.x` documentation, which was previously missing.  
 - The `latest` documentation now redirects to the current version, so existing links keep working.  
 
@@ -213,7 +213,7 @@ To upgrade to **v3.0.0**, follow these steps:
 3. **Regenerate all ViPaq strings**  
    - The format was rebuilt and is not backwards compatible.  
    - Strings from earlier versions no longer decode, and there is no fallback reader.  
-   - Re-run the packing request to get a new one. Any stored string — a saved link or a bookmarked result — is stale.  
+   - Re-run the packing request to get a new one. Any stored string - a saved link or a bookmarked result - is stale.  
    - This applies to V3 responses as well, even though V3 is otherwise unchanged.
 
 4. **Do not mix versions**  
@@ -226,10 +226,10 @@ To upgrade to **v3.0.0**, follow these steps:
    - Repoint log collection from `data/pack-logs/packing/` to `data/pack-logs/`. The old `packing/` and `fitting/` directories are safe to remove.
 
 6. **Review health check `RestrictedIPs`**  
-   - Replace any `start-end` entries with CIDR — `192.168.1.0-192.168.1.255` becomes `192.168.1.0/24`. Left as they are, startup validation now fails.  
-   - Re-check any CIDR entry. It now covers what it says, which is far less than before — confirm the addresses you expect are still inside it, or you will lock yourself out.  
+   - Replace any `start-end` entries with CIDR - `192.168.1.0-192.168.1.255` becomes `192.168.1.0/24`. Left as they are, startup validation now fails.  
+   - Re-check any CIDR entry. It now covers what it says, which is far less than before - confirm the addresses you expect are still inside it, or you will lock yourself out.  
    - A range that does not line up with a CIDR boundary must be split into several entries, or widened to the enclosing subnet.  
-   - Drop any leading zeros — `010.10.10.10` becomes `10.10.10.10`, and note it used to admit `8.10.10.10`, so check that host was not the one you meant. Write IPv6 entries in the short lowercase form: `2001:0DB8::1` becomes `2001:db8::1`.  
+   - Drop any leading zeros - `010.10.10.10` becomes `10.10.10.10`, and note it used to admit `8.10.10.10`, so check that host was not the one you meant. Write IPv6 entries in the short lowercase form: `2001:0DB8::1` becomes `2001:db8::1`.  
    - If Binacle.Net runs behind a proxy, load balancer or CDN, enable **forwarded headers** as well. Without it the list is compared against the proxy's address and can never match your monitoring system.
 
 7. **Drop `BINACLEAPI_CONNECTION_STRING`**  
@@ -240,7 +240,7 @@ To upgrade to **v3.0.0**, follow these steps:
 
 8. **Update any pinned `cosign verify` command**  
    - The repository moved to the `binacle-labs` organization and the certificate identity moved with it. Replace `ChrisMavrommatis` with `binacle-labs` in `--certificate-identity-regexp`.  
-   - Only affects you if you verify signatures in a script or a pipeline. A stale identity **fails** the check, it does not warn — so it reads as a tampered image rather than an out-of-date command.
+   - Only affects you if you verify signatures in a script or a pipeline. A stale identity **fails** the check, it does not warn - so it reads as a tampered image rather than an out-of-date command.
 
 ---
 
@@ -252,7 +252,7 @@ To upgrade to **v3.0.0**, follow these steps:
 - Internal refactoring.
 - Removed Postman metadata from API documentation.
 - Updated packages.
-​
+
 ### ⚙️ Core Changes
 - Removed external dependencies on `ChrisMavrommatis.Features` and `ChrisMavrommatis.StartupTasks` by implementing internal versions.
 - Consolidated logging (`ChrisMavrommatis.Logging`) and testing (`ChrisMavrommatis.Shouldly`) utilities into kernel modules and removed `/dep` folder.
@@ -358,7 +358,7 @@ To upgrade to **v2.0.0**, follow these steps:
 
 5. **Service Module users**  
    - All integrations with the old Service Module will no longer work.  
-   - No public documentation is available — please contact directly if needed.  
+   - No public documentation is available - please contact directly if needed.  
    - For self-hosted setups, you will need to rely on the source code, as documentation will not be provided.
 
 6. **Adopt new documentation**  
@@ -382,11 +382,11 @@ OpenTelemetry has replaced the previous Application Insights integration.
 
 
 ### Overview of New Features & Enhancements
-- **OpenTelemetry** – Fully implemented, replacing the previous incomplete version, now supporting export via OTLP Exporter and Azure Monitor.
-- **Packing Logs** – Added logs to track API usage for analytics and data gathering.
-- **Service Module Logging** – Enhanced logging in the Infrastructure layer to display a clear message when no repository is configured.
-- **UI Module Fix** – Resolved an issue where sample data did not reset correctly when new data was entered.
-- **Docker Image Update** – Added `.dockerignore` to exclude development configuration files from the Docker image.
+- **OpenTelemetry** - Fully implemented, replacing the previous incomplete version, now supporting export via OTLP Exporter and Azure Monitor.
+- **Packing Logs** - Added logs to track API usage for analytics and data gathering.
+- **Service Module Logging** - Enhanced logging in the Infrastructure layer to display a clear message when no repository is configured.
+- **UI Module Fix** - Resolved an issue where sample data did not reset correctly when new data was entered.
+- **Docker Image Update** - Added `.dockerignore` to exclude development configuration files from the Docker image.
 
 
 ### Module-Specific Updates

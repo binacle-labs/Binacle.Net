@@ -47,7 +47,7 @@ just ci moving-tags binacle/binacle-net:3.0.0 'binacle/binacle-net:3.0.0
 binacle/binacle-net:latest'
 ```
 
-**The four `install-*.sh` are the exception: no recipe, called by path.**
+**The `install-*.sh` scripts are the exception: no recipe, called by path.**
 
 ```bash
 tooling/ci/install-lychee.sh

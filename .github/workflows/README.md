@@ -28,15 +28,15 @@ manual trigger, because running one by hand is the point.
 | Workflow | Called by | Also runnable by hand for |
 |---|---|---|
 | `shared-image-tests.yml` | The pull request gate, the release | Running every test the Docker image ships, plus the OpenAPI lint, against a branch |
-| `shared-site-tests.yml` | The pull request gate, the site deploy | Running every test a Jekyll site ships - the ten gems and the javascript packages |
+| `shared-site-tests.yml` | The pull request gate, the site deploy | Running every test a Jekyll site ships - the gems and the javascript packages |
 | `shared-smoke-image.yml` | The release | Smoking any published tag - it must test a **published** image, not a local build |
 | `shared-dockerhub-overview.yml` | The release, as its last job | Fixing the wording on the Docker Hub page without cutting a release |
 
-## ⚠️ Five that are easy to get wrong
+## ⚠️ What will bite you
 
 - **The image build stays out of the test suite.** The release calls that file whole, so anything added there
   is paid for twice - once per pull request and again on every release.
-- **A gem test never goes in the image suite.** The ten Jekyll plugins ship in the sites and never in the
+- **A gem test never goes in the image suite.** The Jekyll plugins ship in the sites and never in the
   image, so they belong in `shared-site-tests.yml`.
 - **The release makes its tag last, and nothing here fires on a tag.** The version is an input; the workflow
   tags the run's own commit once the image is published, so a run that goes red leaves nothing to delete.

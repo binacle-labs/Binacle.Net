@@ -18,7 +18,7 @@ landed at the wrong path; a module env var that no longer switches anything on; 
 on the host and not in the container; the version build arg never reaching the process; a wrong entry point,
 port or runtime. All packaging and wiring, none of it C# logic, which is why the existing suites cannot see it.
 
-## 📂 What is in here
+## 📂 What is in it
 
 | File | Read by | What it is |
 |---|---|---|
@@ -27,7 +27,7 @@ port or runtime. All packaging and wiring, none of it C# logic, which is why the
 | `<profile>.yml` | `docker compose` | The stack for one profile - the image plus the env that defines it |
 
 `structure.yaml` reads the image directly and never starts a container, so it is checked **once** per run rather
-than once per profile - the same assertions behind five different stacks answer the same question five times.
+than once per profile - running it per profile would ask the same question again behind every stack.
 It keeps the `.yaml` extension against the `.yml` stacks on purpose: it is the one file here docker never reads.
 
 ## 📋 The profiles
@@ -106,7 +106,7 @@ It also means a **negative** assertion has to be falsified when you touch it. `n
 `service`'s security check, and a predicate that quietly stops matching passes while asserting nothing. Point it
 at a value that must fail, confirm it goes red, then put it back.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 These are not assertions - they are what makes the setup correct. Miss one and you get a green that means
 nothing, or a red that reads as a flake.

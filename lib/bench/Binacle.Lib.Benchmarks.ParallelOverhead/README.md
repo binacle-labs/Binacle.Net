@@ -1,9 +1,9 @@
 # Binacle.Lib.Benchmarks.ParallelOverhead
 
-What does parallelising **cost**? Three classes, and none of them pack: the algorithms do not pack, so what a
-row measures is what the processor costs around them.
+What does parallelising **cost**? Nothing here packs: the algorithms do not pack, so what a row measures is
+what the processor costs around them.
 
-The other two parallel projects ask whether parallel **pays** on real work. This one asks only what it costs,
+The other parallel projects ask whether parallel **pays** on real work. This one asks only what it costs,
 which is the other half of that question and the only number both of them need.
 
 It exists because the cost used to be read as the gap between two packing rows, and subtracting two numbers of
@@ -37,7 +37,7 @@ just bench lib-parallel-overhead precise 3  # the default job, each case in 3 pr
 
 `just bench` lists it with its cost. The report lands in `BenchmarkDotNet.Artifacts/results/`, gitignored.
 
-## 📊 The three rows, and what the gaps mean
+## 📊 The rows, and what the gaps mean
 
 | Row | What it runs |
 |---|---|
@@ -48,7 +48,7 @@ just bench lib-parallel-overhead precise 3  # the default job, each case in 3 pr
 The gaps are the answer, not the rows:
 
 - **`Loop` to `Parallel_OneThread`** is what `Parallel.For` costs to set up. It does not move with the core
-  count - measured flat across all five, which is what makes it the reference line.
+  count - measured flat across every core count, which is what makes it the reference line.
 - **`Parallel_OneThread` to `Parallel`** is what handing the work to another CPU costs. This is the one that
   moves with the machine.
 
@@ -77,7 +77,7 @@ one CPU that worker waits for the caller to be taken off it. Measured dearer tha
 run the body on the calling thread.
 
 The pinning is Linux only, and a class run outside `Program` fails at setup. The 2, 4, 8 and 12 CPU jobs are the
-set every other project runs, so the three reports can be read side by side; this one adds 1 CPU.
+set every other project runs, so the reports can be read side by side; this one adds 1 CPU.
 
 **The 1-CPU rows of `Fake_Bins` are not usable, and the race rows are.** At one CPU the thread pool and the
 garbage collector contend with the benchmark for it, which a 2- or 3-wide race walking nothing does not
