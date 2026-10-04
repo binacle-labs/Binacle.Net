@@ -78,21 +78,82 @@ parallel paying even when there are plenty of bins and plenty of cores.
 **Suggested (agent, 2026-10-03):** own folder beside `Identical/`, carrying the same six classes, so `--filter`
 picks a whole scenario. The name is his.
 
-## What the FFD run shows - agent, 2026-10-01
+## What the FFD run shows - agent, 2026-10-03
 
-Read from `baseline/parallel-bins/Identical_FFD_Packing.md` before it was removed on 2026-10-03, short job.
-**The report is gone and this is the record of it.** Ratio is BenchmarkDotNet's, Parallel
-against Loop.
+Read from `baseline/parallel-bins/Identical_FFD_Pieces_Packing.md` and
+`Identical_FFD_Lines_Packing.md`, short job, run 2026-10-03 on the six-class shape. These supersede the
+2026-10-01 reading of the removed pre-cap report. Ratio is BenchmarkDotNet's, Parallel against Loop.
 
-- **Parallel's best Ratio is about 0.55, on every core count.** On the big jobs - 4 or more bins, Loop at 30 µs or
-  more - the median is 0.65 on 2 cores, 0.61 on 4, 0.61 on 8 and 0.63 on 12. Most cells sit between 0.55 and
-  0.70, RatioSD at most 0.07. A few reach 0.83 and 0.87, on 8 and 12 cores.
-- **One cell shows 0.43** - 32 bins, 32 pieces, 2 cores. Its Loop took 98 µs against 67 µs on the other core
-  counts: a slow Loop process, not a gain.
-- **The ideal is far lower** - near 0.13 for 8 bins on 8 cores. What stops Parallel near 0.55 is not known.
-- **Loop is the sum of the bins**, and lines cost nothing: the lines class is flat across 1 to 64 lines.
-- **Parallel never wins on 1 bin.** It starts to win once Loop would take about 4 to 8 µs on 2 and 4 cores, and
-  about 16 µs on 12. More cores need a bigger request.
+### The drop point is a surface, and it moves both ways
+
+The piece count where Parallel first wins, by bin count and core count:
+
+| Bins | 2 cores | 4 cores | 8 cores | 12 cores |
+|---|---|---|---|---|
+| 1 | never | never | never | 128 |
+| 2 | 32 | 32 | 32 | 32 |
+| 4 | 8 | 16 | 16 | 32 |
+| 8 | 4 | 4 | 16 | 32 |
+| 16 | 2 | 2 | 8 | 16 |
+| 24 | 1 | 1 | 4 | 8 |
+| 32 | 1 | 1 | 4 | 4 |
+
+**More bins win earlier; more cores win later.** Both directions are monotone with no exceptions, which is what
+makes this readable as a rule rather than a table. The 1-bin row is the control: there is nothing to
+parallelise, and the single cell at 0.97 is noise, not a win.
+
+### Parallel never captures more than about 2x, however many bins
+
+This is the finding to take seriously, and it is the old open question answered the hard way.
+
+| Bins | best ratio | perfect scaling | what it got |
+|---|---|---|---|
+| 2 | 0.63 | 0.50 | 1.6x of a possible 2x |
+| 4 | 0.61 | 0.25 | 1.6x of a possible 4x |
+| 8 | 0.57 | 0.12 | 1.8x of a possible 8x |
+| 16 | 0.54 | 0.08 | 1.9x of a possible 12x |
+| 24 | 0.58 | 0.08 | 1.7x of a possible 12x |
+| 32 | 0.53 | 0.08 | 1.9x of a possible 12x |
+
+**The ceiling does not move with the bin count.** 2 bins and 32 bins both stop near 0.55, so going wider buys an
+earlier drop point and nothing else. The 2026-10-01 reading already said "what stops Parallel near 0.55 is not
+known"; it is now known not to be the bin count, the core count or the request size.
+
+**Suggested (agent, 2026-10-03):** the likeliest cause is memory, not scheduling. Each bin builds its own piece
+array, so 32 bins by 256 pieces allocates 32 copies, and `Fake_Bins` in `ParallelOverhead` already showed the
+cost of handing a bin to another CPU growing far faster than the bin count once each bin walks 64 KB. Nothing
+measures this yet.
+
+### `Bins = 1` is the cap's receipt, and it reads in nanoseconds
+
+`Parallel` sits a flat **230 to 307 ns** above `Loop` on every core count up to 32 pieces, which matches what
+`ParallelOverhead` measures for `Parallel.For`'s own setup. The cap works: the step does not grow with the core
+count, so nothing is being dispatched.
+
+**Do not read that row as a ratio.** The same step is 1.79 to 1.98 at one piece, because the baseline there is
+only about 290 ns. Past 64 pieces the step is smaller than the noise and goes negative. Read it at 1 to 32
+pieces, in nanoseconds.
+
+### Lines are flat, with one small real cost at the extreme
+
+The negative the maintainer asked for, measured. `Loop` against the one-line case:
+
+- **At 256 pieces: flat.** -0.9 to +1.8 per cent across 1, 4, 16 and 64 lines, which is inside the noise.
+- **At 64 pieces over 64 lines: +3.6 to +10.3 per cent**, or +0.6 to +1.6 us on a 16 us baseline. `Loop` StdDev
+  is 0.80 per cent of mean at the median and 2.0 at the 90th percentile, so this is above the noise.
+
+**And it is exactly where this plan predicted it.** The algorithm's constructor calls `CalculateVolume` and
+`CalculateLongestDimension` once per line, outside the quantity loop, so 64 lines of quantity 1 pays 64 of them
+where one line of 64 pays one. It shows only at the small piece count, where there is nothing else to hide it.
+
+**So the rule can read pieces** - lines do not change the shape of the answer. But lines are not free: a request
+of many single-quantity lines costs a few per cent more than the same pieces in one line.
+
+### Noise
+
+`Loop` StdDev is 0.34 per cent of mean at the median on the Pieces class, 0.90 at the 90th percentile, worst
+7.0. `Parallel` is 1.80, 5.5 and 14.0. The Lines class is 0.80 / 2.0 / 4.9 and 2.3 / 7.0 / 10.4. No cell looked
+like the slow whole-process problem that spoils the WFD racing rows.
 
 ## What the overhead project measured for bins - agent, 2026-10-02
 
@@ -180,7 +241,7 @@ after the one before it has run.
 
 Ordered by what each needs measured before it. From the review below.
 
-**1. Identical** (was `Even`) - needs nothing. FFD run and kept; WFD and BFD built but held, see above.
+**1. Identical** (was `Even`) - needs nothing. FFD run and kept 2026-10-03; WFD and BFD built and waiting on a run.
 - Answers: what Parallel costs on its own, and the fastest a bin can pack.
 - Its box is an exact multiple of the item, so every piece takes the first free space. Its time per piece is the
   lowest any request can have - never read a piece count off it.
@@ -215,7 +276,8 @@ Ordered by what each needs measured before it. From the review below.
 - **Each bin is packed on its own, with the whole item list.** Loop costs the sum of the bins. Parallel costs its
   setup plus the slowest bin, while there are enough cores.
 - **Lines only matter while they are turned into pieces.** After that FFD v2 works per piece: a sort, then for
-  each piece a scan of the free spaces, up to 6 turns. Read from the code, not measured.
+  each piece a scan of the free spaces, up to 6 turns. **Measured 2026-10-03** - flat at 256 pieces, and up to
+  10 per cent dearer at 64 pieces over 64 lines, which is the per-line work in the constructor.
 - **A bin that fits only some of the items is the slowest.** A piece that does not fit scans every space 6
   times. A bin that fits nothing is the fastest - its space list stays at one. Packing never stops early; only
   fitting does. In the fixtures the first word of a result is packing, the second fitting - the shared slice doc

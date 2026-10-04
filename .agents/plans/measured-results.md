@@ -50,11 +50,11 @@ Read out of each kept report's own header, not from the recipe comments: a short
 | `lib-algorithms-sample` | 6 classes | precise | about 30 min | - |
 | `lib-algorithms-full` | 6 classes | quick | about 16 hrs | precise, about 30 hrs |
 | `lib-parallel-algorithms-identical` | 5 classes | quick | about 40 min, measured 2026-10-03 | precise; and more launches for the three-algorithm class |
-| `lib-parallel-bins-identical` | nothing | - | about 1 hr for FFD, an estimate | all six of the 2026-10-03 shape |
+| `lib-parallel-bins-identical` | FFD, 2 classes | quick | about 70 min, measured 2026-10-03 | WFD and BFD, 4 classes |
 | `lib-parallel-overhead` | 3 classes | precise | 58 min, measured 2026-10-02 | - |
-| `lib-result-selection` | 3 classes | quick | about 3 min | precise |
+| `lib-result-selection` | 3 classes | precise | about 5 min | - |
 | `lib-scaling` | `Sample_Packing` | precise | about 20 min | - |
-| `vipaq-smoke` | 2 classes | quick | about 3 min | precise |
+| `vipaq-smoke` | 2 classes | precise | about 4 min | - |
 | `vipaq-sample` | 4 classes | precise | about 30 min | - |
 
 Every kept report belongs to a class that still exists - checked file by file against `lib/bench/` and

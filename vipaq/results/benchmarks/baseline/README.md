@@ -20,8 +20,8 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 
 | File | Recipe | Job | Cases |
 |---|---|---|---|
-| `encoding/Smoke_Encode.md` | `just bench vipaq-smoke` | short | 12 |
-| `encoding/Smoke_Decode.md` | `just bench vipaq-smoke` | short | 9 |
+| `encoding/Smoke_Encode.md` | `just bench vipaq-smoke` | default | 12 |
+| `encoding/Smoke_Decode.md` | `just bench vipaq-smoke` | default | 9 |
 | `encoding/Sample_Encode.md` | `just bench vipaq-sample` | default | 48 |
 | `encoding/Sample_Decode.md` | `just bench vipaq-sample` | default | 36 |
 | `encoding/Sample_CompressionCost_Encode.md` | `just bench vipaq-sample` | default | 6 |

@@ -10,7 +10,7 @@ renamed to its class.
 
 ## 🖥️ Where it ran
 
-Copied 2026-09-23 to 2026-10-02, from runs made on those days on one machine:
+Copied 2026-09-23 to 2026-10-03, from runs made on those days on one machine:
 
 - AMD Ryzen 9 9900X, 12 cores, Ubuntu 26.04.1
 - .NET 10.0.12 (SDK 10.0.112), BenchmarkDotNet 0.15.8
@@ -44,24 +44,35 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `parallel-algorithms/Identical_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short | 72 |
 | `parallel-algorithms/Identical_FFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short | 72 |
 | `parallel-algorithms/Identical_FFD_WFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short | 72 |
+| `parallel-bins/Identical_FFD_Pieces_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short | 504 |
+| `parallel-bins/Identical_FFD_Lines_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short | 64 |
 | `parallel-overhead/Fake_TwoAlgorithms.md` | `just bench lib-parallel-overhead` | default | 30 |
 | `parallel-overhead/Fake_ThreeAlgorithms.md` | `just bench lib-parallel-overhead` | default | 30 |
 | `parallel-overhead/Fake_Bins.md` | `just bench lib-parallel-overhead` | default | 90 |
 | `scaling/Sample_Packing.md` | `just bench lib-scaling` | default | 66 |
-| `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | short | 6 |
-| `result-selection/BestBin.md` | `just bench lib-result-selection` | short | 8 |
-| `result-selection/SmallestBin.md` | `just bench lib-result-selection` | short | 8 |
+| `result-selection/BestAlgorithm.md` | `just bench lib-result-selection` | default | 6 |
+| `result-selection/BestBin.md` | `just bench lib-result-selection` | default | 8 |
+| `result-selection/SmallestBin.md` | `just bench lib-result-selection` | default | 8 |
 
 Only classes that exist today have a report here. A class with no row has no kept run yet.
 
 Algorithms full ran the short job (8,400 cases, about 16 hours). A short-job time is a rougher number than a
 default-job one; the ratios still hold.
 
-## ⚠️ ParallelBins has no kept run, and the WFD rows of the racing run are dirty
+## ⚠️ Four of the eleven classes have no kept run, and the WFD racing rows are dirty
 
 Both packing projects were reshaped on 2026-10-03, into five and six classes, and every report they had was
-removed under the rule above. `parallel-algorithms/` was refilled the same day; **`parallel-bins/` is still
-empty, so nothing here measures Loop against Parallel over many bins.**
+removed under the rule above. `parallel-algorithms/` was refilled the same day and so was FFD in
+`parallel-bins/`. **WFD and BFD have no kept run in `parallel-bins/`, Pieces or Lines.**
+
+Reading the bins reports:
+
+- **`Bins = 1` is the cap's receipt, read in nanoseconds and not as a ratio.** `Parallel` sits a flat 230 to
+  307 ns above `Loop` on every core count up to 32 pieces, which matches `ParallelOverhead`'s figure for what
+  `Parallel.For` costs to set up. As a *ratio* that same step reads 1.8 to 2.0 at one piece, because the
+  baseline there is only about 290 ns. Past 64 pieces the step is smaller than the noise.
+- **Parallel never captures more than about 2x, however many bins.** The best ratio is 0.53 at 32 bins where
+  perfect scaling would be 0.08. That holds across every bin count from 2 up - see the plan.
 
 Two things to know before reading the racing reports:
 
