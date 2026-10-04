@@ -89,7 +89,7 @@ Read out of each kept report's own header, not from the recipe comments: a short
 | `lib-algorithms-smoke` | 6 classes | quick | about 6 min | - |
 | `lib-algorithms-sample` | 6 classes | precise | about 30 min | - |
 | `lib-algorithms-full` | 6 classes | quick | about 16 hrs | precise, about 30 hrs |
-| `lib-parallel-algorithms-identical` | 5 classes | quick | about 40 min, measured 2026-10-03 | precise; and more launches for the three-algorithm class |
+| `lib-parallel-algorithms-identical` | 5 classes | quick, 3 launches | about 2 hrs, measured 2026-10-04 | precise |
 | `lib-parallel-bins-identical` | FFD, 2 classes | quick | about 70 min, measured 2026-10-03 | WFD and BFD, 4 classes |
 | `lib-parallel-overhead` | 3 classes | precise | 58 min, measured 2026-10-02 | - |
 | `lib-result-selection` | 3 classes | precise | about 5 min | - |
@@ -580,88 +580,45 @@ The old repo-root `results/` folder and its November 2025 runs are gone, and wha
 
 ## The ViPaq results files
 
-The files in `vipaq/results/` are placeholders, like lib's: a comment per table as its spec, a sample table
-with fake numbers under it.
+**Done.** `format-size.md`, `compressed-size.md`, `encode-cost.md`, `decode-cost.md`, and the README summary.
+Seven files became four: the four layout-and-codec size files were one 4-row table, so they are
+`compressed-size.md`. `INDEX.md` holds the file list, the README holds the story.
 
-**When a file is filled, the same two things come out of it**: the `<!-- Table: ... -->` spec comment above each
-table, and the "Every number in this file is fake" banner.
+### The shape, settled 2026-10-05 - it holds for the lib files too
 
-### Its goal
+Every line is the maintainer's.
 
-**(the maintainer, 2026-09-29):** the shapes are not pinned down yet - "some sample files exist in /lib/results/
-but not pinned down same holsds true for vipaq". Pin each file's shape first, then fill it by hand, as lib's
-("6 is manual for now").
+- **A results file is consolidated data and nothing else** - "purre consoilidated data ... thats the purpose of
+  those result fuiles". No words under a table. A short "What was observed" goes **on top**, as bullets -
+  "the words go on top... as a summary... or in the readme.md summary".
+- **No gaps section.** What a file does not measure was cut from every one of them, and it does not come back -
+  "1 an idea exists".
+- **The losses get their own table** - "now the scenarions where it looses mucst be on a table". Named rows
+  while they are few, counted per group once they are many. No bold above 1.00× and no loss-count column: the
+  table is the catch.
+- **Per case, then averaged** - the ratio on one pack, then the mean per set, never a mean divided by a mean,
+  "cause it contains varried things".
+- **One table per axis, not one per algorithm.** The algorithm gets a single table, a row each, never averaged
+  together.
+- **Equal comparisons only** - "i want equal comparisons fair equitable". A ratio is taken inside one report.
+  No dividing a number in one report by a number in another, and no claim a run did not make: the compression
+  tables are ViPaq against itself, because that class has no protobuf row.
+- **Each table keeps a two-line comment** - what it says, and the raw file it reads. Nothing more.
 
-### The decisions the files serve - suggested (agent), to reinvestigate
+### Still open - the measure output, not the results files
 
-1. Is the format worth having - how much smaller than the alternatives?
-2. Is encode and decode speed acceptable, or worth work?
-3. Should the default layout stay row, or switch to columnar?
-4. Should tokens be compressed, with which codec, and from what pack size?
-
-One file per question, or per layout and codec; the README combines them.
-
-### Fact
-
-**Row is the default layout** (`ViPaqSerializationOptions.Layout = RowMajor`) and the API sets no other, so row
-is what gets sent. The earlier README said the wire carries columnar; it was wrong.
-
-### Rules particular to ViPaq - suggested (agent), to reinvestigate
-
-The rules above hold the maintainer's own: algorithms never mixed, a loss shows.
-
-- **Size, per pack, then averaged.** ViPaq ÷ the other format on that one pack, then the mean per group. Rows
-  thpack1..7, custom problems, demo samples, All, with a Packs column. Each size file carries its tables once
-  per algorithm - FFD, then WFD, then BFD.
-- **A loss shows** this way: any average above 1.00× is bold, and a column "ViPaq larger than protobuf on"
-  counts the packs where ViPaq lost. A JSON count only if some pack has ViPaq larger than JSON.
-- **Widths everywhere**, because width drives ViPaq's size and cost. `Widths` is bin / item / coordinate bits,
-  e.g. `16/8/16`.
-- **Cost files hold cost only.** No size column in a cost file, even for the same pack; the README puts size
-  saved beside time paid.
-- **Say how a number was made when it is not obvious**: compact notation joins the bin and the items with `;`
-  because it has no whole-pack form.
-
-### Open points in the ViPaq shapes - suggested (agent, 2026-09-26), to reinvestigate
-
-Each is the maintainer's to settle, one per turn.
-
-- **The "All" row** of a size table now holds one algorithm's 774 packs, not all 2,322.
-- **Raw row and raw columnar are the same length** on all 2,322 packs (checked 2026-09-26). The question in
-  `format-size.md` is answered, and the Raw table of every `columnar-*` measurement file is an exact copy of the
-  row file's. Drop it from the measure output, or keep it so each layout has its own file?
-- **Unused measure columns:** Compact in the Deflate and Gzip tables, and ViPaq/Proto everywhere (a rounded copy
-  of what the tables compute). Drop, or keep? Items is unused too and stays as context.
-- **The protobuf gap in the codec files.** "Part of the win is the layout" fits the columnar files only; the row
-  files say "no columnar protobuf".
-- **Which file owns** "no MessagePack or CBOR" (now in all five size files) and "no earlier format" (now in
-  `format-size.md` only).
-- **The one-process gap** is named in `encode-cost.md` but not `decode-cost.md`. Slow processes are not
-  chased, so the gap stays.
-- **Kind** (real or synthetic) is not in the report; it comes from the pack name.
-
-### Gaps each ViPaq file names - suggested (agent), to reinvestigate
-
-- Compression cost is measured on two packs only; nothing says from what size compressing pays for its time.
-- No columnar protobuf, MessagePack or CBOR.
-- ViPaq has no "before" to show its direction is sound, the way v1 against v2 does for lib. Is there an earlier
-  format worth measuring, or is "against protobuf" the whole story?
-- The ViPaq README must not claim "smallest" from `format-size.md` alone. Uncompressed, ViPaq is not the
-  smallest format measured; where it wins clearly is compressed and columnar.
-
-### What the removed ViPaq README said (2026-09-22) - checked, agent 2026-10-04
-
-Every number in it was recomputed from the files `just measure vipaq` writes today. All of it holds and all of
-it is recorded as a finding, the gzip rows it was missing included. Nothing from that README is left to check.
-
-One correction must not come back: it said raw still beats deflate up to "1 item". That was base64 rounding on
-one demo pack. The measured figure is 6 items in row and 2 in columnar.
+- **Raw row and raw columnar are the same length**, character for character, on every pack of every algorithm
+  (checked 2026-10-05 by hashing the tables). So the Raw table of every `columnar-*` measurement file is an
+  exact copy of the row file's. Drop it from the measure output, or keep it so each layout has its own file?
+- **Unused measure columns:** ViPaq/Proto everywhere, a rounded copy of what the tables compute. Drop, or keep?
+  Items is unused and stays as context.
 
 ## The results READMEs
 
-Both `lib/results/README.md` and `vipaq/results/README.md` are an index and nothing else. The maintainer has not
-decided the summary's shape. Shape it with him first, one piece per turn, shown with made-up numbers; then write
-it.
+**`vipaq/results/README.md` carries its summary.** The index moved to `INDEX.md` beside it, so the README holds
+the story and nothing else. The shape is a table - the question, the answer, and the files the answer reads -
+then the one fact that crosses two files, then a line stating nothing on the page is computed. `lib/results/`
+is split the same way, and its README still needs the summary.
 
 A README is a public file, so it carries no planning marker to grep for. Whether the summary is there is read by
 eye.
@@ -683,12 +640,8 @@ Combinations seen so far, lib:
 - what a cost function can use - `packing-time-by-size.md`, `scaling.md`, `parallel-algorithms.md`, `parallel-bins.md`
 - whether the direction is sound - the two version files, `packing-efficiency-stats.md`
 
-Combinations seen so far, ViPaq:
-
-- is the format worth having - `format-size.md` and the four codec files
-- should the default be columnar - the row against the columnar files, `encode-cost.md`
-- compress, and with what - the codec files, `encode-cost.md`
-- is the speed acceptable - `encode-cost.md`, `decode-cost.md`
+ViPaq is done. The one fact that crosses two files and lives only in its README: what the wire win costs in
+encode time.
 
 ## Done when
 
@@ -732,8 +685,8 @@ Combinations seen so far, ViPaq:
       `ls lib/results/parallel-algorithms.md lib/results/parallel-bins.md`
 - [ ] Every lib results file has real numbers, filled by hand, and its words and gaps are written from them.
       `! grep -l "is fake" lib/results/*.md`, then **by eye**.
-- [ ] Every ViPaq results file has real numbers, filled by hand, and its words and gaps are written from them.
-      `! grep -l "is fake" vipaq/results/*.md`, then **by eye**.
+- [x] Every ViPaq results file has real numbers and a summary written from them.
+      `! grep -l "is fake" vipaq/results/*.md`, then **by eye**. Done 2026-10-05. Seven files became four.
 - [ ] Each filled file has lost its table specs and its fake banner.
       `! grep -l "^Table:" lib/results/*.md vipaq/results/*.md` and
       `! grep -l "is fake" lib/results/*.md vipaq/results/*.md`

@@ -60,6 +60,6 @@ three codecs. Raised by the maintainer, 2026-09-26.
 
 ## What it costs elsewhere
 
-The size files at the root of `vipaq/results/` - `format-size.md`, `row-*.md`, `columnar-*.md` - tell the size
+The size files at the root of `vipaq/results/` - `format-size.md` and `compressed-size.md` - tell the size
 story against JSON, compact notation and protobuf. Every headline in them moves if this lands, and the honest framing changes with them: the claim stops being "smallest" and becomes
 "holds its shape as packings grow, and has a ceiling nothing else has".

@@ -41,11 +41,11 @@ Time only compares with a run from the same machine and .NET version. Ratio and 
 | `algorithms/Full_WFD_Fitting.md` | `just bench lib-algorithms-full` | short |
 | `algorithms/Full_BFD_Packing.md` | `just bench lib-algorithms-full` | short |
 | `algorithms/Full_BFD_Fitting.md` | `just bench lib-algorithms-full` | short |
-| `parallel-algorithms/Identical_FFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short |
-| `parallel-algorithms/Identical_WFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short |
-| `parallel-algorithms/Identical_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short |
-| `parallel-algorithms/Identical_FFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short |
-| `parallel-algorithms/Identical_FFD_WFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short |
+| `parallel-algorithms/Identical_FFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
+| `parallel-algorithms/Identical_WFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
+| `parallel-algorithms/Identical_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
+| `parallel-algorithms/Identical_FFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
+| `parallel-algorithms/Identical_FFD_WFD_BFD_Packing.md` | `just bench lib-parallel-algorithms-identical` | short, 3 launches |
 | `parallel-bins/Identical_FFD_Pieces_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short |
 | `parallel-bins/Identical_FFD_Lines_Packing.md` | `just bench lib-parallel-bins-identical FFD` | short |
 | `parallel-overhead/Fake_TwoAlgorithms.md` | `just bench lib-parallel-overhead` | default |

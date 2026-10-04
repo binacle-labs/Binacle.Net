@@ -1,20 +1,22 @@
 # ViPaq results
 
-What ViPaq's measure and bench projects found.
+How small a ViPaq token is against the formats it replaces, and what encoding and decoding one costs.
 
-## 📂 What is in it
+[INDEX.md](INDEX.md) lists every file here and the question it answers.
 
-| Path | What it is |
-|---|---|
-| [measurements/](measurements) | Raw measurement results, written by `just measure vipaq`: how long every real pack is as a ViPaq token, and as protobuf, JSON and compact notation, each raw, deflated and gzipped |
-| [benchmarks/](benchmarks) | Raw benchmark results: BenchmarkDotNet reports from `vipaq/bench`, copied by hand. Not written by `just measure` |
-| [format-size.md](format-size.md) | ViPaq against JSON, compact notation and protobuf, uncompressed |
-| [row-deflate.md](row-deflate.md), [row-gzip.md](row-gzip.md) | Row layout, compressed, against protobuf and JSON |
-| [columnar-deflate.md](columnar-deflate.md), [columnar-gzip.md](columnar-gzip.md) | Columnar layout, compressed, against protobuf and JSON |
-| [encode-cost.md](encode-cost.md) | Encode time and memory against protobuf, and what compressing adds |
-| [decode-cost.md](decode-cost.md) | Decode time and memory against protobuf, and what decompressing adds |
+## 📝 What the results say
 
-Each file at this level answers one question from the two folders.
+| The question | The answer | Reads |
+|---|---|---|
+| Is the format worth having? | Yes. A token is 0.65× protobuf and 0.20× JSON stored as is, and 0.60× protobuf and 0.47× JSON as columnar deflate. It is never larger than protobuf on any pack. | `format-size.md`, `compressed-size.md` |
+| Is encoding and decoding fast enough? | Yes. Encoding costs about 2× protobuf's time on the real packs and under half its memory. Decoding beats protobuf on most packs and always allocates less. | `encode-cost.md`, `decode-cost.md` |
+| Row or columnar? | Columnar, once tokens are compressed. Uncompressed the two are identical character for character; compressed, columnar is 0.86× row and the gap widens with pack size. Decoding is the same either way and row encodes a little faster. | `compressed-size.md`, `encode-cost.md`, `decode-cost.md` |
+| Compress, and with what? | Deflate. Gzip is never smaller on any pack. Compressing roughly triples the encode, and decompressing adds about half again to the decode. | `compressed-size.md`, `encode-cost.md`, `decode-cost.md` |
+
+**What the win costs:** columnar deflate puts a pack on the wire at 0.60× protobuf and pays about 2.7× ViPaq's
+own encode time for it.
+
+Every number here is quoted from the file beside it. Nothing on this page is computed.
 
 ## 🛠️ How you use it
 

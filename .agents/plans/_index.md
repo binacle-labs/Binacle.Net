@@ -28,9 +28,9 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
 - file: measured-results.md
-  description: "Orchestrator - fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README; five sessions"
+  description: "Fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README summary"
   state: ready
-  waits-on: "the maintainer says when each session starts"
+  waits-on: "the maintainer runs the parallel bench classes that have no kept report, and pins each results file's shape with his own yes"
   horizon: next-release
   paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", ".agents/**"]
 - file: results-across-slices.md
@@ -125,42 +125,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea"
   horizon: undecided
   paths: ["lib/src/Binacle.Lib/Algorithms/**", "lib/bench/**", "vipaq/bench/**"]
+- file: lib/realistic-parallel-bench-cases.md
+  description: "Every suggestion for harder, more realistic bench cases for the two parallel bench projects - scenarios beyond Identical, bin-set categories, item mixes, a spin stub, and a Real set. Nothing here is figured out"
+  state: idea
+  waits-on: "nobody - it is an idea. An agent picked the horizon to make the file legible; strike it"
+  horizon: undecided
+  paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/**", "lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "shared/test/Binacle.Benchmarking/**"]
 - file: lib/versions-pack-the-same.md
   description: "No test checks that two versions of one heuristic put every item in the same place; the tests and the measure compare status and fill only"
   state: idea
   waits-on: "nobody - it is an idea"
   horizon: undecided
   paths: ["lib/test/**", "lib/measure/**", "lib/src/Binacle.Lib/Algorithms/**"]
-```
-
-## Measured-results
-
-```yaml
-- file: measured-results/04-racing-drop-point.md
-  description: "Session 4 - ParallelAlgorithms - find when racing algorithms on one bin in parallel beats a loop. Five Identical classes, one per alone algorithm and one per race width, all on the same params"
-  state: ready
-  waits-on: "the maintainer runs the five classes - built and dry-checked 2026-10-03. The grid values are a suggestion until he picks them"
-  horizon: undecided
-- file: measured-results/05-bins-drop-point.md
-  description: "Session 5 - ParallelBins - find where packing many bins at the same time starts to pay. Six Identical classes, a Pieces and a Lines one per algorithm, same params within a kind"
-  state: ready
-  waits-on: "the maintainer runs the six classes - built and dry-checked 2026-10-03. The grid values are a suggestion until he picks them"
-  horizon: undecided
-- file: measured-results/06-lib-results.md
-  description: "Session 6 - pin the shape of each lib results file with the maintainer, then fill them by hand from the kept runs, the two parallel files included"
-  state: blocked
-  waits-on: "sessions 4 and 5 - the two drop points"
-  horizon: undecided
-- file: measured-results/07-vipaq-results.md
-  description: "Session 7 - pin the shape of each ViPaq results file with the maintainer, then fill them by hand from the kept runs"
-  state: blocked
-  waits-on: "sessions 4 to 6 - the maintainer, 2026-09-29: 'waits on the rest'"
-  horizon: undecided
-- file: measured-results/08-results-readmes.md
-  description: "Session 8 - shape the summary of lib/results/README.md and vipaq/results/README.md with the maintainer, then write it from the filled results files"
-  state: blocked
-  waits-on: "sessions 6 and 7 - every results file filled"
-  horizon: undecided
 ```
 
 ## Shared

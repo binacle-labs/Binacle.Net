@@ -10,6 +10,11 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
 ## General
 
 ```yaml
+- file: a-doc-is-not-a-report.md
+  description: "A doc states what is true, not what was done to find it out. No session narrative in a file a human reads."
+  when: "writing or editing any doc, README, results file or other public markdown"
+  load: on-trigger
+  paths: ["**/README.md", "lib/results/**", "vipaq/results/**", ".agents/docs/**", ".agents/design/**"]
 - file: comments-are-for-humans.md
   description: "A comment carries the one thing that is not obvious from the code. Short. The reasoning goes in design/, never in both."
   when: "writing or editing a code comment"

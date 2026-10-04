@@ -28,6 +28,7 @@ files hold the carve-outs.
 | write or edit a **code comment** | [comments-are-for-humans](comments-are-for-humans.md) - the not-obvious thing only; the reasoning goes in `design/` |
 | write **text a user will see** - exception, log line, OpenAPI description, UI string | [plain-ascii-for-user-text](plain-ascii-for-user-text.md) |
 | write **any doc, comment or explanation** | [plain-language](plain-language.md) |
+| write a **doc, README or results file** a human reads | [a-doc-is-not-a-report](a-doc-is-not-a-report.md) - state what is true, not what you did to find it |
 | write a **number** into a doc, README, plan, comment or recipe | [numbers-only-where-they-are-the-point](numbers-only-where-they-are-the-point.md) - leave out any count the code already holds |
 | write a **heading in a public markdown file** - README, samples, the Docker Hub page, the docs site | [icon-headings-in-public-docs](icon-headings-in-public-docs.md) |
 | add a **folder**, or write or edit a **`README.md`** outside `.agents/` | [every-folder-has-a-readme](every-folder-has-a-readme.md) |

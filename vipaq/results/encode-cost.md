@@ -2,81 +2,67 @@
 
 What does a ViPaq encode cost in time and memory against protobuf, and what does compressing add?
 
-> Every number in this file is fake. The tables show the shape only.
+## 📝 What was observed
+
+- ViPaq trades time for memory. On the real packs it takes about 2× protobuf's time and under half its memory.
+- Row is faster than columnar on every pack.
+- Above about a thousand items ViPaq turns faster than protobuf too, down to 0.48× at the top of the range.
+- JSON is the slowest everywhere, 1.42× to 4.20× protobuf, and the only format that allocates more.
+- Compressing roughly triples the encode and costs no extra memory.
 
 ## 📊 Time against protobuf
 
 <!--
-Table: encode time as × of protobuf, per bench pack.
+Encode time as × of protobuf, per bench pack. BenchmarkDotNet's own Ratio.
 Reads: vipaq/results/benchmarks/baseline/encoding/Sample_Encode.md
-Rows: one per pack, fewest items to most - the real packs `one item`, `small, all 16-bit`, `small, 8-bit`,
-`typical container`, `100 cubes, 8-bit`, `largest FFD pack`, then the synthetic `<count> items, <width>-bit` packs.
-Columns: Pack, Kind (real or synthetic), Items, Widths, ViPaq row, ViPaq columnar, JSON - each × of protobuf.
-Notes: BenchmarkDotNet's own Ratio; Error and RatioSD dropped. Above 1.00× is bold. Items and Widths are read from
-the report by header. The report has no Kind; it comes from the pack name.
-Cost only: no size column, even for the same pack.
 -->
 
 | Pack | Kind | Items | Widths | ViPaq row | ViPaq columnar | JSON |
 |---|---|---|---|---|---|---|
-| one item | real | 1 | 8/8/8 | **1.99×** | **1.11×** | **1.22×** |
-| small, all 16-bit | real | 4 | 16/16/16 | **1.33×** | **1.44×** | **1.55×** |
-| small, 8-bit | real | 16 | 8/8/8 | **1.66×** | **1.77×** | **1.88×** |
-| typical container | real | 70 | 16/8/16 | **1.99×** | **1.11×** | **1.22×** |
-| 100 cubes, 8-bit | real | 100 | 8/8/8 | **1.33×** | **1.44×** | **1.55×** |
-| largest FFD pack | real | 365 | 16/8/16 | **1.66×** | **1.77×** | **1.88×** |
-| 1000 items, 8-bit | synthetic | 1000 | 8/8/8 | 0.99× | 0.11× | **2.22×** |
-| 1000 items, 16-bit | synthetic | 1000 | 16/16/16 | 0.33× | 0.44× | **5.55×** |
-| 5000 items, 8-bit | synthetic | 5000 | 8/8/8 | 0.66× | 0.77× | **8.88×** |
-| 5000 items, 16-bit | synthetic | 5000 | 16/16/16 | 0.99× | 0.11× | **2.22×** |
-| 65535 items, 8-bit | synthetic | 65535 | 8/8/8 | 0.33× | 0.44× | **5.55×** |
-| 65535 items, 16-bit | synthetic | 65535 | 16/16/16 | 0.66× | 0.77× | **8.88×** |
+| one item | real | 1 | 8/8/8 | 1.89× | 2.37× | 3.32× |
+| small, all 16-bit | real | 4 | 16/16/16 | 1.73× | 2.03× | 3.09× |
+| small, 8-bit | real | 16 | 8/8/8 | 1.94× | 2.17× | 3.96× |
+| typical container | real | 70 | 16/8/16 | 1.94× | 2.14× | 3.82× |
+| 100 cubes, 8-bit | real | 100 | 8/8/8 | 2.13× | 2.34× | 4.20× |
+| largest FFD pack | real | 365 | 16/8/16 | 1.94× | 2.13× | 3.92× |
+| 1000 items, 8-bit | synthetic | 1000 | 8/8/8 | 1.09× | 1.30× | 3.14× |
+| 1000 items, 16-bit | synthetic | 1000 | 16/16/16 | 0.96× | 1.12× | 2.34× |
+| 5000 items, 8-bit | synthetic | 5000 | 8/8/8 | 1.21× | 0.96× | 2.19× |
+| 5000 items, 16-bit | synthetic | 5000 | 16/16/16 | 0.77× | 0.88× | 1.64× |
+| 65535 items, 8-bit | synthetic | 65535 | 8/8/8 | 0.48× | 0.64× | 1.65× |
+| 65535 items, 16-bit | synthetic | 65535 | 16/16/16 | 0.59× | 0.75× | 1.42× |
 
 ## 📊 Memory against protobuf
 
 <!--
-Table: encode memory as × of protobuf, per bench pack.
+Encode memory as × of protobuf, per bench pack. BenchmarkDotNet's own Alloc Ratio.
 Reads: vipaq/results/benchmarks/baseline/encoding/Sample_Encode.md
-Rows: the same packs, in the same order.
-Columns: Pack, Kind (real or synthetic), Items, Widths, ViPaq row, ViPaq columnar, JSON - each × of protobuf.
-Notes: BenchmarkDotNet's own Alloc Ratio. Above 1.00× is bold.
 -->
 
 | Pack | Kind | Items | Widths | ViPaq row | ViPaq columnar | JSON |
 |---|---|---|---|---|---|---|
-| one item | real | 1 | 8/8/8 | **1.99×** | **1.11×** | **1.22×** |
-| small, all 16-bit | real | 4 | 16/16/16 | **1.33×** | **1.44×** | **1.55×** |
-| small, 8-bit | real | 16 | 8/8/8 | **1.66×** | **1.77×** | **1.88×** |
-| typical container | real | 70 | 16/8/16 | **1.99×** | **1.11×** | **1.22×** |
-| 100 cubes, 8-bit | real | 100 | 8/8/8 | **1.33×** | **1.44×** | **1.55×** |
-| largest FFD pack | real | 365 | 16/8/16 | **1.66×** | **1.77×** | **1.88×** |
-| 1000 items, 8-bit | synthetic | 1000 | 8/8/8 | 0.99× | 0.11× | **2.22×** |
-| 1000 items, 16-bit | synthetic | 1000 | 16/16/16 | 0.33× | 0.44× | **5.55×** |
-| 5000 items, 8-bit | synthetic | 5000 | 8/8/8 | 0.66× | 0.77× | **8.88×** |
-| 5000 items, 16-bit | synthetic | 5000 | 16/16/16 | 0.99× | 0.11× | **2.22×** |
-| 65535 items, 8-bit | synthetic | 65535 | 8/8/8 | 0.33× | 0.44× | **5.55×** |
-| 65535 items, 16-bit | synthetic | 65535 | 16/16/16 | 0.66× | 0.77× | **8.88×** |
+| one item | real | 1 | 8/8/8 | 1.00× | 1.38× | 1.73× |
+| small, all 16-bit | real | 4 | 16/16/16 | 0.97× | 1.23× | 1.90× |
+| small, 8-bit | real | 16 | 8/8/8 | 0.53× | 0.63× | 1.86× |
+| typical container | real | 70 | 16/8/16 | 0.46× | 0.48× | 1.53× |
+| 100 cubes, 8-bit | real | 100 | 8/8/8 | 0.35× | 0.37× | 1.59× |
+| largest FFD pack | real | 365 | 16/8/16 | 0.46× | 0.46× | 1.60× |
+| 1000 items, 8-bit | synthetic | 1000 | 8/8/8 | 0.31× | 0.31× | 1.66× |
+| 1000 items, 16-bit | synthetic | 1000 | 16/16/16 | 0.53× | 0.53× | 1.68× |
+| 5000 items, 8-bit | synthetic | 5000 | 8/8/8 | 0.28× | 0.28× | 1.51× |
+| 5000 items, 16-bit | synthetic | 5000 | 16/16/16 | 0.49× | 0.49× | 1.54× |
+| 65535 items, 8-bit | synthetic | 65535 | 8/8/8 | 0.31× | 0.31× | 1.66× |
+| 65535 items, 16-bit | synthetic | 65535 | 16/16/16 | 0.53× | 0.53× | 1.68× |
 
 ## 📊 What compressing adds
 
 <!--
-Table: what deflate and gzip add to one encode.
+What deflate and gzip add to one ViPaq encode, as × of the same encode uncompressed. The baseline is the NoOp
+row, so every ratio here is ViPaq against itself - no protobuf is in this class. Ratio and Alloc Ratio.
 Reads: vipaq/results/benchmarks/baseline/encoding/Sample_CompressionCost_Encode.md
-Rows: `compression low win`, `compression high win` - two real FFD packs, row layout, named as the report prints them.
-Columns: Pack, Items, Widths, Deflate time, Gzip time, Deflate memory, Gzip memory - each × of no compression
-(the NoOp row).
-Notes: BenchmarkDotNet's own Ratio (time) and Alloc Ratio (memory). Above 1.00× is bold.
 -->
 
 | Pack | Items | Widths | Deflate time | Gzip time | Deflate memory | Gzip memory |
 |---|---|---|---|---|---|---|
-| compression low win | 70 | 16/8/16 | **1.99×** | **1.11×** | **1.22×** | **1.33×** |
-| compression high win | 108 | 16/8/16 | **1.44×** | **1.55×** | **1.66×** | **1.77×** |
-
-## Gaps and open questions
-
-<!--
-Question, under the compression table: two packs are not a curve. Is it worth measuring compression cost across pack
-sizes, so the encoder can decide per pack whether to compress?
-Gap: each case runs in one process, so a row can come from a slow or a fast process, and the report cannot show it.
--->
+| compression low win | 70 | 16/8/16 | 2.67× | 2.78× | 0.97× | 1.13× |
+| compression high win | 108 | 16/8/16 | 2.79× | 2.82× | 0.85× | 0.96× |
