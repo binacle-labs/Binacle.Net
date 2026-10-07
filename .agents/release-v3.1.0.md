@@ -10,9 +10,9 @@ run, both bundles rebuilt, `just test all` green across 28 suites, and the chang
 **Every by-eye box passed on 2026-09-17** - rows 5, 6, 7 and 8 - **row 8's two site halves landed the same
 day, and `3.1.0-beta.2` verified clean from the branch tip of that day.** Three commits landed after it, on
 2026-09-17 and 2026-09-18 - the ServiceModule CORS policy, the Kernel `Cors` section, the service client and
-the admin site - **so the last clean beta is behind the branch, and a `beta.3` from the tip is the open box
-under stage 3.** `just test all` was green again on 2026-09-18, after those commits. The six CI edits landed on
-2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
+the admin site - **`beta.3` carried them, green on 2026-09-18.** The branch has moved on since, so a `beta.4`
+from the tip is the open box under stage 3. `just test all` was green on 2026-09-18, before the test
+restructure. The six CI edits landed on 2026-09-11 and 2026-09-12; two of them are proved only by the `3.1.0` run. The maintainer set the order on
 2026-09-11: "first we finish all freatures then changelog/documentation and the rest". Branch
 `release/v3-1-0`. **Every beta is dispatched from this branch and its image stops at GHCR** - the maintainer,
 2026-09-14: "images remain on ghcr for beta thats it"; since 2026-09-18 a beta also gets its git tag and a GitHub prerelease - so nothing merges to
@@ -308,7 +308,7 @@ is finished; only the last one has to be clean.
       through the container itself. **What a beta cannot prove is findings 1 and 8** - the Docker Hub login and
       the buildx-less copy run for the first time on the `3.1.0` dispatch below. A red `publish` there leaves
       Docker Hub untouched and no tag; fix on `main` and dispatch `3.1.0` again.
-- [ ] **`3.1.0-beta.3` dispatched from the branch tip, run green, and verified the same way.** *(the number
+- [x] **`3.1.0-beta.3` dispatched from the branch tip, run green, and verified the same way.** *(the number
       is an agent's guess - it is the next free one)* The tip carries the ServiceModule CORS policy, the Kernel
       `Cors` move, the service client, the admin site, the `release` job change and the branch-name check in
       `check-release-ref.sh` - `release/v3-1-0` may dispatch `3.1.0-*` only - all of 2026-09-18, none of which
@@ -319,13 +319,22 @@ is finished; only the last one has to be clean.
       ghcr.io/binacle-labs/binacle-net` passes, `just smoke all ghcr.io/binacle-labs/binacle-net:3.1.0-beta.3`
       is green, the four UI pages answer 200 with `UI_MODULE=True`, and the six bundle greps from the `beta.2`
       box match. Docker Hub's tag list still has no `beta`.
-      **Found 2026-09-29:** the tag `v3.1.0-beta.3` exists, on `9829dd1b` of 2026-09-18. Nothing here records
-      whether its run was green or its image verified. Over fifty commits have landed on the branch since. Most
-      are agent files, plans, benches and results; the shipped code gained the internal `BestFitDecreasing_v3`
-      and `WorstFitDecreasing_v3` in `Binacle.Lib`, which nothing in `lib/src` or `api/src` calls yet.
-      `CHANGELOG.md` has not changed since the tag.
+      **Checked 2026-10-07 against GitHub and the registries:** the run on `9829dd1b` of 2026-09-18 is green -
+      gate, image tests, build, smoke and `release` passed, `publish` and `page` skipped. `v3.1.0-beta.3` is a
+      tag and a prerelease page. GHCR serves `3.1.0-beta.3`; Docker Hub's tag list has no `beta`.
+      **Not re-run against this image:** `just image verify`, `just smoke` and the by-eye page checks.
 - [ ] **`3.1.0-beta.4` dispatched from the branch tip, run green, and verified the same way as `beta.3`.** The
       maintainer, 2026-09-29: "we will do a beta 4 at the end just for a case".
+      **What changed since `beta.3`, read 2026-10-07 off `git diff v3.1.0-beta.3..HEAD`.** Nothing the image
+      does. In `Binacle.Lib`: the internal `BestFitDecreasing_v3` and `WorstFitDecreasing_v3`, which nothing
+      calls; `ParallelLimits`, a thread cap the three `Parallel*Processor` types now apply, with their
+      constructor argument renamed `concurrencyLevel` to `maxDegreeOfParallelism` - `BinProcessorFactory`
+      returns only the `Loop*` processors, so the image never runs them. Elsewhere: `InternalsVisibleTo`
+      renames, `Binacle.Net.slnx` after the test projects moved, Sonar's project marking and exclusions,
+      `bench.just` and `measure.just` in place of the bench and performance scripts, and wording in READMEs,
+      comments and `CHANGELOG.md` - its em dashes became hyphens, no entry changed. No workflow file changed.
+      **So the risk this beta carries is the test restructure**, which the image tests job builds and runs.
+      `just test all` has not been run since it.
 - [ ] Pull request from `release/v3-1-0` to `main`, and `Gate` is green. **Watch the Sonar job** - it is the
       first real pull request since `D28`, nothing sets `sonar.pullrequest.*`, and with finding 10 in it goes
       red on a failed quality gate. Neither holds the merge; `sonar` is outside `gate`'s `needs`.
@@ -353,7 +362,7 @@ already exists, so the pin follows the publish and never precedes it.
 ## Done when
 
 - [x] **2026-09-16.** `CHANGELOG.md` has an `## [Unreleased]` section describing this release.
-      `just changelog check Unreleased` passes - 47 lines - and the section now covers every row, rows 5 to 8
+      `just changelog check Unreleased` passes - again on 2026-10-07 - and the section covers every row, rows 5 to 8
       and all six CI findings included. **The read against the rows is the stage 2 box**, which holds the
       detail; this box is the command.
       **It fails by design after the rename to `## [3.1.0]`** - that is the last edit before the tag, under
