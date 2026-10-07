@@ -1,56 +1,79 @@
 # Format size
 
-How much smaller is a ViPaq token than JSON, compact notation and protobuf, stored as is?
+How long a ViPaq token is, stored as is, against protobuf, JSON and compact notation.
 
-## 📝 What was observed
+Every size is a character count: ViPaq and protobuf as base64, JSON and compact notation as text, because text
+is their own stored form. Each pack is the result of packing one problem with FFD, WFD or BFD. Uncompressed,
+the row and columnar layouts are the same length on every pack, so layout does not appear here.
 
-- 0.20× JSON, 0.58× compact notation, 0.65× protobuf.
-- Never larger than JSON or protobuf. Larger than compact notation only on empty packs.
-- The algorithm does not change it. The Bischoff set does not change it.
-- Row and columnar are the same length uncompressed, character for character.
+## 📊 ViPaq against protobuf
 
-## 📊 By group, FFD
+On each pack, ViPaq's length divided by protobuf's. Below 1 means ViPaq is shorter. All three algorithms'
+packs are pooled.
 
-<!--
-Raw ViPaq size as × of each other format, per group. Per pack, then the mean per group.
-Reads: the "## Raw" table of vipaq/results/measurements/encoded-size/ffd/row-<group>.md
--->
+| Group | Packs | Min | Mean | Median | Max | Packs where ViPaq is longer | Packs where they are equal |
+|---|---|---|---|---|---|---|---|
+| thpack1 | 300 | 0.62 | 0.65 | 0.65 | 0.70 | 0 | 0 |
+| thpack2 | 300 | 0.62 | 0.65 | 0.65 | 0.69 | 0 | 0 |
+| thpack3 | 300 | 0.62 | 0.65 | 0.65 | 0.70 | 0 | 0 |
+| thpack4 | 300 | 0.63 | 0.65 | 0.65 | 0.69 | 0 | 0 |
+| thpack5 | 300 | 0.62 | 0.65 | 0.65 | 0.69 | 0 | 0 |
+| thpack6 | 300 | 0.63 | 0.65 | 0.65 | 0.69 | 0 | 0 |
+| thpack7 | 300 | 0.63 | 0.65 | 0.65 | 0.68 | 0 | 0 |
+| demo-samples | 159 | 0.51 | 0.63 | 0.58 | 1.00 | 0 | 3 |
+| custom-problems | 63 | 0.48 | 0.70 | 0.70 | 1.00 | 0 | 6 |
+| **All** | 2322 | 0.48 | 0.65 | 0.65 | 1.00 | 0 | 9 |
 
-| Group | Packs | ViPaq chars (median) | × JSON | × compact | × protobuf |
-|---|---|---|---|---|---|
-| thpack1 | 100 | 1036 | 0.20× | 0.58× | 0.65× |
-| thpack2 | 100 | 1018 | 0.20× | 0.57× | 0.65× |
-| thpack3 | 100 | 964 | 0.20× | 0.57× | 0.65× |
-| thpack4 | 100 | 946 | 0.20× | 0.57× | 0.65× |
-| thpack5 | 100 | 952 | 0.20× | 0.57× | 0.65× |
-| thpack6 | 100 | 976 | 0.20× | 0.57× | 0.65× |
-| thpack7 | 100 | 928 | 0.20× | 0.57× | 0.65× |
-| custom problems | 21 | 28 | 0.17× | 0.72× | 0.70× |
-| demo samples | 53 | 76 | 0.16× | 0.57× | 0.63× |
-| All | 774 | 940 | 0.20× | 0.58× | 0.65× |
+Every pack where ViPaq is not shorter holds 0 items: 12 characters against 12.
+
+## 📊 ViPaq against JSON
+
+On each pack, ViPaq's length divided by JSON's. Below 1 means ViPaq is shorter. All three algorithms'
+packs are pooled.
+
+| Group | Packs | Min | Mean | Median | Max | Packs where ViPaq is longer | Packs where they are equal |
+|---|---|---|---|---|---|---|---|
+| thpack1 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack2 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack3 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack4 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack5 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack6 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| thpack7 | 300 | 0.20 | 0.20 | 0.20 | 0.21 | 0 | 0 |
+| demo-samples | 159 | 0.14 | 0.16 | 0.15 | 0.22 | 0 | 0 |
+| custom-problems | 63 | 0.15 | 0.17 | 0.17 | 0.27 | 0 | 0 |
+| **All** | 2322 | 0.14 | 0.20 | 0.20 | 0.27 | 0 | 0 |
+
+## 📊 ViPaq against compact notation
+
+On each pack, ViPaq's length divided by compact notation's. Below 1 means ViPaq is shorter. All three algorithms'
+packs are pooled.
+
+| Group | Packs | Min | Mean | Median | Max | Packs where ViPaq is longer | Packs where they are equal |
+|---|---|---|---|---|---|---|---|
+| thpack1 | 300 | 0.55 | 0.58 | 0.58 | 0.60 | 0 | 0 |
+| thpack2 | 300 | 0.55 | 0.57 | 0.57 | 0.60 | 0 | 0 |
+| thpack3 | 300 | 0.55 | 0.57 | 0.57 | 0.60 | 0 | 0 |
+| thpack4 | 300 | 0.55 | 0.57 | 0.57 | 0.60 | 0 | 0 |
+| thpack5 | 300 | 0.56 | 0.57 | 0.57 | 0.60 | 0 | 0 |
+| thpack6 | 300 | 0.56 | 0.57 | 0.57 | 0.60 | 0 | 0 |
+| thpack7 | 300 | 0.56 | 0.57 | 0.57 | 0.59 | 0 | 0 |
+| demo-samples | 159 | 0.44 | 0.57 | 0.50 | 1.50 | 3 | 0 |
+| custom-problems | 63 | 0.45 | 0.71 | 0.65 | 1.50 | 6 | 0 |
+| **All** | 2322 | 0.44 | 0.58 | 0.57 | 1.50 | 9 | 0 |
+
+Every pack where ViPaq is not shorter holds 0 items: 12 characters against 8.
 
 ## 📊 By algorithm
 
-<!--
-Does the algorithm change the size ratio.
-Reads: the "## Raw" table of vipaq/results/measurements/encoded-size/<alg>/row-<group>.md, every group
--->
+The median of the per-pack ratios over every pack, per algorithm that packed it.
 
-| Algorithm | Packs | × JSON | × compact | × protobuf |
-|---|---|---|---|---|
-| FFD | 774 | 0.20× | 0.58× | 0.65× |
-| WFD | 774 | 0.20× | 0.58× | 0.66× |
-| BFD | 774 | 0.20× | 0.58× | 0.65× |
+| Algorithm | ViPaq ÷ protobuf | ViPaq ÷ JSON | ViPaq ÷ compact notation |
+|---|---|---|---|
+| FFD | 0.65 | 0.20 | 0.57 |
+| WFD | 0.66 | 0.20 | 0.57 |
+| BFD | 0.65 | 0.20 | 0.57 |
 
-## 📊 Where ViPaq loses
+## 📂 Where the numbers come from
 
-<!--
-Every pack where ViPaq is at least as long as another format. The catch a mean cannot give.
-Reads: the "## Raw" table of every file under vipaq/results/measurements/encoded-size/, both layouts, all algorithms
--->
-
-| Pack | Items | Widths | ViPaq | Compact | × compact | × protobuf |
-|---|---|---|---|---|---|---|
-| `Baseline_40x40x40-1_DoesNotFit_60x40x30` | 0 | 8/8/8 | 12 | 8 | 1.50× | 1.00× |
-| `Baseline_5x5x80_TooLong_60x40x30` | 0 | 8/8/8 | 12 | 8 | 1.50× | 1.00× |
-| `DemoSample_07_TallItems_40x40x30` | 0 | 8/8/8 | 12 | 8 | 1.50× | 1.00× |
+The "Raw" tables in [measurements/encoded-size/](measurements/encoded-size), written by `just measure vipaq`.

@@ -6,17 +6,16 @@ How small a ViPaq token is against the formats it replaces, and what encoding an
 
 ## 📝 What the results say
 
-| The question | The answer | Reads |
-|---|---|---|
-| Is the format worth having? | Yes. A token is 0.65× protobuf and 0.20× JSON stored as is, and 0.60× protobuf and 0.47× JSON as columnar deflate. It is never larger than protobuf on any pack. | `format-size.md`, `compressed-size.md` |
-| Is encoding and decoding fast enough? | Yes. Encoding costs about 2× protobuf's time on the real packs and under half its memory. Decoding beats protobuf on most packs and always allocates less. | `encode-cost.md`, `decode-cost.md` |
-| Row or columnar? | Columnar, once tokens are compressed. Uncompressed the two are identical character for character; compressed, columnar is 0.86× row and the gap widens with pack size. Decoding is the same either way and row encodes a little faster. | `compressed-size.md`, `encode-cost.md`, `decode-cost.md` |
-| Compress, and with what? | Deflate. Gzip is never smaller on any pack. Compressing roughly triples the encode, and decompressing adds about half again to the decode. | `compressed-size.md`, `encode-cost.md`, `decode-cost.md` |
-
-**What the win costs:** columnar deflate puts a pack on the wire at 0.60× protobuf and pays about 2.7× ViPaq's
-own encode time for it.
-
 Every number here is quoted from the file beside it. Nothing on this page is computed.
+
+| The question | The answer | Read |
+|---|---|---|
+| How long is a token, stored as is? | 0.65 of protobuf, 0.20 of JSON and 0.57 of compact notation, median per pack. Never longer than protobuf; longer than compact notation only on empty packs, 12 characters against 8. | `format-size.md` |
+| Row or columnar? | Columnar, once compressed: 0.86 of row with deflate, median per pack. The gain shrinks as item types grow, from 0.71 at 3 types to 0.96 at 20. | `compressed-size.md` |
+| Deflate or gzip? | Deflate. Gzip is never shorter, and gzip makes small packs longer than no compression at all; deflate never does. | `compressed-size.md` |
+| How long is a compressed token? | Columnar with deflate is 0.59 of protobuf, 0.48 of JSON and 0.68 of compact notation, each also with deflate, median per pack. | `compressed-size.md` |
+| What do encoding and decoding cost? | In the row layout, encoding takes 1.73 to 2.13x protobuf's time up to 365 items, and less than protobuf on most cases from 1000 items. Decoding takes 0.56 to 1.42x and always allocates less. | `encode-decode-cost.md` |
+| What does compressing add? | Deflate makes an encode 2.67 to 2.79x slower and a decode 1.49 to 1.76x, row layout. | `encode-decode-cost.md` |
 
 ## 🛠️ How you use it
 

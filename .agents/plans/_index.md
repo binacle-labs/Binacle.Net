@@ -27,12 +27,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
-- file: measured-results.md
-  description: "Fill every bench baseline and measure of lib and ViPaq, write one results file per question, then each slice's README summary"
-  state: ready
-  waits-on: "the maintainer runs the parallel bench classes that have no kept report, and pins each results file's shape with his own yes"
-  horizon: next-release
-  paths: ["shared/**", "lib/**", "vipaq/**", "tooling/**", ".agents/**"]
 - file: results-across-slices.md
   description: "A home for results that compare two slices - ViPaq's encode time against lib's pack time, what one request costs end to end"
   state: idea

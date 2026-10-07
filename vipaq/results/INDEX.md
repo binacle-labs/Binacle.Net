@@ -13,9 +13,6 @@ Every file in this folder, and what it holds.
 
 | File | The question |
 |---|---|
-| [format-size.md](format-size.md) | How much smaller is a ViPaq token than JSON, compact notation and protobuf, stored as is? |
-| [compressed-size.md](compressed-size.md) | Compressed, how much smaller is it, and which layout and codec should be used? |
-| [encode-cost.md](encode-cost.md) | What does encoding cost in time and memory against protobuf, and what does compressing add? |
-| [decode-cost.md](decode-cost.md) | What does decoding cost in time and memory against protobuf, and what does decompressing add? |
-
-Each one reads the raw results above. Nothing at this level is generated.
+| [format-size.md](format-size.md) | How long is a ViPaq token stored as is, against protobuf, JSON and compact notation? |
+| [compressed-size.md](compressed-size.md) | Which layout and codec should ViPaq use, and how long is a compressed token against the others? |
+| [encode-decode-cost.md](encode-decode-cost.md) | What do encoding and decoding cost against protobuf, and what does compressing add? |

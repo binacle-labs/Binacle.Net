@@ -11,7 +11,8 @@ renamed to its class.
 ## 🖥️ Where it ran
 
 Every report was replaced 2026-09-26 by a rerun that added the `Items` and `Widths` columns; the ViPaq code
-did not change since the run before. All on one machine:
+did not change since the run before. The two `Smoke_*` reports were run again 2026-10-04 at the default job.
+All on one machine:
 
 - AMD Ryzen 9 9900X, 12 cores, Ubuntu 26.04.1
 - .NET 10.0.12 (SDK 10.0.112), BenchmarkDotNet 0.15.8
