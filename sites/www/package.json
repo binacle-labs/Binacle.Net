@@ -19,7 +19,7 @@
   "author": "Chris Mavrommatis",
   "license": "AGPL-3.0-only AND CC-BY-4.0",
   "devDependencies": {
-    "concurrently": "^10.0.3",
+    "concurrently": "^10.0.6",
     "sass": "^1.93.2",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",

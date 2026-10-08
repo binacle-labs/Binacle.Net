@@ -24,7 +24,7 @@
     "sites/admin"
   ],
   "devDependencies": {
-    "concurrently": "^10.0.3",
+    "concurrently": "^10.0.6",
     "gulp": "^5.0.1"
   }
 }
