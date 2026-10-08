@@ -1,7 +1,7 @@
 ---
 id: samples
 description: Deployment samples — Docker Compose (minimal, quickstart, prod, service, full) and Kubernetes (minimal); each folder name is a smoke profile name, feature flags, config wiring, and the keep-in-sync rule
-verified: 2026-09-28
+verified: 2026-10-08
 check: Sample folders, compose env vars, bind-mounted config paths, the k8s resource bounds, and the pinned image tag match samples/; the compose project name still comes from a top-level name: key and not a .env file; every samples/docker folder name has a tooling/smoke/<name>.yml with the same module set
 also_update:
   - api/configuration
@@ -83,21 +83,25 @@ measure against, not a sizing recommendation; the manifest says so.
 
 ## The image tag is pinned {#image-pin}
 
-Every sample pins the same tag — `samples/docker/*/docker-compose.yml` and
+Every sample pins an image tag — `samples/docker/*/docker-compose.yml` and
 `samples/kubernetes/minimal/binacle-deployment.yaml`. Never `latest`: a sample is copied once and lives for
 years, so `latest` hands the reader the next major release on their next pull, with nothing in their config saying
 what changed.
 
-**Pin the major line where one exists.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` and
-`{{major}}` beside `{{version}}`. The pin is `binacle/binacle-net:3.0` today, because `3` is first written by the
-next release and a pin must name an image that resolves; once it does, the pin becomes `3` and a minor no longer
-touches `samples/`. A major is a breaking change, so the pin moves by hand at a major and never by itself. An
-exact patch is the right pin only for a line that will get no further ones, which is why v1.3.x and v2.x samples
-are pinned that way in the published docs snapshots.
+**Pin the major line.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` and `{{major}}` beside
+`{{version}}`. Every sample pins the major tag, so a minor never touches `samples/`. A major is a breaking change,
+so the pin moves by hand at a major and never by itself. An old minor tag gets no patches, so a sample pinned to
+a minor stops getting fixes the day the next minor ships. An exact patch is the right pin only for a line that
+will get no further ones, which is why v1.3.x and v2.x samples are pinned that way in the published docs
+snapshots.
 
-**Every sample sits on that minor tag**, which opened with v3.0.0. Read the value out of the sample files rather
-than from here; a version named in a doc goes stale silently. **The rule that governs every move: a pin on
-`main` must name an image that already exists**, so the pin follows a publish and never precedes one.
+**One exception: `service` pins the minor tag**, because the Service Module may change between minors and that
+sample is for people who turned it on. It moves by hand at each minor - the maintainer, 2026-09-15: "ok go with
+3, service sample pins minor".
+
+Read the values out of the sample files rather than from here; a version named in a doc goes stale silently.
+**The rule that governs every move: a pin on `main` must name an image that already exists**, so the pin follows
+a publish and never precedes one.
 
 Three files outside the samples carry the tag in prose and have to move with them: `README.md` at the repo root,
 `samples/README.md` and `samples/docker/README.md`. Two more mention it as an example only —

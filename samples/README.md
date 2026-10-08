@@ -25,5 +25,6 @@ matters.
 **`Presets.json` is your bin set.** Every sample ships an example one. Replacing it with your own boxes,
 lockers or pallets is the first thing to do; until then the answers describe someone else's packaging.
 
-**The image tag is pinned to `binacle/binacle-net:3.0`**, the minor tag, which picks up fixes within the 3.0
-line and never a breaking change.
+**The image tag is pinned to `binacle/binacle-net:3`**, the major tag, which follows every 3.x release and
+never a new major. The `service` sample is the exception and pins `3.1`: the Service Module may change between
+minor releases, so that sample moves to a new minor by hand.

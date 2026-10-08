@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: ready
-waits-on: "the first release run from main - it is the first to run the changed publish job, since a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12, the OIDC connection exists since 2026-09-14, and 7 is rejected"
+waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. The first deploy, demo on 2026-10-08, failed on a broken wrangler-action pin; the pin is moved and not yet run"
 horizon: undecided
 paths:
   - ".github/workflows/**"
@@ -470,11 +470,10 @@ that needed a run got it on 2026-09-11:
 - [x] **2026-09-14.** The Docker Hub plan question is answered - the org has an OIDC connection, and it exists.
       **The workflow edit landed 2026-09-12** - `grep -c 'password:' .github/workflows/release-docker-image.yml`
       returns 2 outside comments, both GHCR. **The maintainer created the connection and set
-      `DOCKERHUB_OIDC_CONNECTIONID` on 2026-09-14**. **The login is
-      unproved until the first release run** - a prerelease never reaches it.
+      `DOCKERHUB_OIDC_CONNECTIONID` on 2026-09-14**. **The v3.1.0 release run proved the login on 2026-10-08.**
 - [x] The release workflow has no tag-push step, and the tag is created by the release itself.
       Done 2026-08-28. `github-release.sh` takes the commit and passes `--target`; the tag-push step is gone.
-      Ledger amended. **Only a real release proves it.**
+      Ledger amended. Proved by v3.0.0 and again by v3.1.0.
 - [x] Every script in `tooling/ci/` is shellchecked by a pull request.
       Done 2026-08-28. `just check scripts`, called by the lint job. Sixteen scripts, no errors.
 - [x] `push-tag.sh` sets no git identity.
@@ -483,27 +482,29 @@ that needed a run got it on 2026-09-11:
       `grep -c 'persist-credentials: false' .github/workflows/*.yml` sums to 18, one per checkout - it was 22
       before the three deploy workflows became one - and
       `grep -rn 'git push' tooling/ci` returns nothing - the marker tag is `create-tag.sh`, through `gh api`.
-      **The API call is unproved until a site deploys.**
+      **The API call is unproved until a site deploys.** The first try, demo on 2026-10-08, failed before it.
 - [x] **2026-09-12.** The three deploy workflows share one body, or a line says why they should not.
       `.github/workflows/deploy-site.yml` exists with a `choice` input, and `ls .github/workflows/deploy-*`
       lists nothing else. `just check workflows` - 9 workflows, no errors. **Unproved until a site
-      deploys**, and `deploy-site.yml` can be dispatched only once it is on `main`. `sites/README.md:40-41`
-      still names the three old workflows; that is for a site session.
+      deploys.** The first dispatch, demo on 2026-10-08, failed at `Deploy to Cloudflare`: Dependabot had
+      moved `cloudflare/wrangler-action` to v4.1.1, which Cloudflare marks broken - the tag has no `dist/`.
+      The pin is now v4.1.3. `sites/README.md:40-41` still names the three old workflows; that is for a
+      site session.
 - [x] The container-structure-test checksum names its upstream source.
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.
 - [x] **2026-09-11.** The Docker Hub credential is scoped, or the decision not to is recorded.
       Not scoped; the reason is in the CI/CD decisions ledger.
-- [ ] `docker/setup-buildx-action` is gone from `publish`, proved by the first release run from `main`.
+- [x] **2026-10-08.** `docker/setup-buildx-action` is gone from `publish`, proved by the first release run from `main`.
       **The step was deleted 2026-09-11** - `grep -c setup-buildx .github/workflows/release-docker-image.yml`
       returns 1, the `build` job's. The box closes on the release run; a prerelease stops before `publish`.
-      **By eye.** A release run whose copy step is green with no buildx setup above it. If it fails, the
-      action goes back and a line here says so.
+      **By eye.** The v3.1.0 run's `Copy the smoked digest to Docker Hub` and `Move the tags that move`
+      are green with no buildx setup above them.
 - [x] `setup-just` prints its version and the smoke workflow's bare version step is gone.
       Done 2026-08-28. Sixteen jobs get the line now instead of one.
 - [x] **2026-09-12.** The Sonar wait is decided.
       `grep -c qualitygate.wait tooling/ci/sonar-analysis.xml` returns 1, `grep -c 'for _' tooling/ci/sonar-summary.sh`
       returns 0, and the summary step in `sonar-analysis.yml` carries `if: always()`. Ledger amended.
-      **Unproved until the next pull request runs it.**
+      Proved by the v3.1.0 release pull request, whose Sonar job is green.
 - [x] The four install actions hold no inline shell.
       Done 2026-08-28. Each is a door onto `tooling/ci/install-<tool>.sh`, called by path rather than through
       `just`. Four scripts, not one parameterised script - the argument list would read worse than the copies.

@@ -248,10 +248,9 @@ the exact commit. It does not run `publish` or `page`, so a change to either is 
 release. A red `publish` leaves Docker Hub untouched and makes no tag, and the same version can be dispatched
 again once fixed. The reasoning and the history are `$ci-cd/decisions/D3`.
 
-**The moving-tag half was first proven on the v3.0.0 run, 2026-09-01**, which wrote `3.0.0`, `3.0` and
-`latest` after a green verify onto one digest - `$ci-cd/decisions/D25`. **It has still never moved a name off
-an existing image.** 3.0.0 created `3.0` and `latest`; the next release is the first run that repoints
-`latest`, and the first to write `{{major}}` at all.
+**The moving tags are proven both ways**: creating a name and moving one off an existing image. The
+release writes `{{version}}`, `{{major}}.{{minor}}`, `{{major}}` and `latest` onto one digest after a green
+verify, and an older minor tag stays where it was - `$ci-cd/decisions/D25`.
 
 ## Where the release body comes from
 

@@ -33,9 +33,10 @@ configuration anywhere other people can reach.
 
 ## 🏷️ About the image tag
 
-Every sample pins `binacle/binacle-net:3.0`, the minor tag, which picks up fixes within the 3.0 line and never
-a breaking change. `latest` follows the newest release across majors, which is right for trying things out and
-wrong for anything you keep.
+Every sample pins `binacle/binacle-net:3`, the major tag, which follows every 3.x release and never a new
+major. `service` is the exception and pins `3.1`: the Service Module may change between minor releases, so that
+sample moves to a new minor by hand. `latest` follows the newest release across majors, which is right for
+trying things out and wrong for anything you keep.
 
 ## ✅ These shapes are tested
 

@@ -4,7 +4,7 @@ description: Post-release - what to look at once v3.1.0 is out, what the tag cau
 
 # Post-release - v3.1.0
 
-**Status:** not started. `v3.1.0` is not tagged. **Nothing here can begin before the run is green.**
+**Status:** started. `v3.1.0` is tagged on `946a07e5`, 2026-10-08.
 
 **A pointer surface.** Where a row names a plan, the plan holds the work. Where a row has no plan, it is a
 single mechanical act with a known answer and it lives here.
@@ -23,26 +23,26 @@ two lists are clear** - the third is plans, and plans outlive it.
 
 ## Things to look at
 
-- [ ] `just smoke all binacle/binacle-net:3.1.0` - every profile green.
+- [x] **2026-10-08.** `just smoke all binacle/binacle-net:3.1.0` - every profile green - the maintainer.
       **This confirms, it does not protect.** The pipeline smoked the staging copy already. What this buys is
       the one thing the pipeline cannot check: that the **copy** to Docker Hub landed something that runs.
-- [ ] `3.1.0`, `3.1`, `3` and `latest` are one image, and `3.0` did not move.
+- [x] **2026-10-08.** `3.1.0`, `3.1`, `3` and `latest` are one image, and `3.0` did not move.
       `docker buildx imagetools inspect` on all five; the first four share a digest and `3.0` still reports
       the `3.0.0` digest. **`3.1` and `3` are created for the first time by this release**, and `latest`
       moving off `3.0.0` is the one thing no local run rehearsed. **This also closes the last box of
       `plans/sites/docs-current-at-root.md`** - `docker manifest inspect binacle/binacle-net:3` succeeds -
       so tick it there in the same sitting.
-- [ ] No prerelease reached Docker Hub.
+- [x] **2026-10-08.** No prerelease reached Docker Hub.
       `curl -s "https://hub.docker.com/v2/repositories/binacle/binacle-net/tags?page_size=100" | jq -r '.results[].name'`
       lists no `3.1.0-beta.*`. **The first release under the prerelease stop** - `D3` in the CI/CD ledger -
       and the tag list is the proof it held.
-- [ ] `just image verify 3.1.0` - PASS. Signed on `refs/heads/main` by the release workflow, SBOM and
+- [x] **2026-10-08.** `just image verify 3.1.0` - PASS. Signed on `refs/heads/main` by the release workflow, SBOM and
       provenance present. The identity is the whole value; anyone can sign anything.
 - [ ] The Docker Hub page names `3.1.0`, and nowhere names `3.0.0` except where a version history should.
       **By eye**, on `hub.docker.com/r/binacle/binacle-net`. The `page` job wrote it last; it runs only on a
       real version, so this is its first run for this line.
-- [ ] The GitHub release body is the `3.1.0` changelog section and nothing else.
-      **By eye**, on `github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0`.
+- [x] **2026-10-08.** The GitHub release body is the `3.1.0` changelog section and nothing else.
+      Diffed against `just changelog extract 3.1.0` - equal. **By eye**, on `github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0`.
 - [ ] The published image, in a browser, from Docker Hub.
       `docker run` `binacle/binacle-net:3.1.0` with `UI_MODULE=True`, open `/`, `/packing`, `/vipaq` and
       `/instance`. On `/packing`: `Best` is in the list, the winner shows on the row, `02-packs-nowhere`
@@ -98,16 +98,16 @@ the Service Module is the one thing a minor may break, and that sample is for pe
 by hand at each minor. The release workflow publishes `3` for the first time with this release, which is why
 the move still waits for the run.
 
-- [ ] Five samples pin `binacle/binacle-net:3`, and `samples/docker/service/docker-compose.yml` pins `3.1`.
+- [x] **2026-10-08.** Five samples pin `binacle/binacle-net:3`, and `samples/docker/service/docker-compose.yml` pins `3.1`.
       `grep -rln 'binacle-net:3\.' samples/` returns only the service compose file, and that file says `3.1`.
       The five are `samples/docker/{minimal,quickstart,prod,full}/docker-compose.yml` and
       `samples/kubernetes/minimal/binacle-deployment.yaml`.
-- [ ] The three files that carry the tag in prose moved with them: `README.md:21`, `samples/README.md:28`,
+- [x] **2026-10-08.** The three files that carry the tag in prose moved with them: `README.md:21`, `samples/README.md:28`,
       `samples/docker/README.md:36` - each says `3`, and the two sample READMEs say why `service` is the
       exception. The two that name it only as an example, `tooling/README.md` and `tooling/smoke.just`, may
       stay.
       `grep -rn 'binacle-net:3\.[0-9]' README.md samples/README.md samples/docker/README.md` returns nothing.
-- [ ] `.agents/docs/samples/README.md` still says "read the value out of the sample files" and names no
+- [x] **2026-10-08.** `.agents/docs/samples/README.md` still says "read the value out of the sample files" and names no
       version of its own. **By eye.** If it names `3.0` anywhere, that sentence was not honoured.
 - [ ] The docs site's copies of the six sample files match `samples/` again - a site session, since
       the copies are under `sites/`.
@@ -121,7 +121,16 @@ about which line a new reader is handed, not about anything breaking. **What `3`
 a restart picks up the next minor, and a minor may break the Service Module. That is the trade the
 maintainer took.
 
-### 3. The www `docker run` line - a site session
+### 3. Deploy the demo again - it failed
+
+- [ ] `Deploy Site` dispatched from `main` with `demo`, green, and `demo.binacle.net/packing` packs with `Best`.
+      Moved here from the release plan. **The first dispatch, 2026-10-08, failed** at `Deploy to Cloudflare`:
+      Dependabot had moved `cloudflare/wrangler-action` to v4.1.1, which Cloudflare marks broken. The pin in
+      `.github/workflows/deploy-site.yml` is now v4.1.3, in the working tree. A green run is also the first
+      proof of `deploy-site.yml` and `create-tag.sh` - `plans/ci-cd/ci-open-questions.md` waits on it.
+      **Every site deploy needs the pin on `main` first** - docs and www use the same step.
+
+### 4. The www `docker run` line - a site session
 
 - [ ] `sites/www/_data/exchange.yml` names `binacle/binacle-net:3` in `command.tag` and `command.text`,
       and `Deploy Site` is dispatched with `www` and green.
@@ -130,9 +139,9 @@ maintainer took.
 - [ ] The four `verified:` lines are re-run against `3.1.0` or left dated as they are. **His call**; the
       examples are v3 calls and v3 did not change, so leaving them is defensible.
 
-### 4. Close the release set
+### 5. Close the release set
 
-- [ ] `release-v3.1.0.md` is deleted, once every box in it is ticked and the image is verified.
+- [x] **2026-10-08.** `release-v3.1.0.md` is deleted. Its one open row, the demo deploy, is section 3.
       `test ! -f .agents/release-v3.1.0.md`.
 - [ ] The `verified:` line of `.agents/docs/sites/www.md` and `.agents/docs/sites/docs.md` is refreshed if
       the edits above touched what they describe.
