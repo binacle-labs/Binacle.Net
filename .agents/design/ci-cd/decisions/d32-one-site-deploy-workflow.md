@@ -33,7 +33,7 @@ is live, which it still does; only the per-site numbering is gone. The concurren
 `${{ github.workflow }}-${{ inputs.site }}`, so one site still queues behind itself and two sites still deploy
 side by side, and `run-name` names the site so the run list stays readable.
 
-**What is unproved.** No site has deployed through this file - checked 2026-09-29: it is not on `main`, and
-GitHub still lists only the three old deploy workflows, last run 2026-09-03. A `workflow_dispatch` workflow can
-be dispatched only once it is on the default branch, so the first deploy through it comes after the merge to
-`main`.
+**What is unproved.** No site has deployed through this file. The first dispatch, `demo` from `main` on
+2026-10-08, failed at `Deploy to Cloudflare`: Dependabot had moved `cloudflare/wrangler-action` to v4.1.1, a
+release Cloudflare marks broken because its tag has no `dist/`. The site tests, the build and the link check
+were green, and the marker tag job was skipped. The pin is now v4.1.3; the next dispatch is the proof.

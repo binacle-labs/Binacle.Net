@@ -8,7 +8,7 @@ name: binacle-net-prod
 services:
   binacle-net:
     # Pinned on purpose - a copied sample must not jump to a new major on the next pull.
-    image: binacle/binacle-net:3.0
+    image: binacle/binacle-net:3
     ports:
       - "8080:8080"
     volumes:

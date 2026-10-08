@@ -25,5 +25,6 @@ containing a hyphen is treated as a prerelease and proves nothing, and a clean `
 repository **would move `latest`**, because metadata-action never queries the registry and `latest=auto` marks
 any non-prerelease semver as latest. A rehearsal that avoids both is a rehearsal of something else.
 
-**What this does not close.** The step is proven for a first major release, where `3.0` and `latest` are
-created. It has still never *moved* `latest` off an existing image - the first release after `3.0.0` does that.
+**The v3.1.0 run closed the rest on 2026-10-08.** It moved `latest` off `3.0.0`, wrote `3.1` and wrote `3`
+for the first time. All four resolve to `sha256:2ca375b86e33`, and `3.0` still resolves to
+`sha256:974f3dda3923`, read off the registry with `docker buildx imagetools inspect` the same day.

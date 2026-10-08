@@ -40,9 +40,9 @@ ruleset. Whether Docker matches the immutable form, the plain one, or normalises
 documented, and a rule that never matches costs nothing; two rules mean the release cannot fail on that
 question. **Both are pinned to `main`** - the only ref `gate` lets through anyway.
 
-**A prerelease never reaches the login (`$ci-cd/decisions/D3`), so the v3.1.0 release run is the first to exercise it.** A red
-there is after the build and the smoke and before anything is copied; Docker Hub is untouched and the same
-version is dispatched again.
+**A prerelease never reaches the login (`$ci-cd/decisions/D3`).** The v3.1.0 release run, 2026-10-08, was the
+first to exercise it, and the login step was green. A red there is after the build and the smoke and before
+anything is copied; Docker Hub is untouched and the same version is dispatched again.
 
 **`DOCKERHUB_TOKEN` is not narrowed.** Docker Hub's access-token screen offers scopes but no repository
 picker on this org, so the token the `page` job uses stays read/write/delete on the account. Do not go

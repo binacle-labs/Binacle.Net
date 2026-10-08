@@ -1,7 +1,7 @@
 ---
 description: The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL.
 state: ready
-waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip) or the release (the major tag manifest)"
+waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip). The major tag manifest resolves since the v3.1.0 release, 2026-10-08"
 horizon: now
 paths:
   - "sites/docs/**"
@@ -379,8 +379,8 @@ lies. It is in the post-release set, with the `version_tag: "3"`, `label: v3.1.0
       current-at-root rule, the static-file rule, the collision check and the removed-page list.
       `just test rb_binacle-docs-versions_unit` passes, and
       `grep -c "^\s*it " ruby/binacle-docs-versions/spec/*_spec.rb` grew.
-- [ ] `release-docker-image.yml` publishes the major tag. The grep holds since step 1; the manifest is after
-      the release.
+- [x] **2026-10-08.** `release-docker-image.yml` publishes the major tag. The grep holds since step 1; the
+      manifest is after the release.
       `grep -n 'pattern={{major}}' .github/workflows/release-docker-image.yml` matches, and after the next release
       `docker manifest inspect binacle/binacle-net:3` succeeds.
 - [x] **2026-09-12.** The agent docs say what the tree does.
