@@ -18,7 +18,7 @@ deploy is `workflow_dispatch` and stays that way - `deploy-site.yml` since `$ci-
 written in their own session, and pressing the button is part of how that session ends — a merge that happens
 to touch a page is not a decision to put it live.
 
-**Two mechanical consequences that make the same point.** The marker tag is numbered by `github.run_number`, so
+**Two mechanical consequences that make the same point.** The marker tag is numbered per run, so
 a push trigger would produce a tag per commit and the tag would stop meaning "this is live". And the
 concurrency group is never cancelled — `cancel-in-progress: false`, because a stopped run leaves the site
 deployed with no marker tag — so a busy branch would queue rollouts behind each other rather than skip to the

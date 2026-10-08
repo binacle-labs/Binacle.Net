@@ -79,7 +79,7 @@ jobs:
       contents: write
 
     env:
-      TAG_NAME: ${{ inputs.site }}-${{ github.run_number }}
+      TAG_NAME: ${{ inputs.site }}-${{ github.run_id }}
       COMMIT: ${{ github.sha }}
       URL: https://${{ inputs.site }}.binacle.net
 
