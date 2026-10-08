@@ -31,8 +31,9 @@ Branch `release/v3-1-0`. A beta dispatches from the branch and stops at GHCR; th
 - [ ] `Deploy Site` dispatched from `main` with `demo`, green, and `demo.binacle.net/packing` packs with `Best`.
       **The first run of `deploy-site.yml` and of `create-tag.sh`.** Safe before the image: the v3.0.0 image
       already serves `pack/compare-bins`, `Best` and `algorithmUsed` on v4.
-- [ ] `## [Unreleased]` is `## [3.1.0] - <date>` on `main`. **The last edit before the tag.**
-      `just changelog check 3.1.0` passes, and `just changelog extract 3.1.0` prints the release body. Read it.
+- [x] `## [Unreleased]` is `## [3.1.0] - 2026-10-08`, made on the branch before the merge - the maintainer,
+      2026-10-08: "that rename u must do then we need to release". `just changelog check 3.1.0` passes, and
+      `just changelog extract 3.1.0` prints the release body. Read it.
 - [ ] Actions -> Build and Release Docker Image -> Run workflow, on `main`, version `3.1.0`, and the run is
       green. **The first run of the Docker Hub OIDC login and the copy without a builder** - findings 1 and 8
       of `plans/ci-cd/ci-open-questions.md`. A red `publish` leaves Docker Hub untouched and no tag: fix on

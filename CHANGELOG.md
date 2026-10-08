@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] - 2026-10-08
 
 ### 🔎 Overview
 - **The demo now calls V4.** Both the demo site and the UI module inside the image moved off V3.  
