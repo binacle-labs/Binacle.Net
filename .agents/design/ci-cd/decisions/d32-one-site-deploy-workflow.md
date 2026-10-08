@@ -2,7 +2,7 @@
 id: ci-cd/decisions/D32
 description: the three site deploys are one workflow with a site chosen at dispatch
 status: decided
-verified: 2026-09-29
+verified: 2026-10-08
 check: D32 against deploy-site.yml, whose dispatch must take a site choice of docs, demo and www and whose concurrency group must carry inputs.site
 paths:
   - ".github/workflows/deploy-site.yml"
@@ -27,13 +27,20 @@ fifteen-line callers. The maintainer asked for the enum instead, and it is simpl
 rather than four, no `workflow_call`, no secrets handed across by name, no permissions cap on the caller, and
 none of the environment-secret precedence rules a called job with `environment:` brings.
 
-**What it costs.** `github.run_number` counts per workflow, so the marker tags share one sequence -
-`docs-40`, `demo-41`, `www-42` - where each site used to count on its own. A tag maps a site to the commit that
-is live, which it still does; only the per-site numbering is gone. The concurrency group carries the site,
+**What it costs.** The marker tag is `<site>-<run id>`, so it reads `demo-18234567890` where each site used to
+count on its own. A tag maps a site to the commit that is live, which it still does; only the short per-site
+numbering is gone. The concurrency group carries the site,
 `${{ github.workflow }}-${{ inputs.site }}`, so one site still queues behind itself and two sites still deploy
 side by side, and `run-name` names the site so the run list stays readable.
 
-**What is unproved.** No site has deployed through this file. The first dispatch, `demo` from `main` on
+**Why the run id and not the run number.** The tag was first `<site>-${{ github.run_number }}`, on the
+reading that the number would carry on past the old workflows' tags. It does not: a new workflow file counts
+from 1, and the old files had already made `docs-1` to `docs-10`, `demo-1` to `demo-5` and `www-1` to `www-6`.
+The second dispatch, `demo` on 2026-10-08, deployed and then failed at the tag with `Reference already exists`
+on `demo-2`. `github.run_id` is unique across the repository and never repeats. The maintainer, 2026-10-08,
+picking it from four options: "go with 1".
+
+**What is unproved.** No site has deployed through this file end to end. The first dispatch, `demo` on
 2026-10-08, failed at `Deploy to Cloudflare`: Dependabot had moved `cloudflare/wrangler-action` to v4.1.1, a
-release Cloudflare marks broken because its tag has no `dist/`. The site tests, the build and the link check
-were green, and the marker tag job was skipped. The pin is now v4.1.3; the next dispatch is the proof.
+release Cloudflare marks broken because its tag has no `dist/`. The pin is now v4.1.3, and the second dispatch
+deployed. Its tag failed as above, so `demo` is live with no marker tag. The next dispatch is the proof.

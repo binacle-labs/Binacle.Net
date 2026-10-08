@@ -1,7 +1,7 @@
 ---
 description: Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11
 state: ready
-waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. The first deploy, demo on 2026-10-08, failed on a broken wrangler-action pin; the pin is moved and not yet run"
+waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. Two demo deploys on 2026-10-08 failed - a broken wrangler-action pin, then a marker tag that already existed. Both are fixed and not yet run"
 horizon: undecided
 paths:
   - ".github/workflows/**"
@@ -488,7 +488,9 @@ that needed a run got it on 2026-09-11:
       lists nothing else. `just check workflows` - 9 workflows, no errors. **Unproved until a site
       deploys.** The first dispatch, demo on 2026-10-08, failed at `Deploy to Cloudflare`: Dependabot had
       moved `cloudflare/wrangler-action` to v4.1.1, which Cloudflare marks broken - the tag has no `dist/`.
-      The pin is now v4.1.3. `sites/README.md:40-41` still names the three old workflows; that is for a
+      The pin is now v4.1.3, and the second dispatch deployed but failed at the marker tag - `demo-2`
+      already existed from the old workflow. The tag is now `<site>-<run id>` - `$ci-cd/decisions/D32`.
+      `sites/README.md:40-41` still names the three old workflows; that is for a
       site session.
 - [x] The container-structure-test checksum names its upstream source.
       Done 2026-08-28. Fetched `checksums.txt` from the v1.22.1 release and compared: same value.

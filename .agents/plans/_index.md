@@ -87,7 +87,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 - file: ci-cd/ci-open-questions.md
   description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
   state: ready
-  waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. The first deploy, demo on 2026-10-08, failed on a broken wrangler-action pin; the pin is moved and not yet run"
+  waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. Two demo deploys on 2026-10-08 failed - a broken wrangler-action pin, then a marker tag that already existed. Both are fixed and not yet run"
   horizon: undecided
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md

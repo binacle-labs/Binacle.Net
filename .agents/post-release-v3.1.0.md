@@ -129,6 +129,9 @@ maintainer took.
       `.github/workflows/deploy-site.yml` is now v4.1.3, in the working tree. A green run is also the first
       proof of `deploy-site.yml` and `create-tag.sh` - `plans/ci-cd/ci-open-questions.md` waits on it.
       **Every site deploy needs the pin on `main` first** - docs and www use the same step.
+      **The second dispatch, 2026-10-08, deployed** and failed at the marker tag: `demo-2` already existed
+      from the old deploy workflow. The tag is now `<site>-<run id>`, in the working tree. Dispatch again
+      once it is on `main`; the box closes on an all-green run.
 
 ### 4. The www `docker run` line - a site session
 
