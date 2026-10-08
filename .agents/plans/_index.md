@@ -59,7 +59,7 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "pack/first-bin endpoint"
   state: idea
   waits-on: "nobody - it is an idea"
-  horizon: next-release
+  horizon: near
   paths: ["api/**"]
 - file: api/packing-only-image.md
   description: "The public image becomes packing-only and the Service Module moves to its own image"
