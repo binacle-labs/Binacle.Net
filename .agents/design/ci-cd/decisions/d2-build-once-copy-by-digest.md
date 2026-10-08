@@ -38,3 +38,10 @@ pull from. It was argued as acceptable because nobody follows an exact pin on re
 "true for the tag nobody watches" is a weaker claim than "never happens", and `$ci-cd/decisions/D14` makes it never happen for
 free. The copy command did not change - `imagetools create` handles a cross-registry source as readily as a
 local one, which is what kept a third-party tool out of the job that moves the artifact users pull.
+
+**The copy needs no builder, so `publish` has no `docker/setup-buildx-action`.** `imagetools create` is a
+registry operation: its sources must already exist in the registry, and it reads auth from the docker config the
+login action writes. The runner's bundled buildx is enough. Dropped 2026-09-11, the maintainer's yes the same
+day, and proved by the v3.1.0 run on 2026-10-08, whose copy and tag-move steps were green with no buildx setup
+above them. One fewer third-party action in the job that holds the Docker Hub credential. The `build` job keeps
+its `setup-buildx-action` - `provenance: mode=max` and `sbom: true` need the container driver it sets up.

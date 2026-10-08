@@ -28,8 +28,8 @@ docker run -d --name binacle-net \
   binacle/binacle-net:{{ page.version_tag }}
 ```
 
-The tag `{{ page.version_tag }}` follows the newest patch in this line and never a breaking change. Pin it
-rather than `latest`, which follows every release, including the next major.
+The tag `{{ page.version_tag }}` follows every minor and patch release in this line and never a breaking change.
+Pin it rather than `latest`, which follows every release, including the next major.
 
 ##### 3️⃣ Open it
 

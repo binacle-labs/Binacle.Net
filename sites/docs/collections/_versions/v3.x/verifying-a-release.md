@@ -13,15 +13,15 @@ and carries an SPDX software bill of materials and SLSA build provenance. Signin
 the GitHub Actions release workflow, so there is no private key anywhere - the signature is tied to the workflow
 that built the image.
 
-Two commands cover it. They name `3.0`, the minor tag for this line; any tag or digest pointing at a signed
+Two commands cover it. They name `3`, the major tag for this line; any tag or digest pointing at a signed
 image works the same way.
 
 ```bash
-cosign verify binacle/binacle-net:3.0 \
+cosign verify binacle/binacle-net:3 \
   --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
-docker buildx imagetools inspect binacle/binacle-net:3.0
+docker buildx imagetools inspect binacle/binacle-net:3
 ```
 
 > **Releases before `3.0.0` cannot be verified.** `2.1.1` and everything earlier were
@@ -50,7 +50,7 @@ The pattern ends `@refs/heads/main$`. That last part is the branch the release w
 the `$` closes the pattern there. Without it the pattern matches anything after the `@`, so a signature made
 from any branch in this repository would pass the check - and pushing a branch is not a release.
 
-The signature covers the **image digest**, not the tag. So it holds for the `3.0` and `latest` tags as well as
+The signature covers the **image digest**, not the tag. So it holds for the `3`, `3.1` and `latest` tags as well as
 the exact version tag: whichever one you verify, you are verifying the same artifact.
 
 ## 🧾 Reading the attestations
