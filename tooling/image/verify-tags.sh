@@ -18,7 +18,7 @@ tags_hub() {
         return 1
     }
     digest=$(echo "$json" | jq -r --arg v "$version" '.results[] | select(.name==$v) | .digest')
-    if [ -z "$digest" ] || [ "$digest" = "null" ]; then
+    if [[ -z "$digest" ]] || [[ "$digest" = "null" ]]; then
         echo "  no '${version}' tag on docker hub" >&2
         return 1
     fi
@@ -53,7 +53,7 @@ tags_ghcr() {
     }
 
     digest=$(digest_of "$version")
-    if [ -z "$digest" ]; then
+    if [[ -z "$digest" ]]; then
         echo "  no '${version}' tag on ghcr" >&2
         return 1
     fi
@@ -62,7 +62,7 @@ tags_ghcr() {
     # name for one.
     for tag in $tags; do
         case "$tag" in sha256-*) continue ;; esac
-        [ "$(digest_of "$tag")" = "$digest" ] || continue
+        [[ "$(digest_of "$tag")" = "$digest" ]] || continue
         echo "  ${tag}   ${digest:7:12}"
     done
     echo "  every row above is the same image under another name"

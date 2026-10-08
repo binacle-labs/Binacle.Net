@@ -13,7 +13,7 @@ project="$1"
 label="${2:-}"
 read -ra extra_args <<<"${DOTNET_TEST_ARGS:-}"
 
-if [ -z "${COVERAGE_FORMAT:-}" ]; then
+if [[ -z "${COVERAGE_FORMAT:-}" ]]; then
     exec dotnet test --project "$project" "${extra_args[@]}"
 fi
 
@@ -26,7 +26,7 @@ esac
 
 # The label goes on both file names. Without it a project run twice overwrites its own first run.
 name=$(basename "$project")
-if [ -n "$label" ]; then
+if [[ -n "$label" ]]; then
     name="$name.$label"
 fi
 

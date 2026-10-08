@@ -10,7 +10,7 @@ set -uo pipefail
 
 gem="$1"
 
-if [ -z "${COVERAGE_FORMAT:-}" ]; then
+if [[ -z "${COVERAGE_FORMAT:-}" ]]; then
     cd "ruby/$gem" && exec bundle exec rspec
 fi
 
@@ -39,7 +39,7 @@ rc=$?
 
 # SimpleCov buries the file in a folder. Lift it out, named after the gem, so the folder holds one flat file
 # per project. Not fatal on its own - a failed run reports through rc.
-if [ -f "$COVERAGE_DIR/$produced" ]; then
+if [[ -f "$COVERAGE_DIR/$produced" ]]; then
     mv "$COVERAGE_DIR/$produced" "$coverage/$gem.${produced##*.}"
 fi
 rm -rf "$COVERAGE_DIR"

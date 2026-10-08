@@ -21,14 +21,14 @@ prov=$(docker buildx imagetools inspect "$ref" --format '{{ json .Provenance }}'
 rc=0
 
 packages=$(echo "$sbom" | jq -r '[.. | objects | select(has("packages")) | .packages | length] | add' 2>/dev/null)
-if [ -n "$packages" ] && [ "$packages" != "null" ]; then
+if [[ -n "$packages" ]] && [[ "$packages" != "null" ]]; then
     printf '  sbom        %s packages\n' "$packages"
 else
     echo "  sbom        MISSING" >&2
     rc=1
 fi
 builder=$(echo "$prov" | jq -r '[.. | objects | select(has("builder")) | .builder.id] | first' 2>/dev/null)
-if [ -n "$builder" ] && [ "$builder" != "null" ]; then
+if [[ -n "$builder" ]] && [[ "$builder" != "null" ]]; then
     printf '  provenance  %s\n' "$builder"
 else
     echo "  provenance  MISSING" >&2

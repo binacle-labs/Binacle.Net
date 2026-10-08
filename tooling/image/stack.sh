@@ -23,7 +23,7 @@ case "$name" in
 esac
 
 # Unset for a named-volume stack, or a value exported for `bind` turns the other two's volume into a bind.
-if [ "$data" = "-" ]; then
+if [[ "$data" = "-" ]]; then
     unset BINACLE_DATA_DIR
 else
     export BINACLE_DATA_DIR="${BINACLE_DATA_DIR:-$data}"
@@ -33,7 +33,7 @@ fi
 # writable to whoever wrote them. A recursive chmod would fail on those and ask for a password every time.
 ensure_writable() {
     mkdir -p "$1"
-    [ "$(stat -c '%a' "$1")" = "777" ] && return 0
+    [[ "$(stat -c '%a' "$1")" = "777" ]] && return 0
 
     # A directory docker made for us is owned by root, and only sudo reopens that.
     chmod 777 "$1" 2>/dev/null || sudo chmod 777 "$1"
@@ -47,12 +47,12 @@ require_image() {
     exit 1
 }
 
-if [ "$action" = "up" ]; then
+if [[ "$action" = "up" ]]; then
     require_image
     # Same value compose mounts, so the folder prepared is the one it uses.
     ( cd tooling
-      [ "$data" = "-" ] || ensure_writable "${BINACLE_DATA_DIR}"
-      [ "$dirs" = "-" ] || ensure_writable "$dirs" )
+      [[ "$data" = "-" ]] || ensure_writable "${BINACLE_DATA_DIR}"
+      [[ "$dirs" = "-" ]] || ensure_writable "$dirs" )
 fi
 
 # -p is not optional: `volume` and `bind` come out of one file, so without it `up bind` recreates the

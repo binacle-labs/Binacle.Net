@@ -13,7 +13,7 @@ signed_from="${3:-refs/heads/main}"
 repo="${4:-binacle/binacle-net}"
 here="$(dirname "$0")"
 
-if [ -z "$version" ]; then
+if [[ -z "$version" ]]; then
     echo "A version is required: just image verify 3.0.0" >&2
     exit 1
 fi
@@ -37,7 +37,7 @@ for c in $checks; do
     esac || { rc=1; failed="$failed $c"; }
     echo
 done
-if [ "$rc" -eq 0 ]; then
+if [[ "$rc" -eq 0 ]]; then
     echo "PASS - everything checked came back clean."
 else
     echo "FAIL -$failed" >&2

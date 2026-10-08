@@ -8,7 +8,7 @@ file="$2"
 
 notes="$("$(dirname "$0")/changelog.extract.sh" "$version" "$file")"
 
-if [ -z "${notes//[[:space:]]/}" ]; then
+if [[ -z "${notes//[[:space:]]/}" ]]; then
     echo "No '## ${version}' section in ${file}." >&2
     echo "Rename [Unreleased] to ${version} before tagging." >&2
     exit 1

@@ -8,7 +8,7 @@ set -euo pipefail
 
 package="$1"
 
-if [ -z "${COVERAGE_FORMAT:-}" ]; then
+if [[ -z "${COVERAGE_FORMAT:-}" ]]; then
     exec npx jest --selectProjects "$package"
 fi
 
@@ -32,7 +32,7 @@ npx jest --selectProjects "$package" \
 # jest names the file after its reporter and buries it in a folder. Lift it out, named after the package, so
 # the folder holds one flat file per project.
 for produced in "$coverage/$package"/*; do
-    [ -f "$produced" ] || continue
+    [[ -f "$produced" ]] || continue
     mv "$produced" "$coverage/$package.${produced##*.}"
 done
 rmdir "$coverage/$package"
