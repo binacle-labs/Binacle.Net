@@ -177,6 +177,9 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: ci-cd/github-surface.md
   description: "What GitHub offers a repository, what this one uses, and the ten Actions gotchas that fail quietly"
   paths: [".github/**"]
+- file: ci-cd/kept-as-is.md
+  description: "CI pieces checked against an official or first-party alternative and kept, so the next review does not check them again"
+  paths: [".github/**", "tooling/ci/**"]
 ```
 
 ## Lib

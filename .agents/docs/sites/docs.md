@@ -1,7 +1,7 @@
 ---
 id: sites/docs
 description: The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/.
-verified: 2026-09-29
+verified: 2026-10-09
 check: Collections, plugin list, and version folders match sites/docs/_config.yml and sites/docs/collections/_versions/ - one folder per major, named vN.x; every folder has an entry in sites/docs/_data/versions.yml carrying id, url_segment, label and version_tag, in the order the sidebar renders; collections/ holds _versions alone, pages/ holds 404.html and robots.txt alone, and _layouts and _includes have no versions/ subfolder; no file under collections/_versions/ carries a permalink; a built artifacts/docs renders the current folder at the root and every other under /version/<url_segment>/, has `noindex, follow` on every non-current version page and none on a root page, no sitemap listing a `noindex` URL, and a _redirects file at its root; the webpack entry, output and `clean` behaviour match sites/docs/webpack.config.js; sites/docs/_plugins/ still does not exist and every plugin the site loads except jekyll-tidy is a gem under ruby/, in the order _config.yml lists them; the sitemaps: block in _config.yml writes version-current.xml alone under /sitemap/ with an index at /sitemap.xml; the top-level nav.order sequence is the same in every folder with Release Notes second
 paths:
   - "sites/docs/**"
@@ -94,9 +94,9 @@ a folder with no entry or an entry missing one:
 | Key | Is | `v3.x` today | `v2.x` |
 |---|---|---|---|
 | `id` | the folder. Never in a URL | `v3.x` | `v2.x` |
-| `url_segment` | where a closed line renders: the highest version shipped, unused while current | `3.0.0` | `2.1.1` |
-| `label` | what the selector and every page call the line | `v3.0.0` | `v2.1.1` |
-| `version_tag` | what docker pulls - a closed line's newest patch, the current line's moving tag | `3.0` | `2.1.1` |
+| `url_segment` | where a closed line renders: the highest version shipped, unused while current | `3.1.0` | `2.1.1` |
+| `label` | what the selector and every page call the line | `v3.1.0` | `v2.1.1` |
+| `version_tag` | what docker pulls - a closed line's newest patch, the current line's major tag | `3` | `2.1.1` |
 
 `current` is the one knob: it names the folder at the root, the line search engines may index, and the line
 the selector marks. `list` is the rendered order - newest first, because it is read from the file rather than

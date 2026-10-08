@@ -7,7 +7,7 @@
 #   or: docker run ... binacle/binacle-net:<tag>   and POST to http://localhost:8080
 # Paste the response back verbatim and update `verified` on the block you changed.
 #
-# Every example is v3. v4 is experimental for the whole 3.0.x line and a marketing page must not hand a
+# Every example is v3. v4 is experimental, and a marketing page must not hand a
 # stranger an unstable contract. The v3 routes are fit/by-custom, fit/by-preset/{preset}, pack/by-custom,
 # pack/by-preset/{preset} and GET presets. Anything named fit/bin, fit/smallest-bin or pack/smallest-bin
 # is v4 and does not belong on this site.
@@ -192,6 +192,6 @@ locker:
     }
 
 command:
-  tag: "3.0"
+  tag: "3"
   text: |
-    docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3.0
+    docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3

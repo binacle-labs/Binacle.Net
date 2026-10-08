@@ -45,7 +45,7 @@ component library to reach for, and the asset copy deliberately skips `assets/li
 to re-run them. A response that looks plausible but is not what the API returns is the one thing this audience
 checks.
 
-**Every example is v3.** v4 is experimental for the whole 3.0.x line. A marketing page must not hand a
+**Every example is v3.** v4 is experimental. A marketing page must not hand a
 stranger an unstable contract.
 
 **`sitemap.xml` lists this site's pages and nothing else.** The old `/apps/*` paths move to the demo host and

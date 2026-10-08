@@ -192,15 +192,14 @@ signed twice — once on GHCR in `build`, once on Docker Hub in `publish`.
 Specifically, cosign attaches it as an **OCI 1.1 referrer**: a manifest whose `subject` points at the index
 digest, carrying one layer of `artifactType`
 `application/vnd.dev.sigstore.bundle.v0.3+json`, discoverable through the registry's referrers API and
-addressable by the fallback tag `sha256-<digest>` — **no `.sig` suffix**. Observed on
-`v3.0.0-beta.2`, 2026-08-11. The older cosign scheme put signatures in a `sha256-<digest>.sig` tag instead;
-this repo does not use it, so do not go looking for one.
+addressable by the fallback tag `sha256-<digest>` — **no `.sig` suffix**. The older cosign scheme put
+signatures in a `sha256-<digest>.sig` tag instead; this repo does not use it, so do not go looking for one.
+The evidence is in `$ci-cd/decisions/D15`.
 
 **The two registries expose it differently, and one of them looks broken.** Docker Hub serves the signature
 through the referrers API; **GHCR answers `/v2/.../referrers/<digest>` with a 404**, so a referrers query there
 returns nothing at all. The signature is present either way — on GHCR it is visible in the tag list as
-`sha256-<digest>`, and `cosign verify` passes against both, checked on the published `3.0.0-beta.2`
-(2026-08-13). An empty referrers response from GHCR is not evidence of a missing signature; only a failed
+`sha256-<digest>`, and `cosign verify` passes against both. An empty referrers response from GHCR is not evidence of a missing signature; only a failed
 `cosign verify` is.
 
 Either way the point stands: a referrer is not inside the index, so `imagetools create` does not carry it, and

@@ -107,7 +107,5 @@ Three files outside the samples carry the tag in prose and have to move with the
 `samples/README.md` and `samples/docker/README.md`. Two more mention it as an example only —
 `tooling/README.md` and `tooling/smoke.just`.
 
-The published docs snapshots under `sites/docs/collections/_versions/v3.x/samples/` pin `3.0` directly,
-because a snapshot describes the released version rather than the working tree. They also carry a shorter comment above
-the `image:` line: the repo copies explain our release order, which means nothing to a reader who downloaded
-the file.
+The published docs snapshots under `sites/docs/collections/_versions/v3.x/samples/` are copies of these files
+and pin the same tags. They move in a site session, after the repo copies.

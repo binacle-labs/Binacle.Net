@@ -1,19 +1,18 @@
 ---
 title: Release Notes
 description: >-
-  What changed in this line of Binacle.Net, newest first. v3.0.0 removes the V2 endpoints and changes ViPaq,
-  so read the migration guide.
+  What changed in this line of Binacle.Net, newest release first. v3.0.0 removed the V2 endpoints and changed
+  ViPaq, so read its migration guide.
 nav:
   order: 2
   icon: 🛠️
 ---
 
-Release notes for the **v3.x** line, newest release first. Every patch in this line is on this page.
+Release notes for the **v3.x** line, newest release first. Every release in this line is on this page.
 
-> **v3.0.0 introduces breaking changes.** Existing integrations must be reviewed and updated. V2 endpoints are
-> removed, ViPaq strings from earlier versions no longer decode, and health check IP restrictions are matched
-> differently. See the [Migration Guide](#migration-guide).
-{: .block-warning}
+> Coming from v2? v3.0.0 breaks integrations - its section below has the [migration guide](#migration-guide).
+> Nothing after it does.
+{: .block-note}
 
 > 🛡️ **The Service Module has no public documentation.** Changes to it are listed on this page like anything
 > else, but no migration steps are given for them. A breaking change to it does not force a major version: a
@@ -21,6 +20,128 @@ Release notes for the **v3.x** line, newest release first. Every patch in this l
 > every minor release before upgrading. See the
 > [Service Module]({% vlink configuration/service-module/index.md %}) page.
 {: .block-note}
+
+---
+
+## v3.1.0
+
+*Released 8 October 2026 - [release on GitHub](https://github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0)*
+
+### 🔎 Overview
+- **The demo now calls V4.** Both the demo site and the UI module inside the image moved off V3.
+- **The demo gained the `Best` algorithm**, which was never reachable from V3, and now shows which algorithm won.
+- V3 endpoints are unchanged and remain stable. V4 remains experimental.
+- **A major tag, `3`, is published beside `3.1` and `3.1.0`.** It follows every minor and patch in the 3 line.
+- **The documentation site keeps one folder per major line**, and the current line is served at the site root. A minor
+  release no longer moves every documentation URL.
+- **The ServiceModule's routes can be called from a browser.** A `ServiceApi` CORS policy covers the token and admin
+  routes, configured beside the existing `CoreApi` one. Nothing is allowed until you list an origin.
+
+### 🎨 UI Module
+- **The packing demo calls `pack/compare-bins` on V4**, where it called `pack/by-custom` on V3. It still packs every bin
+  you give it and still lets you click between the results - the endpoint with the same shape, on the newer version.
+  Nothing about the page's behaviour changed with it.
+- **The algorithm list gained `Best`.** It runs more than one heuristic and returns whichever packed best, and it exists
+  only on V4, so the demo could not offer it before. It is listed as **Try all, keep the best**, to keep it apart from
+  **Best Fit Decreasing**, which is one specific heuristic.
+- **Each result now says which algorithm actually ran**, shown only when you asked for `Best` - with a single heuristic
+  selected it would repeat the dropdown a line below itself. The row splits its columns rather than growing taller.
+- **The demo no longer builds its own HTTP calls.** It goes through the new client package, which owns the request and
+  response shapes.
+- **A rate-limited request now says so.** Hitting the demo too often used to show a message about a response that could
+  not be parsed. It now tells you that you have been rate limited and to wait a moment before trying again.
+- **A result that could not fit everything now says what was left out.** An info button on the result row opens a small
+  panel listing the items that did not fit and how many of each. It opens on hover, on tap and from the keyboard, and it
+  floats over the row rather than making it taller.
+- **The Get results button can no longer stick.** It came back only once something had drawn the packed bin, so a page
+  showing the form without the 3D view could leave it disabled. It now comes back as soon as the answer arrives.
+- **The instance page no longer calls the API to list its presets.** It renders them with the rest of the page, so the
+  list still appears behind a proxy, an auth layer or a CORS rule - which is usually when you are looking at that page.
+  A change to `Presets.json` shows up there after a restart.
+- **The demo site shows unpacked items too.** The tooltip that landed on the packing page inside the image is now on the
+  public demo as well.
+- **The packing page shows the request it just made.** After a run, a `Request` button on the results opens a panel on
+  the right with the call as one `curl` line against the instance serving the page - method, path and the JSON body -
+  with a Copy button where the browser allows it. Paste it into a terminal and it answers. The public demo site does not
+  have it, because the only host it could print is one nobody calls from their own code.
+- **`Try all, keep the best` is now first in the algorithm list and selected when the page opens.** It is the reason the
+  demo moved to V4, so it is what you see first.
+- **A new worked example opens the page: two bins, one item set, two different winners.** First Fit Decreasing fills the
+  first bin where Best Fit Decreasing cannot, and Best Fit Decreasing fills the second where First Fit cannot, so the
+  first thing the page shows is why `Try all, keep the best` exists. The twenty earlier examples are still there under
+  Randomize.
+- **The ViPaq Decoder offers five sample strings.** A Samples button opens a panel of known-good strings, each with a
+  Copy button. Paste one into the decoder to see what a decoded pack looks like before you have a response of your own.
+  Each is a packed result from one of the demo's own worked examples.
+
+### 🔌 Service Module
+- **The token and admin routes carry a CORS policy of their own, `ServiceApi`.** Until now only the packing routes had
+  one, so a browser page could log in against this module only through a proxy. The origins go under a `ServiceApi` key -
+  in `Config_Files/ServiceModule/Cors.json`, or beside `CoreApi` in the one `Cors.json`, since both feed the same
+  section. Absent means closed, as before.
+- **Deleting a subscription and creating a new one for the same account no longer answers 409 on Azure Table Storage.**
+  The account update ran as a merge, which skips a null, so the removed subscription id stayed on the row. It now
+  replaces the row. SQLite and Postgres were not affected.
+
+### 🏗️ Internal Work
+- **Added `binacle-net-client`, a private TypeScript client for the v4 API.** Hand-written, with no generator and no
+  runtime dependencies. It carries its own committed copy of the v4 OpenAPI document, and a test validates the
+  hand-written types against that copy - so a contract change in the API fails a test rather than reaching a page. It
+  covers `pack/compare-bins` to start with. Nothing is published; this remains an internal package, and the OpenAPI
+  documents are still what an integrator generates their own client from.
+- **Restructured `binacle-net-ui` into apps, components and shared code.** It was three flat folders, and 19 of the 25
+  files in `utils/` turned out to be the visualizer's own internals sitting where any file could import them. The
+  visualizer now owns them and offers an app its component and one contract type. No behaviour changed - the same 348
+  tests passed before and after, with no assertion edited.
+- **The committed OpenAPI copies are now kept in step as one set.** `just openapi check-site-copies` became
+  `just openapi check-all-copies`, and a new `just openapi sync-all-copies` writes every copy. The check runs on every
+  pull request and on release, as it did before. Nothing calls the sync - a person runs it and commits what it writes.
+- **Added an integration test for CORS.** Nothing asserted `Access-Control-Allow-Origin` before. A preflight from an
+  allowed origin now has a test that fails the way the 2026-09-01 break did, and a second proves that with no
+  `Cors.json` present no origin is allowed at all.
+- **A prerelease never reaches Docker Hub.** A beta is built, signed and smoke tested on GHCR, gets its git tag and a
+  GitHub release marked prerelease, and stops there. `binacle/binacle-net` now only ever receives a released version,
+  and nothing sits beside a release waiting to be deleted.
+- **A prerelease can be dispatched from the `release/` branch named after it.** `release/v3-1-0` may dispatch
+  `3.1.0-beta.*` and no other version; a release still runs from `main` only. The betas of a version come from its
+  branch, so a change to the workflow is proved by a beta before it reaches `main`.
+- **The release logs into Docker Hub with the run's own identity token.** No long-lived registry token is stored for the
+  job that pushes the image; the token is minted per run and expires with it. The Docker Hub page is the one job that
+  still uses a stored token, because the page is written through a different API.
+- **One fewer third-party action runs in the job that holds the registry credential.** Copying the image between
+  registries is a registry call, not a build, and the runner already carries the tool it needs - so the job no longer
+  sets up a builder first.
+- **No job holds a git credential after checkout.** The one tag CI pushed, the site deploy marker, is now created
+  through the GitHub API, so every checkout runs with `persist-credentials: false`.
+- **The three site deploy workflows are one**, with the site chosen at dispatch. Deploys are still by hand.
+- **Sonar waits for its own result** through the scanner's quality gate flag instead of a polling loop, and a
+  workflow-only pull request no longer builds all three documentation sites.
+- **Sonar analysis now runs on every pull request that can carry the token**, in parallel with the existing checks
+  rather than only by hand. It reports and does not block a merge; a pull request from a fork or from Dependabot skips
+  it rather than failing.
+- **CORS moved into the Kernel.** One `Cors` section, one entry per policy name; the core and each module add their own
+  file and name the policy they need, and the Kernel binds the section once, builds the policies from it and validates
+  the registered keys on start. Neither owner holds an options class or a validator any more.
+- **The ServiceModule's OpenAPI document can be exported.** `just openapi generate-service` builds with the module on
+  into its own folder, because that run also changes the v3 and v4 documents, and the copy recipes gained a line for it.
+- **Added `binacle-net-service-client` and `sites/admin`, both experimental and local only.** A hand-written TypeScript
+  client for the token and admin routes, kept honest by the same contract test as the v4 client, and a small Jekyll page
+  that uses it against a local instance. Neither is built, published or deployed by anything.
+- **Added an `Instance` slice to the Kernel** holding what a running instance reports about itself. The feature list
+  moved into it and its values became a small closed set of types, so the presets the instance loaded can sit beside the
+  switched-on features without being mistaken for one. The instance page's javascript is gone with it.
+
+### 📚 Versioned Docs
+Work on the documentation site. Nothing here changes the image you pull.
+
+- **One folder per major line, the current line at the root.** `docs.binacle.net/quick-start/` is the current page;
+  older lines live under `/version/2.1.1/` and `/version/1.3.0/`. A minor release adds to the current folder instead of
+  opening a new one, so URLs stop moving.
+- **Every old URL redirects.** `/version/v3.0.x/...`, `/version/v2.1.x/...`, `/version/v2.0.x/...`,
+  `/version/v1.3.x/...` and `/version/latest/` all land on the page that replaced them.
+- **The `v2.0.x` and `v2.1.x` folders are one `v2.x`**, carrying the whole v2 line, with a note where 2.1.0 added
+  something.
+- **Configuration Basics folded into Configuration, CORS got its own page, and the Integration Guide left the docs.**
 
 ---
 

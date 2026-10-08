@@ -35,9 +35,12 @@ lockers or pallets is the first thing to do; until then the answers describe som
 image on every release.
 
 ## 🏷️ About the image tag
-Every sample pins `binacle/binacle-net:{{ page.version_tag }}` - the minor tag, which picks up fixes within the
-{{ page.version_tag }} line and never a breaking change. A copied sample should not jump to a new major on the
-next pull, which is what `latest` would do.
+Every sample pins `binacle/binacle-net:{{ page.version_tag }}` - the major tag, which picks up every minor and
+patch release in the {{ page.version_tag }} line and never a breaking change. A copied sample should not jump to
+a new major on the next pull, which is what `latest` would do.
+
+The one exception is [Service]({% vlink /samples/docker/service/index.md %}), which pins `3.1`, the minor. A
+minor release may change the Service Module, so that sample moves to a new minor only when you move it.
 
 ## 📄 Copying these files
 Every file on these pages is under the **MIT License**, not the licence covering the API code. Copy one into

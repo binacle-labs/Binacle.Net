@@ -84,12 +84,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 ## CI/CD
 
 ```yaml
-- file: ci-cd/ci-open-questions.md
-  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
-  state: ready
-  waits-on: "a green site deploy through deploy-site.yml. The v3.1.0 release run proved the rest on 2026-10-08. Two demo deploys on 2026-10-08 failed - a broken wrangler-action pin, then a marker tag that already existed. Both are fixed and not yet run"
-  horizon: undecided
-  paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
   state: idea
@@ -153,23 +147,6 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nothing. Horizon picked by an agent to make the file legible; strike it if wrong"
   horizon: undecided
-```
-
-## Sites
-
-```yaml
-- file: sites/code-blocks-and-wide-tables.md
-  description: "Two framework defaults on the docs site - code samples had no named mono face (fixed), and wide tables are still clipped rather than scrolled"
-  state: proposed
-  waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
-  horizon: undecided
-  paths: ["sites/docs/**"]
-- file: sites/docs-current-at-root.md
-  description: "The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL."
-  state: ready
-  waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip). The major tag manifest resolves since the v3.1.0 release, 2026-10-08"
-  horizon: now
-  paths: ["sites/docs/**", "ruby/binacle-docs-versions/**", "tooling/openapi.just", ".github/workflows/release-docker-image.yml"]
 ```
 
 ## Tooling

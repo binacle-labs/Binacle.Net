@@ -4,6 +4,11 @@
       "AllowedOrigins": [
         "https://your-site.example"
       ]
+    },
+    "ServiceApi": {
+      "AllowedOrigins": [
+        "https://your-admin-site.example"
+      ]
     }
   }
 }

@@ -40,7 +40,8 @@ The second dispatch, `demo` on 2026-10-08, deployed and then failed at the tag w
 on `demo-2`. `github.run_id` is unique across the repository and never repeats. The maintainer, 2026-10-08,
 picking it from four options: "go with 1".
 
-**What is unproved.** No site has deployed through this file end to end. The first dispatch, `demo` on
-2026-10-08, failed at `Deploy to Cloudflare`: Dependabot had moved `cloudflare/wrangler-action` to v4.1.1, a
-release Cloudflare marks broken because its tag has no `dist/`. The pin is now v4.1.3, and the second dispatch
-deployed. Its tag failed as above, so `demo` is live with no marker tag. The next dispatch is the proof.
+**Proved 2026-10-08.** The third dispatch, `demo` from `main` on `17d4d78e`, was green on all three jobs, and
+`docs` followed green. The first had failed at `Deploy to Cloudflare`: Dependabot had moved
+`cloudflare/wrangler-action` to v4.1.1, a release Cloudflare marks broken because its tag has no `dist/`. The pin
+is v4.1.3. The second deployed and failed at the tag, as above.
+

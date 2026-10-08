@@ -1,7 +1,7 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-09-29
+verified: 2026-10-09
 check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
 paths:
   - "sites/www/**"
@@ -148,7 +148,7 @@ Any grid holding a code pane also needs `min-width: 0` on its children - a grid 
 
 - **A theme toggle.** `packages/theme-switcher`, the same element the other three hosts use. The pre-paint
   read is *not* in this file — it is its own bundle, `js/theme-init.js`, loaded blocking in `<head>`.
-- **Clipboard copy controls.** The `docker run` line is the primary conversion on three of the four pages.
+- **Clipboard copy controls.** The `docker run` line is the primary conversion on all four pages.
 
 Both controls are `hidden` in the markup and revealed by the script. **All four pages must be complete with
 JavaScript off**, and a control that cannot work is worse than no control.
@@ -172,8 +172,9 @@ syntax rainbow.**
 as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
 reports as an error.
 
-**The `docker run` line names `binacle/binacle-net:3.0`, a published tag.** That command is the primary
-conversion on three pages; a tag that does not exist fails it with `manifest unknown`.
+**The `docker run` line names `binacle/binacle-net:3`, the major tag.** It follows every minor and patch in
+the line, so a minor release does not touch it. That command is the primary conversion on all four pages; a
+tag that does not exist fails it with `manifest unknown`.
 
 **`demo.binacle.net` answers**, and it is linked from the nav, the footer and `/how-it-works/`. The link check
 runs offline and will not catch a host that stops answering.
