@@ -1,4 +1,5 @@
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -13,7 +14,7 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_FFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -24,7 +25,7 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_FFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -35,7 +36,7 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_WFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -46,7 +47,7 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_WFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -57,7 +58,18 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
+	public void OR_Library_Fitting_WFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.WFD_v3, testScenario, AlgorithmOperation.Fitting);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -68,12 +80,23 @@ public class FittingBischoffSuiteTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(BischoffSuiteScenarioProvider.ScenarioNames), MemberType = typeof(BischoffSuiteScenarioProvider))]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
 	public void OR_Library_Fitting_BFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
 
 		var result = this.Fixture.Run(AlgorithmFactories.BFD_v2, testScenario, AlgorithmOperation.Fitting);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(BischoffSuite.TheoryNames), MemberType = typeof(BischoffSuite))]
+	public void OR_Library_Fitting_BFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.BFD_v3, testScenario, AlgorithmOperation.Fitting);
 
 		this.Fixture.AssertResult(testScenario, result);
 	}

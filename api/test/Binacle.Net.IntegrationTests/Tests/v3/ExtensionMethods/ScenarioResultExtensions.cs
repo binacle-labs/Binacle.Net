@@ -1,5 +1,5 @@
 using Binacle.Net.v3.Contracts;
-using Binacle.TestsKernel.Algorithms.Models;
+using Binacle.Data;
 
 namespace Binacle.Net.IntegrationTests.v3.ExtensionMethods;
 

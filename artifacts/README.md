@@ -3,14 +3,13 @@
 Build output lands here, one folder per thing that produced it:
 
 - `binacle-net/` - the published API, copied into the Docker image by the root `Dockerfile`.
-- `docs/` and `web/` - the generated Jekyll sites.
-- `openapi/` - the OpenAPI documents emitted on build.
+- `docs/`, `demo/`, `www/` and `admin/` - the generated Jekyll sites, one folder per site.
+- `openapi/` - the OpenAPI documents emitted on build; `openapi-service/` the ServiceModule's, from `just openapi generate-service`.
 - `tests/` - per-suite test results (`<Project>.ctrf.json`), written by `just test` / `just coverage`.
 - `coverage/` - per-suite coverage, one flat folder per consumer (`cobertura/`, `sonar/`), plus the merged
   report in `html-report/`.
 
 These are build artifacts, not source. Do not edit by hand; they are regenerated on each build.
 
-Not to be confused with repo-root `results/`, which holds committed measured evidence - benchmark output and
-packing-efficiency reports, kept so a change can be diffed against a known baseline. Those are records that
-outlive a build; everything here is regenerated and gitignored.
+Not to be confused with `lib/results/` and `vipaq/results/`, which hold committed measured results, kept so a
+change shows up as a diff. Those outlive a build; everything here is regenerated and gitignored.

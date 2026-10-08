@@ -1,3 +1,4 @@
+using Binacle.Net.Kernel.Instance;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,12 +9,12 @@ namespace Binacle.Net.UIModule.Pages;
 internal class IndexModel : PageModel
 {
 	private readonly AppletsService appletsService;
-	private readonly IOptions<FeatureOptions> featureOptions;
+	private readonly IOptions<InstanceOptions> instanceOptions;
 
-	public IndexModel(AppletsService appletsService, IOptions<FeatureOptions> featureOptions)
+	public IndexModel(AppletsService appletsService, IOptions<InstanceOptions> instanceOptions)
 	{
 		this.appletsService = appletsService;
-		this.featureOptions = featureOptions;
+		this.instanceOptions = instanceOptions;
 	}
 
 	public IReadOnlyList<Applet> Applets => this.appletsService.Applets;
@@ -24,7 +25,7 @@ internal class IndexModel : PageModel
 	{
 		get
 		{
-			var on = FeatureSwitch.All.Count(x => this.featureOptions.Value.IsFeatureEnabled(x.Feature));
+			var on = FeatureSwitch.All.Count(x => this.instanceOptions.Value.IsFeatureEnabled(x.Feature));
 			return $"{Metadata.Version} - {on} of {FeatureSwitch.All.Count} switched on";
 		}
 	}

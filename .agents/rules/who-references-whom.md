@@ -1,5 +1,5 @@
 ---
-description: The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever.
+description: The one reference matrix - what every file type may point at, what it may never point at, and the four exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever.
 load: always
 when: adding any link, $ reference or pointer, anywhere in the repo
 ---
@@ -12,7 +12,7 @@ The whole rule, in one table. Nothing else states any part of it.
 |---|---|---|
 | **docs** (permanent) | code, paths, READMEs, **other docs, design** | plans, memory |
 | **design** (permanent) | code, paths, READMEs, **docs, other design** | plans, memory |
-| **plans** (ephemeral) | code, paths, READMEs - **nothing under `.agents/`** | every layer, including each other |
+| **plans** (ephemeral) | code, paths, READMEs - **nothing under `.agents/`** | every layer, including each other - except inside a topic folder, below |
 | **memory** (ephemeral) | ideally nothing; a doc or design only if it truly must | plans, other memory |
 | **rules** | code, paths, other rules | docs, design, plans, memory |
 | **slice READMEs** | whatever its own layer may | whatever its own layer may not |
@@ -40,7 +40,7 @@ The whole rule, in one table. Nothing else states any part of it.
   `.agents/**/_index.md` and the root `justfile` registers it. Those are operands. What is banned is the
   pointer, because it makes an outside file depend on a layout the system is free to rearrange.
 
-## The three exceptions
+## The four exceptions
 
 Each may point at anything, and **nothing may point back at them**.
 
@@ -48,5 +48,8 @@ Each may point at anything, and **nothing may point back at them**.
 - **`.agents/README.md`** - the map. It may *name* any file as navigation.
 - **the `release-v<version>` set** - permanent files whose contents are entirely ephemeral. A release file
   names the plans it took a slice of, and nothing points back at it.
+- **a topic folder under `plans/`** - one plan too big for one file, granted by the maintainer 2026-09-19.
+  The orchestrator beside the folder points at every file in it; a step file points at its shape file.
+  Nothing outside the folder points in, and no other plan points at any of them.
 
 Navigation is not citation. A README that lists its folder's files is indexing them, not citing them.

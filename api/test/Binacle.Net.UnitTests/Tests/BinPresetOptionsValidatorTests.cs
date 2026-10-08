@@ -1,4 +1,4 @@
-using Binacle.Net.Configuration;
+using Binacle.Net;
 
 namespace Binacle.Net.UnitTests;
 

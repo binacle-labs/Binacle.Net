@@ -1,8 +1,8 @@
 ---
 id: commands
-description: How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image
-verified: 2026-09-04
-check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
+description: How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image
+verified: 2026-10-02
+check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; measure recipes match tooling/measure.just; bench recipes match tooling/bench.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
   - "tooling/**"
@@ -11,8 +11,7 @@ paths:
 # Commands
 
 Setup, running things, tests, coverage, the OpenAPI documents, the image build, the smoke suite, the agent
-indexes and the committed generated data are `just` recipes; only the benchmarks and the performance runs are
-still scripts in `tooling/`. All are run
+indexes, the committed generated data, the measured results and the benchmarks are all `just` recipes, run
 from the repo root. `just` with no arguments lists everything. For the `tooling/` directory anatomy (scripts,
 local compose, env, emulator state) see `$tooling`.
 
@@ -25,18 +24,14 @@ human setting up a machine.
 Do not repeat any of it here, and do not answer a setup question from memory: read that file, or point the user
 at it. This section exists only to say where it is.
 
-The short version, for judging whether a command in this doc can run at all: .NET SDK 10.x, Node 22 (`.nvmrc`),
-Ruby 3.4.7 (`.ruby-version` in `sites/docs/`, `sites/demo/` and `sites/www/` — **all three** sites need it),
-`just`, and docker for anything touching the image.
-
 ## Set up a fresh clone
 
 ```bash
-just install                           # npm workspaces, the gems for all three sites and for ruby/, then the asset copy
+just install                           # npm workspaces, the gems for docs, demo, www and ruby/, then the asset copy
 just assets                            # only the asset copy - after changing anything under assets/
 ```
 
-`assets` copies `assets/**` into the three sites and into the UI module's `wwwroot/` via gulp. Each serves its
+`assets` copies `assets/**` into the docs, demo and www sites and into the UI module's `wwwroot/` via gulp. Each serves its
 own copy, so a changed logo does not show up until this runs. **`sites/www` gets a smaller set** — the gulp
 target skips `assets/lib/`, because that site runs no CSS framework; see `$sites/www`.
 
@@ -47,6 +42,7 @@ just serve api [N|S|U|All]             # the API
 just serve docs                        # docs site: jekyll serve + webpack watch, one terminal
 just serve demo                        # demo site: same
 just serve www                         # marketing site: jekyll serve + sass and webpack watches
+just serve admin                       # admin site, experimental and local only: jekyll serve + webpack watch
 just serve services-up [-d]            # what the API talks to: aspire-dashboard, azurite, postgres
 just serve services-down [-v]          # only needed after -d; Ctrl-C is enough otherwise
 ```
@@ -74,15 +70,15 @@ loaded as the `test` module. The same recipes are what CI calls, so a red step i
 package or gem name lowercased with dots turned to dashes, so `cs_binacle-net-kernel_unit` is
 `Binacle.Net.Kernel.UnitTests` and nothing else. `_` separates the segments, `-` belongs inside a name.
 
-**The tests are `[private]`**, so completion offers the four groups and not twenty-seven tests. A private
-recipe still runs by name. `just test` with no argument prints the whole list.
+**The tests are `[private]`**, so `just test` and completion offer the four groups, not every test. A private
+recipe still runs by name.
 
 ```bash
 just test all                  # every test that needs nothing brought up
 just test all-with-services    # the same, plus the two backends that need services up
-just test image                # the seventeen the Docker image ships
-just test sites                # the fifteen a Jekyll site ships
-just test                      # the four above, then every test name
+just test image                # every test the Docker image ships
+just test sites                # every test a Jekyll site ships
+just test                      # the four groups above
 
 # C#
 just test cs_binacle-lib_unit
@@ -101,11 +97,13 @@ just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorag
 # TypeScript
 just test ts_binacle-compact-notation_unit
 just test ts_binacle-vipaq_unit
+just test ts_binacle-net-client_unit
+just test ts_binacle-net-service-client_unit
 just test ts_binacle-net-ui_unit
 just test ts_cookies_unit
 just test ts_theme-switcher_unit
 
-# Ruby - the ten gems. `just test sites` and `just test all` run them.
+# Ruby - the gems. `just test sites` and `just test all` run them.
 just test rb_binacle-docs-versions_unit
 just test rb_binacle-robots_unit
 just test rb_jekyll-breadcrumb-trail_unit
@@ -118,16 +116,15 @@ just test rb_jekyll-structured-data_unit
 just test rb_jekyll-webmanifest_unit
 ```
 
-**Twenty-seven tests, and `just test all` runs every one.** The ten Ruby ones go through `bundle exec rspec`
+**`just test all` runs every test.** The Ruby ones go through `bundle exec rspec`
 from the gem's own folder, which is the only place a `spec_helper` is on the load path.
 
 **Four group recipes, and the three lists in `tooling/tests.just` are the only copy of the set of tests.**
 `just test image` is what the Docker image ships, `just test sites` is what a Jekyll site ships, and
-`just test all` is a third list, written out as the two of them with nothing run twice — five javascript
+`just test all` is a third list, written out as the two of them with nothing run twice — most javascript
 tests are in both.
 `just test all-with-services` is `all` plus the ServiceModule suite against Postgres and Azure Tables, which
-need `just serve services-up -d` first. Each group runs every test and reports all the failures, not just the
-first.
+need `just serve services-up -d` first. A group stops at the first failure, so the quick tests go first.
 
 **A group is for a laptop, with one exception — the Sonar workflow calls `all-with-services`, because
 coverage has to be a single run.** Every other workflow names every test as its own step, so a red check
@@ -180,7 +177,7 @@ drops whole trees that are in scope here. Use the rows to pick what to work on, 
 which it looks for in the directory it runs in. Both recipes share it. Only `targetdir` and `reporttypes`
 are on the command line, because that is all the two differ on.
 
-**A `sonar` run ends by merging the ten gem reports into one `ruby.json`**, in `tooling/coverage.run.sh`.
+**A `sonar` run ends by merging the gem reports into one `ruby.json`**, in `tooling/coverage.run.sh`.
 `sonar.ruby.coverage.reportPaths` is the only one of Sonar's three coverage settings that takes no wildcard,
 so it has to be handed a file name. That merge is what jq is needed for.
 
@@ -193,20 +190,33 @@ name into `expected.txt` before it runs, which is the only thing separating "the
 ```bash
 just openapi generate                  # artifacts/openapi/Binacle.Net_v3.json + _v4.json
 just openapi generate <dir>            # write them somewhere else (pass an absolute path)
+just openapi generate-service          # artifacts/openapi-service/Binacle.Net_service.json, with ServiceModule on
 just openapi lint [<dir>]              # generate, then lint with Spectral against tooling/openapi.spectral.yaml
-just openapi check-site-copies         # generate, then fail if the docs site's copies have drifted
+just openapi check-all-copies          # generate, then fail if any committed copy has drifted
+just openapi sync-all-copies           # generate, then write every committed copy
 ```
 
-`check-site-copies` diffs the two generated documents against
-`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`, which are hand-placed and which
-nothing else compares. The current version is a variable at the top of `openapi.just` and moves with each
-minor. The frozen version folders below it are records of what those releases documented and are never
-compared. `shared-image-tests.yml` runs it beside the lint.
+`check-all-copies` diffs the generated documents against the four committed copies:
+`sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`,
+`packages/binacle-net-client/spec/v4.json`, and `packages/binacle-net-service-client/spec/service.json`. The
+v4 client takes no copy of v3, and the service client takes only the service document. The current docs
+version is read from `current:` in `sites/docs/_data/versions.yml`; the frozen version folders below
+it are records of what those releases documented and are never compared. `shared-image-tests.yml` runs the
+check beside the lint.
+
+`sync-all-copies` writes those four. **No workflow calls it** - CI only ever checks, and a human runs the
+sync and commits what it writes.
 
 Nothing needs to be brought up — the documents come out of the build, not out of a running server:
 `Microsoft.Extensions.ApiDescription.Server` starts the app host itself and dumps every registered
 `IOpenApiDocument` (`$api/openapi`). The host it starts has no launch profile, so **ServiceModule is off** and
 the documents carry no `/api/auth/token` path — the shape the committed specs assume.
+
+`generate-service` is the one run with the module on. The service document only exists then, but so does a
+different v3 and v4: `/api/auth/token` appears in both and every rate-limited endpoint gains a `429`. So it
+writes to its own folder, `artifacts/openapi-service/`, and only the service file is copied out. The module
+will not start without a store and JWT settings, so the recipe passes throwaway ones by environment variable
+(a sqlite file beside the output; `Development` is not used because it picks Azurite first).
 
 Generation is off by default (`-p:GenerateOpenApi=true`, set by the recipe) so an ordinary build doesn't start
 the app host. The destination is `-p:OpenApiDir`; MSBuild resolves a relative one against the **project**
@@ -216,25 +226,47 @@ directory, which is why the recipe passes an absolute path.
 relative `/`, set in the shared document transform, so a run that reports `oas3-api-servers` means something
 removed it.
 
-## Performance tests
+## Measured results
 
-Per slice; write reports to a gitignored scratch folder — see [results/README.md](../../results/README.md) for the
-scratch-vs-curated convention:
+Per slice; each project writes its reports straight into the slice's tracked `results/measurements/`, so a
+change in what the code does shows up as a diff:
 
 ```bash
-./tooling/performance.lib.sh
-./tooling/performance.vipaq.sh
+just measure            # list
+just measure lib        # Binacle.Lib.PackingEfficiency -> lib/results/measurements/
+just measure vipaq      # Binacle.ViPaq.EncodedSize     -> vipaq/results/measurements/
+just measure all
 ```
 
 ## Benchmarks
 
-Per slice; BenchmarkDotNet, markdown-only, output pinned next to the project:
+BenchmarkDotNet, markdown-only, reports pinned next to the project in its gitignored `BenchmarkDotNet.Artifacts/`,
+where the next run of the class overwrites them. A run worth keeping is copied by hand to
+`<slice>/results/benchmarks/baseline/<family>/` (a class's first kept run) or `<date>/<family>/`. One project per
+question under `<slice>/bench/`, one recipe per project and tier:
 
 ```bash
-./tooling/benchmarks.lib.sh [FastValidation|AlgorithmRacing|BischoffSuite|Parallelization|ResultSelection]
-./tooling/benchmarks.vipaq.sh [Encode|Decode]
-# No argument = all
+just bench                               # the list, in tier order, each recipe with its cost
+just bench lib-algorithms-smoke          # smoke: minutes; also vipaq-smoke
+just bench lib-algorithms-sample quick   # sample; also vipaq-sample
+just bench lib-algorithms-full precise   # full: asks first, except for dry
+just bench lib-result-selection          # about 3 minutes; its one tier
+just bench lib-scaling quick             # the item ladder, about 20 minutes; its one tier
+just bench lib-parallel-algorithms-identical dry   # Loop against Parallel on one bin
+just bench lib-parallel-bins-identical FFD dry     # the same on many bins; also WFD and BFD
+just bench lib-parallel-overhead dry               # what starting a race costs, with no packing in it
+just bench lib-parallel-overhead precise 3         # the same, each case in 3 processes
 ```
+
+Every recipe takes the same two optional arguments: a word - `dry` (each case once), `quick` (the short job) or
+`precise` (the default job) - and then a launch count, which runs each case in that many processes so a
+run-to-run spread shows. With no word a recipe runs the job on its own line, which its comment also names.
+Reports name the job in the header: `short 02 cores`.
+
+The tier is the class name's first word (`Smoke_`, `Sample_`, `Full_`), picked with
+`--filter`; result selection and scaling have one tier and run every class; the parallel projects run their
+`Identical_` classes. A run that times nothing or has a
+failed case exits 1.
 
 ## Run the image
 
@@ -263,6 +295,7 @@ The backing services for an API run from source are a different thing — that i
 just image verify 3.0.0                 # all four checks
 just image verify 3.0.0 signature       # one: tags, signature, attestations or metadata
 just image verify 3.0.0 all refs/heads/main binacle/binacle-net   # the ref and the repo, both defaulted above
+just image verify 3.1.0-beta.1 all refs/heads/main ghcr.io/binacle-labs/binacle-net   # a prerelease, where it stops
 ```
 
 Reads Docker Hub, builds nothing, **never logs in**. The version is required and never defaults — a default
@@ -365,7 +398,7 @@ becomes both the image tag and `BINACLE_VERSION` inside the container, which is 
 Then run it with `just image up`, which prepares the bind-mounted folders first.
 
 `docs`, `demo` and `www` are the build half of `just serve <site>` — same site, built once instead of
-served and watched. **The deploy workflows call these and hand `artifacts/<site>` straight to the host**, so
+served and watched. **The deploy workflow calls these and hands `artifacts/<site>` straight to the host**, so
 what they build is what gets served. Three steps in a fixed order: copy the assets, run webpack over `_js/`, then
 `jekyll build` with `_config.yml,_config.prod.yml`. **Skipping any of them still produces a site**, just one
 with no scripts and no logo, because `js/`, `lib/` and `media/` are gitignored and filled by the first two
@@ -407,7 +440,7 @@ the recipe stops with `No artifacts/docs` rather than checking nothing and passi
 because a source `href` is still Liquid at that point.
 
 `links` passes `--offline`, so it checks only the links that resolve inside the site — the ones a renamed page
-breaks. Both sites together answer in about a fifth of a second, which is why the deploy workflows run it as a
+breaks. Both sites together answer in about a fifth of a second, which is why the deploy workflow runs it as a
 pre-flight. `links-external` makes a real request per unique URL, takes ten seconds, and can fail on somebody
 else's outage; that is why it is a separate recipe rather than a flag, and why it is not a gate.
 
@@ -443,8 +476,7 @@ its `run:` line into a terminal. See `$ci-cd` for which workflow calls which.
 
 ## TypeScript packages
 
-Five tests — `ts_binacle-compact-notation_unit`, `ts_binacle-vipaq_unit`, `ts_binacle-net-ui_unit`, `ts_cookies_unit` and
-`ts_theme-switcher_unit`. They run jest from the repo root through the root `jest.config.js`, which is
+The `ts_*` tests run jest from the repo root through the root `jest.config.js`, which is
 what keeps the workspace folder in coverage paths and applies its `collectCoverageFrom`. Running `npm test`
 inside a package works but drives the run from that package's own config, so its numbers are not the ones CI
 or coverage report.

@@ -1,4 +1,5 @@
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 #pragma warning disable xUnit1007 
 
@@ -15,7 +16,7 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_FFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -26,7 +27,7 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_FFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -37,7 +38,7 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_WFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -48,7 +49,7 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_WFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -59,7 +60,18 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
+	public void CustomProblems_Packing_WFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.WFD_v3, testScenario, AlgorithmOperation.Packing);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_BFD_v1(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
@@ -70,12 +82,23 @@ public class PackingCustomProblemsTests : IClassFixture<CommonTestingFixture>
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
 	public void CustomProblems_Packing_BFD_v2(string scenario)
 	{
 		var testScenario = this.Fixture.GetScenarioByName(scenario);
 
 		var result = this.Fixture.Run(AlgorithmFactories.BFD_v2, testScenario, AlgorithmOperation.Packing);
+
+		this.Fixture.AssertResult(testScenario, result);
+	}
+
+	[Theory]
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
+	public void CustomProblems_Packing_BFD_v3(string scenario)
+	{
+		var testScenario = this.Fixture.GetScenarioByName(scenario);
+
+		var result = this.Fixture.Run(AlgorithmFactories.BFD_v3, testScenario, AlgorithmOperation.Packing);
 
 		this.Fixture.AssertResult(testScenario, result);
 	}

@@ -15,8 +15,11 @@ files hold the carve-outs.
 |---|---|
 | [never-commit](never-commit.md) | Never commit, stage or push. Leave changes in the working tree. |
 | [never-edit-published-sites](never-edit-published-sites.md) | Never edit anything under `sites/`. One carve-out, for security fixes to sample files. |
-| [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the three exceptions. |
+| [never-run-long-commands](never-run-long-commands.md) | The maintainer runs every suite, bench and measure. An agent never does. |
+| [who-references-whom](who-references-whom.md) | The one reference matrix. Every layer, the outward boundary, the four exceptions. |
 | [talking-to-the-maintainer](talking-to-the-maintainer.md) | In chat: plain English, no flattery, say when he is wrong. A question gets an answer, not work. |
+| [only-the-maintainer-decides](only-the-maintainer-decides.md) | A plan holds suggestions. "Decided" needs his words, quoted and dated. |
+| [keep-a-session-small](keep-a-session-small.md) | One session, one step. Warn him to start fresh before the session gets big. |
 
 ## Read when the trigger fires
 
@@ -25,6 +28,8 @@ files hold the carve-outs.
 | write or edit a **code comment** | [comments-are-for-humans](comments-are-for-humans.md) - the not-obvious thing only; the reasoning goes in `design/` |
 | write **text a user will see** - exception, log line, OpenAPI description, UI string | [plain-ascii-for-user-text](plain-ascii-for-user-text.md) |
 | write **any doc, comment or explanation** | [plain-language](plain-language.md) |
+| write a **doc, README or results file** a human reads | [a-doc-is-not-a-report](a-doc-is-not-a-report.md) - state what is true, not what you did to find it |
+| write a **number** into a doc, README, plan, comment or recipe | [numbers-only-where-they-are-the-point](numbers-only-where-they-are-the-point.md) - leave out any count the code already holds |
 | write a **heading in a public markdown file** - README, samples, the Docker Hub page, the docs site | [icon-headings-in-public-docs](icon-headings-in-public-docs.md) |
 | add a **folder**, or write or edit a **`README.md`** outside `.agents/` | [every-folder-has-a-readme](every-folder-has-a-readme.md) |
 | pass **settings to a tool**, or write a table or list inside a script or recipe | [config-goes-in-the-tools-own-file](config-goes-in-the-tools-own-file.md) - use the tool's config file; do not invent one |

@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using Binacle.Net.Kernel.Instance;
+using Binacle.Net.Kernel.Instance.Models;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -9,16 +11,16 @@ namespace Binacle.Net.UIModule.Pages;
 
 internal class InstanceModel : AppletPageModel
 {
-	private readonly IOptions<FeatureOptions> featureOptions;
+	private readonly IOptions<InstanceOptions> instanceOptions;
 
 	public InstanceModel(
 		AppletsService appletsService,
-		IOptions<FeatureOptions> featureOptions,
+		IOptions<InstanceOptions> instanceOptions,
 		IWebHostEnvironment environment
 	)
 		: base(appletsService, "/Instance")
 	{
-		this.featureOptions = featureOptions;
+		this.instanceOptions = instanceOptions;
 		this.Environment = environment.EnvironmentName;
 	}
 
@@ -33,10 +35,17 @@ internal class InstanceModel : AppletPageModel
 	public IReadOnlyList<FeatureSwitch> Switches => FeatureSwitch.All;
 
 	public bool IsOn(FeatureSwitch featureSwitch)
-		=> this.featureOptions.Value.IsFeatureEnabled(featureSwitch.Feature);
+		=> this.instanceOptions.Value.IsFeatureEnabled(featureSwitch.Feature);
 
 	// Whoever switched it on recorded where it answers. The health path is configurable, so this is the only
 	// way to link it correctly.
 	public string? PathFor(FeatureSwitch featureSwitch)
-		=> this.featureOptions.Value.PathFor(featureSwitch.Feature);
+		=> this.instanceOptions.Value.PathFor(featureSwitch.Feature);
+
+	// Sorted here, once, so the view stays a plain loop. This is the same instance the health check and
+	// /_debug read - filled once at startup, so it can go stale against /api/v4/presets. See Program.cs.
+	public IReadOnlyList<InstancePreset> Presets
+		=> this.instanceOptions.Value.Presets.Presets
+			.OrderBy(preset => preset.Name, StringComparer.Ordinal)
+			.ToList();
 }

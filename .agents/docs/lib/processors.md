@@ -1,8 +1,8 @@
 ---
 id: lib/processors
 description: IAlgorithmProcessor, IBinProcessor, and IMultiAlgorithmBinProcessor — their factories and which algorithms each execution path uses
-verified: 2026-08-19
-check: Interface names and full Process() signatures, cancellation token included, match lib/src/Binacle.Lib/Abstractions/; the algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the result-selection table matches which selector methods BinacleService actually calls; a grep for the three Parallel* types shows no factory returning one
+verified: 2026-10-02
+check: Interface names and full Process() signatures, cancellation token included, match lib/src/Binacle.Lib/Abstractions/; the algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the result-selection table matches which selector methods BinacleService actually calls; a grep for the three Parallel* types shows no factory returning one; each takes maxDegreeOfParallelism and no other knob, defaulting to ParallelLimits.Degree
 also_update:
   - api/service
 paths:
@@ -57,9 +57,10 @@ All three `Process` methods take the same trailing optional token, and all three
 **The three `Loop` processors** call `ThrowIfCancellationRequested()` at the top of their loop and nowhere
 else — `LoopAlgorithmProcessor`, `LoopBinProcessor` and `LoopMultiAlgorithmBinProcessor`, which are the only
 ones a factory returns. A cancelled token stops the next algorithm or the next bin; it never interrupts a
-packing run in progress. **The `Parallel` variants do not call it at all** — see *Parallel variants* below;
-nothing the API runs reaches them. That is
-deliberate — one bin's run is tens of milliseconds, and tearing it apart mid-run would cost more than it saves.
+packing run in progress. **The `Parallel` variants do not call it**; they pass the token to `Parallel.For`
+through `ParallelOptions`, which stops starting new units once it is cancelled. Nothing the API runs reaches
+them (see *Parallel variants* below). One bin's run is short - microseconds on the benchmark problems
+(`$lib/findings`) - so stopping it mid-run would save almost nothing.
 
 ## LoopAlgorithmProcessor
 
@@ -107,7 +108,7 @@ below. Pass the real counts anyway; the day a threshold lands, every call site i
 | `AlgorithmProcessorFactory` (single bin, auto) | FFD + WFD + BFD |
 | `BinProcessorFactory.CreateMultiAlgorithm` (multi bin, auto) | FFD + BFD |
 
-WFD is excluded from the multi-bin path. This is intentional.
+WFD is left out of the multi-bin path. Why is in `$lib/decisions#D1`.
 
 ## Diagnostics
 
@@ -138,10 +139,30 @@ See `$lib/result-selection` for scoring rules and how tests verify each strategy
 
 `ParallelAlgorithmProcessor` (`lib/src/Binacle.Lib/AlgorithmProcessing/`) and `ParallelBinProcessor` /
 `ParallelMultiAlgorithmBinProcessor` (`lib/src/Binacle.Lib/BinProcessing/`) exist, and **no factory returns
-one** — so nothing the API runs ever reaches them. The first two are constructed directly by
-`lib/test/Binacle.Lib.Benchmarks`, which measures them against the `Loop` versions, and by one cancellation
-test in `lib/test/Binacle.Lib.UnitTests`.
+one** — so nothing the API runs ever reaches them. `ParallelAlgorithmProcessor` is constructed directly by
+`lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms`, which measures it against the `Loop` version.
+`ParallelBinProcessor` is constructed by one cancellation test in `lib/test/Binacle.Lib.UnitTests`, and both it
+and `ParallelAlgorithmProcessor` by `lib/bench/Binacle.Lib.Benchmarks.ParallelOverhead`.
 
-**`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — checked 2026-09-04, the only file
-that names it is its own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be wired in is an open question with measured
-evidence behind it; do not settle it as a local change.
+**`ParallelMultiAlgorithmBinProcessor` is constructed by nothing at all** — the only file that names it is its
+own. It is unreachable code with a public type, not a measured alternative. Whether any of them should be
+wired in is an open question with measured evidence behind it (`$lib/decisions#O1`); do not settle it as a
+local change.
+
+### The one knob all three take
+
+Each takes an optional `maxDegreeOfParallelism`, and nothing else. It reaches `Parallel.For` and, through
+`ParallelLimits.ConcurrencyLevel`, sizes the result dictionary's lock array.
+
+**Left out, it defaults to `ParallelLimits.Degree` — `min(work items, Environment.ProcessorCount)`, never below
+1.** The algorithm processor resolves that in its constructor, where the algorithms are known; the two bin
+processors resolve it per call, where the bin count is.
+
+The default is a **cap, not a decision**: whether to parallelise at all belongs to the factory, and no
+processor branches to a loop on its own. What the cap prevents is `Parallel.For` handing work to a thread that
+cannot run — one work item, or one CPU — which measures many times dearer than not parallelising. Pass
+`ParallelLimits.NoLimit` (`-1`) to lift it; `ParallelOverhead` does, because an uncapped dispatch is the thing
+it measures.
+
+There is no `concurrencyLevel` argument. There was, it reached only the dictionary, nothing ever passed it, and
+its default restated `ConcurrentDictionary`'s own while also switching off lock-array growth.

@@ -1,7 +1,8 @@
 # Bischoff Suite
 
-Converted **Bischoff & Ratcliff (BR)** container-loading instances, for the **tests kernel** (lib algorithm
-tests). Not used by ViPaq.
+Converted **Bischoff & Ratcliff (BR)** container-loading instances, read through `Binacle.Data` by the lib
+tests, measure and bench projects and the api integration tests, and by the ViPaq packed-data generator, which
+packs them into `vipaq/data/packed/bischoff-suite/`.
 
 - **Source:** [`../or-library/`](../or-library/README.md) raw `thpack1..7.txt`.
 - **Origin:** E.E. Bischoff and M.S.W. Ratcliff, "Issues in the development of Approaches to Container
@@ -11,7 +12,7 @@ tests). Not used by ViPaq.
 
 ## 🧾 Format
 
-One file per `thpack`, a JSON array of scenarios in the tests-kernel compact format:
+One file per `thpack`, a JSON array of scenarios in the compact scenario format:
 
 ```json
 {
@@ -37,12 +38,12 @@ One file per `thpack`, a JSON array of scenarios in the tests-kernel compact for
 
 Both fields need no packer. `Metrics` is pure arithmetic over `Bin` + `Items`. `Result` is a fixed baseline:
 every Bischoff instance fills the container to ~98% but never tessellates perfectly, so the outcome is always
-`PartiallyPacked`. The converter writes that for both operations, under every algorithm. The tests kernel runs
-the real packer against this baseline and asserts they match, so if an instance ever comes out `FullyPacked` or
+`PartiallyPacked`. The converter writes that for both operations, under every algorithm. The lib tests run
+the real packer against this baseline and assert they match, so if an instance ever comes out `FullyPacked` or
 `NotPacked` (packed unusually well, or nothing fit), that test fails. So the converter has no dependency on the
 packing algorithms.
 
-This folder is the single source. The converter writes **here**, and the tests kernel embeds these files directly
-(via `Link`/`LogicalName` in `Binacle.TestsKernel.csproj`) under the manifest name
-`Binacle.TestsKernel.Algorithms.Data.BischoffSuite.<file>`. There is no separate kernel copy. The kernel therefore
-runs on the converter's 2-decimal `Metrics` % normalization for thpack5-7.
+This folder is the single source. The converter writes **here**, and `Binacle.Data` embeds these files directly
+(via `Link`/`LogicalName` in `Binacle.Data.csproj`) under the manifest name
+`Binacle.Data.BischoffSuite.<file>`. There is no separate copy. The tests therefore
+run on the converter's 2-decimal `Metrics` % normalization for thpack5-7.

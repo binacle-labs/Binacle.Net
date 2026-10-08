@@ -13,10 +13,12 @@ paths:
 thing. An issue ignore says "run this rule here, then hide what it finds". A scope exclusion says
 "this is not our code, or not this metric's business".
 
-- `sonar.exclusions` drops vendored `assets/lib/**` and the `shared/data/**` fixture corpus. Nobody reviews or
-  fixes either, so measuring them only moved the totals.
-- `sonar.cpd.exclusions` covers `lib/src/Binacle.Lib/Algorithms/**`, where the v1/v2 variants are parallel
-  implementations by design. **Every rule still runs on those files** — only duplication detection stops.
+- `sonar.exclusions` drops build output, vendored code such as `assets/lib/**`, and the fixture sets under
+  `shared/data/` and the other data folders - the sets only, since the C# project beside each set is analysed.
+  Nobody reviews or fixes these, so measuring them only moved the totals.
+- `sonar.cpd.exclusions` covers `lib/src/Binacle.Lib/Algorithms/**`, where the algorithm versions are parallel
+  implementations by design, and the frozen `api/src/Binacle.Net/v3/**`. **Every rule still runs on those
+  files** — only duplication detection stops.
 - Support projects are handled in `Directory.Build.props`, not here, via `SonarQubeTestProject` (`$build-topology`).
   That reclassifies them as test code rather than hiding anything.
 

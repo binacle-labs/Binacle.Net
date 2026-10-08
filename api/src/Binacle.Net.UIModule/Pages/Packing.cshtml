@@ -184,7 +184,9 @@
     </div>
   </div>
 
-  <div class="grid">
+  @* `request_panel` is registered in _js/packing_demo.js and nests under the demo's scope, so it reads
+     `lastRequest`. The dialog is fixed, so it can sit inside the results card. *@
+  <div class="grid" x-data="request_panel">
     <div class="s12">
       <article class="surface-variant">
         <fieldset>
@@ -194,7 +196,7 @@
           </template>
           <template x-for="(result, index) in results" :key="index">
             <a href="#"
-               class="row wave padding"
+               class="row wave padding max"
                :class="isSelected(result) ? 'surface-container border' : ''"
                :aria-current="isSelected(result) ? 'true' : null"
                x-on:click.prevent.stop="selectResult(result)">
@@ -215,15 +217,67 @@
 
                 <div class="s4" x-text="resultStatusText(result)">
                 </div>
+                <template x-if="showsAlgorithmUsed()">
+                  <div class="s4" x-text="resultAlgorithmText(result)">
+                  </div>
+                </template>
                 <template x-if="!resultIsFullyPacked(result)">
-                  <div class="s8 right-align" x-text="resultItemPercentageText(result)">
+                  <div :class="showsAlgorithmUsed() ? 's4 right-align' : 's8 right-align'"
+                       x-text="resultItemPercentageText(result)">
                   </div>
                 </template>
               </div>
+              @* beercss's own tooltip, so it positions itself against the trigger. The 2026-08-27 attempt
+                 listed the items inline and grew the row, which is why this floats instead. The wrapper is
+                 what beercss hovers - `.tooltip` has to be a direct child of it - and z-index over the row
+                 is the same trick the ViPaq delete button uses.
+                 `position:relative` is not optional: `.tooltip` is absolute, so without it the panel
+                 anchors to some ancestor up the page instead of to this button. *@
+              <template x-if="hasUnpackedItems(result)">
+                <div style="position:relative;z-index:10">
+                  @* Focusing on click is what opens it on a tap - Safari does not focus a clicked button.
+                     `.prevent.stop` keeps the click off the row; Alpine needs a non-empty expression. *@
+                  <button type="button"
+                          class="transparent circle"
+                          :aria-label="unpackedItemsTitle(result)"
+                          x-on:click.prevent.stop="$el.focus()">
+                    <i>info</i>
+                  </button>
+                  <div class="tooltip max large-space">
+                    <p x-text="unpackedItemsTitle(result)"></p>
+                    <template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
+                      <p x-text="unpackedItemText(unpackedItem)"></p>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </a>
           </template>
         </fieldset>
+        <nav class="right-align no-space" x-show="lastRequest">
+          <button class="border surface-container" type="button" x-on:click.prevent.stop="show()">
+            <i>code</i>
+            <span>Request</span>
+          </button>
+        </nav>
       </article>
+
+      @* The call that was just made, for the reader to paste. Same overlay-and-dialog shape as _ErrorsDialog. *@
+      <div class="overlay" :class="open ? 'active' : ''" x-on:click.prevent.stop="hide()"></div>
+      <dialog class="right medium" :class="open ? 'active' : ''">
+        <h5>Request</h5>
+        <p>The call this page just made, against the instance serving it.</p>
+        <pre style="white-space:pre-wrap" x-text="curl(lastRequest)"></pre>
+        <nav class="right-align">
+          <button class="border surface-container" type="button" x-show="canCopy()" x-on:click.prevent.stop="copy(lastRequest)">
+            <i>content_copy</i>
+            <span>Copy</span>
+          </button>
+          <button class="border surface-container" type="button" x-on:click.prevent.stop="hide()">
+            <span>Close</span>
+          </button>
+        </nav>
+      </dialog>
     </div>
   </div>
 

@@ -5,7 +5,7 @@ waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike 
 horizon: future
 paths:
   - "shared/data/**"
-  - "shared/test/Binacle.TestsKernel/**"
+  - "shared/data/Binacle.Data/**"
 ---
 
 # Fixtures record status, not how full the bin got
@@ -25,6 +25,6 @@ points on both and every test stays green.
 
 ### Date not recorded - what argues against it
 
-`results/lib/efficiency/` already measures bin fill over 700+ scenarios, which is far more coverage than a
+`lib/results/measurements/packing-efficiency.md` already measures bin fill over 700 scenarios, which is far more coverage than a
 fixture pin. The counter is that they catch different things: the ledger says what the numbers are, a pin says
 when one moved without anyone meaning it to.

@@ -1,7 +1,7 @@
 ---
 id: lib/models
 description: Lib model types and IWith* interfaces — Bin, Item, packed/unpacked results, and the constraints used in generic type parameters
-verified: 2026-09-04
+verified: 2026-09-28
 check: Type and interface names match shared/src/Binacle.Packing/ and lib/src/Binacle.Lib/Abstractions/; generic geometry interfaces match shared/src/Binacle.Geometry/; every file path in the tables resolves
 also_update:
   - api/v4/contracts
@@ -42,7 +42,7 @@ original input object; it is a snapshot with its own copy of the data.
 
 | Type | File | What it holds |
 |---|---|---|
-| `ResultItem` (abstract) | `Binacle.Packing/Models/ResultItem.cs` | `ID`, `Dimensions` (copied value), `Volume` (computed) |
+| `ResultItem` (abstract) | `Binacle.Packing/Models/ResultItem.cs` | `ID`, `Length`/`Width`/`Height` (read from a copied `Dimensions`), `Volume` (computed) |
 | `PackedItem` | `Binacle.Packing/Models/PackedItem.cs` | Extends `ResultItem`; adds `Coordinates` (x/y/z position in bin) |
 | `UnpackedItem` | `Binacle.Packing/Models/UnpackedItem.cs` | Extends `ResultItem`; adds `Quantity` (count of items that didn't fit, grouped by ID) |
 | `PackedBin` | `Binacle.Packing/Models/PackedBin.cs` | Extends `ResultItem`; carries the bin's ID, dimensions, and volume for the result output |
@@ -92,7 +92,7 @@ identity and the identifiable markers below are Packing's.
 ### Identity and volume
 
 `IWithID` is identity, not geometry, so it sits in `shared/src/Binacle.Packing/Abstractions/` rather than in
-`Binacle.Geometry`. The volume interfaces stayed in `Binacle.Geometry`, still generic over
+`Binacle.Geometry`. The volume interfaces are in `Binacle.Geometry`, generic over
 `System.Numerics.IBinaryInteger<T>` — so this table spans both projects, and the file column says which.
 
 | Interface | File | What it requires |

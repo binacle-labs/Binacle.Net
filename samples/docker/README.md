@@ -1,7 +1,7 @@
 # Docker Compose Samples
 
-Five configurations, from nothing switched on to everything. Pick the one that matches what you are doing, copy
-the folder, and change `Presets.json` to your own bin set.
+One configuration per shape, from nothing switched on to everything. Pick the one that matches what you are
+doing, copy the folder, and change `Presets.json` to your own bin set.
 
 | Sample | Use it when | Modules on |
 |---|---|---|

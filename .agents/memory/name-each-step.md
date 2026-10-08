@@ -36,7 +36,7 @@ var expected = new BinContents<int>(bin, items);
 `new Foo(new Bar())` as an argument is the same problem — hoist the inner `new` to its own local.
 
 An expression body is still fine when it is one call and nothing is nested inside it
-(`public Scenario GetScenarioByName(string name) => AllScenariosProvider.GetScenarioByName(name);`).
+(`public Scenario GetScenarioByName(string name) => All.GetScenarioByName(name);`).
 Object initialisers in a builder are not affected.
 
 **Why:** each step gets a name, so the code reads top to bottom instead of being unwrapped inside-out. It is

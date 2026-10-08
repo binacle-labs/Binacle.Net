@@ -1,5 +1,5 @@
 using System.Net;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 // Microsoft.AspNetCore.Builder ships its own ForwardedHeadersExtensions; the alias keeps this file on ours.
 using ForwardedHeadersExtensions = Binacle.Net.ExtensionMethods.ForwardedHeadersExtensions;
 using Microsoft.AspNetCore.Builder;

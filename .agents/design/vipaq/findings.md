@@ -1,8 +1,8 @@
 ---
 id: vipaq/findings
 description: ViPaq findings — the measured evidence (base64 size, encode/decode time) behind the decisions.
-verified: 2026-08-27
-check: Numbers match the latest results/vipaq/compression/ size reports and results/vipaq/benchmarks/ output; every benchmark and provider class named here still exists under vipaq/test/Binacle.ViPaq.Benchmarks/ and .TestsKernel/Providers/; the dataset note below still matches the entry count in vipaq/data/packed/**/*.json
+verified: 2026-10-04
+check: The numbers under "Size today" match the files under vipaq/results/measurements/encoded-size/ - the per-format table, the share figures, the codec counts and the raw-wins packs were all recomputed from those files on 2026-10-04; the dated sections keep the numbers of their own run and are not renumbered; every benchmark and provider class named in the present tense still exists under vipaq/bench/Binacle.ViPaq.Benchmarks/ (Smoke_Encode, Sample_Encode, Smoke_Decode, Sample_Decode, Sample_CompressionCost_Encode, Sample_CompressionCost_Decode), vipaq/test/Binacle.ViPaq.Testing/ or vipaq/data/Binacle.ViPaq.Data/Packed/; the pack count still matches the entry count in vipaq/data/packed/**/*.json
 also_update:
   - vipaq/decisions
 paths:
@@ -11,16 +11,17 @@ paths:
 
 # ViPaq — findings (the measured evidence)
 
-The current measured truth, on real data from the permanent harness. Every session links here; **no session file
-keeps its own numbers.** Ranges show the effect, not a guarantee. The earlier throwaway-prototype numbers
-(2026-07-05) that informed the locked decisions are superseded and live in `$vipaq/history`.
+The measured evidence behind the decisions, on real data from the permanent harness. Every session links here;
+**no session file keeps its own numbers.** Ranges show the effect, not a guarantee. "Size today" is the current
+run; the dated sections after it are the earlier harness runs the decisions were made on, kept with their own
+numbers. The throwaway-prototype numbers (2026-07-05) are superseded and live in `$vipaq/history`.
 
-## Context (confirmed)
+## Context (2026-07, before v2)
 - ViPaq = **storage-first** base64 text token for a packing result (bin dims + per-item dims + coords + count).
 - Unit **mm** at finest, **cm** typical; **no fractions** (unsigned integers); values **≤ ~16M** ("millions"),
-  billions never. **Coordinates ≤ the bin** (a position inside it). Base64 is the *stored* form (applied today
-  outside the spec).
-- v1 today: fixed ladder **8/16/32/64** (1/2/4/8 bytes), row layout, gzip-Optimal when body > 255 B, base64 wrap.
+  billions never. **Coordinates ≤ the bin** (a position inside it). Base64 is the *stored* form (then outside
+  the spec; `vipaq/PROTOCOL.md` §9 now covers it).
+- v1, the old format: fixed ladder **8/16/32/64** (1/2/4/8 bytes), row layout, gzip-Optimal when body > 255 B, base64 wrap.
 - Fit AND pack results **both carry coordinates** — there is no "drop coordinates" shortcut.
 
 ## The base64-quantization rule (drove most decisions)
@@ -34,22 +35,60 @@ is noise. Measure everything in **base64 chars**.
   A throwaway `V2Encoder` implemented this and was **never round-trip-verified** — dead; don't rebuild it.
 - **Brotli q11 as default:** 98 ms encode. Archival opt-in only.
 - **Byte-plane / transpose layout:** identical to plain columnar (Brotli already exploits it).
-- **Raw Deflate:** ~24 B better than gzip framing, but Brotli beats it — not worth a third codec.
+- **Raw Deflate as a third codec:** ~24 B better than gzip framing, but Brotli beat it. Superseded: raw DEFLATE
+  is now the only codec (`$vipaq/decisions#D16`).
 - **Selling "20% smaller":** it was a q11 artifact.
 
-## The harness — real data, shipped v1 library
+## Size today (2026-09-22)
 
-Source: `Binacle.ViPaq.PerformanceTests` (size + crossover) and
+`Binacle.ViPaq.EncodedSize` over **2,322 packs** - every problem in the Bischoff suite, custom-problems and
+demo-samples, packed by FFD, BFD and WFD. The raw numbers are in `vipaq/results/measurements/encoded-size/`; what the
+decisions lean on:
+
+- **ViPaq is never larger than protobuf under the same codec.** Raw, they are equal only on the nine empty packs;
+  under deflate and gzip ViPaq is smaller on every pack.
+- **Deflate, columnar is the smallest mode**: 58% of protobuf deflate on average (13% to 78%). Row-major under
+  deflate is 68% (57% to 88%). Raw is the same length in both layouts.
+- **Deflate beats raw on every Bischoff pack.** The smallest has 39 items, so the Bischoff crossover sits below
+  anything the suite holds.
+
+**What each format costs, in stored characters.** Mean and max over the 2,322 packs. ViPaq and protobuf are
+base64 lengths; JSON and compact notation are text lengths, because text is its own stored form.
+
+| Format | Mean | Max |
+|---|--:|--:|
+| JSON | 4,702 | 22,048 |
+| Compact notation | 1,669 | 7,904 |
+| Protobuf raw | 1,472 | 7,168 |
+| ViPaq raw (either layout) | 954 | 4,468 |
+| Protobuf deflate | 529 | 1,656 |
+| ViPaq deflate, row | 362 | 1,248 |
+| ViPaq deflate, columnar | 304 | 704 |
+
+- **ViPaq deflate columnar as a share of the others**, per pack then averaged: JSON **7%** (1% to 22%), compact
+  notation **21%**, protobuf raw **24%**, protobuf deflate **58%**.
+- **ViPaq over protobuf under the same codec**: raw **0.65**, deflate row **0.68**, deflate columnar **0.58**,
+  gzip **0.60** columnar to **0.70** row.
+- **Deflate is the smallest of the three codecs on 2,265 packs in row and 2,275 in columnar. Gzip is never the
+  smallest** — it is deflate plus framing, so it loses on size as well as on time.
+- **Every real pack deflates to at most 1,248 base64 characters in row, 704 in columnar.** That is the ceiling a
+  caller has to budget for.
+- **Compression pays from very small packs, but not always.** Raw still wins on 57 packs in row and 47 in
+  columnar, and the largest of those is 6 items in row and 2 in columnar.
+
+## The first harness runs (2026-07) - real data, shipped v1 library
+
+Source: `Binacle.ViPaq.EncodedSize` (size + crossover) and
 `Binacle.ViPaq.Benchmarks` (BDN). Data: 716 placed scenarios, 58,834 items, FFD-packed offline by
-`Binacle.ViPaq.PackedDataGenerator` from the Bischoff suite (thpack1–7) + custom problems. Round-trip green on
-every scenario, both in the generator and the harness.
+`Binacle.ViPaq.PackedDataGenerator` from the Bischoff suite (thpack1–7) + custom problems. Round-trip was green on
+every scenario, both in the generator and the harness, at the time; today neither round-trips, and the unit
+suite round-trips every pack (`$vipaq/dependencies`).
 
-**The dataset has grown twice since these runs, and the counts below are not renumbered.**
+**The dataset has grown since these runs, and the counts in the dated sections are not renumbered.**
 `vipaq/data/packed/` carried 716 scenarios when this was measured; on 2026-07-16 it went to 721 — five small
-custom scenarios and 272 items. It then went to **2,316** when every problem started being packed under all
-three algorithms and the demo-samples family was added. So every "of 716" split here describes the first set.
-Nothing suggests the *shape* moved, but the exact splits would have to be re-run to be restated. The live
-count is in `$vipaq/dependencies`.
+custom scenarios and 272 items. It is now 2,322: every problem packed under all three algorithms, and the
+demo-samples family added. So every "of 716" split here describes the first set; the current run is
+"Size today" above.
 
 ## The headline: random data lies about compression
 
@@ -61,10 +100,12 @@ This is the single most important thing the real-data harness established, and i
 | Real **packed** results | Saves **45–68%** (Bischoff); **64%** on a 100-item custom pack |
 
 Real packing results have structure — repeated item sizes, items on a coordinate grid. Random data gives gzip
-nothing to grip. So the shipped fixed **255-byte threshold is wrong in both directions**: it inflates random data
+nothing to grip. So v1's fixed **255-byte threshold is wrong in both directions**: it inflates random data
 and would miss small compressible data. This drives `$vipaq/decisions#D7`.
 
-## Size vs protobuf (like-for-like: protobuf compressed only when ViPaq compressed)
+## Size vs protobuf, first run (2026-07; like-for-like: protobuf compressed only when ViPaq compressed)
+
+Measured on the 716-pack set under v1's automatic gzip; "Size today" above replaces it.
 
 - ViPaq is **smaller than protobuf on every single row**.
 - **Real data: ViPaq/protobuf ≈ 67–76%.** The gap narrows because real protobuf also gains — it omits zero
@@ -83,10 +124,12 @@ and would miss small compressible data. This drives `$vipaq/decisions#D7`.
 ## Compression crossover
 
 A controlled count ladder pins it: `Simple_5x5x5-N` (N = 5/13/50/200) in a fixed 50³ bin, only the count changing
-(`results/vipaq/compression/CodecCompressionCrossover.*`). For this uniform, maximally-repetitive family deflate
+(measured 2026-07 by the codec crossover report, since replaced by the files under `vipaq/results/measurements/encoded-size/`, which
+covers real packs only). For this uniform, maximally-repetitive family deflate
 already wins at the smallest rung — 5 items: raw 52 → deflate 36 b64 (31% saved) — and the saving climbs with count
 (45% / 64% / 66% at 13 / 50 / 200). Uniform data is gzip's best case; mixed real packs (Bischoff) are less
-repetitive and cross later, in the tens of items. **So the crossover tracks how repetitive the data is, not the
+repetitive. On the 2026-09-22 run deflate still beats raw on every Bischoff pack, down to the smallest at 39
+items (see "Size today"). **So the crossover tracks how repetitive the data is, not the
 item count alone.**
 
 ## Speed and memory (first BDN pass, Short job, one machine)
@@ -126,11 +169,15 @@ justify it (`$vipaq/decisions#D8`). No wire change.
 once the body passed ~255 bytes, so scenarios fell into two regimes. Today compression is a caller flag
 defaulting off (`$vipaq/decisions#D16`) and the harness forces it, so "which regime a scenario lands in" is now
 the caller's call rather than the library's. The two regimes still describe what the *data* does under
-compression, which is what makes the numbers worth keeping. The benchmarks fan out over a curated set (`CuratedScenarioProvider`, which merges
-`BischoffCuratedProvider` and `CustomProblemsCuratedProvider`) that includes an uncompressed ladder
-(`CustomProblemsCuratedProvider.UncompressedNames`: 1 / 8 / 16-item 8-bit packs) so the raw path is measured too —
-before this, all curated benchmarks compressed and the raw path had **no** performance number. The size report now
-shows two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto).
+compression, which is what makes the numbers worth keeping. The benchmarks then fanned out over a curated set (the class now called
+`TimingSet`, which merges what are now `BischoffTimingSet` and `CustomProblemsTimingSet`) that included an
+uncompressed ladder (an `UncompressedNames` member that no longer exists: 1 / 8 / 16-item 8-bit packs) so the raw path was measured too —
+before this, all curated benchmarks compressed and the raw path had **no** performance number. The size report then
+showed two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto). Since 2026-09-22 the timing classes are `Encode`
+and `Decode`, which run every curated pick on the raw path, and `CompressionCost`, which prices the codec. Since
+2026-09-23 that is two classes, `Sample_CompressionCost_Encode` and `_Decode`, each against its own NoOp, and
+the timing classes are split by tier: `Smoke_Encode` and `Smoke_Decode` run three picks, `Sample_Encode` and
+`Sample_Decode` every pick.
 
 **Size (base64 chars).** 15 of 716 scenarios stay uncompressed (all tiny 8-bit customs); 701 compress (nearly all
 16-bit Bischoff).
@@ -140,7 +187,7 @@ shows two ratio columns (ViPaq vs raw proto, ViPaq vs gz proto).
 | Uncompressed (n=15, 8-bit) | 52–67% (median 60%) | — (neither side compresses) |
 | Compressed (n=701) | 17–39% (median 29%) | 64–71–76% (min–median–max) |
 
-**Speed (BDN full run via `CuratedEncodeBenchmarks` / `CuratedDecodeBenchmarks`, ratio = ViPaq / protobuf, post
+**Speed (BDN full run via the then-named `CuratedEncodeBenchmarks` / `CuratedDecodeBenchmarks`, ratio = ViPaq / protobuf, post
 decode span fix):**
 
 | Scenario | Items | Regime | Encode | Decode |
@@ -158,15 +205,14 @@ parity, decode faster. On the **compressed path** it trades encode CPU (the gzip
 and only while ViPaq is paying for compression — exactly the `$vipaq/decisions#D8` priority. Allocations: ViPaq ≤ protobuf everywhere
 except the 1-item token (520 B vs 368 B — noise at that size).
 
-**Coverage:** the uncompressed 16-bit path is now measured by `Simple_16bit-4_FitIn_600x400x300` — 4 items whose
+**Coverage:** the uncompressed 16-bit path was measured by `Simple_16bit-4_FitIn_600x400x300` — 4 items whose
 bin and item dimensions force 16/16/16 widths, small enough to skip compression (raw b64 80, ~0.95× protobuf). It
-sits in the curated uncompressed set so the encode/decode benchmarks cover it; the other uncompressed picks stay
-8-bit.
+is still a timing column today (`CustomProblemsTimingSet`).
 
 ### Compression cost, isolated (2026-07-14)
 
-The encode/decode gaps above fold the compression in with the format. `CompressionCostBenchmarks` prices the
-squeezing on its own: NoOp (body passed straight through) against Deflate and Gzip, row-major, over the two curated
+The encode/decode gaps above fold the compression in with the format. `CompressionCostBenchmarks` (now
+`CompressionCost`) priced the squeezing on its own: NoOp (body passed straight through) against Deflate and Gzip, row-major, over the two curated
 Bischoff packs. BDN Short job. `Deflate − NoOp` is what compression actually costs; `Gzip − Deflate` is the extra
 framing.
 
@@ -185,6 +231,6 @@ framing.
 
 ## What the harness did *not* answer
 
-- **`$vipaq/decisions#O2` (codec + level)** — **resolved (`$vipaq/decisions#D16`):** one codec, raw DEFLATE. The compression cost is measured just above.
+- **O2 (codec + level)** — answered by `$vipaq/decisions#D16`, still pending: one codec, raw DEFLATE. The compression cost is measured just above.
 - Absolute allocation on synthetic data runs a little high (compression can't shrink a random buffer), but ViPaq
   and protobuf see the same sample, so the *ratio* stays valid.

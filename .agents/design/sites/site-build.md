@@ -1,8 +1,8 @@
 ---
 id: sites/site-build
 description: The webpack and sass machinery behind the three sites - the clean rule that keeps a watch alive, the chunk split and the asset budget, and the cache that lies about a clean build.
-verified: 2026-09-04
-check: B1 against the clean option in the main config of all three webpack.config.js files, which must be a keep regex in production and false otherwise; B2 against the cacheGroups and performance blocks in sites/demo/webpack.config.js; B3 against sites/www/webpack.config.js, which must declare no splitChunks on its main config, and against the empty dependencies in sites/www/package.json; B4 against cache.type filesystem in sites/demo/webpack.config.js
+verified: 2026-09-29
+check: B1 against the clean option in the main config of all three webpack.config.js files, which must be a keep regex in production and false otherwise; B2 against the cacheGroups and performance blocks in sites/demo/webpack.config.js; B3 against sites/www/webpack.config.js, which must declare no splitChunks on its main config, and against sites/www/package.json, whose one dependency is theme-switcher; B4 against cache.type filesystem in sites/demo/webpack.config.js
 paths:
   - "sites/www/webpack.config.js"
   - "sites/docs/webpack.config.js"
@@ -37,7 +37,8 @@ else, rather than being permanently over and permanently ignored.
 
 ## B3 - www has one config with no split at all
 
-**This site has no npm dependencies**, so there is nothing to split out. No `splitChunks`, no vendors group.
+**This site has one npm dependency, the workspace package `theme-switcher`**, which is not worth a vendors
+chunk. No `splitChunks`, no vendors group.
 The whole main bundle is the copy button and the switcher registration in `_js/main.ts`.
 
 ## B4 - the filesystem cache reports success on source that fails a cold build

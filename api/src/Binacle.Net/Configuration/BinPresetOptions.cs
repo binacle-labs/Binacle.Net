@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Binacle.Net.Kernel.Configuration.Models;
 using FluentValidation;
 
-namespace Binacle.Net.Configuration;
+namespace Binacle.Net;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 

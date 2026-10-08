@@ -4,6 +4,7 @@
 #   just serve docs              the documentation site
 #   just serve demo              the demo site
 #   just serve www               the marketing site
+#   just serve admin             the admin site - experimental, local only
 #   just serve services-up [-d]  what the API talks to: aspire dashboard, azurite, postgres
 #   just serve services-down     stop them, only needed after -d
 #
@@ -105,6 +106,9 @@ demo: (_serve-n-watch 'sites/demo')
 
 # Marketing site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
 www: (_serve-n-watch 'sites/www')
+
+# Admin site, experimental and local only: jekyll serve + webpack watch, one terminal
+admin: (_serve-n-watch 'sites/admin')
 
 # Serve and watch together, each line prefixed with its source. --kill-others makes one Ctrl-C stop both.
 [private]

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{ page.hreflang }}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% page_meta %}
+    {% link_tags site.data.includes.links %}
+</head>
+<body>
+    {{ content }}
+
+    {% script_tags site.data.includes.scripts_body_end %}
+</body>
+</html>

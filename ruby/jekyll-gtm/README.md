@@ -45,7 +45,7 @@ id itself, but only when it has the shape of one - `GTM-` and then letters and d
 To turn tracking off, set the id to an empty string. The tags then write nothing at all - no comment, no
 script, no iframe.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - Misspell the variable and you get an empty page section, with no warning. `{% gtm_head site.gtn %}` finds
   nothing, does not have the shape of an id, and renders nothing. Check the built page for the snippet

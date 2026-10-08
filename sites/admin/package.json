@@ -1,0 +1,22 @@
+{
+  "name": "binacle-net-admin",
+  "version": "0.1.0",
+  "description": "Experimental, local only. An admin page for the Binacle.Net service API",
+  "private": true,
+  "scripts": {
+    "build": "webpack --env build=dist",
+    "serve": "bundle exec jekyll serve",
+    "watch": "webpack --watch --env build=watch"
+  },
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "alpinejs": "^3.15.2",
+    "binacle-net-service-client": "*"
+  }
+}

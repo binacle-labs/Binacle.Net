@@ -82,7 +82,7 @@ only keys the gem knows by name are the path keys and the three below that `pref
   Everything else on the item carries through - `crossorigin` in particular, without which a cross-origin
   script gets fetched twice.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - Key order is load-bearing. It is what lets you move an existing site onto these tags with no change to its
   built pages: write the data keys in the order the old template emitted them. Ruby and the YAML parser both

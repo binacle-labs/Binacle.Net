@@ -1,8 +1,8 @@
 ---
 id: decisions
-description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model.
-verified: 2026-09-02
-check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and the two gemspecs, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.0.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types
+description: General decisions ledger — why the repository moved to the binacle-labs organization, what moved with it and what deliberately did not, the three signing identity bands, the rule that a version is named only where the version is the fact and that no docs page quotes a figure that expires, why the licence file keeps its name and why the root holds only one of them, why only the current docs version is indexable and old ones are bug-fix only, how the agent reference layer is kept honest against the code, and what was deliberately not reduced to a shared model, and the four project folders and what each may reference, and why measured numbers live in the slice - deterministic ones tracked and diffed, timing ones kept by hand.
+verified: 2026-09-29
+check: D6 by running `licensee detect .` at the repo root, which must report AGPL-3.0 with LICENSE.AGPL-3.0 as the only matched file, and by confirming the root holds exactly one file whose name contains LICENSE, LICENCE, COPYING or COPYRIGHT and that no LICENSES/ folder exists - LICENSE.GPL-3.0 is a directory and does not count; D1 against the copyright lines in NOTICE, README.md, CONTENT-TERMS.md, the root package.json author, the UI module's Pages/Shared/_Footer.cshtml and every gemspec under ruby/, and against org.opencontainers.image.vendor in Dockerfile; every repository.url stays on binacle-labs; D3 against the certificate-identity-regexp, which must name binacle-labs everywhere and must be anchored everywhere - an unanchored copy accepts a signature made from any ref in the repository; the three published copies in SECURITY.md, CHANGELOG.md and .github/dockerhub-overview.md must each end yml@refs/heads/main$ literally, and tooling/image.just must default signed_from to refs/heads/main and tooling/image/verify-signature.sh must close the regexp with $ because it builds the string to keep the old betas checkable; the two docs-site copies, in sites/docs/collections/_versions/v3.x/release-notes.md and verifying-a-release.md, must end the same way and are a docs session's to change, not a coding session's; D7 by building sites/docs and confirming every non-current version page carries `noindex, follow` and no sitemap lists a `noindex` URL; D8 against `shared/src/Binacle.Packing/Abstractions/`, which must hold `IWithID.cs`, `IWithReadOnlyID.cs`, `IIdentifiableBin.cs` and `IIdentifiableItem.cs`, and against `shared/src/Binacle.Packing/Models/` for the two `internal readonly struct` types; D9 by the three greps it lists, each of which must return nothing, run over every csproj outside obj/; D10 by `tooling/measure.just`, which has no recipe that fails on a changed result, by no workflow under .github/workflows calling it, by the header sentence on every file under lib/results/measurements and vipaq/results/measurements, and by neither measure project registering a README reporter
 paths:
   - "NOTICE"
   - "README.md"
@@ -19,20 +19,169 @@ paths:
 Decisions that belong to no single slice. What each area *is* lives in its own doc; this file is the reasoning,
 so a later session does not undo a deliberate choice.
 
-## Locked
+## Decided
+
+### D9 — four folders, and what each may reference (2026-09-20)
+
+**Decided (the maintainer, 2026-09-19):** "yes go with option 2 and write it in ... measure /. bench / tools are tools/executables that produce something auxl;iary./// nothing should referenc them.. .they  can reference src, shared tests, data"
+
+Every C# project sits in one of four kinds of folder, and the folder says what it may reference. Stated by the
+maintainer 2026-09-19; the tree matched it on 2026-09-20.
+
+| Folder | Holds | May reference |
+|---|---|---|
+| `src/` | the product, or support libraries about the product | `src` |
+| `data/` | test data and the code that reads it into models | shared `src`, `data` |
+| `test/` | tests of the product, or support libraries about tests | `src`, `data`, `test` support libraries |
+| `measure/`, `bench/`, `tools/` | executables that produce something auxiliary - a report, a keeper, a data file | `src`, `data`, `test` support libraries |
+
+Three sentences finish it:
+
+1. **Nothing references a test project or an executable.** A project named `*.UnitTests` or
+   `*.IntegrationTests` is a test project: it has the test SDK, `just test` runs it, and no `ProjectReference`
+   points at it. Nothing under `measure/`, `bench/` or `tools/` is referenced either. Everything else under
+   `test/` is a support library, named for what it holds - `Data`, `Testing`, `Reporting`, `Benchmarking` - never for a test.
+2. **A slice references itself and shared, never another slice.** `Binacle.ViPaq.UnitTests` may reference
+   `Binacle.ViPaq.Data` and anything under `shared/`; never `lib/data` or lib's `Testing`. The one accepted
+   exception is `Binacle.ViPaq.PackedDataGenerator`, which packs with `Binacle.Lib` to make vipaq's data; a
+   lib tool writing into vipaq would be worse.
+3. **Nothing in `data/` references a slice's algorithms, a benchmark pick or a generator.** A data project may
+   name an algorithm in `Binacle.Packing`'s words - `Binacle.Lib.Data` parses `Algorithm` and `AlgorithmInfo`
+   out of its fixtures - but never references `Binacle.Lib`. `Binacle.Data` takes interfaces, enums and one
+   parser from shared `src` and nothing else; a `Testing` project is the only support library that references
+   its slice's `src`.
+
+Sonar draws the same line by path: `/data/`, `/test/`, `/measure/`, `/bench/` and `/tools/` are support code
+(`$build-topology#sonar-test-projects`).
+
+**Why.** Until 2026-09-19 three projects were each called a tests kernel, and each mixed the JSON on disk and
+its reader, the scenario models, and harness code - assertion helpers, algorithm factories, the encoders a
+benchmark drives. The name told nobody which of the three was inside. The mix cost real copies: the
+embedded-resource reader existed three times, `AlgorithmFactories.cs` three times byte for byte, and the
+benchmark split planned next would have made that five. Two projects were named for tests and were not:
+`TestsKernel` and `TestReporting`. The kernels became `Binacle.Data`, `Binacle.Lib.Data`, `Binacle.ViPaq.Data`
+and `Binacle.ViPaq.Testing`; `Binacle.Lib.Testing` took the factories and checks; `Binacle.TestReporting`
+became `Binacle.Reporting`. The reader lives once, in `Binacle.Data`, and the caller names the assembly.
+
+**The names.** `Data` is the folder the project sits in. `.Testing` is the .NET convention for "helpers for
+testing X" (`Mvc.Testing`, `TimeProvider.Testing`); `Fixtures` collides with xunit, `Harness` is what the
+measure projects are called. Not a project per set: every consumer of the shared sets reads them together, so
+two projects would be two builds nothing references apart.
+
+**Three kinds of class, three endings** (2026-09-24). The ending says what a class does, so a call site does
+not have to be read twice:
+
+| Ending | What it holds | Shape |
+|---|---|---|
+| `DataProvider` | a whole committed set, read once and handed out by name. Picks nothing, builds nothing | folder and namespace name the set, the class is `DataProvider`: `Binacle.Data.BischoffSuite.DataProvider`, aliased at the top of each caller |
+| `Set` | a handful of ids named out of a holder, each carrying the column name a report prints | one class in a `Testing` project: `SmokeSet`, `TimingSet` |
+| `Generator` | scenarios built from a number - nothing exists until it is asked for | one class in a `Testing` project: `LadderGenerator`, `SyntheticGenerator` |
+
+A `Set` and a `Generator` answer a benchmark the same two questions, so both expose `Names` (the columns) and
+`GetByName(column)`; a set also exposes `PackNames`, the picks behind its columns, for the gate that checks
+they still exist. A holder exposes `Names`, `All`, `GetByName(name)` and `TheoryNames`, the `object[]` wrapper
+xUnit's `MemberData` needs. `Binacle.Data.All`, the every-set aggregate, is the one exception: its values are
+`All.Scenarios`, because the class is already called `All`.
+
+**Why the holder's name is not the set's name.** Before this, every set class was called `Scenarios` and the
+set lived only in a `using`, so a line reading `Scenarios.GetScenarioByName(...)` did not say which of nine
+sets it read, and two files away the same word meant a different set. Now the caller writes
+`using BischoffSuite = Binacle.Data.BischoffSuite.DataProvider;` and every line says the set:
+`BischoffSuite.GetByName(...)`. The alias is required, not a style choice - a using directive imports a
+namespace's types, not its nested namespaces, so `using Binacle.Data;` alone does not reach `BischoffSuite`.
+Inside `Binacle.Data` itself no alias is needed, which is why the data projects compiled while every consumer
+did not. The two ViPaq
+"Bischoff" classes are still told apart by where they sit - `ViPaq.Data.Packed.BischoffSuite` is every pack,
+the picks out of it are `BischoffTimingSet` in `ViPaq.Testing`.
+
+The embedded-resource readers under the holders end in `Reader`, matching `ScenarioReader` and
+`PackedDataReader`, and are `internal`: a caller that needs one collection at a time asks the holder
+(`BischoffSuite.DataProvider.ByCollection`) rather than reaching past it.
+
+**The check, three greps.** If a dependency lint ever exists, these are its first ruleset:
+
+- no `ProjectReference` under `src/` or `data/` points into `test/`, `measure/`, `bench/` or `tools/`;
+- no `ProjectReference` anywhere ends in `Tests.csproj`;
+- no `data/` project points outside shared `src` and `data/`.
+
+Where each slice's projects sit on this rule is drawn in `$shared/dependencies`, `$lib/dependencies` and
+`$vipaq/dependencies`. ViPaq adds one sentence of its own, `$vipaq/decisions#D18`.
+
+### D10 — measured numbers live in the slice that produces them (2026-09-22)
+
+**Leaning yes (the maintainer, 2026-09-18):** "for now it stays at the repo in the slice they belong... each with their own structure". On gating, **Decided (the maintainer, 2026-09-22):** "3 we dont need measure check... this is a tool local not to ensure nothing changed"
+
+The repo has two kinds of measured number, and they get two rules.
+
+| | Deterministic | Timing |
+|---|---|---|
+| What | how full a bin gets, how many characters a token takes | BenchmarkDotNet runs |
+| Same on another machine? | yes, so a change is a change in the code | no - only the ratio between rows in one run holds |
+| Produced by | the slice's `measure/` project, `just measure <slice>` | the slice's `bench/` projects, `just bench <name>` |
+| Kept | written by the harness into `<slice>/results/measurements/`, tracked, overwritten every run | scratch; a run worth keeping is copied by hand to `<slice>/results/benchmarks/baseline/<family>/<Class>.md` (a class's first kept run) or `<date>/<family>/<Class>.md` |
+| Compared by | `git diff` after a run | Ratio and Allocated across keepers, never Mean; Loop vs Parallel only on the same core count |
+
+**Measurements do not gate.** `just measure` is a local tool: run it, read the diff, commit what changed. No
+recipe fails on a changed number and no workflow runs it. A harness that fails on a changed number was
+rejected: a changed number is the thing being measured, not an error.
+
+**What a written file looks like.** Its title, then a sentence naming the recipe, the project, the count and
+the data set, then "Do not edit". Never a date or a commit - git has both.
+
+**The harness writes raw files; one file per question reads them.** A raw file is one row per scenario or
+pack, every number - under `measurements/` from the harness, under `benchmarks/` copied by hand. At the root of
+`<slice>/results/`, one file per question reads one kind of raw file and answers it for a person. The slice's
+`results/README.md` indexes them and, last, sums them up; it computes nothing. None of these is written by the
+harness. Until 2026-09-22 the harness wrote the README as summary tables; tables are not a story, and the
+reader still had to find the claim. The reasoning behind a number goes in the slice's findings record.
+
+**One run, many views.** A measure project packs or encodes every scenario once into a bag, and one reporter per
+file reads it. The shared loop is `Binacle.Reporting`; the bag is typed per slice and lives in the slice.
+
+**Removing a reporter means deleting its file by hand.** The writer rewrites the files the code produces today
+and touches nothing else, so a dropped reporter's `.md` stays in `<slice>/results/measurements/`, never
+updated, and git shows no change. Whoever removes a
+reporter, or changes what the files are called, deletes the old ones in the same change (2026-09-23).
+
+**Only deterministic numbers are published.** Timing from one desktop is not a claim.
+
+**Why.** Until 2026-09-22 a root `results/` folder held both kinds under one rule, copied in by hand. It went
+stale: every raw benchmark report in it was for a class that no longer existed, and the one folder that looked
+current predated the data it claimed to cover. Rejected on the way:
+
+- scratch plus `diff` and `promote` recipes - keeps the copy step that went stale;
+- a root `results/` mirroring the slices - a tree three folders from its writer, held together by a README;
+- dated copies of the deterministic files - git is the history;
+- a new site for the tables - a fourth Jekyll site for a few tables and no data for charts;
+- BenchmarkDotNet categories in one assembly - one project per question instead, so the tree says what exists.
+
+**Why Mean does not compare across keepers.** Same code, `FFD_v1` fitting at 10 items, three machines and
+runtimes, no algorithm change between them:
+
+| Machine | Runtime | Mean | v2 / v1 | Allocated |
+|---|---|---|---|---|
+| i5-4570 Linux | .NET 9 | 18.7 us | 0.64 | 5.6 KB |
+| i5-4570 Linux | .NET 10 | 14.2 us | 0.69 | 5.56 KB |
+| i7-14700 Windows | .NET 9 | 1.18 us | 0.66 | 5.6 KB |
+
+Read as a timeline, Mean says "24% faster" and then "12x faster". Ratio and Allocated hold across all three.
+
+## Pending
+
+What was built and why. No quote from the maintainer covers these yet.
 
 ### D1 — the repository moved to an organization, and copyright did not move with it
 
 The repo has lived at `binacle-labs/Binacle.Net` since 2026-08-16.
 
 **Copyright and authorship stay on the person, everywhere they appear** — `NOTICE` and `README.md`
-("Copyright (c) 2023-2026 Chris Mavrommatis"), `CONTENT-TERMS.md` ("© 2026"), the root `package.json`
-`author`, the copyright line in the UI module's `Pages/Shared/_Footer.cshtml`, and the `authors` in both
-`.gemspec` files. Moving a repository into a GitHub organization does not move copyright, and `binacle-labs`
+("Copyright (c) 2023-2026 Chris Mavrommatis"), `CONTENT-TERMS.md` ("© 2023-2026 Chris Mavrommatis"), the `author` in the root and site `package.json`
+files, the copyright line in the UI module's `Pages/Shared/_Footer.cshtml`, and the `authors` in every
+`.gemspec` under `ruby/`. Moving a repository into a GitHub organization does not move copyright, and `binacle-labs`
 is a namespace rather than a legal entity — there is nothing for it to hold. Writing the org name into a
 copyright line would make that line less true.
 
-**A `repository.url` is the opposite case and does carry the org**: both `package.json` files point at
+**A `repository.url` is the opposite case and does carry the org**: every `package.json` that has one points at
 `github.com/binacle-labs/Binacle.Net`, which is where the repository actually is. `packages/binacle-net-ui/package.json`
 has a `repository` and a `license` but **no author field at all**, so there is nothing on it to protect — do not
 add one to make the set look symmetrical.
@@ -82,8 +231,8 @@ root file that matches the pattern is a candidate even when its content matches 
 nothing" resolves to `other`, which counts as a second licence. That is the same mechanism `CONTENT-LICENSE.md`
 tripped above, with different files.
 
-**Subdirectories are invisible to licensee**, which is why the nineteen `LICENSE` files under `ruby/`,
-`samples/`, `tooling/`, the two wire-format libraries and their npm twins cost the badge nothing. Confirmed
+**Subdirectories are invisible to licensee**, which is why the `LICENSE` files in subfolders - `ruby/`,
+`samples/`, `tooling/`, `shared/`, `vipaq/`, `packages/`, `assets/lib/` - cost the badge nothing. Confirmed
 against the repository after they landed: `GPL-3.0`, 100%, exact matcher.
 
 **One trap in that: never create a `LICENSES/` folder.** licensee scans that name specifically, per the REUSE
@@ -99,14 +248,14 @@ text with no context.
 
 ### D2 — a version's published page must match what that version's image serves
 
-Each folder under `sites/docs/collections/_versions/` describes the image that shipped under that minor version.
+Each folder under `sites/docs/collections/_versions/` describes the images one major line shipped.
 `2.1.1` really does serve `https://github.com/ChrisMavrommatis/Binacle.Net` in its OpenAPI documents and its
-UI, so rewriting v1.3.x, v2.0.x or v2.1.x to say `binacle-labs` would make the page disagree with the running
-artifact. **Only v3.0.x changed**, because `3.0.0` is built after `Metadata.cs` moved and serves the new owner.
+UI, so rewriting `v1.x` or `v2.x` to say `binacle-labs` would make the page disagree with the running
+artifact. **Only `v3.x` changed**, because `3.0.0` is built after `Metadata.cs` moved and serves the new owner.
 How the site is versioned is `$sites/docs`.
 
 The same reason covers every other survivor of the move: the `v1.3.0...v2.0.0` compare link in `CHANGELOG.md`,
-the `ChrisMavrommatis.*` NuGet package names listed there, the 2024 records under `results/lib/benchmarks/`,
+the `ChrisMavrommatis.*` NuGet package names listed there, the 2024 records under `results/lib/benchmarks/` (removed 2026-09-22; git history holds them),
 and the links to workflow runs that happened under the old owner. They are records of what was true then.
 GitHub redirects them forever, and rewriting them makes them false.
 
@@ -115,8 +264,8 @@ rule and the generator are in `$sites/docs`.
 
 ### D7 — an old docs version is de-indexed, and after that it is only ever bug-fixed
 
-Four documentation versions are published and only one is current. Before 2026-08-23 all four were indexable,
-all four were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
+Several documentation versions are published and only one is current. Before 2026-08-23 all of them were
+indexable, all were in a sitemap, and no `<title>` said which version it was: 72 of 118 built pages shared both a
 title and a meta description with a sibling, and five said `Quick Start - Binacle.Net Docs`. A search engine
 had nothing to choose on, so readers landed on documentation for image tags that will never ship again.
 
@@ -137,7 +286,7 @@ alone safe rather than merely convenient.
 
 **It is deliberately cheap to reverse, and that is why the old versions have written descriptions.** Every
 legacy page carries a hand-written `meta_description` naming the version it documents, written on the same day
-the versions were de-indexed. **That was the maintainer's call and the reasoning is the point:** if indexing an
+the versions were de-indexed. **Whose call that was is not confirmed; the reasoning is the point:** if indexing an
 old line ever turns out to be worth it, flipping it back is a change to `current` and a sitemap, not a writing
 project across seventy-four pages. **De-index freely; do not also let the copy rot** — the two decisions look
 like one and are not.
@@ -167,7 +316,7 @@ printed in `SECURITY.md` passed verbatim from a clean shell; and the SLSA proven
 `github.com/binacle-labs/Binacle.Net/actions/runs/31970609518` — Fulcio's record of which workflow signed it,
 not a string this repo controls.
 
-Which surfaces carry the invocation, and what else would change it, is `$ci-cd/decisions#D15`.
+Which surfaces carry the invocation, and what else would change it, is `$ci-cd/decisions/D15`.
 
 ### D4 — name a version where the version is the fact, never as a floor or an example
 
@@ -175,17 +324,17 @@ A floor ("signed from `X` onward") and a sample tag both go stale on their own. 
 does not. So a floor names the current released version, an example uses a placeholder the reader
 substitutes, and a concrete version survives only where the point is what happened to that version.
 
-**No public surface names a beta image at all** — decided 2026-08-17. A beta stays pullable long after it
+**No public surface names a beta image at all** — since 2026-08-17. A beta stays pullable long after it
 stops being the right thing to pull, and a published command that fails against it reads as our bug rather
 than as history. Agent docs under `.agents/` may name one, and have to: the bands in D3 mean nothing without
 the numbers.
 
-**A page under `sites/docs` also quotes no figure that expires** — settled 2026-08-31, and it is the sharper
-form of the same rule. A versioned page names its own version explicitly, so a `v3.0.x` page names `3.0` and
+**A page under `sites/docs` also quotes no figure that expires** — since 2026-08-31, and it is the sharper
+form of the same rule. A versioned page names its own version explicitly, so a `v3.x` page names `3.0` and
 `3.0.0`. **What it does not carry is a digest, a package count or a run URL**, however real they were when
 they were pasted.
 
-**This was learned by doing it twice.** `v3.0.x/verifying-a-release.md` quoted `3.0.0-beta.2`, a deleted tag
+**This was learned by doing it twice.** The v3 `verifying-a-release.md` quoted `3.0.0-beta.2`, a deleted tag
 signed under the old owner. It was rewritten as a record of `3.0.0-beta.5` carrying real figures, and that
 lasted a day: the betas are deleted once the release is live, so a record of a deleted image is the exact
 fault the first rewrite existed to fix. **The third version describes what the commands print and quotes
@@ -216,9 +365,10 @@ for f in $(find .agents/docs .agents/design -name "*.md" ! -name "_index.md" | s
 done
 ```
 
-A clean run prints exactly two lines, both deliberate: `design/README.md` (navigation, claims nothing about
-code) and `design/vipaq/history.md` (frozen at the date it was measured, and path-less on purpose so a live
-session is never handed superseded numbers). **Anything else in the skip list is a hole, not a result.**
+A clean run prints exactly three skip lines, all deliberate: `design/README.md` (navigation, claims nothing
+about code), `design/ci-cd/decisions/README.md` (a split ledger's opening text; each entry carries its own
+`paths:`) and `design/vipaq/history.md` (frozen at the date it was measured, and path-less on purpose so a
+live session is never handed superseded numbers). **Anything else in the skip list is a hole, not a result.**
 
 **This decision is not watched by its own query.** Its subject is the reference layer, and a `paths:` broad
 enough to cover that would fire on every edit to it. Some claims are not expressible as a pathspec; saying so
@@ -268,7 +418,7 @@ internal result models (internal ctors, immutable) · algorithm working types (t
 (frozen) · UIModule ViewModels (DataAnnotations + computed ID) · lib **internal** readonly-struct `Dimensions` /
 `Coordinates` (value-type performance — they must stay structs).
 
-**That list is settled, not an open question.** A later "reduce the duplication" pass that does not read it
+**That list is an answer on record, not an open question** (not confirmed with the maintainer). A later "reduce the duplication" pass that does not read it
 will re-derive the same five answers from scratch, or take one of them the other way.
 
 **TypeScript duplicates the model shapes on purpose.** TS is structurally typed, so the duplicates already
@@ -277,16 +427,19 @@ start to drift.
 
 ## Open
 
-### O1 — what happens to `3.0.0-beta.1` and `3.0.0-beta.2` on Docker Hub
+**Nothing is open.** O1 closed on 2026-09-05.
 
-Both are still pullable. Under D4 no public surface names either, and under D3 neither passes the published
-command — beta 1 was never signed, and beta 2 needs a string no page carries any more. So anyone who pulls one
-gets a failure with nothing anywhere to explain it.
+### O1 — what happens to `3.0.0-beta.1` and `3.0.0-beta.2` on Docker Hub — **done 2026-09-05**
 
-Deleting both tags is the clean end of it. **The deadline this entry claimed is gone** - Docker Hub tag
-immutability was answered no on 2026-09-04 and the switch stays off, so nothing is about to make these
-undeletable. The decision and its reversal condition are in the CI/CD ledger under D26.
+The question was that both were still pullable while no public surface named either and neither passed the
+published verify command — beta 1 was never signed, and beta 2 needs a string no page carries any more. So
+anyone who pulled one got a failure with nothing anywhere to explain it.
 
-**Answered 2026-09-04: they go, in a few months.** Not urgent, because no public surface names a beta since
-the example pins moved to `3.0`. All eight `3.0.0-beta.*` tags still resolve, read off the registry the same
-day - 23 tags in the repository. **This is no longer an open question and the work has its own plan.**
+**All eight `3.0.0-beta.*` tags were deleted, read off the registry on 2026-09-05.** Nothing is left to
+explain.
+
+**It was a one-off cleanup, and since 2026-09-14 the policy exists.** A prerelease's image stops at GHCR
+after the smoke and never reaches Docker Hub - `$ci-cd/decisions/D3`. Nothing needs cleaning up after the next release.
+
+**Tag immutability is not what made this possible and must not be read as a follow-up.** It was answered no - "its no for now"
+(the maintainer, 2026-09-03) - and the switch stays off; the reversal condition is in the CI/CD ledger under D26.

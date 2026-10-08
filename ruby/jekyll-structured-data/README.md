@@ -106,7 +106,7 @@ One block, with the parts joined by `@id` rather than nested. Nothing is written
 to say about the page: with no page node and no trail, the tag renders an empty string rather than a graph
 holding only the publisher.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - A `</script>` in a title would close the block early and render the rest of your graph as text on the
   page. Every `</` is escaped on the way out. The JSON comes from a JSON library, never from a template, so

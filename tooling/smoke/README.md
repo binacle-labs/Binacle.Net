@@ -18,19 +18,19 @@ landed at the wrong path; a module env var that no longer switches anything on; 
 on the host and not in the container; the version build arg never reaching the process; a wrong entry point,
 port or runtime. All packaging and wiring, none of it C# logic, which is why the existing suites cannot see it.
 
-## 📂 What is in here
+## 📂 What is in it
 
 | File | Read by | What it is |
 |---|---|---|
-| `structure.yaml` | `container-structure-test` | The image's static content - shipped files, absent files, permissions, metadata, OCI labels. 31 assertions |
+| `structure.yaml` | `container-structure-test` | The image's static content - shipped files, absent files, permissions, metadata, OCI labels |
 | `<profile>.hurl` | `hurl` | The HTTP surface for one profile, run against a running stack |
 | `<profile>.yml` | `docker compose` | The stack for one profile - the image plus the env that defines it |
 
 `structure.yaml` reads the image directly and never starts a container, so it is checked **once** per run rather
-than once per profile - the same assertions behind five different stacks answer the same question five times.
+than once per profile - running it per profile would ask the same question again behind every stack.
 It keeps the `.yaml` extension against the `.yml` stacks on purpose: it is the one file here docker never reads.
 
-## 📋 The five profiles
+## 📋 The profiles
 
 Real configurations, from nothing switched on to everything. They are declared in one place - the `profiles`
 variable at the top of `tooling/smoke.just` - which is what both the `all` loop and the unknown-name check read.
@@ -106,7 +106,7 @@ It also means a **negative** assertion has to be falsified when you touch it. `n
 `service`'s security check, and a predicate that quietly stops matching passes while asserting nothing. Point it
 at a value that must fail, confirm it goes red, then put it back.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 These are not assertions - they are what makes the setup correct. Miss one and you get a green that means
 nothing, or a red that reads as a flake.
@@ -116,7 +116,7 @@ nothing, or a red that reads as a flake.
   case-insensitive; feature flags are not.
 - **Redirects are off** (hurl's default), so request the real pages: `/swagger/` 301s to `index.html`, and
   `/scalar` 302s to `/scalar/`. A stray HTTPS redirect surfaces as a 307 rather than a connection error.
-- **`prod` and `full` raise `RateLimiter__ApiUsageAnonymous`.** The shipped anonymous limit is 60 requests an
+- **`service` and `full` raise `RateLimiter__ApiUsageAnonymous`.** The shipped anonymous limit is 60 requests an
   hour in a bucket that decays, so two runs ten minutes apart would go red on 429s. Presence of the setting is
   packaging; the number is behaviour, and behaviour belongs to the integration suite.
 - **Use a real GUID for the admin 401 check.** `Guid.Empty` is rejected as invalid (422) before the lookup ever

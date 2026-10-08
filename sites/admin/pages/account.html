@@ -1,0 +1,90 @@
+---
+title: Account
+permalink: /account/
+---
+<div x-data="account('{{ site.api_url }}')">
+	<p><a href="/accounts/">All accounts</a></p>
+
+	<template x-if="error"><p class="message error" x-text="error"></p></template>
+	<template x-if="notice"><p class="message ok" x-text="notice"></p></template>
+
+	<template x-if="account">
+		<div>
+			<dl>
+				<dt>Id</dt><dd x-text="account.id"></dd>
+				<dt>Username</dt><dd x-text="account.username"></dd>
+				<dt>Email</dt><dd x-text="account.email"></dd>
+				<dt>Role</dt><dd x-text="account.role"></dd>
+				<dt>Status</dt><dd x-text="account.status"></dd>
+				<dt>Created</dt><dd x-text="account.createdAtUtc"></dd>
+				<dt>Deleted</dt><dd x-text="account.isDeleted ? account.deletedAtUtc : 'no'"></dd>
+				<dt>Security stamp</dt><dd x-text="account.securityStamp"></dd>
+				<dt>Password hash</dt><dd x-text="account.passwordHash ?? '-'"></dd>
+			</dl>
+
+			<form @submit.prevent="submitPatch">
+				<h2>Change</h2>
+				<label for="username">Username</label>
+				<input id="username" x-model="form.username" :placeholder="account.username">
+				<label for="email">Email</label>
+				<input id="email" type="email" x-model="form.email" :placeholder="account.email">
+				<label for="password">New password</label>
+				<input id="password" type="password" x-model="form.password" autocomplete="new-password" placeholder="unchanged">
+				<label for="status">Status</label>
+				<select id="status" x-model="form.status">
+					<option value="">unchanged</option>
+					<template x-for="s in accountStatuses" :key="s"><option :value="s" x-text="s"></option></template>
+				</select>
+				<label for="role">Role</label>
+				<select id="role" x-model="form.role">
+					<option value="">unchanged</option>
+					<template x-for="r in roles" :key="r"><option :value="r" x-text="r"></option></template>
+				</select>
+				<div class="actions">
+					<button type="submit">Save changes</button>
+					<button type="button" class="danger" @click="remove">Delete account</button>
+				</div>
+			</form>
+
+			<template x-if="account.subscription">
+				<form @submit.prevent="submitSubscriptionPatch">
+					<h2>Subscription</h2>
+					<dl style="grid-column: 1 / -1">
+						<dt>Id</dt><dd x-text="account.subscription.id"></dd>
+						<dt>Type</dt><dd x-text="account.subscription.type"></dd>
+						<dt>Status</dt><dd x-text="account.subscription.status"></dd>
+						<dt>Created</dt><dd x-text="account.subscription.createdAtUtc"></dd>
+						<dt>Deleted</dt><dd x-text="account.subscription.isDeleted ? account.subscription.deletedAtUtc : 'no'"></dd>
+					</dl>
+					<label for="sub-type">Type</label>
+					<select id="sub-type" x-model="subscriptionForm.type">
+						<option value="">unchanged</option>
+						<template x-for="t in subscriptionTypes" :key="t"><option :value="t" x-text="t"></option></template>
+					</select>
+					<label for="sub-status">Status</label>
+					<select id="sub-status" x-model="subscriptionForm.status">
+						<option value="">unchanged</option>
+						<template x-for="s in subscriptionStatuses" :key="s"><option :value="s" x-text="s"></option></template>
+					</select>
+					<div class="actions">
+						<button type="submit">Save changes</button>
+						<button type="button" class="danger" @click="removeSubscription">Delete subscription</button>
+					</div>
+				</form>
+			</template>
+
+			<template x-if="!account.subscription">
+				<form @submit.prevent="submitSubscriptionCreate">
+					<h2>Subscription</h2>
+					<p style="grid-column: 1 / -1; margin: 0">None.</p>
+					<label for="sub-type">Type</label>
+					<select id="sub-type" x-model="subscriptionForm.type">
+						<option value="">pick one</option>
+						<template x-for="t in subscriptionTypes" :key="t"><option :value="t" x-text="t"></option></template>
+					</select>
+					<div class="actions"><button type="submit">Create subscription</button></div>
+				</form>
+			</template>
+		</div>
+	</template>
+</div>

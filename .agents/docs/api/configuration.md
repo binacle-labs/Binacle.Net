@@ -1,7 +1,7 @@
 ---
 id: api/configuration
 description: Config file layout, env-var conventions, override precedence, and feature flag list
-verified: 2026-09-04
+verified: 2026-09-29
 check: The file tree matches api/src/Binacle.Net/Config_Files/ and the AddJsonConfiguration calls in Program.cs; the Cors and ForwardedHeaders keys match their options classes in Configuration/ and the mapping in ExtensionMethods/ForwardedHeadersExtensions.cs; the feature flag table matches every Feature.IsEnabled call site in api/src
 also_update:
   - api/modules/service
@@ -23,7 +23,7 @@ All config files live under `/app/Config_Files` in the container.
 app
 └── Config_Files
     ├── Presets.json                             required — app fails to start without this
-    ├── Cors.json                                optional — CORS allowed origins (core API, not a module)
+    ├── Cors.json                                optional — CORS allowed origins, one key per policy
     ├── Cors.{Environment}.json                  optional override
     ├── ForwardedHeaders.json                    optional — proxy trust for resolving the caller's address
     ├── ForwardedHeaders.{Environment}.json      optional override
@@ -40,8 +40,13 @@ app
     │   └── Serilog.{Environment}.json           optional override
     └── ServiceModule
         ├── ConnectionStrings.json               optional — DB connection strings
+        ├── ConnectionStrings.{Environment}.json optional override
         ├── RateLimiter.json                     required when SERVICE_MODULE=True — rate limiter rules
-        └── JwtAuth.json                         optional — JWT issuer, audience, secret
+        ├── RateLimiter.{Environment}.json       optional override
+        ├── JwtAuth.json                         optional — JWT issuer, audience, secret
+        ├── JwtAuth.{Environment}.json           optional override
+        ├── Cors.json                            optional — the module's ServiceApi origins; same section as the root Cors.json
+        └── Cors.{Environment}.json              optional override
 
 `Presets.json` and the four DiagnosticsModule base files are the only ones the app refuses to start without,
 and the DiagnosticsModule four because that module is never switched off (`$api/modules`). Everything else is
@@ -59,16 +64,24 @@ Bind-mount individual files in Docker with `-v $(pwd)/Presets.json:/app/Config_F
 
 ### CORS (`Cors.json`)
 
-Bound to `CorsOptions` (section `Cors`), loaded for the core API (`Program.cs`, not a module). Defines a single
-named policy `CoreApi` that endpoints opt into with `.RequireCors(CorsPolicy.CoreApi)`:
+The `Cors` section is one dictionary, policy name to allowed origins, owned by the Kernel (`$api/kernel`,
+*Cors*). Each owner adds its own file and names its policy; the core adds `Cors.json` and registers `CoreApi`,
+the ServiceModule adds `ServiceModule/Cors.json` and registers `ServiceApi`. All files feed the same section,
+so the keys may also sit together in one file:
 
 ```json
 {
   "Cors": {
-    "CoreApi": { "AllowedOrigins": ["https://example.com"] }
+    "CoreApi": { "AllowedOrigins": ["https://example.com"] },
+    "ServiceApi": { "AllowedOrigins": ["https://admin.example.com"] }
   }
 }
 ```
+
+Every v3 and v4 endpoint requires `CoreApi` (`.RequireCors(CorsPolicy.CoreApi)`); the token route and the
+admin group require `ServiceApi`. A key absent or empty means that policy allows nothing. Validated on start:
+a bad origin under a registered key fails startup; a key no owner registered - `ServiceApi` with the module
+off, say - is ignored.
 
 ### Forwarded headers (`ForwardedHeaders.json`)
 
@@ -154,7 +167,7 @@ Only include the keys you want to change. The rest come from the base file.
 
 Example: `DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413`
 
-The name must be uppercase. This maps to `ConnectionStrings.<Name>` in the config system.
+The name is uppercased. The variable is read only when `ConnectionStrings.<Name>` is empty in config.
 
 ## Precedence
 

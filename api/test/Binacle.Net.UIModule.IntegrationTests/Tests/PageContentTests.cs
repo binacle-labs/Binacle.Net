@@ -56,13 +56,23 @@ public class PageContentTests : IClassFixture<UIModuleBinacleApi>
 	[Theory]
 	[InlineData("/packing", "packing_demo")]
 	[InlineData("/vipaq", "protocol_decoder")]
-	[InlineData("/instance", "instance")]
 	public async Task A_Page_Asks_For_Its_Own_Bundle_And_The_Shared_One(string path, string entryName)
 	{
 		var page = await this.GetPage(path);
 
 		page.ShouldContain($"/_content/Binacle.Net.UIModule/js/{entryName}.js");
 		page.ShouldContain("/_content/Binacle.Net.UIModule/js/main.js");
+	}
+
+	// Presets are now rendered server-side, so the page carries no entry of its own - just the shared one
+	// every page loads. This is the page that lost its bundle when the browser fetch moved to server state.
+	[Fact]
+	public async Task The_Instance_Page_Asks_For_No_Bundle_Of_Its_Own()
+	{
+		var page = await this.GetPage("/instance");
+
+		page.ShouldContain("/_content/Binacle.Net.UIModule/js/main.js");
+		page.ShouldNotContain("/_content/Binacle.Net.UIModule/js/instance.js");
 	}
 
 	[Theory]

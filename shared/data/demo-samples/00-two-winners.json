@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "DemoSample_00_TwoWinners_45x30x25",
+    "Bin": "45x30x25",
+    "Metrics": "23400 33750 13 69.33",
+    "Result": {
+      "FFD": "FullyPacked FullyPacked",
+      "BFD": "PartiallyPacked PartiallyPacked",
+      "WFD": "FullyPacked FullyPacked"
+    },
+    "Items": [
+      "12x10x15 [5]",
+      "18x10x12 [4]",
+      "8x15x12 [4]"
+    ]
+  },
+  {
+    "Name": "DemoSample_00_TwoWinners_40x30x30",
+    "Bin": "40x30x30",
+    "Metrics": "23400 36000 13 65.0",
+    "Result": {
+      "FFD": "PartiallyPacked PartiallyPacked",
+      "BFD": "FullyPacked FullyPacked",
+      "WFD": "PartiallyPacked PartiallyPacked"
+    },
+    "Items": [
+      "12x10x15 [5]",
+      "18x10x12 [4]",
+      "8x15x12 [4]"
+    ]
+  }
+]

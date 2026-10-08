@@ -1,6 +1,6 @@
 namespace Binacle.Net.UIModule.Models;
 
-// The other things this server can expose. FeatureOptions only records what is switched on, so the off half
+// The other things this server can expose. InstanceOptions only records what is switched on, so the off half
 // has to be listed somewhere - this is that list, and a new switch needs a row here to appear on the page.
 //
 // The service module is left out on purpose: it is not advertised, and the documentation site has no page for

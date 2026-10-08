@@ -54,7 +54,7 @@ them. A generator publishes the four values as `page.meta.title`, `page.meta.des
 `page.meta.canonical` and `page.meta.image`; `{% page_meta %}` writes the title, description, canonical,
 robots, OpenGraph and Twitter card elements from those keys and works nothing out for itself.
 
-Every setting has a default, so a site can load it and write no config at all. All three sites load it and
+Every setting has a default, so a site can load it and write no config at all. Every site loads it and
 none of them has an seo include any more. `jekyll-page-meta/README.md` has the config and the front matter
 keys.
 
@@ -124,7 +124,7 @@ cd ruby/jekyll-multi-sitemap && bundle exec rspec
 From the repo root each gem is a test, so `just test rb_jekyll-gtm_unit` runs one and `just test all` runs
 them with everything else. Coverage comes with them, through simplecov.
 
-For style there is `.rubocop.yml`, covering all ten gems. Nothing runs it - no recipe, no pipeline step. Run
+For style there is `.rubocop.yml`, covering every gem. Nothing runs it - no recipe, no pipeline step. Run
 it by hand from here:
 
 ```bash

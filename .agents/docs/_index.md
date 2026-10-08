@@ -15,7 +15,7 @@ table of [README.md](README.md).
   description: "Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects"
   paths: ["Binacle.Net.slnx", "Directory.*.props", "global.json", "**/*.csproj", "Dockerfile"]
 - file: commands.md
-  description: "How to set up a clone, run the API and the three sites, run tests and benchmarks, and build the Docker image"
+  description: "How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image"
   paths: ["justfile", "tooling/**"]
 - file: concepts.md
   description: "Fit exits early on first failure; pack continues and returns positions. Both return the same result shape — packed items and unpacked items. Used by both Lib algorithms and API endpoints."
@@ -85,10 +85,13 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ci-cd/README.md
-  description: "CI/CD — the eleven GitHub Actions workflows in .github/workflows and the nine shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
+  description: "CI/CD — the GitHub Actions workflows in .github/workflows and the shared actions in .github/actions, what triggers each, the conventions they all follow, and the repo variables, secrets and environments they need"
   paths: [".github/workflows/**", ".github/actions/**"]
+- file: ci-cd/branches.md
+  description: "Branch names — the three kinds in use, the snake_case subject, and the two constraints that are mechanical: Sonar analyses main and pull requests targeting main, and only main or the release/v<x>-<y>-<z> branch named after the version may dispatch the release workflow"
+  paths: [".github/workflows/**"]
 - file: ci-cd/release-pipeline.md
-  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step every release reaches with a prerelease narrowed to its immutable tag, the CHANGELOG.md release body, and the Docker Hub page written last"
+  description: "The release pipeline in release-docker-image.yml — seven jobs from a dispatched version to a published GitHub release and the git tag it creates last, GHCR as the staging registry, the copy-to-Docker-Hub step a release reaches and a prerelease skips on its way to a GitHub prerelease, the CHANGELOG.md release body, and the Docker Hub page written last"
   paths: [".github/workflows/**"]
 ```
 
@@ -105,7 +108,7 @@ table of [README.md](README.md).
   description: "Packing heuristics (FFD/WFD/BFD) — versions, operation types, trade-offs, and the fit/pack guarantee"
   paths: ["lib/src/Binacle.Lib/Algorithms/**"]
 - file: lib/dependencies.md
-  description: "Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection tests kernel, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer)."
+  description: "Lib slice dependency tree — Binacle.Lib as the single src project, its own result-selection data project, who sees internals (IVT), and the composition-root rule (only Binacle.Net references the packer)."
   paths: ["lib/**"]
 - file: lib/models.md
   description: "Lib model types and IWith* interfaces — Bin, Item, packed/unpacked results, and the constraints used in generic type parameters"
@@ -120,18 +123,21 @@ table of [README.md](README.md).
   description: "IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them"
   paths: ["lib/src/Binacle.Lib/ResultSelection/**"]
 - file: lib/tests.md
-  description: "lib/test projects — unit tests, performance tests, benchmarks; AlgorithmFactories, CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
-  paths: ["lib/test/**"]
+  description: "lib/test projects — Binacle.Lib.Testing (the one AlgorithmFactories, the scenario checks, the benchmark providers), unit tests, the bench projects in lib/bench with their tiers, and the measure project in lib/measure; CommonTestingFixture, ResultSelectionTestingFixture, and run aliases"
+  paths: ["lib/test/**", "lib/measure/**", "lib/bench/**", "shared/test/Binacle.Benchmarking/**"]
 ```
 
 ## Packages
 
 ```yaml
 - file: packages/README.md
-  description: "TypeScript packages under packages/ (npm workspaces) — UI components, compact-notation mirror, cookie utilities, and theme switching."
+  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching."
+  paths: ["packages/**"]
+- file: packages/binacle-net-client.md
+  description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
   paths: ["packages/**"]
 - file: packages/binacle-net-ui.md
-  description: "packages/binacle-net-ui — Alpine.js components + Three.js visualizer for the packing demo. Components, plugins, model layers, and the window.binacle global."
+  description: "packages/binacle-net-ui — Alpine.js apps and components plus a Three.js visualizer for the packing demo. The apps/components/shared split, the plugins, and the window.binacle global."
   paths: ["packages/**"]
 - file: packages/dependencies.md
   description: "TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which."
@@ -158,10 +164,10 @@ table of [README.md](README.md).
 
 ```yaml
 - file: shared/README.md
-  description: "Shared slice — Binacle.TestsKernel (algorithm scenario data, compact-string formats, providers, fixtures) and shared/data (the fixture corpus more than one slice reads)"
+  description: "Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)"
   paths: ["shared/**"]
 - file: shared/dependencies.md
-  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals."
+  description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals."
   paths: ["shared/**"]
 ```
 
@@ -169,7 +175,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: sites/README.md
-  description: "Every published site lives under sites/, one directory each. What the three share, and what is per-site."
+  description: "Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site."
   paths: ["sites/**"]
 - file: sites/demo.md
   description: "The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/."
@@ -186,7 +192,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: tooling/README.md
-  description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the benchmark/performance scripts, the wrangler configs, the local compose stacks, and emulator state"
+  description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the bench and measure modules, the wrangler configs, the local compose stacks, and emulator state"
   paths: ["tooling/**"]
 ```
 
@@ -203,7 +209,7 @@ table of [README.md](README.md).
   description: "ViPaq cross-language wire testing — the C#/TS shared-vector apparatus, its inventory, and the decode-to-input contract"
   paths: ["vipaq/**"]
 - file: vipaq/dependencies.md
-  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests never references TestsKernel; no test project references a generator)."
+  description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator)."
   paths: ["vipaq/**"]
 - file: vipaq/typescript.md
   description: "Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library"

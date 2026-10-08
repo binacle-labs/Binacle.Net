@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
-description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, and the two footer calls. What a review would otherwise re-litigate.
-verified: 2026-08-31
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose collections are versions and common_pages; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder and the shared pages, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui
+description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate.
+verified: 2026-09-29
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose one collection is versions; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major and no permalink line, against sites/docs/collections/, which must hold _versions alone, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -13,9 +13,134 @@ paths:
 Why the two published sites are the way they are. `$sites/demo` and `$sites/docs` say what they *are*; this
 says why, so a later pass does not undo a deliberate choice.
 
-**`sites/www` is not covered here.** It is being built in its own session and owns its own record.
+**`sites/www` is not covered here.** Its record is `$sites/www-design`.
 
-## Locked
+## Decided
+
+### S10 — the sites publish no CSS source map
+
+**Decided (the maintainer, 2026-09-03):** "no source maps fix this"
+
+**`sourcemap: never` in the `sass:` block of `sites/docs/_config.yml` and `sites/demo/_config.yml`**, set
+2026-09-04.
+
+**A Jekyll sass source map embeds `sourcesContent` - the full text of every `_sass` partial, comments and
+all - and serves it at a public URL.** `docs.binacle.net/css/main.css.map` and the demo's equivalent both
+answered 200 with it. Anything written in a stylesheet comment was public the moment the site deployed, which
+is not how anyone treats a stylesheet comment.
+
+**`sites/www` never had one** and needs no setting: it has no `sass:` block at all and compiles its CSS
+through `package.json`'s `build:css`. Its webpack `devtool` is `false` in production on all three sites, so
+webpack was never the source.
+
+**What it costs: nothing a visitor sees.** The built CSS is byte-identical apart from the trailing
+`sourceMappingURL` comment, and debugging a published stylesheet was not something anyone was doing. A local
+build can turn it back on for one run.
+
+**The vendored `lib/swagger-ui/*` files still carry `sourceMappingURL` comments and always did.** Those maps
+are not shipped - `swagger-ui.css.map` answers 404 - so the references dangle, harmlessly, in third-party
+code this repository does not build.
+
+**What would reopen it:** wanting to debug a live stylesheet against its source. The answer then is a
+development build, not shipping the map.
+
+### S11 - one folder per major, the current line at the site root, no common layer
+
+**Decided (the maintainer, 2026-09-11):** "1 ok ... 3 ok 4 ok but an agen will have to change and merge the changelog or mark whats 2.1.x only" (answering: no common layer, the six common pages move into `v3.x`, a selector on every page, `v2.0.x` and `v2.1.x` become one `v2.x`)
+
+**Set by the maintainer on 2026-09-11 and 2026-09-12; landed 2026-09-12** across `ruby/binacle-docs-versions`
+and `sites/docs`. Three rules replaced the old scheme: one folder per major (`v1.x`, `v2.x`, `v3.x`); the
+folder named by `current` renders with no prefix and every other under `/version/<url_segment>/`; no page
+renders once for every version.
+
+**What it replaced, and why that was wrong.** Until 2026-09-12 every minor opened a new folder
+(`v3.0.x`, then `v3.1.x`), rendered at `/version/<folder>/`, and six pages sat outside the versions as
+"common" because the root had to hold something. The per-minor argument was that the API set changes at
+minors (v1.2.0 added V3) so a folder must answer "what does my image do". It does - but semver says a minor
+only adds, so a reader on 3.0 who sees a 3.1 page sees something their image does not have yet, never
+something it lost, and an "added in 3.1.0" note says which. The cost of per-minor was paid at every release:
+a minor copied 52 files, rewrote 18 permalinks, added a config block, and **moved every indexed URL** -
+`current` moved, every URL search had ranked went `noindex`, and a set it had never seen went live. Landing
+this before 3.1.0 made it the first minor that moved none.
+
+**The common pages were not common - read on 2026-09-11.** `core-concepts` listed three algorithms and V4
+has four (`Best`). `generate-a-client` named `v4.json`, `packCustomBin`, `Algorithm.Best` and "V4 is
+experimental". `configuration-basics` named `/app/Config_Files`, `.Production.json` and the
+`_CONNECTION_STRING` fallback. Only `integration-guide` was advice that survives any version. ViPaq had shown
+it first: its common page had been stripped, category by category - codec, base64, integer widths, header,
+body layout, then "experimental", when v3.0.0 made ViPaq stable and the shared page kept saying experimental
+to a v3 reader - until it said nothing. A page that is true for every version lives in the current folder and
+is copied forward with it; the six moved in with their content merged from the `v3.0.0` tag and the working
+tree, and `generate-a-client`, written after the tag, into `v3.x` alone.
+
+**A closed line is named by what it shipped last, not by its folder - 2026-09-12.** The maintainer's first
+call was to leave the old URLs (`/version/v1.3.x/`) untouched ("yes", 2026-09-11, to keeping `v1.3.x` where it
+is); the second, the one that stands, is that a closed line renders at the highest version it produced,
+`/version/1.3.0/`, and the selector says `v1.3.0`: "the old versions must have the highest version url they
+produced  and so will the dropdown" (the maintainer, 2026-09-11).
+So every `versions.yml` entry carries four keys, nothing derived and the build stopping on a missing one:
+`id` (the folder, never in a URL), `url_segment` (`1.3.0`), `label` (`v1.3.0`), `version_tag` (what docker
+pulls - `1.3.0` for a closed line, a moving tag for the current one). The old URLs redirect through a
+`_redirects` file Cloudflare reads, **302 until each has been checked on the deployed site, then 301** - a
+browser caches a 301 and a wrong one cannot be taken back.
+
+**Descriptions name no version - 2026-09-12.** Sixty-four of them said "Binacle.Net v2.x" or "for v1.3.x".
+Front matter cannot read the label (`jekyll-page-meta` strips Liquid from it), a folder name is not what a
+reader should see, and a written version would need editing at every release; the title suffix and the URL
+carry the version, so the description does not. Prose writes `{{ page.version_label }}`.
+
+**The gem is the only place a URL is decided.** Sixty-one hand-written `permalink:` lines went; a
+`permalink` a page writes is overwritten. Static files needed a `StaticFile` subclass with a settable url,
+because Jekyll's own reads the collection template and ignores data - and, measured on the way,
+`site.documents` does include a collection's static files, which the plan had said it did not. The seven
+swagger pages moved from `swagger/v4.html` to `swagger/v4/` for one URL shape; each old `.html` URL has an
+exact redirect line. `{% vlink v2.x /path %}` links another line by file, so a cross-line link fails the build
+rather than 404.
+
+**What would reopen it:** a major that removes pages from the root - the gem prints the removed-page list at
+build for exactly that day - or a minor that turns out to change what an existing page says rather than add
+to it, which semver says does not happen.
+
+### S12 - the last common page went, and with it the second layout; one sidebar order in every folder
+
+**Decided (the maintainer, 2026-09-12):** "rule release notes always after quick start ... version must go it has no place now ... configuration basics was because that was the same across versions... maybe we can collapse it into jsut configuration", then "now for the rest ececute in one pass" (answering the proposed structure, Integration Guide deleted and salvaged)
+
+**Set by the maintainer on 2026-09-12; landed the same day** in `sites/docs`. Three things, all one decision:
+every page is a `versions` document; the top level reads in one order in every folder; two pages that only
+existed to be version-free were folded into the pages that owned their facts.
+
+**`version.html` had no place once the selector existed.** It was the one page left outside the versions,
+listing the lines at `/version/` - and the selector on every page listed the same lines, on every page,
+landing on the same page in the other line. A "Latest Version Docs" button beside it was a third way to the
+current index, after the logo and the selector's `(current)` option. Both went. With the collection empty,
+`_layouts/default.html`, `_includes/sidebar.html`, `_includes/menu.html` and `_data/sidebar.yml` had nothing
+to render, so the `versions/` copies became the only ones and lost the prefix. `pages.xml` listed nothing
+after that - `404.html` is excluded - and went too. `/version/` redirects to `/`.
+
+**Release Notes is second, always.** The six pages that moved in on 2026-09-12 kept the `nav.order` they had
+had on the old root, so the current line's sidebar read Quick Start, Release Notes, Core Concepts,
+Configuration Basics, Generate a Client, API, Configuration, and the old lines read a different subset in a
+different order. One sequence now, written into every folder; the numbers are in `$sites/docs#sidebar-order`.
+
+**Configuration Basics folded into Configuration; Integration Guide left the docs.** Basics existed to be
+version-free, and there is no version-free layer; every fact in it - the `Config_Files` tree, the four
+override methods, the precedence table - is true in every folder and was already printed on the Configuration
+page beside a second copy of the tree, with a third on Core. One page now, with Basics' headings kept so the
+old anchors hold, and the two deleted pages redirect. The guide was a locker-shipping checkout story from
+2023; its two reference facts - integers in one unit, box the irregular ones; the destination's sizes or your
+own boxes as the bin set - went into Core Concepts and Presets, and the story is not documentation.
+
+**Core lists one child page per file it reads.** `Cors.json` had been a section in the middle of the Core
+page while `ForwardedHeaders.json` and `Presets.json` had pages; the switches (`SWAGGER_UI`, `SCALAR_UI`,
+`DEBUG_ENDPOINT`, the port) were sections too. Core is now an overview, a file table and a switch table, and
+CORS is the third child - the shape Diagnostics already had.
+
+**What would reopen it:** a page that is genuinely the same in every line and changes often enough that
+three copies drift - the answer then is a generated include, not a common collection.
+
+## Pending
+
+What the sites do and why. No quote from the maintainer covers these yet.
 
 ### S1 — the link preview is a square logo and a small card, and the two change together
 
@@ -42,7 +167,7 @@ lead. A page may override the whole string with `seo_title` when the composed on
 ### S3 — the demo host calls itself Binacle.Net Demo, and `site.title` stays the brand
 
 `sites/demo/_config.yml` carries both: `title` is `Binacle.Net`, `display_title` is `Binacle.Net Demo`. The
-header bar and the index `h1` use `display_title`; the `<title>` suffix and `og:site_name` use `title`.
+header bar uses `display_title`; the `<title>` suffix and `og:site_name` use `title`.
 
 **Two different jobs.** A visitor needs to know which host they are on, because the demo and the marketing site
 otherwise wear the same name and the nav's exit link off the demo is meaningless. A `<title>` suffix needs the
@@ -50,8 +175,8 @@ brand — `Packing Demo - Binacle.Net Demo` stutters, and the page half already 
 
 ### S4 — the demo site has no collections at all
 
-The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser, both
-navs and the JSON-LD block all select on that flag.
+The two tool pages are pages in `sites/demo/pages/` carrying `applet: true` and an `order`. The chooser and the
+nav menu select on that flag.
 
 **They were an `apps` collection while the URLs were `/apps/:name/`.** Once the host became the index and the
 tools moved to `/packing/` and `/vipaq/`, a collection expressed nothing a front-matter flag does not.
@@ -62,8 +187,7 @@ which was the argument for keeping it a collection. `jekyll-multi-sitemap` remov
 `sitemaps:` block in `_config.yml` names the files and what each includes, and the gem generates them, so
 there is nothing on disk to inherit a default. `sites/demo/_config.yml` declares no `collections:` key.
 
-**`sites/docs` is the only site with collections** — `versions` and `common_pages` — and neither is a
-sitemap.
+**`sites/docs` is the only site with a collection** — `versions` — and it is not a sitemap.
 
 ### S5 — legacy swagger pages keep `nofollow`; every other legacy page gets `follow`
 
@@ -72,7 +196,7 @@ The swagger pages are the exception and stay `noindex, nofollow`, which is what 
 shell has no links a crawler benefits from following.
 
 **The inconsistency is deliberate and it is the smaller cost.** Making them uniform would mean either
-following links that go nowhere, or dropping `follow` from seventy-four pages that have real ones.
+following links that go nowhere, or dropping `follow` from every old page that has real ones.
 
 ### S6 — the demo footer carries a version badge and no stars badge
 
@@ -99,7 +223,7 @@ four, because that is where someone who has finished looks.
 
 ### S8 - quotes are typed straight and the build curls them
 
-`sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`, and it stays. kramdown
+`sites/docs/_config.yml` sets `smart_quotes : lsquo,rsquo,ldquo,rdquo` under `kramdown`. kramdown
 rewrites a straight `'` or `"` into its curly form when the page is built.
 
 **So type ASCII in the markdown.** `don't` in the source comes out as a curly apostrophe on the page. A curly
@@ -115,36 +239,10 @@ version folder, not just the current one**, so an older page is typed the same w
 `` `Enabled` (_boolean_): turns the feature on `` - the colon tight against the term, one space after. It is
 the same list shape on every page of every version, so it gets one character.
 
-**The site used an en dash on some pages and an em dash on others** until 31 Aug 2026, two characters for one
-job, and a reader moving between versions saw both. Neither dash survives anywhere under `sites/docs/`: not in
-`v1.3.x`, `v2.0.x`, `v2.1.x` or `v3.0.x`, not in the shared pages that render inside every version, not in the
-outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punctuate.**
+**The site used an en dash on some pages and an em dash on others**, two characters for one job, and a reader
+moving between versions saw both. Neither dash survives anywhere under `sites/docs/`: not in any version
+folder, not in the outdated-version notice. **`lib/swagger-ui` is vendored and is not ours to punctuate.**
 
 **A dash doing another job was not turned into a colon.** A pair around an aside became commas, a dash joining
 two clauses became a full stop, and a dash inside a code block, a sample response or a config block is data and
 was left alone.
-
-### S10 — the sites publish no CSS source map
-
-**`sourcemap: never` in the `sass:` block of `sites/docs/_config.yml` and `sites/demo/_config.yml`**, set
-2026-09-04.
-
-**A Jekyll sass source map embeds `sourcesContent` - the full text of every `_sass` partial, comments and
-all - and serves it at a public URL.** `docs.binacle.net/css/main.css.map` and the demo's equivalent both
-answered 200 with it. Anything written in a stylesheet comment was public the moment the site deployed, which
-is not how anyone treats a stylesheet comment.
-
-**`sites/www` never had one** and needs no setting: it has no `sass:` block at all and compiles its CSS
-through `package.json`'s `build:css`. Its webpack `devtool` is `false` in production on all three sites, so
-webpack was never the source.
-
-**What it costs: nothing a visitor sees.** The built CSS is byte-identical apart from the trailing
-`sourceMappingURL` comment, and debugging a published stylesheet was not something anyone was doing. A local
-build can turn it back on for one run.
-
-**The vendored `lib/swagger-ui/*` files still carry `sourceMappingURL` comments and always did.** Those maps
-are not shipped - `swagger-ui.css.map` answers 404 - so the references dangle, harmlessly, in third-party
-code this repository does not build.
-
-**What would reopen it:** wanting to debug a live stylesheet against its source. The answer then is a
-development build, not shipping the map.

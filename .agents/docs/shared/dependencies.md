@@ -1,7 +1,7 @@
 ---
 id: shared/dependencies
-description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, TestReporting, and the algorithm TestsKernel; who references them and who sees internals.
-verified: 2026-09-04
+description: Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals.
+verified: 2026-10-01
 check: ProjectReference and InternalsVisibleTo entries in shared/**/*.csproj match the graph and notes below; Binacle.FluxResults carries its own MIT LICENSE and Binacle.Geometry and Binacle.CompactNotation each carry an Apache-2.0 one, and NOTICE names all three; nothing Apache-2.0 here may take a ProjectReference on anything under the repository's code licence
 paths:
   - "shared/**"
@@ -10,7 +10,8 @@ paths:
 # Shared — project dependencies
 
 The foundation slice. **Nothing here references `api`, `lib` or `vipaq`.** There is no exception: the slice is
-the bottom of the stack in both directions, production and test.
+the bottom of the stack in both directions, production and test. Which folder may reference which is the
+repo-wide rule, `$decisions#D9`; this file is where the shared projects sit on it.
 
 ## The graph
 
@@ -26,9 +27,9 @@ Binacle.Geometry                 leaf — BCL only, no Binacle deps
    │      └── Binacle.CompactNotation.UnitTests   xUnit
    │
    └── Binacle.Packing ──────────┘   the packing vocabulary: results, identity, status enums
-          [IVT → Binacle.Lib, Binacle.Lib.TestsKernel]
-          consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.TestsKernel,
-                     Binacle.Lib.TestsKernel, OrLibrary.Converter, ViPaq.PackedDataGenerator
+          [IVT → Binacle.Lib, Binacle.Lib.Data]
+          consumers: Binacle.Lib, api DiagnosticsModule + IntegrationTests, Binacle.Data,
+                     Binacle.Lib.Data, OrLibrary.Converter, ViPaq.PackedDataGenerator
                      (Binacle.Net reaches it transitively and imports it globally - $api/dependencies)
 
 Binacle.FluxResults              leaf — BCL only, no Binacle deps
@@ -37,15 +38,22 @@ Binacle.FluxResults              leaf — BCL only, no Binacle deps
    │                             SM.IntegrationTests reach it transitively and import it globally
    └── Binacle.FluxResults.UnitTests   xUnit
 
-Binacle.TestsKernel              algorithm fixture hub — Bischoff + custom-problems scenarios
-   refs: Binacle.Packing, Binacle.CompactNotation
-   consumers: api IntegrationTests, Binacle.Lib.UnitTests/Benchmarks/PerformanceTests
+shared/data/Binacle.Data         the three scenario sets — Bischoff, custom-problems, demo-samples — and
+   refs: Binacle.Packing, Binacle.CompactNotation                      the one embedded-resource reader
+   consumers: api IntegrationTests, Lib.Testing, Lib.UnitTests, Lib.PackingEfficiency,
+              Lib.Benchmarks.Algorithms, .ParallelAlgorithms, .ParallelBins, .ParallelOverhead and .Scaling,
+              and Binacle.Lib.Data and Binacle.ViPaq.Data (the reader only)
 
-Binacle.TestReporting            leaf — markdown report writer, no Binacle deps
-   consumers: Binacle.Lib.PerformanceTests, ViPaq.PerformanceTests, both ViPaq generators, OrLibrary.Converter
+Binacle.Reporting            leaf — the measure loop, markdown writer and RepositoryRoot; no Binacle deps
+   consumers: Lib.PackingEfficiency, ViPaq.EncodedSize, both ViPaq generators, OrLibrary.Converter
+
+Binacle.Benchmarking         leaf — the BDN config, the order attribute, the --job and --launches options and the core pinning;
+   refs BenchmarkDotNet, no Binacle deps                JobsByCoreCount builds one pinned job per core count, and
+   consumers: every bench project (Lib.Benchmarks.Algorithms, .ParallelAlgorithms,   takes the counts to use
+              .ParallelBins, .ParallelOverhead, .ResultSelection, .Scaling, ViPaq.Benchmarks)
 
 shared/tools/Binacle.OrLibrary.Converter   exe tool
-   refs: Binacle.CompactNotation, Binacle.Packing, Binacle.TestReporting
+   refs: Binacle.CompactNotation, Binacle.Packing, Binacle.Reporting
 ```
 
 ## Projects at a glance
@@ -55,12 +63,13 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 | `Binacle.Geometry` | library | — (BCL only) | — | the geometry leaf: `IWith[ReadOnly]*` + `Dimensions<T>`/`Coordinates<T>`/`Item<T>` (Apache-2.0, see note 8) |
 | `Binacle.CompactNotation` | library | Geometry | grants IVT to its UnitTests | parses/formats the `LxWxH (X,Y,Z)` compact string |
 | `Binacle.CompactNotation.UnitTests` | xUnit exe | CompactNotation | yes | notation tests |
-| `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.TestsKernel` | packing result models, identity, status enums |
+| `Binacle.Packing` | library | Geometry | grants IVT to `Binacle.Lib`, `Binacle.Lib.Data` | packing result models, identity, status enums |
 | `Binacle.FluxResults` | library | — (BCL only) | — | result/union types: `FluxUnion<T0, T1>` + the `TypedResult` structs (see note 7) |
 | `Binacle.FluxResults.UnitTests` | xUnit exe | FluxResults | — (public surface only) | union, extension and typed-result units |
-| `Binacle.TestReporting` | library | — | — | markdown report writer for the perf harnesses |
-| `Binacle.TestsKernel` | library | Packing, CompactNotation | — | algorithm fixtures + providers (see note 3) |
-| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, TestReporting | — | converts OR-Library benchmark data |
+| `Binacle.Reporting` | library | — | — | the measure loop and markdown writer for the measure projects; `RepositoryRoot` for them and the tools |
+| `Binacle.Benchmarking` | library | — (BenchmarkDotNet only) | — | `BenchmarkConfig.Create()`, `[BenchmarkOrder]` and `BenchmarkProgram.Run` for every bench project; the only project that references BenchmarkDotNet |
+| `Binacle.Data` | library | Packing, CompactNotation | — | the three scenario sets + the reader; no harness code (see notes 3, 4) |
+| `Binacle.OrLibrary.Converter` | exe tool | CompactNotation, Packing, Reporting | — | converts OR-Library benchmark data |
 
 ## Notes
 
@@ -69,25 +78,28 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
 
 2. **`Binacle.Packing` is the vocabulary, not the engine.** It holds what a packing *result* is written in —
    `OperationResult`, `PackedBin`, `PackedItem`, the status enums, `IWithID`. The engine interfaces and the
-   algorithms live in `Binacle.Lib`, one slice up. The split is what lets the api integration suite and both
-   tests kernels assert on results without referencing the packer.
+   algorithms live in `Binacle.Lib`, one slice up. The split is what lets the api integration suite and the
+   data projects name a result without referencing the packer.
 
-3. **`Binacle.TestsKernel` holds the algorithm fixtures only.** Bischoff suite and custom-problems, embedded by
-   link from `shared/data`. It is here rather than in a slice because two slices read it: the api integration
-   suite and the lib tests. The result-selection fixtures went the other way — one consumer, so they live in
-   `lib/data` and are embedded by `Binacle.Lib.TestsKernel` (see `$lib/dependencies`). Not to be confused with
-   `Binacle.ViPaq.TestsKernel`, a separate ViPaq-only hub — see `$vipaq/dependencies`.
+3. **`Binacle.Data` holds the algorithm scenarios only.** Bischoff suite, custom-problems and demo-samples,
+   embedded by link from the sibling folders under `shared/data`. It is here rather than in a slice because two slices
+   read it: the api integration suite and the lib tests. The result-selection fixtures went the other way —
+   one consumer, so they live in `lib/data` and are embedded by `Binacle.Lib.Data` (see
+   `$lib/dependencies`). ViPaq's placed packs went the same way: `vipaq/data`, embedded by `Binacle.ViPaq.Data` -
+   see `$vipaq/dependencies`.
 
-4. **Each tests kernel owns its own embedded-resource reader.** `Assembly.GetExecutingAssembly()` resolves to
-   the assembly holding the data, so a shared reader would look in the wrong assembly and find nothing. The
-   three kernels have deliberately divergent `IFile` shapes for the same reason.
+4. **`Binacle.Data` owns the one embedded-resource reader, and the caller names the assembly.**
+   `EmbeddedResourceFileProvider.ByPrefix(assembly, prefix)` reads from the assembly it is given, so any data
+   project can use it by passing its own. It hands the manifest name back unsplit; how the name is shaped is
+   each project's to know. `Binacle.Lib.Data` and `Binacle.ViPaq.Data` both read through it, which is the only
+   reason either references this project.
 
 5. **An `InternalsVisibleTo` grant is not a dependency edge.** It annotates one the grantee's `ProjectReference`
-   already declares — `Binacle.Packing` granting to `Binacle.Lib.TestsKernel` records that the kernel leans on
-   Packing's internals, not that Packing leans on the kernel.
+   already declares — `Binacle.Packing` granting to `Binacle.Lib.Data` records that the data project leans on
+   Packing's internals, not that Packing leans on the data project.
 
-6. **`Binacle.TestReporting` has no Binacle deps** — a plain writer, safe for any harness to reference. It owns
-   `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the tools and perf harnesses use.
+6. **`Binacle.Reporting` has no Binacle deps** — safe for any measure project or tool to reference. It owns
+   `RepositoryRoot`/`RepositoryRootLocator`, the repo-root locator the measure projects and the tools use.
 
 7. **`Binacle.FluxResults` came in from the retired FluxResults NuGet package**, v1.0.0. Same copyright
    holder, and **it keeps that package's MIT licence rather than the repository's** — it carries its own

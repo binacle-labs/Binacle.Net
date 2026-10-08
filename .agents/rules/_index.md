@@ -10,6 +10,11 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
 ## General
 
 ```yaml
+- file: a-doc-is-not-a-report.md
+  description: "A doc states what is true, not what was done to find it out. No session narrative in a file a human reads."
+  when: "writing or editing any doc, README, results file or other public markdown"
+  load: on-trigger
+  paths: ["**/README.md", "lib/results/**", "vipaq/results/**", ".agents/docs/**", ".agents/design/**"]
 - file: comments-are-for-humans.md
   description: "A comment carries the one thing that is not obvious from the code. Short. The reasoning goes in design/, never in both."
   when: "writing or editing a code comment"
@@ -35,6 +40,10 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "adding a file under tooling/, or a file a just recipe reads"
   load: on-trigger
   paths: ["tooling/**"]
+- file: keep-a-session-small.md
+  description: "One session, one step. Read only what the step needs, tell the maintainer to start fresh before the session gets big, and split big work into files one session can finish."
+  when: "at the start of a session, when a task grows, and when planning work"
+  load: always
 - file: keep-verified-current.md
   description: "When you edit a doc, update its verified date and check its also_update list. One carve-out - a prose-only edit that checks nothing against code does not bump the date."
   when: "editing any doc or design record"
@@ -49,11 +58,23 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   when: "before editing anything under sites/"
   load: always
   paths: ["sites/**"]
+- file: never-run-long-commands.md
+  description: "The maintainer runs every suite, bench, measure and anything that starts the host. An agent never does."
+  when: "before running any command that is not a read, a single-project build or a dry run"
+  load: always
+- file: numbers-only-where-they-are-the-point.md
+  description: "Write a number only where it is the point. A count the code already holds goes stale with the next change."
+  when: "writing a number into a doc, README, plan, comment or recipe"
+  load: on-trigger
 - file: one-fact-one-place.md
   description: "Put a fact in exactly one place and cross-link. A fact written twice will disagree."
   when: "adding a fact to any file under .agents/"
   load: on-trigger
   paths: [".agents/**"]
+- file: only-the-maintainer-decides.md
+  description: "A plan holds suggestions. Only the maintainer turns one into a decision, in his own words. A suggestion is never a reason to argue with him."
+  when: "writing into any file under .agents/, writing anything for the next session, or acting on what a plan says"
+  load: always
 - file: plain-ascii-for-user-text.md
   description: "Text that reaches a user stays plain ASCII - no em dashes, curly quotes, ellipsis characters or arrows."
   when: "writing text a user will see - validation and exception messages, log lines, OpenAPI descriptions, UI strings"
@@ -81,7 +102,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   load: on-trigger
   paths: [".agents/release-v*.md", ".agents/post-release-v*.md"]
 - file: who-references-whom.md
-  description: "The one reference matrix - what every file type may point at, what it may never point at, and the three exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever."
+  description: "The one reference matrix - what every file type may point at, what it may never point at, and the four exceptions. Docs and design point at each other; nothing outside .agents/ points into it, ever."
   when: "adding any link, $ reference or pointer, anywhere in the repo"
   load: always
 ```

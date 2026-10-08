@@ -1,8 +1,8 @@
 ---
 id: vipaq/architecture
 description: ViPaq architecture — the blind encode/decode layer, the layout codecs, and the serializer that chooses. The policy/mechanism split the rebuild keeps.
-verified: 2026-08-27
-check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; the report files under results/vipaq/compression/ resolve
+verified: 2026-09-29
+check: Policy/mechanism split matches vipaq/src/Binacle.ViPaq — ProtocolEncoder obeys the header, ViPaqSerializer chooses widths/layout/compression, Layouts/ hold the codecs; every type named here has the visibility claimed; the ViPaqSerializer call sites listed still exist and still name their types; vipaq/results/measurements/encoded-size/ holds a folder per algorithm, and a file per layout per group inside it
 paths:
   - "vipaq/**"
 ---
@@ -59,8 +59,8 @@ whatever `Encode` writes, `Decode` must read back. Keeping them in one class kee
 **The codec is a constructor argument on `ProtocolEncoder`.** That is what makes the blind layer fully testable:
 hand it a `NoOpCodec` and every combination of widths, layout and compression becomes forceable *with the body
 still readable*, so framing can be checked byte for byte — impossible through a real codec, because compressed
-bytes must never be compared (§6.1). Racing DEFLATE against gzip is two encoders and nothing else. Once the race
-is settled the codec is pinned by `Version` (§6) and the constructor takes the winner.
+bytes must never be compared (§6.1). Racing DEFLATE against gzip is two encoders and nothing else. The wire codec is
+pinned by `Version` (§6); `ResolveCodec` hands the constructor raw DEFLATE.
 
 **Why the encoder, and not the serializer, owns the codec and the item count.** The count is a uint16 at the
 front of the *body* (§3), and the body is what gets compressed (§1). So the count cannot be read until after the
@@ -121,17 +121,19 @@ with a `with` expression:
   at large coordinates, so the three sections genuinely disagree (Bischoff packs to `16/8/16`).
   With no items both item widths stay `Eight`, which is what §4 requires.
 - **Layout** — the caller's choice through `ViPaqSerializationOptions`, default `RowMajor`. Both codecs ship and
-  the header bit records which was used, so the default can change without a version bump.
+  the header bit records which was used, so the default can change without a version bump. Measured over
+  every real pack in `vipaq/results/measurements/encoded-size/`: raw is the same length in both layouts, and under deflate or
+  gzip columnar is smaller on average.
 - **Compressed** — the caller's choice too, default off. Not decided by the library: encoding both ways and
-  keeping the shorter blob costs a second compression on every call, and that cost is unmeasured, so the call
-  is handed to whoever knows their own trade-off.
+  keeping the shorter blob costs a second compression on every call. What one compression adds is measured on
+  two packs only (`vipaq/results/benchmarks/baseline/encoding/Sample_CompressionCost_Encode.md`), not as a curve
+  over pack sizes, so the call is handed to whoever knows their own trade-off.
 
 `Deserialize` is the easy half: `Header.FromBytes` on the first two bytes — which already rejects a bad version,
 a set reserved bit and a reserved width code (§7, steps 2-3) — then hand the encoder the header plus the rest.
 
 That layer is what the public API calls. **The benchmark harness does not** — it constructs `ViPaqEncoder`
-and `ProtobufEncoder` and drives the blind layer directly, which is what the *Public surface* section below
-says and what this sentence used to contradict.
+and `ProtobufEncoder` and drives the blind layer directly (see *Public surface* below).
 
 **One codec rule, read the same way in both directions.** `ResolveCodec(header)` is the only place that maps the
 `Compressed` bit onto a codec — raw DEFLATE when set, `NoOpCodec` when clear — and both `Serialize` and
@@ -152,12 +154,12 @@ them** — that page decodes in the browser through the TypeScript package, and 
   codecs and their factory, `ProtocolEncoder`, `Header`, `Version`, `Width`, `HeaderNotation`, and the three
   codec implementations. **`ICompressionCodec` itself is public** while `DeflateCodec` / `GzipCodec` /
   `NoOpCodec` are not: the seam is visible, the choice of stream is not.
-- `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.TestsKernel`,
-  `.PerformanceTests` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
+- `Binacle.ViPaq.csproj` grants `InternalsVisibleTo` to `.UnitTests`, `.VectorGenerators`, `.Testing`,
+  `.EncodedSize` and `.Benchmarks` — the measurement harnesses drive the blind layer directly, which needs
   internals. `.PackedDataGenerator` is deliberately not on that list (`$vipaq/dependencies`, wall 3).
-- **Racing the codecs needs internals**, and `TestsKernel` has them. The race is part of the permanent harness,
-  so it belongs there rather than in a throwaway. No new grant is needed. The reports are in
-  `results/vipaq/compression/`.
+- **Racing the codecs needs internals**, and `Binacle.ViPaq.Testing` has them. The race is part of the
+  permanent harness, so it belongs there rather than in a throwaway. No new grant is needed. The sizes are in
+  `vipaq/results/measurements/encoded-size/`.
 
 The public contract does not grow, yet tests can force any combination.
 
@@ -170,7 +172,7 @@ The public contract does not grow, yet tests can force any combination.
 - **The chooser is a checkable function** (phase 2). Enumerate the combinations through the blind layer and
   assert the choosing layer picked the **narrowest widths that hold each section**. **Not the smallest
   base64** — compression is the caller's choice and is deliberately not decided by the library, because
-  encoding both ways to compare costs a second compression on every call and that cost is unmeasured.
+  encoding both ways to compare costs a second compression on every call, measured on two packs only.
 - **A header that cannot hold its data throws.** The blind layer trusts the header but rejects the impossible —
   1 byte per number forced on a value of 300 (§8, encode side).
 
@@ -182,8 +184,5 @@ the two could silently disagree in a mode neither would choose on its own.
 
 ## Open — do not assume
 
-- **Does columnar actually pay?** Both layouts were raced against both codecs — the reports are in
-  `results/vipaq/compression/` (`CodecCompressionCrossover.Row.md`, `.Columnar.md`). `RowMajor` remains the
-  default; treat columnar as available and measured, not as the better choice.
 - **Whether the library should choose `Compressed` for you.** It does not. Encoding both ways and keeping the
-  shorter blob is still unmeasured for encode time, so the decision stays with the caller.
+  shorter blob is measured on two packs only, not across pack sizes, so the decision stays with the caller.

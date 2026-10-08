@@ -1,7 +1,7 @@
 ---
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
-verified: 2026-08-27
+verified: 2026-09-29
 check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
 paths:
   - "sites/www/**"
@@ -35,8 +35,9 @@ with no `defer` and no `async` on purpose.
 **It cannot touch `document.body`** - the parser has not reached it - which is why the theme is `data-theme`
 on `<html>` and not a class on `<body>`, on this site and on the other three.
 
-**It is a second webpack config, not a second entry.** The main config splits every entry into a runtime
-chunk and a vendors chunk, and a head script has to be one self-contained file. Both write into `js/`, so
+**It is a second webpack config, not a second entry.** On docs and demo the main config splits every entry
+into a runtime chunk and a vendors chunk, and a head script has to be one self-contained file. www's main
+config does not split; here the second config is what keeps the `esnext` override below to this bundle alone. Both write into `js/`, so
 the main config's `clean` keeps `theme-init.js` - without that the two race and the file is deleted after
 it is written.
 
@@ -75,7 +76,7 @@ classes Rouge emits are mapped in `_sass/_code.scss`, confirmed against a real b
 
 ## W6 - every example is v3, and that is a contract question
 
-v4 is experimental for the whole 3.0.x line. **`fit/bin`, `fit/smallest-bin` and `pack/smallest-bin` are v4
+v4 is marked experimental (`ApiV4Document.IsExperimental`). **`fit/bin`, `fit/smallest-bin` and `pack/smallest-bin` are v4
 and must not appear on this site.** `parameters` is required on every fit and pack request - a body without
 it returns 400.
 
@@ -93,7 +94,7 @@ across several boxes. **Whoever ships that feature deletes it.**
 
 ## W8 - four schema types are rejected, so nobody adds them back
 
-`_includes/schema.html` emits two blocks on `/` alone, where a page opts in with `structured_data: true`.
+`{% structured_data %}` writes the graph, and `/` alone names a type, `SoftwareApplication` - `$sites/www`.
 **Four more were considered and rejected**: `BreadcrumbList` (four flat pages), `FAQPage` (rich results
 withdrawn, and it invites writing fake questions), `WebSite` + `SearchAction` (no site search), and `HowTo`
 (deprecated).

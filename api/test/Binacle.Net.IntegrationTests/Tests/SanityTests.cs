@@ -1,4 +1,4 @@
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 

@@ -1,8 +1,8 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-09-04
-check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow count matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
+verified: 2026-09-29
+check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow list matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
   - "tooling/*.just"
@@ -36,36 +36,44 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `api/test/*.UnitTests` | One unit suite per source project — `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`. `Kernel.UnitTests` is split by feature folder |
 | `lib/src/Binacle.Lib` | Core bin-packing algorithms and processors |
 | `shared/src/Binacle.Packing` | The packing vocabulary shared between `Binacle.Lib` and the API layer |
-| `lib/test/` | Lib unit tests, performance tests, benchmarks |
+| `lib/test/` | Lib unit tests and `Binacle.Lib.Testing` |
+| `lib/data/` | The result-selection fixtures and `Binacle.Lib.Data`, which reads them |
+| `lib/measure/` | `Binacle.Lib.PackingEfficiency` - packs every scenario and writes `lib/results/measurements/` |
+| `lib/bench/` | The lib benchmarks, one BenchmarkDotNet project per question |
 | `vipaq/src/Binacle.ViPaq` | Compact binary format for encoding packing results |
-| `vipaq/test/` | ViPaq unit tests, performance tests, benchmarks |
+| `vipaq/test/` | ViPaq unit tests and `Binacle.ViPaq.Testing` |
+| `vipaq/data/` | The packed results ViPaq encodes, and `Binacle.ViPaq.Data`, which reads them |
+| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` - encodes every pack and writes `vipaq/results/measurements/` |
+| `vipaq/bench/` | `Binacle.ViPaq.Benchmarks` - the ViPaq timings |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror of ViPaq |
-| `shared/src/Binacle.Geometry` | Shared geometry leaf — generic `IWith*` interfaces + concrete `Dimensions<T>`/`Coordinates<T>` (BCL-only, referenced by lib, ViPaq, CompactNotation) |
+| `shared/src/Binacle.Geometry` | Shared geometry leaf — generic `IWith*` interfaces + concrete `Dimensions<T>`/`Coordinates<T>` (BCL-only, referenced by Packing, ViPaq and CompactNotation, and through Packing by lib) |
 | `shared/src/Binacle.CompactNotation` | Shared compact-string parser/formatter (`LxWxH (X,Y,Z) [Q]`) |
 | `shared/src/Binacle.FluxResults` | Result and union types the service module returns instead of throwing |
-| `shared/test/Binacle.TestsKernel` | Shared test fixtures and scenario data |
+| `shared/data/Binacle.Data` | Shared scenario data and the code that reads it |
 | `shared/test/Binacle.CompactNotation.UnitTests` | Tests for the shared compact notation |
 | `shared/test/Binacle.FluxResults.UnitTests` | Tests for the shared result and union types |
-| `shared/test/Binacle.TestReporting` | The report runner and markdown/console writers the performance runs and the converter tools share |
+| `shared/test/Binacle.Reporting` | The runner-and-reporter loop and the markdown writer the measure projects use; the data tools use only its `RepositoryRoot` |
+| `shared/test/Binacle.Benchmarking` | The BenchmarkDotNet config every bench project runs with |
 | `packages/` | TypeScript packages (npm workspaces) |
 | `ruby/` | Ruby gems (Jekyll plugins) |
 | `sites/` | Every published site, one directory each (`$sites`) |
 | `sites/docs/` | Jekyll documentation site — the published one (`$sites/docs`), not `.agents/docs/` |
 | `sites/demo/` | Jekyll demo site (`$sites/demo`) |
 | `sites/www/` | Jekyll marketing site (`$sites/www`) |
+| `sites/admin/` | Jekyll admin site - experimental, local only, never built or deployed |
 | `api/requests/` | HTTP request files for manual testing (subfolders: v3, v4, Service) |
 | `samples/` | Docker and Kubernetes deployment samples (user-facing starting points) |
-| `tooling/` | Every task the repo can run, called by CI and by hand alike — twelve `just` modules (agents, build, changelog, check, ci, coverage, image, openapi, regen, serve, smoke, tests), the benchmark/performance scripts, the wrangler configs, local compose, emulator state |
-| `.github/workflows/` | The eleven GitHub Actions workflows — the PR gate, the shared image tests, the shared site tests, Sonar, CodeQL, the release pipeline, image smoke, the Docker Hub overview push, and the three site deploys (`$ci-cd`) |
+| `tooling/` | Every task the repo can run, called by CI and by hand alike — the `just` modules (agents, bench, build, changelog, check, ci, coverage, image, measure, openapi, regen, serve, smoke, tests), the scripts they call, the wrangler configs, local compose, emulator state |
+| `.github/workflows/` | The GitHub Actions workflows — the PR gate, the shared image tests, the shared site tests, Sonar, CodeQL, the release pipeline, image smoke, the Docker Hub overview push, and the site deploy (`$ci-cd`) |
 | `shared/data/` | Fixture data more than one slice reads — `or-library/` (raw), `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
-| `assets/` | Shared images, js, css and fonts, copied into the three Jekyll sites and the UI module by `gulpfile.js` |
+| `assets/` | Shared images, js, css and fonts, copied into the docs, demo and www sites and the UI module by `gulpfile.js` |
 | `LICENSE.GPL-3.0/` | The GPL-3.0 text, kept because images and tags published before v3.0.0 link to this path |
-| `results/` | The hand-curated measurement vault — benchmark and size reports, never auto-written (`$build-topology`) |
-| `artifacts/` | Build output only — `binacle-net/`, `docs/`, `demo/`, `www/`, `openapi/`, `tests/`, `coverage/`. Never edit |
+| `lib/results/`, `vipaq/results/` | Measured results. `measurements/` is what the measure projects write and overwrite, so a change is a diff; `benchmarks/` holds bench runs kept by hand; each file at the root answers one question from those two |
+| `artifacts/` | Build output only — `binacle-net/`, one folder per site, `openapi*/`, `tests/`, `coverage/`. Never edit |
 
 ## Commands
 
-See Commands (`$commands`) — how to set up a clone, run the API and the three sites, run tests and
+See Commands (`$commands`) — how to set up a clone, run the API and the sites, run tests and
 benchmarks, and build the Docker image.
 
 ## Common Tasks
@@ -92,6 +100,7 @@ benchmarks, and build the Docker image.
 | Change a GitHub Actions workflow | `$ci-cd`, `$tooling` (the recipe it calls) |
 | Understand how the image gets released | `$ci-cd/release-pipeline`, `$build-topology` |
 | Add a CI check or a PR gate | `$ci-cd`, `$tooling` |
+| Name a branch, or open one | `$ci-cd/branches` |
 
 ## Slice Docs
 
@@ -99,7 +108,7 @@ benchmarks, and build the Docker image.
 - API (`$api`) — endpoints, contracts, service, kernel, modules (Diagnostics, ServiceModule, UIModule)
 - Configuration (`$api/configuration`) — config file layout, env-var conventions, feature flags
 - Lib (`$lib`) — algorithms, processors, result building and selection; lib tests
-- Shared (`$shared`) — Binacle.TestsKernel scenario data & compact formats; OR-Library data
+- Shared (`$shared`) — Binacle.Data scenario data & compact formats; OR-Library data
 - ViPaq (`$vipaq`) — `Binacle.ViPaq` binary format and TypeScript mirror
 - Packages (`$packages`) — TypeScript npm packages
 - Ruby (`$ruby`) — Ruby/Jekyll plugins

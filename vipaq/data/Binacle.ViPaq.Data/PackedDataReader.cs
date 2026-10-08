@@ -1,0 +1,111 @@
+using System.Text.Json;
+using Binacle.CompactNotation;
+using Binacle.Data.Files;
+
+namespace Binacle.ViPaq.Data;
+
+// Reads the frozen placed-result files that Binacle.ViPaq.PackedDataGenerator emits under vipaq/data/packed and
+// the .csproj embeds as "PackedData.<family>.<name>.<algo>.json", and turns their rows into Scenarios. The
+// embedded-resource reader is Binacle.Data's; the four-part name is parsed here because only this project
+// embeds files in that shape.
+internal static class PackedDataReader
+{
+	private const string ResourcePrefix = "PackedData.";
+
+	private static readonly JsonSerializerOptions Options = new()
+	{
+		// JSON keys and POCO properties are both PascalCase, so no case-insensitive matching is needed.
+		PropertyNameCaseInsensitive = false,
+		ReadCommentHandling = JsonCommentHandling.Skip,
+	};
+
+	// The scenarios from one family's embedded files. The file provider returns them sorted, so the flattened
+	// stream is stable.
+	public static IEnumerable<Scenario> Read(string family)
+	{
+		var assembly = typeof(PackedDataReader).Assembly;
+		var files = EmbeddedResourceFileProvider.ByPrefix(assembly, ResourcePrefix)
+			.Select(PackedFile.Parse)
+			.Where(file => file.Family == family);
+
+		foreach (var file in files)
+		{
+			using var stream = file.Resource.OpenRead();
+
+			var records = JsonSerializer.Deserialize<PackedRecord[]>(stream, Options)
+				?? throw new InvalidOperationException($"Packed data '{file.Name}' deserialized to null.");
+
+			foreach (var record in records)
+			{
+				yield return ToScenario(record, file.Algorithm);
+			}
+		}
+	}
+
+	// One embedded file with its name split. The part after the prefix is "<family>.<name>.<algorithm>.<extension>",
+	// e.g. "bischoff-suite.orlib_thpack1.ffd.json". Family folders and names carry no dots, so a plain split
+	// gives exactly four parts.
+	private sealed record PackedFile(EmbeddedResourceFile Resource, string Family, string Name, string Algorithm)
+	{
+		public static PackedFile Parse(EmbeddedResourceFile resource)
+		{
+			var parts = resource.RelativeName.Split('.');
+			if (parts.Length != 4)
+			{
+				throw new ArgumentException(
+					$"Packed-data resource '{resource.ResourceName}' is not the expected <family>.<name>.<algorithm>.<extension> shape.");
+			}
+
+			return new PackedFile(resource, parts[0], parts[1], parts[2]);
+		}
+	}
+
+	// The source problem name repeats across algorithms, so the algorithm is part of the scenario name. Without
+	// it the providers' name-keyed dictionaries collide.
+	private static Scenario ToScenario(PackedRecord record, string algorithm)
+	{
+		// Parse as int, then narrow with a checked cast. The largest Bischoff coordinate is ~587, far below
+		// ushort's 65535, so the cast is a guard, not a lossy conversion.
+		var binInt = CompactNotationParser.ParseDimensions<int>(record.Bin);
+		var bin = new Dimensions<ushort>
+		{
+			Length = checked((ushort)binInt.Length),
+			Width = checked((ushort)binInt.Width),
+			Height = checked((ushort)binInt.Height),
+		};
+
+		var items = new Item<ushort>[record.Items.Length];
+		for (var index = 0; index < items.Length; index++)
+		{
+			var item = CompactNotationParser.ParseItem<int>(record.Items[index]);
+			items[index] = new Item<ushort>
+			{
+				Length = checked((ushort)item.Length),
+				Width = checked((ushort)item.Width),
+				Height = checked((ushort)item.Height),
+				X = checked((ushort)item.X),
+				Y = checked((ushort)item.Y),
+				Z = checked((ushort)item.Z),
+			};
+		}
+
+		return new Scenario
+		{
+			Name = $"{record.Name}.{algorithm}",
+			WidthBits = record.WidthBits,
+			Spread = "real",
+			Bin = bin,
+			Items = items,
+		};
+	}
+
+	// One row as stored on disk: compact-notation strings plus the derived width family. No token is stored - it
+	// is derivable from the geometry, and its compressed bytes vary by runtime.
+	private sealed class PackedRecord
+	{
+		public required string Name { get; init; }
+		public required int WidthBits { get; init; }
+		public required string Bin { get; init; }
+		public required string[] Items { get; init; }
+	}
+}

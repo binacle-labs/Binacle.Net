@@ -1,8 +1,8 @@
 ---
 id: vipaq
 description: Binacle.ViPaq — compact binary format for packing results. The wire is defined in PROTOCOL.md; this covers the C# API surface, repo layout, and tests.
-verified: 2026-09-04
-check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects and the pre-report gates in PerformanceTests/PreReportChecks/
+verified: 2026-09-29
+check: Every row of the public-surface table matches vipaq/src/Binacle.ViPaq/, including which types are internal and every member of Limits; every path in the repo layout resolves and no top-level folder under vipaq/ is missing from it; the Tests table matches the projects, the real-pack theories in vipaq/test/Binacle.ViPaq.UnitTests/Tests/Packed/ and the two gates in vipaq/measure/Binacle.ViPaq.EncodedSize/PreReportChecks/
 also_update:
   - vipaq/typescript
   - vipaq/cross-language-testing
@@ -62,24 +62,27 @@ notation (`"10x10x10 (0,0,0)"`) is not here; it lives in the shared `Binacle.Com
 | `vipaq/src/Binacle.ViPaq/` | C# reference implementation |
 | `vipaq/packages/binacle-vipaq/` | TypeScript mirror (`$vipaq/typescript`) |
 | `vipaq/test-vectors/` | Language-neutral vectors read by both suites |
-| `vipaq/test/` | C# unit tests, the real-data tests kernel, benchmarks, performance tests |
+| `vipaq/test/` | C# unit tests and `Binacle.ViPaq.Testing` (the harness's encoders and picks) |
+| `vipaq/measure/` | `Binacle.ViPaq.EncodedSize` — encodes every pack and writes `vipaq/results/measurements/` |
+| `vipaq/results/` | `measurements/` is what `Binacle.ViPaq.EncodedSize` writes, so a change is a diff; `benchmarks/` holds kept timing runs |
+| `vipaq/bench/` | `Binacle.ViPaq.Benchmarks` — the timings |
 | `vipaq/tools/` | `VectorGenerators` (writes `test-vectors/`) and `PackedDataGenerator` (writes `data/packed/`) |
-| `vipaq/data/packed/` | The frozen placed results the kernel embeds — `bischoff-suite/`, `custom-problems/`, `demo-samples/` |
+| `vipaq/data/` | `packed/` — the frozen placed results, `bischoff-suite/`, `custom-problems/`, `demo-samples/` — and `Binacle.ViPaq.Data`, which embeds them |
 
 ## Tests
 
 | Project | Covers |
 |---|---|
-| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection; internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
-| `vipaq/test/Binacle.ViPaq.PerformanceTests` | the `IPreReportCheck` gates — all 2,316 real packs × every codec × both layouts × natural/forced-16-bit widths, header + decode-to-input, run before the size reports |
-| `vipaq/test/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings over the curated picks and the synthetic sets |
+| `vipaq/test/Binacle.ViPaq.UnitTests` | serializer round-trips, exact-byte golden vectors, the forced width/layout/compression matrix, every rejection, every real pack round-tripped in every public mode and under gzip, and every non-empty pack at forced 16-bit widths in every codec (an empty pack keeps 8-bit widths); internal `Header` / `ProtocolEncoder` / codecs via `InternalsVisibleTo` |
+| `vipaq/measure/Binacle.ViPaq.EncodedSize` | two `IPreReportCheck` gates — every curated benchmark pick still names a real scenario, and every pack lands in a file — then every pack's size in ViPaq, protobuf, JSON and compact notation, written to `vipaq/results/measurements/encoded-size/` |
+| `vipaq/bench/Binacle.ViPaq.Benchmarks` | BenchmarkDotNet timings: `Smoke_Encode`, `Smoke_Decode` on three packs; `Sample_Encode`, `Sample_Decode` over the curated picks and the synthetic curve, and `Sample_CompressionCost_Encode`, `_Decode`; every report prints each pack's `Items` and `Widths` (`PackColumns.cs`) — `just bench vipaq-smoke`, `vipaq-sample` |
 | `vipaq/packages/binacle-vipaq` | TypeScript mirror — `just test ts_binacle-vipaq_unit` (jest) |
 
 The C# unit suite runs with `just test cs_binacle-vipaq_unit`. Only the two unit suites are on `just test all`; the
-performance and benchmark projects are run on demand.
+measure and benchmark projects are run on demand (`just measure vipaq`, `just bench vipaq-smoke`, `vipaq-sample`).
 
 How the two languages are held to one wire — the shared vectors, the generators, and the decode-to-input contract
 for compressed payloads — is in `$vipaq/cross-language-testing`.
 
-How the projects reference each other, who can see internals, and the walls between them (UnitTests never touches
-the real-data kernel) are in `$vipaq/dependencies`.
+How the projects reference each other, who can see internals, and the walls between them (UnitTests reads
+`Binacle.ViPaq.Data`, never `Binacle.ViPaq.Testing`) are in `$vipaq/dependencies`.

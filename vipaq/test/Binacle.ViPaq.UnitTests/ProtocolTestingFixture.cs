@@ -9,8 +9,8 @@ namespace Binacle.ViPaq.UnitTests;
 // the path a real caller takes.
 //
 // These helpers are uncompressed: the encoder gets the NoOp codec, so the body stays byte-for-byte readable and
-// the exact-byte pins hold. DecodeWith is the exception, taking a codec so the cross-language decode test can
-// read deflate/gzip blobs.
+// the exact-byte pins hold. EncodeWith and DecodeWith are the exception, taking a codec so a test can reach
+// gzip, which the serializer never picks, and the cross-language decode test can read deflate/gzip blobs.
 //
 // Nothing here checks anything. Every method hands back a BinContents to compare with BinContents.AssertSame.
 internal static class ProtocolTestingFixture
@@ -23,7 +23,19 @@ internal static class ProtocolTestingFixture
 	)
 		where T : struct, IBinaryInteger<T>
 	{
-		var encoder = new ProtocolEncoder(new NoOpCodec());
+		return EncodeWith(header, bin, items, new NoOpCodec());
+	}
+
+	// A whole blob under a caller-chosen header and codec. The header's Compressed bit must match the codec.
+	public static byte[] EncodeWith<T>(
+		Header header,
+		Binacle.Geometry.Dimensions<T> bin,
+		IReadOnlyList<Binacle.Geometry.Item<T>> items,
+		ICompressionCodec codec
+	)
+		where T : struct, IBinaryInteger<T>
+	{
+		var encoder = new ProtocolEncoder(codec);
 
 		return encoder.Encode<Binacle.Geometry.Dimensions<T>, Binacle.Geometry.Item<T>, T>(header, bin, items);
 	}

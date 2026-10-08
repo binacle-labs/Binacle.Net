@@ -10,6 +10,7 @@ Jekyll.logger.log_level = :error
 FIXTURE_SITE = File.expand_path('fixtures/site', __dir__).freeze
 BROKEN_SITE = File.expand_path('fixtures/broken', __dir__).freeze
 NO_INDEX_SITE = File.expand_path('fixtures/no-index', __dir__).freeze
+COLLISION_SITE = File.expand_path('fixtures/collision', __dir__).freeze
 TMP_ROOT = Dir.mktmpdir('binacle-docs-versions').freeze
 
 at_exit { FileUtils.rm_rf(TMP_ROOT) }
@@ -34,12 +35,21 @@ module SiteBuilder
 
   # The one knob, moved. Jekyll reads _data before any generator runs, so a spec sets it after the read.
   def build_with_current(version)
+    build_with_versions('current' => version)
+  end
+
+  def build_with_list(list)
+    build_with_versions('list' => list)
+  end
+
+  def build_with_versions(overrides)
     site = build_site
-    site.data['versions']['current'] = version
     site.reset
     site.read
-    site.data['versions']['current'] = version
+    site.data['versions'].merge!(overrides)
     site.generate
+    site.render
+    site.write
     site
   end
 end

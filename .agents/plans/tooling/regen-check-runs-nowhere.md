@@ -2,6 +2,7 @@
 description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
 state: ready
 waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
+horizon: undecided
 paths:
   - "tooling/**"
   - "vipaq/test-vectors/**"
@@ -12,8 +13,8 @@ paths:
 
 **One of four gaps that were filed together. The other three are closed.**
 
-**What `regen` covers is settled**: data generated *into* the repository, and nothing else. The docs site's
-OpenAPI copies are not that - they are hand-carried, and `just openapi check-site-copies` compares them now.
+**What `regen` covers**: data generated *into* the repository, and nothing else. The docs site's
+OpenAPI copies are not that - they are hand-carried, and `just openapi check-all-copies` compares them now.
 
 ## No workflow calls it
 

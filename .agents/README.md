@@ -14,7 +14,7 @@ reviewable. Read this first to know where things are.
 | `memory/` | Durable "why" with no home in a doc or plan — gotchas, settled decisions, conventions. | Scan `memory/_index.md` at session start. Add a fact only if no doc/plan fits (`memory/README.md` says how). |
 | `release-v<version>.md` (+ companion) | The per-version release set, at root: the release plan, plus `post-release-v<version>.md` (right-after-release work). The GitHub release body is not here — it is the `## [Unreleased]` section of `CHANGELOG.md` at the repo root, which the release workflow extracts. | When cutting a release. The plan is deleted once the version is out; the post-release list goes when its own items are done. |
 
-Nothing here is loaded up front. `CLAUDE.md` carries the four always-on rules and points at this file; you
+Nothing here is loaded up front. `CLAUDE.md` carries the always-on rules and points at this file; you
 fetch the rest on demand.
 
 **Every file declares when it is needed, so you can decide without opening it.** The front matter is the fetch
@@ -76,7 +76,7 @@ first is off limits.
 ## Who may reference whom
 
 One table, one file: `rules/who-references-whom.md`. It covers every layer, the outward boundary, and the
-three exceptions. Nothing here restates it.
+exceptions. Nothing here restates it.
 
 ## How to reference — the `$` symbol scheme
 
@@ -90,7 +90,7 @@ Point at another agent doc with a **`$` reference**, not a file path. Paths brea
 - **Annotate a referenced section** so the target is findable: a heading tag `{#width-selection}`, or a label the
   heading already carries (the decision headings `D1…`, `O1…` are their own anchors).
 - `also_update:` lists sibling docs by **id** (`vipaq/findings`), not path.
-- Reference **code, `results/`, and the wire spec by real path** — the `$` scheme is for `.agents` docs only.
+- Reference **code, `lib/results/`, `vipaq/results/`, and the wire spec by real path** — the `$` scheme is for `.agents` docs only.
 
 **Ref codes stay inside the agent docs** - see `rules/ref-codes-stay-in-the-agent-docs.md`.
 
@@ -101,4 +101,4 @@ here. Two that shape how you use *this* directory:
 
 - **Find the layer first, then the file.** Each layer has an `_index.md` manifest; open that, not every file.
 - **A rule about the whole system belongs in `rules/`. A fact about one topic belongs in the doc or memory
-  that owns it** - v3-is-frozen in `memory/v3-frozen.md`, endpoint rules in `docs/api/`.
+  that owns it** - v3-is-frozen in `memory/api-v3-frozen.md`, endpoint rules in `docs/api/`.

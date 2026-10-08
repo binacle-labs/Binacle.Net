@@ -10,6 +10,7 @@ built with webpack and TypeScript beside them.
 | [`docs/`](docs) | The documentation site - versioned API reference and guides |
 | [`demo/`](demo) | The demo site - the packing demo, the ViPaq decoder, and the pages around them |
 | [`www/`](www) | The marketing site - what Binacle.Net does, and who it is for |
+| [`admin/`](admin) | **Experimental, local only - not published.** A page to manage a local ServiceModule's accounts. No build recipe, no assets copy, no workflow names it |
 
 Each has its own `README.md`, `Gemfile` and `package.json`. **All three `package.json` files are root npm
 workspace members**, so one `npm install` at the root covers them and none has a lock file of its own. Ruby is
@@ -37,10 +38,9 @@ Output goes to `artifacts/<site>` at the repo root, which is what gets deployed.
 
 ## ☁️ Deploying
 
-All three go to Cloudflare, each from its own workflow - `Deploy Docs Site`, `Deploy Demo Site` and
-`Deploy WWW Site`. All are **manual** (`workflow_dispatch`), all build the site fresh, check its links
-offline, upload `artifacts/<site>`, and then tag the commit they published so a live site maps back to a
-commit.
+All three go to Cloudflare from one workflow, `Deploy Site`, with the site picked at dispatch - `docs`, `demo`
+or `www`. It is **manual** (`workflow_dispatch`), builds the site fresh, checks its links offline, uploads
+`artifacts/<site>`, and then tags the commit it published so a live site maps back to a commit.
 
 The wrangler config for each lives in [`tooling/cloudflare/`](../tooling/cloudflare). The `directory` it
 uploads has to match the `destination` in that site's `_config.yml`.

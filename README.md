@@ -56,17 +56,18 @@ searches for 3D bin packing, so that is the term used here.
 ├── /api          # HTTP API - ASP.NET Core minimal APIs (v3, v4) and modules
 ├── /lib          # Core 3D bin-packing engine (Binacle.Lib)
 ├── /vipaq        # ViPaq - compact binary format for packing results
-├── /shared       # Shared test kernel and benchmark data
+├── /shared       # Shared libraries, scenario data and the code that reads it
 ├── /packages     # JavaScript/TypeScript packages (npm workspaces)
 ├── /ruby         # Ruby gems - Jekyll plugins for the sites
-├── /sites        # Every published site (Jekyll)
+├── /sites        # Every site (Jekyll)
+│   ├── /www      # binacle.net
 │   ├── /docs     # Documentation site
-│   └── /demo     # Binacle.Net demo site
+│   ├── /demo     # Binacle.Net demo site
+│   └── /admin    # Experimental, local only - never deployed
 ├── /samples      # Docker Compose and Kubernetes deployment samples
 ├── /tooling      # Every task the repo can run - just modules, scripts, local compose
 ├── /assets       # Shared static assets copied into the sites at build time
-├── /artifacts    # Build output - published app, sites, OpenAPI, test results, coverage
-└── /results      # Benchmark and packing-efficiency output
+└── /artifacts    # Build output - published app, sites, OpenAPI, test results, coverage
 ```
 
 Each slice folder has its own `README.md` with details.
@@ -77,7 +78,7 @@ You need the .NET SDK, Node, Ruby, `just` and - for the container image only - D
 **[DEVELOPMENT.md](DEVELOPMENT.md)** has the versions, the pin files and the install commands.
 
 ```bash
-just install                     # npm workspaces, all three sites' gems, then the asset copy
+just install                     # npm workspaces, the docs, demo and www gems, then the asset copy
 just test all                    # every suite that needs nothing brought up
 just build image                 # publish, then tag binacle-net:local
 ```
@@ -96,6 +97,7 @@ This project carries more than one license. Which one applies depends on which p
 | The Ruby gems under [`ruby/`](ruby) | MIT |
 | Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
 | [`packages/theme-switcher`](packages/theme-switcher) | MIT |
+| [`packages/cookies`](packages/cookies) - adapted from js-cookie | MIT |
 | [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
 `SPDX-License-Identifier: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`

@@ -1,8 +1,8 @@
 ---
 id: api/decisions
-description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, and why the shipped image carries one caller of the experimental v4 API.
-verified: 2026-08-27
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must return the instance page's presets fetch and nothing else
+description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, and why the instance page renders its presets from a startup snapshot rather than a live provider.
+verified: 2026-09-29
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must now return no call - the one remaining hit is a comment in Instance.cshtml.cs naming the endpoint this page can go stale against - and note this grep never saw the demo's v4 call, which reaches the image through the bundle rather than the module's source; D6 against the absence of api/src/Binacle.Net.UIModule/_js/instance.js and of an instance entry in that module's webpack.config.js, against InstanceOptions.EnabledFeatures filtering on FeatureValue rather than on a name list, and against Binacle.Net.Kernel.csproj referencing Binacle.Packing neither directly nor through what it references; the BinOption-to-InstancePresetBin projection must live in api/src/Binacle.Net/ExtensionMethods/BinPresetOptionsExtensions.cs and nowhere else
 paths:
   - "api/**"
 ---
@@ -12,7 +12,99 @@ paths:
 Why the API is shaped the way it is where the shape is not obvious from the code. What it *does* is `$api` and
 the docs under it; this file is the reasoning, so a later session does not undo a deliberate choice.
 
-## Locked
+## Decided
+
+### D5 — the shipped image calls the experimental v4 API, and that is accepted
+
+**Decided (the maintainer, 2026-09-09):** "we do a gull rebuild from v3 to v4" (answering: move the demo UI to v4)
+The maintainer, 2026-09-29: "D5 yes its used as a testing ground".
+
+**One caller ships in the image. Until 2026-09-10 there were two.**
+
+**The packing demo calls `/api/v4/pack/compare-bins`** through `packages/binacle-net-client`, which both hosts
+bundle - so the shipped `/packing` page is a v4 consumer, where until 2026-09-09 it called v3.
+
+**The second one is gone.** `api/src/Binacle.Net.UIModule/_js/instance.js` fetched `/api/v4/presets` from the
+browser until D6 replaced it with server-side state on 2026-09-10 and deleted the file. The reasoning below
+about its blast radius is kept because it is why the call was tolerated for as long as it was, not because
+the call still exists.
+
+The marketing site tells a reader v4 can change in a patch release and not to integrate against it by
+accident, so the image doing exactly that is worth writing down rather than leaving for someone to find.
+
+**Note the grep in `check:` does not see the demo's call.** It searches the module's own source, and the demo's
+call lives in `packages/binacle-net-ui` and `packages/binacle-net-client`, reaching the image only through
+the bundle. Anyone re-verifying this record from the grep alone will count one caller and be wrong.
+
+**It is accepted, not overlooked.** Three reasons.
+
+**Moving our own UI onto v4 is the point, not an accident.** It is the adoption that earns calling v4 stable
+later, and the flip is a separate piece of work needing an endpoint v4 does not yet have. A demo on the
+version we tell readers is older argues against our own recommendation.
+
+**The blast radius of the presets call is one page.** `/instance` lists the presets the running container was
+configured with. If a v4 change broke the shape, that page stops listing presets. No packing call, no result,
+no data written.
+
+**The demo's blast radius is bigger and is the accepted cost.** A v4 change to `pack/compare-bins` breaks the
+`/packing` page for everyone running the image, and the contract test in `packages/binacle-net-client` is
+what turns that from a silent break into a failing build - it validates the hand-written types against the
+committed copy of the v4 document.
+
+**Moving it to v3 would have been work thrown away**, which is why it was never done: the rewrite that
+deleted the file was already planned, and editing the version string first would have read afterwards as a
+deliberate v3 choice rather than as a stopgap. That rewrite landed as D6.
+
+**What would change this.** The presets half is closed. For the demo, v4 going stable removes the question
+entirely.
+
+### D6 — the instance page renders its presets from a startup snapshot, not a live provider
+
+**Decided (the maintainer, 2026-09-10):** "on presets  we go route A" (answering: (a) fill the presets once at startup, or (c) a live provider)
+
+**Decided 2026-09-10.** `_js/instance.js` fetched `GET /api/v4/presets` from the browser and built the table
+in DOM calls. It now renders server-side and the file is deleted, along with its webpack entry and its script
+tag.
+
+**Three reasons, and they are independent.** The server is holding the answer while it renders the page, so
+the call was the process asking itself a question over the network. A browser fetch dies behind an auth layer,
+a proxy or a CORS rule - which is the situation an operator is in when they open a diagnostics page, so it
+failed exactly when it was needed. And it was the last v4 call made from a browser inside the image, which
+D5 above had to carry.
+
+**The route the obvious fix cannot take, measured 2026-08-22.** `BinPresetOptions` lives in the entry project,
+which references the UI module, so a project reference back is a cycle - `Instance.cshtml.cs` cannot inject
+`IOptions<BinPresetOptions>` the way it injects the switch list. **And the type cannot simply move**:
+`BinOption` implements `IIdentifiableBin` and `IWithDimensions`, from `Binacle.Packing` and `Binacle.Geometry`.
+`Binacle.Net.Kernel` does not reach `Binacle.Packing`; it gets `Binacle.Geometry` only through
+`Binacle.CompactNotation`. Pulling `Binacle.Packing` in would have been the largest cost in the job by
+far, so `PresetsValue` carries a name and, per bin, an id and three ints. `BinPresetOptionsExtensions` in the
+entry project does the projection and is the one place a `Bin` type meets one that is not - it extends the
+nullable type, because the configuration section is optional and reads back null.
+
+**What was built.** A `Kernel/Instance/` slice, holding what a running instance reports about itself.
+`FeatureOptions` moved into it as `InstanceOptions`, and its `Dictionary<string, string?>` became a closed
+value hierarchy: `InstanceValue`, with `FeatureValue` for the switched-on things - `SwitchedOn` and
+`PathValue` - and `PresetsValue` beside them.
+
+**`FeatureValue` is not decoration, it is what keeps the wire honest.** `EnabledFeatures` is published in the
+health check payload and dumped by the debug middleware. Keyed on names alone, a presets entry would have made
+the health check report `Presets` as a switched-on feature and `IsFeatureEnabled("Presets")` return true and
+mean nothing. It filters on `is FeatureValue` for that reason, and a Kernel unit test holds it.
+
+**The snapshot is the accepted cost.** `BinPresetOptions.ReloadOnChange` is `true`, so an operator who edits
+`Presets.json` sees `/instance` disagree with `/api/v4/presets` until the process restarts - and that operator
+is the page's whole audience. **A live provider was the alternative and was rejected on cost**: it needs an
+interface in `Kernel` implemented in the entry project reading `IOptionsMonitor` per render, to close a window
+that ends at the next restart on a page that already reports version and environment, which also need one.
+The comment at the fill point in `Program.cs` says so, so the staleness reads as chosen rather than missed.
+
+**What would change this.** An operator hitting the stale window in practice, or presets becoming editable
+from the page. Either makes the provider worth its cost.
+
+## Pending
+
+What the API does and why. No quote from the maintainer covers these yet.
 
 ### D1 — a module-off document must carry no `429`, and the metadata is what guarantees it
 
@@ -110,13 +202,13 @@ into exactly that. Deleting the HSTS half removes one leg of it.
 
 ### D3 — DiagnosticsModule is always on, and the asymmetry is deliberate
 
-**Settled 2026-08-17.** `builder.AddDiagnosticsModule()` and `app.UseDiagnosticsModule()` are unconditional in
+**Since 2026-08-17.** `builder.AddDiagnosticsModule()` and `app.UseDiagnosticsModule()` are unconditional in
 `Program.cs`, while ServiceModule and UIModule sit behind `Feature.IsEnabled`.
 
 **That is by design and is not evidence of anything.** An earlier draft of the architecture-check work read it
 as a sign a boundary was being crossed, and that argument is withdrawn. **So "every module is registered
-behind a feature check" is not a rule anyone should write** — it would be red on a decision that has been
-taken.
+behind a feature check" is not a rule anyone should write** — it would be red on the choice this entry
+records.
 
 **`IOptionalDependency<T>` is still doing real work**, which is a separate thing. The module is always
 registered; the packing log processor inside it is not — `ModuleDefinition.cs` registers that only when its
@@ -125,7 +217,7 @@ that abstraction covers.
 
 ### D4 — an unknown enum answers with the error a missing one gives, keyed the same way
 
-**Settled 2026-08-27.** A value the enum does not have is refused during binding, and the 422 it produces
+**Since 2026-08-27.** A value the enum does not have is refused during binding, and the 422 it produces
 carries the same key and the same message the validator produces when the field is absent.
 
 **Refusing it is the first half.** Reading an unknown value as null would make it indistinguishable from
@@ -156,24 +248,3 @@ silently undone.
 contract by reflection and fails if one does not carry the converter — a new field is covered the day it is
 added, without anyone remembering to add a test. The integration suites assert the 422 body, not just the
 status, because the status was right while the key was wrong.
-
-### D5 — the shipped image carries one caller of the experimental v4 API, and that is accepted
-
-`api/src/Binacle.Net.UIModule/_js/instance.js` fetches `/api/v4/presets`. It is the only v4 consumer that
-ships inside the image; everything else in the module and both site demos call v3, which is frozen. The
-marketing site tells a reader v4 can change in a patch release and not to integrate against it by accident,
-so the image doing exactly that is worth writing down rather than leaving for someone to find.
-
-**It is accepted, not overlooked.** Two reasons.
-
-**The blast radius is one page.** `/instance` lists the presets the running container was configured with. If
-a v4 change broke the shape, that page stops listing presets. No packing call, no result, no data written -
-and the two pages a visitor actually uses, `/packing` and `/vipaq`, are untouched.
-
-**Moving it to v3 is work that gets thrown away.** The plan for that page renders the presets server-side and
-deletes the fetch entirely, so the file this call lives in is on its way out. Editing the version string now
-means editing a file that is scheduled for deletion, and it would read afterwards as a deliberate v3 choice
-rather than as a stopgap.
-
-**What would change this.** A v4 breaking change landing before that page is rewritten. The signal is the
-`/instance` page listing nothing; the fix at that point is the rewrite, not a version bump.

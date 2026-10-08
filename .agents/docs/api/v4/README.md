@@ -1,7 +1,7 @@
 ---
 id: api/v4
 description: v4 API — active development. Endpoints, algorithm selection, parameters, contracts, and response shape.
-verified: 2026-09-04
+verified: 2026-09-29
 check: Endpoint table matches files in api/src/Binacle.Net/v4/Endpoints/; IsExperimental in ApiV4Document.cs matches what this says
 also_update:
   - api/v4/contracts
@@ -70,9 +70,9 @@ Every fit/pack route ends in `bin` or `bins`, and the plural is load-bearing: `c
 for every bin, `smallest-bin` / `best-bin` / `bin` return exactly one. The name tells you the response shape.
 
 The selecting routes are named after their strategy class — `SmallestBin_v2` → `smallest-bin`, `BestBin_v2` →
-`best-bin`. **Never name a route after a packing algorithm.** `best-bin` was called `best-fit` until it was
-caught: `BFD` in the `Algorithm` enum *is* Best Fit Decreasing, so `POST /pack/best-fit` with
-`{"algorithm": "FFD"}` used two senses of "fit" in one call and named neither of the things it did. The route
+`best-bin`. **Never name a route after a packing algorithm.** `BFD` in the `Algorithm` enum *is* Best Fit
+Decreasing, so a route called `best-fit` taking `{"algorithm": "FFD"}` would use two senses of "fit" in one call
+and name neither of the things it did. The route
 picks a bin; `Parameters.Algorithm` picks a packing algorithm. Keep those vocabularies apart. `best` alone is
 no good either — `Algorithm.Best` already means "auto-select the algorithm".
 

@@ -13,7 +13,7 @@ This is **not** a deployment template - `samples/` holds the user-facing startin
 Root `justfile`, not a module. Run once on a fresh clone.
 
 ```bash
-just install                     # npm workspaces, both jekyll sites' gems, then the asset copy
+just install                     # npm workspaces, every jekyll site's gems and ruby/, then the asset copy
 just assets                      # only the asset copy - after changing anything under assets/
 ```
 
@@ -30,6 +30,8 @@ the only place that lives; nothing here repeats it.
 just serve api [N|S|U|All]       # Normal, WithServiceModuleOnly, WithUiModuleOnly, WithAllModules
 just serve docs                  # jekyll serve + webpack watch, one Ctrl-C stops both
 just serve demo
+just serve www
+just serve admin
 just serve services-up [-d]      # what the API talks to: aspire dashboard, azurite, postgres. No binacle-net
 just serve services-down [-v]    # only needed after -d; Ctrl-C is enough otherwise
 ```
@@ -45,15 +47,15 @@ one `-v` in either place that empties it.
 ---
 
 ## 🧪 Tests
-`tests.just`, loaded as the `test` module. One recipe per suite, and CI calls the same recipes a maintainer
-does.
+`tests.just`, loaded as the `test` module, and the three runners - one per language - in
+[`tests/`](tests/README.md). One recipe per suite, and CI calls the same recipes a maintainer does.
 
 A test name is derived, never chosen - `<lang>_<project>_<kind>`, where the project segment is the assembly,
 package or gem name lowercased with dots turned to dashes. The single tests are private, so completion offers
-the three groups; `just test` with no argument prints every name.
+the groups only; `just test` with no argument lists them, and `tooling/tests.just` has every single name.
 
 ```bash
-just test                        # the three groups, then every name
+just test                        # list the groups
 just test all                    # everything that needs nothing brought up
 just test image                  # the ones the Docker image ships
 just test sites                  # the ones a Jekyll site ships
@@ -64,7 +66,7 @@ just test cs_binacle-net-service-module_integration Postgres
 Postgres and AzureStorage need their service up first (`just serve services-up -d`); with no argument the harness
 falls back to SQLite.
 
-The ten `rb_` tests are the Jekyll plugin gems. They need nothing brought up, they report coverage through
+The `rb_` tests are the Jekyll plugin gems. They need nothing brought up, they report coverage through
 simplecov, and they run on the site path only: a gem ships in the three sites and never in the Docker image.
 
 `image` and `sites` are for a laptop. CI names every test as its own step, so a red check names the suite.
@@ -100,7 +102,10 @@ the detail**.
 
 ```bash
 just openapi generate [dir]      # write artifacts/openapi/Binacle.Net_v3.json and _v4.json
+just openapi generate-service    # the ServiceModule's document, into artifacts/openapi-service/
 just openapi lint [dir]          # generate, then Spectral them against openapi.spectral.yaml
+just openapi check-all-copies    # every committed copy of a document matches a fresh generate
+just openapi sync-all-copies     # rewrite the copies from a fresh generate
 just agents all                  # rewrite every .agents/**/_index.md
 ```
 
@@ -109,7 +114,7 @@ The documents come out of the build, not out of a running server, so nothing has
 ---
 
 ## 🔄 Regenerating committed data
-`regen.just`, loaded as the `regen` module. Five tools write data that is **committed to the repo**, and this
+`regen.just`, loaded as the `regen` module. These tools write data that is **committed to the repo**, and this
 is the only place that says how to run them.
 
 ```bash
@@ -136,7 +141,7 @@ demo reads whatever is in it.
 Every run is deterministic, so `check` is just "run everything, then see whether the tree moved". It diffs only
 what the generators write - these folders also hold their own README, `vipaq/test-vectors` as a whole holds
 hand-authored vectors no generator touches, and the demo's package is otherwise hand-written. **Nothing in CI
-calls it**, and that is deliberate: it is for the maintainer who edited a tool or a source problem and wants
+calls it.** It is for the maintainer who edited a tool or a source problem and wants
 to know what fell out of step.
 
 ---
@@ -157,7 +162,8 @@ Neither recipe touches the container data folders, and neither needs `sudo`, so 
 ---
 
 ## 🐳 Image stacks
-`image.just`, loaded as the `image` module. Runs the image `just build image` produced, three ways - all
+`image.just`, loaded as the `image` module, and one file per operation in [`image/`](image/README.md) - the
+module is a door, like `ci.just`. Runs the image `just build image` produced, three ways - all
 `binacle-net:local`, differing in what runs beside it and where `/app/data` goes.
 
 ```bash
@@ -172,7 +178,7 @@ Extra arguments go straight through to `docker compose`. The name is positional,
 a flag - `just image up -d` reads `-d` as the stack name and is rejected.
 
 Two files, three stacks. `volume` and `bind` are one container differing only in where `/app/data` goes, so
-they share `image.local.yml`; `_compose` gives each its own project name and sets `BINACLE_DATA_DIR` for
+they share `image.local.yml`; `stack.sh` gives each its own project name and sets `BINACLE_DATA_DIR` for
 `bind` alone. `full` is `image.full.yml`, which `include:`s that file and `serve.services.yml` and overrides
 the app's storage and telemetry - about twenty lines, and nothing declared twice. It publishes the same 5432
 as `serve services-up`, so those two cannot run at once.
@@ -182,7 +188,7 @@ that check compose falls back to pulling from Docker Hub and reports "pull acces
 credentials problem rather than the missing local build it is. `serve services-up` needs no such check - it
 runs no binacle-net.
 
-The folder setup is written out in both `serve.just` and `image.just` rather than shared. A module that
+The folder setup is written out in both `serve.just` and `image/stack.sh` rather than shared. A module that
 reaches into another one puts back the coupling that splitting them removed, and it is a few lines of `mkdir`
 and `chmod`.
 
@@ -191,13 +197,15 @@ and `chmod`.
 ```bash
 just image verify 3.0.0            # all four checks
 just image verify 3.0.0 signature  # one of them
+just image verify 3.1.0-beta.1 all refs/heads/main ghcr.io/binacle-labs/binacle-net   # a prerelease, on GHCR
 ```
 
-The odd one out in this module: it reads a published image off Docker Hub, builds nothing, and never logs in.
-Four checks, each answering something the next assumes - which Docker Hub tags share the digest, the
-signature, the SBOM and provenance, and the labels plus what the container says about itself when you run it.
+The odd one out in this module: it reads a published image, builds nothing, and never logs in. Four checks,
+each answering something the next assumes - which tags share the digest, the signature, the SBOM and
+provenance, and the labels plus what the container says about itself when you run it.
 
-**Docker Hub only.** The staging registry is the release workflow's business and nothing else reads it.
+**Docker Hub by default, GHCR when told.** The repository is the fourth argument. A prerelease stops on GHCR
+after the smoke and is checked there with the same command.
 
 **The version is required and has no default**, because a default rots into a tag nobody meant to check. All
 four run even when one fails, so a failure comes with the three answers that explain it; the exit code is 1 if
@@ -237,9 +245,9 @@ would tag `binacle-net:local` while the stacks went on using the image you asked
 
 Two halves. `tooling/smoke/structure.yaml` is read straight from the image - the shipped config files,
 `/app/data` ownership, the OCI labels. It has nothing to do with which stack is up, so `all` runs it once rather
-than once per profile. The other half is one `.hurl` per profile, run against a running stack. The four profiles
-- `minimal`, `quickstart`, `prod`, `service`, `full` - are declared in the `profiles` variable at the top of
-`smoke.just`, and each one is also a folder name under `samples/docker/`.
+than once per profile. The other half is one `.hurl` per profile, run against a running stack. The profiles are
+declared in the `profiles` variable at the top of `smoke.just`, and each one is also a folder name under
+`samples/docker/`.
 
 Editing a `.hurl` is the one case for the private recipe: `just smoke up prod`, then
 `just smoke::_test_profile prod` as many times as you need, then `just smoke down prod -v`.
@@ -295,9 +303,9 @@ ones that write a run summary fall back to the screen. **[`ci/README.md`](ci/REA
 ## ☁️ Cloudflare
 
 `cloudflare/` holds one wrangler config per site - `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and
-`www.wrangler.jsonc`. They are **not** run from here: the three `Deploy ... Site` workflows call
-`wrangler deploy --config` against them, all manual (`workflow_dispatch`) and all tagging the commit they
-published.
+`www.wrangler.jsonc`. They are **not** run from here: the `Deploy Site` workflow, with the site chosen at
+dispatch, calls `wrangler deploy --config` against the matching one, by hand only (`workflow_dispatch`) and
+tagging the commit it published.
 
 Each config points at the folder the build already wrote - `artifacts/docs`, `artifacts/demo`,
 `artifacts/www` - so a deploy uploads whatever `just build docs` last produced. That path is relative to the config file and has to match
@@ -309,17 +317,34 @@ a dead inbound link, because the link check runs offline against the built folde
 
 ---
 
-## 📈 Benchmarks and performance
-Still scripts, one per slice. Both take `-c Release` and write into gitignored folders.
+## 📊 Measured results
+`measure.just`, loaded as the `measure` module. One project per slice packs or encodes every scenario and
+writes the numbers into the slice's tracked `results/` folder, so a change is a diff.
 
 ```bash
-./tooling/benchmarks.lib.sh [FastValidation|AlgorithmRacing|BischoffSuite|Parallelization|ResultSelection]
-./tooling/benchmarks.vipaq.sh [Encode|Decode]      # no argument = every benchmark
-./tooling/performance.lib.sh                       # console runner, writes markdown reports
-./tooling/performance.vipaq.sh
+just measure all       # both slices
+just measure lib       # lib/measure/Binacle.Lib.PackingEfficiency -> lib/results/measurements/
+just measure vipaq     # vipaq/measure/Binacle.ViPaq.EncodedSize   -> vipaq/results/measurements/
 ```
 
-The alias tables live at the top of each `benchmarks.*` script - that is the list to change when a benchmark
-class is added or renamed.
+## 📈 Benchmarks
+`bench.just`, loaded as the `bench` module. One project per question under `<slice>/bench/`, one recipe per
+project and tier; the recipe's comment is its cost. The BenchmarkDotNet config is C# in `shared/test/Binacle.Benchmarking`; reports land in the project's
+gitignored `BenchmarkDotNet.Artifacts/`.
+
+```bash
+just bench                               # the list, in tier order, each recipe with its cost
+just bench lib-algorithms-smoke          # smoke: minutes, takes nothing
+just bench lib-algorithms-sample quick   # sample: the default job; `quick` runs the short one
+just bench lib-algorithms-full precise   # full: hours, asks first; the short job unless `precise`
+```
+
+Three tiers. **Smoke** checks nothing broke, in minutes. **Sample** is the run to read, up to about an hour;
+where it runs long it takes `quick`. **Full** runs for hours, asks before it starts, and takes `precise` for
+the default job. The tier is the first word of the class name - `Smoke_`, `Sample_`, `Full_` - and the recipe
+picks it with `--filter`. Result selection and scaling have one recipe and no tiers, and run every class. So do
+the two parallel projects, on their `Identical_` classes; each takes `dry`, and the bins one takes the algorithm.
+Every `lib-parallel-` case runs once per pinned core count. A run that times
+nothing, or has a failed case, exits 1.
 
 

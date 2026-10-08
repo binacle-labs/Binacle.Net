@@ -1,7 +1,7 @@
 ---
 id: vipaq/history
 description: ViPaq design history — superseded throwaway-prototype measurements (2026-07-05), the earlier framings of decisions that were later amended or reversed, and where the test files the v2 rebuild deleted ended up. Reference only, not current truth.
-verified: 2026-08-26
+verified: 2026-09-29
 check: The measurements are frozen and are never re-measured. What can rot is checked — every path in "Where the deleted test files went" still resolves under `vipaq/test/Binacle.ViPaq.UnitTests/` or `vipaq/packages/binacle-vipaq/`, and every claim about what the real library has since measured still matches `$vipaq/findings`. It declares no `paths:` on purpose, so a session working on live ViPaq code is not handed numbers that no longer describe it.
 ---
 
@@ -52,7 +52,7 @@ real win was ~4–5×, not 10×). Two conclusions were left open at the time; ne
 
 ## Superseded decision framings
 
-Earlier versions of locked decisions in `$vipaq/decisions`, kept for the *why did it change* trail. The current
+Earlier versions of the decisions in `$vipaq/decisions`, kept for the *why did it change* trail. The current
 decision is always the one in the ledger — read these only for context.
 
 ### D4 original — the harness re-parsed the header bytes itself (2026-07-07, amended 2026-07-10)
@@ -62,7 +62,7 @@ which had already gone stale by the rewrite — it still read a one-byte header 
 `Version`. Amended so the harness reads the header through the internal `Header` instead: one copy of the spec beats
 the boundary. The encode/decode-through-public-API part was unaffected.
 
-### O2 original — "name the codec and level before v2 ships" (2026-07-08, resolved 2026-07-13 → D16)
+### O2 original — "name the codec and level before v2 ships" (2026-07-08, answered 2026-07-13 by D16)
 The open question was which compression codec and which level to pin, treated as a blocker for shipping v2. It
 stopped being a blocker once compression became a user toggle that defaults to off: there is one codec (raw
 DEFLATE), and the level never reaches the wire, so it is a free encoder-side choice.

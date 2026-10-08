@@ -8,14 +8,18 @@ from the repo root with `npm install`.
 | Package | What it is |
 |---|---|
 | [`binacle-net-ui`](binacle-net-ui) | Alpine.js components and a Three.js visualizer for the interactive packing demo |
+| [`binacle-net-client`](binacle-net-client) | Hand-written TypeScript client for the v4 API, with a committed copy of the OpenAPI spec and a test that keeps the types honest |
+| [`binacle-net-service-client`](binacle-net-service-client) | **Experimental, local only.** The same, for the service API - the token route and the admin routes |
 | `binacle-compact-notation` | Parses and formats the compact strings (`"60x40x30"`, `"108x76x30 [40]"`). TypeScript mirror of C# `Binacle.CompactNotation` |
 | `cookies` | Cookie read/write helpers. A vendored fork of js-cookie v3.0.5, MIT, kept close to upstream |
 | `theme-switcher` | Light/dark theme toggle, as a `<theme-switcher>` custom element |
 
-All four have tests. From the repo root:
+Every package has tests. From the repo root:
 
 ```
 just test ts_binacle-compact-notation_unit                # binacle-compact-notation
+just test ts_binacle-net-client_unit      # binacle-net-client
+just test ts_binacle-net-service-client_unit  # binacle-net-service-client
 just test ts_binacle-net-ui_unit          # binacle-net-ui
 just test ts_cookies_unit         # cookies
 just test ts_theme-switcher_unit  # theme-switcher
@@ -27,10 +31,11 @@ between them. Its leaf is named after `shared` for that reason, not after this f
 
 ## 🌐 Who imports them
 
-The two sites and the API's UI module pull them in by package name and webpack bundles them:
+The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
-the packing demo and the ViPaq decoder, and all three use `theme-switcher`. Nothing is copied: the import
-resolves through the workspace. (`just assets` is a different job - it copies the static files in
+the packing demo and the ViPaq decoder, those two, [`sites/www`](../sites/www) and [`sites/docs`](../sites/docs)
+use `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`.
+Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 
 **None of them has a build step.** Each host compiles the TypeScript from source with its own webpack and

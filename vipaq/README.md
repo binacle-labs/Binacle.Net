@@ -22,9 +22,12 @@ The shared test vectors are what keep them honest.
 | `src/Binacle.ViPaq/` | C# library - the reference implementation, produces the golden bytes |
 | [`packages/binacle-vipaq/`](packages/binacle-vipaq) | TypeScript mirror - see its `README.md` |
 | `test-vectors/` | Language-neutral test data read by both suites - see its `README.md` |
-| `test/` | C# unit tests, benchmarks, performance tests |
-| `tools/` | Data generators |
-| `data/` | Frozen real packing results used by the benchmarks |
+| `test/` | C# unit tests, and the harness's encoders and picks |
+| `measure/` | `Binacle.ViPaq.EncodedSize` - encodes every pack and writes the sizes to `results/` |
+| `bench/` | `Binacle.ViPaq.Benchmarks` - the timings, `just bench vipaq-smoke`, `vipaq-sample` - see [its README](bench/README.md) |
+| `tools/` | Generators - the test vectors and the packed data |
+| `data/` | Frozen real packing results, and the project that reads them - used by the unit tests, `measure/` and `bench/` |
+| `results/` | What `measure/` writes, the bench runs kept by hand, and one file per question read from them. Tracked, so a change in the sizes shows up as a diff - see [its README](results/README.md) |
 
 ## 📏 Key rule
 

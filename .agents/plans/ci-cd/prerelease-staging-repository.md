@@ -1,41 +1,63 @@
 ---
-description: Prereleases go to a public staging repository instead of the one users pull from
+description: Branch builds go to the staging registry on dispatch, the way a prerelease now does - so an image from a branch can be tried without ever reaching the repository users pull from
 state: idea
-waits-on: "nobody - it is an idea. horizon: undecided - chosen by an agent, strike it if wrong"
+waits-on: "the signing story for a branch-built image. horizon: undecided - chosen by an agent, strike it if wrong"
 horizon: undecided
 paths:
   - ".github/workflows/**"
+  - "tooling/ci/**"
   - "tooling/image.just"
+  - "tooling/image/**"
 ---
 
-# Prereleases go to a public staging repository
+# Branch builds go to the staging registry
 
-Today every tag the pipeline publishes lands in `binacle/binacle-net`, betas included - D14 says so. That is
-what left eight `3.0.0-beta.*` tags sitting beside the release until they were deleted by hand on
-2026-09-05, and nothing stops the next set doing the same. **A second public repository takes them instead**,
-so the repository users pull from carries released versions only and there is nothing to clean up.
+**The prerelease half of this plan landed on 2026-09-14.** A prerelease's image now stops at
+`ghcr.io/binacle-labs/binacle-net` after the smoke - no Docker Hub copy - and since 2026-09-18 it still gets
+its git tag and a GitHub prerelease; the reasoning is in the CI/CD decisions ledger. GHCR is the staging repository; the second public Docker Hub repository this plan used to propose is
+not needed, because GHCR is already public and needs no new credential. **What is left is branch builds.**
 
-**Public, not private.** A beta is something a person is asked to try, so it has to be pullable without a
-login.
+**The rule worth having, and it is simpler than a retention policy:** a tag in the release repository is a
+release. No betas, no branch builds, no exceptions. Prereleases now honour it; branch builds cannot be made at
+all yet.
+
+## Branch builds
+
+**Dispatch only, on any ref. Never on push - answered 2026-09-05.** No branch pattern, no `push:` key, no
+automatic trigger of any kind. A build happens because somebody asked for one, which is also what keeps
+`dependabot/**` out without having to name it: those branches are pushed, never dispatched.
+
+**Since 2026-09-14 a prerelease already dispatches from a `release/*` branch** - `check-release-ref.sh`
+lets a hyphenated version through from `main` or `release/*` and keeps a release on `main`. So a release
+branch can already be tried by giving it a prerelease version. What this plan still adds is a build from any
+other branch, carrying no version at all.
+
+**A staging tag must not look like a release.** Slug the ref - `/` and `_` to `-`, lowercased - and add the
+short sha: `features/release_v3-1` becomes `release-v3-1-<sha>`. A Docker tag takes no `/`.
 
 ## What has to be worked out at pickup
 
-- **Whether this replaces the GHCR staging step or sits after it.** D14 has GHCR as staging that no public
-  surface names and nothing else reads. A public prerelease repository is a different job - a surface people
-  are pointed at - and the two can coexist or collapse into one. That choice is the whole plan.
-- The repository name, and whether its Docker Hub page says anything at all.
-- Whether a prerelease is still signed under the same identity, and what `just image verify` does with it.
-  `SECURITY.md` and the docs site both print a verify command naming one repository.
-- Whether prereleases in the new repository are deleted, kept, or left to accumulate. **A separate repository
-  makes the question cheap rather than answering it.**
+- **The signing story, and this one has already bitten.** The published verify command is anchored at
+  `@refs/heads/main$` in `SECURITY.md`, on the Docker Hub page and on the docs verifying page. **Anything
+  built from a branch signs under that branch's ref and fails it.** That is precisely why the v3.0.0 betas 1
+  to 4 read as tampered - they were signed under a tag ref. A prerelease from `main` is fine; a branch build
+  is not. Either the branch build is unsigned and says so, or the run summary prints the identity that does
+  verify it. **Do not publish one command that fails on half the images it appears to describe.**
+- **Staging images are kept for now.** The maintainer, 2026-09-28: "i dont delete them but i havent decided how
+  or when to do that". GHCR held `3.0.0-beta.3` to `-beta.8`, `3.0.0`, a stale `latest` and `3.1.0-beta.1` on
+  2026-09-14. Nothing names them and nothing costs while they sit there. A branch build per dispatch adds them
+  faster. The maintainer, 2026-09-29: "need to figure it out soon".
+  **Suggested (agent, 2026-09-29):** delete them automatically. Once a version is on Docker Hub, its betas
+  and its own staging copy on GHCR serve nothing, so a last job in the release run could delete them. Not
+  checked: whether `GITHUB_TOKEN` may delete package versions. The stale `latest` on GHCR goes by hand.
 
 ## Done when
 
-- [ ] A prerelease publishes to the staging repository and to nothing else.
-      `docker buildx imagetools inspect binacle/binacle-net:<next prerelease>` fails, and the same reference
-      against the staging repository succeeds.
-- [ ] The release repository contains released versions and the moving tags, and nothing else.
-      `curl -s "https://hub.docker.com/v2/repositories/binacle/binacle-net/tags?page_size=100" | jq -r '.results[].name'`
-      matches no prerelease pattern.
-- [ ] D14 and D27 say what the shape actually is, and the verify command names the right repository for each.
-      **By eye** in `design/ci-cd/decisions.md`, `SECURITY.md` and the docs verifying page.
+- [ ] A branch build publishes to the staging registry and to nothing else.
+      `docker buildx imagetools inspect binacle/binacle-net:<slug>-<sha>` fails, and the same reference
+      against `ghcr.io/binacle-labs/binacle-net` succeeds.
+- [ ] The `main` check still gates everything that reaches Docker Hub.
+      `grep -n check-release-ref .github/workflows/release-docker-image.yml` still matches on the publish path.
+- [ ] A reader can tell which images the published verify command covers.
+      **By eye** in `SECURITY.md` and on the Docker Hub page. If a staging image fails the command a page
+      prints and nothing says so, the box is open.

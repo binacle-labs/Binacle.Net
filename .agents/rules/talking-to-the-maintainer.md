@@ -32,6 +32,6 @@ the question and change nothing. Do not open files, do not start the work, do no
 If the answer needs a fact you do not have, go and read that one fact and come back with the answer - not
 with a diff.
 
-**Why:** the worst sessions on record are five turns of him asking one plain question and getting work back
-each time. "wait", "backtrack" and "in plain and simple english" are all the same signal: he asked something
-and did not get an answer.
+**Why:** the common failure is several turns of a plain question getting work back instead of an answer.
+"wait", "backtrack" and "in plain and simple english" are all the same signal: a question was asked and not
+answered.

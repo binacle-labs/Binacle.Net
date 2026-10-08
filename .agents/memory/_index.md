@@ -10,13 +10,29 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
 ## General
 
 ```yaml
+- file: a-new-demo-sample-needs-two-edits.md
+  description: "A new file in shared/data/demo-samples reaches the demo on its own, but the ViPaq packed data and the lib tests only if you also add it to two hand-kept lists - both fail silently"
+  when: "adding or renaming a file in shared/data/demo-samples"
+  paths: ["shared/data/demo-samples/**", "vipaq/tools/Binacle.ViPaq.PackedDataGenerator/**", "vipaq/data/packed/**"]
 - file: algorithm-identifier-is-a-format.md
   description: "The FFD_v2 / BFD_v1 string is a parsed data format, not a naming style - never tidy the underscore out of it"
   when: "renaming an algorithm class, enum member or identifier string"
   paths: ["lib/**", "shared/src/Binacle.Packing/**"]
+- file: api-v2-dropped.md
+  description: "The v2 API does not exist on this branch — only v3 and v4; never add v2 code, docs, or references"
+  when: "touching API versioning, routes or docs"
+  paths: ["api/**"]
+- file: api-v3-frozen.md
+  description: "v3 API is frozen — never modify it; all new endpoints and contract work go in v4 only"
+  when: "changing anything under api/src/Binacle.Net/v3"
+  paths: ["api/src/Binacle.Net/v3/**"]
 - file: bulk-rename-traps.md
   description: "Four traps when sweeping a namespace or type rename across this repo — spaces in Algorithms/ folder names, unstaged files and git mv, global usings that collide, and fully-qualified names"
   when: "sweeping a namespace or type rename across the repo"
+- file: image-source-label-has-two-copies.md
+  description: "The image-source URL is written as a literal in two files and nothing links them - change one and the smoke step goes red with a message that does not name the cause"
+  when: "changing the repository URL, moving the repository, or editing the Dockerfile label block"
+  paths: ["Dockerfile", "tooling/smoke/**"]
 - file: migration-no-silent-deletions.md
   description: "Migrations land as small reviewable diffs — every removed test needs a visible successor, never a silent delete"
   when: "deleting or replacing a test during a migration"
@@ -33,18 +49,14 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "Sonar findings are answered in code, never with a sonar.issue.ignore rule in tooling/ci/sonar-analysis.xml"
   when: "answering a Sonar finding"
   paths: ["tooling/ci/sonar-analysis.xml", "Directory.Build.props"]
-- file: results-curated.md
-  description: "results/ is a hand-curated vault — harnesses write to gitignored scratch, never straight into results/"
-  when: "writing anything into results/"
-  paths: ["results/**"]
+- file: oidc-subject-is-the-immutable-form.md
+  description: "This repository's OIDC token carries GitHub's immutable subject claim, which breaks nothing today but is what a cloud trust policy keyed on `sub` would have to match"
+  when: "wiring OIDC trust to a cloud provider, or debugging a trust policy that will not match"
+  paths: [".github/workflows/**"]
 - file: servicemodule-test-infra.md
   description: "Test-host config goes through an env var the harness reads, never a .runsettings file — the MTP runner ignores VSTest runsettings"
   when: "changing ServiceModule test-host configuration"
   paths: ["api/test/Binacle.Net.ServiceModule.IntegrationTests/**"]
-- file: sonar-no-quality-profile.md
-  description: "Sonar rules cannot be switched off on this project - custom quality profiles start at the Team plan and this one is on Free, so \"Sonar way\" is read-only"
-  when: "someone proposes turning a Sonar rule off"
-  paths: ["tooling/ci/sonar-analysis.xml"]
 - file: sonar-ruby-coverage-paths.md
   description: "sonar.ruby.coverage.reportPaths takes no wildcard and resolves against the ruby/ module, not the repo root - the other two coverage properties beside it do neither"
   when: "changing a coverage report path in the Sonar settings, or adding a gem"
@@ -67,20 +79,12 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   description: "A test body shows arrange, act and assert as separate lines — never one helper that does all three"
   when: "writing a test body"
   paths: ["**/test/**"]
-- file: v2-dropped.md
-  description: "The v2 API does not exist on this branch — only v3 and v4; never add v2 code, docs, or references"
-  when: "touching API versioning, routes or docs"
-  paths: ["api/**"]
-- file: v3-frozen.md
-  description: "v3 API is frozen — never modify it; all new endpoints and contract work go in v4 only"
-  when: "changing anything under api/src/Binacle.Net/v3"
-  paths: ["api/src/Binacle.Net/v3/**"]
 - file: version-only-when-published.md
   description: "A component gets its own version number only once it is published independently; until then the docker image's BINACLE_VERSION is the only version."
   when: "adding a version number or a Directory.Build.props to a component"
   paths: ["**/Directory.Build.props", "**/*.csproj"]
 - file: vipaq-byte-vectors-agent-owned.md
-  description: "ViPaq byte-exact golden vectors carry a byte-by-byte comment — a wall of hex nobody can check is not a test"
+  description: "ViPaq byte-exact golden vectors lay their bytes out by wire segment — a wall of hex nobody can check is not a test"
   when: "editing ViPaq byte-exact golden vectors"
   paths: ["vipaq/test-vectors/**"]
 ```

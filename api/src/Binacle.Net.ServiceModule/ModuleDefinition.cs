@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Text;
+using Binacle.Net.Kernel.Cors;
 using Binacle.Net.Kernel.Endpoints;
+using Binacle.Net.Kernel.Instance;
 using Binacle.Net.Kernel.OpenApi.ExtensionsMethods;
 using Binacle.Net.ServiceModule.Configuration;
 using Binacle.Net.ServiceModule.Domain;
@@ -94,6 +96,9 @@ public static class ModuleDefinition
 			});
 		});
 
+		builder.AddCorsFile("ServiceModule/Cors.json");
+		builder.Services.AddCorsPolicy(ServiceModuleCorsPolicy.Name);
+
 		var defaultAdminCredentials = Environment.GetEnvironmentVariable("BINACLE_ADMIN_CREDENTIALS");
 		if (!string.IsNullOrWhiteSpace(defaultAdminCredentials))
 		{
@@ -118,7 +123,7 @@ public static class ModuleDefinition
 		// endpoints never name a policy only this module can supply.
 		builder.Services.AddSingleton<IEndpointConvention, RateLimitedEndpointConvention>();
 		
-		builder.Services.Configure<FeatureOptions>(options =>
+		builder.Services.Configure<InstanceOptions>(options =>
 		{
 			options.AddFeature("RateLimiter");
 			options.AddFeature("ServiceModule");

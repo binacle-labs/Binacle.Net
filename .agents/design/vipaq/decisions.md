@@ -1,8 +1,8 @@
 ---
 id: vipaq/decisions
-description: ViPaq decisions ledger — the locked decisions and their reasons, plus the open questions.
-verified: 2026-08-27
-check: Locked decisions are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
+description: ViPaq decisions ledger — the decisions and their reasons, plus the open questions.
+verified: 2026-09-29
+check: Decided entries are not contradicted by vipaq/PROTOCOL.md or vipaq/src/Binacle.ViPaq; D18 by vipaq/test/Binacle.ViPaq.UnitTests/*.csproj carrying no ProjectReference to Binacle.ViPaq.Testing; D15's generated-vs-hand-authored split still matches vipaq/test-vectors/ and the two generator folders; D4's ViPaqHeader still keeps every wire type off its public members
 also_update:
   - vipaq/architecture
   - vipaq/findings
@@ -12,11 +12,32 @@ paths:
 
 # ViPaq — decisions ledger
 
-Locked decisions and open questions, with the *why*. Evidence lives in `$vipaq/findings` (superseded prototype
-numbers in `$vipaq/history`); design detail in `$vipaq/architecture`. This file is the "what we settled and why"
+Decisions and open questions, with the *why*. Evidence lives in `$vipaq/findings` (superseded prototype
+numbers in `$vipaq/history`); design detail in `$vipaq/architecture`. This file is the "what was chosen and why"
 so a fresh session doesn't re-litigate it.
 
-## What we must reach (must-have)
+## Decided
+
+### D19 — One bench project, one synthetic curve (2026-09-21)
+
+**Decided (the maintainer, 2026-09-21):** "ok sure do we have more?" (answering: one bench binary, and a synthetic curve of 1,000 / 5,000 / 65,535 inside `Encode` and `Decode`)
+
+- **One project, `vipaq/bench/Binacle.ViPaq.Benchmarks`.** Splitting it builds no wall: size is written by
+  `Binacle.ViPaq.EncodedSize`, which never touches the synthetic provider; BDN only writes time and bytes to
+  its own folder; and both halves would reference `Binacle.ViPaq.Testing` anyway.
+- **One synthetic curve is enough.** The encoder is a per-item loop, so cost is linear by construction; the
+  curve runs past the real data (median 79 items, max 371) to the format's limit. 2,000 was dropped, and the
+  8-item real pack, which says the same as the 16-item one a step apart.
+- **`Json` times encode only.** Added 2026-09-23 to both encode classes; the test `JsonEncoder` has no
+  decode, so there is no decode row.
+- **The production path is `Protobuf` against `ViPaq_Row`.** The api only encodes, row-major, uncompressed;
+  decoding happens in the browser.
+
+## Pending
+
+What ViPaq does and why. No quote from the maintainer covers these yet.
+
+### What we must reach (must-have)
 
 The target for v2. A change only ships if it keeps all of these true:
 
@@ -30,7 +51,7 @@ The target for v2. A change only ships if it keeps all of these true:
 - **Only ships if measured.** Smaller base64, or faster / less memory, or a clear simplicity win. No measured gain,
   no ship — the worth-it gate below.
 
-## The worth-it gate (governs every decision here)
+### The worth-it gate (governs every decision here)
 
 Every decision — a header bit, a codec, a layout, a feature — must answer **"is it worth it?"**, written as:
 - **Cost:** effort + risk + complexity + cross-language churn (C#, TS, interop vectors).
@@ -38,44 +59,49 @@ Every decision — a header bit, a codec, a layout, a feature — must answer **
   concrete simplicity/maintenance gain. "Might be nice" is not a benefit.
 - **Verdict + why. Default to NO.** The format is already good; the bias is against churn.
 
-## Locked
+### D1 — v2 is `8/16 + reserved codes`, for simplicity (2026-07-05)
 
-### D1 — v2 is `8/16 + reserved codes`, for simplicity (CONFIRMED 2026-07-05)
 Varint is deferred and may never happen. **Not a size play** — two tiers cost the same as four on ≤16-bit
 data, so ~0% smaller. The payoff is a **simpler format** (2 tiers not 4; no 2⁵³ ceiling to reason about) and a
 clean base if varint is ever wanted. Do not sell "20% smaller" — that was a Brotli-q11 artifact (see `$vipaq/findings`).
 
 ### D2 — 16-bit cap in v2.0; throw above 65,535
+
 Fixed 8/16 caps at 65,535. v2.0 throws above it; varint would lift the cap later. mm → 65 m, fine for
 physical bins. **Done:** the old `ViPaqLimits.MaxInteger` (2⁵³−1) is gone — `Limits` now carries
 `EightBitsMax = 255`, `MaxValue = 65_535`, `MaxItemCount = 65_535`, and encoding above `MaxValue` throws.
 
-### D3 — Baselining without a v1/v2 pair (CONFIRMED 2026-07-07)
+### D3 — Baselining without a v1/v2 pair (2026-07-07)
+
 ViPaq has one implementation, so there's no in-code baseline like lib's v1-vs-v2 racing. Two mechanisms replace it:
 - **Protobuf is the in-run anchor** — `[Benchmark(Baseline = true)]`. ViPaq is reported as a *ratio* to protobuf,
   so a rerun on another machine/day stays comparable; the anchor absorbs environment drift.
-- **Committed result files are the recorded baseline** — the size reports under `results/vipaq/compression/`. A *win* = a
-  diff showing smaller base64 / lower ns / lower allocs **while the protobuf anchor is unchanged**. Small
-  increments; keep only measured wins.
-- **The perf test writes to build-local scratch, not to the committed vault** (2026-07-14). It emits into its
-  `PerformanceTests.Artifacts/` folder (gitignored); to check for a win, diff that against
-  `results/vipaq/compression/`, and copy the report in by hand only when it's a keeper. The committed baseline is
-  hand-curated, never auto-overwritten — same model as `results/lib/`.
-- Results stay in the repo under `results/`, organized by slice — see [results/README.md](../../../results/README.md)
-  for the layout and the scratch-vs-curated convention. (Settled 2026-07-14; the old results migration is closed.)
+- **Committed result files are the recorded baseline, and a size win is a diff** (2026-09-20).
+  `Binacle.ViPaq.EncodedSize` writes straight into `vipaq/results/measurements/encoded-size/`, one file per group per
+  algorithm per layout; run it, read `git diff`, commit what changed. A win is smaller ViPaq base64 **while the
+  protobuf columns are unchanged**. Small increments; keep only measured wins. Timing is not in these files: it
+  is machine-bound, so a benchmark report is a keeper, not a diff (`$decisions#D10`). From 2026-07-14 to
+  2026-09-20 the measure project wrote to a gitignored scratch folder and a keeper was copied into a root
+  `results/` vault by hand; the copy step was where reports went stale, so it went.
 
-### D4 — The permanent harness uses only the minimal public API (CONFIRMED 2026-07-07)
-The permanent benchmark **encodes and decodes** through `ViPaqSerializer.Serialize`/`Deserialize` only — that is
-what makes the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
-re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.TestsKernel`, and `ViPaqHeader`
-holds `Header` in an `internal` field, exposing only `bool`/`int`/`string` publicly. Internal rather than
-private because the kernel's own encoder reads it; what matters is that no *public* member names `Header`,
+### D4 — The permanent harness uses only the minimal public API (2026-07-07)
+
+**As of 2026-09-22 the harness no longer goes through `ViPaqSerializer`.** The codec race (D5) has to force
+every mode, so `Testing`'s `ViPaqEncoder` takes the width choice from `Header.Create` and drives the internal
+`ProtocolEncoder` directly, through `InternalsVisibleTo`. What still holds from the record below: the header is
+read through the internal `Header`, never re-parsed, and no public member of `ViPaqHeader` names a wire type.
+
+Until 2026-09-22 the benchmark **encoded and decoded** through `ViPaqSerializer.Serialize`/`Deserialize` only —
+that is what made the harness layout-agnostic. It reads the header through the library's internal `Header`, not by
+re-parsing bytes: `Binacle.ViPaq` grants `InternalsVisibleTo` to `Binacle.ViPaq.Testing`, and `Testing`'s
+`ViPaqHeader` holds `Header` in an `internal` field, exposing only `int` and `string` publicly. Internal rather than
+private because `Testing`'s own encoder reads it; what matters is that no *public* member names `Header`,
 `Width` or `Layout`. **One copy of the spec beats a clean
 boundary here** — `Header` is a frozen wire description, not an evolving API, so if it churns the format churned and
 the harness *should* break. (This reading-via-internals rule replaced an earlier re-parse-the-bytes rule; the
 superseded version is in `$vipaq/history`.)
 
-Two consequences of the public-API rule, both still true:
+Two consequences of the public-API rule, true until 2026-09-22 while the harness went through `Serialize`:
 - **Layout-agnostic for free** — when v2 swaps row→columnar internally, the bytes change but the harness call
   sites don't. This is automatic from living at the public boundary, not something the harness engineers.
 - **It measures real behavior only** — the public `Serialize` chooses compression itself (D7), so the harness
@@ -87,15 +113,18 @@ Two consequences of the public-API rule, both still true:
 - **Why minimal:** a permanent ruler must not churn when the lib evolves. Coupling it to an evolving API would
   defeat the point. The codec race is part of the ruler, not a separate experiment (D5).
 
-### D5 — The codec race lives in the harness, permanently (CONFIRMED 2026-07-07)
-- **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio, and *observes* the shipped
-  compression crossover by sweeping item count.
-- **The codec race is part of it, permanently.** The harness encodes every scenario in each mode — `Raw`, `NoOp`,
-  and deflate/gzip across both layouts — and mirrors each codec onto protobuf. The reports are in
-  `results/vipaq/compression/`.
+### D5 — The codec race lives in the harness, permanently (2026-07-07)
+
+- **Permanent harness**: measures real-mode size + CPU/mem + protobuf ratio. It once observed the shipped
+  compression crossover by sweeping item count; no such sweep is left - the synthetic 1,000, 5,000 and 65,535
+  item packs are timing only.
+- **The codec race is part of it, permanently.** The harness encodes every scenario with each codec — raw (the
+  `NoOp` codec), deflate and gzip — in both layouts, and mirrors each codec onto protobuf. The sizes are in
+  `vipaq/results/measurements/encoded-size/`, one file per group per algorithm per layout.
 
 Why it belongs in the permanent ruler, not a throwaway — **the race is not only about the codec:**
-- It also settles **row-major vs columnar**, which is unmeasured and is a permanent harness concern.
+- It also settles **row-major vs columnar**, which was unmeasured when this was decided and is a permanent
+  harness concern.
 - It fixes a real bug. The harness would otherwise compare a **compressed** ViPaq token against **raw** protobuf,
   so the gap it prints is mostly the compression, not the format. Mirroring each codec onto protobuf is the fix —
   the ruler being honest, not an experiment.
@@ -109,12 +138,17 @@ collapses when the codec is pinned. The wire still pins exactly one codec — `V
 codec field in the header — so pinning changes one line in `ViPaqSerializer` and nothing else.
 
 ### D6 — Scope: 8/16 only, no 32/64 in the permanent tool
+
 32/64 is pointless to keep measuring — v2 drops it. Craft payloads whose values force ViPaq into 8- or 16-bit
 selection; don't try to benchmark widths v2 won't have.
 
-### D7 — Compression trigger is **try-both-keep-smaller** (was O1; CONFIRMED 2026-07-08)
+### D7 — Compression trigger is **try-both-keep-smaller** (was O1; 2026-07-08)
+
+**Not what ships.** `Serialize` compresses only when the caller sets `Compress`, and nothing in the repo runs
+try-both (D16). The record below is the case for it.
+
 Compress, keep whichever is shorter, never inflate. Both sides were measured, and the fixed 255-byte threshold
-the lib ships today is **wrong in both directions**: it inflates random data (gzip saved −8% to −0%) and would miss
+the lib shipped then is **wrong in both directions**: it inflates random data (gzip saved −8% to −0%) and would miss
 small compressible data (real packed data saves 45–68%). A threshold cannot be tuned to fit both, because the right
 answer depends on the data, not its size. Try-both has no knob to get wrong and can never inflate.
 
@@ -126,12 +160,14 @@ back to picking the wrong one.
 The spec states this as a **SHOULD**, not a MUST: the `Compressed` bit is normative, the choosing policy is not.
 That is what lets phase 1 force compression on or off to measure it — see D13.
 
-### D8 — Encode speed is the priority; decode is second (CONFIRMED 2026-07-08)
+### D8 — Encode speed is the priority; decode is second (2026-07-08)
+
 ViPaq's job is to produce a token fast and store it; reads are rarer. **Optimise encode first.** Take decode wins
 only when they are cheap — the decode span fix is exactly that, so it still belongs. Read the benchmark this way:
 encode is the number that gates a change, decode is watch-not-block.
 
-### D9 — Synthetic data measures CPU/memory; real data measures size (CONFIRMED 2026-07-08)
+### D9 — Synthetic data measures CPU/memory; real data measures size (2026-07-08)
+
 The two things we measure depend on different properties of the data.
 - **CPU and memory** depend on item count and byte width, not on whether values repeat — encode/decode do the same
   work either way. So **synthetic random is fine, and preferred**: deterministic, scales freely to counts no real
@@ -142,7 +178,17 @@ The two things we measure depend on different properties of the data.
 
 The contrast itself (synthetic inflates, real saves 45–68%) is a keep-it finding, not a bug.
 
-### D10 — ViPaq test kernel owns its file plumbing; no shared TestFiles (CONFIRMED 2026-07-09)
+**Since 2026-09-22** the synthetic counts are 1,000, 5,000 and 65,535, and the timing classes run the raw path
+(`NoOpCodec`); what compression costs is timed alone, in the two `Sample_CompressionCost_*` classes.
+
+### D10 — ViPaq test kernel owns its file plumbing; no shared TestFiles (2026-07-09, SUPERSEDED 2026-09-19)
+
+**Superseded.** `shared/data/Binacle.Data` now holds one reader, `EmbeddedResourceFileProvider.ByPrefix(assembly,
+prefix)`, that takes the assembly to read from and hands the manifest name back unsplit. That is the shape this
+decision asked for - share the enumeration, not the parse - with the wrong-assembly failure removed at the
+call. `Binacle.ViPaq.Data` reads through it since 2026-09-20 and parses the four-part name itself. The
+record below is why the earlier shared copy was reverted.
+
 An earlier session extracted the embedded-file plumbing into a shared `shared/test/Binacle.TestFiles` so both the
 shared kernel and the ViPaq kernel could use it. **Reverted.** The only genuinely shared part is ~15 lines of
 "enumerate manifest resources by prefix"; the *parse* differs — ViPaq's name is `<family>.<name>.<algorithm>`, the
@@ -150,31 +196,34 @@ shared kernel's is `<folder>.<name>` — so sharing needed a generic factory sea
 little gain. Worse, a shared copy is silently broken: `Assembly.GetExecutingAssembly()` inside a shared library
 resolves to *that* library, which embeds nothing, so lookups return empty and tests quietly vanish.
 
-The ViPaq kernel now has its own `Files/` trio (`IFile`, `EmbeddedResourceFile`, `EmbeddedResourceFileProvider`),
-where `GetExecutingAssembly` correctly resolves to the assembly that embeds the data. This matches the standalone
-principle already recorded for the reader. **Revisit sharing only if a third
-consumer appears** — and even then, share the enumeration, not the parse.
+The ViPaq kernel then kept its own `Files/` trio (`IFile`, `EmbeddedResourceFile`, `EmbeddedResourceFileProvider`),
+where `GetExecutingAssembly` correctly resolves to the assembly that embeds the data. The shared reader that
+replaced it shares the enumeration only, and the caller names the assembly - both failures above designed out.
 
-### D11 — Breaking rebuild; the old format is ignored (CONFIRMED 2026-07-09)
+### D11 — Breaking rebuild; the old format is ignored (2026-07-09)
+
 No compatibility, no migration, no fallback. No decoder reads the old wire and no code path detects it; stored
 tokens must be re-encoded. Nothing in the repo says the old format existed — the break is announced in the
 release notes only.
 
-What settled it: reading old blobs means keeping four integer widths, a 64-bit tier, and the whole `2^53 − 1`
+Why: reading old blobs means keeping four integer widths, a 64-bit tier, and the whole `2^53 − 1`
 range apparatus alive in every decoder, in both languages, forever. That apparatus is the biggest thing we delete.
 
-### D12 — Two-byte header, split by purpose (CONFIRMED 2026-07-09)
+### D12 — Two-byte header, split by purpose (2026-07-09)
+
 `Version`(2) + `Compressed`(1) + `Layout`(1) + three 2-bit widths is 10 bits. Byte 0 is **how to read** the body,
 byte 1 is **how wide** its integers are. The second byte is nearly free — base64 encodes 3 bytes to 4 characters.
 Widths keep 2 bits, so each section has two spare codes: one for varint, one in hand. `vipaq/PROTOCOL.md` §2.
 
-### D13 — `Compressed` and `Layout` are per-blob flags, not versions (CONFIRMED 2026-07-09)
+### D13 — `Compressed` and `Layout` are per-blob flags, not versions (2026-07-09)
+
 Both describe what the encoder did to *this* blob, so one decoder reads all four combinations. That makes them
 measurable — row/columnar × raw/compressed, raced on real packs instead of guessed at spec time. It is also the
-phase-1 switch. It does **not** re-open the threshold question (D7): try-both stays the default, and the spec
+phase-1 switch. It does **not** re-open the threshold question (D7): the spec
 makes the *bit* normative while the *policy* is not.
 
-### D14 — Widths are policy too; only the header is normative (CONFIRMED 2026-07-09)
+### D14 — Widths are policy too; only the header is normative (2026-07-09)
+
 Found by reviewing the spec against these plans. Widths, `Layout` and `Compressed` are all the encoder's choice,
 all recorded in the header, and a decoder obeys the header rather than re-deriving anything. Two consequences:
 
@@ -184,7 +233,8 @@ all recorded in the header, and a decoder obeys the header rather than re-derivi
   conformant encoders may choose differently for the same input and both are right. Golden vectors must state the
   header they expect bytes under. The old blanket claim was wrong; sessions 5 and 6 are corrected.
 
-### D15 — Generators are for combinatorial and derived vectors only (CONFIRMED 2026-07-13)
+### D15 — Generators are for combinatorial and derived vectors only (2026-07-13)
+
 Generators earn their keep on two kinds of file: `header-bytes.json` (32 combinatorial rows, tedious and
 error-prone by hand) and the interop artifacts — the actual bytes each encoder emits, which have to be derived
 because the point is to compare engines. **Both languages generate their own half**:
@@ -193,14 +243,15 @@ because the point is to compare engines. **Both languages generate their own hal
 and each suite decodes the other's. Everything else stays **hand-authored** — `$vipaq/cross-language-testing`
 carries the current inventory and the regen recipe, so it is the list, not this line.
 
-What settled it: those are small, curated sets. Writing a C# scenario record plus a bespoke formatter to emit JSON
+Why: those are small, curated sets. Writing a C# scenario record plus a bespoke formatter to emit JSON
 a human writes directly is more machinery than the payoff. The cross-language value comes from *both suites reading
 one shared file* — not from generating that file. And for the oracle/spec files (width-*, invalid, round-trip),
 recomputing the oracle from the library under test would make the tests tautological — the library grading its own
 homework. So task #9 ("generate ALL vectors") is closed as effectively done: the two files that justify a generator
 are generated; the rest stay hand-authored.
 
-### D16 — One codec (raw DEFLATE); compression is a user toggle, not a pinned policy (CONFIRMED 2026-07-13)
+### D16 — One codec (raw DEFLATE); compression is a user toggle, not a pinned policy (2026-07-13)
+
 Resolves O2. The wire has a `Compressed` bit but **no codec field**, so multiple codecs was never really on the
 table — a decoder could not tell them apart. So there is exactly **one** compression codec, and it is **raw
 DEFLATE** (RFC 1951, no wrapper). Gzip is the same DEFLATE stream plus ~18 bytes of framing that buys nothing
@@ -218,8 +269,8 @@ present and unused. **Baked in 2026-07-14:** `ViPaqSerializer.Serialize` now tak
 defaulting off / RowMajor. They set the header's `Compressed` and `Layout` bits; a single `ResolveCodec(header)`
 maps the bit to the codec (raw DEFLATE when set, a pass-through `NoOpCodec` when not), and the encoder just runs
 that codec — the same three lines for encode and decode. `Compress` is a straight on/off: it does not check
-whether compression paid, so a small pack can come out larger, which §6 allows (D7's try-both is **not** wired —
-it stays available in the harness for measurement, not in the serializer). `Deserialize` reads compressed blobs
+whether compression paid, so a small pack can come out larger, which §6 allows (D7's try-both is **not** wired;
+the harness races the codecs but does not pick one). `Deserialize` reads compressed blobs
 again; the old refusal is gone. `ProtocolEncoder` takes the codec as a **required** argument in both languages;
 `NoOpCodec` keeps the compressed path testable with the body readable.
 
@@ -238,11 +289,23 @@ bump, and a bump changes token 0, so a parser that reads token 0 first can alway
 the rest. That is what makes positional parsing safe to extend, and it is why the grammar is not
 order-independent.
 
+### D18 — `Binacle.ViPaq.UnitTests` never references `Binacle.ViPaq.Testing` (2026-09-20)
+
+The unit tests are the spec gate. They prove the code obeys `PROTOCOL.md` through the shared vectors and their
+own curated inputs, and they must not lean on the harness's rival encoder. The repo-wide folder rule
+(`$decisions#D9`) lets a unit suite reference its slice's `data/` and any `test/` support library; this
+sentence closes that door for one library. `Binacle.ViPaq.Data` is open - the packs are inputs, not an encoder
+- and since 2026-09-20 the suite reads it to round-trip every real pack.
+
+Before 2026-09-20 the doc said "UnitTests never references the kernel", which also shut out the data, because
+the packs and the encoders were one project.
+
+### Ruled out — do not rebuild
+
+24-bit ladder (8/16/24/32) + coords-ride-bin · Brotli q11 as default · byte-plane/transpose layout · selling
+"20% smaller". See `$vipaq/findings` for the numbers behind each.
+
 ## Open — decide with data
 
-**Nothing is open.** Both questions closed: O1 (compression trigger) → **D7**, O2 (codec + level) → **D16**.
-Their original framings are in `$vipaq/history`.
-
-## Ruled out — do not rebuild
-24-bit ladder (8/16/24/32) + coords-ride-bin · Brotli q11 as default · byte-plane/transpose layout · raw Deflate
-as a third codec · selling "20% smaller". See `$vipaq/findings` for the numbers behind each.
+**Nothing else is open.** O1 (compression trigger) became **D7** and O2 (codec + level) **D16**; both are
+pending above. Their original framings are in `$vipaq/history`.

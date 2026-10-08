@@ -1,7 +1,7 @@
 ---
 id: api
 description: Index for API slice docs — endpoints, contracts, service, kernel, presets, and module docs (Diagnostics, ServiceModule, UIModule)
-verified: 2026-09-04
+verified: 2026-09-29
 check: The startup order matches Program.cs top to bottom, builder half then pipeline half; the dependency map matches every ProjectReference in api/**/*.csproj and the projects those reach; every type named in the v4 request flow still resolves
 also_update:
   - api/modules
@@ -36,8 +36,9 @@ ConfigureForwardedHeaders()              // proxy trust; writes ForwardedHeaders
 AddDiagnosticsModule()
 if SERVICE_MODULE → AddServiceModule()   // calls AddInfrastructure() internally
 if UI_MODULE      → AddUIModule()
-read SWAGGER_UI / SCALAR_UI       // into swaggerEnabled / scalarEnabled, then added to FeatureOptions
+read SWAGGER_UI / SCALAR_UI       // into swaggerEnabled / scalarEnabled, then added to InstanceOptions
                                   // as "SwaggerUI" (/swagger) and "ScalarUI" (/scalar) when on
+read BinPresetOptions once        // the presets snapshot, set on InstanceOptions beside them
 Configure<ReservedPathOptions>()  // /api, /openapi, /swagger, /scalar reserved whether or not a UI is on
 ---
 UseForwardedHeaders()                    // FIRST — rewrites RemoteIpAddress and Scheme before anything reads them

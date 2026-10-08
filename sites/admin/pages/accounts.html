@@ -1,0 +1,43 @@
+---
+title: Accounts
+permalink: /accounts/
+---
+<div x-data="accounts('{{ site.api_url }}')">
+	<template x-if="error"><p class="message error" x-text="error"></p></template>
+	<template x-if="notice"><p class="message ok" x-text="notice"></p></template>
+
+	{% include paging.html %}
+
+	<table>
+		<thead>
+			<tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Subscription</th><th>Created</th><th>Deleted</th></tr>
+		</thead>
+		<tbody>
+			<template x-for="row in rows" :key="row.id">
+				<tr data-href @click="open(row)">
+					<td x-text="row.username"></td>
+					<td x-text="row.email"></td>
+					<td x-text="row.role"></td>
+					<td x-text="row.status"></td>
+					<td x-text="row.subscriptionId ? 'yes' : '-'"></td>
+					<td x-text="row.createdAtUtc.slice(0, 19)"></td>
+					<td x-text="row.isDeleted ? row.deletedAtUtc?.slice(0, 19) : '-'"></td>
+				</tr>
+			</template>
+			<template x-if="rows.length === 0 && !error">
+				<tr><td colspan="7">No accounts.</td></tr>
+			</template>
+		</tbody>
+	</table>
+
+	<form @submit.prevent="submitCreate">
+		<h2>Create account</h2>
+		<label for="new-username">Username</label>
+		<input id="new-username" x-model="create.username" required>
+		<label for="new-email">Email</label>
+		<input id="new-email" type="email" x-model="create.email" required>
+		<label for="new-password">Password</label>
+		<input id="new-password" type="password" x-model="create.password" autocomplete="new-password" required>
+		<div class="actions"><button type="submit">Create</button></div>
+	</form>
+</div>

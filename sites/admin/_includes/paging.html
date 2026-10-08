@@ -1,0 +1,6 @@
+<div class="paging">
+	<button type="button" @click="go(paging.page - 1)" :disabled="!paging.hasPrevious">Previous</button>
+	<span x-text="`Page ${paging.page} of ${paging.totalPages} - ${paging.total} total`"></span>
+	<button type="button" @click="go(paging.page + 1)" :disabled="!paging.hasNext">Next</button>
+	<label><input type="checkbox" x-model="paging.allowDeleted" @change="go(1)"> Show deleted</label>
+</div>

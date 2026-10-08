@@ -1,5 +1,5 @@
 using Binacle.Lib.Exceptions;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 using Bogus;
 
 namespace Binacle.Lib.UnitTests;
@@ -8,19 +8,19 @@ namespace Binacle.Lib.UnitTests;
 public class CreationTests : IClassFixture<CommonTestingFixture>
 {
 	private readonly CommonTestingFixture fixture;
-	private readonly Faker<TestItem> testItemsFaker;
-	private readonly Faker<TestBin> testBinsFaker;
+	private readonly Faker<ScenarioItem> testItemsFaker;
+	private readonly Faker<ScenarioBin> testBinsFaker;
 
 	public CreationTests(CommonTestingFixture fixture)
 	{
 		this.fixture = fixture;
 		Randomizer.Seed = new Random(605080);
-		this.testItemsFaker = new Faker<TestItem>()
+		this.testItemsFaker = new Faker<ScenarioItem>()
 			.RuleFor(x => x.Length, x => x.Random.Number(1, 65535))
 			.RuleFor(x => x.Width, x => x.Random.Number(1, 65535))
 			.RuleFor(x => x.Height, x => x.Random.Number(1, 65535));
 		
-		this.testBinsFaker = new Faker<TestBin>()
+		this.testBinsFaker = new Faker<ScenarioBin>()
 			.RuleFor(x => x.Length, x => x.Random.Number(1, 65535))
 			.RuleFor(x => x.Width, x => x.Random.Number(1, 65535))
 			.RuleFor(x => x.Height, x => x.Random.Number(1, 65535));
@@ -54,7 +54,7 @@ public class CreationTests : IClassFixture<CommonTestingFixture>
 			});
 			Should.Throw<ArgumentNullException>(() =>
 			{
-				var algorithmInstance = algorithmFactory(bin, Enumerable.Empty<TestItem>().ToList());
+				var algorithmInstance = algorithmFactory(bin, Enumerable.Empty<ScenarioItem>().ToList());
 			});
 		}
 	}

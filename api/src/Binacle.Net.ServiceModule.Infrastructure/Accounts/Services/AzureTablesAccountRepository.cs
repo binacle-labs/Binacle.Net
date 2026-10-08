@@ -94,9 +94,11 @@ internal class AzureTablesAccountRepository : IAccountRepository
 	)
 	{
 		var entity = new AccountTableEntity(account);
+		// Replace, not Merge: Merge skips a null property, so a removed subscription would stay on the row.
 		var response = await tableClient.UpdateEntityAsync(
 			entity,
 			ETag.All,
+			TableUpdateMode.Replace,
 			cancellationToken: cancellationToken
 		);
 

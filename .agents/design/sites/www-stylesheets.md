@@ -1,7 +1,7 @@
 ---
 id: sites/www-stylesheets
 description: The www stylesheet system - the palette and its measured contrast numbers, the separation rhythm, the one-column hero and why the two-column version was dropped, and the exchange card's scroll behaviour.
-verified: 2026-09-04
+verified: 2026-09-29
 check: WS1 against the token block in sites/www/_sass/_tokens.scss, where --action and --accent must still be separate from --primary and --tertiary; WS2 against .band, .band.alt and .rule > .shell in _sass/_content.scss; WS3 against .hero-grid, which must stay a single-column grid; WS4 against the max-width 640px block in .scope; WS5 against the @supports (animation-timeline: scroll()) block in .exchange-code; WS6 against the max-width 719px grid block in _sass/_layout.scss
 paths:
   - "sites/www/_sass/**"
@@ -118,8 +118,7 @@ No shields.io badge anywhere in the footer - that is a third-party request on ev
 carry (`--text`), punctuation is lighter than either. **No syntax rainbow.** Which class is which is in
 `$sites/www-design#W5`.
 
-**Orange (`--secondary`) is what you type, and nothing else.** Roughly four appearances on the whole site: the
-method chip and the `$` prompt. Never a button, a heading, a link, a hover state or a section background.
+**Orange (`--secondary`) is what you type, and nothing else:** the method chip and the `$` prompt. Never a button, a heading, a link, a hover state or a section background.
 
 ## WS8 - the copy button is the only script beyond the theme
 

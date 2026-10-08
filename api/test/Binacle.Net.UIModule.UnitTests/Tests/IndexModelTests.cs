@@ -1,3 +1,4 @@
+using Binacle.Net.Kernel.Instance;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Pages;
 using Binacle.Net.UIModule.Services;
@@ -12,13 +13,13 @@ public class IndexModelTests
 {
 	private static IndexModel IndexWith(params string[] enabledFeatures)
 	{
-		var featureOptions = new FeatureOptions();
+		var instanceOptions = new InstanceOptions();
 		foreach (var feature in enabledFeatures)
 		{
-			featureOptions.AddFeature(feature);
+			instanceOptions.AddFeature(feature);
 		}
 
-		return new IndexModel(new AppletsService(), Options.Create(featureOptions));
+		return new IndexModel(new AppletsService(), Options.Create(instanceOptions));
 	}
 
 	[Fact]

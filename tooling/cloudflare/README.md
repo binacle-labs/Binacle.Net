@@ -4,9 +4,8 @@ One wrangler config per site - `docs.wrangler.jsonc`, `demo.wrangler.jsonc` and 
 the whole deployment configuration for [`sites/docs`](../../sites/docs), [`sites/demo`](../../sites/demo) and
 [`sites/www`](../../sites/www).
 
-**Nothing here is run by hand.** The `Deploy Docs Site`, `Deploy Demo Site` and `Deploy WWW Site` workflows
-call `wrangler deploy --config` against them; all three are manual, and all three tag the commit they
-published.
+**Nothing here is run by hand.** The `Deploy Site` workflow calls `wrangler deploy --config` against the one
+for the site chosen at dispatch; it is manual, and it tags the commit it published.
 
 ## ⚙️ What each one sets
 

@@ -85,9 +85,9 @@ scripts:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Both levels. tooling/ci/ is the shell a workflow runs; tooling/*.sh is what a recipe calls instead of
+    # Both levels. tooling/ci/ is the shell a workflow runs; the rest is what a recipe calls instead of
     # carrying a body, and the only reason those are files is that they can be checked.
-    files=(tooling/*.sh tooling/ci/*.sh)
+    files=(tooling/*.sh tooling/ci/*.sh tooling/image/*.sh tooling/tests/*.sh)
 
     echo "checking ${#files[@]} scripts under tooling"
     printf '  %s\n' "${files[@]##*/}"

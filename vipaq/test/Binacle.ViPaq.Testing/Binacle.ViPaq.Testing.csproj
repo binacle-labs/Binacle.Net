@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.Tools" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Binacle.ViPaq\Binacle.ViPaq.csproj" />
+    <ProjectReference Include="..\..\data\Binacle.ViPaq.Data\Binacle.ViPaq.Data.csproj" />
+    <ProjectReference Include="..\..\..\shared\src\Binacle.Geometry\Binacle.Geometry.csproj" />
+    <ProjectReference Include="..\..\..\shared\src\Binacle.CompactNotation\Binacle.CompactNotation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protobuf\packing.proto" GrpcServices="None" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Binacle.Geometry" />
+    <Using Include="Binacle.ViPaq.Data" />
+  </ItemGroup>
+
+</Project>

@@ -1,5 +1,5 @@
 using Binacle.Net.Kernel.OpenApi.Attributes;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using System.ComponentModel;
 
 namespace Binacle.Net.v4.Contracts.Presets;

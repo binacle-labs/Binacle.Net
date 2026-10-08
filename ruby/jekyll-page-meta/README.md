@@ -104,7 +104,7 @@ your markup with your visible page.
 A key it cannot resolve is not written. A page with no url has no `canonical`, and a site with no image
 anywhere has no `image`. Anything reading these omits the field rather than writing an empty one.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - The generator runs at Jekyll's `:low` priority, so anything stamping a key it reads must run higher. A
   plugin that writes `title_suffix` after this one has resolved the title leaves the suffix out of

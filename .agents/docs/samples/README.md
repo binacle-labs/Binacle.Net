@@ -1,7 +1,7 @@
 ---
 id: samples
 description: Deployment samples — Docker Compose (minimal, quickstart, prod, service, full) and Kubernetes (minimal); each folder name is a smoke profile name, feature flags, config wiring, and the keep-in-sync rule
-verified: 2026-09-04
+verified: 2026-09-28
 check: Sample folders, compose env vars, bind-mounted config paths, the k8s resource bounds, and the pinned image tag match samples/; the compose project name still comes from a top-level name: key and not a .env file; every samples/docker folder name has a tooling/smoke/<name>.yml with the same module set
 also_update:
   - api/configuration
@@ -42,15 +42,14 @@ Common to all: host port `8080→8080`; a top-level compose `name:` key sets the
 
 **`prod` and `service` are two different products, not two sizes.** ServiceModule is accounts, JWT auth, rate
 limiting and a database — the shape for *hosting* Binacle.Net for other people. Most deployments call the API
-from their own backend and need none of it, which is `prod`. Before this split every "serious" sample assumed
-the hosted shape, so the commonest deployment had no starting point.
+from their own backend and need none of it, which is `prod`.
 
 **`full` turns `DEBUG_ENDPOINT` on deliberately.** `/_debug` echoes the caller's whole request including their
 `Authorization` header. It is a demo box; never present it as a deployment.
 
-No sample bundles its own database any more. `service` points at infrastructure the reader already runs — the
-old `service-npgsql` started a `postgres:17.6` container in the same file, which is a dev pattern, and its
-connection string used `Host=localhost`, which inside a container means the container itself.
+No sample bundles its own database. `service` points at infrastructure the reader already runs: a database
+container in the same file is a dev pattern, and `Host=localhost` inside a container means the container
+itself.
 
 Fixed container config paths: `Presets.json` → `/app/Config_Files/Presets.json`; JWT →
 `/app/Config_Files/ServiceModule/JwtAuth.json`; OTel →
@@ -77,34 +76,34 @@ measure against, not a sizing recommendation; the manifest says so.
   with `<Build />`) or `/samples/kubernetes/` (`.proj`, `Type="Shared"`). Generate a fresh `ProjectGuid`.
 - **Baseline files**: `docker-compose.yml` (with its `name:` key), `Presets.json`, `README.md`, and a
   `.dcproj` (SDK `Microsoft.Docker.Sdk`). **No `.env`** — no sample has one. `JwtAuth.json` is required only with `SERVICE_MODULE=True`;
-  `OpenTelemetry.Production.json` + `aspire-dashboard-config.json` only when shipping OTel/Aspire.
+  `OpenTelemetry.Production.json` only when shipping OTel.
 - Published samples bind config files read-only and use the pinned image tag (see below). The local build pipeline
   (`tooling/image.full.yml`, fed by `just build image`) instead uses `binacle-net:local` and injects config via
   compose `configs:` — see `$build-topology`.
 
 ## The image tag is pinned {#image-pin}
 
-All six samples pin the same tag — `samples/docker/*/docker-compose.yml` and
+Every sample pins the same tag — `samples/docker/*/docker-compose.yml` and
 `samples/kubernetes/minimal/binacle-deployment.yaml`. Never `latest`: a sample is copied once and lives for
 years, so `latest` hands the reader the next major release on their next pull, with nothing in their config saying
 what changed.
 
-**Pin the minor line where one exists.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` beside
-`{{version}}`, so from v3.0.0 the pin is `binacle/binacle-net:3.0` and the sample inherits every later patch —
-bug fixes flow, breaking changes never do, and the pin only changes when a new minor line opens. There is no
-`{{major}}` tag on purpose: `3` crosses minor lines. An exact patch is the right pin only for a line that will get no
-further ones, which is why v1.3.x and v2.x samples are pinned that way in the published docs snapshots.
+**Pin the major line where one exists.** `release-docker-image.yml` publishes `{{major}}.{{minor}}` and
+`{{major}}` beside `{{version}}`. The pin is `binacle/binacle-net:3.0` today, because `3` is first written by the
+next release and a pin must name an image that resolves; once it does, the pin becomes `3` and a minor no longer
+touches `samples/`. A major is a breaking change, so the pin moves by hand at a major and never by itself. An
+exact patch is the right pin only for a line that will get no further ones, which is why v1.3.x and v2.x samples
+are pinned that way in the published docs snapshots.
 
-**All six now sit on that minor tag**, which opened with v3.0.0. Read the value out of the sample files rather
+**Every sample sits on that minor tag**, which opened with v3.0.0. Read the value out of the sample files rather
 than from here; a version named in a doc goes stale silently. **The rule that governs every move: a pin on
 `main` must name an image that already exists**, so the pin follows a publish and never precedes one.
 
-Three files outside the six carry the tag in prose and have to move with them: `README.md` at the repo root,
+Three files outside the samples carry the tag in prose and have to move with them: `README.md` at the repo root,
 `samples/README.md` and `samples/docker/README.md`. Two more mention it as an example only —
 `tooling/README.md` and `tooling/smoke.just`.
 
-The published docs snapshots under `sites/docs/collections/_versions/v3.0.x/samples/` pin `3.0` directly,
-because a
-snapshot describes the released version rather than the working tree. They also carry a shorter comment above
+The published docs snapshots under `sites/docs/collections/_versions/v3.x/samples/` pin `3.0` directly,
+because a snapshot describes the released version rather than the working tree. They also carry a shorter comment above
 the `image:` line: the repo copies explain our release order, which means nothing to a reader who downloaded
 the file.

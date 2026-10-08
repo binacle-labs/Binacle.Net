@@ -1,7 +1,7 @@
 using Binacle.Lib.Abstractions;
 using Binacle.Lib.Abstractions.Algorithms;
 using Binacle.Lib.AlgorithmProcessing;
-using Binacle.TestsKernel.Models;
+using Binacle.Data;
 
 namespace Binacle.Lib.UnitTests;
 
@@ -16,14 +16,14 @@ public class BinProcessingCancellationTests
 	};
 
 	// Enough bins for a cancelled run to have somewhere to stop, and enough items that each bin costs real work.
-	private static List<TestBin> CreateBins()
+	private static List<ScenarioBin> CreateBins()
 		=> Enumerable.Range(1, 20)
-			.Select(index => new TestBin { ID = $"bin_{index}", Length = 100, Width = 100, Height = 100 })
+			.Select(index => new ScenarioBin { ID = $"bin_{index}", Length = 100, Width = 100, Height = 100 })
 			.ToList();
 
-	private static List<TestItem> CreateItems()
+	private static List<ScenarioItem> CreateItems()
 		=> Enumerable.Range(1, 20)
-			.Select(index => new TestItem { ID = $"item_{index}", Length = 10, Width = 10, Height = 10, Quantity = 10 })
+			.Select(index => new ScenarioItem { ID = $"item_{index}", Length = 10, Width = 10, Height = 10, Quantity = 10 })
 			.ToList();
 
 	[Fact(DisplayName = "LoopBinProcessor Throws When Token Is Already Cancelled")]

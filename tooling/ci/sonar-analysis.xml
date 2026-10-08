@@ -19,8 +19,9 @@
        The test for every entry: did we write it, do we review it, can we change it? If no, it goes here.
        If yes, it stays in scope even when its findings are unwelcome.
 
-       - Build output: bin/, obj/, artifacts/, results/, and the site equivalents sites/*/js and sites/*/media
+       - Build output: bin/, obj/, artifacts/, and the site equivalents sites/*/js and sites/*/media
          (webpack bundles and copied assets). All gitignored, so CI never sees them anyway.
+       - Measured results: lib/results/ and vipaq/results/. Markdown, not code.
        - Vendored: assets/lib/ and its build-time copies under sites/*/lib - alpine, beercss,
          material-dynamic-colors, swagger-ui. 8157 ncloc and 274 issues in the 2026-08-08 run, none ours to fix,
          and 2329 uncovered lines that were most of the missing coverage.
@@ -28,7 +29,9 @@
          vendor/bundle before the scan. 3524 ncloc and 65 issues in the 2026-08-27 run, including every one of
          the 8 open security findings and 12 of the 34 HIGH. They are other people's gems: the gate was failing
          on kramdown's html fixtures and on unpinned actions in http_parser.rb's own workflows.
-       - Not code: shared/data/ and vipaq/test-vectors/, the two fixture corpora. shared/data was the whole
+       - Not code: the fixture corpora - the set folders under shared/data/, vipaq/data/packed/,
+         lib/data/result-selection/ and vipaq/test-vectors/. Listed by folder because each data/ folder also
+         holds a C# project that reads the set, and that code is analysed. shared/data was the whole
          json=14010 slice of that run, 28% of the project measured as data files.
        - Not code: ruby/*/spec/fixtures/, the gems' own fixture sites. Broken on purpose - a rspec case named
          nasty.html exists to feed the parser a stray </script>, and Sonar reported it as a defect.
@@ -41,7 +44,7 @@
        attack surface in the repo - 5e5f8c02 was an XSS fix in one of them. Back in scope: 6 hand-written js,
        15 scss, and the site yml and json. Fixing them is still not a coding session's job (CLAUDE.md);
        findings go in a plan for the session that owns those files. -->
-  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/**,vipaq/test-vectors/**</Property>
+  <Property Name="sonar.exclusions">**/node_modules/**,**/bin/**,**/obj/**,artifacts/**,lib/results/**,vipaq/results/**,assets/lib/**,ruby/vendor/**,ruby/*/spec/fixtures/**,sites/*/lib/**,sites/*/js/**,sites/*/media/**,sites/**/*.html,shared/data/bischoff-suite/**,shared/data/custom-problems/**,shared/data/demo-samples/**,shared/data/or-library/**,vipaq/data/packed/**,lib/data/result-selection/**,vipaq/test-vectors/**</Property>
 
   <!-- One flat file per suite in artifacts/coverage/sonar, split by extension: .xml from the C# collector,
        .info from jest. tooling/tests.just is what writes them and the only place that knows the suite list.
@@ -77,8 +80,8 @@
        debt and stays visible. -->
   <Property Name="sonar.cpd.exclusions">lib/src/Binacle.Lib/Algorithms/**,api/src/Binacle.Net/v3/**</Property>
 
-  <!-- Build tooling, not shipped code. The .NET support projects (benchmarks, performance suites, tools and
-       the two test kernels) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
+  <!-- Build tooling, not shipped code. The .NET support projects (data, measure, bench,
+       tools and the test support libraries) are handled properly instead, by SonarQubeTestProject in Directory.Build.props -
        that takes them out of the coverage denominator and off the product rule set in one move.
 
        SonarQubeTestProject only reaches MSBuild projects, so the five globs below do the same job for
@@ -100,5 +103,9 @@
        profiles start at the Team plan and we are on Free, so "Sonar way" is fixed. A rule we disagree with is
        therefore answered in code, or marked Accepted on the individual finding in the SonarCloud UI, where it
        carries a reason and stays visible. Never with a blanket path ignore here. -->
+
+  <!-- `end` returns when the upload finishes; with this it blocks until SonarCloud has processed the analysis
+       and exits non-zero on a red gate. Without it the gate read straight after is the previous run's. -->
+  <Property Name="sonar.qualitygate.wait">true</Property>
 
 </SonarQubeAnalysisProperties>

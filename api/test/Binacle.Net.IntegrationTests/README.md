@@ -15,7 +15,7 @@ just test cs_binacle-net_integration   # from the repo root
 api/src/Binacle.Net/v4/Endpoints/Fit/CustomBin.cs  ->  Tests/v4/Endpoints/Fit/CustomBin/
 ```
 
-Each of those folders holds the same **two** files, and the split is the point:
+Each of those folders holds up to **two** files, and the split is the point (a preset lookup has nothing to pack, so it has only the first):
 
 | File | What it covers | Marked with |
 |---|---|---|
@@ -23,7 +23,7 @@ Each of those folders holds the same **two** files, and the split is the point:
 | `...Scenario.cs` | What the packer actually returns, run against the shared fixture corpus | `[Trait("Scenario Tests", ...)]` |
 
 Behaviour tests build their request inline and assert the response code. Scenario tests take their cases from
-the shared test kernel in [`shared/test/Binacle.TestsKernel`](../../../shared/test/Binacle.TestsKernel) as
+the shared scenario project in [`shared/data/Binacle.Data`](../../../shared/data/Binacle.Data) as
 xUnit `[MemberData]`, so the API and the lib are graded against the same problems.
 
 The shared behaviour assertions - `Request_Returns_200Ok`, `Request_Returns_422UnprocessableContent` and the
@@ -34,14 +34,15 @@ request with one field replaced by raw JSON, which is how a value the C# type ca
 an ordinal - reaches the endpoint. The field is named with `nameof`, so a renamed property is a build error
 rather than a test that quietly passes on nothing.
 
-## 🧩 Two fixtures
+## 🧩 Fixtures
 
-Both are assembly fixtures, so the app starts once for the whole run.
+`BinacleApi` and `BinacleApiWithoutPresets` are assembly fixtures, so the app starts once for the whole run.
 
 | Fixture | Why |
 |---|---|
-| `BinacleApi` | The normal one. Presets loaded, used by almost everything |
+| `BinacleApi` | The normal one. Presets loaded, used by almost everything. Carries no `Cors.json`, which is what proves CORS is closed by default |
 | `BinacleApiWithoutPresets` | The same app with no presets, to prove the endpoints answer sensibly when there are none |
+| `CorsConfiguredBinacleApi` | A class fixture, not assembly-wide - the one host with an allowed origin set, for `Tests/CorsTests.cs` |
 
 `PresetKeys.cs` holds the preset names the tests ask for, so a renamed preset breaks in one place.
 

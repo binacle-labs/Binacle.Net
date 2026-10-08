@@ -27,6 +27,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
+- file: results-across-slices.md
+  description: "A home for results that compare two slices - ViPaq's encode time against lib's pack time, what one request costs end to end"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/results/**", "vipaq/results/**"]
+- file: results-story-for-others.md
+  description: "A results story for people outside the project, told from the same lib and ViPaq results files the maintainer's own story uses"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/results/**", "vipaq/results/**"]
 - file: testing-techniques.md
   description: "The testing techniques this repo does not use - property-based, fuzzing, load, mutation - and the four yes-or-no answers"
   state: idea
@@ -49,33 +61,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   waits-on: "nobody - it is an idea"
   horizon: next-release
   paths: ["api/**"]
-- file: api/packing-demo-next.md
-  description: "The next three pieces of work on the packing demo - name the items that did not fit, stop the submit button sticking, and show the visitor the HTTP call that was just made"
-  state: proposed
-  waits-on: "two answers - whether the request panel is a UI Module feature or a shared one, and which API version it prints. The other two need no decision. State chosen by an agent to make the file legible; strike it if it is wrong"
-  paths: ["api/src/Binacle.Net.UIModule/**", "packages/binacle-net-ui/**", "sites/demo/**"]
 - file: api/packing-only-image.md
   description: "The public image becomes packing-only and the Service Module moves to its own image"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
+  horizon: undecided
   paths: ["api/**"]
 - file: api/servicemodule.md
-  description: "How far ServiceModule is taken - answered. One store, one project, refresh tokens"
+  description: "How far ServiceModule is taken - one store, one project, refresh tokens. A suggestion waiting on a yes"
   state: proposed
   waits-on: "nothing. The tag landed 2026-09-01. It is answered together with the packing-only image split, and still needs a yes, which is what `proposed` means"
+  horizon: undecided
   paths: ["api/src/Binacle.Net.ServiceModule/**", "api/src/Binacle.Net.ServiceModule.Domain/**", "api/src/Binacle.Net.ServiceModule.Infrastructure/**"]
-- file: api/ui-clients-off-v3.md
-  description: "Migrate the shipped UI clients off the v3 API"
-  state: idea
-  waits-on: "the shape - what the UI changes to and how is not worked out yet"
-  horizon: near
-  paths: ["api/**", "packages/binacle-net-ui/**"]
-- file: api/uimodule-instance-presets.md
-  description: "The instance page reads its presets over HTTP from the browser - move it to server-side state"
-  state: idea
-  waits-on: "nobody - it is an idea"
-  horizon: next-release
-  paths: ["api/src/Binacle.Net.UIModule/**", "api/src/Binacle.Net.Kernel/**"]
 - file: api/v4-stable.md
   description: "v4 - flip from experimental to stable"
   state: idea
@@ -88,9 +85,10 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
 
 ```yaml
 - file: ci-cd/ci-open-questions.md
-  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. Six close on a sentence; one needs a dispatch"
-  state: blocked
-  waits-on: "the maintainer - findings 2, 3, 6, 9, 11 and the shellcheck gap are done; the rest are each a separate yes or no. State chosen by an agent, it was `in-progress` and that is not one of the five - strike it if wrong"
+  description: "Seven open CI questions left by the platform sweep - Docker Hub OIDC, persist-credentials, one deploy workflow instead of three, scoping the registry credential, dropping setup-buildx-action, the Sonar wait, and the site half of the path filter. All seven close on a sentence; all were re-verified on 2026-09-11"
+  state: ready
+  waits-on: "the first release run from main - it is the first to run the changed publish job, since a prerelease stops at staging. All six approved findings landed 2026-09-11 and 2026-09-12, the OIDC connection exists since 2026-09-14, and 7 is rejected"
+  horizon: undecided
   paths: [".github/workflows/**", ".github/actions/**", "tooling/ci/**"]
 - file: ci-cd/multi-arch-images.md
   description: "CI - publish the image for arm64 as well as amd64"
@@ -99,17 +97,40 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   horizon: on-demand
   paths: [".github/workflows/**"]
 - file: ci-cd/prerelease-staging-repository.md
-  description: "Prereleases go to a public staging repository instead of the one users pull from"
+  description: "Branch builds go to the staging registry on dispatch, the way a prerelease now does - so an image from a branch can be tried without ever reaching the repository users pull from"
   state: idea
-  waits-on: "nobody - it is an idea. horizon: undecided - chosen by an agent, strike it if wrong"
+  waits-on: "the signing story for a branch-built image. horizon: undecided - chosen by an agent, strike it if wrong"
   horizon: undecided
-  paths: [".github/workflows/**", "tooling/image.just"]
-- file: ci-cd/what-the-pull-request-does-not-run.md
-  description: "Two things a pull request does not run - the integration suites against the shipped module set, and Sonar, which is dispatch-only"
+  paths: [".github/workflows/**", "tooling/ci/**", "tooling/image.just", "tooling/image/**"]
+```
+
+## Lib
+
+```yaml
+- file: lib/bfd-wfd-v3.md
+  description: "A test-only v3 of BFD and WFD finds a space in one scan instead of a sort - same fill as v2, far faster on the few cases timed; held for more testing before it could ship"
   state: idea
-  waits-on: "nobody - it is an idea. horizon: near - chosen by an agent, strike it if wrong"
-  horizon: near
-  paths: [".github/workflows/**"]
+  waits-on: "the maintainer - held for more testing"
+  horizon: undecided
+  paths: ["lib/src/Binacle.Lib/Algorithms/**", "lib/src/Binacle.Lib/AlgorithmFactory.cs"]
+- file: lib/pgo-two-speeds.md
+  description: "Some bench processes run slow from start to end because of tiered PGO, and one process per case hides it; a code fix was tried and did not hold"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/src/Binacle.Lib/Algorithms/**", "lib/bench/**", "vipaq/bench/**"]
+- file: lib/realistic-parallel-bench-cases.md
+  description: "Every suggestion for harder, more realistic bench cases for the two parallel bench projects - scenarios beyond Identical, bin-set categories, item mixes, a spin stub, and a Real set. Nothing here is figured out"
+  state: idea
+  waits-on: "nobody - it is an idea. An agent picked the horizon to make the file legible; strike it"
+  horizon: undecided
+  paths: ["lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/**", "lib/bench/Binacle.Lib.Benchmarks.ParallelBins/**", "shared/test/Binacle.Benchmarking/**"]
+- file: lib/versions-pack-the-same.md
+  description: "No test checks that two versions of one heuristic put every item in the same place; the tests and the measure compare status and fill only"
+  state: idea
+  waits-on: "nobody - it is an idea"
+  horizon: undecided
+  paths: ["lib/test/**", "lib/measure/**", "lib/src/Binacle.Lib/Algorithms/**"]
 ```
 
 ## Shared
@@ -120,13 +141,18 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
-  paths: ["shared/data/**", "shared/test/Binacle.TestsKernel/**"]
-- file: shared/testskernel-data-extraction.md
-  description: "TestsKernel - grow the shared fixture cases"
+  paths: ["shared/data/**", "shared/data/Binacle.Data/**"]
+- file: shared/grow-the-fixture-cases.md
+  description: "Binacle.Data - grow the shared fixture cases"
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
   paths: ["shared/**"]
+- file: shared/orphaned-result-files.md
+  description: "Nothing tells you a results file is stale - a dropped reporter's markdown stays on disk and git shows no change"
+  state: idea
+  waits-on: "nothing. Horizon picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
 ```
 
 ## Sites
@@ -136,12 +162,29 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "Two framework defaults on the docs site - code samples had no named mono face (fixed), and wide tables are still clipped rather than scrolled"
   state: proposed
   waits-on: "a yes or no on wrapping each table in a scroll box - the only route left. State picked to make the file legible; strike it if it is wrong."
+  horizon: undecided
   paths: ["sites/docs/**"]
+- file: sites/docs-current-at-root.md
+  description: "The docs site keeps one folder per major, renders the current one at the site root, and drops the common-page layer. A minor stops moving every URL."
+  state: ready
+  waits-on: "the docs deploy - everything on the branch landed 2026-09-12, both open questions answered the same day; what is left needs the deployed site (the redirect curls, the selector click, the 301 flip) or the release (the major tag manifest)"
+  horizon: now
+  paths: ["sites/docs/**", "ruby/binacle-docs-versions/**", "tooling/openapi.just", ".github/workflows/release-docker-image.yml"]
 ```
 
 ## Tooling
 
 ```yaml
+- file: tooling/just-recipes-cleanup.md
+  description: "The just modules get the fixes the bench module got - recipes listed in file order, a word checked by just before anything runs, short scripts folded back into their recipe, one way to name a private recipe"
+  state: proposed
+  waits-on: "a yes from the maintainer, item by item. State picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
+- file: tooling/keep-a-bench-run.md
+  description: "A recipe that copies the reports of the last bench run into the kept-runs folder, instead of doing it by hand"
+  state: idea
+  waits-on: "nothing. Horizon picked by an agent to make the file legible; strike it if wrong"
+  horizon: undecided
 - file: tooling/linting.md
   description: "Answered no - linting is one decision for the whole repository, not a per-language one. TypeScript has nothing, Ruby has a config nobody runs, C# has SonarCloud but no in-build linter. Every language gets the same treatment or none does."
   state: deferred
@@ -152,11 +195,17 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   description: "`just regen check` is called by no workflow, and two of the files it covers cannot pass it - .NET's deflate output moves between SDK patch versions and nothing pins the SDK"
   state: ready
   waits-on: "nothing. Answered 2026-09-04: stop byte-comparing the two ViPaq vector files and compare what they decode to. The SDK stays unpinned"
+  horizon: undecided
   paths: ["tooling/**", "vipaq/test-vectors/**", ".github/workflows/**"]
-- file: tooling/where-benchmark-results-live.md
-  description: "One unanswered question - where benchmark and performance results are persisted and in what shape - and the two mechanical jobs waiting behind it"
+```
+
+## ViPaq
+
+```yaml
+- file: vipaq/off-the-shelf-binary-formats.md
+  description: "Measure MessagePack, CBOR and a columnar protobuf beside ViPaq in the encoded-size files, in the form people actually use, and lean the JSON baseline"
   state: idea
-  waits-on: "a research session coming back with proposals. Nothing here can start until the maintainer picks one"
-  horizon: next-release
-  paths: ["tooling/**", "results/**", "lib/**"]
+  waits-on: "nobody - it is an idea. horizon: undecided, an agent did not judge the distance"
+  horizon: undecided
+  paths: ["vipaq/test/Binacle.ViPaq.Testing/**", "vipaq/measure/Binacle.ViPaq.EncodedSize/**", "vipaq/results/**"]
 ```

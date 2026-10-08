@@ -9,8 +9,7 @@ module.exports = (env, argv) => {
 	console.log(`Environment Build: ${buildType}`);
 
 
-	// A second config, not a second entry: the head script has to be one self-contained file, and the main
-	// config splits every entry into a runtime chunk and a vendors chunk.
+	// A second config, not a second entry: the esnext override below applies to the head script alone.
 	const themeInit = {
 		mode: production ? 'production' : 'development',
 		entry: {'theme-init': './_js/theme-init.ts'},

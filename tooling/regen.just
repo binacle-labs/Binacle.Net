@@ -7,8 +7,8 @@
 #   just regen demo-samples            shared/data/demo-samples -> the demo's sample set
 #   just regen check                   regenerate, then fail if any of it changed
 #
-# Every tool here rewrites committed files. No recipe takes an argument, so a run does its whole list and
-# cannot leave the data half written.
+# Every tool here rewrites committed files, as measure.just's do. No recipe takes an argument, so a run does
+# its whole list and cannot leave the data half written.
 
 # Recipes in a module run from the folder the module is in. Every path below is written from the repo root.
 set working-directory := '..'
@@ -29,7 +29,7 @@ default:
 # Run every generator
 all: or-lib-scenarios vipaq-packed-data vipaq-interop-vectors demo-samples
 
-# OR-Library text -> the tests-kernel scenarios in shared/data/bischoff-suite
+# OR-Library text -> the scenario JSON in shared/data/bischoff-suite
 or-lib-scenarios:
     dotnet run --project shared/tools/Binacle.OrLibrary.Converter
 
@@ -65,7 +65,7 @@ check: all
         ':(glob)vipaq/test-vectors/header/**/*.json'
         ':(glob)vipaq/test-vectors/interop/cs/**/*.json'
         ':(glob)vipaq/test-vectors/interop/ts/**/*.json'
-        'packages/binacle-net-ui/src/utils/sampleData.ts'
+        'packages/binacle-net-ui/src/apps/packingDemo/sampleData.ts'
     )
 
     changed="$(git status --porcelain -- "${generated[@]}")"

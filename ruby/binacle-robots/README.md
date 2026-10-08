@@ -52,7 +52,7 @@ nav:
 There is no config. A body that could be configured per site is a body that can differ per site, which is
 the thing this exists to prevent.
 
-## ⚠️ What will bite
+## ⚠️ What will bite you
 
 **Call it on its own line with nothing after it.** The tag emits no trailing newline - the file's own
 newline supplies it. `{%- robots -%}` eats that newline and the byte output changes.

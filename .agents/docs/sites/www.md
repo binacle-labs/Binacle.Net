@@ -1,7 +1,7 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-09-04
+verified: 2026-09-29
 check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
 paths:
   - "sites/www/**"
@@ -10,7 +10,7 @@ paths:
 # WWW Site
 
 Jekyll site at `sites/www/`, published at `www.binacle.net`. It is the marketing site — what Binacle.Net does
-and who it is for. It is off limits from a coding session; see `.agents/README.md`.
+and who it is for. It is off limits from a coding session.
 
 Output goes to `../../artifacts/www`. Worker `binacle-net-www`.
 
@@ -21,7 +21,7 @@ just build www    # the same site built once, into artifacts/www
 
 ## What is different from the other two sites
 
-Three things, and each one is a decision rather than an oversight.
+Three things, each on purpose.
 
 **Jekyll compiles no sass here.** `_config.yml` carries no `sass:` block. `npm run build:css` runs the sass
 CLI over `_sass/main.scss` and writes `css/main.css` — the same pattern as `api/src/Binacle.Net.UIModule`,
@@ -43,7 +43,7 @@ processes where the other two run two.
 |---|---|
 | `pages/` | The four pages, plus `404.html` and `robots.txt` |
 | `_data/exchange.yml` | Every request and response the site shows, as data |
-| `_includes/` | Header, footer, and the two conversion components |
+| `_includes/` | Header, footer, and the page parts: `exchange`, `command`, `verdicts`, `glyphs` |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its
@@ -63,9 +63,7 @@ processes where the other two run two.
 ## The metadata comes from a gem
 
 **There is no seo include on any of the three sites.** `{% page_meta %}` writes the head from
-`jekyll-page-meta`, and the five defects the three hand-written copies used to disagree over — a description
-cut from body copy, `og:type` as `article`, a missing `og:image`, an unexamined `twitter:card`, whitespace
-inside `<title>` — cannot come back one site at a time, because there is one implementation.
+`jekyll-page-meta`, one implementation for all three.
 
 `description` is front matter on every page here; the excerpt is only a fallback. Separator is ` - `, not
 `|`, and it is `page_meta: title_separator:` in `_config.yml`. Every absolute URL is built from `url` in
@@ -76,8 +74,7 @@ image is worse than either.
 
 ## Structured data
 
-One JSON-LD graph per page, written by `{% structured_data %}`. `_includes/schema.html` is gone and its two
-unconnected blocks are now two nodes joined by `@id`.
+One JSON-LD graph per page, written by `{% structured_data %}`; its nodes are joined by `@id`.
 
 `/` is the only page that names a type — `structured_data: type: SoftwareApplication` in its front matter,
 with `name: Binacle.Net` because the node names the software, not the browser title. Its `offers` at price
@@ -93,15 +90,15 @@ reasons are `$sites/www-design#W8`.
 
 ## Every code block is a real response
 
-`_data/exchange.yml` holds every request and response on the site. **How to re-run them is in the design records now**, not in the data file - its comments were moved out on 2026-09-04.
-Nothing is hand-written. **A response that looks plausible but is not what the API returns is the one lie
+`_data/exchange.yml` holds every request and response on the site. How to re-run them is in the design
+records, not in the data file. Nothing is hand-written. **A response that looks plausible but is not what the API returns is the one lie
 this audience catches**, and they are the least likely to forgive it.
 
 It is one data file and one include (`_includes/exchange.html`) rather than markup in each page, because the
 card appears on all four pages: inline copies get re-run in one page and rot in the other three.
 
-**Every example is v3.** v4 is experimental for the whole 3.0.x line and a marketing page must not hand a
-stranger an unstable contract. The v3 routes are `fit/by-custom`, `fit/by-preset/{preset}`, `pack/by-custom`,
+**Every example is v3.** v4 is marked experimental (`ApiV4Document.IsExperimental`), and a marketing page must
+not hand a stranger an unstable contract. The v3 routes are `fit/by-custom`, `fit/by-preset/{preset}`, `pack/by-custom`,
 `pack/by-preset/{preset}` and `GET presets`. Anything named `fit/bin`, `fit/smallest-bin` or
 `pack/smallest-bin` is v4. `just openapi generate` writes the current documents if you need to check.
 
@@ -117,12 +114,11 @@ Four exchanges are in the file, one per job: the homepage fit against two locker
 
 ## The stylesheet, and the two tokens that are not the palette
 
-Plain CSS, no framework, about 2.5 KB gzipped. `_sass/` is five partials plus `main.scss`: `_tokens`,
+Plain CSS, no framework. `_sass/` is five partials plus `main.scss`: `_tokens`,
 `_base`, `_layout`, `_code`, `_content`.
 
 **Colour is rationed and the rationing is the design.** Blue is the answer - links, the primary button, one
-3px structural rule per page. Orange is what you type, and only that: the `POST` chip and the `$` prompt, four
-appearances on the whole site. Violet is accents only - the small-caps eyebrow above each `h2`, and the rule
+3px structural rule per page. Orange is what you type, and only that: the `POST` chip and the `$` prompt. Violet is accents only - the small-caps eyebrow above each `h2`, and the rule
 on a caveat callout. **There is no coloured header bar and no coloured footer.** Do not repaint this; large
 flat fills are why the other two sites read as framework demos.
 
@@ -141,14 +137,14 @@ signal separating the two registers. **Never put `shell` and `prose` on the same
 wins and then `margin-inline: auto` centres it, so the column floats to the middle of the viewport while every
 other band stays left. Nest them.
 
-**The hero is one column.** It was specified as two at roughly 55/45 and that does not survive the payload: a
-real `fit` response is 757px of monospace and a 45% column is about 517px, so the card chopped off mid-token.
+**The hero is one column.** Two columns do not survive the payload: a real `fit` response is wider than a
+45% column, so the card chops off mid-token.
 Any grid holding a code pane also needs `min-width: 0` on its children - a grid item defaults to
 `min-width: auto` and will grow its track to the intrinsic width of a `<pre>`.
 
 ## The JavaScript, and there is very little
 
-`_js/main.ts`, about 2.8 KB gzipped as `js/main.js`, two behaviours, both degrading cleanly:
+`_js/main.ts`, built as `js/main.js`, two behaviours, both degrading cleanly:
 
 - **A theme toggle.** `packages/theme-switcher`, the same element the other three hosts use. The pre-paint
   read is *not* in this file — it is its own bundle, `js/theme-init.js`, loaded blocking in `<head>`.
@@ -157,16 +153,13 @@ Any grid holding a code pane also needs `min-width: 0` on its children - a grid 
 Both controls are `hidden` in the markup and revealed by the script. **All four pages must be complete with
 JavaScript off**, and a control that cannot work is worse than no control.
 
-The consent banner has a reserved slot in `_data/includes.yml`. The maintainer will fill it in a dedicated
-session.
-
 ## What will bite
 
 **The Worker name is set once.** Renaming `binacle-net-www` after the first deploy creates a second Worker,
 leaves the first running, and detaches the custom domain.
 
-**The three-step build order is not optional**, and it matters more here than on the other two: Jekyll no
-longer compiles the sass, so a clean `jekyll build` proves nothing about whether the site has styles.
+**The three-step build order is not optional**, and it matters more here than on the other two: Jekyll does
+not compile the sass, so a clean `jekyll build` proves nothing about whether the site has styles.
 `just build www` does all three steps.
 
 **The exchange card is the most valuable element on the site, and it is one card.** One border, one radius,
@@ -179,23 +172,19 @@ syntax rainbow.**
 as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
 reports as an error.
 
-**The `docker run` line names `binacle/binacle-net:3.0`, and that tag is published** — v3.0.0 shipped on
-1 Sep 2026, so `3.0` and `latest` both resolve to it. That command is the primary conversion on three pages,
-and it used to fail with `manifest unknown`, which is why the site was held back until the tag existed. That
-gate is met.
+**The `docker run` line names `binacle/binacle-net:3.0`, a published tag.** That command is the primary
+conversion on three pages; a tag that does not exist fails it with `manifest unknown`.
 
 **`demo.binacle.net` answers**, and it is linked from the nav, the footer and `/how-it-works/`. The link check
 runs offline and will not catch a host that stops answering.
 
-**The code panes scroll on a phone and that is deliberate.** Wrapping them was tried and reverted: a wrapped
-line starts at a different indent from the line it continues, so the JSON's own structure stops being
+**The code panes scroll on a phone and that is deliberate.** Wrapping fails: a wrapped line starts at a different indent from the line it continues, so the JSON's own structure stops being
 readable and the hero card grew to roughly 1900px tall. What helps instead is room and smaller type - the
-card goes gutter to gutter below 720px and the code drops to 0.8125rem, which took the visible share of a
-response line from 42% to 59% at 390px. **Do not "fix" this by wrapping it again.**
+card goes gutter to gutter below 720px and the code drops to 0.8125rem. **Do not "fix" this by wrapping it again.**
 
 **The `docker run` line is one line in `_data/exchange.yml`, with no backslash continuations.** They wrap into
 nonsense on a phone - `pre-wrap` keeps both the newlines and the continuation indents and then wraps on top of
-them, which left a stray `-e` alone on a line in the middle of the primary conversion.
+them.
 
 **The mobile header is an explicit grid, not the flex row.** Left to source order the nav spans both columns,
 takes row 2, and pushes the theme control onto a row of its own - a four-row, 200px header before the reader

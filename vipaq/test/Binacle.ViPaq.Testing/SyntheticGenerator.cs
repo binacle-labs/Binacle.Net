@@ -1,0 +1,89 @@
+using Binacle.Geometry;
+
+namespace Binacle.ViPaq.Testing;
+
+// Deterministic random scenarios at item counts past any real pack, up to the format's limit, for the speed and
+// memory benchmarks only. The name is the column the report prints.
+//
+// Never use these for size or compression. Random data has nothing for a codec to grip, so it reports the
+// opposite of real behaviour. CPU and memory depend on item count and byte width, not on whether values repeat,
+// so random is fine there and scales freely.
+public static class SyntheticGenerator
+{
+	// A fixed seed base: a benchmark whose input changed between runs would not be comparable.
+	private const int SeedBase = 20_260_714;
+
+	private const ushort EightBitMax = 255;
+	private const ushort SixteenBitMax = 65_535;
+
+	// The largest real pack is 371 items, the BFD pack of thpack1_65; 65,535 is Limits.MaxItemCount. Spread is "mixed": CPU and memory depend
+	// on the count and byte width, not on where the values sit.
+	private static readonly int[] Counts = [1_000, 5_000, 65_535];
+	private static readonly int[] WidthBitsMatrix = [8, 16];
+
+	private static readonly Dictionary<string, Scenario> scenarios;
+
+	static SyntheticGenerator()
+	{
+		scenarios = new Dictionary<string, Scenario>();
+
+		foreach (var widthBits in WidthBitsMatrix)
+		{
+			foreach (var count in Counts)
+			{
+				var scenario = Generate(count, widthBits);
+				scenarios.Add(scenario.Name, scenario);
+			}
+		}
+	}
+
+	public static IReadOnlyCollection<Scenario> All => scenarios.Values;
+
+	public static IEnumerable<string> Names => scenarios.Keys;
+
+	public static Scenario GetByName(string name) => scenarios[name];
+
+	private static Scenario Generate(int count, int widthBits)
+	{
+		// Deterministic per (count, widthBits): same seed -> same bytes every run.
+		var random = new Random(SeedBase + (widthBits * 100_000) + count);
+
+		// 16-bit forces two bytes by starting dimensions past 255. Bin is the width max so any item is in range.
+		var maxValue = widthBits == 8 ? EightBitMax : SixteenBitMax;
+		var minDimension = widthBits == 8 ? (ushort)1 : (ushort)256;
+
+		var bin = new Dimensions<ushort>
+		{
+			Length = maxValue,
+			Width = maxValue,
+			Height = maxValue
+		};
+
+		var items = new Item<ushort>[count];
+		for (var index = 0; index < count; index++)
+		{
+			items[index] = new Item<ushort>
+			{
+				Length = Next(random, minDimension, maxValue),
+				Width = Next(random, minDimension, maxValue),
+				Height = Next(random, minDimension, maxValue),
+				X = Next(random, 0, maxValue),
+				Y = Next(random, 0, maxValue),
+				Z = Next(random, 0, maxValue)
+			};
+		}
+
+		return new Scenario
+		{
+			Name = $"{count} items, {widthBits}-bit",
+			Bin = bin,
+			Items = items,
+			WidthBits = widthBits,
+			Spread = "mixed"
+		};
+	}
+
+	// Dimensions must be >= 1 (a zero dimension is rejected); coordinates may be 0. Both stay within the width max.
+	private static ushort Next(Random random, int minInclusive, int maxInclusive)
+		=> (ushort)random.Next(minInclusive, maxInclusive + 1);
+}

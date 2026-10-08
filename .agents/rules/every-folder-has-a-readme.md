@@ -60,6 +60,9 @@ Two paragraphs is a fine README. Nothing here asks for length.
 - **Headings carry an icon** - `icon-headings-in-public-docs.md` has the icon set and the one-per-heading rule.
 - **Write for the human, not for us.** Say what a person opening the folder wants to know. Anything that only
   an agent needs belongs in `.agents/`, not here.
+- **Describe what exists, not what is planned.** What is missing, what is next, what is still open and what
+  someone decided belong in `.agents/plans/`. A README that tracks work goes stale every time the work moves,
+  and it goes stale silently.
 - **Link real paths** - the file next door, the parent, the root `README.md`. Never point into `.agents/`;
   `who-references-whom.md` is the full matrix.
 - Plain language, and cut every word that does not change the meaning.

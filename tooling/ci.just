@@ -31,9 +31,9 @@ gate results:
 deploy-message commit:
     @tooling/ci/deploy-message.sh {{ quote(commit) }}
 
-# Tag a commit and push the tag
-push-tag tag commit:
-    @tooling/ci/push-tag.sh {{ quote(tag) }} {{ quote(commit) }}
+# Tag a commit through the API
+create-tag tag commit:
+    @tooling/ci/create-tag.sh {{ quote(tag) }} {{ quote(commit) }}
 
 # Write the deploy's run summary: commit, marker tag, site
 deploy-summary commit tag url:
@@ -43,9 +43,9 @@ deploy-summary commit tag url:
 sonar-summary report commit branch:
     @tooling/ci/sonar-summary.sh {{ quote(report) }} {{ quote(commit) }} {{ quote(branch) }}
 
-# Only main may release
-check-release-ref ref:
-    @tooling/ci/check-release-ref.sh {{ quote(ref) }}
+# A release from main only; a prerelease from main or a release/* branch
+check-release-ref ref version:
+    @tooling/ci/check-release-ref.sh {{ quote(ref) }} {{ quote(version) }}
 
 # The version is semver shaped, with no leading v
 check-version version:
@@ -72,8 +72,8 @@ github-release tag section commit:
     @tooling/ci/github-release.sh {{ quote(tag) }} {{ quote(section) }} {{ quote(commit) }}
 
 # Write the release's run summary: version, digest, public tags
-release-summary version digest tag url tags:
-    @tooling/ci/release-summary.sh {{ quote(version) }} {{ quote(digest) }} {{ quote(tag) }} {{ quote(url) }} {{ quote(tags) }}
+release-summary version digest tag url tags ref:
+    @tooling/ci/release-summary.sh {{ quote(version) }} {{ quote(digest) }} {{ quote(tag) }} {{ quote(url) }} {{ quote(tags) }} {{ quote(ref) }}
 
 # Pull a published image - prints digest=sha256:...
 pull-image image:

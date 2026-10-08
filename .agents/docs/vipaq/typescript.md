@@ -1,8 +1,8 @@
 ---
 id: vipaq/typescript
 description: Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library
-verified: 2026-09-04
-check: TS API signatures, the package root index.ts re-exports and every row of the divergence table match vipaq/packages/binacle-vipaq/; the suite and test counts match a `just test ts_binacle-vipaq_unit` run
+verified: 2026-09-29
+check: TS API signatures, the package root index.ts re-exports and every row of the divergence table match vipaq/packages/binacle-vipaq/
 also_update:
   - vipaq
 paths:
@@ -65,7 +65,7 @@ Compressed bytes are **not** byte-identical across the two engines; the guarante
 
 ## Tests
 
-`just test ts_binacle-vipaq_unit` (jest, run from the repo root; run `npm install` at the root first). 20 suites, 380 tests — unit tests
+`just test ts_binacle-vipaq_unit` (jest, run from the repo root; run `npm install` at the root first). Unit tests
 on the utils (`createHeader`, `getDimensionsWidth`, `getCoordinatesWidth`, `getBodyLength`, header pack/parse),
 the `ProtocolReader` / `ProtocolWriter` little-endian and range guards, `ViPaqSerializer` round-trips and the
 `compress` / `layout` options, and the interop cross-decode matrix.

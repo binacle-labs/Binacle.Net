@@ -29,7 +29,7 @@ wiring bug reads as a clear mismatch rather than a whole-object inequality.
 
 The current fixture surfaces are in `$lib/tests` and `$vipaq`.
 
-**Why:** the maintainer asked for it directly, and it is what makes Sonar's S2699 pass honestly rather than
+**Why:** it is what makes Sonar's S2699 pass honestly rather than
 by suppression. A test whose assertion is invisible is one nobody can review — the analyser complaining is a
 symptom, not the reason.
 

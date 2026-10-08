@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Binacle.Lib\Binacle.Lib.csproj" />
+        <ProjectReference Include="..\..\..\shared\data\Binacle.Data\Binacle.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Binacle.Geometry" />
+        <Using Include="Binacle.Packing" />
+        <Using Include="Binacle.Data" />
+    </ItemGroup>
+
+</Project>

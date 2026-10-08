@@ -1,7 +1,7 @@
 # Packed placed-result data
 
-Frozen, packed results read by the ViPaq test kernel's `BischoffDataProvider`, `CustomProblemsDataProvider`
-and `DemoSamplesDataProvider` (the first two merged for curated runs by `CuratedScenarioProvider`). Each
+Frozen, packed results read by `Binacle.ViPaq.Data`, one class per family under `Packed/` (the harness's
+curated picks in `Binacle.ViPaq.Testing` resolve by name against them). Each
 sample is a bin plus the **placed** items a packing run produced: dimensions **and** coordinates
 (`L x W x H (X,Y,Z)`), which is what ViPaq serializes. The source problems carry only item *types* with a
 quantity and no coordinates, so the coordinates only exist after packing.
@@ -22,13 +22,13 @@ all` instead - it does both, in that order.
 The run is deterministic: a no-change re-run is byte-identical, so it produces no git noise. `just regen check`
 regenerates everything and fails if any generated file moved.
 
-## 📂 Layout
+## 📂 What is in it
 
 Split by source family, mirroring `shared/data`:
 
 - `custom-problems/` - `baseline`, `complex`, `simple`.
 - `bischoff-suite/` - `orlib_thpack1` .. `orlib_thpack7` (BR1-BR7).
-- `demo-samples/` - the demo site's sample set, `01-opening-set` .. `20-wfd-wins`.
+- `demo-samples/` - the demo site's sample set, one per file under `shared/data/demo-samples/`.
 
 The **algorithm** rides on the file name as a `.<algo>` suffix, not a folder, e.g. `orlib_thpack1.ffd.json`.
 Every algorithm the packer offers is generated: `.ffd.json`, `.wfd.json` and `.bfd.json`, side by side in the
@@ -36,7 +36,7 @@ same folder. The suffix names the family, not the implementation version. The to
 factory the API uses, which is the v2 implementation of each. Different algorithms place items differently, so
 their coordinates, and tokens, differ; the suffix keeps the sets apart without duplicating the folder tree.
 
-The test kernel reads a sample's name as `<problem>.<algo>`, so the same problem under three algorithms is
+`Binacle.ViPaq.Data` reads a sample's name as `<problem>.<algo>`, so the same problem under three algorithms is
 three distinct scenarios.
 
 The tool prints a per-file and total sample/item count on each run; that console summary is the run's report,
@@ -64,6 +64,5 @@ Each problem file is a JSON array of samples. One sample:
   fill ~98%, never tessellate perfectly), so not every source box appears here, only the placed ones.
 
 Only placed geometry is stored, no ViPaq token. The token is derivable from `Bin`+`Items`, and its compressed
-bytes vary by gzip encoder/runtime, so committing it would churn the files on every regen. The kernel computes
-the token itself when it benchmarks. Every sample is still round-tripped (encode -> decode == input) at
-generation time, or the run fails.
+bytes vary by compressor and runtime, so committing it would churn the files on every regen. The harness computes
+the token itself when it benchmarks. The ViPaq unit tests round-trip every sample (encode -> decode == input).

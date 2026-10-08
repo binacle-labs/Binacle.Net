@@ -17,17 +17,17 @@ its own and neither can be handed to shellcheck. A `.sh` file is both.
 | `install-container-structure-test.sh` | Installs container-structure-test, the same way |
 | `install-hurl.sh` | Installs hurl, the same way |
 | `install-lychee.sh` | Installs lychee, the same way |
-| `push-tag.sh` | Tags a commit and pushes the tag - the three deploy markers; the release makes its own |
+| `create-tag.sh` | Tags a commit through the API - the deploy marker; the release makes its own |
 | `deploy-summary.sh` | The deploy's run summary: commit, marker tag, site |
-| `sonar-summary.sh` | Waits for SonarCloud to finish, then writes its quality gate |
-| `check-release-ref.sh` | Passes only if the release was dispatched on `main` |
+| `sonar-summary.sh` | Writes the SonarCloud quality gate to the run summary |
+| `check-release-ref.sh` | Passes only if a release was dispatched on `main`, or a prerelease on `main` or on the `release/v<x>-<y>-<z>` branch named after its version |
 | `check-version.sh` | Passes only if the version is semver shaped, with no leading `v` |
 | `check-release-tag.sh` | Passes only if the tag is free, or already points at this commit |
 | `changelog-section.sh` | Which `CHANGELOG.md` section a version publishes. Prints `name=...` |
 | `moving-tags.sh` | Which public tags move, given the one that never does. Prints `moving=...` |
 | `copy-tags.sh` | Copies one image to one or more tags by digest, then proves each reads back as it |
 | `github-release.sh` | Creates the release, making the tag on the commit, or replaces the body of one that exists |
-| `release-summary.sh` | The release's run summary: version, digest, public tags |
+| `release-summary.sh` | The release's run summary: version, digest, public tags, the release link and the verify command - the GHCR form for a prerelease |
 | `pull-image.sh` | Pulls a published image. Prints `digest=sha256:...` |
 | `smoke-summary.sh` | The smoke's run summary: image, digest, each check |
 | `codeql-summary.sh` | Counts the open code scanning alerts by severity |
@@ -47,7 +47,7 @@ just ci moving-tags binacle/binacle-net:3.0.0 'binacle/binacle-net:3.0.0
 binacle/binacle-net:latest'
 ```
 
-**The four `install-*.sh` are the exception: no recipe, called by path.**
+**The `install-*.sh` scripts are the exception: no recipe, called by path.**
 
 ```bash
 tooling/ci/install-lychee.sh
@@ -75,8 +75,9 @@ fallback is what makes it runnable here; do not drop it.
 **They must pass `shellcheck` clean.** That is the whole reason they are files rather than recipe bodies, and
 `just check scripts` is what enforces it - on the pull request and on a laptop.
 
-`push-tag.sh` sets no git identity. With no `-a` or `-m` the tag is lightweight, which is a ref and not an
-object, so git never asks who you are.
+**Nothing in CI runs `git push`.** `create-tag.sh` makes the marker tag with `gh api`, so every checkout carries
+`persist-credentials: false` and no job holds a git credential after checkout. A script that needs to write to
+the repository takes `GH_TOKEN`, like `github-release.sh` does.
 
 **`check-release-tag.sh` reaches origin.** It asks `git ls-remote` as well as the local clone, because the tag
 it is guarding against is usually one only origin has.

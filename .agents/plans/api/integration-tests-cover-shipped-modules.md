@@ -20,9 +20,6 @@ break lives: a core endpoint keeps passing in the harness and fails in the image
       `grep -rn "Run the tests with all modules enabled" api/test` returns nothing.
 - [ ] One run with everything on, or a matrix over the combinations that ship, is decided and written here.
       **By eye.** The answer is in this file, not in someone's head.
-- [ ] CORS is asserted: a configured origin comes back in `Access-Control-Allow-Origin`, an unconfigured one
-      does not.
-      `grep -rn "Access-Control-Allow-Origin" api/test` matches.
 
 ## Research
 
@@ -40,11 +37,6 @@ are all off.
 **Rate limiting is the worked example of the shape.** A core behaviour that exists only because an optional
 module registered something. `api/test/Binacle.Net.ServiceModule.IntegrationTests/RateLimiting/` answers in
 code what this file asks in prose.
-
-**CORS is exercised nowhere.** `Program.cs` always registers the `CoreApi` policy and every core endpoint
-carries `.RequireCors(CorsPolicy.CoreApi)`. The origins come from an optional `Cors.json`; with none present
-`AllowedOrigins` falls back to an empty array, a closed default the validator's own comment says is intended.
-Nothing asserts that a configured origin is echoed back, or that an unconfigured one is not.
 
 **The shipped presets are replaced.** Both core harnesses swap in three test-only presets, so no in-process
 test ever reads `Config_Files/Presets.json`. Leave that alone - proving the shipped presets load is the
@@ -72,9 +64,18 @@ The three questions a pickup session answers first:
   `RequireAuthorization`, and any middleware a module adds to the shared pipeline.
 - **Does anything break when the modules go on?** If existing assertions have to change, which and why.
 
+### 2026-09-11 - the CI half, folded in from the pull-request plan
+
+**The integration suites already run on every pull request.** `shared-image-tests.yml` names five of them as
+its own steps - the UI module's, the core one, and the Service Module's on Sqlite, Postgres and AzureStorage -
+rather than calling a group recipe. True since `d0ba7823`. A separate plan claimed otherwise until it was
+corrected and deleted on 2026-09-11; **the run was never the gap, the module set is.** So this file owns the
+whole of what is left, and there is no CI work to do beyond whatever turning the modules on requires.
+
 ### 2026-08-27 - the maintainer agreed the split
 
-His word was *"agreed"* on splitting the investigation from the build.
+His word was *"agreed"* on splitting the investigation from the build. Before the session logs, so the quote
+cannot be checked.
 
 ### Date not recorded - what will bite
 
@@ -88,6 +89,10 @@ His word was *"agreed"* on splitting the investigation from the build.
   might be the bug this work exists to find.
 - **The ServiceModule harness disables the auth-token limiter on purpose.** Turn it back on and the auth tests
   need to account for it.
-- **The Azure Storage provider is a hole in every layer of coverage.** Since `service-azure` was folded into
-  `service` it has no dedicated sample, no CI coverage and no smoke profile, and nobody has written down
-  whether it stays or goes.
+- **Whatever runs the all-modules suite must not be added to `shared-image-tests.yml`.** The release calls
+  that file whole and takes no inputs, so a step added there is a step every release pays for. It belongs in
+  `pull-request.yml`. This is the one trap the deleted pull-request plan carried that was not already here.
+- **The Azure Storage provider has in-process coverage and nothing else.** `shared-image-tests.yml` runs the
+  Service Module integration suite against Azurite, checked 2026-09-14. What it lacks: no smoke profile, and
+  the sample carries it only as a commented block in `samples/docker/service/docker-compose.yml`. The
+  ServiceModule plan says it goes.

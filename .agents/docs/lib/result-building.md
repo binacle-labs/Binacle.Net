@@ -1,7 +1,7 @@
 ---
 id: lib/result-building
 description: OperationResultBuilder — how OperationResult is constructed, status rules, volume percentages, and integrity checks
-verified: 2026-09-04
+verified: 2026-09-28
 check: The builder's methods, status branches, integrity checks and rounding match lib/src/Binacle.Lib/Models/OperationResultBuilder.cs; the entry point matches ExtensionMethods/AlgorithmResultBuilderExtensions.cs; OperationResult and its enums are still in shared/src/Binacle.Packing/Models/OperationResultStatus.cs
 paths:
   - "lib/src/Binacle.Lib/Models/OperationResultBuilder.cs"
@@ -14,8 +14,10 @@ paths:
 ## OperationResultBuilder
 
 `OperationResultBuilder<TBin, TItem>` (`lib/src/Binacle.Lib/Models/OperationResultBuilder.cs`) is internal to `Binacle.Lib`.
-It's the only way an `OperationResult` is created — `OperationResult` (`shared/src/Binacle.Packing/Models/OperationResultStatus.cs`)
-has an internal constructor and cannot be instantiated directly.
+`OperationResult` (`shared/src/Binacle.Packing/Models/OperationResultStatus.cs`) has an internal constructor, so
+only a friend of `Binacle.Packing` can create one. In `Binacle.Lib` the builder is the only place that does; the
+other friend is `Binacle.Lib.Data`, whose `OperationResultHelper` builds results for the result-selection
+fixtures (`$lib/dependencies`).
 
 Each algorithm creates its builder at the **top of `Execute()`**, through the
 `CreateResultBuilder<TBin, TItem>` extension in `lib/src/Binacle.Lib/ExtensionMethods/`, and finishes with it
@@ -40,7 +42,7 @@ builder
 |---|---|
 | `None` | Default — no early exit |
 | `ContainerVolumeExceeded` | Total item volume exceeds bin volume |
-| `ContainerDimensionExceeded` | An item dimension exceeds a bin dimension |
+| `ContainerDimensionExceeded` | An item's longest side exceeds the bin's longest side |
 
 ## Status rules
 
@@ -55,7 +57,7 @@ builder
 | Early exit called | `EarlyExit` (overrides the above) |
 
 **The `Unknown` fall-through cannot be reached**, and that is worth knowing because nothing downstream guards
-against it (`$lib/result-selection`). The integrity check above has already forced
+against it (`$lib/result-selection`). The integrity check (below) has already forced
 `packedCount + unpackedCount == totalItems`, so `packedCount == 0` implies `unpackedCount == totalItems` and
 the second branch takes it. `Unknown` survives as the sentinel a new code path would land on, not as a state
 the current one produces.

@@ -1,0 +1,7 @@
+{
+  "Cors": {
+    "ServiceApi": {
+      "AllowedOrigins": [ "http://localhost:7198" ]
+    }
+  }
+}

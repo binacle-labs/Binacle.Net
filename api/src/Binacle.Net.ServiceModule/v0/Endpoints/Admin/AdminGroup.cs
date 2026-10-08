@@ -17,6 +17,7 @@ internal class AdminGroup : IEndpointGroup
 		return endpoints.MapGroup($"/api/admin")
 				.WithTags("Admin")
 				.RequireAuthorization("Admin")
+				.RequireCors(ServiceModuleCorsPolicy.Name)
 				.WithGroupName(ServiceModuleApiDocument.DocumentName)
 				
 				.Produces(StatusCodes.Status401Unauthorized)

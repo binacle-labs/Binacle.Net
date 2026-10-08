@@ -1,7 +1,7 @@
 ---
 id: sites/webmanifest
 description: Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither.
-verified: 2026-08-27
+verified: 2026-09-29
 check: the theme_color in each site's webmanifest block against the dark --primary and --bg in that site's own sass; the android-chrome ignore line in gulpfile.js for the uimodule target; no site holding a pages/site.webmanifest of its own
 paths:
   - "sites/**"
@@ -19,8 +19,8 @@ throws away work that is done, and a manifest is what makes a site installable.
 
 ## Every value traces to something, and two of them to a stylesheet
 
-`name` is `display_title` where a site sets one and `title` otherwise, so the demo is "Binacle.Net Demo"
-rather than a second thing called "Binacle.Net". `description` is the site description. `start_url` is the
+`name` is the block's own `name:` where a site sets one and `title` otherwise. The demo sets
+`name: "Binacle.Net Demo"`, so it is not a second thing called "Binacle.Net". `description` is the site description. `start_url` is the
 site root through `relative_url`.
 
 **There is no `short_name`.** Android truncates a home-screen label at about twelve characters and no site
@@ -50,7 +50,7 @@ puts each icon's keys on their own line.
 ## The link rides the icon list
 
 The `rel="manifest"` link is one entry in each site's `_data/includes.yml` under `icons:`, which
-`{% link_tags %}` already renders into every head. No layout was touched, and the link is on all 127 pages.
+`{% link_tags %}` already renders into every head. No layout was touched, and the link is on every page.
 **The gem ships a link tag and none of these three uses it**, because that would write the link twice.
 
 ## The UI module gets neither

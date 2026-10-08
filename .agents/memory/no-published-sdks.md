@@ -14,16 +14,16 @@ client from it with whatever tool they use (`hey-api`, `kiota`, `openapi-generat
 **Why:** a clean per-version spec covers the whole developer audience for close to zero upkeep. Every published
 SDK is the opposite: a package to version, test, publish and patch, times the number of languages, and each one
 becomes a compatibility promise the moment somebody depends on it. The spec generates a client in one command,
-so shipping SDKs buys convenience we would then owe maintenance on forever. Decided 2026-07-19, and the spec
-side of it is already built — `$api/openapi` describes the documents, `tooling/openapi.spectral.yaml` and `just openapi lint`
+so shipping SDKs buys convenience we would then owe maintenance on forever. Written 2026-07-19, before the
+session logs, so no quote from the maintainer backs it. The spec side is already built — `$api/openapi` describes the documents, `tooling/openapi.spectral.yaml` and `just openapi lint`
 hold them to a standard good enough to generate from.
 
 **How to apply:**
 
 - **Do not publish a package to close a "make integration easier" request.** The answer is the spec plus a
   short "generate a client" guide, not a shipped package.
-- **Do not add a `PackageId`, drop `private` from a TS workspace package, or wire a publish step** without the
-  maintainer deciding to reverse this. Doing so also makes a component earn a real version number, which is a
+- **Do not add a `PackageId`, drop `private` from a TS workspace package, or wire a publish step** without asking
+  the maintainer. Doing so also makes a component earn a real version number, which is a
   second decision with its own consequences.
 - Keep the documents generation-quality: descriptions on every schema and property, stable `operationId`s, no
   numeric-as-string unions. Those exist so a generated client is usable, not for tidiness.

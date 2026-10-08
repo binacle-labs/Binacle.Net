@@ -1,5 +1,5 @@
 using System.Text.Json.Nodes;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Binacle.Net.v3.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

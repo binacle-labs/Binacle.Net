@@ -43,7 +43,7 @@ Write the placeholder into your data and let the filter fill it in:
 copyright: "(c) 2023-{now} Your Name"
 ```
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - `clean_content` cuts characters, not words. It can stop mid-word and it adds no ellipsis.
 - It removes tags with a regular expression, not a parser. Anything between a `<` and the next `>` goes, so

@@ -41,9 +41,6 @@ HTTP 200
 GET http://localhost:8080/_content/Binacle.Net.UIModule/js/main.js
 HTTP 200
 
-GET http://localhost:8080/_content/Binacle.Net.UIModule/js/instance.js
-HTTP 200
-
 GET http://localhost:8080/_content/Binacle.Net.UIModule/js/packing_demo.js
 HTTP 200
 

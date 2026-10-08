@@ -1,7 +1,7 @@
 ---
 id: api/v4/add-endpoint
 description: Step-by-step guide for adding a new v4 endpoint
-verified: 2026-09-04
+verified: 2026-09-29
 check: Code template matches a real v4 endpoint file and compiles
 also_update:
   - api/v4
@@ -15,7 +15,7 @@ paths:
 
 No manual registration needed — the app finds endpoints automatically.
 
-New endpoints go in **v4 only**. v3 is stable and must not be modified.
+New endpoints go in **v4 only**. Nothing a v3 client can see may change.
 
 ## Steps
 
@@ -61,7 +61,7 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
 
             .RateLimited()   // on user-request (fit/pack) endpoints — the ServiceModule supplies the policy
             .RequireCors(CorsPolicy.CoreApi);   // the CoreApi policy comes from the core, not a module
-            // do NOT add .ProducesProblem(500) — ApiV4EndpointGroup sets it for all endpoints (see openapi.md)
+            // do NOT add .ProducesProblem(500) — ApiV4EndpointGroup sets it for all endpoints (`$api/openapi`)
     }
 
     internal static async Task<IResult> HandleAsync(
@@ -133,7 +133,8 @@ See `PresetBin.cs` in the existing v4 endpoints for a working example.
 ## Choosing the Service Method
 
 See `$api/service` for the full method reference and call pattern.
-Quick reference: single bin → `SingleBinAsync`, multiple bins → `MultipleBinsAsync`, smallest bin → `SmallestBinAsync`.
+Quick reference: single bin → `SingleBinAsync`, multiple bins → `MultipleBinsAsync`, smallest bin → `SmallestBinAsync`,
+fullest bin → `BestBinAsync`.
 Each has an explicit-algorithm overload and an auto-select overload.
 
 To understand how the service runs algorithms and picks results, see `$lib/processors`

@@ -47,11 +47,23 @@
   <Folder Name="/lib/src/">
     <Project Path="lib/src/Binacle.Lib/Binacle.Lib.csproj" />
   </Folder>
+  <Folder Name="/lib/data/">
+    <Project Path="lib/data/Binacle.Lib.Data/Binacle.Lib.Data.csproj" />
+  </Folder>
+  <Folder Name="/lib/measure/">
+    <Project Path="lib/measure/Binacle.Lib.PackingEfficiency/Binacle.Lib.PackingEfficiency.csproj" />
+  </Folder>
+  <Folder Name="/lib/bench/">
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.Algorithms/Binacle.Lib.Benchmarks.Algorithms.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ParallelAlgorithms/Binacle.Lib.Benchmarks.ParallelAlgorithms.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ParallelBins/Binacle.Lib.Benchmarks.ParallelBins.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ParallelOverhead/Binacle.Lib.Benchmarks.ParallelOverhead.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.ResultSelection/Binacle.Lib.Benchmarks.ResultSelection.csproj" />
+    <Project Path="lib/bench/Binacle.Lib.Benchmarks.Scaling/Binacle.Lib.Benchmarks.Scaling.csproj" />
+  </Folder>
   <Folder Name="/lib/test/">
     <Project Path="lib/test/Binacle.Lib.UnitTests/Binacle.Lib.UnitTests.csproj" />
-    <Project Path="lib/test/Binacle.Lib.TestsKernel/Binacle.Lib.TestsKernel.csproj" />
-    <Project Path="lib/test/Binacle.Lib.Benchmarks/Binacle.Lib.Benchmarks.csproj" />
-    <Project Path="lib/test/Binacle.Lib.PerformanceTests/Binacle.Lib.PerformanceTests.csproj" />
+    <Project Path="lib/test/Binacle.Lib.Testing/Binacle.Lib.Testing.csproj" />
   </Folder>
   <Folder Name="/api/src/">
     <Project Path="api/src/Binacle.Net/Binacle.Net.csproj" />
@@ -72,18 +84,28 @@
     <Project Path="api/test/Binacle.Net.UIModule.IntegrationTests/Binacle.Net.UIModule.IntegrationTests.csproj" />
     <Project Path="api/test/Binacle.Net.ServiceModule.IntegrationTests/Binacle.Net.ServiceModule.IntegrationTests.csproj" />
   </Folder>
+  <Folder Name="/vipaq/data/">
+    <Project Path="vipaq/data/Binacle.ViPaq.Data/Binacle.ViPaq.Data.csproj" />
+  </Folder>
   <Folder Name="/vipaq/src/">
     <Project Path="vipaq/src/Binacle.ViPaq/Binacle.ViPaq.csproj" />
   </Folder>
+  <Folder Name="/vipaq/bench/">
+    <Project Path="vipaq/bench/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/vipaq/measure/">
+    <Project Path="vipaq/measure/Binacle.ViPaq.EncodedSize/Binacle.ViPaq.EncodedSize.csproj" />
+  </Folder>
   <Folder Name="/vipaq/test/">
     <Project Path="vipaq/test/Binacle.ViPaq.UnitTests/Binacle.ViPaq.UnitTests.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.TestsKernel/Binacle.ViPaq.TestsKernel.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.Benchmarks/Binacle.ViPaq.Benchmarks.csproj" />
-    <Project Path="vipaq/test/Binacle.ViPaq.PerformanceTests/Binacle.ViPaq.PerformanceTests.csproj" />
+    <Project Path="vipaq/test/Binacle.ViPaq.Testing/Binacle.ViPaq.Testing.csproj" />
   </Folder>
   <Folder Name="/vipaq/tools/">
     <Project Path="vipaq/tools/Binacle.ViPaq.VectorGenerators/Binacle.ViPaq.VectorGenerators.csproj" />
     <Project Path="vipaq/tools/Binacle.ViPaq.PackedDataGenerator/Binacle.ViPaq.PackedDataGenerator.csproj" />
+  </Folder>
+  <Folder Name="/shared/data/">
+    <Project Path="shared/data/Binacle.Data/Binacle.Data.csproj" />
   </Folder>
   <Folder Name="/shared/src/">
     <Project Path="shared/src/Binacle.CompactNotation/Binacle.CompactNotation.csproj" />
@@ -94,8 +116,8 @@
   <Folder Name="/shared/test/">
     <Project Path="shared/test/Binacle.CompactNotation.UnitTests/Binacle.CompactNotation.UnitTests.csproj" />
     <Project Path="shared/test/Binacle.FluxResults.UnitTests/Binacle.FluxResults.UnitTests.csproj" />
-    <Project Path="shared/test/Binacle.TestReporting/Binacle.TestReporting.csproj" />
-    <Project Path="shared/test/Binacle.TestsKernel/Binacle.TestsKernel.csproj" />
+    <Project Path="shared/test/Binacle.Reporting/Binacle.Reporting.csproj" />
+    <Project Path="shared/test/Binacle.Benchmarking/Binacle.Benchmarking.csproj" />
   </Folder>
   <Folder Name="/shared/tools/">
     <Project Path="shared/tools/Binacle.OrLibrary.Converter/Binacle.OrLibrary.Converter.csproj" />
@@ -128,6 +150,9 @@
       <Platform Project="AnyCPU" />
     </Project>
     <Project Path="sites/www/www.proj" Type="Shared">
+      <Platform Project="AnyCPU" />
+    </Project>
+    <Project Path="sites/admin/admin.proj" Type="Shared">
       <Platform Project="AnyCPU" />
     </Project>
   </Folder>

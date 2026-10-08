@@ -99,8 +99,7 @@ public class ErrorPageRoutingTests : IClassFixture<UIModuleBinacleApi>
 		body.ShouldNotContain("<html");
 	}
 
-	// The presets list is the one API route the demo's own pages depend on, so a page-shaped answer here would
-	// break the instance page rather than the caller.
+	// An ordinary v4 route, picked because it needs no request body.
 	[Fact]
 	public async Task A_Served_Api_Route_Is_Untouched_By_The_Error_Page()
 	{

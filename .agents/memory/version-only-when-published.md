@@ -9,14 +9,14 @@ paths:
 ---
 
 Nothing in this repo carries a version of its own. No `<VersionPrefix>` or `<Version>` in
-`Directory.Build.props` or any `.csproj`, and every TS workspace package is `private` with an inert number.
+`Directory.Build.props` or any `.csproj`, and no TS package is published - the number in each `package.json`
+is inert.
 The single version that exists is `BINACLE_VERSION`, set from `ARG VERSION` in the `Dockerfile` and fed by the
 release tag. `Binacle.Net.Metadata.Version` is the one place that reads it.
 
 **Why:** a version is only worth having when someone can obtain the component *independently of the product*.
 Nothing here can be. `Binacle.Lib`, `Binacle.ViPaq`, `Binacle.Geometry` and `Binacle.CompactNotation` are
-consumed only by `api/src/Binacle.Net` and by tests and tools inside this repo; nothing is packable, and no TS
-package is published. Every project ships inside one artifact - the docker image - so a per-component number
+consumed only by other projects inside this repo; nothing is packed, and no TS package is published. Every project ships inside one artifact - the docker image - so a per-component number
 could only ever repeat the image's, or lie about it. Stamping assemblies would add a second number that means
 nothing, and "which build is this" is already answered by the image tag.
 

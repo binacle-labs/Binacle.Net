@@ -15,7 +15,7 @@ paths:
 # Linting is a whole-repository decision
 
 **Answered no on 2026-08-27, and the reason is the shape, not the tool.** The maintainer's words: *"then no
-we don't do. There is no linter for C#, there is for Ruby, but no - not yet, all need same treatment."*
+we don't do. There is no linter for C#, there is for Ruby, but no - not yet, all need same treatment."* Before the session logs, so the quote cannot be checked.
 
 **Do not reopen this as a TypeScript question.** Adopting a linter for one of three languages leaves the
 repository with three different answers to the same question. **What revives this file is a decision to lint

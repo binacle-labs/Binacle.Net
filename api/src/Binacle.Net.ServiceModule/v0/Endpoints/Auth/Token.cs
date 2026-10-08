@@ -57,7 +57,8 @@ internal class Token : IEndpoint
 				StatusCodes.Status500InternalServerError,
 				MediaTypeNames.Application.ProblemJson
 			)
-			.RequireRateLimiting("AuthToken");
+			.RequireRateLimiting("AuthToken")
+			.RequireCors(ServiceModuleCorsPolicy.Name);
 	}
 
 	internal static async Task<IResult> HandleAsync(

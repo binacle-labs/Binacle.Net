@@ -1,0 +1,2051 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Binacle.Net Service",
+    "description": "**Binacle.Net Service API**\n\nThis api is designed only for when Binacle.Net is used as public service.\n\n[View on Github](https://github.com/binacle-labs/Binacle.Net)\n\n[🐳 Binacle.Net on Dockerhub](https://hub.docker.com/r/binacle/binacle-net)\n\n",
+    "license": {
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://www.gnu.org/licenses/agpl-3.0.html"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/auth/token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth Token",
+        "description": "Use this endpoint if you have the credentials to get a token and use the service without limits",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              },
+              "example": {
+                "username": "test_user",
+                "password": "testpassword"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK. The credentials are valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                },
+                "example": {
+                  "tokenType": "Bearer",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                  "expiresIn": 3600
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. The request is malformed or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "Invalid JSON",
+                    "description": "Example response when JSON is invalid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Invalid JSON Format",
+                      "status": 400,
+                      "detail": "'s' is an invalid start of a value. Path: $.Password | LineNumber: 3 | BytePositionInLine: 14."
+                    }
+                  },
+                  "malformedRequest": {
+                    "summary": "Malformed Request",
+                    "description": "Example response when the server could not read the request",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Malformed Request",
+                      "status": 400,
+                      "detail": "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. The credentials are invalid."
+          },
+          "403": {
+            "description": "Forbidden. The account is suspended."
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Email": [
+                      "'Email' is not a valid email address."
+                    ],
+                    "Password": [
+                      "The length of 'Password' must be at least 10 characters. You entered 8 characters."
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests. You have reached the maximum number of requests allowed. Please try again later."
+          }
+        }
+      }
+    },
+    "/api/admin/account/{id}/subscription": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create subscription",
+        "description": "Admins can use this endpoint to create a subscription for an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionCreateRequest"
+              },
+              "example": {
+                "type": "Normal"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created. The subscription for the specified account was created succesfully"
+          },
+          "404": {
+            "description": "Not Found. The account does not have a subscription or the account doesn't exist"
+          },
+          "409": {
+            "description": "Conflict. The account already has a subscription"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "examples": {
+                  "validationProblem": {
+                    "summary": "Validation Problem",
+                    "description": "Example response when you provide invalid type",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Type": [
+                          "'Type' is required and must be one of the following values: Normal, Demo"
+                        ]
+                      }
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "Invalid Id",
+                    "description": "Example response when you provide and ID that isn't Guid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Id": [
+                          "The provided value for 'Id' must be a valid Guid"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete subscription",
+        "description": "Admins can use this endpoint to delete the subscription for an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The Subscription was deleted"
+          },
+          "404": {
+            "description": "Not Found. The account does not have a subscription or the account doesn't exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Id": [
+                      "The provided value for 'Id' must be a valid Guid"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get subscription",
+        "description": "Admins can use this endpoint to get an account's subscription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "allowDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK. The account has a subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionGetResponse"
+                },
+                "example": {
+                  "id": "526501c7-653c-4430-9808-cf64aaf188fa",
+                  "accountId": "7433feec-4863-41df-ba45-57eb52c3f014",
+                  "type": "Normal",
+                  "status": "Active",
+                  "createdAtUtc": "2025-01-11T14:35:23+00:00",
+                  "isDeleted": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found. The account does not have a subscription or the account doesn't exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Id": [
+                      "The provided value for 'Id' must be a valid Guid"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Partiually update the subscription",
+        "description": "Admins can use this endpoint to partially update the subscription for an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionPatchRequest"
+              },
+              "examples": {
+                "fullUpdate": {
+                  "summary": "Full Update",
+                  "value": {
+                    "type": "Normal",
+                    "status": "Suspended"
+                  }
+                },
+                "onlyType": {
+                  "summary": "Only Type",
+                  "value": {
+                    "type": "Normal"
+                  }
+                },
+                "onlyStatus": {
+                  "summary": "Only Status",
+                  "value": {
+                    "status": "Suspended"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The subscription was updated succesfully"
+          },
+          "404": {
+            "description": "Not Found. The account does not have a subscription or the account doesn't exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "examples": {
+                  "validationProblem": {
+                    "summary": "Validation Problem",
+                    "description": "Example response when you don't provide any field",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "": [
+                          "At least one field must be provided for update."
+                        ]
+                      }
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "Invalid Id",
+                    "description": "Example response when you provide and ID that isn't Guid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Id": [
+                          "The provided value for 'Id' must be a valid Guid"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update subscription",
+        "description": "Admins can use this endpoint to update the subscription for an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionUpdateRequest"
+              },
+              "example": {
+                "type": "Normal",
+                "status": "Active"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The subscription was updated successfully"
+          },
+          "404": {
+            "description": "Not Found. The account does not have a subscription or the account doesn't exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "examples": {
+                  "validationProblem": {
+                    "summary": "Validation Problem",
+                    "description": "Example response when you provide invalid Type and Status",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Type": [
+                          "'Type' is required and must be one of the following values: Normal, Demo"
+                        ],
+                        "Status": [
+                          "'Status' is required and must be one of the following values: Active, Inactive, Suspended"
+                        ]
+                      }
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "Invalid Id",
+                    "description": "Example response when you provide and ID that isn't Guid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Id": [
+                          "The provided value for 'Id' must be a valid Guid"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/subscriptions": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List subscriptions",
+        "description": "Admins can use this endpoint to list subscriptions, one page at a time",
+        "parameters": [
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AllowDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK. The requested page of subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfSubscriptionGetResponse"
+                },
+                "example": {
+                  "total": 1,
+                  "page": 1,
+                  "pageSize": 50,
+                  "totalPages": 1,
+                  "items": [
+                    {
+                      "id": "526501c7-653c-4430-9808-cf64aaf188fa",
+                      "accountId": "7433feec-4863-41df-ba45-57eb52c3f014",
+                      "type": "Normal",
+                      "status": "Active",
+                      "createdAtUtc": "2025-01-11T14:35:23+00:00",
+                      "isDeleted": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "PageSize": [
+                      "The provided value for 'PageSize' must be between 1 and 200"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/account": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create account",
+        "description": "Admins can use this endpoint to create accounts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              },
+              "example": {
+                "username": "test_user",
+                "password": "testpassword",
+                "email": "user@domain.test"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created. The account was created succesfully."
+          },
+          "400": {
+            "description": "Bad Request. The request is malformed or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "Invalid JSON",
+                    "description": "Example response when JSON is invalid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Invalid JSON Format",
+                      "status": 400,
+                      "detail": "'s' is an invalid start of a value. Path: $.Password | LineNumber: 3 | BytePositionInLine: 14."
+                    }
+                  },
+                  "malformedRequest": {
+                    "summary": "Malformed Request",
+                    "description": "Example response when the server could not read the request",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Malformed Request",
+                      "status": 400,
+                      "detail": "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. An account with the same username already exists"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Email": [
+                      "'Email' is not a valid email address."
+                    ],
+                    "Password": [
+                      "The length of 'Password' must be at least 10 characters. You entered 8 characters."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/account/{id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete an account",
+        "description": "Admins can use this endpoint to delete an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The account was deleted"
+          },
+          "404": {
+            "description": "Not Found. The account with the specified ID does not exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Id": [
+                      "The provided value for 'Id' must be a valid Guid"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get account",
+        "description": "Admins can use this endpoint to get an account's information",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "allowDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK. The account exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountGetResponse"
+                },
+                "example": {
+                  "id": "7433feec-4863-41df-ba45-57eb52c3f014",
+                  "username": "user@example.binacle.net",
+                  "role": "User",
+                  "email": "user@example.binacle.net",
+                  "status": "Active",
+                  "passwordHash": "type::hash::salt",
+                  "securityStamp": "753a88e6-f69b-4362-8b7b-d4b1958c926f",
+                  "subscription": {
+                    "id": "526501c7-653c-4430-9808-cf64aaf188fa",
+                    "type": "Normal",
+                    "status": "Active",
+                    "createdAtUtc": "2025-01-11T14:35:23+00:00",
+                    "isDeleted": false
+                  },
+                  "createdAtUtc": "2025-01-11T14:30:53+00:00",
+                  "isDeleted": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found. The account with the specified ID does not exist"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Id": [
+                      "The provided value for 'Id' must be a valid Guid"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Partially update an account",
+        "description": "Admins can use this endpoint to partially update an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPatchRequest"
+              },
+              "examples": {
+                "fullUpdate": {
+                  "summary": "Full Update",
+                  "value": {
+                    "username": "user@example.binacle.net",
+                    "email": "user@example.binacle.net",
+                    "password": "userspassword",
+                    "status": "Active",
+                    "role": "User"
+                  }
+                },
+                "usernameOnly": {
+                  "summary": "Username Only",
+                  "value": {
+                    "username": "user@example.binacle.net"
+                  }
+                },
+                "passwordOnly": {
+                  "summary": "Password Only",
+                  "value": {
+                    "username": "user@example.binacle.net"
+                  }
+                },
+                "roleAndStatus": {
+                  "summary": "Role and Status",
+                  "value": {
+                    "status": "Suspended",
+                    "role": "User"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The account was updated succesfully"
+          },
+          "400": {
+            "description": "Bad Request. The request is malformed or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "Invalid JSON",
+                    "description": "Example response when JSON is invalid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Invalid JSON Format",
+                      "status": 400,
+                      "detail": "'s' is an invalid start of a value. Path: $.Password | LineNumber: 3 | BytePositionInLine: 14."
+                    }
+                  },
+                  "malformedRequest": {
+                    "summary": "Malformed Request",
+                    "description": "Example response when the server could not read the request",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Malformed Request",
+                      "status": 400,
+                      "detail": "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found. The account with the specified ID does not exist"
+          },
+          "409": {
+            "description": "Conflict. An account with the same username already exists"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "examples": {
+                  "validationProblem": {
+                    "summary": "Validation Problem",
+                    "description": "Example response with validation errors",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Email": [
+                          "'Email' is not a valid email address."
+                        ],
+                        "Password": [
+                          "The length of 'Password' must be at least 10 characters. You entered 8 characters."
+                        ]
+                      }
+                    }
+                  },
+                  "invalidId": {
+                    "summary": "Invalid Id",
+                    "description": "Example response when you provide and ID that isn't Guid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "Id": [
+                          "The provided value for 'Id' must be a valid Guid"
+                        ]
+                      }
+                    }
+                  },
+                  "validationProblem2": {
+                    "summary": "Validation Problem 2",
+                    "description": "Example response with validation errors",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                      "title": "One or more validation errors occurred.",
+                      "status": 422,
+                      "errors": {
+                        "": [
+                          "At least one field must be provided for update."
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update an account",
+        "description": "Admins can use this endpoint to update an account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              },
+              "example": {
+                "username": "user@example.binacle.net",
+                "email": "user@example.binacle.net",
+                "password": "userspassword",
+                "status": "Active",
+                "role": "User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content. The account was updated succesfully"
+          },
+          "400": {
+            "description": "Bad Request. The request is malformed or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "summary": "Invalid JSON",
+                    "description": "Example response when JSON is invalid",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Invalid JSON Format",
+                      "status": 400,
+                      "detail": "'s' is an invalid start of a value. Path: $.Password | LineNumber: 3 | BytePositionInLine: 14."
+                    }
+                  },
+                  "malformedRequest": {
+                    "summary": "Malformed Request",
+                    "description": "Example response when the server could not read the request",
+                    "value": {
+                      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                      "title": "Malformed Request",
+                      "status": 400,
+                      "detail": "The server could not process the request because it is malformed or contains invalid data. Please verify the request format and try again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found. The account with the specified ID does not exist"
+          },
+          "409": {
+            "description": "Conflict. An account with the same username already exists"
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "Email": [
+                      "'Email' is not a valid email address."
+                    ],
+                    "Password": [
+                      "The length of 'Password' must be at least 10 characters. You entered 8 characters."
+                    ],
+                    "Role": [
+                      "'Role' is required and must be one of the following values: Admin, User, Guest"
+                    ],
+                    "Status": [
+                      "'Status' is required and must be one of the following values: Active, Inactive, Suspended"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/accounts": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List accounts",
+        "description": "Admins can use this endpoint to list accounts, one page at a time",
+        "parameters": [
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AllowDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized. The provided Bearer token is invalid."
+          },
+          "403": {
+            "description": "Forbidden. The provided Bearer token does not have permission."
+          },
+          "500": {
+            "description": "Internal Server Error. An unexpected error occurred on the server",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                  "title": "Unexpected Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred while processing your request. Please try again later or contact support."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK. The requested page of accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfAccountListItem"
+                },
+                "example": {
+                  "total": 2,
+                  "page": 1,
+                  "pageSize": 50,
+                  "totalPages": 1,
+                  "items": [
+                    {
+                      "id": "7433feec-4863-41df-ba45-57eb52c3f014",
+                      "username": "user@example.binacle.net",
+                      "role": "User",
+                      "email": "user@example.binacle.net",
+                      "status": "Active",
+                      "subscriptionId": "526501c7-653c-4430-9808-cf64aaf188fa",
+                      "createdAtUtc": "2025-01-11T14:30:53+00:00",
+                      "isDeleted": false
+                    },
+                    {
+                      "id": "a0c0e0a6-9a4e-4e5d-9e9b-9c4e9f4e1b22",
+                      "username": "admin@example.binacle.net",
+                      "role": "Admin",
+                      "email": "admin@example.binacle.net",
+                      "status": "Active",
+                      "createdAtUtc": "2025-01-10T09:12:04+00:00",
+                      "isDeleted": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content. The request is well-formed but contains validation errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                },
+                "example": {
+                  "type": "https://tools.ietf.org/html/rfc4918#section-11.2",
+                  "title": "One or more validation errors occurred.",
+                  "status": 422,
+                  "errors": {
+                    "PageSize": [
+                      "The provided value for 'PageSize' must be between 1 and 200"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountCreateRequest": {
+        "required": [
+          "username",
+          "password",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountGetResponse": {
+        "required": [
+          "id",
+          "username",
+          "role",
+          "email",
+          "status",
+          "securityStamp",
+          "createdAtUtc",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AccountRole"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AccountStatus"
+          },
+          "passwordHash": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "securityStamp": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subscription": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AccountSubscription"
+              }
+            ]
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "deletedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountListItem": {
+        "required": [
+          "id",
+          "username",
+          "role",
+          "email",
+          "status",
+          "createdAtUtc",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AccountRole"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AccountStatus"
+          },
+          "subscriptionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "deletedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountPatchRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AccountStatus"
+              }
+            ]
+          },
+          "role": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AccountRole"
+              }
+            ]
+          }
+        }
+      },
+      "AccountRole": {
+        "enum": [
+          "Admin",
+          "User",
+          "Guest"
+        ],
+        "type": "string"
+      },
+      "AccountStatus": {
+        "enum": [
+          "Active",
+          "Inactive",
+          "Suspended"
+        ],
+        "type": "string"
+      },
+      "AccountSubscription": {
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdAtUtc",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SubscriptionType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatus"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "deletedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountUpdateRequest": {
+        "required": [
+          "username",
+          "email",
+          "password",
+          "status",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AccountStatus"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AccountRole"
+          }
+        }
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PagedResponseOfAccountListItem": {
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "totalPages",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountListItem"
+            }
+          }
+        }
+      },
+      "PagedResponseOfSubscriptionGetResponse": {
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "totalPages",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionGetResponse"
+            }
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/SubscriptionType"
+          }
+        }
+      },
+      "SubscriptionGetResponse": {
+        "required": [
+          "id",
+          "accountId",
+          "type",
+          "status",
+          "createdAtUtc",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SubscriptionType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatus"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "deletedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "SubscriptionPatchRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionType"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionStatus"
+              }
+            ]
+          }
+        }
+      },
+      "SubscriptionStatus": {
+        "enum": [
+          "Active",
+          "Inactive",
+          "Suspended"
+        ],
+        "type": "string"
+      },
+      "SubscriptionType": {
+        "enum": [
+          "Normal",
+          "Demo"
+        ],
+        "type": "string"
+      },
+      "SubscriptionUpdateRequest": {
+        "required": [
+          "type",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/SubscriptionType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatus"
+          }
+        }
+      },
+      "TokenRequest": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenResponse": {
+        "required": [
+          "tokenType",
+          "accessToken",
+          "expiresIn"
+        ],
+        "type": "object",
+        "properties": {
+          "tokenType": {
+            "type": "string"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "refreshToken": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Please provide a valid JWT token",
+        "scheme": "bearer",
+        "bearerFormat": "Json Web Token"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Admin"
+    }
+  ]
+}

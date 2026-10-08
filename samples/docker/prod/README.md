@@ -30,7 +30,7 @@ Uncomment the `ForwardedHeaders.json` mount in `docker-compose.yml` and edit tha
 Without it the app treats your proxy as the caller. Nothing crashes - which is what makes it worth calling out.
 Health check IP restrictions match the proxy instead of the real client, rate limiting puts every caller in one
 bucket, and every log line records your proxy's address. `TrustPrivateNetworks` is on by default and already
-covers `10/8`, `172.16/12` and `192.168/16`, so in a normal container deployment you only need to set `Enabled`.
+covers `10/8`, `172.16/12`, `192.168/16` and `fc00::/7`, so in a normal container deployment you only need to set `Enabled`.
 
 If a CDN sits in front, set `ForwardedForHeaderName` to the header **it** sends - `CF-Connecting-IP` for
 Cloudflare, `X-Real-IP` for many nginx setups, `X-Azure-ClientIP` for Azure Front Door. Trusting a header
@@ -40,7 +40,7 @@ nothing sets means the caller never resolves.
 |---|---|
 | `Enabled` | Off by default. With nothing in front of the app, the connection address is already the caller's and cannot be forged, so reading the headers would only replace it with a value the caller controls |
 | `TrustLoopback` | A proxy on the same machine. Nothing outside the host can present a loopback address, so this costs nothing |
-| `TrustPrivateNetworks` | A proxy on a container or local network - `10/8`, `172.16/12`, `192.168/16`. Usually all you need. **Do not restate these ranges in `TrustedProxies`** |
+| `TrustPrivateNetworks` | A proxy on a container or local network - `10/8`, `172.16/12`, `192.168/16`, `fc00::/7`. Usually all you need. **Do not restate these ranges in `TrustedProxies`** |
 | `TrustedProxies` | Anything else, named exactly - a CDN's published ranges, or a balancer outside your network. Added to what the flags above allow |
 | `ForwardLimit` | How many proxies stand in front. Entries beyond this are ignored, so padding the header cannot push the result further back than your real topology |
 | `ForwardedForHeaderName` | `null` means `X-Forwarded-For`. Name your CDN's single-value header instead if it sends one |

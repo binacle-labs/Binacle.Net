@@ -76,8 +76,10 @@ module.exports = (env, argv) => {
 						enforce: true,
 						priority: 10,
 					},
+					// binacle-net-client rides in this chunk rather than its own. Every chunk file is listed
+					// by hand in _data/includes.yml, so a new one is dead weight until a script tag names it.
 					binacleNetUi: {
-						test: /[\\/]packages[\\/]binacle-net-ui[\\/]/,
+						test: /[\\/]packages[\\/]binacle-net-(ui|client)[\\/]/,
 						name: 'binacle-net-ui',
 						chunks: 'all',
 						enforce: true,

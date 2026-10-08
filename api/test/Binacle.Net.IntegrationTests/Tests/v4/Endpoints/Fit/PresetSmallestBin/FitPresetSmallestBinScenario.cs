@@ -2,7 +2,8 @@ using Binacle.Packing;
 using System.Net;
 using System.Net.Http.Json;
 using Binacle.Net.v4.Contracts.Fit;
-using Binacle.TestsKernel.Algorithms.Providers;
+using Binacle.Data;
+using CustomProblems = Binacle.Data.CustomProblems.DataProvider;
 
 namespace Binacle.Net.IntegrationTests.v4.Endpoints.Fit.PresetSmallestBin;
 
@@ -23,13 +24,10 @@ public class FitPresetSmallestBinScenario
 	}
 
 	[Theory]
-	[MemberData(nameof(CustomProblemsScenarioProvider.ScenarioNames), MemberType = typeof(CustomProblemsScenarioProvider))]
-	public Task Custom_Problems(string scenario)
-		=> RunTest(scenario);
-
-	private async Task RunTest(string scenarioName)
+	[MemberData(nameof(CustomProblems.TheoryNames), MemberType = typeof(CustomProblems))]
+	public async Task Custom_Problems(string scenarioName)
 	{
-		var scenario = AllScenariosProvider.GetScenarioByName(scenarioName);
+		var scenario = All.GetByName(scenarioName);
 		var url = routePath.Replace("{preset}", PresetKeys.CustomProblems);
 
 		var request = new FitPresetSmallestBinRequest
@@ -61,7 +59,7 @@ public class FitPresetSmallestBinScenario
 
 		result.ShouldNotBeNull();
 		result!.Bin.ShouldNotBeNull();
-		CustomProblemsScenarioProvider.GetDistinctBinIds().ShouldContain(result.Bin.ID);
+		CustomProblems.GetDistinctBinIds().ShouldContain(result.Bin.ID);
 
 		if (scenario.Result.For(request.Parameters.GetAlgorithm()!.Value).FittingStatus == OperationResultStatus.FullyPacked)
 		{

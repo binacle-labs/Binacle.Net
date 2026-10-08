@@ -10,6 +10,6 @@ change.
 
 | File | What is in it |
 |---|---|
-| `TypedResults.cs` | The `ITypedResult` interfaces, the ten result structs, and the `TypedResult` factory |
+| `TypedResults.cs` | The `ITypedResult` interfaces, the result structs, and the `TypedResult` factory |
 | `FluxUnion.cs` | `FluxUnion<T0, T1>` - a two-arm union with implicit conversion from either arm and `Match` |
 | `IFluxUnion.cs` | `IFluxUnion` and its `Is<T>` / `As<T>` / `Unwrap<T>` / `TryGetValue<T>` extensions |

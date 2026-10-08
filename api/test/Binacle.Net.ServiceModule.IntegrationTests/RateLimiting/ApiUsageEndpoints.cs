@@ -1,5 +1,5 @@
 using System.Text;
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;

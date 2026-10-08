@@ -132,7 +132,7 @@ User-Agent: *
 
 The same urls are readable as `site.sitemaps.urls`, for a site that wants its own line format.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 - A tag takes a variable name, not an expression. Liquid hands a tag its markup as plain text, so
   `{% sitemap_urlset site.versions | where: "version", "2.0" %}` never runs the filter. Assign first, then

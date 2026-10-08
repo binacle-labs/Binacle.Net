@@ -115,7 +115,7 @@ After the generator runs, the built path is readable as `site.webmanifest.url`, 
 A site that already renders its head links from a data list does not need the tag - point one entry at
 `/site.webmanifest` and leave it out. With no `webmanifest:` block the tag renders an empty string.
 
-## ⚠️ Gotchas
+## ⚠️ What will bite you
 
 **A beautifier will reformat it, and a recursive glob will not stop one.** The generator makes the page in
 memory, so its path is the bare filename with no directory in front of it - `jekyll-tidy`'s

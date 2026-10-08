@@ -33,8 +33,8 @@ wire itself is defined in [`../PROTOCOL.md`](../PROTOCOL.md), which stands alone
 ## 🔢 Integer range
 
 Every dimension and coordinate is in `[0, 65535]` (PROTOCOL.md §5). There is no wider width and no 32/64-bit tier.
-A value above 65,535 is an error, not a wider encoding. C# reads these scenarios as `int`, which holds the range
-and is the safe default `T`.
+A value above 65,535 is an error, not a wider encoding. C# reads these scenarios as `long`, which holds the range
+and pairs with JS `number`.
 
 ## 🧾 Header notation
 
@@ -42,7 +42,7 @@ The header's text form, used wherever a vector needs to name a full header:
 `v{N}_{raw|comp}_{row|col}_{binWidth}_{itemDimWidth}_{itemCoordWidth}`, e.g. `v1_raw_row_8_8_8` or
 `v1_comp_col_16_8_16`. Six tokens in wire order. Mirrors C# `HeaderNotation` / TS `src/headerNotation.ts`.
 
-## 📂 Files
+## 📂 What is in it
 
 | File | Shape | Read by |
 |---|---|---|

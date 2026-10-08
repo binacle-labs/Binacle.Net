@@ -2,17 +2,20 @@
 description: The public image becomes packing-only and the Service Module moves to its own image
 state: proposed
 waits-on: "nothing. The tag landed 2026-09-01. It still needs a yes from the maintainer, which is what `proposed` means"
+horizon: undecided
 paths:
   - "api/**"
 ---
 
 # The public image becomes packing-only
 
-**Decided 2026-08-31, and it is the inverse of what this file used to say.** The normal image ships packing
+**The maintainer, 2026-08-31: "yes the normal image then the odd one oiut that s what i was thinking".** It is
+the inverse of what this file used to say. The normal image ships packing
 and fitting only, with no ServiceModule assemblies in it at all. The ServiceModule gets its own image, and
 that one is the odd one out.
 
-The module is for the maintainer's own instance, so shipping its auth and database assemblies to every
+The module is for the maintainer's own instance (the maintainer, 2026-08-31: "i only plan the service module for
+my use"), so shipping its auth and database assemblies to every
 self-hoster is surface defended for nobody. Removing them removes the documentation and migration obligation
 with them.
 

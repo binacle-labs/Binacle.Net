@@ -24,7 +24,7 @@ side since February 2023. Hand it a glob and the sensor looks for a file literal
 ERROR: SimpleCov report not found: 'artifacts/coverage/sonar/*.json'
 ```
 
-So `tooling/coverage.run.sh` merges the ten gem reports into one `ruby.json` at the end of a sonar run. The
+So `tooling/coverage.run.sh` merges the gem reports into one `ruby.json` at the end of a sonar run. The
 gem list stays in `tooling/tests.just`; the merge reads whatever is there.
 
 **Resolved against the module, not the root.** A report path is resolved against the base directory of the
@@ -44,5 +44,4 @@ project takes its test/source split from `SonarQubeTestProject` in `Directory.Bu
 
 **How to apply:** change one of the two variables at a time, or a red run tells you nothing. If ruby reads 0%
 again, grep the run for `SimpleCov report not found` - the message prints the path it actually tried, which
-is the whole diagnosis. See the memory on Sonar scope exclusions for the neighbouring properties in the same
-file.
+is the whole diagnosis.

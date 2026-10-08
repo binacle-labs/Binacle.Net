@@ -8,7 +8,12 @@ items, it works out whether they fit (**fit**) and packs as many as it can (**pa
 | Path | What it is |
 |---|---|
 | `src/Binacle.Lib` | The algorithms, processors, and result building. The only project in `src`. |
-| `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's tests only. |
+| `data/result-selection` | Hand-authored result-selection fixtures. Read by this slice's unit tests and result-selection benchmark only. |
+| `data/Binacle.Lib.Data` | The project that embeds those fixtures and reads them into models - see [its README](data/Binacle.Lib.Data/README.md). |
+| `measure/Binacle.Lib.PackingEfficiency` | Packs every scenario with every algorithm and writes the numbers to `results/` - see [its README](measure/Binacle.Lib.PackingEfficiency/README.md). |
+| `bench/` | The timings, one BenchmarkDotNet project per question - see [its README](bench/README.md). |
+| `test/` | The unit tests, and `Binacle.Lib.Testing`, the harness code they share with `measure/` and `bench/` - see [its README](test/Binacle.Lib.Testing/README.md). |
+| `results/` | What `measure/` writes, the bench runs kept by hand, and one file per question read from them. Tracked, so a change in the numbers shows up as a diff - see [its README](results/README.md). |
 
 ## ⚙️ How it works
 
@@ -21,8 +26,9 @@ return the same result shape: packed items and unpacked items.
   it all fit.
 
 Packing uses three heuristics: First Fit Decreasing (FFD), Worst Fit Decreasing (WFD), and
-Best Fit Decreasing (BFD), each with two versions (v1 and v2; the API uses v2). A result selector
-then picks the best outcome across algorithms or across bins.
+Best Fit Decreasing (BFD), each in more than one version. The API uses v2; BFD and WFD also have a v3 that
+only the tests and the measure project run. A result selector then picks the best outcome across algorithms
+or across bins.
 
 ## 📂 Layout
 
@@ -31,9 +37,10 @@ then picks the best outcome across algorithms or across bins.
 | `Algorithms/` | The FFD / WFD / BFD heuristics and their versions |
 | `AlgorithmProcessing/` | Runs several algorithms against a single bin |
 | `BinProcessing/` | Runs algorithms across many bins |
-| `AlgorithmFactories/` | Creates algorithm instances |
+| `Abstractions/` | The engine interfaces - algorithm, processors, result selection |
+| `AlgorithmFactory.cs`, `AlgorithmFactories/` | Create algorithm instances. The API uses `AlgorithmFactory` (v2); the folder holds versions pinned for the benchmarks |
 | `ResultSelection/` | Picks the best result (best algorithm, smallest bin, best bin) |
-| `Models/` | Bin, Item, packed/unpacked result types |
+| `Models/` | `Bin`, `Item` and the result builder. The result types are in `shared/src/Binacle.Packing` |
 | `GuardClauses/` | Input checks - null, dimensions, volume, quantity |
 | `Exceptions/` | `DimensionException` |
 
@@ -41,7 +48,5 @@ then picks the best outcome across algorithms or across bins.
 
 | Project | Run with | Covers |
 |---|---|---|
-| `test/Binacle.Lib.TestsKernel` | - | Fixture kernel for result selection. Embeds `data/result-selection`. |
+| `test/Binacle.Lib.Testing` | - | What the unit tests, the measure project and the bench projects share: the algorithm factories, the scenario checks, the benchmark picks |
 | `test/Binacle.Lib.UnitTests` | `just test cs_binacle-lib_unit` | All algorithm versions × scenarios; result selection |
-| `test/Binacle.Lib.PerformanceTests` | `./tooling/performance.lib.sh` | Algorithm performance (console runner) |
-| `test/Binacle.Lib.Benchmarks` | `./tooling/benchmarks.lib.sh` | BenchmarkDotNet microbenchmarks |

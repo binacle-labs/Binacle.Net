@@ -1,7 +1,7 @@
 ---
 id: packages/dependencies
 description: TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which.
-verified: 2026-09-04
+verified: 2026-09-28
 check: the workspaces globs in the root package.json still cover every package; each package.json dependencies block matches the graph; a grep for non-relative `from "..."` across packages/*/src and vipaq/packages/binacle-vipaq/src turns up nothing the graph does not name
 paths:
   - "packages/**"
@@ -9,8 +9,8 @@ paths:
 
 # Packages — TypeScript dependencies
 
-The npm workspaces. Root `package.json` covers `packages/*`, `vipaq/packages/binacle-vipaq`, and the four
-consumers — `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo` and `sites/www`. Every package resolves the others
+The npm workspaces. Root `package.json` covers `packages/*`, `vipaq/packages/binacle-vipaq`, and the
+consumers — `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo`, `sites/www` and `sites/admin`. Every package resolves the others
 from the workspace. Every workspace import is also declared in its importer's `package.json` (all as `"*"`),
 so the graph is honest on its own, not only by hoisting.
 
@@ -27,7 +27,11 @@ binacle-vipaq  ───────────────┘  — imported on
    ▲                              mirror of the C# ViPaq
    │
 binacle-net-ui ───────────────┘  + external: alpinejs, three
-   Alpine components + Three.js visualizer
+   │                              Alpine components + Three.js visualizer
+   ▼
+binacle-net-client            leaf (no deps)
+
+binacle-net-service-client    leaf (no deps); only sites/admin imports it
 
 cookies                       leaf (no deps)
    ▲
@@ -42,12 +46,14 @@ theme-switcher ───────────────┘
 | `cookies` | `packages/` | — | — |
 | `theme-switcher` | `packages/` | `cookies` | — |
 | `binacle-vipaq` | `vipaq/packages/` | `binacle-compact-notation` | — |
-| `binacle-net-ui` | `packages/` | `binacle-vipaq`; `binacle-compact-notation` (dev) | `alpinejs`, `three` (incl. the `three/examples/jsm/controls/OrbitControls` subpath) |
+| `binacle-net-client` | `packages/` | — | — |
+| `binacle-net-service-client` | `packages/` | — | — |
+| `binacle-net-ui` | `packages/` | `binacle-net-client`, `binacle-vipaq`; `binacle-compact-notation` (dev) | `alpinejs`, `three` (incl. the `three/examples/jsm/controls/OrbitControls` subpath) |
 
 ## Notes
 
 1. **Every workspace import is declared** as `"*"` in the importer's `package.json` (`binacle-net-ui` →
-   `binacle-vipaq`, `theme-switcher` → `cookies`, `binacle-vipaq` → `binacle-compact-notation`), so resolution
+   `binacle-net-client` and `binacle-vipaq`, `theme-switcher` → `cookies`, `binacle-vipaq` → `binacle-compact-notation`), so resolution
    never relies on workspace hoisting.
 
 2. **Two packages reach `binacle-compact-notation`, and neither does it at runtime.** `binacle-vipaq` touches
@@ -59,7 +65,8 @@ theme-switcher ───────────────┘
    **`binacle-vipaq` declares it as a runtime `dependency`, which is what makes npm's graph look cyclic.**
    Moving it to `devDependencies` is a known one-line change nobody has made.
 
-3. **`binacle-compact-notation` and `cookies` are leaves** — no workspace or runtime deps.
+3. **`binacle-compact-notation`, `cookies` and the two clients are leaves** — no workspace or runtime deps.
+   The clients' only extra is `ajv`, a devDependency for the contract test.
 
 4. **`binacle-net-ui` is the only package with runtime externals.** Everything else declares only devDependencies
    (jest, ts-jest, typescript, type packages) or nothing at all. The root `package.json` carries no runtime

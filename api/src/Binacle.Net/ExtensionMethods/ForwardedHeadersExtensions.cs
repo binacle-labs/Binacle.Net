@@ -1,4 +1,4 @@
-using Binacle.Net.Configuration;
+using Binacle.Net;
 using Binacle.Net.Kernel.Network;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;

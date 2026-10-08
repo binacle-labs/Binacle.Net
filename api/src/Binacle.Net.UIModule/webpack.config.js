@@ -7,7 +7,6 @@ module.exports = (env) => {
 		mode: production ? 'production' : 'development',
 		entry: {
 			main: './_js/main.js',
-			instance: './_js/instance.js',
 			packing_demo: './_js/packing_demo.js',
 			protocol_decoder: './_js/protocol_decoder.js'
 		},
@@ -52,8 +51,11 @@ module.exports = (env) => {
 						enforce: true,
 						priority: 10,
 					},
+					// binacle-net-client rides in this chunk rather than its own. Every chunk file is listed
+					// by hand in _AppletScripts.cshtml, so a new one is dead weight until a script tag
+					// names it.
 					binacleNetUi: {
-						test: /[\\/]packages[\\/]binacle-net-ui[\\/]/,
+						test: /[\\/]packages[\\/]binacle-net-(ui|client)[\\/]/,
 						name: 'binacle-net-ui',
 						chunks: 'all',
 						enforce: true,

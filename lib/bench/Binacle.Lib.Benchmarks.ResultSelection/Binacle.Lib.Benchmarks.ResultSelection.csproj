@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\test\Binacle.Benchmarking\Binacle.Benchmarking.csproj" />
+    <ProjectReference Include="..\..\src\Binacle.Lib\Binacle.Lib.csproj" />
+    <ProjectReference Include="..\..\data\Binacle.Lib.Data\Binacle.Lib.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Binacle.Packing" />
+    <Using Include="Binacle.Benchmarking" />
+    <Using Include="BenchmarkDotNet.Attributes" />
+  </ItemGroup>
+
+</Project>

@@ -9,18 +9,17 @@ Four things that go wrong when renaming a namespace or moving a type across this
 real during the `Binacle.Packing` extraction and the tests-kernel split.
 
 **`grep -rl ... | xargs sed` silently skips `lib/src/Binacle.Lib/Algorithms/`.** Those directory names contain
-spaces — `Best Fit Decreasing v1`, `Worst Fit Decreasing v2` and four more — so `xargs` splits the paths and
-30 files are never touched. No error, no output, just an incomplete rename that builds fine until something
+spaces — `Best Fit Decreasing v1`, `Worst Fit Decreasing v2` and the rest — so `xargs` splits the paths and
+their files are never touched. No error, no output, just an incomplete rename that builds fine until something
 downstream fails. Use `xargs -d '\n'`, `-print0`/`-0`, or a script that quotes paths.
 
 **Stage new files before moving a directory.** A file created earlier in the same session and never `git add`ed
 is invisible to `git mv`, and an `rm -rf` of the emptied directory takes it with it.
 
-**A global using is not always safe.** `<Using Include="Binacle.Packing" />` collides with the api's
-`v3.Contracts.Algorithm` and `v4.Contracts.Algorithm`, so that project needs per-file usings. It also
-collided with `Binacle.Net.UIModule`'s own `Models.PackedItem` / `UnpackedItem` - **those types are gone as of
-the 2026-08 rebuild**, and that `Models/` folder is now `Applet.cs` and `FeatureSwitch.cs`. The collision is
-the point, not the two type names.
+**A global using is not always safe.** `<Using Include="Binacle.Packing" />` brings in
+`Binacle.Packing.Algorithm`, which collides with the api's `v3.Contracts.Algorithm` and
+`v4.Contracts.Algorithm`. The api project keeps the global using and writes `Binacle.Packing.Algorithm` out in
+full where the two meet. Any type a project already names the same way collides the same way.
 
 **Fully-qualified names do not move themselves.** Sites that write `Binacle.Lib.Algorithm` or `Lib.Algorithm`
 outright are invisible to any using-line sweep. Grep for the bare type name too, not just the using.

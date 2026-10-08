@@ -1,7 +1,6 @@
 namespace Binacle.OrLibrary.Converter;
 
-// The tests-kernel compact scenario, in the exact shape and property order the kernel reads and writes. One
-// array per thpack file.
+// The compact scenario, in the exact shape and property order Binacle.Data reads. One array per thpack file.
 //
 //   Name    - "OrLibrary_thpack{file}_{problem index}", e.g. "OrLibrary_thpack1_1".
 //   Bin      - the container as "LxWxH".

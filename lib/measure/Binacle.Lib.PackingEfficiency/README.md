@@ -1,0 +1,30 @@
+# Binacle.Lib.PackingEfficiency
+
+Packs every Bischoff suite scenario with every algorithm version, once, and writes what came out - fill per
+algorithm, which won, where any version packs differently, including the test-only v3 of WFD and BFD - as markdown into [`lib/results/measurements/`](../../results/measurements). Not a test:
+nothing here passes or fails, and the numbers are deterministic, so the files are tracked and a change in the
+packer shows up as a diff.
+
+## 📂 What is in it
+
+| Path | What it is |
+|---|---|
+| `Program.cs` | Wires the bag, the runner, the reporters and the writer, pointed at `lib/results/measurements/` |
+| `PackingRunner.cs` | Packs every Bischoff scenario with every algorithm version and fills the bag |
+| `PackingBag.cs` | What the runner measured; every reporter reads from here |
+| `ResultFiles.cs` | The two files and the header sentence they open with |
+| `Reporters/` | One class per file: the per-scenario rows, the scenarios where versions differ |
+
+## 🛠️ How you use it
+
+```
+just measure lib
+git diff lib/results/measurements
+```
+
+Run it after touching an algorithm. A diff is the finding; commit it with the change that caused it.
+
+## ⚠️ What will bite you
+
+It overwrites the tracked files every run. Timings are not measured here on purpose - they vary by machine
+and belong in `lib/bench/`.

@@ -1,7 +1,7 @@
 ---
 id: architecture-graph
 description: Why the repo's dependency graph is generated rather than declared, what no generator can see, what an InternalsVisibleTo grant means for the graph, and the heavier architecture tools that were surveyed and not taken.
-verified: 2026-08-27
+verified: 2026-09-29
 check: The InternalsVisibleTo rule against `grep -rn 'InternalsVisibleTo' --include=*.csproj .` - every grant must name an assembly that references the granter; the ArchUnitNET xunit caveat against the runner pin in Directory.Packages.props; the claim that no root tsconfig.json exists
 paths:
   - "**/*.csproj"
@@ -17,7 +17,7 @@ so it is not re-litigated.
 ## A hand-written declaration was built, run green, and reverted
 
 A root `architecture.yml` stated the shape and **nothing read it.** It was a second copy of the truth, it
-could drift from the tree in silence, and it did - twice. Deleted 2026-08-25 at the maintainer's call.
+could drift from the tree in silence, and it did - twice. Deleted 2026-08-25.
 
 What that cost is worth keeping:
 
@@ -47,10 +47,10 @@ the wrong file.
 The .NET project references and the npm workspace packages are the easy half and cover most of the code. These
 edges exist and no reference audit sees them:
 
-- `docs` and `demo` on `ruby` - Gemfile `path:` gems.
+- the sites on `ruby` - Gemfile `path:` gems.
 - `demo` and `api` on `packages` and `vipaq` - webpack chunk regexes, one config each.
 - `tooling` on everything - path strings inside `just` recipes.
-- `assets` on `docs`, `demo` and `api` - a gulp copy into each.
+- `assets` on `docs`, `demo`, `www` and `api` - a gulp copy into each.
 - `vipaq/tools` on `shared/data` - a path resolved at run time.
 
 **Anything that reports on this graph has to name these in its output.** Silence about them is how a green run
@@ -58,7 +58,7 @@ gets read as total coverage.
 
 ## An `InternalsVisibleTo` grant annotates an edge; it never adds one
 
-Settled 2026-08-13. When `A` grants `InternalsVisibleTo(B)`, nothing in `A` resolves `B` - `A` compiles fine
+Written 2026-08-13. When `A` grants `InternalsVisibleTo(B)`, nothing in `A` resolves `B` - `A` compiles fine
 if `B` does not exist. The grant records that **`B` depends on `A`**, more deeply than usual: on internals
 rather than on the public API. So the dependency runs `B -> A`, the same direction `B`'s own reference already
 points.
@@ -89,7 +89,7 @@ Four things to settle before adopting ArchUnitNET, and the first decides whether
 - **Check `.xUnitV3`'s transitive xunit dependency.** This repo pins `xunit.v3.mtp-v2` precisely because
   mixing the MTP v1 and v2 adapters throws `TypeLoadException` before a test runs. If `.xUnitV3` pulls plain
   `xunit.v3`, the new test reproduces it.
-- **It collides with work that grows the shared TestsKernel fixtures.** Both touch the tests, so
+- **It collides with work that grows the shared scenario fixtures.** Both touch the tests, so
   whichever runs second reads the other's result.
 - **Decide which graph is authoritative.** ArchUnitNET measures *type* dependencies from loaded assemblies; a
   derived graph comes from project references. They disagree - `api/src/Binacle.Net/Binacle.Net.csproj`
@@ -97,7 +97,7 @@ Four things to settle before adopting ArchUnitNET, and the first decides whether
 - **Its test project must reference every slice it inspects**, becoming a node with an edge to everything.
 
 For `dependency-cruiser`, reading a graph file is the easy half. **There is no root `tsconfig.json`** - there
-are nine, one per workspace - and imports are bare specifiers resolved
+is one per workspace - and imports are bare specifiers resolved
 through npm workspace symlinks, so rules must be written against resolved real paths with symlink handling
 pinned.
 

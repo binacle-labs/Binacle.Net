@@ -1,8 +1,8 @@
 ---
 id: lib/result-selection
 description: IResultSelector, IResultSelectionStrategy, and the three selection strategies — scoring rules, tie-breaking, and how tests verify them
-verified: 2026-09-04
-check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and the TestsKernel Scenario
+verified: 2026-09-28
+check: Strategy class names, scoring rules and the strict > comparison match lib/src/Binacle.Lib/ResultSelection/; the DI registration matches api/src/Binacle.Net/ExtensionMethods/ServiceCollectionExtensions.cs; the fixture signature and Scenario members match lib/test/Binacle.Lib.UnitTests/ResultSelectionTestingFixture.cs and lib/data/Binacle.Lib.Data/ResultSelection/Scenario.cs
 also_update:
   - api/service
 paths:
@@ -34,8 +34,8 @@ Called by `LoopMultiAlgorithmBinProcessor` (per bin) and by `BinacleService` —
 
 `OperationResultStatus` includes `Unknown = -1` as a sentinel default. **None of the three strategies checks
 for it** — they only ever test `== FullyPacked`, so an `Unknown` result carrying a high percentage would score
-like any other partial one. They are safe because nothing produces `Unknown`, not because they defend against
-it. Keep that in mind before you make one reachable.
+like any other partial one. They are safe only because no result leaves the builder as `Unknown`
+(`$lib/result-building`). Keep that in mind before you make one reachable.
 
 ## DI Registration
 
@@ -90,9 +90,10 @@ fully — this one then takes the highest utilization, `SmallestBin_v2` the leas
 
 ## How tests verify selection
 
-`ResultSelectionTestingFixture.GetScenarioByName(scenarioName)` resolves the scenario (from JSON test data
-under `lib/data/result-selection/`, embedded by `lib/test/Binacle.Lib.TestsKernel` under the manifest prefix
-`ResultSelection.` — see `$lib/tests`).
+Each test resolves its scenario through its own set's `DataProvider.GetByName(scenarioName)` (from JSON
+test data under `lib/data/result-selection/`, embedded by `lib/data/Binacle.Lib.Data` under the manifest
+prefix `ResultSelection.` — see `$lib/tests`). The same files and names are the columns of
+`lib/bench/Binacle.Lib.Benchmarks.ResultSelection`.
 
 `ResultSelectionTestingFixture.Select(scenario, strategy, resultSelector)` then takes:
 - that scenario

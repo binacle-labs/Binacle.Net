@@ -1,7 +1,7 @@
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Fit;
 using Binacle.Net.v4.Contracts.Pack;
-using Binacle.TestsKernel.Algorithms.Models;
+using Binacle.Data;
 
 namespace Binacle.Net.IntegrationTests.v4.ExtensionMethods;
 

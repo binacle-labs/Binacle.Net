@@ -1,8 +1,8 @@
 ---
 id: lib/algorithms
 description: Packing heuristics (FFD/WFD/BFD) — versions, operation types, trade-offs, and the fit/pack guarantee
-verified: 2026-09-04
-check: The six directories and their five-file layout match lib/src/Binacle.Lib/Algorithms/; v2 default confirmed in AlgorithmFactory.cs; both early-exit paths still read AlgorithmOperation.Fitting in every heuristic's AlgorithmOperation.cs
+verified: 2026-09-28
+check: The version directories and their shared file layout match lib/src/Binacle.Lib/Algorithms/; v2 default confirmed in AlgorithmFactory.cs; both early-exit paths still read AlgorithmOperation.Fitting in every heuristic's AlgorithmOperation.cs
 also_update:
   - lib/algorithm-factory
 paths:
@@ -14,16 +14,16 @@ paths:
 
 ## Heuristics
 
-Three heuristics, each with two versions:
+Three heuristics, each with v1 and v2. BFD and WFD also have a test-only v3:
 
 | Heuristic | Versions |
 |---|---|
 | First Fit Decreasing (FFD) | v1, v2 |
-| Best Fit Decreasing (BFD) | v1, v2 |
-| Worst Fit Decreasing (WFD) | v1, v2 |
+| Best Fit Decreasing (BFD) | v1, v2, v3 (test only) |
+| Worst Fit Decreasing (WFD) | v1, v2, v3 (test only) |
 
-Each lives under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/`, and every one of the six holds the same
-five files:
+Each lives under `lib/src/Binacle.Lib/Algorithms/<Heuristic> v<N>/`, and every version folder holds the same
+files:
 
 | File | Holds |
 |---|---|
@@ -36,15 +36,21 @@ does the work, and a version's loop can be read without the setup around it.
 See Algorithm Factory (`$lib/algorithm-factory`) for the concrete class names (`FirstFitDecreasing_v2`, etc.).
 
 All versions of a heuristic produce the same results, and that is held up by the test suite rather than by
-convention: `CommonTestingFixture` puts all six factories in `AlgorithmsUnderTest[]` and asserts each against
-the same scenario expectations (`$lib/tests`). Newer versions are faster and use less memory.
+convention: `CommonTestingFixture` puts every factory in `AlgorithmsUnderTest[]` and asserts each against
+the same scenario expectations (`$lib/tests`). v2 is faster than v1 and allocates less. v3 allocates the same as v2
+and was faster on the smoke run (`$lib/findings#F5`).
 The API currently uses **v2 for all three heuristics** — this is set in `lib/src/Binacle.Lib/AlgorithmFactory.cs`.
-When writing new code, always use the latest version (currently v2).
-Old versions are kept so you can benchmark without changing what the API uses — do not remove them.
+When writing new code, always use the latest shipped version (currently v2).
+
+**v3 is test-only.** No factory under `lib/src/` creates it, so the API cannot run it; the unit tests and the
+measure reach it through `AlgorithmFactories` in `lib/test/Binacle.Lib.Testing`. It differs from v2 in
+one method: `FindAvailableSpace` scans the free spaces once for the smallest (BFD) or largest (WFD) that fits,
+where v2 sorts the list first. A tie goes to the earliest space in the list, as in v1.
+Old versions are kept, and a new version starts as a copy of the latest. Why: `$lib/decisions#D4`.
 
 ## Trade-offs
 
-- **FFD** — fast; places each item in the first available space. Default algorithm. Not always optimal.
+- **FFD** — fast; places each item in the first available space. Not always optimal.
 - **WFD** — places each item in the space leaving the most unused room. Useful for spread/distribution,
   but generally slower and less efficient than FFD or BFD.
 - **BFD** — places each item in the space leaving the least unused room. Often slightly better packing
