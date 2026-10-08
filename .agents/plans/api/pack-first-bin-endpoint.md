@@ -2,7 +2,7 @@
 description: pack/first-bin endpoint
 state: idea
 waits-on: "nobody - it is an idea"
-horizon: next-release
+horizon: near
 paths:
   - "api/**"
 ---

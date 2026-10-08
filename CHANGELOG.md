@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased]
+
 ## [3.1.0] - 2026-10-08
 
 ### 🔎 Overview
