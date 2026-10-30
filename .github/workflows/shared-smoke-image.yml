@@ -59,7 +59,7 @@ jobs:
       # Only for a GHCR image, so a Docker Hub dispatch needs no credential at all.
       - name: Login to GHCR
         if: ${{ startsWith(inputs.image, 'ghcr.io/') }}
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
