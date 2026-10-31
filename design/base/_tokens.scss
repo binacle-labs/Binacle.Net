@@ -1,0 +1,148 @@
+// The colours, sizes and fonts, for both themes.
+// Load it first when passing `with`: Sass only takes settings on a module's first load, and stops otherwise.
+
+// Font URLs resolve from the built CSS, not from here, so each site says where it serves the fonts.
+$font-path: "fonts/" !default;
+
+@font-face {
+  font-family: "Familjen Grotesk";
+  src: url("#{$font-path}familjen-grotesk-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("#{$font-path}martian-mono-latin.woff2") format("woff2");
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+
+  --paper: #efece4;
+  --panel: #e7e3d9;
+  --ink: #221d18;
+  --muted: #57534b;
+  --rule: #cdc7ba;
+  --accent: #ee8800;
+  --on-accent: #221d18;
+  --error: #af2c2e;
+  --info: #1666aa;
+  --warn: #786914;
+
+  // The band tint and the line on it.
+  --tint: #e3ded1;
+  --tint-rule: #c3bcac;
+
+  // Colours on a drawing or the 3D view. Each sets its own --ground: the tint, or paper for a painted drawing.
+  --ground-ink: #221d18;
+  --ground-muted: #57534b;
+  --ground-rule: #cdc7ba;
+
+  // The footer and the statement band. Darkest of the page colours in both themes, so they read as a change.
+  --deep: #d7d1c1;
+  --deep-rule: #b7b1a2;
+
+  // One colour per item, by placement order, first placed lightest. Shades of the mark's blue.
+  --item-1: oklch(0.88 0.08 247.2);
+  --item-2: oklch(0.798 0.08 247.2);
+  --item-3: oklch(0.715 0.08 247.2);
+  --item-4: oklch(0.633 0.08 247.2);
+  --item-5: oklch(0.55 0.08 247.2);
+  --item-6: oklch(0.468 0.08 247.2);
+  // Items placed before the latest one, during playback.
+  --item-rest: oklch(0.86 0.012 247.2);
+  // The demo colours items by kind. Lightness is spread so the kinds stay apart for red-green colour blindness.
+  --kind-1: oklch(0.62 0.095 250);
+  --kind-2: oklch(0.56 0.11 32);
+  --kind-3: oklch(0.82 0.10 90);
+  --kind-4: oklch(0.68 0.09 142);
+  --kind-5: oklch(0.74 0.07 198);
+  --kind-6: oklch(0.50 0.085 345);
+  // The line round each item in the 3D view.
+  --item-line: #8c857a;
+  --bin-line: var(--muted);
+
+  --font-text: "Familjen Grotesk", system-ui, sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, monospace;
+
+  --size-display-1: 68px;
+  --size-display-2: 54px;
+  --size-h2: 32px;
+  --size-h3: 17px;
+  --size-prose: 16.5px;
+  --size-ui: 14.5px;
+  --size-label: 10.5px;
+  --size-code: 10.5px;
+
+  --measure-prose: 68ch;
+  --measure-marketing: 50ch;
+
+  --page-max: 1240px;
+  --gutter: 30px;
+  --label-col: 190px;
+  // Docs only.
+  --sidebar: 250px;
+  --outline: 200px;
+  --col-gap: 40px;
+
+  --step: 13px;
+  --band-pad: calc(var(--step) * 4);
+
+  --hit: 44px;
+}
+
+// Dark applies in two cases: the reader picks it, or picks nothing and the system is dark.
+// Written once here so the two cannot drift apart.
+@mixin -dark {
+  color-scheme: dark;
+
+  --paper: #1a1815;
+  --panel: #221f1b;
+  --ink: #efece4;
+  --muted: #a9a296;
+  --rule: #4b453c;
+  --accent: #f59a1f;
+  --on-accent: #1a1815;
+  --error: #fc746e;
+  --info: #60aaf3;
+  --warn: #c8b962;
+  --tint: #2c2824;
+  --tint-rule: #5a5349;
+  --ground-ink: #efece4;
+  --ground-muted: #a9a296;
+  --ground-rule: #4b453c;
+  // Darker than paper, so the footer and the dark band read as a change.
+  --deep: #100f0d;
+  --deep-rule: #4b453c;
+  --item-1: oklch(0.93 0.08 247.2);
+  --item-2: oklch(0.868 0.08 247.2);
+  --item-3: oklch(0.806 0.08 247.2);
+  --item-4: oklch(0.744 0.08 247.2);
+  --item-5: oklch(0.682 0.08 247.2);
+  --item-6: oklch(0.62 0.08 247.2);
+  --item-rest: oklch(0.36 0.008 80);
+  --kind-1: oklch(0.70 0.085 247);
+  --kind-2: oklch(0.58 0.10 42);
+  --kind-3: oklch(0.66 0.10 85);
+  --kind-4: oklch(0.74 0.08 140);
+  --kind-5: oklch(0.78 0.075 200);
+  --kind-6: oklch(0.62 0.08 350);
+  --item-line: #5a5349;
+  // The 3D view's bin: between muted and ink, muted alone is too weak on the dark tint.
+  --bin-line: #ccc7bd;
+}
+
+:root[data-theme="dark"] {
+  @include -dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include -dark;
+  }
+}

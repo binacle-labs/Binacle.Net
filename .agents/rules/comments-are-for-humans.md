@@ -1,5 +1,5 @@
 ---
-description: A comment carries the one thing that is not obvious from the code. Short. The reasoning goes in design/, never in both.
+description: A comment gives the reason for the line below it, in one short plain line. The long reasoning goes in .agents/design/, never in both.
 load: on-trigger
 when: writing or editing a code comment
 paths:
@@ -10,6 +10,9 @@ paths:
   - "**/*.props"
   - "**/*.just"
   - "**/*.yml"
+  - "**/*.scss"
+  - "**/*.css"
+  - "**/*.html"
 ---
 
 # Comments are for humans, and they are thin
@@ -19,10 +22,11 @@ there is no `--` before the runner options. That the catch is empty on purpose. 
 line does it.**
 
 **The test is the line below it.** If a person reading that line would already know it, cut the comment. If
-they would not, that is the comment - and only that. "Why" is the wrong word for this test, because why
-invites the reasoning; the reasoning is not the comment.
+they would not, the comment says why the line is there - the reason in one short line, in simple words. "A
+media query cannot read a custom property", not the story of how that was found. No step numbers, no dates, no
+names of plans.
 
-**The reasoning goes in `design/`.** That layer exists for exactly this - why it was built this way, and what
+**The long reasoning goes in `.agents/design/`** - not the root `design/` folder, which holds the Sass. That layer exists for exactly this - why it was built this way, and what
 proved it. Background, the options that were rejected, task history, "keep this in step with X", and anything
 that reads like a briefing goes there, not above the line.
 

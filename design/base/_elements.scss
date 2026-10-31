@@ -1,0 +1,146 @@
+// The reset and the bare elements. Mobile first.
+@use "../abstracts/tiers";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--rule) transparent;
+}
+
+// The footer sits at the bottom of the window on a page shorter than it.
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--size-prose);
+  line-height: calc(var(--step) * 2);
+  -webkit-font-smoothing: antialiased;
+}
+
+body > main {
+  flex: 1 0 auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+pre,
+figure,
+table {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+
+  @media (width >= tiers.$desktop) {
+    font-size: var(--size-display-2);
+    line-height: 0.95;
+  }
+}
+
+h2 {
+  font-size: var(--size-h2);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+h3 {
+  font-size: var(--size-h3);
+  font-weight: 600;
+  line-height: calc(var(--step) * 2);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+strong {
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--muted);
+  text-underline-offset: 3px;
+
+  &:hover {
+    text-decoration-color: var(--ink);
+  }
+}
+
+:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+// Inline code does not stretch its line, and short code never breaks.
+// The components script marks long code text-break, so it can wrap.
+:not(pre) > code {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+:not(pre) > code.text-break {
+  white-space: normal;
+}
+
+// A long one with nowhere to break, like a variable name, breaks inside rather than run past the column.
+:not(pre) > code.text-break,
+h1 code,
+h2 code,
+h3 code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  scrollbar-color: var(--rule) transparent;
+}
+
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: var(--size-code);
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+ul {
+  padding-left: 1.2em;
+}
+
+li + li {
+  margin-top: calc(var(--step) / 2);
+}

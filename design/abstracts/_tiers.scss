@@ -1,0 +1,4 @@
+// Where mobile becomes tablet, and tablet becomes desktop.
+// Sass variables, because a media query cannot read a custom property.
+$tablet: 640px;
+$desktop: 800px;

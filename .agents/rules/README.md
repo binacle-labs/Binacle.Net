@@ -25,7 +25,7 @@ files hold the carve-outs.
 
 | About to... | Read |
 |---|---|
-| write or edit a **code comment** | [comments-are-for-humans](comments-are-for-humans.md) - the not-obvious thing only; the reasoning goes in `design/` |
+| write or edit a **code comment** - in any language, Sass and HTML too | [comments-are-for-humans](comments-are-for-humans.md) - the reason for the line, short and plain; the long reasoning goes in `.agents/design/` |
 | write **text a user will see** - exception, log line, OpenAPI description, UI string | [plain-ascii-for-user-text](plain-ascii-for-user-text.md) |
 | write **any doc, comment or explanation** | [plain-language](plain-language.md) |
 | write a **doc, README or results file** a human reads | [a-doc-is-not-a-report](a-doc-is-not-a-report.md) - state what is true, not what you did to find it |

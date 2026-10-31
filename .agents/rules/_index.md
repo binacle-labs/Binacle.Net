@@ -16,10 +16,10 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   load: on-trigger
   paths: ["**/README.md", "lib/results/**", "vipaq/results/**", ".agents/docs/**", ".agents/design/**"]
 - file: comments-are-for-humans.md
-  description: "A comment carries the one thing that is not obvious from the code. Short. The reasoning goes in design/, never in both."
+  description: "A comment gives the reason for the line below it, in one short plain line. The long reasoning goes in .agents/design/, never in both."
   when: "writing or editing a code comment"
   load: on-trigger
-  paths: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.csproj", "**/*.props", "**/*.just", "**/*.yml"]
+  paths: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.csproj", "**/*.props", "**/*.just", "**/*.yml", "**/*.scss", "**/*.css", "**/*.html"]
 - file: config-goes-in-the-tools-own-file.md
   description: "If a tool reads a config file, use it. Do not invent a config format the code has to parse itself."
   when: "passing settings to a tool, or writing a table or list inside a script, recipe or workflow"

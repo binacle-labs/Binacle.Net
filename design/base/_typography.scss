@@ -1,0 +1,49 @@
+// Type styles: classes that go on any element. They are not blocks.
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+// The label style names things. A value, a caption or the footer keeps its own case: AllItemsFit is never
+// ALLITEMSFIT, (c) is never (C), and the x in 10 x 20 stays small.
+.label.doc__value,
+.drawing__caption .label,
+.site-footer .label,
+.result-row .label {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.prose {
+  max-width: var(--measure-prose);
+  display: flex;
+  flex-direction: column;
+  gap: var(--step);
+
+  &--marketing {
+    max-width: var(--measure-marketing);
+  }
+}
+
+.prose > h2 + p {
+  margin-top: calc(var(--step) / 2);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

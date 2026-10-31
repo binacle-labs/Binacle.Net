@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <title>Binacle small mark</title>
+  <rect x="0" y="0" width="35" height="35" fill="#49769e"/>
+  <rect x="41" y="0" width="23" height="15" fill="#ee8800"/>
+  <rect x="0" y="41" width="35" height="23" fill="#49769e"/>
+  <rect x="41" y="21" width="23" height="43" fill="#ffffff"/>
+</svg>

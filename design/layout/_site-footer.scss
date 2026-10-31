@@ -1,0 +1,5 @@
+@use "../abstracts/grounds";
+
+.site-footer {
+  @include grounds.deep;
+}

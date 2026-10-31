@@ -1,0 +1,8 @@
+// The dark ground of the footer and the statement band.
+// It re-points --paper and --rule, so everything inside picks up the deep colours.
+@mixin deep {
+  --paper: var(--deep);
+  --rule: var(--deep-rule);
+  background: var(--deep);
+  color: var(--ink);
+}

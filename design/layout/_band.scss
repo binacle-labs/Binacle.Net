@@ -1,0 +1,43 @@
+// A full-width section of a page, with a ruled top. From desktop, a label column beside the body.
+@use "../abstracts/tiers";
+@use "../abstracts/grounds";
+
+.band {
+  padding: var(--band-pad) 0;
+  border-top: 1px solid var(--ink);
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &--deep {
+    @include grounds.deep;
+  }
+}
+
+.band__grid {
+  display: grid;
+  gap: var(--step);
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: var(--label-col) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+  }
+}
+
+.band__label {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) / 2);
+
+  @media (width >= tiers.$desktop) {
+    padding-top: 6px;
+  }
+}
+
+.band__body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  min-width: 0;
+}

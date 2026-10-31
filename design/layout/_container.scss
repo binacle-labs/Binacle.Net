@@ -1,0 +1,12 @@
+// The page width, centred, with the gutter on each side.
+@use "../abstracts/tiers";
+
+.container {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 16px;
+
+  @media (width >= tiers.$tablet) {
+    padding: 0 var(--gutter);
+  }
+}
