@@ -1,0 +1,19 @@
+// A row of box cards. Each card is drawn front on to the same scale and starts its tool with that box.
+
+.box-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  container-type: inline-size;
+}
+
+// The UI module's presets: a card per preset; a click opens its boxes.
+.box-cards--presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.lightbox--preset .box-cards {
+  padding: 12px;
+}

@@ -1,0 +1,56 @@
+// Columns side by side, separated by rules. Stacked until the block around them has room.
+@use "../abstracts/tiers";
+@use "../abstracts/lines";
+
+// The query below measures the block that holds the columns, not the window.
+:has(> .columns) {
+  container: columns / inline-size;
+}
+
+.columns {
+  @include lines.strong;
+  display: grid;
+
+  // One row however many columns: a fourth narrows the others instead of wrapping alone. The outer columns
+  // reach past the edge, so every column is the same width inside and its drawing the same scale.
+  @media (width >= tiers.$desktop) {
+    @container columns (width >= 600px) {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      margin: 0 -20px;
+      background: none;
+    }
+  }
+}
+
+.columns__column {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) / 2);
+  padding: var(--step) 0 calc(var(--step) * 1.5);
+
+  // Side by side, each column takes its own short strong line.
+  @media (width >= tiers.$desktop) {
+    @container columns (width >= 600px) {
+      padding: var(--step) 20px calc(var(--step) * 1.5);
+      background: linear-gradient(var(--ink), var(--ink)) 20px 0 / calc(100% - 40px) 1px no-repeat;
+    }
+  }
+
+  & + & {
+    border-top: 1px solid var(--rule);
+
+    @media (width >= tiers.$desktop) {
+      @container columns (width >= 600px) {
+        border-top: 0;
+        border-left: 1px solid var(--rule);
+      }
+    }
+  }
+}
+
+.columns__column p:not(.label),
+.columns__column :not(.fit-row__verdicts) > li {
+  font-size: var(--size-ui);
+  line-height: 1.5;
+}

@@ -1,0 +1,19 @@
+// A row of buttons. Stacked full width on a phone.
+@use "../abstracts/tiers";
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (width >= tiers.$tablet) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+// The page's button, under the docs page title.
+.doc > h1 + .actions {
+  margin-top: calc(var(--step) * 1.5);
+}

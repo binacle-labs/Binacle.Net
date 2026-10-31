@@ -1,0 +1,335 @@
+// The bar at the top of every page: the wordmark, the nav and the theme button.
+// Below 800 www and demo fold the nav into a drawer behind a burger. On docs, below 1000 the drawer holds the
+// pages, and below 1200 the header stays at the top and names the page past its title.
+@use "../abstracts/tiers";
+
+.site-header {
+  border-bottom: 1px solid var(--rule);
+
+  &:has(.site-header__where) {
+    @media (width < 1200px) {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--paper);
+    }
+  }
+}
+
+.site-header .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--step) calc(var(--step) * 2);
+  padding-top: var(--step);
+  padding-bottom: var(--step);
+
+  // Below 800 the nav is its own row under the logo.
+  @media (width < tiers.$desktop) {
+    position: relative;
+    row-gap: 0;
+    padding-bottom: 0;
+  }
+
+  @media (width >= tiers.$desktop) {
+    flex-wrap: nowrap;
+    column-gap: 20px;
+  }
+}
+
+// The nav row scrolls, so an arrow holds the right edge while there is more. It sits on the header, which
+// does not scroll.
+.site-header .container:has(.site-header__nav[data-more="right"], .site-header__nav[data-more="both"])::after {
+  @media (width < tiers.$desktop) {
+    content: "\2192";
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 72px;
+    height: var(--hit);
+    padding-right: inherit;
+    background: linear-gradient(to right, transparent, var(--paper) 36px);
+    color: var(--ink);
+    font-size: var(--size-ui);
+    pointer-events: none;
+  }
+}
+
+.site-header:has(.site-header__where) .container {
+  @media (width < 1200px) {
+    flex-wrap: nowrap;
+    column-gap: 12px;
+  }
+}
+
+.site-header:has(.site-header__burger) .container {
+  @media (width < tiers.$desktop) {
+    flex-wrap: nowrap;
+    column-gap: 12px;
+    padding-bottom: var(--step);
+  }
+}
+
+// With a burger the links live in the drawer.
+.site-header:has(.site-header__burger) .container::after,
+.site-header:has(.site-header__burger) .site-header__nav {
+  @media (width < tiers.$desktop) {
+    display: none;
+  }
+}
+
+.site-header__wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.025em;
+  text-decoration: none;
+
+  img {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.site-header:has(.site-header__where) .site-header__wordmark {
+  @media (width < 1000px) {
+    white-space: nowrap;
+  }
+}
+
+// Past the page title the page's name takes the wordmark's place.
+.site-header.site-header--past .site-header__wordmark {
+  @media (width < 1000px) {
+    display: none;
+  }
+}
+
+.site-header:has(.site-header__burger) .site-header__wordmark {
+  @media (width < tiers.$desktop) {
+    white-space: nowrap;
+  }
+}
+
+.site-header__nav {
+  --nav-gap: 22px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0 var(--nav-gap);
+  font-size: var(--size-ui);
+  white-space: nowrap;
+  order: 3;
+
+  // One row that scrolls sideways, edge to edge.
+  @media (width < tiers.$desktop) {
+    overflow-x: auto;
+    scrollbar-width: none;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    padding: 0 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (tiers.$tablet <= width < tiers.$desktop) {
+    width: calc(100% + 2 * var(--gutter));
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter);
+  }
+
+  // Narrower gaps near 800, so six links and the theme button still fit on one row.
+  @media (width >= tiers.$desktop) {
+    --nav-gap: clamp(12px, calc(6vw - 36px), 18px);
+    order: 0;
+    gap: 4px var(--nav-gap);
+    margin-left: auto;
+  }
+
+  // The left edge fades once the row is scrolled.
+  &[data-more="left"],
+  &[data-more="both"] {
+    @media (width < tiers.$desktop) {
+      mask-image: linear-gradient(to right, transparent, #000 40px);
+    }
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit);
+    text-decoration: none;
+
+    &[aria-current="page"] {
+      text-decoration: underline;
+      text-decoration-color: var(--ink);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// The other sites come after the site's own, muted. GitHub and Docker Hub come last. A short rule sits
+// before each group.
+.site-header__nav a.site-header__link--other-site {
+  color: var(--muted);
+}
+
+.site-header__nav a:not(.site-header__link--other-site) + a.site-header__link--other-site,
+.site-header__nav a:not(.site-header__link--external) + a.site-header__link--external {
+  position: relative;
+  margin-left: var(--nav-gap);
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--nav-gap) * -1);
+    top: 50%;
+    width: 1px;
+    height: 14px;
+    margin-top: -7px;
+    background: var(--rule);
+  }
+}
+
+.site-header__burger {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--hit);
+  height: var(--hit);
+  margin: -6px 0 -6px -13px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+
+  @media (width < tiers.$desktop) {
+    display: flex;
+  }
+}
+
+.site-header:has(.site-header__where) .site-header__burger {
+  @media (width < 1000px) {
+    display: flex;
+  }
+}
+
+.site-header__burger-icon,
+.site-header__burger-icon::before,
+.site-header__burger-icon::after {
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+}
+
+.site-header__burger-icon {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+  }
+
+  &::before {
+    top: -6px;
+  }
+
+  &::after {
+    top: 6px;
+  }
+}
+
+// The page's name, and the section below it. A tap opens the drawer.
+.site-header__where {
+  display: none;
+
+  @media (width < 1200px) {
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    min-height: var(--hit);
+    margin: -6px 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--size-ui);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  // From 1000 the menu is the sidebar, so the name opens nothing.
+  @media (1000px <= width < 1200px) {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.site-header.site-header--past .site-header__where {
+  @media (width < 1200px) {
+    display: flex;
+  }
+}
+
+.site-header__where [data-where],
+.site-header__section {
+  @media (width < 1200px) {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.site-header__where [data-where] {
+  @media (width < 1200px) {
+    flex: 0 1 auto;
+  }
+}
+
+// With a section showing, the page steps back and the section takes the rest of the line.
+.site-header__where:has(.site-header__section:not(:empty)) [data-where] {
+  @media (width < 1200px) {
+    flex: 0 3 auto;
+    color: var(--muted);
+  }
+}
+
+.site-header__section {
+  @media (width < 1200px) {
+    flex: 0 1 auto;
+  }
+
+  &:empty {
+    @media (width < 1200px) {
+      display: none;
+    }
+  }
+
+  &::before {
+    @media (width < 1200px) {
+      content: "/";
+      margin-right: 12px;
+      color: var(--muted);
+    }
+  }
+}

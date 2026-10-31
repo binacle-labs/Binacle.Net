@@ -1,0 +1,61 @@
+// A still of the 3D view as one SVG for both themes: its faces, shades and prints worked out as the view does.
+
+.pack-still {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--tint);
+
+  path {
+    stroke-width: 1;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  g path {
+    stroke: var(--item-line);
+  }
+}
+
+.pack-still .pack-still__bin {
+  fill: none;
+  stroke: var(--bin-line);
+}
+
+@for $i from 1 through 6 {
+  .pack-still .pack-still__item--kind-#{$i} {
+    --k: var(--kind-#{$i});
+  }
+}
+
+@for $i from 1 through 6 {
+  .pack-still .pack-still__item--step-#{$i} {
+    --k: var(--item-#{$i});
+  }
+}
+
+.pack-still .pack-still__top {
+  fill: oklch(from var(--k) min(1, calc(l + 0.08)) c h);
+}
+
+.pack-still .pack-still__left {
+  fill: var(--k);
+}
+
+.pack-still .pack-still__right {
+  fill: oklch(from var(--k) calc(l - 0.09) c h);
+}
+
+.pack-still .pack-still__under {
+  fill: oklch(from var(--k) calc(l - 0.16) c h);
+}
+
+.pack-still g .pack-still__print {
+  fill: none;
+  stroke: oklch(from var(--k) calc(l - 0.3) c h);
+}
+
+.lightbox .pack-still {
+  max-height: calc(92vh - 60px);
+  cursor: zoom-out;
+}

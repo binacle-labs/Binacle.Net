@@ -1,0 +1,39 @@
+// One kind in the result: how many of it went in. A press shows only that kind in the view.
+
+.kind-result {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--hit);
+  padding: 6px 12px 6px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--size-ui);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--panel);
+  }
+
+  &[aria-pressed="true"] {
+    background: var(--panel);
+    box-shadow: inset 2px 0 0 var(--ink);
+  }
+}
+
+.kind-result .kind-result__count {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  color: var(--muted);
+  text-align: right;
+
+  // Fewer went in than were asked for.
+  &.kind-result__count--short {
+    color: var(--error);
+  }
+}

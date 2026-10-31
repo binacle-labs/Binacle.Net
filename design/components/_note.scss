@@ -1,0 +1,8 @@
+// A note set apart from the prose around it.
+
+.note {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: var(--step) 0;
+  color: var(--muted);
+}

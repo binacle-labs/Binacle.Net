@@ -1,0 +1,42 @@
+// The row of steps under the hero. It counts the way the bands do, so the two match.
+
+.band.path {
+  padding: var(--step) 0;
+  border-top-color: var(--rule);
+}
+
+.path {
+  ol {
+    counter-reset: path;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 calc(var(--step) * 2);
+  }
+
+  li {
+    counter-increment: path;
+    margin: 0;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--hit);
+    font-size: var(--size-ui);
+    text-decoration: none;
+
+    &::before {
+      content: counter(path, decimal-leading-zero);
+      font-family: var(--font-mono);
+      font-size: var(--size-label);
+      color: var(--muted);
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+// A tool page: the form beside the view from 800. On a phone the intro, then the view, then the form.
+@use "../abstracts/tiers";
+
+.workbench {
+  display: grid;
+  gap: calc(var(--step) * 3);
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+}
+
+.workbench__view {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 2);
+  min-width: 0;
+
+  @media (width >= tiers.$desktop) {
+    position: sticky;
+    top: var(--step);
+  }
+
+  @media (width < tiers.$desktop) {
+    order: -1;
+  }
+}
+
+// The intro and the form share the left column.
+.workbench__side {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 3);
+  min-width: 0;
+
+  @media (width < tiers.$desktop) {
+    display: contents;
+  }
+}
+
+.workbench__intro {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 2);
+
+  @media (width < tiers.$desktop) {
+    order: -2;
+  }
+}

@@ -1,0 +1,31 @@
+// Two halves side by side from 800: the text, and the thing it talks about.
+@use "../abstracts/tiers";
+
+.split {
+  display: grid;
+  gap: calc(var(--step) * 2);
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+
+  // In half the width the heading grows with the window and reaches full size at 1100.
+  h1 {
+    @media (width >= tiers.$desktop) {
+      font-size: clamp(36px, calc(6vw - 12px), var(--size-display-2));
+    }
+  }
+
+  // A tool beside its text, on a home page.
+  &.split--tool {
+    @media (width >= tiers.$desktop) {
+      align-items: center;
+    }
+  }
+}
+
+.doc--home .split h1 {
+  font-size: clamp(36px, calc(4vw - 4px), var(--size-display-2));
+}

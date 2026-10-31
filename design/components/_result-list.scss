@@ -1,0 +1,38 @@
+// The list of result rows, one per bin.
+@use "../abstracts/lines";
+
+// The strong line sits in its own pixel of padding, so a picked first row cannot paint over it.
+.result-list {
+  @include lines.strong;
+  list-style: none;
+  padding: 1px 0 0;
+
+  > li {
+    margin: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  // A row with a delete button beside it.
+  > li.result-row--removable {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--hit);
+    align-items: center;
+  }
+
+  // The tint runs under the delete button too, so the button is part of the row.
+  > li.result-row--removable:has(> .result-row:hover),
+  > li.result-row--removable:has(> .result-row[aria-current="true"]) {
+    background: var(--panel);
+  }
+}
+
+.result-list__empty {
+  padding: var(--step) 0;
+  color: var(--muted);
+  font-size: var(--size-ui);
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc__body .result-list {
+  max-width: none;
+}

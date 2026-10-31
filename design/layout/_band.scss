@@ -1,10 +1,17 @@
 // A full-width section of a page, with a ruled top. From desktop, a label column beside the body.
+// Neighbouring bands take different shapes, so a page does not read as one band pasted down it. Below 800
+// every shape stacks the same way.
 @use "../abstracts/tiers";
 @use "../abstracts/grounds";
 
+// The bands of a page count from here.
+main {
+  counter-reset: step;
+}
+
 .band {
   padding: var(--band-pad) 0;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--rule);
 
   &:first-child {
     border-top: 0;
@@ -12,6 +19,35 @@
 
   &--deep {
     @include grounds.deep;
+  }
+
+  // A change of ground is already an edge, so it needs no line.
+  &.band--deep,
+  &.band--deep + .band {
+    border-top-color: transparent;
+  }
+
+  &.band--tint {
+    --rule: var(--tint-rule);
+    background: var(--tint);
+  }
+
+  &.band--no-edge {
+    border-top-color: transparent;
+  }
+
+  &.band--numbered {
+    counter-increment: step;
+  }
+
+  // One short line, less padding.
+  &.band--compact {
+    padding: calc(var(--step) * 2) 0;
+  }
+
+  // The instance readout, a thin band under the hero.
+  &.band--status {
+    padding: calc(var(--step) * 1.5) 0;
   }
 }
 
@@ -40,4 +76,199 @@
   flex-direction: column;
   gap: calc(var(--step) * 1.5);
   min-width: 0;
+}
+
+// The band's number sits over its label. In a mirrored band the label is inside the text column, so it moves
+// with the text.
+.band.band--numbered .band__label .label,
+.band.band--numbered .split > .prose > .label:first-child {
+  color: var(--ink);
+
+  &::before {
+    content: counter(step, decimal-leading-zero);
+    display: block;
+    margin-bottom: 8px;
+    font-size: var(--size-h2);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+}
+
+// number-in-column: the number in a label column, whatever the band's shape.
+.band.band--numbered.band--number-in-column .band__grid {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: var(--label-col) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+  }
+}
+
+// number-in-row: the number before the heading, on its row; the label keeps its own row.
+.band.band--numbered.band--number-in-row .band__label .label::before {
+  display: none;
+}
+
+.band.band--numbered.band--number-in-row :is(.band__body > h2:first-child, .band__body > .prose:first-child > h2:first-child)::before {
+  content: counter(step, decimal-leading-zero);
+  margin-right: 0.4em;
+  font-family: var(--font-mono);
+  font-weight: 300;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.band--compact .band__body {
+  gap: 4px;
+}
+
+.band--compact .band__body > :not(h2) + :not(h2) {
+  margin-top: calc(var(--step) - 4px);
+}
+
+.band--compact h2 {
+  font-size: var(--size-h3);
+  letter-spacing: 0;
+  line-height: calc(var(--step) * 2);
+}
+
+// split, mirrored and wide have no label column.
+.band--split .band__grid,
+.band--mirrored .band__grid,
+.band--wide .band__grid {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: calc(var(--step) * 1.5);
+  }
+}
+
+// split: the text on the left, the thing it talks about on the right.
+.band--split .split {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+// mirrored: the same, the thing on the left.
+.band--mirrored .split {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.band--mirrored .split > :first-child {
+  @media (width >= tiers.$desktop) {
+    order: 2;
+  }
+}
+
+// wide: the heading on the left, the rest of its text on the right, the content full width under both.
+.band--wide {
+  @media (width >= tiers.$desktop) {
+    .band__body.prose,
+    .band__body > .prose:first-child {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: var(--col-gap);
+      row-gap: 0;
+      align-items: start;
+      max-width: none;
+    }
+
+    // Spans rows that may be empty; with no row gap an empty row takes no space.
+    .band__body.prose > h2,
+    .band__body > .prose:first-child > h2 {
+      grid-column: 1;
+      grid-row: 1 / span 8;
+      font-size: 44px;
+    }
+
+    .band__body.prose > :not(h2),
+    .band__body > .prose:first-child > :not(h2) {
+      grid-column: 2;
+      margin-top: 0;
+    }
+
+    .band__body.prose > :not(h2) ~ :not(h2),
+    .band__body > .prose:first-child > :not(h2) ~ :not(h2) {
+      margin-top: var(--step);
+    }
+
+    // A single short line beside a wide heading reads as a fragment, so it goes under the heading.
+    .band__body > .prose.prose--one-line:first-child {
+      display: flex;
+    }
+
+    .band__body > .prose.prose--one-line:first-child > p {
+      margin-top: calc(var(--step) / 2);
+    }
+
+    // code-left: a short code block under the left column of text, beside the list on the right.
+    .band__body.band__body--code-left {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      row-gap: var(--step);
+      align-content: start;
+      align-items: start;
+    }
+
+    .band__body.band__body--code-left > .prose:first-child:has(> *) {
+      display: contents;
+    }
+
+    .band__body.band__body--code-left > .prose:first-child > * {
+      grid-column: 1;
+      grid-row: auto;
+      margin: 0;
+    }
+
+    .band__body.band__body--code-left > .prose:first-child > h2 {
+      grid-column: 1 / -1;
+    }
+
+    .band__body.band__body--code-left > .prose:first-child > ul {
+      grid-column: 2;
+      grid-row: 2 / span 3;
+    }
+
+    .band__body.band__body--code-left > :not(.prose) {
+      grid-column: 1;
+    }
+
+    // More than one block of text would leave the heading's column empty. The heading goes on top and the
+    // text runs in two columns under it.
+    .band__body.prose:has(> :not(h2) ~ :not(h2)),
+    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) {
+      display: block;
+      columns: 2;
+      column-gap: var(--col-gap);
+    }
+
+    .band__body.prose:has(> :not(h2) ~ :not(h2)) > h2,
+    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) > h2 {
+      column-span: all;
+      margin-bottom: var(--step);
+    }
+
+    .band__body.prose:has(> :not(h2) ~ :not(h2)) > :not(h2),
+    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) > :not(h2) {
+      break-inside: avoid;
+    }
+  }
+}
+
+.band--compact .band__label {
+  @media (width >= tiers.$desktop) {
+    padding-top: 0;
+  }
+}
+
+// The instance readout's label sits beside its cells.
+.band--status .band__grid {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: var(--label-col) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+    align-items: center;
+  }
 }

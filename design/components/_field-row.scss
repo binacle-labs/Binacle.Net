@@ -1,0 +1,20 @@
+// A row of fields for one bin or item, with its remove button last. The fourth value column is as wide as its
+// label, QUANTITY.
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 76px 32px;
+  gap: 8px;
+  align-items: end;
+
+  // A three-field row, like a bin, spans the same length as a four-field one; its fields are wider.
+  &:not(:has(> .field:nth-of-type(4))) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 32px;
+  }
+}
+
+// The word for what failed, under the row.
+.field-row__error {
+  font-size: var(--size-ui);
+  color: var(--error);
+}

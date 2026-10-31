@@ -1,0 +1,368 @@
+// A drawn picture: a bin and its items, a locker bank, a carton. It carries its own ground in both themes.
+// The rules keep their order on purpose: a later one overrides an earlier one of the same weight.
+@use "../abstracts/tiers";
+
+.drawing {
+  background: var(--ground);
+  padding: 12px;
+  color: var(--ground-muted);
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.drawing .drawing__bin path {
+  fill: none;
+  stroke: var(--ground-ink);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.drawing .drawing__item path {
+  stroke: var(--ground);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+// What is seen through an opening sits further back.
+.drawing .drawing__inside path {
+  stroke: var(--ground-muted);
+}
+
+.drawing .drawing__dims path {
+  fill: none;
+  stroke: var(--ground-muted);
+  stroke-width: 1.2;
+}
+
+.drawing .drawing__dims text {
+  fill: var(--ground-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+// On a docs page: on the tint with 1px lines, held to a size that keeps the labels readable.
+.drawing--docs {
+  --ground: var(--tint);
+  margin: var(--step) 0;
+
+  svg {
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  &.drawing path {
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .drawing__item path {
+    stroke: var(--item-line);
+  }
+}
+
+.drawing .drawing__dims .drawing__tick {
+  stroke: var(--ground-ink);
+}
+
+.drawing .drawing__dims .drawing__extension {
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+// A drawing's numbers shrink with it, to about 6px on a phone, so there they go. A vertical dimension is
+// dropped, not shortened.
+.drawing .drawing__dims {
+  @media (width < tiers.$tablet) {
+    display: none;
+  }
+}
+
+// These dimensions are the point of the drawing, so a phone keeps them.
+.drawing .drawing__dims.drawing__keep {
+  display: inline;
+}
+
+.drawing__caption {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding-top: 10px;
+}
+
+// Three faces, painted: the top a step lighter, the right a step darker.
+@for $i from 1 through 3 {
+  .drawing__item--step-#{$i} {
+    --face: var(--item-#{$i});
+  }
+}
+
+.drawing__item .drawing__top {
+  fill: oklch(from var(--face) calc(l + 0.08) c h);
+}
+
+.drawing__item .drawing__left {
+  fill: var(--face);
+}
+
+.drawing__item .drawing__right {
+  fill: oklch(from var(--face) calc(l - 0.09) c h);
+}
+
+// Held to a size that leaves the text beside it in view.
+.drawing--pack {
+  min-width: 0;
+
+  svg {
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+
+// A size shrinks with a narrow drawing, so three sizes never run together.
+.fit-row .drawing {
+  container-type: inline-size;
+}
+
+// A carton flap, or the outside of a drawn object, hides what is behind it.
+.drawing .drawing__bin.drawing__flap path,
+.drawing .drawing__bin.drawing__solid path {
+  fill: var(--ground);
+}
+
+// The inside of an open compartment, a step towards the rule.
+.drawing .drawing__hollow path {
+  fill: color-mix(in oklab, var(--ground-rule) 40%, var(--ground));
+  stroke: none;
+}
+
+.drawing .drawing__door-number text {
+  fill: var(--ground-muted);
+  font-family: var(--font-mono);
+  font-size: 6.4px;
+  dominant-baseline: hanging;
+}
+
+// On a phone a drawing keeps its shapes and drops the small parts.
+.drawing .drawing__detail,
+.drawing .drawing__door-number {
+  @media (width < tiers.$tablet) {
+    display: none;
+  }
+}
+
+// A cropped drawing is shown large, so on a phone it keeps the small parts too.
+.drawing svg.drawing__art--cropped .drawing__detail,
+.drawing svg.drawing__art--cropped .drawing__door-number {
+  display: inline;
+}
+
+// The hero is a pair: the whole bank, and on a phone its left part, larger.
+.drawing .drawing-pair > svg.drawing__art--cropped {
+  display: none;
+
+  @media (width < tiers.$tablet) {
+    display: block;
+  }
+}
+
+.drawing .drawing-pair > svg:not(.drawing__art--cropped) {
+  @media (width < tiers.$tablet) {
+    display: none;
+  }
+}
+
+// A shadow on the floor, so a drawing stands on something.
+.drawing .drawing__shadow path {
+  fill: color-mix(in oklab, var(--ground-rule) 55%, transparent);
+  stroke: none;
+}
+
+// The www style: an object on the page, no ground of its own. Lines stay one width at every screen width, the
+// object's outline 2px and the rest 1px. The body is steel; its faces are shaded as an item's are, and its
+// lines are a darker step of it.
+.drawing.drawing--painted {
+  --ground: var(--paper);
+  --body: light-dark(oklch(0.82 0.012 75), oklch(0.50 0.012 75));
+  --door: light-dark(oklch(0.89 0.008 75), oklch(0.57 0.012 75));
+  --line: light-dark(oklch(0.38 0.015 75), oklch(0.22 0.01 75));
+  --dim: light-dark(var(--line), oklch(0.9 0.01 75));
+  background: transparent;
+  padding: 0;
+
+  path {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 1px;
+  }
+
+  .drawing__outline path {
+    stroke-width: 2px;
+  }
+
+  .drawing__bin path {
+    stroke: var(--line);
+  }
+
+  .drawing__body .drawing__front,
+  .drawing__door path {
+    fill: var(--body);
+  }
+
+  .drawing__body .drawing__top {
+    fill: oklch(from var(--body) calc(l + 0.06) c h);
+  }
+
+  .drawing__body .drawing__side {
+    fill: oklch(from var(--body) calc(l - 0.08) c h);
+  }
+
+  .drawing__doors path:not(:last-child),
+  .drawing__detail path {
+    fill: var(--door);
+  }
+
+  .drawing__door + .drawing__doors path {
+    fill: oklch(from var(--body) calc(l - 0.04) c h);
+  }
+
+  .drawing__screen path {
+    fill: oklch(0.3 0.035 245);
+  }
+
+  .drawing__hollow path {
+    fill: oklch(from var(--body) calc(l - 0.16) c h);
+  }
+
+  .drawing__hollow .drawing__floor {
+    fill: oklch(from var(--body) calc(l - 0.1) c h);
+  }
+
+  .drawing__inside path {
+    stroke: oklch(from var(--body) calc(l - 0.24) c h);
+  }
+
+  .drawing__door-number text {
+    fill: var(--line);
+  }
+
+  .drawing__dims path {
+    stroke: var(--dim);
+  }
+
+  .drawing__dims text {
+    fill: var(--dim);
+  }
+
+  .drawing__item.drawing__item--over-print .drawing__print path {
+    stroke: var(--error);
+  }
+
+  .drawing__item.drawing__no-room > path {
+    fill: none;
+    stroke: var(--error);
+    stroke-width: 2px;
+    stroke-dasharray: 4 3;
+  }
+}
+
+// Cartons are kraft, not steel. Their label is the door's colour, paper. A faded carton is the one not picked.
+.drawing.drawing--painted:has(.drawing__art--cartons),
+.drawing.drawing--painted svg.drawing__art--packed {
+  --body: light-dark(oklch(0.80 0.06 72), oklch(0.56 0.055 68));
+  --door: light-dark(oklch(0.97 0.006 80), oklch(0.80 0.01 80));
+  --line: light-dark(oklch(0.40 0.045 60), oklch(0.24 0.03 60));
+
+  .drawing__flaps path {
+    fill: oklch(from var(--body) calc(l - 0.04) c h);
+  }
+
+  .drawing__flaps .drawing__flap-in {
+    fill: oklch(from var(--body) calc(l + 0.03) c h);
+  }
+
+  .drawing__flaps .drawing__lid {
+    fill: oklch(from var(--body) calc(l + 0.06) c h);
+  }
+
+  .drawing__tape path {
+    fill: oklch(from var(--body) calc(l + 0.09) calc(c * 0.6) h);
+  }
+
+  .drawing__faded {
+    opacity: 0.42;
+  }
+
+  .drawing__dims text {
+    text-anchor: middle;
+  }
+
+  .drawing__cut path {
+    fill: oklch(from var(--body) calc(l + 0.1) calc(c * 0.7) h);
+  }
+}
+
+// An item's number in the order it was placed, printed on its front.
+.drawing .drawing__item .drawing__order {
+  fill: oklch(from var(--face) calc(l - 0.34) c h);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  dominant-baseline: hanging;
+}
+
+// With no ground of its own, a painted drawing takes the band's.
+.band.band--tint .drawing.drawing--painted {
+  --ground: var(--tint);
+}
+
+// A drawing of named things takes the demo's kind colours.
+@for $i from 1 through 6 {
+  .drawing__item.drawing__item--kind-#{$i} {
+    --face: var(--kind-#{$i});
+  }
+}
+
+// What is printed on a box: a kettle, a mug, a lid, tape.
+.drawing .drawing__item .drawing__print path {
+  fill: none;
+  stroke: oklch(from var(--face) calc(l - 0.3) c h);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+// Self-hosting: the machine it runs on, over the command.
+.drawing--host {
+  margin: 0 0 var(--step);
+
+  svg {
+    max-height: 18rem;
+  }
+
+  .drawing__plate text {
+    fill: var(--line);
+  }
+}
+
+// A name printed on an item's front, kept on a phone.
+.drawing .drawing__item .drawing__name {
+  fill: oklch(from var(--face) calc(l - 0.34) c h);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  dominant-baseline: hanging;
+}
+
+// The outline of a drawn object shows only from 1200, as the docs page outline does.
+.drawing__outline {
+  display: none;
+
+  @media (width >= 1200px) {
+    display: block;
+  }
+}

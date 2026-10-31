@@ -1,0 +1,46 @@
+// A list where each item opens with a label: the steps beside a tool, the trade-offs.
+@use "../abstracts/tiers";
+@use "../abstracts/lines";
+
+.labelled-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) / 2);
+
+  li {
+    margin: 0;
+  }
+
+  .label {
+    display: block;
+  }
+}
+
+// The cost is set apart from the point above it, so its label does not read as the end of that line.
+.labelled-list .labelled-list__cost {
+  margin-top: calc(var(--step) / 2);
+}
+
+// On a tool page the steps are a short key to the form, so each label sits beside its text.
+.workbench__intro .labelled-list li,
+.split--tool .labelled-list li {
+  @media (width >= tiers.$tablet) {
+    display: grid;
+    grid-template-columns: 16ch minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: baseline;
+  }
+}
+
+// On a home page the same key sits beside the tool's text, each step on its own line.
+.split--tool .labelled-list {
+  @include lines.strong;
+  gap: 0;
+}
+
+.split--tool .labelled-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}

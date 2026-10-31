@@ -1,0 +1,125 @@
+// Each bin of a fit response, front on and to scale, with its verdict under it.
+@use "../abstracts/tiers";
+
+.fit-row {
+  min-width: 0;
+
+  figcaption {
+    padding-top: 10px;
+  }
+}
+
+.fit-row__verdicts {
+  list-style: none;
+  padding: 10px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 5.8%;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  line-height: 1.4;
+  color: var(--ground-muted);
+
+  // On a phone a column is narrower than NotAllItemsFit at label size.
+  @media (width < tiers.$tablet) {
+    font-size: 9px;
+  }
+
+  // A verdict is one identifier and never wraps.
+  li {
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+.fit-row__verdicts .fit-row__number {
+  display: block;
+  font-size: min(13px, 5cqi);
+}
+
+.fit-row__verdicts .fit-row__verdict--fits {
+  color: var(--ground-ink);
+}
+
+// Each verdict sits under its open compartment, past the screen column for the third. The shares of the
+// width match the drawing's.
+.drawing:has(.drawing__art--lockers) > .fit-row__verdicts {
+  column-gap: 0;
+  grid-template-columns: 1.1% 22.8% 22.7% 9.7% 22.8%;
+
+  li {
+    padding-right: 4px;
+  }
+
+  li:nth-child(1) {
+    grid-column: 2;
+  }
+
+  li:nth-child(2) {
+    grid-column: 3;
+  }
+
+  li:nth-child(3) {
+    grid-column: 5;
+  }
+
+  // In a narrow drawing the columns are too narrow for a verdict on one line. They step down instead, each row
+  // starting at its opening's left edge, the size beside the verdict.
+  @container (width < 520px) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+
+    li {
+      padding-right: 0;
+      border-left: 1px solid var(--ground-rule);
+      padding-left: 6px;
+    }
+
+    li:nth-child(1) {
+      margin-left: 1.1%;
+    }
+
+    li:nth-child(2) {
+      margin-left: 23.9%;
+    }
+
+    li:nth-child(3) {
+      margin-left: min(56.3%, 100% - 15ch - 8px);
+    }
+
+    .fit-row__number {
+      display: inline;
+      font-size: inherit;
+      margin-right: 0.6em;
+    }
+  }
+}
+
+// Each verdict sits under its carton's front.
+.drawing:has(.drawing__art--cartons) > .fit-row__verdicts {
+  column-gap: 0;
+  grid-template-columns: 6.2% 16.7% 16.2% 16.7% 16.1% 16.8%;
+
+  li {
+    padding-right: 4px;
+  }
+
+  li:nth-child(1) {
+    grid-column: 2 / span 2;
+  }
+
+  li:nth-child(2) {
+    grid-column: 4 / span 2;
+  }
+
+  li:nth-child(3) {
+    grid-column: 6 / span 2;
+  }
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc__body .fit-row {
+  max-width: none;
+}

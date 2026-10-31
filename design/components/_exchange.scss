@@ -1,0 +1,13 @@
+// A request and its response.
+
+.exchange {
+  display: grid;
+  gap: var(--step);
+}
+
+.exchange__part {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) / 2);
+  min-width: 0;
+}

@@ -1,0 +1,157 @@
+// A docs page: the title, the breadcrumbs, then a flat body the way markdown renders it - headings, prose and
+// blocks one after another. Text holds the measure; code, tables and drawings may take the column.
+@use "../abstracts/tiers";
+
+.doc {
+  min-width: 0;
+  padding: calc(var(--step) * 2) 16px calc(var(--step) * 4);
+
+  @media (width >= tiers.$tablet) {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  // Below 1000 the page keeps the width it has beside the menu at 1000, so text and blocks end where they do
+  // there and the empty space sits once, past the page.
+  @media (width < 1000px) {
+    max-width: calc(1000px - var(--sidebar) - 80px + 2 * var(--gutter));
+  }
+
+  @media (width >= 1000px) {
+    padding: calc(var(--step) * 3) 40px calc(var(--step) * 5);
+  }
+
+  > h1 {
+    font-size: 40px;
+
+    @media (width >= tiers.$desktop) {
+      font-size: 46px;
+    }
+  }
+
+  > h1 .doc__icon {
+    margin-right: 0.3em;
+    font-size: 0.8em;
+  }
+
+  // Any link target clears the header that stays at the top below 1200.
+  [id] {
+    @media (width < 1200px) {
+      scroll-margin-top: calc(var(--hit) + var(--step) * 2);
+    }
+  }
+}
+
+.doc__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: var(--step);
+}
+
+// A value keeps its own case inside an upper-case label.
+.doc__meta .doc__value {
+  text-transform: none;
+}
+
+// Body text a step down from the prose size, on docs only.
+.doc__body {
+  margin-top: calc(var(--step) * 2);
+  font-size: 15.5px;
+
+  > * + * {
+    margin-top: var(--step);
+  }
+
+  > p,
+  > ul,
+  > ol,
+  > h2,
+  > h3,
+  > h4 {
+    max-width: var(--measure-prose);
+  }
+
+  > h2 {
+    margin-top: calc(var(--step) * 4);
+    padding-top: calc(var(--step) * 2);
+    border-top: 1px solid var(--rule);
+    scroll-margin-top: var(--step);
+  }
+
+  > h3 {
+    margin-top: calc(var(--step) * 2.5);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    scroll-margin-top: var(--step);
+  }
+
+  > h4,
+  > h5,
+  > h6 {
+    margin-top: calc(var(--step) * 2);
+    font-size: var(--size-h3);
+    font-weight: 600;
+    max-width: var(--measure-prose);
+  }
+
+  > hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin-top: calc(var(--step) * 2);
+    margin-bottom: calc(var(--step) * 2);
+  }
+
+  > blockquote {
+    max-width: var(--measure-prose);
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 16px;
+    border-left: 1px solid var(--rule);
+    color: var(--muted);
+  }
+
+  li > ul,
+  li > ol {
+    margin-top: calc(var(--step) / 2);
+  }
+
+  > h2 + *,
+  > h3 + *,
+  > h4 + *,
+  > h5 + * {
+    margin-top: calc(var(--step) * 0.75);
+  }
+
+  > .lede {
+    font-size: 19px;
+    line-height: 1.55;
+  }
+}
+
+// A tinted block in a docs page, from the page column's left edge to the window's right.
+.doc__band {
+  --rule: var(--tint-rule);
+  margin: calc(var(--step) * 3) -16px 0;
+  padding: calc(var(--step) * 2) 16px;
+  background: var(--tint);
+
+  @media (width >= tiers.$tablet) {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  // The shadow carries the tint past a wide window's page edge; the clip keeps it to the right.
+  @media (width >= 1000px) {
+    margin-inline: -40px;
+    padding: calc(var(--step) * 2.5) 40px;
+    box-shadow: 0 0 0 100vmax var(--tint);
+    clip-path: inset(0 -100vmax 0 0);
+  }
+
+  > * + * {
+    margin-top: calc(var(--step) * 1.5);
+  }
+}

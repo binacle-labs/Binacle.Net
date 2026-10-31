@@ -1,0 +1,108 @@
+// One bin of a result. The picked row carries a 2px marker in the ramp's colour. Its fill is a dimension: a rule
+// track, an ink line as long as the figure, and the figure.
+
+.result-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 6px 16px;
+  width: 100%;
+  padding: var(--step) 12px var(--step) 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--size-ui);
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: inset 2px 0 0 transparent;
+
+  &:hover {
+    background: var(--panel);
+  }
+
+  &[aria-current="true"] {
+    box-shadow: inset 2px 0 0 var(--item-5);
+    background: var(--panel);
+  }
+}
+
+.result-row__title {
+  font-weight: 600;
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+  }
+}
+
+.result-row__meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  color: var(--muted);
+}
+
+.result-row__fill {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7ch;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.result-row__fill-track {
+  position: relative;
+  height: 9px;
+  background: linear-gradient(var(--rule), var(--rule)) center / 100% 1px no-repeat;
+
+  > span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--ink);
+    border-right: 1px solid var(--ink);
+    background: linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat;
+  }
+}
+
+.result-row__fill-number {
+  text-align: right;
+  color: var(--ink);
+}
+
+// The items that did not fit, folded under the rows.
+.result-row--unfit {
+  padding: 0 12px var(--step) 14px;
+  font-size: var(--size-ui);
+  color: var(--muted);
+
+  summary {
+    cursor: pointer;
+    min-height: 28px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 4px 0 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+}
+
+// A docs page shows a row, it does not pick one.
+.doc__body .result-row {
+  cursor: default;
+
+  &:hover {
+    background: transparent;
+  }
+}

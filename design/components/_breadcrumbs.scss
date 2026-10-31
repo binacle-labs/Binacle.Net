@@ -1,0 +1,25 @@
+// Where a docs page sits, from the docs home down.
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  margin-bottom: calc(var(--step) * 1.5);
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  > * + *::before {
+    content: "/";
+    margin-right: 8px;
+  }
+
+  [aria-current] {
+    color: var(--ink);
+  }
+}

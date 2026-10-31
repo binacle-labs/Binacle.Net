@@ -1,0 +1,56 @@
+// Pick one box of three. Each option is a radio button dressed as a card.
+
+.box-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  container-type: inline-size;
+}
+
+.box-picker__option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  strong {
+    font-weight: 600;
+    font-size: var(--size-ui);
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  // A size never breaks, so where three cannot sit side by side they stack: name left, size right. That is a
+  // phone, and the side column from 800 to 1050.
+  @container (width < 370px) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &:hover,
+  &:has(input:focus-visible) {
+    border-color: var(--ink);
+  }
+
+  &:has(input:checked) {
+    border-color: var(--ink);
+    background: var(--panel);
+  }
+}

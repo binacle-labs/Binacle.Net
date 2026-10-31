@@ -1,0 +1,21 @@
+// Colour emoji, toned down per theme so they sit on the page.
+
+@mixin -dark {
+  filter: saturate(0.68) sepia(0.1) brightness(0.86) contrast(0.95);
+  opacity: 0.92;
+}
+
+.emoji {
+  filter: saturate(0.72) sepia(0.14) contrast(0.96);
+  opacity: 0.94;
+}
+
+:root[data-theme="dark"] .emoji {
+  @include -dark;
+}
+
+:root:not([data-theme="light"]) .emoji {
+  @media (prefers-color-scheme: dark) {
+    @include -dark;
+  }
+}

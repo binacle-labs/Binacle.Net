@@ -1,0 +1,106 @@
+// Below 800, where the section box is off: a see-through button bottom right names the current section; a tap
+// lists every section above it. It shows past the first section and steps aside for the previous and next
+// links, as the box does.
+@use "../abstracts/tiers";
+
+.section-button {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+
+  @media (width < tiers.$desktop) {
+    display: flex;
+    position: fixed;
+    z-index: 45;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  // Less see-through than the box: on a phone it sits over the text, not beside it.
+  button,
+  ol {
+    border: 1px solid var(--rule);
+    background: color-mix(in oklch, var(--paper) 80%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(170px, calc(100vw - 32px));
+    min-height: 36px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+
+    // Up while closed, since the list opens above; down while open.
+    &::after {
+      content: "";
+      flex: none;
+      width: 6px;
+      height: 6px;
+      margin-top: 3px;
+      border-top: 1.5px solid currentColor;
+      border-left: 1.5px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    &[aria-expanded="true"]::after {
+      margin-top: -3px;
+      transform: rotate(225deg);
+    }
+  }
+
+  // Open, the list covers the page text, so it takes the solid page colour to stay readable.
+  ol {
+    width: min(240px, calc(100vw - 32px));
+    background: var(--paper);
+    max-height: 50vh;
+    overflow-y: auto;
+    margin: 0 0 8px;
+    padding: 4px 10px;
+    list-style: none;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: block;
+    padding: 10px 0 10px 10px;
+    border-left: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--muted);
+    text-decoration: none;
+
+    &[aria-current="true"] {
+      border-left-color: var(--ink);
+      color: var(--ink);
+    }
+  }
+
+  &.section-button--gone {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+}
+
+.section-button__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

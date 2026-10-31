@@ -1,0 +1,54 @@
+// One primary per page.
+@use "../abstracts/tiers";
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--size-ui);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+
+  &--primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+  }
+
+  @media (width >= tiers.$tablet) {
+    min-height: var(--hit);
+  }
+
+  // A button that reads as a link: no box.
+  &--link {
+    min-height: var(--hit);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-text);
+    font-size: var(--size-ui);
+    font-weight: 400;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
+}

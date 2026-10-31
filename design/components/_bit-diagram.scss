@@ -1,0 +1,56 @@
+// A byte bit by bit, or a run of bytes, in one row at every width. --cols sets the column count. A cell grows to
+// hold its field name and its size, so the bits are close to even, not exact. A row wider than the column
+// scrolls sideways, so on a phone the fields of one byte still sit side by side.
+@use "../abstracts/tiers";
+
+.bit-diagram {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 8), minmax(min-content, 1fr));
+  overflow-x: auto;
+}
+
+.bit-diagram__field {
+  --pad: 10px;
+  grid-column: span var(--span, 1);
+  display: grid;
+  // auto, not minmax(0, 1fr): the cell has to report its field name's width, or the name spills over.
+  grid-template-columns: auto;
+  align-content: start;
+  gap: 6px;
+  padding: 0 var(--pad) 12px;
+  border: 1px solid var(--rule);
+  border-left-width: 0;
+  font-size: var(--size-ui);
+  line-height: 1.4;
+
+  &:first-child {
+    border-left-width: 1px;
+  }
+
+  @media (width < tiers.$tablet) {
+    --pad: 6px;
+  }
+
+  code {
+    font-size: var(--size-label);
+    font-weight: 500;
+  }
+
+  .muted {
+    font-size: 13px;
+
+    @media (width < tiers.$tablet) {
+      font-size: 12px;
+    }
+  }
+
+  &.bit-diagram__field--reserved {
+    color: var(--muted);
+    background: repeating-linear-gradient(135deg, transparent 0 6px, var(--rule) 6px 7px);
+  }
+
+  &.bit-diagram__field--more,
+  &.bit-diagram__field--more code {
+    color: var(--muted);
+  }
+}

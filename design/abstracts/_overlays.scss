@@ -1,0 +1,47 @@
+// What the panel, the menu drawer and the docs sidebar share when they sit over the page.
+@use "tiers";
+
+// The head of a panel or drawer: its title, and the close button at the right.
+@mixin head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: calc(var(--step) * 1.5) 16px var(--step);
+  border-bottom: 1px solid var(--rule);
+
+  @media (width >= tiers.$tablet) {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  // A panel's text runs a step smaller than the page's.
+  h2 {
+    font-size: 24px;
+  }
+}
+
+// A drawer from the left, closed. It stays in the page, hidden, so it can slide.
+@mixin drawer {
+  display: block;
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(320px, calc(100vw - 48px));
+  border-right: 1px solid var(--rule);
+  background: var(--paper);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform 0.2s ease, visibility 0s linear 0.2s;
+}
+
+@mixin drawer-open {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.2s ease;
+}

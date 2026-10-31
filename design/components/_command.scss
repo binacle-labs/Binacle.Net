@@ -1,0 +1,46 @@
+// The run command. In the hero it is the second action.
+@use "../abstracts/tiers";
+
+.command {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--ink);
+  min-width: 0;
+
+  pre {
+    flex: 1;
+    min-width: 0;
+    padding: var(--step) 16px;
+    white-space: pre-wrap;
+  }
+}
+
+// A word never breaks; the line breaks between words.
+.command .command__word {
+  white-space: nowrap;
+}
+
+.command .command__prompt {
+  color: var(--muted);
+  user-select: none;
+}
+
+// Stacked but wide enough, the button and the command share a row.
+.hero__grid--picture-first .hero__actions .command {
+  @media (width >= tiers.$tablet) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (width >= tiers.$desktop) {
+    flex: none;
+  }
+}
+
+// Under a wide heading it takes the text's half, never the whole width.
+.band--wide .band__body > .command {
+  @media (width >= tiers.$desktop) {
+    width: calc((100% - var(--col-gap)) / 2);
+    margin-left: auto;
+  }
+}

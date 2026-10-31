@@ -1,0 +1,13 @@
+// The request behind a result, folded open under the results.
+
+.request-fold {
+  margin-top: calc(var(--step) * 1.5);
+
+  &[hidden] {
+    display: none;
+  }
+
+  &[open] > summary {
+    margin-bottom: calc(var(--step) / 2);
+  }
+}

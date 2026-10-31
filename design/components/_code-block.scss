@@ -1,0 +1,92 @@
+// A block of code, with an optional head: what it is on the left, Copy on the right.
+// The script puts each line in its own __line and marks its parts.
+
+.code-block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.code-block__pre {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: var(--step) 16px;
+  overflow-x: auto;
+
+  // Below 1100 a long line wraps instead, so the block clips nothing.
+  &:has(.code-block__line) {
+    @media (width < 1100px) {
+      overflow-x: hidden;
+    }
+  }
+
+  &.code-block__pre--wrap {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+// A wrapped line hangs under the start of its own line, so no number is hidden past the edge.
+.code-block__pre .code-block__line {
+  display: block;
+  padding-left: var(--indent, 0);
+
+  @media (width < 1100px) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    padding-left: calc(var(--indent, 0ch) + 2ch);
+    text-indent: -2ch;
+  }
+}
+
+.code-block__pre .code-block__line .code-block__indent {
+  display: none;
+}
+
+// A block that always wraps hangs its wrapped part at every width.
+.code-block__pre.code-block__pre--wrap .code-block__line {
+  padding-left: calc(var(--indent, 0ch) + 2ch);
+  text-indent: -2ch;
+}
+
+// A word moves to the next line whole, and breaks inside only when it is wider than the block.
+.code-block__pre .code-block__word {
+  display: inline-block;
+  max-width: 100%;
+  text-indent: 0;
+}
+
+// Monochrome carried by weight: keys and numbers heavier, punctuation muted.
+.code-block__pre .code-block__property,
+.code-block__pre .code-block__number {
+  font-weight: 500;
+}
+
+.code-block__pre .code-block__punctuation {
+  color: var(--muted);
+}
+
+.code-block .code-block__pre {
+  margin: 0;
+}
+
+// Room for the copy button in the corner.
+.code-block > .copy-button:not([hidden]) + .code-block__pre {
+  padding-right: 44px;
+}
+
+.code-block__head {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 34px;
+  padding-left: 16px;
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+}
+
+.code-block__head .label {
+  align-self: center;
+}

@@ -1,0 +1,181 @@
+// The live 3D view. It sits on the tint, one step from paper, in both themes; its strip and buttons take the
+// page's ink, muted and rule.
+@use "../abstracts/tiers";
+
+.pack-view {
+  --ground: var(--tint);
+  --ground-ink: var(--ink);
+  --ground-muted: var(--muted);
+  --ground-rule: var(--rule);
+  margin: 0;
+  background: var(--ground);
+  color: var(--ground-muted);
+  min-width: 0;
+}
+
+.pack-view__stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-height: 70vh;
+  width: 100%;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+.pack-view__empty,
+.pack-view__note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: calc(var(--step) * 2);
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ground-muted);
+  pointer-events: none;
+}
+
+// The strip writes the empty note itself.
+.pack-view__empty {
+  display: none !important;
+}
+
+.pack-view__strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--ground-rule);
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  font-variant-numeric: tabular-nums;
+  min-height: 40px;
+}
+
+.pack-view__strip [data-placed] {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 0 12px;
+  color: var(--ground-ink);
+
+  // On a phone it always takes two lines, so the buttons under it do not jump as you step.
+  @media (width < tiers.$tablet) {
+    min-height: 2lh;
+  }
+
+  > span:first-child {
+    color: var(--ground-muted);
+  }
+}
+
+// The item's size and place, a step smaller and fainter than its name.
+.pack-view__placed {
+  font-size: 9.5px;
+  color: color-mix(in oklab, var(--ground-muted) 75%, var(--ground));
+}
+
+.pack-view__controls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--ground-rule);
+}
+
+.pack-view__control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--hit);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ground-ink);
+  cursor: pointer;
+
+  & + & {
+    border-left: 1px solid var(--ground-rule);
+  }
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--ground-rule);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--ground-ink);
+    outline-offset: -4px;
+  }
+
+  &:disabled {
+    color: var(--ground-rule);
+    cursor: default;
+  }
+}
+
+// While the answer is on its way the bin is drawn, the strip says Packing, and an ink stroke runs along the
+// rule over the strip.
+.pack-view__wait {
+  display: none;
+}
+
+.pack-view.pack-view--waiting .pack-view__wait {
+  position: absolute;
+  left: 0;
+  right: 0;
+  // On the strip's top rule, not above it.
+  bottom: -1px;
+  display: block;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 30%;
+    background: var(--ground-ink);
+    animation: pack-wait-line 1.2s ease-in-out infinite;
+
+    // Still, for a reader who asks for less motion: the stroke sits the whole width.
+    @media (prefers-reduced-motion: reduce) {
+      width: 100%;
+      animation: none;
+    }
+  }
+}
+
+@keyframes pack-wait-line {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(calc(100% / 0.3));
+  }
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc__body .pack-view {
+  max-width: none;
+}

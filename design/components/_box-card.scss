@@ -1,0 +1,75 @@
+// One box: its drawing, its name and its size.
+
+.box-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--ink);
+  }
+
+  strong {
+    font-weight: 600;
+    font-size: var(--size-ui);
+
+    &::after {
+      content: " \2192";
+      font-weight: 400;
+    }
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  // A size never breaks, so where three cannot sit side by side they stack: face, name, size on one row. That
+  // is a phone, and the hero's narrow column from 800 to 1000.
+  @container (width < 460px) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 56px auto 1fr;
+    align-items: center;
+    column-gap: 12px;
+
+    .mono {
+      text-align: right;
+    }
+  }
+
+  // A preset is a button, not a link.
+  &--preset {
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    cursor: pointer;
+  }
+}
+
+// The box as an open carton. All share one scale and one floor, so they differ only in height.
+.box-card__face {
+  display: block;
+  margin-bottom: 6px;
+
+  @container (width < 460px) {
+    margin: 0;
+  }
+}
+
+.lightbox--preset .box-card {
+  &:hover {
+    border-color: var(--rule);
+  }
+
+  strong::after {
+    content: none;
+  }
+}

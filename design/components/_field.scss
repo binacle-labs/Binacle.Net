@@ -1,0 +1,81 @@
+// A label over a 1px box. Focus turns the box from rule to ink. Numbers are set in the mono.
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+
+  > span {
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: var(--hit);
+    padding: 0 10px;
+    border: 1px solid var(--rule);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+
+    &:focus {
+      outline: 0;
+      border-color: var(--ink);
+    }
+  }
+
+  select {
+    font-family: var(--font-text);
+    font-size: var(--size-ui);
+  }
+
+  textarea {
+    padding: 10px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  // The failing field gets a red border; the word goes in the message under the row.
+  &.field--invalid input {
+    border-color: var(--error);
+  }
+
+  // Spinners off: the mono figure is the point.
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+// The column labels show once per group, over the first row.
+.form__group > div + div > .field-row > .field > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// The docs version picker is smaller than a form's field.
+.sidebar .field select {
+  min-height: 36px;
+  font-size: var(--size-label);
+  letter-spacing: 0.05em;
+}

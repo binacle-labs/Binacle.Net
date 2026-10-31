@@ -1,0 +1,111 @@
+// Links to pages, one per row. The whole row is the target.
+@use "../abstracts/tiers";
+@use "../abstracts/lines";
+
+.doors {
+  @include lines.strong;
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--step) 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  h3::after {
+    content: " \2192";
+    font-weight: 400;
+  }
+
+  p {
+    font-size: var(--size-ui);
+    line-height: 1.5;
+  }
+
+  a:hover h3 {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  // Each link carries a small copy of its page's drawing, beside the words.
+  &.doors--pictured a {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: var(--col-gap);
+    row-gap: 4px;
+    align-items: start;
+
+    @media (width < tiers.$tablet) {
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+  }
+
+  // Side by side from 800, each with its own short line.
+  &.doors--row {
+    display: grid;
+    gap: 0 var(--col-gap);
+    background-image: none;
+  }
+
+  // Two columns from 640, three from 800, each with its own short line.
+  &.doors--grid {
+    display: grid;
+    gap: 0 var(--col-gap);
+    background-image: none;
+  }
+}
+
+.doors__picture {
+  grid-row: 1 / span 2;
+  align-self: center;
+  margin: 0;
+
+  svg {
+    height: 5.5rem;
+
+    @media (width < tiers.$tablet) {
+      height: 4rem;
+    }
+  }
+
+  .drawing__detail,
+  .drawing__door-number {
+    display: none;
+  }
+}
+
+.doors--row {
+  @media (width >= tiers.$desktop) {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+}
+
+.doors--row a {
+  border-top: 1px solid var(--ink);
+  border-bottom: 0;
+}
+
+.doors--grid {
+  @media (width >= tiers.$tablet) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.doors--grid a {
+  border-top: 1px solid var(--ink);
+  border-bottom: 0;
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc__body > .doors {
+  max-width: none;
+}

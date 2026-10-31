@@ -1,0 +1,90 @@
+// The top of a page: the copy on the left, the picture on the right from 800.
+@use "../abstracts/tiers";
+
+.hero__grid {
+  display: grid;
+  gap: calc(var(--step) * 3);
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+    align-items: center;
+  }
+
+  &.hero__grid--picture-first {
+    row-gap: calc(var(--step) * 1.5);
+  }
+}
+
+.hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  min-width: 0;
+}
+
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero__source {
+  font-size: var(--size-ui);
+}
+
+.hero__picture {
+  min-width: 0;
+}
+
+// Stacked, the picture comes up between the text and the buttons.
+.hero__grid--picture-first .hero__copy {
+  display: contents;
+
+  @media (width >= tiers.$desktop) {
+    display: flex;
+  }
+}
+
+.hero__grid--picture-first .hero__picture {
+  order: 1;
+  margin-block: calc(var(--step) * 0.75);
+
+  @media (width >= tiers.$desktop) {
+    margin-block: 0;
+  }
+}
+
+.hero__grid--picture-first .hero__actions,
+.hero__grid--picture-first .hero__source {
+  order: 2;
+}
+
+// Stacked but wide enough, the button and the command share a row.
+.hero__grid--picture-first .hero__actions {
+  @media (width >= tiers.$tablet) {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+
+  @media (width >= tiers.$desktop) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+// Stacked, a home hero's text runs as wide as any other hero's.
+.hero__copy .prose--marketing {
+  @media (width < tiers.$desktop) {
+    max-width: var(--measure-prose);
+  }
+}
+
+// A home hero: the text sits level with the middle of the picture.
+.split.hero--centred {
+  @media (width >= tiers.$desktop) {
+    align-items: center;
+  }
+}

@@ -1,0 +1,54 @@
+// One icon for the theme now in use: a half circle for auto, a sun for light, a moon for dark.
+// Its text stays in the button for screen readers.
+@use "../abstracts/tiers";
+
+:root {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='black' stroke-width='1.2'/%3E%3Cpath d='M10 3a7 7 0 0 0 0 14z'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="light"] {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='3.5'/%3E%3Cpath d='M10 1.5v2.5M10 16v2.5M1.5 10h2.5M16 10h2.5M4 4l1.8 1.8M14.2 14.2L16 16M4 16l1.8-1.8M14.2 5.8L16 4'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"] {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M16 12.6A6.8 6.8 0 0 1 7.4 4 6.8 6.8 0 1 0 16 12.6z'/%3E%3C/svg%3E");
+}
+
+.theme-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hit);
+  height: var(--hit);
+  margin: -6px -12px -6px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background: currentColor;
+    -webkit-mask: var(--theme-icon) center / 20px 20px no-repeat;
+    mask: var(--theme-icon) center / 20px 20px no-repeat;
+  }
+
+  &:hover {
+    color: var(--ink);
+  }
+
+  @media (width >= tiers.$desktop) {
+    flex: none;
+  }
+}
+
+// With the links in the drawer, the button goes to the right end of the row.
+.site-header:has(.site-header__burger) .theme-button {
+  @media (width < tiers.$desktop) {
+    margin-left: auto;
+  }
+}

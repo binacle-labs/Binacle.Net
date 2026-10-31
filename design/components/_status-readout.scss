@@ -1,0 +1,83 @@
+// What a running instance has switched on: each switch named over its state. A filled square is on, an
+// outlined one off - shape, not colour.
+@use "../abstracts/tiers";
+
+.status-readout__cells {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 1px;
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    outline: 1px solid var(--rule);
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  dd.status-readout__value--on::before,
+  dd.status-readout__value--off::before {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+  }
+
+  dd.status-readout__value--off {
+    color: var(--muted);
+
+    &::before {
+      border-color: var(--muted);
+      background: transparent;
+    }
+  }
+}
+
+.status-readout__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  a {
+    text-decoration: none;
+
+    &::after {
+      content: " \2192";
+      font-size: 1.5em;
+      line-height: 0;
+    }
+
+    &:hover {
+      color: var(--ink);
+      text-decoration: underline;
+    }
+  }
+}
+
+// In its own band, the head sits in the label column beside the cells.
+.band--status .status-readout__head {
+  @media (width >= tiers.$desktop) {
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+  }
+}

@@ -1,0 +1,59 @@
+// From 800 to 1200, where there is no outline column: a see-through list bottom right, the current section and up
+// to two each side. The script hides it once the previous and next links are in view.
+@use "../abstracts/tiers";
+
+.section-box {
+  display: none;
+
+  @media (tiers.$desktop <= width < 1200px) {
+    display: block;
+    position: fixed;
+    z-index: 45;
+    right: 16px;
+    bottom: 16px;
+    width: min(200px, calc(100vw - 32px));
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    background: color-mix(in oklch, var(--paper) 50%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  &.section-box--gone {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    margin: 0;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  a {
+    display: block;
+    padding: 7px 0 7px 10px;
+    overflow: hidden;
+    border-left: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--muted);
+    text-decoration: none;
+
+    &[aria-current="true"] {
+      border-left-color: var(--ink);
+      color: var(--ink);
+    }
+  }
+}

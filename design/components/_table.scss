@@ -1,0 +1,233 @@
+// Below 640 a table stops being a table: each row becomes label and value. Not in docs, at the end.
+@use "../abstracts/tiers";
+@use "../abstracts/lines";
+
+.table {
+  @include lines.strong;
+  display: block;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--size-ui);
+  line-height: 1.45;
+
+  @media (width >= tiers.$tablet) {
+    display: table;
+  }
+
+  thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+
+    @media (width >= tiers.$tablet) {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+      display: table-header-group;
+    }
+  }
+
+  tbody,
+  tr {
+    display: block;
+  }
+
+  tbody {
+    @media (width >= tiers.$tablet) {
+      display: table-row-group;
+      border-top: 0;
+    }
+  }
+
+  tr {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+
+    @media (width >= tiers.$tablet) {
+      display: table-row;
+      padding: 0;
+      border-bottom: 0;
+    }
+  }
+
+  td {
+    display: block;
+    padding: 4px 0;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  td,
+  td.table__text {
+    @media (width >= tiers.$tablet) {
+      display: table-cell;
+      padding: 10px 16px 10px 0;
+      border-top: 1px solid var(--rule);
+      text-align: left;
+    }
+  }
+
+  // Stacked, each value carries its column's name above it.
+  td::before {
+    content: attr(data-label);
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+  }
+
+  td::before,
+  td.table__text::before {
+    @media (width >= tiers.$tablet) {
+      display: none;
+    }
+  }
+
+  th {
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--muted);
+    padding: 10px 16px 10px 0;
+    vertical-align: baseline;
+  }
+
+  // A row name in the first column carries the row's line too.
+  tbody th {
+    @media (width >= tiers.$tablet) {
+      border-top: 1px solid var(--rule);
+    }
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  // Code of any length may break when the column cannot hold it, so the table never runs past the text column.
+  code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  // Short values: below 640 each label sits on the same line as its value.
+  &.table--pairs {
+    @media (width < tiers.$tablet) {
+      tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        column-gap: 24px;
+      }
+
+      th {
+        width: 14ch;
+        padding: 4px 0;
+      }
+
+      tr:has(td[data-label]) th {
+        flex-basis: 100%;
+      }
+
+      td::before {
+        display: inline;
+        margin-right: 1ch;
+      }
+
+      // The same width on every row, so the next label starts in one place down the table.
+      td[data-label]:not(:last-child) {
+        min-width: 12ch;
+      }
+    }
+  }
+
+  // Values and what they mean, read one after another: the meaning starts at one place in all.
+  &.table--keyed th:first-child {
+    @media (width >= tiers.$tablet) {
+      width: 52%;
+    }
+  }
+}
+
+.table .table__off {
+  color: var(--muted);
+}
+
+.table td.table__number,
+.table th.table__number {
+  @media (width >= tiers.$tablet) {
+    text-align: right;
+  }
+}
+
+// Under a wide heading the second column starts where the text beside the heading does.
+.band--wide .band__body > .prose:first-child + .table {
+  @media (width >= tiers.$desktop) {
+    table-layout: fixed;
+
+    th:first-child {
+      width: 50%;
+    }
+
+    :is(th, td):nth-child(2) {
+      padding-left: calc(var(--col-gap) / 2);
+    }
+  }
+}
+
+// A docs table stays a table on a phone. Its tables are reference, read across a row, and stacked they lose
+// half the width. A long path wraps inside its column.
+.doc__body .table {
+  @media (width < tiers.$tablet) {
+    display: table;
+
+    thead {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+      display: table-header-group;
+    }
+
+    tbody {
+      display: table-row-group;
+    }
+
+    tr {
+      display: table-row;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    :is(td, th) {
+      display: table-cell;
+      padding: 8px 12px 8px 0;
+    }
+
+    :is(td, tbody th) {
+      border-top: 1px solid var(--rule);
+    }
+
+    td::before {
+      display: none;
+    }
+
+    // A short value in a mono cell stays whole; the column widens for it.
+    .mono {
+      overflow-wrap: break-word;
+    }
+  }
+}

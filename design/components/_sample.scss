@@ -1,0 +1,30 @@
+// One sample in the Samples panel: its name, its Use button, its request.
+
+.sample {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  h3 {
+    font-size: var(--size-ui);
+    line-height: 1.4;
+  }
+
+  // The samples sit in one list, so the panel body's gap does not reach between them.
+  & + & {
+    margin-top: calc(var(--step) * 1.5);
+  }
+
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+// The name and its Use button on one row.
+.sample__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}

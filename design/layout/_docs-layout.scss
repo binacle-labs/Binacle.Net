@@ -1,0 +1,27 @@
+// The docs page: the sidebar beside the page from 1000, and from 1200 the page outline on the right.
+// From 1200 every page keeps the outline's column, with or without an outline, so the text keeps its width
+// from page to page.
+
+.docs-layout {
+  flex: 1 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+
+  @media (width >= 1000px) {
+    grid-template-columns: var(--sidebar) minmax(0, 1fr);
+  }
+
+  @media (width >= 1200px) {
+    grid-template-columns: var(--sidebar) minmax(0, 1fr) var(--outline);
+  }
+
+  // The docs home has no outline, so it takes the outline's column too.
+  &:has(.doc--home) {
+    @media (width >= 1200px) {
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+    }
+  }
+}

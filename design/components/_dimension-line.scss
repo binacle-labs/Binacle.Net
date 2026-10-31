@@ -1,0 +1,78 @@
+// A measurement: a line with an end tick each side and the number in the gap. Only ever around a true number.
+
+.dimension-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--muted);
+  }
+
+  &--small {
+    font-size: 9px;
+  }
+
+  // The display above would show it otherwise.
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dimension-line .dimension-line__tick {
+  width: 1px;
+  height: 13px;
+  background: var(--ink);
+  flex: none;
+}
+
+.dimension-line .dimension-line__number {
+  flex: none;
+  order: 0;
+}
+
+.dimension-line--small .dimension-line__tick {
+  height: 9px;
+}
+
+// On the 3D view's strip it takes the view's own ground colours.
+.pack-view__strip .dimension-line {
+  flex: 1 1 160px;
+  max-width: 260px;
+  color: var(--ground-muted);
+
+  &::before,
+  &::after {
+    background: var(--ground-muted);
+  }
+}
+
+.pack-view__strip .dimension-line .dimension-line__tick {
+  background: var(--ground-ink);
+}
+
+// In a bit diagram it sits on the cell's top rule.
+.bit-diagram__field .dimension-line {
+  margin: 0 calc(var(--pad) * -1) 4px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+
+  // A short line stays each side, so two cells' ticks never touch.
+  &::before,
+  &::after {
+    min-width: 8px;
+  }
+}
+
+.bit-diagram__field .dimension-line .dimension-line__number {
+  white-space: nowrap;
+}

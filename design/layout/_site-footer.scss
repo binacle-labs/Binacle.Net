@@ -2,4 +2,55 @@
 
 .site-footer {
   @include grounds.deep;
+  border-top: 1px solid var(--rule);
+
+  // A ground change is already an edge.
+  &.site-footer--no-edge {
+    border-top-color: transparent;
+  }
+
+  p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  // A line that has to wrap splits evenly, so no name sits alone.
+  p > * {
+    text-wrap: balance;
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.site-footer .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--step) calc(var(--step) * 2);
+  padding-top: calc(var(--step) * 2);
+  padding-bottom: calc(var(--step) * 2);
+}
+
+// GitHub and Docker Hub come after the other sites, past a short rule.
+.site-footer a:not(.site-footer__link--external) + a.site-footer__link--external {
+  position: relative;
+  margin-left: 16px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    width: 1px;
+    height: 10px;
+    margin-top: -5px;
+    background: var(--rule);
+  }
 }

@@ -1,0 +1,35 @@
+// A count with a minus and a plus beside it.
+
+.stepper {
+  display: flex;
+  align-items: center;
+
+  button {
+    width: var(--hit);
+    height: var(--hit);
+    padding: 0;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--rule);
+    }
+
+    &:disabled {
+      color: var(--rule);
+      cursor: default;
+    }
+  }
+
+  output {
+    min-width: 3ch;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: var(--size-ui);
+    font-variant-numeric: tabular-nums;
+  }
+}

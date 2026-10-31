@@ -1,0 +1,150 @@
+// The docs menu. Beside the page from 1000, where the text beside it still holds a full line of prose; below
+// that it is a drawer.
+@use "../abstracts/tiers";
+@use "../abstracts/overlays";
+
+.sidebar {
+  @media (width >= 1000px) {
+    border-right: 1px solid var(--rule);
+  }
+
+  @media (width < 1000px) {
+    @include overlays.drawer;
+
+    &.is-open {
+      @include overlays.drawer-open;
+    }
+  }
+
+  // The open rule weighs more, so it is named too.
+  &,
+  &.is-open {
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}
+
+.sidebar__inner {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  padding: 0 16px calc(var(--step) * 2);
+
+  @media (width >= 1000px) {
+    position: sticky;
+    top: 0;
+    max-height: calc(100vh - var(--below, 0px));
+    overflow-y: auto;
+    padding: calc(var(--step) * 2) 20px calc(var(--step) * 2) var(--gutter);
+  }
+
+  // Below 1200 the header stays at the top, so the sidebar sticks below it.
+  @media (1000px <= width < 1200px) {
+    top: 61px;
+    max-height: calc(100vh - 61px);
+  }
+}
+
+.sidebar__nav,
+.sidebar__nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar__nav {
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+    margin-left: -12px;
+    padding: 4px 10px;
+    border-left: 2px solid transparent;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--ink);
+    }
+
+    // The one orange event on a docs page: where you are.
+    &[aria-current="page"] {
+      border-left-color: var(--accent);
+      background: var(--panel);
+      color: var(--ink);
+      font-weight: 600;
+    }
+  }
+
+  // Each level opens under a thin guide line in line with its parent, like a bracket. The current page's
+  // mark hangs left of it, or covers the line.
+  ul ul {
+    margin-left: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  ul ul ul {
+    margin-left: 18px;
+  }
+
+  ul ul a {
+    margin-left: -1px;
+    padding-left: 17px;
+  }
+
+  ul a {
+    min-height: 30px;
+    font-size: 13px;
+  }
+
+  a,
+  ul a {
+    @media (width < tiers.$desktop) {
+      min-height: var(--hit);
+    }
+  }
+
+  // A group: its own page, and a marker that opens the pages under it.
+  details > summary {
+    display: flex;
+    align-items: stretch;
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    > a {
+      flex: 1;
+    }
+
+    &::after {
+      content: "+";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      font-family: var(--font-mono);
+      font-size: var(--size-label);
+      color: var(--muted);
+    }
+  }
+
+  details[open] > summary::after {
+    content: "-";
+  }
+}
+
+.sidebar__nav .sidebar__icon {
+  flex: none;
+  width: 1.6em;
+  font-size: 13px;
+}

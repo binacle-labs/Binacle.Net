@@ -1,4 +1,5 @@
 // Type styles: classes that go on any element. They are not blocks.
+@use "../abstracts/tiers";
 
 .label {
   font-family: var(--font-mono);
@@ -46,4 +47,38 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+// The page's first display slot, in the hero.
+.display-1 {
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  max-width: 14ch;
+
+  @media (width >= tiers.$desktop) {
+    font-size: clamp(40px, calc(8vw - 20px), var(--size-display-1));
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+}
+
+// The second: one sentence at display size, on the deep ground.
+.display-2 {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+
+  @media (width >= tiers.$desktop) {
+    font-size: var(--size-display-2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  // Each sentence on its own line, wrapped into even lines.
+  > span {
+    display: block;
+    text-wrap: balance;
+  }
 }

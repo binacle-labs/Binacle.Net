@@ -1,0 +1,35 @@
+// The previous and next page.
+@use "../abstracts/lines";
+
+.pager {
+  @include lines.strong;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: calc(var(--step) * 4);
+  padding-top: var(--step);
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--step) 0;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover span:last-child {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    &[rel="next"] {
+      grid-column: 2;
+      text-align: right;
+    }
+  }
+
+  // Next alone, on the first page: the line sits over it.
+  &:not(:has([rel="prev"])) {
+    background-position: top right;
+  }
+}

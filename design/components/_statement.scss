@@ -1,0 +1,17 @@
+// A band that holds one sentence at display size, on the deep ground.
+@use "../abstracts/tiers";
+
+.band.statement .container {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+
+  // The sentence starts where the body of a band with a label column does.
+  @media (width >= tiers.$desktop) {
+    padding-left: calc(var(--gutter) + var(--label-col) + var(--col-gap));
+  }
+}
+
+.band.statement p:not(.display-2) {
+  font-size: var(--size-prose);
+}

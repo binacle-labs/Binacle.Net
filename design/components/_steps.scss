@@ -1,0 +1,52 @@
+// Steps, numbered down a docs page.
+
+.steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: doc-step;
+
+  > li {
+    counter-increment: doc-step;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--step) * 0.75);
+    margin: 0;
+    padding: var(--step) 0 calc(var(--step) * 1.5) 44px;
+    border-top: 1px solid var(--rule);
+
+    &::before {
+      content: counter(doc-step, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: calc(var(--step) + 6px);
+      font-family: var(--font-mono);
+      font-size: var(--size-label);
+      line-height: 1;
+      color: var(--muted);
+    }
+
+    > * {
+      min-width: 0;
+    }
+
+    > p {
+      max-width: var(--measure-prose);
+    }
+  }
+
+  // A list inside a step is a first-level list: filled dots, not the browser's hollow ones for a nested list.
+  ul {
+    list-style-type: disc;
+  }
+
+  h4 {
+    font-size: var(--size-h3);
+    font-weight: 600;
+  }
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc__body > .steps {
+  max-width: none;
+}

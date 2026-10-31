@@ -1,0 +1,37 @@
+// Text tabs: the current one in ink, on the rule.
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  [role="tabpanel"] {
+    padding-top: var(--step);
+  }
+}
+
+.tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  border-bottom: 1px solid var(--rule);
+
+  // An ink line over the rule, not a text underline, which is how a link looks.
+  button {
+    min-height: var(--hit);
+    margin-bottom: -1px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--size-ui);
+    cursor: pointer;
+
+    &[aria-selected="true"] {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+  }
+}

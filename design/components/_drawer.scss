@@ -1,0 +1,153 @@
+// The menu drawer from the left. On www and demo the burger opens it below 800, with the header's links. On
+// docs the sidebar is the drawer below 1000, and below 800 it holds the site links too.
+@use "../abstracts/tiers";
+@use "../abstracts/overlays";
+
+.drawer {
+  display: none;
+
+  @media (width < 1000px) {
+    @include overlays.drawer;
+
+    &.is-open {
+      @include overlays.drawer-open;
+    }
+  }
+
+  // The open rule weighs more, so it is named too.
+  &,
+  &.is-open {
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}
+
+// The page stays put while a drawer is open.
+:root:has([data-drawer].is-open) {
+  @media (width < 1000px) {
+    overflow: hidden;
+  }
+}
+
+.drawer__head {
+  @include overlays.head;
+}
+
+// The head shows only while the drawer is one.
+.drawer .drawer__head,
+.sidebar .drawer__head {
+  display: none;
+
+  @media (width < 1000px) {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--hit);
+    margin: 0 -16px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+}
+
+.drawer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  padding: 0 16px calc(var(--step) * 2);
+}
+
+.drawer__pages {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--size-ui);
+
+  a {
+    display: flex;
+    align-items: center;
+    min-height: var(--hit);
+    margin-left: -16px;
+    padding: 0 14px;
+    border-left: 2px solid transparent;
+    color: var(--ink);
+    text-decoration: none;
+
+    &[aria-current="page"] {
+      border-left-color: var(--accent);
+      background: var(--panel);
+      font-weight: 600;
+    }
+  }
+}
+
+// The site links, below 800 where they leave the header.
+.drawer__sites {
+  display: none;
+
+  @media (width < tiers.$desktop) {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--step);
+    border-top: 1px solid var(--rule);
+    font-size: var(--size-ui);
+  }
+
+  a {
+    @media (width < tiers.$desktop) {
+      display: flex;
+      align-items: center;
+      min-height: var(--hit);
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    &:hover {
+      @media (width < tiers.$desktop) {
+        color: var(--ink);
+      }
+    }
+  }
+}
+
+.drawer__close {
+  @media (width < 1000px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--hit);
+    height: var(--hit);
+    margin-right: -13px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+}
+
+.drawer__close-icon {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    width: 22px;
+    height: 1px;
+    background: currentColor;
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}

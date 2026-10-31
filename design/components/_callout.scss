@@ -1,0 +1,104 @@
+// A note set apart: a 2px left edge and a coloured label; the body stays ink. Note and tip are info, warning
+// and caution are warn, critical is the error colour.
+@use "../abstracts/tiers";
+
+.callout {
+  display: grid;
+  gap: 4px 16px;
+  max-width: var(--measure-prose);
+  padding: var(--step) 16px;
+  border: 0;
+  border-left: 2px solid var(--info);
+  font-size: var(--size-ui);
+  line-height: 1.55;
+
+  @media (width >= tiers.$tablet) {
+    grid-template-columns: 13ch minmax(0, 1fr);
+  }
+
+  > .label {
+    color: var(--info);
+
+    @media (width >= tiers.$tablet) {
+      align-self: baseline;
+      white-space: nowrap;
+    }
+  }
+
+  > :not(.label) {
+    @media (width >= tiers.$tablet) {
+      grid-column: 2;
+      min-width: 0;
+      align-self: baseline;
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: calc(var(--step) / 2);
+  }
+
+  &--note {
+    color: var(--muted);
+  }
+
+  &.callout--warning,
+  &.callout--caution {
+    border-left-color: var(--warn);
+
+    > .label {
+      color: var(--warn);
+    }
+  }
+
+  &.callout--critical {
+    border-left-color: var(--error);
+
+    > .label {
+      color: var(--error);
+    }
+  }
+}
+
+// The old-version notice is a warning box but only a notice, so it is info. It sits above everything else on
+// the page.
+.doc > .callout {
+  margin-bottom: calc(var(--step) * 2);
+
+  &.callout--warning {
+    border-left-color: var(--info);
+
+    > .label {
+      color: var(--info);
+    }
+  }
+}
+
+// On a docs page it runs to the column's edge, as code and tables do.
+.doc .callout {
+  max-width: none;
+}
+
+// No critical box exists in the docs yet. These real-danger warnings stand in for one; drop this block when the
+// docs mark them critical.
+$-critical-pages: (
+  "samples/docker/full",
+  "configuration/core",
+  "configuration/core/forwarded-headers",
+  "configuration/diagnostics-module/health-checks",
+  "api/v3"
+);
+
+@each $page in $-critical-pages {
+  body[data-page="#{$page}"] .callout.callout--warning {
+    border-left-color: var(--error);
+
+    > .label {
+      color: var(--error);
+    }
+  }
+}

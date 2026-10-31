@@ -1,0 +1,36 @@
+// A part that folds away, such as a long response. The verdict under it says what it holds.
+
+.disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) / 2);
+  min-width: 0;
+}
+
+details.disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--hit);
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::before {
+    content: "+";
+    width: 1.2em;
+    text-align: center;
+    border: 1px solid var(--rule);
+  }
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+details.disclosure[open] > summary::before {
+  content: "-";
+}

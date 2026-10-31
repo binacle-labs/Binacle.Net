@@ -1,0 +1,22 @@
+// A picture of the 3D view, one per theme, that opens larger on click. A home page shows a picture, not a live
+// view: a visitor may not know the view turns.
+
+.still {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--ground);
+  cursor: zoom-in;
+
+  &:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}

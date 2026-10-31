@@ -1,0 +1,48 @@
+// A panel that slides over the page from the right. No shadow: the ink edge and the dimmed page do the work.
+@use "../abstracts/tiers";
+@use "../abstracts/overlays";
+
+.panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  // A phone keeps a strip of page beside the panel, to tap.
+  width: min(480px, calc(100% - var(--hit)));
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+
+  // The head stays put; only the body scrolls.
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+}
+
+.panel__head {
+  @include overlays.head;
+}
+
+.panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  padding: var(--step) 16px calc(var(--step) * 2);
+  overflow-y: auto;
+  font-size: var(--size-ui);
+
+  @media (width >= tiers.$tablet) {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+}

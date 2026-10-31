@@ -1,0 +1,5 @@
+// The strong line: an ink rule over the first half of a block at most, never its whole width.
+// It marks the top of a table, a row of columns or a list of links.
+@mixin strong {
+  background: linear-gradient(var(--ink), var(--ink)) top left / min(50%, var(--measure-prose)) 1px no-repeat;
+}

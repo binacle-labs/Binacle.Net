@@ -144,3 +144,8 @@ ul {
 li + li {
   margin-top: calc(var(--step) / 2);
 }
+
+// A block right under a heading drops its strong line, so the heading does not look underlined.
+:is(h2, h3, h4) + :is(.table, .columns, .doors, ol, ul) {
+  background-image: none;
+}

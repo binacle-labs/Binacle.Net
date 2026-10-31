@@ -1,0 +1,43 @@
+// The kinds of item, each with its colour key, its name and size, and how many go in.
+
+.kind-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  > li {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--rule);
+
+    // The form's own rule closes the list.
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+// The size sits beside the name, so a row is one hit tall. It drops under the name only when there is no room.
+.kind-list__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  min-width: 0;
+  font-size: var(--size-ui);
+
+  // Below 1000 every size goes under its name, so the rows match.
+  @media (width < 1000px) {
+    flex-direction: column;
+    padding: 4px 0;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+}
