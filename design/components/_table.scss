@@ -121,43 +121,43 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+}
 
-  // Short values: below 640 each label sits on the same line as its value.
-  &.table--pairs {
-    @media (width < tiers.$tablet) {
-      tr {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        column-gap: 24px;
-      }
+// Short values: below 640 each label sits on the same line as its value.
+.table--pairs {
+  @media (width < tiers.$tablet) {
+    tr {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      column-gap: 24px;
+    }
 
-      th {
-        width: 14ch;
-        padding: 4px 0;
-      }
+    th {
+      width: 14ch;
+      padding: 4px 0;
+    }
 
-      tr:has(td[data-label]) th {
-        flex-basis: 100%;
-      }
+    tr:has(td[data-label]) th {
+      flex-basis: 100%;
+    }
 
-      td::before {
-        display: inline;
-        margin-right: 1ch;
-      }
+    td::before {
+      display: inline;
+      margin-right: 1ch;
+    }
 
-      // The same width on every row, so the next label starts in one place down the table.
-      td[data-label]:not(:last-child) {
-        min-width: 12ch;
-      }
+    // The same width on every row, so the next label starts in one place down the table.
+    td[data-label]:not(:last-child) {
+      min-width: 12ch;
     }
   }
+}
 
-  // Values and what they mean, read one after another: the meaning starts at one place in all.
-  &.table--keyed th:first-child {
-    @media (width >= tiers.$tablet) {
-      width: 52%;
-    }
+// Values and what they mean, read one after another: the meaning starts at one place in all.
+.table--keyed th:first-child {
+  @media (width >= tiers.$tablet) {
+    width: 52%;
   }
 }
 

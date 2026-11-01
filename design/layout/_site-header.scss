@@ -7,7 +7,7 @@
   border-bottom: 1px solid var(--rule);
 
   &:has(.site-header__where) {
-    @media (width < 1200px) {
+    @media (width < tiers.$widest) {
       position: sticky;
       top: 0;
       z-index: 40;
@@ -61,7 +61,7 @@
 }
 
 .site-header:has(.site-header__where) .container {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     flex-wrap: nowrap;
     column-gap: 12px;
   }
@@ -101,14 +101,14 @@
 }
 
 .site-header:has(.site-header__where) .site-header__wordmark {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     white-space: nowrap;
   }
 }
 
 // Past the page title the page's name takes the wordmark's place.
 .site-header.site-header--past .site-header__wordmark {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     display: none;
   }
 }
@@ -223,7 +223,7 @@
 }
 
 .site-header:has(.site-header__where) .site-header__burger {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     display: flex;
   }
 }
@@ -260,7 +260,7 @@
 .site-header__where {
   display: none;
 
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     flex: 1 1 auto;
     align-items: center;
     gap: 12px;
@@ -278,21 +278,21 @@
   }
 
   // From 1000 the menu is the sidebar, so the name opens nothing.
-  @media (1000px <= width < 1200px) {
+  @media (tiers.$wide <= width < tiers.$widest) {
     cursor: default;
     pointer-events: none;
   }
 }
 
 .site-header.site-header--past .site-header__where {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     display: flex;
   }
 }
 
 .site-header__where [data-where],
 .site-header__section {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -301,32 +301,32 @@
 }
 
 .site-header__where [data-where] {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     flex: 0 1 auto;
   }
 }
 
 // With a section showing, the page steps back and the section takes the rest of the line.
 .site-header__where:has(.site-header__section:not(:empty)) [data-where] {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     flex: 0 3 auto;
     color: var(--muted);
   }
 }
 
 .site-header__section {
-  @media (width < 1200px) {
+  @media (width < tiers.$widest) {
     flex: 0 1 auto;
   }
 
   &:empty {
-    @media (width < 1200px) {
+    @media (width < tiers.$widest) {
       display: none;
     }
   }
 
   &::before {
-    @media (width < 1200px) {
+    @media (width < tiers.$widest) {
       content: "/";
       margin-right: 12px;
       color: var(--muted);

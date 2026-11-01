@@ -1,4 +1,7 @@
-// Where mobile becomes tablet, and tablet becomes desktop.
+// The tier boundaries.
 // Sass variables, because a media query cannot read a custom property.
 $tablet: 640px;
 $desktop: 800px;
+$wide: 1000px;
+$wider: 1100px;
+$widest: 1200px;

@@ -41,40 +41,40 @@
   p + p {
     margin-top: calc(var(--step) / 2);
   }
+}
 
-  &--note {
-    color: var(--muted);
+.callout--warning,
+.callout--caution {
+  border-left-color: var(--warn);
+
+  > .label {
+    color: var(--warn);
   }
+}
 
-  &.callout--warning,
-  &.callout--caution {
-    border-left-color: var(--warn);
+.callout--critical {
+  border-left-color: var(--error);
 
-    > .label {
-      color: var(--warn);
-    }
+  > .label {
+    color: var(--error);
   }
+}
 
-  &.callout--critical {
-    border-left-color: var(--error);
-
-    > .label {
-      color: var(--error);
-    }
-  }
+.callout--note {
+  color: var(--muted);
 }
 
 // The old-version notice is a warning box but only a notice, so it is info. It sits above everything else on
 // the page.
 .doc > .callout {
   margin-bottom: calc(var(--step) * 2);
+}
 
-  &.callout--warning {
-    border-left-color: var(--info);
+.doc > .callout--warning {
+  border-left-color: var(--info);
 
-    > .label {
-      color: var(--info);
-    }
+  > .label {
+    color: var(--info);
   }
 }
 
@@ -94,7 +94,7 @@ $-critical-pages: (
 );
 
 @each $page in $-critical-pages {
-  body[data-page="#{$page}"] .callout.callout--warning {
+  body[data-page="#{$page}"] .callout--warning {
     border-left-color: var(--error);
 
     > .label {

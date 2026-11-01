@@ -362,7 +362,7 @@
 .drawing__outline {
   display: none;
 
-  @media (width >= 1200px) {
+  @media (width >= tiers.$widest) {
     display: block;
   }
 }

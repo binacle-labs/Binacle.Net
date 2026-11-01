@@ -10,10 +10,10 @@
     column-gap: var(--col-gap);
     align-items: center;
   }
+}
 
-  &.hero__grid--picture-first {
-    row-gap: calc(var(--step) * 1.5);
-  }
+.hero__grid--picture-first {
+  row-gap: calc(var(--step) * 1.5);
 }
 
 .hero__copy {

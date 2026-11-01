@@ -17,12 +17,12 @@
       font-size: clamp(36px, calc(6vw - 12px), var(--size-display-2));
     }
   }
+}
 
-  // A tool beside its text, on a home page.
-  &.split--tool {
-    @media (width >= tiers.$desktop) {
-      align-items: center;
-    }
+// A tool beside its text, on a home page.
+.split--tool {
+  @media (width >= tiers.$desktop) {
+    align-items: center;
   }
 }
 

@@ -43,15 +43,15 @@
       text-align: right;
     }
   }
+}
 
-  // A preset is a button, not a link.
-  &--preset {
-    font: inherit;
-    color: inherit;
-    text-align: left;
-    background: none;
-    cursor: pointer;
-  }
+// A preset is a button, not a link.
+.box-card--preset {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  cursor: pointer;
 }
 
 // The box as an open carton. All share one scale and one floor, so they differ only in height.

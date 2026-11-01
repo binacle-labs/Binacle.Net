@@ -29,34 +29,34 @@
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
+}
 
-  // Each link carries a small copy of its page's drawing, beside the words.
-  &.doors--pictured a {
-    display: grid;
-    grid-template-columns: 11rem minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    column-gap: var(--col-gap);
-    row-gap: 4px;
-    align-items: start;
+// Each link carries a small copy of its page's drawing, beside the words.
+.doors--pictured a {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: var(--col-gap);
+  row-gap: 4px;
+  align-items: start;
 
-    @media (width < tiers.$tablet) {
-      grid-template-columns: 6rem minmax(0, 1fr);
-    }
+  @media (width < tiers.$tablet) {
+    grid-template-columns: 6rem minmax(0, 1fr);
   }
+}
 
-  // Side by side from 800, each with its own short line.
-  &.doors--row {
-    display: grid;
-    gap: 0 var(--col-gap);
-    background-image: none;
-  }
+// Side by side from 800, each with its own short line.
+.doors--row {
+  display: grid;
+  gap: 0 var(--col-gap);
+  background-image: none;
+}
 
-  // Two columns from 640, three from 800, each with its own short line.
-  &.doors--grid {
-    display: grid;
-    gap: 0 var(--col-gap);
-    background-image: none;
-  }
+// Two columns from 640, three from 800, each with its own short line.
+.doors--grid {
+  display: grid;
+  gap: 0 var(--col-gap);
+  background-image: none;
 }
 
 .doors__picture {

@@ -85,6 +85,14 @@ theme: binacle-components
 
 Inside the include, `{{ include.lang }}` reads what was passed.
 
+**Classes on markdown output - perhaps a Liquid filter.** Kramdown writes bare tags, so the CSS styles
+`.doc__body > h2` and `.doc__body .table` where BEM wants a class on each. A filter in the layout,
+`{{ content | doc_classes }}`, could parse the rendered HTML with Nokogiri and add them. Its list of which tag
+gets which class has to match the Sass, so it could live in this package beside it. The maintainer, 2026-11-01:
+*"make a note in the shared plan to perhaps add jekyll filters and ts and sharefd html"*. A theme gem cannot
+hold plugins itself; Jekyll's docs say it loads plugin gems the theme names as runtime dependencies, so the
+filter would be a gem of its own - `ruby/jekyll-filters` already holds three.
+
 **Markup in the UI module - written again.** It is Razor and cannot read Liquid. Its parts are Razor partials,
 or later a Razor Class Library. The screenshot compare against the mockup keeps them in step with the Liquid
 ones.
@@ -105,6 +113,8 @@ ones.
 - The `pkg:` importer and the `exports` conditions may not resolve the way the docs say through npm
   workspace links.
 - A Jekyll theme gem from a local path may not find its includes, or may clash with `jekyll-include-cache`.
+- A plugin gem named by the theme may not load from a local path, and `jekyll-tidy` rewrites the same output as
+  the filter, so their order matters.
 - Webpack may not drop unused init functions unless the package is ES modules and has no side effects.
 
 ## Trying it

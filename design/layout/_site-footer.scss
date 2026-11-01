@@ -4,11 +4,6 @@
   @include grounds.deep;
   border-top: 1px solid var(--rule);
 
-  // A ground change is already an edge.
-  &.site-footer--no-edge {
-    border-top-color: transparent;
-  }
-
   p {
     display: flex;
     flex-wrap: wrap;
@@ -27,6 +22,11 @@
       text-decoration: underline;
     }
   }
+}
+
+// A ground change is already an edge.
+.site-footer--no-edge {
+  border-top-color: transparent;
 }
 
 .site-footer .container {

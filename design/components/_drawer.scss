@@ -6,7 +6,7 @@
 .drawer {
   display: none;
 
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     @include overlays.drawer;
 
     &.is-open {
@@ -25,7 +25,7 @@
 
 // The page stays put while a drawer is open.
 :root:has([data-drawer].is-open) {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     overflow: hidden;
   }
 }
@@ -39,7 +39,7 @@
 .sidebar .drawer__head {
   display: none;
 
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     position: sticky;
     top: 0;
     z-index: 1;
@@ -114,7 +114,7 @@
 }
 
 .drawer__close {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     display: flex;
     align-items: center;
     justify-content: center;

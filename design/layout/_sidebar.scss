@@ -4,11 +4,11 @@
 @use "../abstracts/overlays";
 
 .sidebar {
-  @media (width >= 1000px) {
+  @media (width >= tiers.$wide) {
     border-right: 1px solid var(--rule);
   }
 
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     @include overlays.drawer;
 
     &.is-open {
@@ -31,7 +31,7 @@
   gap: calc(var(--step) * 1.5);
   padding: 0 16px calc(var(--step) * 2);
 
-  @media (width >= 1000px) {
+  @media (width >= tiers.$wide) {
     position: sticky;
     top: 0;
     max-height: calc(100vh - var(--below, 0px));
@@ -40,7 +40,7 @@
   }
 
   // Below 1200 the header stays at the top, so the sidebar sticks below it.
-  @media (1000px <= width < 1200px) {
+  @media (tiers.$wide <= width < tiers.$widest) {
     top: 61px;
     max-height: calc(100vh - 61px);
   }

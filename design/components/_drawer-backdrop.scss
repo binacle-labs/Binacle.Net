@@ -1,9 +1,10 @@
 // The dimmed page behind an open drawer. A tap on it closes the drawer.
+@use "../abstracts/tiers";
 
 .drawer-backdrop {
   display: none;
 
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     display: block;
     position: fixed;
     inset: 0;
@@ -20,7 +21,7 @@
 }
 
 [data-drawer].is-open + .drawer-backdrop {
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     opacity: 1;
     pointer-events: auto;
   }

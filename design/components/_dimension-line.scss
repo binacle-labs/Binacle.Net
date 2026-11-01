@@ -18,14 +18,14 @@
     background: var(--muted);
   }
 
-  &--small {
-    font-size: 9px;
-  }
-
   // The display above would show it otherwise.
   &[hidden] {
     display: none;
   }
+}
+
+.dimension-line--small {
+  font-size: 9px;
 }
 
 .dimension-line .dimension-line__tick {

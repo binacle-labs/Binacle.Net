@@ -1,9 +1,10 @@
 // The outline of a docs page, from its own headings. It shows from 1200, in the page's third column.
+@use "../abstracts/tiers";
 
 .outline {
   display: none;
 
-  @media (width >= 1200px) {
+  @media (width >= tiers.$widest) {
     display: block;
   }
 
@@ -48,13 +49,13 @@
 }
 
 .docs-layout--outline .outline {
-  @media (width >= 1200px) {
+  @media (width >= tiers.$widest) {
     border-left: 1px solid var(--rule);
   }
 }
 
 .docs-layout:has(.doc--home) > .outline {
-  @media (width >= 1200px) {
+  @media (width >= tiers.$widest) {
     display: none;
   }
 }

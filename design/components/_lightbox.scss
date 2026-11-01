@@ -21,11 +21,11 @@
     object-fit: contain;
     cursor: zoom-out;
   }
+}
 
-  // A preset's boxes, each on its own scale.
-  &--preset {
-    width: min(96vw, 640px);
-  }
+// A preset's boxes, each on its own scale.
+.lightbox--preset {
+  width: min(96vw, 640px);
 }
 
 // The page stays put while a picture is open.

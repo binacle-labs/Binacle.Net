@@ -5,7 +5,7 @@
 .section-box {
   display: none;
 
-  @media (tiers.$desktop <= width < 1200px) {
+  @media (tiers.$desktop <= width < tiers.$widest) {
     display: block;
     position: fixed;
     z-index: 45;

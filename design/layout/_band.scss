@@ -16,39 +16,39 @@ main {
   &:first-child {
     border-top: 0;
   }
+}
 
-  &--deep {
-    @include grounds.deep;
-  }
+// A change of ground is already an edge, so it needs no line.
+.band--deep,
+.band--deep + .band {
+  border-top-color: transparent;
+}
 
-  // A change of ground is already an edge, so it needs no line.
-  &.band--deep,
-  &.band--deep + .band {
-    border-top-color: transparent;
-  }
+.band--tint {
+  --rule: var(--tint-rule);
+  background: var(--tint);
+}
 
-  &.band--tint {
-    --rule: var(--tint-rule);
-    background: var(--tint);
-  }
+.band--no-edge {
+  border-top-color: transparent;
+}
 
-  &.band--no-edge {
-    border-top-color: transparent;
-  }
+.band--numbered {
+  counter-increment: step;
+}
 
-  &.band--numbered {
-    counter-increment: step;
-  }
+// One short line, less padding.
+.band--compact {
+  padding: calc(var(--step) * 2) 0;
+}
 
-  // One short line, less padding.
-  &.band--compact {
-    padding: calc(var(--step) * 2) 0;
-  }
+// The instance readout, a thin band under the hero.
+.band--status {
+  padding: calc(var(--step) * 1.5) 0;
+}
 
-  // The instance readout, a thin band under the hero.
-  &.band--status {
-    padding: calc(var(--step) * 1.5) 0;
-  }
+.band--deep {
+  @include grounds.deep;
 }
 
 .band__grid {
@@ -80,8 +80,8 @@ main {
 
 // The band's number sits over its label. In a mirrored band the label is inside the text column, so it moves
 // with the text.
-.band.band--numbered .band__label .label,
-.band.band--numbered .split > .prose > .label:first-child {
+.band--numbered .band__label .label,
+.band--numbered .split > .prose > .label:first-child {
   color: var(--ink);
 
   &::before {
@@ -97,7 +97,7 @@ main {
 }
 
 // number-in-column: the number in a label column, whatever the band's shape.
-.band.band--numbered.band--number-in-column .band__grid {
+.band--numbered.band--number-in-column .band__grid {
   @media (width >= tiers.$desktop) {
     grid-template-columns: var(--label-col) minmax(0, 1fr);
     column-gap: var(--col-gap);
@@ -105,11 +105,11 @@ main {
 }
 
 // number-in-row: the number before the heading, on its row; the label keeps its own row.
-.band.band--numbered.band--number-in-row .band__label .label::before {
+.band--numbered.band--number-in-row .band__label .label::before {
   display: none;
 }
 
-.band.band--numbered.band--number-in-row :is(.band__body > h2:first-child, .band__body > .prose:first-child > h2:first-child)::before {
+.band--numbered.band--number-in-row :is(.band__body > h2:first-child, .band__body > .prose:first-child > h2:first-child)::before {
   content: counter(step, decimal-leading-zero);
   margin-right: 0.4em;
   font-family: var(--font-mono);
@@ -195,15 +195,16 @@ main {
     }
 
     // A single short line beside a wide heading reads as a fragment, so it goes under the heading.
-    .band__body > .prose.prose--one-line:first-child {
+    .band__body > .prose--one-line:first-child {
       display: flex;
     }
 
-    .band__body > .prose.prose--one-line:first-child > p {
+    .band__body > .prose--one-line:first-child > p {
       margin-top: calc(var(--step) / 2);
     }
 
     // code-left: a short code block under the left column of text, beside the list on the right.
+    // Written with the block, so these beat the plain text rules above.
     .band__body.band__body--code-left {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));

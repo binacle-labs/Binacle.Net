@@ -1,5 +1,6 @@
 // A block of code, with an optional head: what it is on the left, Copy on the right.
 // The script puts each line in its own __line and marks its parts.
+@use "../abstracts/tiers";
 
 .code-block {
   position: relative;
@@ -16,15 +17,15 @@
 
   // Below 1100 a long line wraps instead, so the block clips nothing.
   &:has(.code-block__line) {
-    @media (width < 1100px) {
+    @media (width < tiers.$wider) {
       overflow-x: hidden;
     }
   }
+}
 
-  &.code-block__pre--wrap {
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
+.code-block__pre--wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 // A wrapped line hangs under the start of its own line, so no number is hidden past the edge.
@@ -32,7 +33,7 @@
   display: block;
   padding-left: var(--indent, 0);
 
-  @media (width < 1100px) {
+  @media (width < tiers.$wider) {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     padding-left: calc(var(--indent, 0ch) + 2ch);
@@ -45,7 +46,7 @@
 }
 
 // A block that always wraps hangs its wrapped part at every width.
-.code-block__pre.code-block__pre--wrap .code-block__line {
+.code-block__pre--wrap .code-block__line {
   padding-left: calc(var(--indent, 0ch) + 2ch);
   text-indent: -2ch;
 }

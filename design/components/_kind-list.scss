@@ -1,4 +1,5 @@
 // The kinds of item, each with its colour key, its name and size, and how many go in.
+@use "../abstracts/tiers";
 
 .kind-list {
   list-style: none;
@@ -29,7 +30,7 @@
   font-size: var(--size-ui);
 
   // Below 1000 every size goes under its name, so the rows match.
-  @media (width < 1000px) {
+  @media (width < tiers.$wide) {
     flex-direction: column;
     padding: 4px 0;
   }

@@ -16,39 +16,39 @@
   text-decoration: none;
   cursor: pointer;
 
-  &--primary {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: var(--on-accent);
-    font-weight: 600;
-  }
-
   @media (width >= tiers.$tablet) {
     min-height: var(--hit);
-  }
-
-  // A button that reads as a link: no box.
-  &--link {
-    min-height: var(--hit);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-text);
-    font-size: var(--size-ui);
-    font-weight: 400;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-    cursor: pointer;
-
-    &:hover {
-      color: var(--ink);
-    }
   }
 
   &:disabled {
     opacity: 0.55;
     cursor: progress;
+  }
+}
+
+.button--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+// A button that reads as a link: no box.
+.button--link {
+  min-height: var(--hit);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-text);
+  font-size: var(--size-ui);
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ink);
   }
 }

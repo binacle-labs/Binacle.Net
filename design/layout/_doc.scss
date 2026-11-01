@@ -13,11 +13,11 @@
 
   // Below 1000 the page keeps the width it has beside the menu at 1000, so text and blocks end where they do
   // there and the empty space sits once, past the page.
-  @media (width < 1000px) {
-    max-width: calc(1000px - var(--sidebar) - 80px + 2 * var(--gutter));
+  @media (width < tiers.$wide) {
+    max-width: calc(tiers.$wide - var(--sidebar) - 80px + 2 * var(--gutter));
   }
 
-  @media (width >= 1000px) {
+  @media (width >= tiers.$wide) {
     padding: calc(var(--step) * 3) 40px calc(var(--step) * 5);
   }
 
@@ -36,7 +36,7 @@
 
   // Any link target clears the header that stays at the top below 1200.
   [id] {
-    @media (width < 1200px) {
+    @media (width < tiers.$widest) {
       scroll-margin-top: calc(var(--hit) + var(--step) * 2);
     }
   }
@@ -144,7 +144,7 @@
   }
 
   // The shadow carries the tint past a wide window's page edge; the clip keeps it to the right.
-  @media (width >= 1000px) {
+  @media (width >= tiers.$wide) {
     margin-inline: -40px;
     padding: calc(var(--step) * 2.5) 40px;
     box-shadow: 0 0 0 100vmax var(--tint);
