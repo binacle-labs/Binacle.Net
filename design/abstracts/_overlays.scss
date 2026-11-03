@@ -15,11 +15,6 @@
     padding-left: var(--gutter);
     padding-right: var(--gutter);
   }
-
-  // A panel's text runs a step smaller than the page's.
-  h2 {
-    font-size: 24px;
-  }
 }
 
 // A drawer from the left, closed. It stays in the page, hidden, so it can slide.

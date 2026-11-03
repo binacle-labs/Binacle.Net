@@ -21,25 +21,25 @@
     padding: calc(var(--step) * 3) 40px calc(var(--step) * 5);
   }
 
-  > h1 {
-    font-size: 40px;
-
-    @media (width >= tiers.$desktop) {
-      font-size: 46px;
-    }
-  }
-
-  > h1 .doc__icon {
-    margin-right: 0.3em;
-    font-size: 0.8em;
-  }
-
   // Any link target clears the header that stays at the top below 1200.
   [id] {
     @media (width < tiers.$widest) {
       scroll-margin-top: calc(var(--hit) + var(--step) * 2);
     }
   }
+}
+
+.doc__title {
+  font-size: 40px;
+
+  @media (width >= tiers.$desktop) {
+    font-size: 46px;
+  }
+}
+
+.doc__title .doc__icon {
+  margin-right: 0.3em;
+  font-size: 0.8em;
 }
 
 .doc__meta {

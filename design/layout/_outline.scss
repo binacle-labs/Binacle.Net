@@ -7,34 +7,34 @@
   @media (width >= tiers.$widest) {
     display: block;
   }
+}
 
-  ol {
-    list-style: none;
-    padding: 0;
+.outline__list {
+  list-style: none;
+  padding: 0;
+}
+
+.outline__item {
+  margin: 0;
+}
+
+.outline__link {
+  display: block;
+  padding: 4px 0 4px 10px;
+  overflow-wrap: anywhere;
+  border-left: 1px solid var(--rule);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--ink);
   }
 
-  li {
-    margin: 0;
-  }
-
-  a {
-    display: block;
-    padding: 4px 0 4px 10px;
-    overflow-wrap: anywhere;
-    border-left: 1px solid var(--rule);
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--muted);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--ink);
-    }
-
-    &[aria-current="true"] {
-      border-left-color: var(--ink);
-      color: var(--ink);
-    }
+  &[aria-current="true"] {
+    border-left-color: var(--ink);
+    color: var(--ink);
   }
 }
 

@@ -31,6 +31,11 @@
 
 .panel__head {
   @include overlays.head;
+
+  // A panel's text runs a step smaller than the page's.
+  h2 {
+    font-size: 24px;
+  }
 }
 
 .panel__body {

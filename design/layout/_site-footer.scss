@@ -3,24 +3,24 @@
 .site-footer {
   @include grounds.deep;
   border-top: 1px solid var(--rule);
+}
 
-  p {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 16px;
-  }
+.site-footer__line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
 
   // A line that has to wrap splits evenly, so no name sits alone.
-  p > * {
+  > * {
     text-wrap: balance;
   }
+}
 
-  a {
-    text-decoration: none;
+.site-footer__link {
+  text-decoration: none;
 
-    &:hover {
-      text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
   }
 }
 
@@ -39,7 +39,7 @@
 }
 
 // GitHub and Docker Hub come after the other sites, past a short rule.
-.site-footer a:not(.site-footer__link--external) + a.site-footer__link--external {
+.site-footer__link:not(.site-footer__link--external) + .site-footer__link--external {
   position: relative;
   margin-left: 16px;
 

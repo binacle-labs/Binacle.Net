@@ -92,12 +92,12 @@
   font-size: 17px;
   letter-spacing: -0.025em;
   text-decoration: none;
+}
 
-  img {
-    display: block;
-    width: 24px;
-    height: 24px;
-  }
+.site-header__mark {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
 .site-header:has(.site-header__where) .site-header__wordmark {
@@ -160,34 +160,34 @@
       mask-image: linear-gradient(to right, transparent, #000 40px);
     }
   }
+}
 
-  a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit);
-    text-decoration: none;
+.site-header__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit);
+  text-decoration: none;
 
-    &[aria-current="page"] {
-      text-decoration: underline;
-      text-decoration-color: var(--ink);
-      text-decoration-thickness: 1px;
-      text-underline-offset: 5px;
-    }
+  &[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-color: var(--ink);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+  }
 
-    &:hover {
-      text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
   }
 }
 
 // The other sites come after the site's own, muted. GitHub and Docker Hub come last. A short rule sits
 // before each group.
-.site-header__nav a.site-header__link--other-site {
+.site-header__link--other-site {
   color: var(--muted);
 }
 
-.site-header__nav a:not(.site-header__link--other-site) + a.site-header__link--other-site,
-.site-header__nav a:not(.site-header__link--external) + a.site-header__link--external {
+.site-header__link:not(.site-header__link--other-site) + .site-header__link--other-site,
+.site-header__link:not(.site-header__link--external) + .site-header__link--external {
   position: relative;
   margin-left: var(--nav-gap);
 
