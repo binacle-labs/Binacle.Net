@@ -64,12 +64,13 @@
   }
 }
 
-.lightbox--preset .box-card {
+// A card that shows a box and starts nothing.
+.box-card--static {
   &:hover {
     border-color: var(--rule);
   }
 }
 
-.lightbox--preset .box-card__name::after {
+.box-card--static .box-card__name::after {
   content: none;
 }

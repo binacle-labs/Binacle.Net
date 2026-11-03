@@ -80,7 +80,7 @@
 }
 
 // A docs page shows a row, it does not pick one.
-.doc__body .result-row {
+.result-row--static {
   cursor: default;
 
   &:hover {

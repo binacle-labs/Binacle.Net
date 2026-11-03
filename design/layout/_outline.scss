@@ -48,13 +48,13 @@
   padding: calc(var(--step) * 3) 20px;
 }
 
-.docs-layout--outline .outline {
+.outline--ruled {
   @media (width >= tiers.$widest) {
     border-left: 1px solid var(--rule);
   }
 }
 
-.docs-layout:has(.doc--home) > .outline {
+.outline--hidden {
   @media (width >= tiers.$widest) {
     display: none;
   }

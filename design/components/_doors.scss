@@ -63,19 +63,6 @@
   grid-row: 1 / span 2;
   align-self: center;
   margin: 0;
-
-  .drawing__art {
-    height: 5.5rem;
-
-    @media (width < tiers.$tablet) {
-      height: 4rem;
-    }
-  }
-
-  .drawing__detail,
-  .drawing__door-number {
-    display: none;
-  }
 }
 
 .doors--row {
@@ -106,6 +93,6 @@
 }
 
 // On a docs page it runs to the column's edge, as code and tables do.
-.doc__body > .doors {
+.doors--full {
   max-width: none;
 }

@@ -19,6 +19,15 @@
   width: min(96vw, 640px);
 }
 
+.lightbox__cards {
+  padding: 12px;
+}
+
+.lightbox__still {
+  max-height: calc(92vh - 60px);
+  cursor: zoom-out;
+}
+
 // The page stays put while a picture is open.
 :root:has(.lightbox[open]) {
   overflow: hidden;

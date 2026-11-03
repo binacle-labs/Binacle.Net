@@ -37,6 +37,11 @@
   }
 }
 
+// The page's button, under the title.
+.doc__actions {
+  margin-top: calc(var(--step) * 1.5);
+}
+
 .doc__title .doc__icon {
   margin-right: 0.3em;
   font-size: 0.8em;

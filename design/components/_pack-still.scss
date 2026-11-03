@@ -54,8 +54,3 @@
   fill: none;
   stroke: oklch(from var(--k) calc(l - 0.3) c h);
 }
-
-.lightbox .pack-still {
-  max-height: calc(92vh - 60px);
-  cursor: zoom-out;
-}

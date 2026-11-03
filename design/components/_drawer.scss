@@ -35,8 +35,7 @@
 }
 
 // The head shows only while the drawer is one.
-.drawer .drawer__head,
-.sidebar .drawer__head {
+.drawer__head {
   display: none;
 
   @media (width < tiers.$wide) {

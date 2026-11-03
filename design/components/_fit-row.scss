@@ -118,8 +118,3 @@
     grid-column: 6 / span 2;
   }
 }
-
-// On a docs page it runs to the column's edge, as code and tables do.
-.doc__body .fit-row {
-  max-width: none;
-}

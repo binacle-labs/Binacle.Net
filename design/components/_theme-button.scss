@@ -47,7 +47,7 @@
 }
 
 // With the links in the drawer, the button goes to the right end of the row.
-.site-header:has(.site-header__burger) .theme-button {
+.theme-button--end {
   @media (width < tiers.$desktop) {
     margin-left: auto;
   }

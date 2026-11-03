@@ -85,7 +85,8 @@ another partial loaded it earlier, the build stops with *already loaded, so it c
 
 **`_drawing.scss` still writes its modifiers with the block,** `.drawing.drawing--painted`, and so does
 `.band__body.band__body--code-left`. Their rules win by that extra class; taking it off changes which rule wins.
-`.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later.
+`.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later. So has
+`.result-list.result-list--full`: it has to beat `.doc__body > ul`.
 
 **Load `utilities/` last.** A type style shares its element with a block - `band__body prose` - and both set
 `gap`. Written on purpose, the type style has to win, so it comes after every block.

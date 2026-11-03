@@ -74,7 +74,7 @@
 }
 
 // The docs version picker is smaller than a form's field.
-.sidebar .field__select {
+.field__select--small {
   min-height: 36px;
   font-size: var(--size-label);
   letter-spacing: 0.05em;

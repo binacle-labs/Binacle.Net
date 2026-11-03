@@ -24,8 +24,7 @@
 }
 
 // On a tool page the steps are a short key to the form, so each label sits beside its text.
-.workbench__intro .labelled-list__item,
-.split--tool .labelled-list__item {
+.labelled-list--key .labelled-list__item {
   @media (width >= tiers.$tablet) {
     display: grid;
     grid-template-columns: 16ch minmax(0, 1fr);
@@ -35,18 +34,18 @@
 }
 
 // On a home page the same key sits beside the tool's text, each step on its own line.
-.split--tool .labelled-list {
+.labelled-list--lined {
   @include lines.strong;
   gap: 0;
 }
 
-.split--tool .labelled-list__item {
+.labelled-list--lined .labelled-list__item {
   padding: 12px 0;
   border-bottom: 1px solid var(--rule);
 }
 
 // In a column it is set as small as the text beside it.
-.columns__column .labelled-list__item {
+.labelled-list--small .labelled-list__item {
   font-size: var(--size-ui);
   line-height: 1.5;
 }

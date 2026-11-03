@@ -12,8 +12,3 @@
     align-items: center;
   }
 }
-
-// The page's button, under the docs page title.
-.doc__title + .actions {
-  margin-top: calc(var(--step) * 1.5);
-}

@@ -174,8 +174,3 @@
     transform: translateX(calc(100% / 0.3));
   }
 }
-
-// On a docs page it runs to the column's edge, as code and tables do.
-.doc__body .pack-view {
-  max-width: none;
-}

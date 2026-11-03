@@ -54,9 +54,9 @@
     padding-top: 0;
     border-top: 0;
   }
+}
 
-  // A list whose rows carry their own lines ends on the form's rule, with no gap under the last row.
-  > .form__group:has(> .kind-list) {
-    padding-bottom: 0;
-  }
+// A list whose rows carry their own lines ends on the form's rule, with no gap under the last row.
+.form__group--list {
+  padding-bottom: 0;
 }

@@ -74,7 +74,7 @@
 }
 
 // In its own band, the head sits in the label column beside the cells.
-.band--status .status-readout__head {
+.status-readout__head--column {
   @media (width >= tiers.$desktop) {
     flex-direction: column;
     gap: 6px;

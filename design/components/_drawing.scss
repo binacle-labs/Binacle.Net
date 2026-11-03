@@ -355,3 +355,17 @@
   font-weight: 600;
   dominant-baseline: hanging;
 }
+
+// A card's small copy of a drawing: its shapes, not its small parts.
+.drawing .drawing__art--thumb {
+  height: 5.5rem;
+
+  @media (width < tiers.$tablet) {
+    height: 4rem;
+  }
+}
+
+.drawing__art--thumb .drawing__detail,
+.drawing__art--thumb .drawing__door-number {
+  display: none;
+}

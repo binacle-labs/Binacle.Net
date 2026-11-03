@@ -78,10 +78,8 @@ main {
   min-width: 0;
 }
 
-// The band's number sits over its label. In a mirrored band the label is inside the text column, so it moves
-// with the text.
-.band--numbered .band__label .label,
-.band--numbered .split > .prose > .label:first-child {
+// The band's number sits over its label.
+.band--numbered .band__label .label {
   color: var(--ink);
 
   &::before {
@@ -142,23 +140,11 @@ main {
   }
 }
 
-// split: the text on the left, the thing it talks about on the right.
-.band--split .split {
+// Under a wide heading a command takes the text's half, never the whole width.
+.band__command {
   @media (width >= tiers.$desktop) {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  }
-}
-
-// mirrored: the same, the thing on the left.
-.band--mirrored .split {
-  @media (width >= tiers.$desktop) {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  }
-}
-
-.band--mirrored .split > :first-child {
-  @media (width >= tiers.$desktop) {
-    order: 2;
+    width: calc((100% - var(--col-gap)) / 2);
+    margin-left: auto;
   }
 }
 

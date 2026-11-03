@@ -82,9 +82,13 @@
   }
 }
 
-// A home hero: the text sits level with the middle of the picture.
-.split.hero--centred {
+// Stacked but wide enough, the button and the command share a row.
+.hero__command {
+  @media (width >= tiers.$tablet) {
+    flex: 1;
+  }
+
   @media (width >= tiers.$desktop) {
-    align-items: center;
+    flex: none;
   }
 }
