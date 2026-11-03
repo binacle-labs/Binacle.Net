@@ -18,16 +18,16 @@
   aspect-ratio: 4 / 3;
   max-height: 70vh;
   width: 100%;
+}
 
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    cursor: grab;
+.pack-view__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
 
-    &:active {
-      cursor: grabbing;
-    }
+  &:active {
+    cursor: grabbing;
   }
 }
 
@@ -66,7 +66,7 @@
   min-height: 40px;
 }
 
-.pack-view__strip [data-placed] {
+.pack-view__status {
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -77,10 +77,10 @@
   @media (width < tiers.$tablet) {
     min-height: 2lh;
   }
+}
 
-  > span:first-child {
-    color: var(--ground-muted);
-  }
+.pack-view__count {
+  color: var(--ground-muted);
 }
 
 // The item's size and place, a step smaller and fainter than its name.
@@ -110,13 +110,6 @@
     border-left: 1px solid var(--ground-rule);
   }
 
-  svg {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.25;
-    stroke-linejoin: round;
-  }
-
   &:hover:not(:disabled) {
     background: var(--ground-rule);
   }
@@ -130,6 +123,13 @@
     color: var(--ground-rule);
     cursor: default;
   }
+}
+
+.pack-view__icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linejoin: round;
 }
 
 // While the answer is on its way the bin is drawn, the strip says Packing, and an ink stroke runs along the

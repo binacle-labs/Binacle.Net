@@ -62,16 +62,16 @@
   position: relative;
   height: 9px;
   background: linear-gradient(var(--rule), var(--rule)) center / 100% 1px no-repeat;
+}
 
-  > span {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    border-left: 1px solid var(--ink);
-    border-right: 1px solid var(--ink);
-    background: linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat;
-  }
+.result-row__fill-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+  background: linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat;
 }
 
 .result-row__fill-number {

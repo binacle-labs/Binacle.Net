@@ -49,8 +49,7 @@
   }
 }
 
-.columns__column p:not(.label),
-.columns__column :not(.fit-row__verdicts) > li {
+.columns__text {
   font-size: var(--size-ui);
   line-height: 1.5;
 }

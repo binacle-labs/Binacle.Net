@@ -7,7 +7,7 @@
   min-width: 0;
 }
 
-details.disclosure > summary {
+.disclosure__summary {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -31,6 +31,6 @@ details.disclosure > summary {
   }
 }
 
-details.disclosure[open] > summary::before {
+.disclosure[open] > .disclosure__summary::before {
   content: "-";
 }

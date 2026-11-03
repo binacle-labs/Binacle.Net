@@ -5,66 +5,66 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
 
-  > span {
-    font-family: var(--font-mono);
-    font-size: var(--size-label);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
+.field__label {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field__input,
+.field__select,
+.field__textarea {
+  width: 100%;
+  min-height: var(--hit);
+  padding: 0 10px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+
+  &:focus {
+    outline: 0;
+    border-color: var(--ink);
   }
+}
 
-  input,
-  select,
-  textarea {
-    width: 100%;
-    min-height: var(--hit);
-    padding: 0 10px;
-    border: 1px solid var(--rule);
-    border-radius: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-variant-numeric: tabular-nums;
+.field__select {
+  font-family: var(--font-text);
+  font-size: var(--size-ui);
+}
 
-    &:focus {
-      outline: 0;
-      border-color: var(--ink);
-    }
-  }
+.field__textarea {
+  padding: 10px;
+  resize: vertical;
+  line-height: 1.6;
+}
 
-  select {
-    font-family: var(--font-text);
-    font-size: var(--size-ui);
-  }
+// The failing field gets a red border; the word goes in the message under the row.
+.field__input[aria-invalid="true"] {
+  border-color: var(--error);
+}
 
-  textarea {
-    padding: 10px;
-    resize: vertical;
-    line-height: 1.6;
-  }
+// Spinners off: the mono figure is the point.
+.field__input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 
-  // The failing field gets a red border; the word goes in the message under the row.
-  input[aria-invalid="true"] {
-    border-color: var(--error);
-  }
-
-  // Spinners off: the mono figure is the point.
-  input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
 // The column labels show once per group, over the first row.
-.form__group > div + div > .field-row > .field > span {
+.form__row + .form__row .field__label {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -74,7 +74,7 @@
 }
 
 // The docs version picker is smaller than a form's field.
-.sidebar .field select {
+.sidebar .field__select {
   min-height: 36px;
   font-size: var(--size-label);
   letter-spacing: 0.05em;

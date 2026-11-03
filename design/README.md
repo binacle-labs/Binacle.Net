@@ -32,6 +32,10 @@ the bare HTML elements inside it are nested in the block. Each modifier and each
 after the block, one class, as BEM has it: `.band--tint`, never `.band.band--tint`. A rule that reaches into
 another block is flat.
 
+**A block inside another block.** If it changes what the block sets, or reaches its elements, it is a modifier
+in the block's own file: `.close-button--bin`. If it only places the block, it is an element of the parent,
+mixed on: `class="copy-button command__copy"`. Two blocks on one element never set the same property.
+
 **A state a script sets is an `is-` class**, always written beside its block: `.drawer.is-open`, never
 `.is-open` alone.
 
@@ -81,6 +85,7 @@ another partial loaded it earlier, the build stops with *already loaded, so it c
 
 **`_drawing.scss` still writes its modifiers with the block,** `.drawing.drawing--painted`, and so does
 `.band__body.band__body--code-left`. Their rules win by that extra class; taking it off changes which rule wins.
+`.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later.
 
 **Load `utilities/` last.** A type style shares its element with a block - `band__body prose` - and both set
 `gap`. Written on purpose, the type style has to win, so it comes after every block.

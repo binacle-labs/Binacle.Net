@@ -6,22 +6,22 @@
   @include lines.strong;
   list-style: none;
   padding: 1px 0 0;
+}
 
-  > li {
-    margin: 0;
-    border-bottom: 1px solid var(--rule);
-  }
+.result-list__item {
+  margin: 0;
+  border-bottom: 1px solid var(--rule);
+}
 
-  // A row with a delete button beside it.
-  > li.result-list__item--removable {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--hit);
-    align-items: center;
-  }
+// A row with a delete button beside it.
+.result-list__item--removable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--hit);
+  align-items: center;
 
   // The tint runs under the delete button too, so the button is part of the row.
-  > li.result-list__item--removable:has(> .result-row:hover),
-  > li.result-list__item--removable:has(> .result-row[aria-current="true"]) {
+  &:has(> .result-row:hover),
+  &:has(> .result-row[aria-current="true"]) {
     background: var(--panel);
   }
 }
@@ -31,18 +31,18 @@
   padding: 0 12px var(--step) 14px;
   font-size: var(--size-ui);
   color: var(--muted);
+}
 
-  summary {
-    cursor: pointer;
-    min-height: 28px;
-  }
+.result-list__unfit-summary {
+  cursor: pointer;
+  min-height: 28px;
+}
 
-  ul {
-    list-style: none;
-    padding: 4px 0 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
+.result-list__unfit-list {
+  list-style: none;
+  padding: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 
 .result-list__empty {

@@ -35,16 +35,3 @@
     outline-offset: -4px;
   }
 }
-
-// With no head it floats in the block's top right corner.
-.code-block > .copy-button {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  z-index: 1;
-}
-
-.command > .copy-button {
-  align-self: flex-start;
-  margin: 4px 4px 0 0;
-}

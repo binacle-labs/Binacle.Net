@@ -5,18 +5,18 @@
   list-style: none;
   padding: 0;
   margin: 0;
+}
 
-  > li {
-    display: grid;
-    grid-template-columns: 14px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--rule);
+.kind-list__item {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--rule);
 
-    // The form's own rule closes the list.
-    &:last-child {
-      border-bottom: 0;
-    }
+  // The form's own rule closes the list.
+  &:last-child {
+    border-bottom: 0;
   }
 }
 

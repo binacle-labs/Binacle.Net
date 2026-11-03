@@ -109,7 +109,7 @@ main {
   display: none;
 }
 
-.band--numbered.band--number-in-row :is(.band__body > h2:first-child, .band__body > .prose:first-child > h2:first-child)::before {
+.band--numbered.band--number-in-row :is(.band__body > .band__heading:first-child, .band__body > .prose:first-child > .band__heading:first-child)::before {
   content: counter(step, decimal-leading-zero);
   margin-right: 0.4em;
   font-family: var(--font-mono);
@@ -122,11 +122,11 @@ main {
   gap: 4px;
 }
 
-.band--compact .band__body > :not(h2) + :not(h2) {
+.band--compact .band__body > :not(:where(.band__heading)) + :not(:where(.band__heading)) {
   margin-top: calc(var(--step) - 4px);
 }
 
-.band--compact h2 {
+.band--compact .band__heading {
   font-size: var(--size-h3);
   letter-spacing: 0;
   line-height: calc(var(--step) * 2);
@@ -176,21 +176,22 @@ main {
     }
 
     // Spans rows that may be empty; with no row gap an empty row takes no space.
-    .band__body.prose > h2,
-    .band__body > .prose:first-child > h2 {
+    .band__body.prose > .band__heading,
+    .band__body > .prose:first-child > .band__heading {
       grid-column: 1;
       grid-row: 1 / span 8;
       font-size: 44px;
     }
 
-    .band__body.prose > :not(h2),
-    .band__body > .prose:first-child > :not(h2) {
+    // :where keeps the heading's class out of the weight, so these stay below code-left.
+    .band__body.prose > :not(:where(.band__heading)),
+    .band__body > .prose:first-child > :not(:where(.band__heading)) {
       grid-column: 2;
       margin-top: 0;
     }
 
-    .band__body.prose > :not(h2) ~ :not(h2),
-    .band__body > .prose:first-child > :not(h2) ~ :not(h2) {
+    .band__body.prose > :not(:where(.band__heading)) ~ :not(:where(.band__heading)),
+    .band__body > .prose:first-child > :not(:where(.band__heading)) ~ :not(:where(.band__heading)) {
       margin-top: var(--step);
     }
 
@@ -199,7 +200,7 @@ main {
       display: flex;
     }
 
-    .band__body > .prose--one-line:first-child > p {
+    .band__body > .prose--one-line:first-child > .band__text {
       margin-top: calc(var(--step) / 2);
     }
 
@@ -224,11 +225,12 @@ main {
       margin: 0;
     }
 
-    .band__body.band__body--code-left > .prose:first-child > h2 {
+    .band__body.band__body--code-left > .prose:first-child > .band__heading {
       grid-column: 1 / -1;
+      margin-bottom: 0;
     }
 
-    .band__body.band__body--code-left > .prose:first-child > ul {
+    .band__body.band__body--code-left > .prose:first-child > .band__list {
       grid-column: 2;
       grid-row: 2 / span 3;
     }
@@ -239,21 +241,21 @@ main {
 
     // More than one block of text would leave the heading's column empty. The heading goes on top and the
     // text runs in two columns under it.
-    .band__body.prose:has(> :not(h2) ~ :not(h2)),
-    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) {
+    .band__body.prose:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))),
+    .band__body > .prose:first-child:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))) {
       display: block;
       columns: 2;
       column-gap: var(--col-gap);
     }
 
-    .band__body.prose:has(> :not(h2) ~ :not(h2)) > h2,
-    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) > h2 {
+    .band__body.prose:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))) > .band__heading,
+    .band__body > .prose:first-child:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))) > .band__heading {
       column-span: all;
       margin-bottom: var(--step);
     }
 
-    .band__body.prose:has(> :not(h2) ~ :not(h2)) > :not(h2),
-    .band__body > .prose:first-child:has(> :not(h2) ~ :not(h2)) > :not(h2) {
+    .band__body.prose:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))) > :not(:where(.band__heading)),
+    .band__body > .prose:first-child:has(> :not(:where(.band__heading)) ~ :not(:where(.band__heading))) > :not(:where(.band__heading)) {
       break-inside: avoid;
     }
   }

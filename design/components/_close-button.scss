@@ -18,7 +18,7 @@
 }
 
 // A row's remove is a bin, boxed like a field so it reads as a button. Its name is in aria-label.
-.field-row > .close-button {
+.close-button--bin {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -39,18 +39,15 @@
 }
 
 // In a panel's head it is boxed too, so it reads as a button at a glance.
-.panel__head .close-button,
-.drawer__head .close-button {
+.close-button--boxed {
   border-color: var(--rule);
   color: var(--ink);
   font-size: 24px;
 }
 
-.panel__head .close-button:hover,
-.drawer__head .close-button:hover,
-.panel__head .close-button:focus-visible,
-.drawer__head .close-button:focus-visible,
-.field-row > .close-button:focus-visible {
+.close-button--boxed:hover,
+.close-button--boxed:focus-visible,
+.close-button--bin:focus-visible {
   outline: 0;
   border-color: var(--ink);
 }

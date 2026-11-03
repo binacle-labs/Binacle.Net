@@ -5,38 +5,36 @@
   border-top-color: var(--rule);
 }
 
-.path {
-  ol {
-    counter-reset: path;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 calc(var(--step) * 2);
+.path__list {
+  counter-reset: path;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--step) * 2);
+}
+
+.path__item {
+  counter-increment: path;
+  margin: 0;
+}
+
+.path__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--hit);
+  font-size: var(--size-ui);
+  text-decoration: none;
+
+  &::before {
+    content: counter(path, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: var(--size-label);
+    color: var(--muted);
   }
 
-  li {
-    counter-increment: path;
-    margin: 0;
-  }
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: var(--hit);
-    font-size: var(--size-ui);
-    text-decoration: none;
-
-    &::before {
-      content: counter(path, decimal-leading-zero);
-      font-family: var(--font-mono);
-      font-size: var(--size-label);
-      color: var(--muted);
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
   }
 }

@@ -3,33 +3,33 @@
 .stepper {
   display: flex;
   align-items: center;
+}
 
-  button {
-    width: var(--hit);
-    height: var(--hit);
-    padding: 0;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--ink);
-    font-family: var(--font-mono);
-    font-size: 16px;
-    cursor: pointer;
+.stepper__button {
+  width: var(--hit);
+  height: var(--hit);
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  cursor: pointer;
 
-    &:hover:not(:disabled) {
-      border-color: var(--rule);
-    }
-
-    &:disabled {
-      color: var(--rule);
-      cursor: default;
-    }
+  &:hover:not(:disabled) {
+    border-color: var(--rule);
   }
 
-  output {
-    min-width: 3ch;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: var(--size-ui);
-    font-variant-numeric: tabular-nums;
+  &:disabled {
+    color: var(--rule);
+    cursor: default;
   }
+}
+
+.stepper__count {
+  min-width: 3ch;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--size-ui);
+  font-variant-numeric: tabular-nums;
 }

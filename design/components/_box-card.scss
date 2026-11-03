@@ -13,16 +13,6 @@
     border-color: var(--ink);
   }
 
-  strong {
-    font-weight: 600;
-    font-size: var(--size-ui);
-
-    &::after {
-      content: " \2192";
-      font-weight: 400;
-    }
-  }
-
   .mono {
     font-family: var(--font-mono);
     font-size: var(--size-label);
@@ -42,6 +32,16 @@
     .mono {
       text-align: right;
     }
+  }
+}
+
+.box-card__name {
+  font-weight: 600;
+  font-size: var(--size-ui);
+
+  &::after {
+    content: " \2192";
+    font-weight: 400;
   }
 }
 
@@ -68,8 +68,8 @@
   &:hover {
     border-color: var(--rule);
   }
+}
 
-  strong::after {
-    content: none;
-  }
+.lightbox--preset .box-card__name::after {
+  content: none;
 }

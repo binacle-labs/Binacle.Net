@@ -7,7 +7,7 @@
     display: none;
   }
 
-  &[open] > summary {
+  &[open] > .request-fold__summary {
     margin-bottom: calc(var(--step) / 2);
   }
 }

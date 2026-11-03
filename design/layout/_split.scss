@@ -10,12 +10,13 @@
     column-gap: var(--col-gap);
     align-items: start;
   }
+}
 
-  // In half the width the heading grows with the window and reaches full size at 1100.
-  h1 {
-    @media (width >= tiers.$desktop) {
-      font-size: clamp(36px, calc(6vw - 12px), var(--size-display-2));
-    }
+// In half the width the heading grows with the window and reaches full size at 1100. Two classes, so it beats
+// display-1, which loads later.
+.split .split__title {
+  @media (width >= tiers.$desktop) {
+    font-size: clamp(36px, calc(6vw - 12px), var(--size-display-2));
   }
 }
 
@@ -26,6 +27,6 @@
   }
 }
 
-.doc--home .split h1 {
+.doc--home .split__title {
   font-size: clamp(36px, calc(4vw - 4px), var(--size-display-2));
 }

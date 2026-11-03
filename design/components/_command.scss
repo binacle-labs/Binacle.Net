@@ -6,13 +6,18 @@
   align-items: stretch;
   border: 1px solid var(--ink);
   min-width: 0;
+}
 
-  pre {
-    flex: 1;
-    min-width: 0;
-    padding: var(--step) 16px;
-    white-space: pre-wrap;
-  }
+.command__pre {
+  flex: 1;
+  min-width: 0;
+  padding: var(--step) 16px;
+  white-space: pre-wrap;
+}
+
+.command__copy {
+  align-self: flex-start;
+  margin: 4px 4px 0 0;
 }
 
 // A word never breaks; the line breaks between words.

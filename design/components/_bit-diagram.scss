@@ -31,11 +31,6 @@
     --pad: 6px;
   }
 
-  code {
-    font-size: var(--size-label);
-    font-weight: 500;
-  }
-
   .muted {
     font-size: 13px;
 
@@ -45,12 +40,17 @@
   }
 }
 
+.bit-diagram__name {
+  font-size: var(--size-label);
+  font-weight: 500;
+}
+
 .bit-diagram__field--reserved {
   color: var(--muted);
   background: repeating-linear-gradient(135deg, transparent 0 6px, var(--rule) 6px 7px);
 }
 
 .bit-diagram__field--more,
-.bit-diagram__field--more code {
+.bit-diagram__field--more .bit-diagram__name {
   color: var(--muted);
 }

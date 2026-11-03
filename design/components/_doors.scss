@@ -4,35 +4,35 @@
 
 .doors {
   @include lines.strong;
+}
 
-  a {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: var(--step) 0;
-    border-bottom: 1px solid var(--rule);
-    text-decoration: none;
-  }
+.doors__link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--step) 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
 
-  h3::after {
-    content: " \2192";
-    font-weight: 400;
-  }
-
-  p {
-    font-size: var(--size-ui);
-    line-height: 1.5;
-  }
-
-  a:hover h3 {
+  &:hover .doors__title {
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
 }
 
+.doors__title::after {
+  content: " \2192";
+  font-weight: 400;
+}
+
+.doors__text {
+  font-size: var(--size-ui);
+  line-height: 1.5;
+}
+
 // Each link carries a small copy of its page's drawing, beside the words.
-.doors--pictured a {
+.doors--pictured .doors__link {
   display: grid;
   grid-template-columns: 11rem minmax(0, 1fr);
   grid-template-rows: auto 1fr;
@@ -64,7 +64,7 @@
   align-self: center;
   margin: 0;
 
-  svg {
+  .drawing__art {
     height: 5.5rem;
 
     @media (width < tiers.$tablet) {
@@ -85,7 +85,7 @@
   }
 }
 
-.doors--row a {
+.doors--row .doors__link {
   border-top: 1px solid var(--ink);
   border-bottom: 0;
 }
@@ -100,7 +100,7 @@
   }
 }
 
-.doors--grid a {
+.doors--grid .doors__link {
   border-top: 1px solid var(--ink);
   border-bottom: 0;
 }

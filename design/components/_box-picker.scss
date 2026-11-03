@@ -16,17 +16,6 @@
   border: 1px solid var(--rule);
   cursor: pointer;
 
-  input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  strong {
-    font-weight: 600;
-    font-size: var(--size-ui);
-  }
-
   .mono {
     font-family: var(--font-mono);
     font-size: var(--size-label);
@@ -45,12 +34,23 @@
   }
 
   &:hover,
-  &:has(input:focus-visible) {
+  &:has(.box-picker__input:focus-visible) {
     border-color: var(--ink);
   }
 
-  &:has(input:checked) {
+  &:has(.box-picker__input:checked) {
     border-color: var(--ink);
     background: var(--panel);
   }
+}
+
+.box-picker__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.box-picker__name {
+  font-weight: 600;
+  font-size: var(--size-ui);
 }

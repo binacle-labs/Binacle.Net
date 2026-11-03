@@ -9,14 +9,14 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--step) / 2);
+}
 
-  // Floated, so the legend sits inside the group and not across the rule above it.
-  > legend {
-    float: left;
-    width: 100%;
-    padding: 0;
-    margin-bottom: calc(var(--step) / 2);
-  }
+// Floated, so the legend sits inside the group and not across the rule above it.
+.form__legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin-bottom: calc(var(--step) / 2);
 }
 
 .form__actions {

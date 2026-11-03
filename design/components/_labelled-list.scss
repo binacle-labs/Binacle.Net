@@ -9,23 +9,23 @@
   flex-direction: column;
   gap: calc(var(--step) / 2);
 
-  li {
-    margin: 0;
-  }
-
   .label {
     display: block;
   }
 }
 
+.labelled-list__item {
+  margin: 0;
+}
+
 // The cost is set apart from the point above it, so its label does not read as the end of that line.
-.labelled-list .labelled-list__cost {
+.labelled-list__cost {
   margin-top: calc(var(--step) / 2);
 }
 
 // On a tool page the steps are a short key to the form, so each label sits beside its text.
-.workbench__intro .labelled-list li,
-.split--tool .labelled-list li {
+.workbench__intro .labelled-list__item,
+.split--tool .labelled-list__item {
   @media (width >= tiers.$tablet) {
     display: grid;
     grid-template-columns: 16ch minmax(0, 1fr);
@@ -40,7 +40,13 @@
   gap: 0;
 }
 
-.split--tool .labelled-list li {
+.split--tool .labelled-list__item {
   padding: 12px 0;
   border-bottom: 1px solid var(--rule);
+}
+
+// In a column it is set as small as the text beside it.
+.columns__column .labelled-list__item {
+  font-size: var(--size-ui);
+  line-height: 1.5;
 }

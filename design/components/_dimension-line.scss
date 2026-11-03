@@ -45,7 +45,7 @@
 }
 
 // On the 3D view's strip it takes the view's own ground colours.
-.pack-view__strip .dimension-line {
+.dimension-line--strip {
   flex: 1 1 160px;
   max-width: 260px;
   color: var(--ground-muted);
@@ -56,12 +56,12 @@
   }
 }
 
-.pack-view__strip .dimension-line .dimension-line__tick {
+.dimension-line--strip .dimension-line__tick {
   background: var(--ground-ink);
 }
 
 // In a bit diagram it sits on the cell's top rule.
-.bit-diagram__field .dimension-line {
+.dimension-line--cell {
   margin: 0 calc(var(--pad) * -1) 4px;
   padding: 6px 0;
   border-bottom: 1px solid var(--rule);
@@ -73,6 +73,6 @@
   }
 }
 
-.bit-diagram__field .dimension-line .dimension-line__number {
+.dimension-line--cell .dimension-line__number {
   white-space: nowrap;
 }

@@ -72,8 +72,16 @@
   margin: 0;
 }
 
-// Room for the copy button in the corner.
-.code-block > .copy-button:not([hidden]) + .code-block__pre {
+// With no head the copy button floats in the top right corner.
+.code-block__copy {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+}
+
+// Room for it.
+.code-block__copy:not([hidden]) + .code-block__pre {
   padding-right: 44px;
 }
 
@@ -90,4 +98,18 @@
 
 .code-block__head .label {
   align-self: center;
+}
+
+// The head can name the call. Softer than a line on its own.
+.code-block__http-line {
+  align-self: center;
+  min-width: 0;
+  margin: 4px 0;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sample .code-block__pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

@@ -12,15 +12,6 @@
   &::backdrop {
     background: rgba(0, 0, 0, 0.75);
   }
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: calc(92vh - 60px);
-    object-fit: contain;
-    cursor: zoom-out;
-  }
 }
 
 // A preset's boxes, each on its own scale.
@@ -44,6 +35,6 @@
   font-size: var(--size-label);
 }
 
-.lightbox--preset .lightbox__bar code {
+.lightbox__code {
   font-size: inherit;
 }
