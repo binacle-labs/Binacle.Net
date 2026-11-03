@@ -31,7 +31,7 @@
   color: var(--muted);
   min-height: calc(var(--step) * 2);
 
-  &.form__status--error {
+  &.is-error {
     color: var(--error);
   }
 }

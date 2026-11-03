@@ -28,7 +28,7 @@
 }
 
 // What is seen through an opening sits further back.
-.drawing .drawing__inside path {
+.drawing .drawing__bin--inside path {
   stroke: var(--ground-muted);
 }
 
@@ -117,8 +117,6 @@
 
 // Held to a size that leaves the text beside it in view.
 .drawing--pack {
-  min-width: 0;
-
   svg {
     max-width: 360px;
     margin: 0 auto;
@@ -132,7 +130,7 @@
 
 // A carton flap, or the outside of a drawn object, hides what is behind it.
 .drawing .drawing__bin.drawing__flap path,
-.drawing .drawing__bin.drawing__solid path {
+.drawing .drawing__bin.drawing__bin--solid path {
   fill: var(--ground);
 }
 
@@ -201,7 +199,7 @@
     stroke-width: 1px;
   }
 
-  .drawing__outline path {
+  .drawing__bin--outline path {
     stroke-width: 2px;
   }
 
@@ -243,7 +241,7 @@
     fill: oklch(from var(--body) calc(l - 0.1) c h);
   }
 
-  .drawing__inside path {
+  .drawing__bin--inside path {
     stroke: oklch(from var(--body) calc(l - 0.24) c h);
   }
 
@@ -294,7 +292,7 @@
     fill: oklch(from var(--body) calc(l + 0.09) calc(c * 0.6) h);
   }
 
-  .drawing__faded {
+  .drawing__carton--faded {
     opacity: 0.42;
   }
 
@@ -356,13 +354,4 @@
   font-size: 8px;
   font-weight: 600;
   dominant-baseline: hanging;
-}
-
-// The outline of a drawn object shows only from 1200, as the docs page outline does.
-.drawing__outline {
-  display: none;
-
-  @media (width >= tiers.$widest) {
-    display: block;
-  }
 }

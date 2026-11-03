@@ -79,9 +79,8 @@ another partial loaded it earlier, the build stops with *already loaded, so it c
 **Inside a file, order matters.** A later rule beats an earlier one of the same weight. `_drawing.scss` and
 `_form.scss` depend on it; moving a rule there can change the look.
 
-**`_drawing.scss` still writes its modifiers with the block,** `.drawing.drawing--painted`, and so do
-`.band__body.band__body--code-left` and the states a script sets as modifiers, `.field.field--invalid`. Their
-rules win by that extra class; taking it off changes which rule wins.
+**`_drawing.scss` still writes its modifiers with the block,** `.drawing.drawing--painted`, and so does
+`.band__body.band__body--code-left`. Their rules win by that extra class; taking it off changes which rule wins.
 
 **Load `utilities/` last.** A type style shares its element with a block - `band__body prose` - and both set
 `gap`. Written on purpose, the type style has to win, so it comes after every block.

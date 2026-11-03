@@ -33,7 +33,7 @@
   text-align: right;
 
   // Fewer went in than were asked for.
-  &.kind-result__count--short {
+  &.is-short {
     color: var(--error);
   }
 }

@@ -46,7 +46,7 @@
   }
 
   // The failing field gets a red border; the word goes in the message under the row.
-  &.field--invalid input {
+  input[aria-invalid="true"] {
     border-color: var(--error);
   }
 
