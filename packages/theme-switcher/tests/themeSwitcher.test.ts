@@ -2,6 +2,7 @@ import {Cookies} from "cookies";
 
 import ThemeSwitcherButtonElement from "../src/themeSwitcher";
 import {DEFAULT_OPTIONS} from "../src/options";
+import {systemTheme} from "../src/theme";
 
 // jsdom gives us a real customElements registry, so connectedCallback fires on appendChild. The tag can
 // only be defined once per file - a second define throws.
@@ -38,8 +39,18 @@ function button(element: ThemeSwitcherButtonElement): HTMLButtonElement {
 	return found;
 }
 
+function withSystemDark(dark: boolean): void {
+	window.matchMedia = ((query: string) => ({
+		matches: dark,
+		media: query,
+		addEventListener: () => undefined,
+		removeEventListener: () => undefined
+	})) as unknown as typeof window.matchMedia;
+}
+
 beforeEach(() => {
 	clearCookies();
+	withSystemDark(false);
 	document.body.innerHTML = "";
 	document.documentElement.removeAttribute("data-theme");
 	document.documentElement.removeAttribute("data-theme-storage");
@@ -105,29 +116,28 @@ describe("picking the theme on connect", () => {
 });
 
 describe("system as the default", () => {
-	function withSystemDark(dark: boolean): void {
-		window.matchMedia = ((query: string) => ({
-			matches: dark,
-			media: query,
-			addEventListener: () => undefined,
-			removeEventListener: () => undefined
-		})) as unknown as typeof window.matchMedia;
-	}
-
-	test("a dark machine gets dark", () => {
+	test("no attribute is set, so the tokens follow the machine", () => {
 		withSystemDark(true);
 
 		document.body.appendChild(createSwitcher("system"));
 
-		expect(theme()).toBe("dark");
+		expect(theme()).toBeNull();
 	});
 
-	test("a light machine gets light", () => {
-		withSystemDark(false);
+	test("an attribute already there is removed", () => {
+		document.documentElement.setAttribute("data-theme", "dark");
 
 		document.body.appendChild(createSwitcher("system"));
 
-		expect(theme()).toBe("light");
+		expect(theme()).toBeNull();
+	});
+
+	test("the button starts on auto", () => {
+		const element = createSwitcher("system");
+
+		document.body.appendChild(element);
+
+		expect(button(element).textContent).toBe("Theme: auto");
 	});
 
 	test("a stored choice still beats the machine", () => {
@@ -138,9 +148,24 @@ describe("system as the default", () => {
 
 		expect(theme()).toBe("light");
 	});
+
+	test("a browser with no matchMedia counts as light", () => {
+		window.matchMedia = undefined as unknown as typeof window.matchMedia;
+
+		expect(systemTheme()).toBe("light");
+	});
 });
 
 describe("clicking", () => {
+	test("auto becomes light", () => {
+		const element = createSwitcher("system");
+		document.body.appendChild(element);
+
+		button(element).click();
+
+		expect(theme()).toBe("light");
+	});
+
 	test("light becomes dark", () => {
 		const element = createSwitcher("light");
 		document.body.appendChild(element);
@@ -150,8 +175,18 @@ describe("clicking", () => {
 		expect(theme()).toBe("dark");
 	});
 
-	test("dark becomes light", () => {
+	test("dark becomes auto, with the attribute gone", () => {
 		const element = createSwitcher("dark");
+		document.body.appendChild(element);
+
+		button(element).click();
+
+		expect(theme()).toBeNull();
+	});
+
+	test("auto on a dark machine still goes to light first", () => {
+		withSystemDark(true);
+		const element = createSwitcher("system");
 		document.body.appendChild(element);
 
 		button(element).click();
@@ -168,8 +203,19 @@ describe("clicking", () => {
 		expect(Cookies.get("theme")).toBe("dark");
 	});
 
-	test("a second click writes the theme back", () => {
+	test("going to auto clears the stored choice", () => {
 		const element = createSwitcher("light");
+		document.body.appendChild(element);
+
+		button(element).click();
+		button(element).click();
+
+		expect(Cookies.get("theme")).toBeUndefined();
+	});
+
+	test("going on from auto stores a choice again", () => {
+		Cookies.set("theme", "dark");
+		const element = createSwitcher("system");
 		document.body.appendChild(element);
 
 		button(element).click();
@@ -178,8 +224,31 @@ describe("clicking", () => {
 		expect(Cookies.get("theme")).toBe("light");
 	});
 
+	test("going to auto calls clear on a host's own storage", () => {
+		const storage = {read: () => "dark" as const, write: jest.fn(), clear: jest.fn()};
+		ThemeSwitcherButtonElement.configure({storage});
+		const element = createSwitcher();
+		document.body.appendChild(element);
+
+		button(element).click();
+
+		expect(storage.clear).toHaveBeenCalledTimes(1);
+	});
+
 	test("a themeChanged event carries the new theme", () => {
 		const element = createSwitcher("light");
+		document.body.appendChild(element);
+		const listener = jest.fn();
+		window.addEventListener("themeChanged", listener);
+
+		button(element).click();
+
+		expect(listener.mock.calls[0][0].detail).toEqual({theme: "dark"});
+	});
+
+	test("under auto the event carries the machine's theme, for a listener that knows only two", () => {
+		withSystemDark(true);
+		const element = createSwitcher("dark");
 		document.body.appendChild(element);
 		const listener = jest.fn();
 		window.addEventListener("themeChanged", listener);
@@ -199,97 +268,70 @@ describe("the control", () => {
 		expect(button(element).type).toBe("button");
 	});
 
-	test("the button says what it does", () => {
+	test("the button says where it is", () => {
 		const element = createSwitcher("light");
 
 		document.body.appendChild(element);
 
-		expect(button(element).getAttribute("aria-label")).toBe("Switch to the dark theme");
+		expect(button(element).textContent).toBe("Theme: light");
 	});
 
-	test("the label follows the theme", () => {
-		const element = createSwitcher("light");
-		document.body.appendChild(element);
-
-		button(element).click();
-
-		expect(button(element).getAttribute("aria-label")).toBe("Switch to the light theme");
-	});
-
-	test("aria-pressed follows the theme", () => {
+	test("the text follows a click", () => {
 		const element = createSwitcher("light");
 		document.body.appendChild(element);
 
 		button(element).click();
 
-		expect(button(element).getAttribute("aria-pressed")).toBe("true");
+		expect(button(element).textContent).toBe("Theme: dark");
 	});
 
-	test("a light theme renders the icon that offers dark", () => {
-		const element = createSwitcher("light");
-
-		document.body.appendChild(element);
-
-		expect(element.querySelector("i")?.textContent).toBe("dark_mode");
-	});
-
-	test("a dark theme renders the icon that offers light", () => {
+	test("the text says auto after the last click of the round", () => {
 		const element = createSwitcher("dark");
+		document.body.appendChild(element);
+
+		button(element).click();
+
+		expect(button(element).textContent).toBe("Theme: auto");
+	});
+
+	test("nothing overrides the text for a screen reader", () => {
+		const element = createSwitcher("light");
 
 		document.body.appendChild(element);
 
-		expect(element.querySelector("i")?.textContent).toBe("light_mode");
+		expect(button(element).hasAttribute("aria-label")).toBe(false);
 	});
 
-	test("a host label is used instead of an icon, and kept in step", () => {
+	test("it is not announced as a two-way toggle", () => {
 		const element = createSwitcher("light");
-		element.innerHTML = "<span data-theme-label>Theme</span>";
+
 		document.body.appendChild(element);
 
-		expect(element.querySelector("[data-theme-label]")?.textContent).toBe("Dark");
+		expect(button(element).hasAttribute("aria-pressed")).toBe(false);
 	});
 
-	test("a host label moves inside the button, so the whole control is clickable", () => {
+	test("it draws no icon element", () => {
 		const element = createSwitcher("light");
-		element.innerHTML = "<span data-theme-label>Theme</span>";
-		document.body.appendChild(element);
 
-		expect(button(element).querySelector("[data-theme-label]")).not.toBeNull();
-	});
-
-	test("a host label means no material icon is rendered", () => {
-		const element = createSwitcher("light");
-		element.innerHTML = "<span data-theme-label>Theme</span>";
 		document.body.appendChild(element);
 
 		expect(element.querySelector("i")).toBeNull();
 	});
 
-	test("the host label follows a click", () => {
-		const element = createSwitcher("light");
-		element.innerHTML = "<span data-theme-label>Theme</span>";
-		document.body.appendChild(element);
-
-		button(element).click();
-
-		expect(element.querySelector("[data-theme-label]")?.textContent).toBe("Light");
-	});
-
 	test("data-button-class is put on the rendered button, so the host can style it", () => {
 		const element = createSwitcher("light");
-		element.dataset.buttonClass = "theme-toggle";
+		element.dataset.buttonClass = "theme-button";
 		document.body.appendChild(element);
 
-		expect(button(element).className).toBe("theme-toggle");
+		expect(button(element).className).toBe("theme-button");
 	});
 
-	test("the icon swaps when the theme is clicked", () => {
+	test("a host that names no class gets none", () => {
 		const element = createSwitcher("light");
+
 		document.body.appendChild(element);
 
-		button(element).click();
-
-		expect(element.querySelector("i")?.textContent).toBe("light_mode");
+		expect(button(element).className).toBe("");
 	});
 });
 
@@ -306,12 +348,22 @@ describe("elements marked with data-swap", () => {
 	test("a click moves them to the other theme", () => {
 		document.body.innerHTML =
 			"<img data-swap=\"src\" data-darktheme=\"/dark.png\" data-lighttheme=\"/light.png\">";
-		const element = createSwitcher("dark");
+		const element = createSwitcher("light");
 		document.body.appendChild(element);
 
 		button(element).click();
 
-		expect(document.querySelector("img")?.getAttribute("src")).toBe("/light.png");
+		expect(document.querySelector("img")?.getAttribute("src")).toBe("/dark.png");
+	});
+
+	test("under auto they follow the machine", () => {
+		withSystemDark(true);
+		document.body.innerHTML =
+			"<img data-swap=\"src\" data-darktheme=\"/dark.png\" data-lighttheme=\"/light.png\">";
+
+		document.body.appendChild(createSwitcher("system"));
+
+		expect(document.querySelector("img")?.getAttribute("src")).toBe("/dark.png");
 	});
 
 	test("a missing value skips the element rather than writing the string undefined", () => {

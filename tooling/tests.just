@@ -89,6 +89,7 @@ all:
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
+    just test ts_binacle-components_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
     just test cs_binacle-net-diagnostics-module_unit
@@ -195,6 +196,9 @@ ts_cookies_unit: (_jest_test 'cookies')
 
 [private]
 ts_theme-switcher_unit: (_jest_test 'theme-switcher')
+
+[private]
+ts_binacle-components_unit: (_jest_test 'binacle-components')
 
 # The Ruby tests. The argument is the gem's folder under ruby/.
 

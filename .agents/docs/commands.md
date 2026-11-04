@@ -102,6 +102,7 @@ just test ts_binacle-net-service-client_unit
 just test ts_binacle-net-ui_unit
 just test ts_cookies_unit
 just test ts_theme-switcher_unit
+just test ts_binacle-components_unit
 
 # Ruby - the gems. `just test sites` and `just test all` run them.
 just test rb_binacle-docs-versions_unit

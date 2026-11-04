@@ -1,7 +1,7 @@
 ---
 id: packages
-description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching.
-verified: 2026-09-28
+description: TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, theme switching, and the sites' page behaviour.
+verified: 2026-11-05
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
   - packages/binacle-net-ui
@@ -17,7 +17,7 @@ paths:
 npm workspaces at the repo root. Every one is `private: true` — none is published to npm, and every one is
 TypeScript with no build step of its own: `main` points at a `.ts` entry and each host compiles the source
 with its own webpack + ts-loader. `binacle-compact-notation`, `binacle-net-client` and
-`binacle-net-service-client` put that entry at `src/index.ts`; the other three keep an `index.ts` barrel at
+`binacle-net-service-client` put that entry at `src/index.ts`; the others keep an `index.ts` barrel at
 the package root.
 
 | Package | Description |
@@ -27,7 +27,8 @@ the package root.
 | `binacle-net-service-client` | **Experimental, local only.** The same shape as `binacle-net-client`, for the ServiceModule's token and admin routes, with its own committed document and contract test. Its one host is `sites/admin`, which nothing builds or deploys |
 | `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) and `binacle-net-ui` (its sample generator) |
 | `cookies` | Cookie read/write utility (based on js-cookie v3.0.5, MIT) |
-| `theme-switcher` | Light/dark theme switching — the custom element and the pre-paint read |
+| `theme-switcher` | Auto, light and dark theme switching — the custom element and the pre-paint read |
+| `binacle-components` | Page behaviour for the sites — the menu drawer, code wrapping, copy buttons, tabs and more. No host imports it yet |
 
 The ViPaq TypeScript mirror lives at `vipaq/packages/binacle-vipaq/` — see `$vipaq`.
 
@@ -97,8 +98,12 @@ script cannot read an attribute on an element the parser has not reached.
 
 **The element renders a real `<button>`.** A custom element takes no focus and answers no key, so without
 it the theme could not be changed from a keyboard. `data-button-class` puts the host's
-class on it. A `[data-theme-label]` child is kept in step as words; an empty element gets the material
-ligature the BeerCSS hosts expect.
+class on it. Its text is *Theme: auto*, *light* or *dark*. It draws no icon: the host's CSS does, and hides
+the text from sight but not from a screen reader.
+
+**A click goes auto, light, dark.** Auto removes `data-theme` and the stored choice, and no attribute is how
+the stylesheet follows the system. The word `auto` is never stored, so a host default of `light` or `dark`
+comes back on the next load. `themeChanged` always carries `light` or `dark`: under auto, the system's.
 
 **It sets `secure` only on an https page**, rather than taking the cookies default. The API image is
 commonly served over plain http on a LAN, and a secure cookie is dropped there.
@@ -107,7 +112,7 @@ commonly served over plain http on a LAN, and a secure cookie is dropped there.
 on the demo. It comes from `_config.prod.yml` and is absent from `_config.yml`: **a browser drops a cookie
 whose domain the host does not match**, so a local build or the self-hosted image must set none. Writing a
 domain cookie removes the host-only one first — otherwise both are sent under one name and `Cookies.get`
-can return the stale one forever.
+can return the stale one forever. Going to auto removes both.
 
 **`data-swap` makes something CSS cannot reach follow the theme** — `data-swap="src"` with
 `data-lighttheme` and `data-darktheme`. A missing value skips the element.
@@ -131,12 +136,13 @@ the server and the browser cannot disagree.
 | `packages/binacle-net-service-client` | the contract test against the committed service document | `just test ts_binacle-net-service-client_unit` |
 | `packages/cookies` | the converter round trip, get/set/remove, attribute stringifying | `just test ts_cookies_unit` |
 | `packages/theme-switcher` | connect, click, the control and its labels, `system`, the swap, the host settings, the pre-paint read, and the cookie over plain http | `just test ts_theme-switcher_unit` |
+| `packages/binacle-components` | every part: the drawer, the nav fade, the sticky sidebar, copy buttons, code wrapping, tabs, the lightbox | `just test ts_binacle-components_unit` |
 | `vipaq/packages/binacle-vipaq` | the ViPaq TS mirror, including the shared cross-language vectors | `just test ts_binacle-vipaq_unit` |
 
 The compact-notation alias is filed under **shared**, not packages, because that package mirrors a
 `shared/src` C# project; the others are named after the folder they live in.
 
-**`binacle-net-ui`, `cookies` and `theme-switcher` run on jsdom**, so their configs add `jest-environment-jsdom` (jest 29 does not
+**`binacle-components`, `binacle-net-ui`, `cookies` and `theme-switcher` run on jsdom**, so their configs add `jest-environment-jsdom` (jest 29 does not
 bundle it). `cookies` and `theme-switcher` also point jsdom at an `https` URL, because the cookies defaults
 include `secure` and jsdom hides a secure cookie from a document on an insecure origin.
 

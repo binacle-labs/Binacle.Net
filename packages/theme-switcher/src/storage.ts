@@ -47,18 +47,22 @@ export function createStorage(options: ThemeSwitcherOptions): ThemeStorage {
 	}
 	return {
 		read: () => readStored(options),
-		write: writerFor(options)
+		...writersFor(options)
 	};
 }
 
-function writerFor(options: ThemeSwitcherOptions): (theme: Theme) => void {
+function writersFor(options: ThemeSwitcherOptions): Pick<ThemeStorage, "write" | "clear"> {
+	const key = options.storageKey;
 	if (options.storage === "local") {
-		return theme => writeLocal(options.storageKey, theme);
+		return {write: theme => writeLocal(key, theme), clear: () => clearLocal(key)};
 	}
 	if (options.storage === "none") {
-		return () => undefined;
+		return {write: () => undefined, clear: () => undefined};
 	}
-	return theme => writeCookie(options.storageKey, options.cookie, theme);
+	return {
+		write: theme => writeCookie(key, options.cookie, theme),
+		clear: () => clearCookie(key, options.cookie)
+	};
 }
 
 function writeCookie(key: string, attributes: CookieAttributes, theme: Theme): void {
@@ -74,10 +78,27 @@ function writeCookie(key: string, attributes: CookieAttributes, theme: Theme): v
 	Cookies.set(key, theme, {...attributes, secure});
 }
 
+function clearCookie(key: string, attributes: CookieAttributes): void {
+	const secure = location.protocol === "https:";
+	// The host-only cookie can sit beside the shared one. Left behind, it brings the old choice back.
+	if (attributes.domain) {
+		Cookies.remove(key, {secure});
+	}
+	Cookies.remove(key, {...attributes, secure});
+}
+
 function writeLocal(key: string, theme: Theme): void {
 	try {
 		localStorage.setItem(key, theme);
 	} catch {
 		// Private windows throw on write. The choice still applies for this page load.
+	}
+}
+
+function clearLocal(key: string): void {
+	try {
+		localStorage.removeItem(key);
+	} catch {
+		// Private windows throw here too. Nothing was stored.
 	}
 }

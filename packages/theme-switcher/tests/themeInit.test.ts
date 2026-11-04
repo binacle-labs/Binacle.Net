@@ -87,6 +87,29 @@ describe("the pre-paint read", () => {
 		expect(theme()).toBe("dark");
 	});
 
+	test("nothing stored and a system default sets no attribute", () => {
+		document.documentElement.dataset.defaultTheme = "system";
+
+		initTheme();
+
+		expect(theme()).toBeNull();
+	});
+
+	test("nothing declared at all sets no attribute", () => {
+		initTheme();
+
+		expect(theme()).toBeNull();
+	});
+
+	test("a stored choice beats a system default", () => {
+		document.documentElement.dataset.defaultTheme = "system";
+		Cookies.set("theme", "dark");
+
+		initTheme();
+
+		expect(theme()).toBe("dark");
+	});
+
 	test("storage of none never reads anything back", () => {
 		document.documentElement.dataset.themeStorage = "none";
 		document.documentElement.dataset.defaultTheme = "light";
@@ -123,6 +146,63 @@ describe("the shared cookie", () => {
 		document.documentElement.dataset.themeDomain = "localhost";
 
 		createStorage(optionsFromDocument()).write("dark");
+
+		expect(Cookies.get("theme")).toBe("dark");
+	});
+});
+
+describe("clearing the stored choice", () => {
+	test("with a domain, both the host-only and the shared cookie are removed", () => {
+		const remove = jest.spyOn(Cookies, "remove");
+		document.documentElement.dataset.themeDomain = "localhost";
+
+		createStorage(optionsFromDocument()).clear();
+
+		expect(remove.mock.calls.map(([, attributes]) => attributes?.domain)).toEqual([undefined, "localhost"]);
+	});
+
+	test("with no domain, the one cookie is removed once", () => {
+		const remove = jest.spyOn(Cookies, "remove");
+
+		createStorage(optionsFromDocument()).clear();
+
+		expect(remove).toHaveBeenCalledTimes(1);
+	});
+
+	test("a shared cookie is gone afterwards", () => {
+		document.documentElement.dataset.themeDomain = "localhost";
+		const storage = createStorage(optionsFromDocument());
+		storage.write("dark");
+
+		storage.clear();
+
+		expect(Cookies.get("theme")).toBeUndefined();
+	});
+
+	test("a cookie with no domain is gone afterwards", () => {
+		const storage = createStorage(optionsFromDocument());
+		storage.write("dark");
+
+		storage.clear();
+
+		expect(Cookies.get("theme")).toBeUndefined();
+	});
+
+	test("local storage is cleared when the host asks for it", () => {
+		document.documentElement.dataset.themeStorage = "local";
+		const storage = createStorage(optionsFromDocument());
+		storage.write("dark");
+
+		storage.clear();
+
+		expect(localStorage.getItem("theme")).toBeNull();
+	});
+
+	test("storage of none leaves the cookie alone", () => {
+		document.documentElement.dataset.themeStorage = "none";
+		Cookies.set("theme", "dark");
+
+		createStorage(optionsFromDocument()).clear();
 
 		expect(Cookies.get("theme")).toBe("dark");
 	});

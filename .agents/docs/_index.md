@@ -131,7 +131,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: packages/README.md
-  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, and theme switching."
+  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, theme switching, and the sites' page behaviour."
   paths: ["packages/**"]
 - file: packages/binacle-net-client.md
   description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."

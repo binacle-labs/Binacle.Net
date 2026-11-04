@@ -56,6 +56,16 @@ test("the chosen theme is written to a cookie", () => {
 	expect(Cookies.get("theme")).toBe("dark");
 });
 
+test("going to auto clears the cookie", () => {
+	const element = createSwitcher("light");
+	document.body.appendChild(element);
+
+	click(element);
+	click(element);
+
+	expect(Cookies.get("theme")).toBeUndefined();
+});
+
 test("the cookie is still there for the next page load", () => {
 	const element = createSwitcher("light");
 	document.body.appendChild(element);

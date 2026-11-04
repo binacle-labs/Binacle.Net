@@ -1,7 +1,7 @@
 ---
 id: packages/dependencies
 description: TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which.
-verified: 2026-09-28
+verified: 2026-11-04
 check: the workspaces globs in the root package.json still cover every package; each package.json dependencies block matches the graph; a grep for non-relative `from "..."` across packages/*/src and vipaq/packages/binacle-vipaq/src turns up nothing the graph does not name
 paths:
   - "packages/**"
@@ -36,6 +36,8 @@ binacle-net-service-client    leaf (no deps); only sites/admin imports it
 cookies                       leaf (no deps)
    ▲
 theme-switcher ───────────────┘
+
+binacle-components            leaf (no deps); no host imports it yet
 ```
 
 ## Packages at a glance
@@ -45,6 +47,7 @@ theme-switcher ───────────────┘
 | `binacle-compact-notation` | `packages/` | — | — |
 | `cookies` | `packages/` | — | — |
 | `theme-switcher` | `packages/` | `cookies` | — |
+| `binacle-components` | `packages/` | — | — |
 | `binacle-vipaq` | `vipaq/packages/` | `binacle-compact-notation` | — |
 | `binacle-net-client` | `packages/` | — | — |
 | `binacle-net-service-client` | `packages/` | — | — |

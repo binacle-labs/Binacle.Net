@@ -108,6 +108,11 @@ ones.
   scripts off. They suit small interactive parts, as `theme-switcher` already is.
 - **Only one Jekyll theme per site.** A second shared set of includes would have to join this gem.
 
+**The theme switcher could join it.** It stays its own package for now. The maintainer, 2026-11-04: *"theme switcher
+remains as is... meybe wehn i port the css components maybe i do it then"*. What will bite: `theme-switcher` is MIT on
+purpose and `binacle-components` is AGPL, and a package has one licence; the pre-paint script is small only because
+webpack shakes the barrel, so its size needs checking from a bigger package.
+
 ## What could stop it
 
 - The `pkg:` importer and the `exports` conditions may not resolve the way the docs say through npm

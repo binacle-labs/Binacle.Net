@@ -12,7 +12,8 @@ from the repo root with `npm install`.
 | [`binacle-net-service-client`](binacle-net-service-client) | **Experimental, local only.** The same, for the service API - the token route and the admin routes |
 | `binacle-compact-notation` | Parses and formats the compact strings (`"60x40x30"`, `"108x76x30 [40]"`). TypeScript mirror of C# `Binacle.CompactNotation` |
 | `cookies` | Cookie read/write helpers. A vendored fork of js-cookie v3.0.5, MIT, kept close to upstream |
-| `theme-switcher` | Light/dark theme toggle, as a `<theme-switcher>` custom element |
+| `theme-switcher` | Auto, light and dark theme button, as a `<theme-switcher>` custom element |
+| [`binacle-components`](binacle-components) | Page behaviour for the sites: the menu drawer, code wrapping, copy buttons, tabs and more. Nothing imports it yet |
 
 Every package has tests. From the repo root:
 
@@ -23,6 +24,7 @@ just test ts_binacle-net-service-client_unit  # binacle-net-service-client
 just test ts_binacle-net-ui_unit          # binacle-net-ui
 just test ts_cookies_unit         # cookies
 just test ts_theme-switcher_unit  # theme-switcher
+just test ts_binacle-components_unit  # binacle-components
 ```
 
 `binacle-compact-notation` has to agree with

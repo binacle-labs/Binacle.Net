@@ -1,0 +1,21 @@
+{
+  "name": "binacle-components",
+  "version": "1.0.0",
+  "description": "Page behaviour for the Binacle.Net websites: the drawer, code wrapping, copy buttons, tabs and more",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.6.0"
+  }
+}

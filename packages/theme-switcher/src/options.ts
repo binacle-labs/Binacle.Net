@@ -5,6 +5,7 @@ import type {CookieAttributes} from "cookies";
 export interface ThemeStorage {
 	read(): Theme | undefined;
 	write(theme: Theme): void;
+	clear(): void;
 }
 
 export type StorageKind = "cookie" | "local" | "none";
