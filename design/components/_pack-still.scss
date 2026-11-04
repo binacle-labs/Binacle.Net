@@ -5,16 +5,24 @@
   width: 100%;
   height: auto;
   background: var(--tint);
+}
 
-  path {
-    stroke-width: 1;
-    stroke-linejoin: round;
-    vector-effect: non-scaling-stroke;
-  }
+.pack-still__bin,
+.pack-still__top,
+.pack-still__left,
+.pack-still__right,
+.pack-still__under,
+.pack-still__print {
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
 
-  g path {
-    stroke: var(--item-line);
-  }
+.pack-still__top,
+.pack-still__left,
+.pack-still__right,
+.pack-still__under {
+  stroke: var(--item-line);
 }
 
 .pack-still .pack-still__bin {
@@ -50,7 +58,7 @@
   fill: oklch(from var(--k) calc(l - 0.16) c h);
 }
 
-.pack-still g .pack-still__print {
+.pack-still .pack-still__print {
   fill: none;
   stroke: oklch(from var(--k) calc(l - 0.3) c h);
 }
