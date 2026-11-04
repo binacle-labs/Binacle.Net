@@ -1,7 +1,7 @@
 ---
 id: sites/decisions
 description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate.
-verified: 2026-09-29
+verified: 2026-11-05
 check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose one collection is versions; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major and no permalink line, against sites/docs/collections/, which must hold _versions alone, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
 paths:
   - "sites/demo/**"
@@ -144,7 +144,7 @@ What the sites do and why. No quote from the maintainer covers these yet.
 
 ### S1 — the link preview is a square logo and a small card, and the two change together
 
-Every page on both sites emits `og:image` pointing at `media/logo/binacle-logo-512x512.png`, with
+Every page on both sites emits `og:image` pointing at `media/logo/binacle-logo-512x512a.png`, with
 `twitter:card` set to `summary`.
 
 **`summary` is not an oversight.** `summary_large_image` renders a wide card, and a wide card crops a square

@@ -1,26 +1,19 @@
-
 {%- assign block = include.block -%}
-{%- capture request_md %}```json
-{{ block.request | strip }}
-```{% endcapture -%}
-{%- capture response_md %}```json
-{{ block.response | strip }}
-```{% endcapture -%}
-
 <div class="exchange">
-    <div class="exchange-ask">
-        <span class="method-chip">{{ block.method }}</span>
-        <code class="exchange-path" id="{{ include.id }}-path">{{ block.path }}</code>
-        <button type="button" class="copy" data-copy="{{ include.id }}-request" hidden>Copy</button>
+    <div class="exchange__part">
+        <div class="code-block" data-code-block>
+            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">{{ block.method }}</span><span>{{ block.path }}</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+            <pre class="code-block__pre"><code>{{ block.request | strip | escape }}</code></pre>
+        </div>
     </div>
-
-    <div class="exchange-code" id="{{ include.id }}-request">{{ request_md | markdownify }}</div>
-
-    <div class="exchange-seam"><span>RESPONSE</span></div>
-
-    <div class="exchange-code">{{ response_md | markdownify }}</div>
-
+    <div class="exchange__part">
+        <p class="label">Response</p>
+        <div class="code-block" data-code-block>
+            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">200</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+            <pre class="code-block__pre"><code>{{ block.response | strip | escape }}</code></pre>
+        </div>
+    </div>
     {%- if include.verdict %}
-    <p class="exchange-verdict">{{ include.verdict }}</p>
+    <p class="verdict">{{ include.verdict }}</p>
     {%- endif %}
 </div>

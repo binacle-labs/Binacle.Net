@@ -67,6 +67,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_cookies_unit
 
+      - name: Test - binacle-components
+        if: ${{ !cancelled() }}
+        run: just test ts_binacle-components_unit
+
       - name: Test - theme-switcher
         if: ${{ !cancelled() }}
         run: just test ts_theme-switcher_unit

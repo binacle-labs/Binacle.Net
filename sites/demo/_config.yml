@@ -22,7 +22,7 @@ logo:
   alt                  : "Binacle.Net Logo"
 
 # The link-preview image every page falls back to. A page overrides it with og_image.
-og_image                : /media/logo/binacle-logo-512x512.png
+og_image                : /media/logo/binacle-logo-512x512a.png
 
 default_theme: "system"
 theme_storage: "cookie"
@@ -210,7 +210,7 @@ structured_data:
     "@id": https://www.binacle.net/#organization
     name: Binacle.Net
     url: https://www.binacle.net/
-    logo: /media/logo/binacle-logo-512x512.png
+    logo: /media/logo/binacle-logo-512x512a.png
     same_as:
       - https://github.com/binacle-labs
       - https://hub.docker.com/r/binacle/binacle-net

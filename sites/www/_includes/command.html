@@ -1,6 +1,5 @@
 {%- assign id = include.id | default: 'run' -%}
-<div class="command">
-    <span class="prompt" aria-hidden="true">$</span>
-    <code id="{{ id }}-text">{{ site.data.exchange.command.text | strip }}</code>
-    <button type="button" class="copy" data-copy="{{ id }}-text" hidden>Copy</button>
+<div class="command{% if include.class %} {{ include.class }}{% endif %}" data-command>
+    <pre class="command__pre"><span class="command__prompt">$ </span><code id="{{ id }}-text">{{ site.data.exchange.command.text | strip }}</code></pre>
+    <button type="button" class="copy-button command__copy" data-copy="{{ id }}-text" hidden>Copy</button>
 </div>

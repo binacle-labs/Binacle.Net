@@ -1,10 +1,4 @@
-<ul class="verdicts">
-    <li class="verdict-tick">
-        <svg class="glyph" aria-hidden="true" focusable="false"><use href="#glyph-tick"/></svg>
-        <span class="visually-hidden">Does: </span>{{ include.tick }}
-    </li>
-    <li class="verdict-scales">
-        <svg class="glyph" aria-hidden="true" focusable="false"><use href="#glyph-scales"/></svg>
-        <span class="visually-hidden">Costs: </span>{{ include.scales }}
-    </li>
+<ul class="labelled-list labelled-list--small">
+    <li class="labelled-list__item">{{ include.tick }}</li>
+    <li class="labelled-list__item labelled-list__cost"><span class="label">Costs</span>{{ include.scales }}</li>
 </ul>

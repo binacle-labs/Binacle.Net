@@ -12,7 +12,7 @@ description             : >-
 
 # The link-preview image every page falls back to. Square today, so twitter_card stays `summary`.
 # Both change together the day a 1200x630 image exists.
-og_image                : /media/logo/binacle-logo-512x512.png
+og_image                : /media/logo/binacle-logo-512x512a.png
 
 author:
   name                  : "Chris Mavrommatis"
@@ -212,7 +212,7 @@ structured_data:
     "@id": https://www.binacle.net/#organization
     name: Binacle.Net
     url: https://www.binacle.net/
-    logo: /media/logo/binacle-logo-512x512.png
+    logo: /media/logo/binacle-logo-512x512a.png
     same_as:
       - https://github.com/binacle-labs
       - https://hub.docker.com/r/binacle/binacle-net

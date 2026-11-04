@@ -1,5 +1,23 @@
-@use 'tokens';
-@use 'base';
-@use 'layout';
-@use 'code';
-@use 'content';
+@use "base/tokens" with ($font-path: "/fonts/");
+@use "base/elements";
+
+@use "layout/container";
+@use "layout/site-header";
+@use "layout/site-footer";
+@use "layout/band";
+@use "layout/split";
+@use "layout/columns";
+
+@use "components/code-block";
+@use "components/command";
+@use "components/copy-button";
+@use "components/drawing";
+@use "components/exchange";
+@use "components/http-line";
+@use "components/labelled-list";
+@use "components/note";
+@use "components/theme-button";
+@use "components/verdict";
+
+// Last: a type style shares its element with a block and has to win.
+@use "utilities/typography";

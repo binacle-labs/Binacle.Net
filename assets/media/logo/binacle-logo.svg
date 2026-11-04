@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Binacle logo</title>
+  <g transform="translate(56 56)">
+    <path fill="#ee8800" d="M0 200H400V360A40 40 0 0 1 360 400H40A40 40 0 0 1 0 360Z"/>
+    <path fill="#49769e" d="M0 40A40 40 0 0 1 40 0H288V80A32 32 0 0 0 320 112H400V240H262V248H206V337.816A98 98 0 0 1 200 338V340A100 100 0 0 1 100 240H0Z"/>
+    <path fill="#ee8800" d="M280 0H360A40 40 0 0 1 400 40V120H320A40 40 0 0 1 280 80Z"/>
+    <path fill="#ffffff" d="M100 0H180V142.020A100 100 0 0 1 300 240A100 100 0 0 1 200 340V240H260A60 60 0 0 0 200 180A60 60 0 0 0 140 240H100Z"/>
+  </g>
+</svg>

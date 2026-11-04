@@ -16,6 +16,16 @@ icons:
     href: '/site.webmanifest'
 
 links:
+  - rel: 'preload'
+    href: '/fonts/familjen-grotesk-latin.woff2'
+    as: 'font'
+    type: 'font/woff2'
+    crossorigin: true
+  - rel: 'preload'
+    href: '/fonts/martian-mono-latin.woff2'
+    as: 'font'
+    type: 'font/woff2'
+    crossorigin: true
   - rel: 'stylesheet'
     type: 'text/css'
     href: '/css/main.css'

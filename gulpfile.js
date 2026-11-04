@@ -59,6 +59,15 @@ function copyAssets(destinationDir, ignore = []) {
 	});
 }
 
+// A font URL resolves from the built CSS, so a site carries its own copy, with the licences the fonts require.
+function copyFonts(destinationDir) {
+	return new Promise((resolve) => {
+		src('design/fonts/*', {encoding: false})
+			.pipe(dest(destinationDir))
+			.on('end', resolve);
+	});
+}
+
 // ----------------- End Functions  ----------------- //
 
 // Tasks
@@ -71,7 +80,7 @@ task('copy-assets-to-docs', async function(){
 });
 
 task('copy-assets-to-www', async function(){
-	return copyAssets('sites/www', IGNORE.www);
+	return Promise.all([copyAssets('sites/www', IGNORE.www), copyFonts('sites/www/fonts')]);
 });
 
 task('copy-assets-to-uimodule', async function(){

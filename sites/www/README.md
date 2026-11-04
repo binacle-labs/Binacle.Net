@@ -12,10 +12,10 @@ below.
 |---|---|
 | `pages/` | The four pages, plus `404.html` and `robots.txt` |
 | `collections/_sitemaps/` | `sitemap.xml`, served at `/sitemap.xml` |
-| `_sass/` | The stylesheet source. Compiled by the sass CLI, **not by Jekyll** |
-| `_js/` | The TypeScript source. Two behaviours - the theme toggle and the copy controls |
+| `_sass/` | `main.scss`, which names the partials of `design/` this site uses. Compiled by the sass CLI, **not by Jekyll** |
+| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` this site calls |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
-| `_includes/` | The header and footer, the theme init, and the two conversion components |
+| `_includes/` | The header and footer, the theme init, the two conversion components, and `drawings/`, one SVG per picture |
 
 ## 🛠️ Building and serving
 
@@ -38,8 +38,9 @@ the sass CLI over `_sass/main.scss` and writes `css/main.css`, the same way `Bin
 the block back and two compilers have a claim on the same files. It also means **`css/` is gitignored** - it
 is build output, like `js/`.
 
-**No framework and no npm dependencies.** The other two sites run BeerCSS; this one is plain CSS. There is no
-component library to reach for, and the asset copy deliberately skips `assets/lib/` entirely.
+**The look comes from `design/` at the repo root.** `build:css` passes it as a load path, so a partial this site
+needs goes in `_sass/main.scss`. The asset copy puts `design/fonts/` in `fonts/`, which is gitignored like `css/`,
+and deliberately skips `assets/lib/` entirely.
 
 **Every code block on the site is a real response.** They live in `_data/exchange.yml`, and that file says how
 to re-run them. A response that looks plausible but is not what the API returns is the one thing this audience

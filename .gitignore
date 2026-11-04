@@ -16,6 +16,11 @@ obj/
 !.vscode/extensions.json
 .history/*
 
+# Claude Code - local settings can hold paths from this machine
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
 # Rider
 .idea
 
@@ -90,6 +95,7 @@ sites/admin/js
 artifacts/www
 sites/www/js
 sites/www/css
+sites/www/fonts
 sites/www/media
 sites/www/lib
 sites/www/*.ico

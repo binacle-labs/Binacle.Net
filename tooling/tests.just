@@ -64,6 +64,7 @@ sites:
     just test ts_binacle-net-service-client_unit
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
+    just test ts_binacle-components_unit
     just test ts_theme-switcher_unit
     just test rb_binacle-docs-versions_unit
     just test rb_binacle-robots_unit
