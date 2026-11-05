@@ -1,22 +1,15 @@
-<header class="site-header">
-  <div class="shell header-inner">
-    <a class="wordmark" href="{{ '/' | relative_url }}">
-        <img src="{{ site.logo.src | relative_url }}" alt="" width="28" height="28">
-        <span>{{ site.data.header.wordmark }}</span>
-    </a>
-
-    <nav class="site-nav" aria-label="Main">
-        {%- for item in site.data.header.nav -%}
-        {%- if item.external -%}
-        <a href="{{ item.url }}">{{ item.title }}</a>
-        {%- else -%}
-        <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
-        {%- endif -%}
-        {%- endfor -%}
+<header class="site-header" data-site-header>
+  <div class="container">
+    <a class="site-header__wordmark" href="{{ '/' | relative_url }}"><img class="site-header__mark" src="{{ site.logo.src | relative_url }}" alt="" width="24" height="24"><span>{{ site.data.header.wordmark }}</span></a>
+    <nav class="site-header__nav" data-site-nav aria-label="Main">
+      {%- for item in site.data.header.nav %}
+      {%- if item.external %}
+      <a class="site-header__link site-header__link--other-site" data-other-site href="{{ item.url }}">{{ item.title }}</a>
+      {%- else %}
+      <a class="site-header__link" href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
+      {%- endif %}
+      {%- endfor %}
     </nav>
-
-    <theme-switcher data-button-class="theme-toggle">
-        <span data-theme-label>Theme</span>
-    </theme-switcher>
+    <theme-switcher data-button-class="theme-button theme-button--end"></theme-switcher>
   </div>
 </header>

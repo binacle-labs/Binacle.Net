@@ -24,7 +24,7 @@ url                     : "http://localhost:7197"
 gtm                     : ''
 
 logo:
-  src                   : /media/logo/binacle-logo-16x16.svg
+  src                   : /media/logo/binacle-logo.svg
   alt                   : "Binacle.Net Logo"
 
 default_theme: "system"
@@ -150,7 +150,7 @@ defaults:
       path            : "pages/**"
       type            : "pages"
     values:
-      layout          : "default"
+      layout          : "page"
       locale          : "en_US"
       hreflang        : "en"
       nav:

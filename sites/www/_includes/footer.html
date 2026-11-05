@@ -1,13 +1,13 @@
-<footer class="site-footer">
-  <div class="shell">
-    <p>
-        <span>{{ site.data.footer.copyright | expand_year }}</span>
-        <span aria-hidden="true">&middot;</span>
-        <a href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
-        {%- for link in site.data.footer.links %}
-        <span aria-hidden="true">&middot;</span>
-        <a href="{{ link.url }}">{{ link.title }}</a>
-        {%- endfor %}
+<footer class="site-footer site-footer--no-edge">
+  <div class="container">
+    <p class="site-footer__line label">
+      <span>{{ site.data.footer.copyright | expand_year }}</span>
+      <a class="site-footer__link" href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
+    </p>
+    <p class="site-footer__line label">
+      {%- for link in site.data.footer.links %}
+      <a class="site-footer__link{% if link.external %} site-footer__link--external{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor %}
     </p>
   </div>
 </footer>

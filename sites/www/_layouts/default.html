@@ -14,13 +14,7 @@
 <body>
     {% gtm_body site.gtm %}
 
-    {% include header.html %}
-
-    <main id="content">
-        {{ content }}
-    </main>
-
-    {% include footer.html %}
+    {{ content }}
 
     {% script_tags site.data.includes.scripts_body_end %}
 </body>

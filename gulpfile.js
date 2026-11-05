@@ -28,13 +28,19 @@ const ASSETS = {
 // Swashbuckle.
 // material-dynamic-colors, 72 KB: stays everywhere, because sites/demo/_data/includes.yml keeps a
 // commented-out script tag for it.
-// www runs no framework, so it takes the media and the favicons and none of assets/lib/.
+// www runs no framework, so it takes the favicons, the mark and the link preview and nothing else.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const IGNORE = {
 	docs: [],
 	demo: ['assets/lib/swagger-ui/**'],
 	uimodule: ['assets/lib/swagger-ui/**', 'assets/android-chrome-*.png'],
-	www: ['assets/lib/**']
+	www: [
+		'assets/lib/**',
+		'assets/media/docker/**',
+		'assets/media/github/**',
+		'assets/media/logo/binacle-logo-16x16.svg',
+		'assets/media/logo/binacle-logo-{16x16a,24x24a,32x32a,48x48a,128x128a,256x256a}.png'
+	]
 };
 
 // ----------------- Begin Functions  ----------------- //

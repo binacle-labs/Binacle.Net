@@ -12,8 +12,9 @@ below.
 |---|---|
 | `pages/` | The pages, plus `404.html` and `robots.txt` |
 | `_sass/` | `main.scss`, which names the partials of `design/` this site uses. Compiled by the sass CLI, **not by Jekyll** |
-| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` this site calls |
+| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` this site calls, the menu drawer among them |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
+| `_layouts/` | `default.html` is the bare document, `page.html` the header, main and footer around a page |
 | `_includes/` | The header and footer, the exchange, the run command, the trade-off list, and `drawings/`, one SVG per picture |
 
 ## 🛠️ Building and serving
@@ -39,7 +40,7 @@ is build output, like `js/`.
 
 **The look comes from `design/` at the repo root.** `build:css` passes it as a load path, so a partial this site
 needs goes in `_sass/main.scss`. The asset copy puts `design/fonts/` in `fonts/`, which is gitignored like `css/`,
-and deliberately skips `assets/lib/` entirely.
+and skips everything under `assets/` this site does not read: `gulpfile.js` lists it.
 
 **Every code block on the site is a real response.** They live in `_data/exchange.yml`, and that file says how
 to re-run them. A response that looks plausible but is not what the API returns is the one thing this audience

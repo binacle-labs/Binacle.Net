@@ -7,6 +7,8 @@ nav:
     url: '/parcel-lockers/'
   - title: 'How it works'
     url: '/how-it-works/'
+  - title: 'Self-hosting'
+    url: '/self-hosting/'
   - title: 'Docs'
     url: 'https://docs.binacle.net'
     external: true

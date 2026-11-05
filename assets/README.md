@@ -40,7 +40,7 @@ just assets                      # after changing anything here
 
 That runs every gulp task in the root `gulpfile.js`, which copy every `.js`, `.css`, `.woff2`, image and
 icon - and each vendored `LICENSE` - into [`sites/docs/`](../sites/docs), [`sites/demo/`](../sites/demo) and the UI module's `wwwroot/`, and
-the media and icons only into [`sites/www/`](../sites/www), which takes no `lib/`. It is
+only the icons and the logo files it reads into [`sites/www/`](../sites/www). It is
 also part of `just install`, so a fresh clone gets them without asking.
 
 **Every target gets the same layout - `lib/`, `media/` and the icons at the root.** What differs is only what
