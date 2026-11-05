@@ -65,9 +65,11 @@ _site
 .jekyll-cache
 .jekyll-metadata
 
-## Docs
+## Docs - the sass CLI writes css/ from _sass/, as on www.
 artifacts/docs
 sites/docs/js
+sites/docs/css
+sites/docs/fonts
 sites/docs/media
 sites/docs/lib
 sites/docs/*.ico

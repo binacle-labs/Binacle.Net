@@ -4,7 +4,7 @@ description: >-
   That page is not here. Head back to the Binacle.Net documentation home for the quick start, the HTTP API,
   configuration and the samples.
 permalink: /404.html
-layout: page
+layout: default
 breadcrumbs: false
 nav:
     exclude: true
@@ -17,15 +17,11 @@ excerpt: |
 
 {% include header.html %}
 
-<main class="responsive padding">
-
-  <div class="padding medium middle-align center-align">
-    <div>
-      <h1>Page not found</h1>
-      <h2>:(</h2>
-      <p>The requested page could not be found.</p>
-      <a href="/" class="button primary">Go to Home</a>
-    </div>
+<main id="content" class="doc">
+  <h1 class="doc__title">Page not found</h1>
+  <div class="doc__body">
+    <p>The requested page could not be found.</p>
+    <p><a href="{{ '/' | relative_url }}" class="button button--primary">Go to Home</a></p>
   </div>
 </main>
 

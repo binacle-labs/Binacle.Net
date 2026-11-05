@@ -1,42 +1,33 @@
-<header>
-    <article class="middle-align center-align secondary no-radius">
-        <div>
-            <a href="{% vlink /index.md %}">
-                <img class="large" src="{{ site.logo.src | relative_url }}" alt="{{ site.logo.alt }}"/>
-            </a>
-            <div class="max">
-                <a href="{% vlink /index.md %}">
-                    <h5>{{ site.title }}</h5>
-                </a>
-            </div>
-            {% if site.data.versions.list.size != 0 %}
-            <div class="field suffix small">
-                {%- comment -%}
-                Each option carries the url of this same page in that version, stamped by the gem - or that
-                version's index where the page does not exist there.
-                {%- endcomment -%}
-                <select id="version-select" data-versionselect>
-                    {% for version in site.data.versions.list %}
-                    {% assign label = version.label %}
-                    {% if version.id == site.data.versions.current %}
-                    {% assign label = label | append: ' (current)' %}
-                    {% endif %}
-                    {% assign target = page.version_urls[version.id] | default: version.url %}
-                    {% if version.id == page.version %}
-                    <option value="{{ target | relative_url }}" selected>{{ label }}</option>
-                    {% else %}
-                    <option value="{{ target | relative_url }}">{{ label }}</option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
-                <i>arrow_drop_down</i>
-            </div>
-            {% endif %}
-        </div>
-    </article>
-</header>
-<div>
-    {% assign menu_items = site.versions | where: 'nav.exclude',nill | where: 'version',page.version | where: 'nav.parent',nil %}
-    
-    {% include menu.html menu_items=menu_items menu_level=0 %}
-</div>
+<aside class="sidebar" id="docs-side" data-drawer="sidebar">
+    <div class="sidebar__inner" data-sidebar-inner>
+        <div class="drawer__head"><span class="label">Menu</span><button type="button" class="drawer__close" aria-label="Close" data-drawer-close><span class="drawer__close-icon" aria-hidden="true"></span></button></div>
+        {% if site.data.versions.list.size != 0 %}
+        <label class="field">
+            <span class="field__label">Version</span>
+            {%- comment -%}
+            Each option carries the url of this same page in that version, stamped by the gem - or that
+            version's index where the page does not exist there.
+            {%- endcomment -%}
+            <select class="field__select field__select--small" data-versionselect>
+                {% for version in site.data.versions.list %}
+                {% assign label = version.label %}
+                {% if version.id == site.data.versions.current %}
+                {% assign label = label | append: ' (current)' %}
+                {% endif %}
+                {% assign target = page.version_urls[version.id] | default: version.url %}
+                <option value="{{ target | relative_url }}"{% if version.id == page.version %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        {% endif %}
+        <nav class="sidebar__nav" data-sidebar-nav aria-label="Docs">
+            {% assign menu_items = site.versions | where: 'nav.exclude',nil | where: 'version',page.version | where: 'nav.parent',nil %}
+            {% include menu.html menu_items=menu_items menu_level=0 %}
+        </nav>
+        <nav class="drawer__sites" aria-label="Sites">
+            {%- for item in site.data.header.nav %}
+            <a class="drawer__site-link" href="{{ item.url }}">{{ item.title }}</a>
+            {%- endfor %}
+        </nav>
+    </div>
+</aside>

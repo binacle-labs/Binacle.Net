@@ -95,14 +95,14 @@ services-up *args:
 services-down *args:
     docker compose -f tooling/serve.services.yml down {{ args }}
 
-# Docs site: jekyll serve + webpack watch, one terminal (Ctrl-C stops both)
+# Docs site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
 docs: (_serve-n-watch 'sites/docs')
 
 # Demo site: jekyll serve + webpack watch, one terminal (Ctrl-C stops both)
 demo: (_serve-n-watch 'sites/demo')
 
-# Three processes for www, not two: its `npm run watch` is itself a concurrently pair, because the sass CLI
-# compiles the stylesheet here and Jekyll does not.
+# Three processes for docs and www, not two: their `npm run watch` is itself a concurrently pair, because the
+# sass CLI compiles the stylesheet there and Jekyll does not.
 
 # Marketing site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
 www: (_serve-n-watch 'sites/www')

@@ -28,10 +28,11 @@ const ASSETS = {
 // Swashbuckle.
 // material-dynamic-colors, 72 KB: stays everywhere, because sites/demo/_data/includes.yml keeps a
 // commented-out script tag for it.
+// beercss: docs builds on design/ instead.
 // www runs no framework, so it takes the favicons, the mark and the link preview and nothing else.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const IGNORE = {
-	docs: [],
+	docs: ['assets/lib/beercss/**'],
 	demo: ['assets/lib/swagger-ui/**'],
 	uimodule: ['assets/lib/swagger-ui/**', 'assets/android-chrome-*.png'],
 	www: [
@@ -82,7 +83,7 @@ task('copy-assets-to-demo', async function(){
 });
 
 task('copy-assets-to-docs', async function(){
-	return copyAssets('sites/docs', IGNORE.docs);
+	return Promise.all([copyAssets('sites/docs', IGNORE.docs), copyFonts('sites/docs/fonts')]);
 });
 
 task('copy-assets-to-www', async function(){

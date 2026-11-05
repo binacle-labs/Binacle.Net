@@ -1,13 +1,11 @@
 @mixin when-dark {
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]),
-    :root:not([data-theme="light"]) body {
+    :root:not([data-theme="light"]) {
       @content;
     }
   }
 
-  :root[data-theme="dark"],
-  :root[data-theme="dark"] body {
+  :root[data-theme="dark"] {
     @content;
   }
 }

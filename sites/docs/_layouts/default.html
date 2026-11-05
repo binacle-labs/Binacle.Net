@@ -1,44 +1,20 @@
----
-layout: page
----
+<!DOCTYPE html>
+<html lang="{{ page.hreflang }}" data-default-theme="{{ site.default_theme }}" data-theme-storage="{{ site.theme_storage | default: 'cookie' }}"{% if site.cookie_domain %} data-theme-domain="{{ site.cookie_domain }}"{% endif %}>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% link_tags site.data.includes.icons %}
 
-{% include header.html %}
-
-<nav class="left drawer no-padding surface-container m l scroll">
-    {% include sidebar.html %}
-</nav>
-<dialog class="left no-padding surface-container scroll no-radius" id="mobile-menu">
-    {% include sidebar.html %}
-</dialog>
-
-<main class="responsive padding">
-    {% include outdated-notice.html %}
-    <h1>{{ page.title }}</h1>
+    {% page_meta %}
+    {% structured_data %}
+    {% link_tags site.data.includes.links %}
+    <script src="{{ '/js/theme-init.js' | relative_url }}"></script>
+    {% gtm_head site.gtm %}
+</head>
+<body>
+    {% gtm_body site.gtm %}
     {{ content }}
-</main>
 
-{% if page.swagger %}
-<nav class="fixed transparent bottom right-align min fab swagger-fab">
-  <button class="secondary-container" data-ui="#swagger-dialog">Swagger</button>
-</nav>
-{% endif %}
-
-<nav class="fixed transparent bottom right-align min fab s">
-    <button class="left-round top-round">
-        <span>{{ page.version_label }}</span>
-    </button>
-</nav>
-
-{% include footer.html %}
-
-
-{% if page.swagger %}
-<div>
-  <dialog id="swagger-dialog" class="white no-padding swagger-dialog">
-    <button type="button" class="close-btn top right circle small transparent">
-      <i class="material-icons black-text">close</i>
-    </button>
-    <iframe src="{% vlink /swagger/{{ page.swagger | downcase }}.md %}"></iframe>
-  </dialog>
-</div>
-{% endif %}
+    {% script_tags site.data.includes.scripts_body_end %}
+</body>
+</html>

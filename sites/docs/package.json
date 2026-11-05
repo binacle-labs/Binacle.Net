@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "This is the documentation site for Binacle.Net.",
   "scripts": {
-    "build": "webpack --env build=dist",
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "sass --load-path=../../design --no-source-map --style=compressed _sass/main.scss:css/main.css _sass/pygments.scss:css/pygments.css",
+    "build:js": "webpack --env build=dist",
     "serve": "bundle exec jekyll serve",
-    "watch": "webpack --watch --env build=watch"
+    "watch": "concurrently --names 'css,js' 'npm:watch:css' 'npm:watch:js'",
+    "watch:css": "sass --load-path=../../design --watch _sass/main.scss:css/main.css _sass/pygments.scss:css/pygments.css",
+    "watch:js": "webpack --watch --env build=watch"
   },
   "repository": {
     "type": "git",
@@ -14,12 +18,15 @@
   "author": "Chris Mavrommatis",
   "license": "AGPL-3.0-only AND CC-BY-4.0 AND MIT",
   "devDependencies": {
+    "concurrently": "^10.0.6",
+    "sass": "^1.93.2",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
     "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "binacle-components": "*",
     "theme-switcher": "*"
   }
 }

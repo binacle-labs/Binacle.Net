@@ -1,26 +1,20 @@
-<header class="fixed top responsive max primary">
-    <nav>
-        <button class="circle transparent s" data-ui="#mobile-menu">
-            <i>menu</i>
-        </button>
-        
-        {% breadcrumbs %}
-        
-        <div class="max center-align"></div>
-
-        {% for link in site.data.header.links %}
-        <a href="{{ link.url }}" title="{{ link.title }}" target="{{ link.target }}">
-            {% if link.image != nil %}
-            <img src="{{ link.image.url | relative_url }}" alt="{{ link.image.alt }}"  height="{{ link.image.height }}" />
-            {% endif %}
-        </a>
-        {% endfor %}
-
-        <theme-switcher data-button-class="transparent circle">
-
-        </theme-switcher>
+{%- comment -%}
+A page outside the versions has no sidebar, so the burger stays out and the shared script builds the site drawer.
+{%- endcomment -%}
+<header class="site-header" data-site-header>
+  <div class="container">
+    {%- if page.version %}
+    <button type="button" class="site-header__burger" aria-label="Menu" aria-expanded="false" aria-controls="docs-side" data-drawer-open="docs-side"><span class="site-header__burger-icon" aria-hidden="true"></span></button>
+    {%- endif %}
+    <a class="site-header__wordmark" href="{% if page.version %}{% vlink /index.md %}{% else %}{{ '/' | relative_url }}{% endif %}"><img class="site-header__mark" src="{{ site.logo.src | relative_url }}" alt="" width="24" height="24"><span>{{ site.data.header.wordmark }}</span></a>
+    {%- if page.version %}
+    <button type="button" class="site-header__where" aria-expanded="false" aria-controls="docs-side" data-drawer-open="docs-side"><span class="visually-hidden">Menu: </span><span data-where>{% if page.nav.exclude %}Home{% else %}{% if page.nav.icon and page.nav.parent == nil %}<span class="sidebar__icon emoji" aria-hidden="true">{{ page.nav.icon }}</span> {% endif %}{{ page.menu_title | default: page.title }}{% endif %}</span><span class="site-header__section" data-section></span></button>
+    {%- endif %}
+    <nav class="site-header__nav" data-site-nav aria-label="Main">
+      {%- for item in site.data.header.nav %}
+      <a class="site-header__link site-header__link--other-site{% if item.external %} site-header__link--external{% endif %}" data-other-site href="{{ item.url }}">{{ item.title }}</a>
+      {%- endfor %}
     </nav>
+    <theme-switcher data-button-class="theme-button theme-button--end"></theme-switcher>
+  </div>
 </header>
-
-
-

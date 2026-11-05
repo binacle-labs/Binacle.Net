@@ -1,10 +1,13 @@
-<footer class="responsive max secondary-container">
-    <div class="grid center-align">
-        <div class="s6">
-            {{ site.data.footer.copyright | expand_year }}
-        </div>
-        <div class="s6">
-            {{ site.data.footer.license | expand_year }}
-        </div>
-    </div>
+<footer class="site-footer" data-site-footer>
+  <div class="container">
+    <p class="site-footer__line label">
+      <span>{{ site.data.footer.copyright | expand_year }}</span>
+      <a class="site-footer__link" href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
+    </p>
+    <p class="site-footer__line label">
+      {%- for link in site.data.header.nav %}
+      <a class="site-footer__link{% if link.external %} site-footer__link--external{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor %}
+    </p>
+  </div>
 </footer>

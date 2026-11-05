@@ -27,7 +27,7 @@ module.exports = (env, argv) => {
 	const main = {
 		mode: production ? 'production' : 'development',
 		entry: {
-			main: './_js/main.js'
+			main: './_js/main.ts'
 		},
 		output: {
 			filename: '[name].js',

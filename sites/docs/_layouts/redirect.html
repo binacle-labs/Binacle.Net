@@ -20,19 +20,9 @@
 <body>
 
 {% include header.html %}
-<main class="responsive padding">
-    <div class="padding medium middle-align center-align">
-        <div>
-            <h1>{{ page.title }}</h1>
-
-        </div>
-    </div>
-    <div class="padding medium middle-align center-align">
-        <div>
-            <a href="{{ redirect_to }}">Click here if you are not redirected.</a>
-        </div>
-    </div>
-
+<main id="content" class="doc">
+    <h1 class="doc__title">{{ page.title }}</h1>
+    <p><a href="{{ redirect_to }}">Click here if you are not redirected.</a></p>
 </main>
 {% include footer.html %}
 

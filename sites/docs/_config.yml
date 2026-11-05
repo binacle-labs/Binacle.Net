@@ -18,7 +18,7 @@ url                     : "http://localhost:7195"
 gtm                     : ''
 
 logo:
-  src                  : /media/logo/binacle-logo-512x512a.png
+  src                  : /media/logo/binacle-logo.svg
   alt                  : "Binacle.Net Logo"
 
 default_theme: "system"
@@ -33,12 +33,6 @@ plugins_dir         : _plugins       # takes an array of strings and loads plugi
 layouts_dir         : _layouts
 includes_dir        : _includes
 data_dir            : _data
-sass:
-  sass_dir          : _sass
-  cache             : false
-  style             : compressed
-  # A source map ships sourcesContent - every comment in _sass, served to anyone.
-  sourcemap         : never
 collections:
   versions:
     output          : true
@@ -152,7 +146,7 @@ defaults:
       path           : "pages/**"
       type           : "pages"
     values:
-      layout          : "default"
+      layout          : "page"
       locale          : "en_US"
       hreflang        : "en"
       nav:
@@ -167,7 +161,7 @@ defaults:
       path           : "**/**"
       type           : "versions"
     values:
-      layout          : "default"
+      layout          : "page"
       path_prefix     : "version"
       locale          : "en_US"
       hreflang        : "en"

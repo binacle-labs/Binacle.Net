@@ -1,8 +1,6 @@
 @use '../theme-modes' as *;
 
-:root,
-body.light,
-body.dark {
+:root {
   --hl-bg: #f8f8f2;
   --hl-fg: #333333;
   --hl-comment: #75715e;

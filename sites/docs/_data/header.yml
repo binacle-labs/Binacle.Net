@@ -1,15 +1,13 @@
-links:
-  - title: 'Check out my GitHub'
+wordmark: "Binacle.Net Docs"
+
+nav:
+  - title: 'Binacle.Net'
+    url: 'https://www.binacle.net'
+  - title: 'Demo'
+    url: 'https://demo.binacle.net'
+  - title: 'GitHub'
     url: 'https://github.com/binacle-labs/Binacle.Net'
-    image:
-      url: 'media/github/github-mark-white.png'
-      alt: 'Github'
-      height: 20
-    target: '_blank'
-  - title: 'Visit Binacle.Net on Dockerhub'
+    external: true
+  - title: 'Docker Hub'
     url: 'https://hub.docker.com/r/binacle/binacle-net'
-    image:
-      url: 'media/docker/docker-mark-white.png'
-      alt: 'Dockerhub'
-      height: 20
-    target: '_blank'
+    external: true

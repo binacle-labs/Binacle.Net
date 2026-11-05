@@ -1,50 +1,23 @@
+{%- comment -%}
+Reads include.menu_level, never an assign of it: an assign is global, so a nested menu would change its parent's.
+{%- endcomment -%}
 {% assign menu_items = include.menu_items | sort: "nav.order" %}
-{% assign menu_level = include.menu_level %}
-{% assign menu_level = menu_level | plus: 1 %}
-
-
 {% unless menu_items.size == 0 %}
-<ul class="list border" data-level="{{ menu_level }}">
+<ul class="sidebar__list{% if include.menu_level > 0 %} sidebar__list--nested{% endif %}{% if include.menu_level > 1 %} sidebar__list--deep{% endif %}">
     {% for item in menu_items %}
-        {% assign is_active = false %}
-        {% if item.url == page.url %}
-            {% assign is_active = true %}
-        {% endif %}
-        {% assign child_menu_items = site.versions | where: 'nav.exclude',nil | where: 'version', item.version | where: 'nav.parent',item.title %}
-        {% if child_menu_items.size == 0 %}
-        <li class="tiny-space{% if is_active %} surface-container-highest{% endif %}">
-            <span>{{ item.nav.icon }}</span>
-            {% if is_active %}
-            <span data-active>
-                <strong>{{ item.menu_title | default: item.title }}</strong>       
-            </span>
-            {% else %}
-            <a href="{{ item.url | relative_url }}">
-                {{ item.menu_title | default: item.title }}
-            </a>
-            {% endif %}
-        </li>
-        {% else %}
-        <li class="tiny-space">
-            <details>
-                <summary class="{% if is_active %}surface-container-highest{% endif %}">
-                    <span>{{ item.nav.icon }}</span>
-                    {% if is_active %}
-                    <span data-active>
-                        <strong>{{ item.menu_title | default: item.title }}</strong>
-                    </span>
-                    {% else %}
-                    <a href="{{ item.url | relative_url }}">
-                        {{ item.menu_title | default: item.title }}
-                    </a>
-                    {% endif %}
-                    <i>arrow_drop_down</i>
-                </summary>
-                {% include menu.html menu_items=child_menu_items menu_level=menu_level %}
-            </details>
-        </li>
-        {% endif %}
+    {% assign child_menu_items = site.versions | where: 'nav.exclude',nil | where: 'version', item.version | where: 'nav.parent',item.title %}
+    {% capture menu_link %}<a class="sidebar__link{% if include.menu_level > 0 %} sidebar__link--nested{% endif %}" href="{{ item.url | relative_url }}"{% if item.url == page.url %} aria-current="page"{% endif %}>{% if include.menu_level == 0 and item.nav.icon %}<span class="sidebar__icon emoji" aria-hidden="true">{{ item.nav.icon }}</span>{% endif %}<span>{{ item.menu_title | default: item.title }}</span></a>{% endcapture %}
+    {% if child_menu_items.size == 0 %}
+    <li class="sidebar__item">{{ menu_link }}</li>
+    {% else %}
+    <li class="sidebar__item">
+        <details class="sidebar__group">
+            <summary class="sidebar__summary">{{ menu_link }}</summary>
+            {% assign next_level = include.menu_level | plus: 1 %}
+            {% include menu.html menu_items=child_menu_items menu_level=next_level %}
+        </details>
+    </li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endunless %}
-

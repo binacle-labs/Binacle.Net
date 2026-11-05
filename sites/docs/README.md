@@ -11,11 +11,12 @@ The documentation site, built with [Jekyll](https://jekyllrb.com/). It hosts the
 | `pages/` | `404.html` and `robots.txt`. The landing page is the current line's index |
 | `_data/` | Site data. `versions.yml` is the version list: which one is current, where each renders, what docker tag each pulls |
 | `_redirects` | Old urls and where they went, one per line. Cloudflare reads it from the output root |
-| `_layouts/`, `_includes/`, `_sass/`, `css/` | Templates, partials and styles |
+| `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document, `page.html` the wrapper every page gets |
+| `_sass/` | This site's stylesheets. `main.scss` names what it takes from the repo-root [`design/`](../../design) folder. The sass command compiles them into `css/` |
 | `_js/` | TypeScript and JavaScript sources. Webpack bundles them into `js/` |
 
-`js/`, `lib/`, `media/` and the favicons at the root are **generated or copied in** and gitignored - webpack
-writes the first, `just assets` writes the rest. Nothing there is edited by hand.
+`css/`, `js/`, `fonts/`, `lib/`, `media/` and the favicons at the root are **generated or copied in** and
+gitignored - sass writes the first, webpack the second, `just assets` the rest. Nothing there is edited by hand.
 
 ## 🚀 Develop
 
@@ -25,7 +26,7 @@ From the repo root:
 just serve docs
 ```
 
-That runs `jekyll serve` and the webpack watch together in one terminal, and one Ctrl-C stops both. **Use it
+That runs `jekyll serve` and the sass and webpack watches together in one terminal, and one Ctrl-C stops them all. **Use it
 rather than `jekyll serve` on its own** - Jekyll alone does not rebuild the TypeScript or SCSS under `_js/`, so
 a script or style change appears to do nothing.
 
