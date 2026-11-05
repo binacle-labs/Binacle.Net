@@ -4,6 +4,7 @@ require 'jekyll'
 
 require_relative 'binacle-docs-versions/error'
 require_relative 'binacle-docs-versions/pages'
+require_relative 'binacle-docs-versions/pager'
 require_relative 'binacle-docs-versions/urls'
 require_relative 'binacle-docs-versions/versioned_file'
 require_relative 'binacle-docs-versions/generator'

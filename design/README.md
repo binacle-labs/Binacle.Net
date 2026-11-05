@@ -20,8 +20,9 @@ built on its own.
 
 **One partial per block, named after it.** `.drawer` is in `components/_drawer.scss`.
 
-**A rule goes in the file of the last block its selector names.** `.doc__body .table` is in `_table.scss`, so
-everything that can change a table is in one place. The page width, `container`, and the type styles - `label`,
+**A rule goes in the file of the last block its selector names.** `.doc > .callout` is in `_callout.scss`, so
+everything that can change a callout is in one place. A second class counts the same: `.doc__table` is in
+`_table.scss`. The page width, `container`, and the type styles - `label`,
 `prose`, `mono` - do not count: `.site-header .container` is in `_site-header.scss`.
 
 **Every class is written out in full, never glued with `&`,** so a search for its name finds it - the
@@ -50,9 +51,6 @@ On purpose, each for a reason:
   They share elements with blocks and have to win, so they sit in a last layer, as ITCSS has it.
 - **States are `is-` classes, as in SMACSS and BEMIT; nothing else takes a prefix.** BEM writes a state as a
   modifier. BEMIT would also mark the type styles as utilities, `u-label`; here they are `label`.
-- **Content from markdown is styled by its bare tags and its context.** BEM wants a class on every element and
-  a second class where a block sits inside another. Markdown gives a class only where one is written by hand,
-  so `.doc__body > h2` styles a heading and `.doc__body .table` a table.
 
 ## 🚀 How you use it
 
@@ -85,8 +83,7 @@ another partial loaded it earlier, the build stops with *already loaded, so it c
 
 **`_drawing.scss` still writes its modifiers with the block,** `.drawing.drawing--painted`, and so does
 `.band__body.band__body--code-left`. Their rules win by that extra class; taking it off changes which rule wins.
-`.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later. So has
-`.result-list.result-list--full`: it has to beat `.doc__body > ul`.
+`.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later.
 
 **Load `utilities/` last.** A type style shares its element with a block - `band__body prose` - and both set
 `gap`. Written on purpose, the type style has to win, so it comes after every block.

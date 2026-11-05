@@ -9,7 +9,7 @@ RSpec.describe Jekyll::BreadcrumbTrail::BreadcrumbsTag do
         '<nav aria-label="breadcrumb">',
         '<ol class="breadcrumb">',
         '<li class="breadcrumb-item"><a href="/section/v1.0.x/">Home</a></li>',
-        '<li class="breadcrumb-item"><a href="/section/v1.0.x/getting-started/">Getting Started</a></li>',
+        '<li class="breadcrumb-item"><a href="/section/v1.0.x/getting-started/">Getting started</a></li>',
         '<li class="breadcrumb-item active" aria-current="page">Quick start</li>',
         '</ol>',
         '</nav>'

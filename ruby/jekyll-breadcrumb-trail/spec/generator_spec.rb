@@ -9,10 +9,16 @@ RSpec.describe Jekyll::BreadcrumbTrail::TrailGenerator do
     expect(trail(build_site(versioned), DEEP_PAGE)).to eq(
       [
         { 'name' => 'Home', 'url' => VERSION_ROOT },
-        { 'name' => 'Getting Started', 'url' => '/section/v1.0.x/getting-started/' },
+        { 'name' => 'Getting started', 'url' => '/section/v1.0.x/getting-started/' },
         { 'name' => 'Quick start', 'url' => '/section/v1.0.x/getting-started/quick-start.html' }
       ]
     )
+  end
+
+  it 'names a segment from its own page, and from the segment where it has none' do
+    names = trail(build_site, DEEP_PAGE).map { |crumb| crumb['name'] }
+
+    expect(names).to include('Getting started', 'Section')
   end
 
   describe 'the home crumb' do

@@ -30,9 +30,6 @@ links:
   - type: 'text/css'
     rel: 'stylesheet'
     href: '/css/main.css'
-  - type: 'text/css'
-    rel: 'stylesheet'
-    href: '/css/pygments.css'
 
 
 scripts_body_end:

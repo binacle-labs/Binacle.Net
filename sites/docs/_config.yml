@@ -240,10 +240,9 @@ page_meta:
 ################################################################
 breadcrumbs:
   exclude: ["version", "*.*"]
-  class: tiny-space
-  title_from: [menu_title, title]
+  title_from: [title]
   home:
-    html: '<i class="small">home</i>'
+    title: Docs
 
 ################################################################
 # jekyll-structured-data

@@ -11,7 +11,7 @@ Two pieces, both keyed on the version the page belongs to.
 
 | Surface | Does |
 |---|---|
-| the generator | decides the url of every file under `_versions/`; stamps `version`, `version_tag`, `title_suffix`, `robots` and `version_urls`; fails the build on two files at one url; prints the pages the previous version had that the current one lacks |
+| the generator | decides the url of every file under `_versions/`; stamps `version`, `version_tag`, `title_suffix`, `robots`, `version_urls` and `pager`, the page before and after in the menu; fails the build on two files at one url; prints the pages the previous version had that the current one lacks |
 | `{% vlink /path %}` | links to a file inside the current page's version, or inside the version named first |
 
 ## 🚀 Quick start

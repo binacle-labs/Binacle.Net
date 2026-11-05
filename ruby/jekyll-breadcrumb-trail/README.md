@@ -46,7 +46,7 @@ Every setting has a default, so that is enough to get a working trail.
 ```yaml
 breadcrumbs:
   exclude: []                        # globs, matched against one path segment
-  title_from: [crumbtitle, title]    # front matter keys, in order, for the current page's label
+  title_from: [crumbtitle, title]    # front matter keys, in order, for a page's label
   link_last: false                   # is the current page a link
   label: breadcrumb                  # the nav's aria-label
   class: ''                          # an extra class on the <nav>
@@ -58,7 +58,7 @@ breadcrumbs:
 | Key | Default | What it does |
 |---|---|---|
 | `exclude` | `[]` | segments whose label is left out of the trail. Globs, matched one segment at a time |
-| `title_from` | `[crumbtitle, title]` | front matter keys tried in order for the current page's label |
+| `title_from` | `[crumbtitle, title]` | front matter keys tried in order for a page's label |
 | `link_last` | `false` | when false the current page is text, not a link. Both are conformant |
 | `label` | `breadcrumb` | the `aria-label` on the nav landmark. Change it for another language |
 | `class` | none | an extra class on the `<nav>`. The list and item classes are always written |
@@ -97,8 +97,9 @@ markup draws the separator in CSS, not in the list.
 
 ## 🧭 How the trail is worked out
 
-The trail comes from the page's url, one crumb per segment. Labels for the segments above the current page
-are the segment with hyphens turned into spaces, any `.html` dropped, and every word capitalized.
+The trail comes from the page's url, one crumb per segment. A segment above the current page takes its label
+from the page at that url, through `title_from`. With no page there, the label is the segment with hyphens
+turned into spaces, any `.html` dropped, and every word capitalized.
 
 **`exclude` suppresses a label, never a url.** The segment keeps its place in every crumb below it, so the
 trail a crawler follows is real.

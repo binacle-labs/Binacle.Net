@@ -78,23 +78,3 @@
 .doc .callout {
   max-width: none;
 }
-
-// No critical box exists in the docs yet. These real-danger warnings stand in for one; drop this block when the
-// docs mark them critical.
-$-critical-pages: (
-  "samples/docker/full",
-  "configuration/core",
-  "configuration/core/forwarded-headers",
-  "configuration/diagnostics-module/health-checks",
-  "api/v3"
-);
-
-@each $page in $-critical-pages {
-  body[data-page="#{$page}"] .callout--warning {
-    border-left-color: var(--error);
-
-    > .label {
-      color: var(--error);
-    }
-  }
-}

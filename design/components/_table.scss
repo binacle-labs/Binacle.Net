@@ -189,7 +189,7 @@
 
 // A docs table stays a table on a phone. Its tables are reference, read across a row, and stacked they lose
 // half the width. A long path wraps inside its column.
-.doc__body .table {
+.doc__table {
   @media (width < tiers.$tablet) {
     display: table;
 

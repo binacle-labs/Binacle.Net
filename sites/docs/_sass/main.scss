@@ -9,18 +9,23 @@
 @use "layout/sidebar";
 @use "layout/outline";
 
+@use "components/breadcrumbs";
 @use "components/button";
 @use "components/callout";
 @use "components/close-button";
+@use "components/code-block";
+@use "components/copy-button";
 @use "components/drawer";
 @use "components/drawer-backdrop";
 @use "components/emoji";
 @use "components/field";
+@use "components/http-line";
+@use "components/pager";
 @use "components/section-box";
 @use "components/section-button";
+@use "components/table";
 @use "components/theme-button";
 
-@use "blockquote";
 @use "swagger";
 
 // Last: a type style shares its element with a block and has to win.

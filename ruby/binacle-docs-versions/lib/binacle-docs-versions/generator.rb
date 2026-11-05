@@ -42,6 +42,7 @@ module Binacle
         end
 
         stamp_version_urls(pages, versioned)
+        stamp_pagers(pages, versioned)
         stamp_redirects(site, current)
         check_collisions(site)
         print_removed(pages, current, previous_version(site, current))
@@ -90,6 +91,13 @@ module Binacle
             target = pages.counterpart(doc, version)
             urls[version] = target.url unless target.nil?
           end
+        end
+      end
+
+      def stamp_pagers(pages, versioned)
+        # site.documents holds a collection's static files too, and a download is no page in the menu.
+        versioned.grep(Jekyll::Document).group_by { |doc| version_of(doc) }.each do |version, docs|
+          Pager.new(docs, pages.index_of(version)).stamp
         end
       end
 

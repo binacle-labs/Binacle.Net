@@ -6,8 +6,8 @@ module Jekyll
     # visible trail and any markup built from the same key cannot disagree.
     class Trail
       def initialize(site, config)
-        @site = site
         @config = config
+        @pages = (site.pages + site.documents).to_h { |doc| [doc.url.to_s.sub(%r{/index\.html\z}, '/'), doc] }
       end
 
       def write(doc)
@@ -32,7 +32,8 @@ module Jekyll
         trail = [crumb(@config.home_title, path(segments, start, true))]
         ((start + 1)..last).each do |index|
           directory = index < last || url.end_with?('/')
-          trail << crumb(name(doc, segments, index, last), path(segments, index, directory))
+          url_here = path(segments, index, directory)
+          trail << crumb(name(doc, segments, index, last, url_here), url_here)
         end
         trail
       end
@@ -51,10 +52,10 @@ module Jekyll
         directory ? "#{built}/" : built
       end
 
-      def name(doc, segments, index, last)
-        return Labels.humanize(segments[index]) unless index == last
-
-        Labels.first_of(doc.data, @config.title_from) || Labels.humanize(segments[index])
+      # A segment's own page knows its name, so a segment like api can read API.
+      def name(doc, segments, index, last, url)
+        page = index == last ? doc : @pages[url]
+        (page && Labels.first_of(page.data, @config.title_from)) || Labels.humanize(segments[index])
       end
 
       def crumb(name, url)

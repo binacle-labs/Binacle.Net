@@ -3,20 +3,45 @@ layout: default
 ---
 {% include header.html %}
 
-{% assign sections = content | doc_sections %}
+{% assign body = content | doc_body %}
+{% assign sections = body | doc_sections %}
 <div class="docs-layout">
     {% include sidebar.html %}
     <div class="drawer-backdrop" data-drawer-close></div>
 
     <main id="content" class="doc">
         {% include outdated-notice.html %}
-        <h1 class="doc__title" data-doc-title>{{ page.title }}</h1>
+        <nav class="breadcrumbs label" aria-label="Breadcrumb">
+            {%- if page.nav.exclude %}
+            <span aria-current="page">Docs</span>
+            {%- else %}
+            {%- for crumb in page.breadcrumb_trail %}
+            {%- if forloop.last %}
+            <span aria-current="page">{{ crumb.name }}</span>
+            {%- else %}
+            <a class="breadcrumbs__link" href="{{ crumb.url | relative_url }}">{{ crumb.name }}</a>
+            {%- endif %}
+            {%- endfor %}
+            {%- endif %}
+        </nav>
+        {%- comment -%} A keycap numbers a menu entry; it is not a picture of the page. {%- endcomment %}
+        <h1 class="doc__title" data-doc-title>{% if page.nav.icon and page.nav.exclude == nil %}{% unless page.nav.icon contains '⃣' %}<span class="doc__icon emoji" aria-hidden="true">{{ page.nav.icon }}</span>{% endunless %}{% endif %}{{ page.title }}</h1>
         {% if page.swagger %}
         <div class="doc__actions"><button type="button" class="button" data-dialog-open="swagger-dialog">Swagger</button></div>
         {% endif %}
         <div class="doc__body" data-doc-body>
-            {{ content }}
+            {{ body }}
         </div>
+        {% if page.pager.previous or page.pager.next %}
+        <nav class="pager" data-pager aria-label="Previous and next">
+            {%- if page.pager.previous %}
+            <a class="pager__link" rel="prev" href="{{ page.pager.previous.url | relative_url }}"><span class="label">Previous</span><span class="pager__title">{{ page.pager.previous.title }}</span></a>
+            {%- endif %}
+            {%- if page.pager.next %}
+            <a class="pager__link" rel="next" href="{{ page.pager.next.url | relative_url }}"><span class="label">Next</span><span class="pager__title">{{ page.pager.next.title }}</span></a>
+            {%- endif %}
+        </nav>
+        {% endif %}
     </main>
 
     <nav class="outline{% if sections.size > 1 %} outline--ruled{% endif %}" aria-label="On this page">

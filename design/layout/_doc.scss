@@ -68,72 +68,62 @@
     margin-top: var(--step);
   }
 
-  > p,
-  > ul,
-  > ol,
-  > h2,
-  > h3,
-  > h4 {
-    max-width: var(--measure-prose);
-  }
-
-  > h2 {
-    margin-top: calc(var(--step) * 4);
-    padding-top: calc(var(--step) * 2);
-    border-top: 1px solid var(--rule);
-    scroll-margin-top: var(--step);
-  }
-
-  > h3 {
-    margin-top: calc(var(--step) * 2.5);
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-    scroll-margin-top: var(--step);
-  }
-
-  > h4,
-  > h5,
-  > h6 {
-    margin-top: calc(var(--step) * 2);
-    font-size: var(--size-h3);
-    font-weight: 600;
-    max-width: var(--measure-prose);
-  }
-
-  > hr {
-    border: 0;
-    border-top: 1px solid var(--rule);
-    margin-top: calc(var(--step) * 2);
-    margin-bottom: calc(var(--step) * 2);
-  }
-
-  > blockquote {
-    max-width: var(--measure-prose);
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 16px;
-    border-left: 1px solid var(--rule);
-    color: var(--muted);
-  }
-
-  li > ul,
-  li > ol {
-    margin-top: calc(var(--step) / 2);
-  }
-
-  > h2 + *,
-  > h3 + *,
-  > h4 + *,
-  > h5 + * {
-    margin-top: calc(var(--step) * 0.75);
-  }
-
   > .lede {
     font-size: 19px;
     line-height: 1.55;
   }
+}
+
+.doc__text,
+.doc__list,
+.doc__heading {
+  max-width: var(--measure-prose);
+}
+
+.doc__heading--2 {
+  margin-top: calc(var(--step) * 4);
+  padding-top: calc(var(--step) * 2);
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: var(--step);
+}
+
+.doc__heading--3 {
+  margin-top: calc(var(--step) * 2.5);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  scroll-margin-top: var(--step);
+}
+
+.doc__heading--4 {
+  margin-top: calc(var(--step) * 2);
+  font-size: var(--size-h3);
+  font-weight: 600;
+}
+
+.doc__rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin-top: calc(var(--step) * 2);
+  margin-bottom: calc(var(--step) * 2);
+}
+
+.doc__quote {
+  max-width: var(--measure-prose);
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.doc__list--nested {
+  margin-top: calc(var(--step) / 2);
+}
+
+.doc__heading + * {
+  margin-top: calc(var(--step) * 0.75);
 }
 
 // A tinted block in a docs page, from the page column's left edge to the window's right.

@@ -23,6 +23,19 @@ RSpec.describe Binacle::DocsVersions::VersionGenerator do
     end
   end
 
+  describe 'the pager' do
+    it 'links a page to the next in its version' do
+      expect(doc(build_site, 'v1.x/index.md').data['pager']['next']['url']).to start_with('/version/')
+    end
+
+    it 'holds no static file' do
+      urls = build_site.documents.filter_map { |item| item.data['pager'] }.flat_map(&:values).map { |link| link['url'] }
+
+      expect(urls).not_to be_empty
+      expect(urls.grep(/\.json\z/)).to be_empty
+    end
+  end
+
   describe 'the versions list' do
     it 'stamps the tag listed beside the version id' do
       expect(doc(build_site, V1_GUIDE).data['version_tag']).to eq('1.0.3')
