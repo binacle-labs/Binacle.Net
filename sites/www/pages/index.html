@@ -11,79 +11,112 @@ structured_data:
 ---
 
 <section class="band hero">
-    <div class="shell hero-grid">
-        <div class="hero-copy prose">
-            <h1>{{ page.heading }}</h1>
+    <div class="container hero__grid hero__grid--picture-first">
+        <div class="hero__copy">
+            <h1 class="display-1">{{ page.heading }}</h1>
 
-            <p class="lead">Binacle.Net answers which box an order goes in, in milliseconds. Give it your box
-                sizes and a list of items and it returns the smallest box that holds them, and where every
-                item sits. It is a free and open source 3D bin packing API that you host yourself.</p>
+            <div class="prose prose--marketing">
+                <p>Binacle.Net answers which box an order goes in, in milliseconds. Give it your box sizes and a
+                    list of items and it returns the smallest box that holds them, and where every item sits. It
+                    is a free and open source 3D bin packing API that you host yourself.</p>
+                <p class="muted">Built for checkout: your customer picks a locker or a box, and Binacle.Net says
+                    whether the order fits before they pay.</p>
+            </div>
 
-            <p>Built for checkout: your customer picks a locker or a box, and Binacle.Net says whether the
-                order fits before they pay.</p>
+            <div class="hero__actions">
+                <p class="actions"><a class="button button--primary" href="https://demo.binacle.net">Try the
+                    demo</a></p>
+                {% include command.html id="hero" class="hero__command" %}
+            </div>
 
-            <p class="actions">
-                <a class="button primary" href="#run">Run it</a>
-                <a class="button secondary" href="https://demo.binacle.net">Try the demo</a>
-            </p>
-
-            <p class="hero-repo"><a href="https://github.com/binacle-labs/Binacle.Net">Read the source on
+            <p class="hero__source"><a href="https://github.com/binacle-labs/Binacle.Net">Read the source on
                 GitHub</a></p>
         </div>
 
-        <div class="hero-card">
-            {% include exchange.html id="hero" block=site.data.exchange.fit
-               verdict="The medium locker holds all three items. The small one takes only one of them." %}
+        <figure class="hero__picture">
+            <div class="drawing drawing--painted">
+                <div class="drawing-pair">
+                    {% include drawings/hero.svg %}
+                    {% include drawings/hero-crop.svg %}
+                </div>
+            </div>
+            <figcaption class="drawing__caption">
+                <span class="label">compartment-L &middot; AllItemsFit</span>
+                <span class="label">kettle-boxed &middot; 24 x 20 x 28</span>
+            </figcaption>
+        </figure>
+    </div>
+</section>
+
+<nav class="band path" aria-label="On this page">
+    <div class="container">
+        <ol class="path__list">
+            <li class="path__item"><a class="path__link" href="#problem">The problem</a></li>
+            <li class="path__item"><a class="path__link" href="#scope">Scope</a></li>
+            <li class="path__item"><a class="path__link" href="#trade-offs">Trade-offs</a></li>
+            <li class="path__item"><a class="path__link" href="#api">The API</a></li>
+            <li class="path__item"><a class="path__link" href="#use-cases">Use cases</a></li>
+            <li class="path__item"><a class="path__link" href="#run">Get started</a></li>
+        </ol>
+    </div>
+</nav>
+
+<section class="band band--numbered band--split band--number-in-row band--tint band--no-edge" id="problem">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">The problem</p></div>
+        <div class="band__body split split--text-left">
+            <div class="prose">
+                <h2 class="band__heading">Checkout has to answer before the customer pays.</h2>
+                <p>Your customer picks a locker size or a box, and something has to say yes or no while they are
+                    still on the page. Not in a warehouse an hour later.</p>
+                <p>Get it wrong and someone repacks the order, prints a second label, or sends a parcel to a
+                    locker that will not take it. The customer has already paid.</p>
+                <p>Working out whether the items go in is a 3D packing problem, and checkout does not have long
+                    to wait.</p>
+            </div>
+
+            <figure class="fit-row">
+                <div class="drawing drawing--painted">
+                    {% include drawings/lockers.svg %}
+                    <ol class="fit-row__verdicts fit-row__verdicts--lockers">
+                        <li class="fit-row__verdict"><span class="fit-row__number">8</span> NotAll<wbr>ItemsFit</li>
+                        <li class="fit-row__verdict"><span class="fit-row__number">19</span> NotAll<wbr>ItemsFit</li>
+                        <li class="fit-row__verdict fit-row__verdict--fits"><span
+                            class="fit-row__number">41</span> AllItems<wbr>Fit</li>
+                    </ol>
+                </div>
+                <figcaption class="fit-row__caption verdict">The kettle from the locker example, against three
+                    compartments 61 wide. Only the large one takes it. <a href="{{ '/parcel-lockers/' |
+                    relative_url }}#example">See the request</a>.</figcaption>
+            </figure>
         </div>
     </div>
 </section>
 
-<section class="band alt">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">The problem</p>
-            <h2>Checkout has to answer before the customer pays.</h2>
-
-            <p>Your customer picks a locker size or a box, and something has to say yes or no while they are
-                still on the page. Not in a warehouse an hour later.</p>
-
-            <p>Get it wrong and someone repacks the order, prints a second label, or sends a parcel to a
-                locker that will not take it. The customer has already paid.</p>
-
-            <p>Working out whether the items go in is a 3D packing problem, and checkout does not have long
-                to wait.</p>
-        </div>
-    </div>
-</section>
-
-<section class="band">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">Scope</p>
-            <h2>What it answers</h2>
-            <p>Binacle.Net works one box at a time.</p>
-        </div>
-
-        <div class="table-wrap">
-            <table class="scope">
+<section class="band band--numbered band--wide band--number-in-column band--no-edge" id="scope">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Scope</p></div>
+        <div class="band__body">
+            <div class="prose prose--one-line">
+                <h2 class="band__heading">What it answers</h2>
+                <p class="band__text">Binacle.Net works one box at a time.</p>
+            </div>
+            <table class="table" data-table>
                 <thead>
-                    <tr>
-                        <th scope="col">It answers</th>
-                        <th scope="col">It does not answer</th>
-                    </tr>
+                    <tr><th scope="col">It answers</th><th scope="col">It does not answer</th></tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td data-label="It answers">Does this order fit in this box?</td>
-                        <td data-label="It does not answer">How do I split an order across boxes?</td>
+                        <td class="table__text" data-label="It answers">Does this order fit in this box?</td>
+                        <td class="table__text table__off" data-label="It does not answer">How do I split an order across boxes?</td>
                     </tr>
                     <tr>
-                        <td data-label="It answers">Which of my boxes is the smallest that holds it?</td>
-                        <td data-label="It does not answer">How many boxes do I need?</td>
+                        <td class="table__text" data-label="It answers">Which of my boxes is the smallest that holds it?</td>
+                        <td class="table__text table__off" data-label="It does not answer">How many boxes do I need?</td>
                     </tr>
                     <tr>
-                        <td data-label="It answers">Where does every item sit?</td>
-                        <td data-label="It does not answer">Which carrier or rate is cheapest?</td>
+                        <td class="table__text" data-label="It answers">Where does every item sit?</td>
+                        <td class="table__text table__off" data-label="It does not answer">Which carrier or rate is cheapest?</td>
                     </tr>
                 </tbody>
             </table>
@@ -91,117 +124,143 @@ structured_data:
     </div>
 </section>
 
-<section class="band alt rule">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">Trade-offs</p>
-            <h2>What you get, and what it costs</h2>
-        </div>
+<section class="band statement band--deep band--no-edge">
+    <div class="container">
+        <p class="display-2"><span>A yes is reliable.</span> <span>A no is not a proof.</span></p>
+        <p class="statement__text"><a href="{{ '/how-it-works/' | relative_url }}">What a yes and a no each mean</a></p>
+    </div>
+</section>
 
-        <div class="tradeoffs">
-            <div class="tradeoff">
-                <h3>You run it yourself</h3>
-                {% include verdicts.html
-                   tick="Your customers' dimensions never leave your network"
-                   scales="Uptime is yours" %}
+<section class="band band--numbered band--number-in-column band--no-edge" id="trade-offs">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Trade-offs</p></div>
+        <div class="band__body">
+            <h2 class="band__heading">What you get, and what it costs</h2>
+            <div class="columns">
+                <div class="columns__column">
+                    <h3>You run it yourself</h3>
+                    {% include trade-off.html
+                          gets="Your customers' dimensions never leave your network"
+                          costs="Uptime is yours" %}
+                </div>
+                <div class="columns__column">
+                    <h3>A yes is reliable</h3>
+                    {% include trade-off.html
+                          gets="If it says the items fit, they fit, and the pack routes show you how"
+                          costs="A no is not a proof - there may be an arrangement it did not find" %}
+                </div>
+                <div class="columns__column">
+                    <h3>Free and open source</h3>
+                    {% include trade-off.html
+                          gets="AGPL-3.0, no signup, no tier"
+                          costs="Support is a GitHub discussion, not an SLA" %}
+                </div>
             </div>
-            <div class="tradeoff">
-                <h3>A yes is reliable</h3>
-                {% include verdicts.html
-                   tick="If it says the items fit, they fit, and the pack routes show you how"
-                   scales="A no is not a proof - there may be an arrangement it did not find" %}
-            </div>
-            <div class="tradeoff">
-                <h3>Free and open source</h3>
-                {% include verdicts.html
-                   tick="AGPL-3.0, no signup, no tier"
-                   scales="Support is a GitHub discussion, not an SLA" %}
-            </div>
-        </div>
-
-        <div class="prose">
-            <p>Strictly, that makes this the single-container case - a 3D knapsack rather than bin packing,
-                and the word the logistics trade uses is cartonization. Most people looking for it search for
-                3D bin packing, so that is the term used here.</p>
+            <p class="prose muted">Strictly, that makes this the single-container case - a 3D knapsack rather
+                than bin packing, and the word the logistics trade uses is cartonization. Most people looking
+                for it search for 3D bin packing, so that is the term used here.</p>
         </div>
     </div>
 </section>
 
-<section class="band">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">The API</p>
-            <h2>What you can ask it</h2>
+<section class="band band--numbered band--wide band--number-in-row band--tint band--no-edge" id="api">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">The API</p></div>
+        <div class="band__body">
+            <div class="prose">
+                <h2 class="band__heading">What you can ask it</h2>
+                <p>Two functions. <strong>Fit</strong> checks whether a set of items goes into a box.
+                    <strong>Pack</strong> works out where each one sits.</p>
+                <p>Either takes your boxes in the request - <code>by-custom</code> - or by the name of a preset
+                    you configured once - <code>by-preset/{preset}</code>.</p>
+                <p>The pack endpoints run the same algorithms and also return the position of every item. A fit
+                    response tells you what went in and what did not; it has no coordinates in it.</p>
+            </div>
 
-            <p>Two functions. <strong>Fit</strong> checks whether a set of items goes into a box.
-                <strong>Pack</strong> works out where each one sits.</p>
+            <div class="exchange-list">
+            {% include exchange.html block=site.data.exchange.fit fold=true
+                  verdict="The medium locker holds all three items. The small one takes only one of them." %}
 
-            <p>Either takes your boxes in the request - <code>by-custom</code> - or by the name of a preset
-                you configured once - <code>by-preset/{preset}</code>.</p>
-
-            <p>The pack endpoints run the same algorithms and also return the position of every item. A fit
-                response tells you what went in and what did not; it has no coordinates in it.</p>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="band alt">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">Use cases</p>
-            <h2>Where people use it</h2>
-
-            <p>The same 3D bin packing API answers three different questions, depending on who is asking.</p>
-
-            <p>Warehouse and shipping teams call it
-                <a href="{{ '/cartonization/' | relative_url }}">picking the right box for an order</a>.</p>
-
-            <p>If your customers collect from a locker, the question is
-                <a href="{{ '/parcel-lockers/' | relative_url }}">whether an order fits a parcel
-                compartment</a> before they choose one.</p>
-
-            <p>If you are deciding whether to integrate it, read
-                <a href="{{ '/how-it-works/' | relative_url }}">how the packing itself works</a> - the two
-                functions, the three algorithms, and what a yes and a no each mean.</p>
+<section class="band band--numbered band--split band--number-in-row band--tint" id="use-cases">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Use cases</p></div>
+        <div class="band__body split split--text-left">
+            <div class="prose">
+                <h2 class="band__heading">Where people use it</h2>
+                <p>The same 3D bin packing API answers three different questions, depending on who is asking.</p>
+            </div>
+            <div class="doors doors--pictured">
+                <a class="doors__link" href="{{ '/cartonization/' | relative_url }}">
+                    <figure class="doors__picture"><div class="drawing drawing--painted">{% include drawings/door-carton.svg %}</div></figure>
+                    <h3 class="doors__title">Cartonization</h3>
+                    <p class="doors__text">Warehouse and shipping teams call it picking the right box for an order.</p>
+                </a>
+                <a class="doors__link" href="{{ '/parcel-lockers/' | relative_url }}">
+                    <figure class="doors__picture"><div class="drawing drawing--painted">{% include drawings/door-locker.svg %}</div></figure>
+                    <h3 class="doors__title">Parcel lockers</h3>
+                    <p class="doors__text">If your customers collect from a locker, the question is whether an
+                        order fits a parcel compartment before they choose one.</p>
+                </a>
+                <a class="doors__link" href="{{ '/how-it-works/' | relative_url }}">
+                    <figure class="doors__picture"><div class="drawing drawing--painted">{% include drawings/door-pack.svg %}</div></figure>
+                    <h3 class="doors__title">How it works</h3>
+                    <p class="doors__text">If you are deciding whether to integrate it, read how the packing
+                        itself works - the two functions, the three algorithms, and what a yes and a no each
+                        mean.</p>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="band">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">The maintainer</p>
-            <h2>Who makes this</h2>
+<section class="band band--compact band--no-edge">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">The maintainer</p></div>
+        <div class="band__body prose">
+            <h2 class="band__heading">Who makes this</h2>
             <p><a href="https://github.com/ChrisMavrommatis">Chris Mavrommatis</a> builds Binacle.Net. Every
-                commit since February 2023 is his. Questions go to
-                <a href="https://github.com/binacle-labs/Binacle.Net/discussions">GitHub Discussions</a>.</p>
+                commit since February 2023 is his. Questions go to <a
+                href="https://github.com/binacle-labs/Binacle.Net/discussions">GitHub Discussions</a>.</p>
         </div>
     </div>
 </section>
 
-<section class="band alt" id="run">
-    <div class="shell">
-        <div class="prose">
-            <p class="eyebrow">Get started</p>
-            <h2>Run it</h2>
-            <p>One image, one port.</p>
-        </div>
+<section class="band band--numbered band--split band--number-in-row" id="run">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Get started</p></div>
+        <div class="band__body split split--text-left">
+            <div class="prose">
+                <h2 class="band__heading">Run it</h2>
+                <p>One image, one port.</p>
+                <p>The three flags turn on three optional pages, and the API needs none of them.</p>
+            </div>
 
-        {% include command.html id="run" %}
+            <div class="band__body">
 
-        <div class="prose">
-            <p>The three flags turn on three optional pages, and the API needs none of them.</p>
+            {% include command.html id="run" %}
 
-            <ul>
-                <li><code>UI_MODULE</code> - the packing demo, at <code>/</code></li>
-                <li><code>SWAGGER_UI</code> - Swagger UI, at <code>/swagger/</code></li>
-                <li><code>SCALAR_UI</code> - Scalar, at <code>/scalar/</code></li>
-            </ul>
+            <table class="table" data-table>
+                <thead>
+                    <tr><th scope="col">Flag</th><th scope="col">Page</th><th scope="col">Path</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="mono" data-label="Flag">UI_MODULE</td><td data-label="Page">The packing demo</td><td class="mono" data-label="Path">/</td></tr>
+                    <tr><td class="mono" data-label="Flag">SWAGGER_UI</td><td data-label="Page">Swagger UI</td><td class="mono" data-label="Path">/swagger/</td></tr>
+                    <tr><td class="mono" data-label="Flag">SCALAR_UI</td><td data-label="Page">Scalar</td><td class="mono" data-label="Path">/scalar/</td></tr>
+                </tbody>
+            </table>
 
-            <p>The API itself is under <code>/api/v3</code>. Everything else is optional, and
-                <a href="https://docs.binacle.net/quick-start/">the quick start</a> has the rest.</p>
-
-            <p>Try it out.</p>
+            <div class="prose">
+                <p>The API itself is under <code>/api/v3</code>. Everything else is optional, and <a
+                    href="https://docs.binacle.net/quick-start/">the quick start</a> has the rest.</p>
+                <p>Try it out.</p>
+            </div>
+            </div>
         </div>
     </div>
 </section>

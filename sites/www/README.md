@@ -1,6 +1,6 @@
 # Marketing site
 
-The Jekyll site published at `www.binacle.net` - the four pages a stranger lands on. The documentation is a
+The Jekyll site published at `www.binacle.net` - the pages a stranger lands on. The documentation is a
 different site next door in [`../docs`](../docs), and the browser demos are in [`../demo`](../demo).
 
 **It is built differently from the other two, in three ways that will catch you out.** They are the section
@@ -10,12 +10,11 @@ below.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The four pages, plus `404.html` and `robots.txt` |
-| `collections/_sitemaps/` | `sitemap.xml`, served at `/sitemap.xml` |
+| `pages/` | The pages, plus `404.html` and `robots.txt` |
 | `_sass/` | `main.scss`, which names the partials of `design/` this site uses. Compiled by the sass CLI, **not by Jekyll** |
 | `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` this site calls |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
-| `_includes/` | The header and footer, the theme init, the two conversion components, and `drawings/`, one SVG per picture |
+| `_includes/` | The header and footer, the exchange, the run command, the trade-off list, and `drawings/`, one SVG per picture |
 
 ## 🛠️ Building and serving
 

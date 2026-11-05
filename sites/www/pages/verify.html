@@ -1,0 +1,78 @@
+---
+permalink: /verify/
+title: Verify a release
+heading: Verify a release.
+description: >-
+  Check that a Binacle.Net image is the one the release workflow built. Every image from 3.0.0 onward is signed
+  with Sigstore cosign, and carries a software bill of materials and build provenance.
+---
+
+<section class="band band--split">
+    <div class="container band__grid">
+        <div class="band__body prose">
+            <h1>{{ page.heading }}</h1>
+            <p>Check that a Binacle.Net image is the one the release workflow built. Every image from 3.0.0
+                onward is signed with Sigstore cosign, and carries a software bill of materials and build
+                provenance.</p>
+            <p class="muted">Signing is keyless and happens inside the release workflow, so there is no private
+                key anywhere.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band band--wide band--tint band--no-edge">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">The check</p></div>
+        <div class="band__body">
+            <div class="prose">
+                <h2 class="band__heading">Two commands</h2>
+                <p>The first checks the signature. The second lists the bill of materials and the provenance.</p>
+                <p>They name <code>3</code>, the major tag. Any tag or digest pointing at a signed image works
+                    the same way.</p>
+            </div>
+            <div class="code-block" data-code-block>
+                <div class="code-block__head"><span class="label" data-code-lang>Signature &middot; bash</span><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+<pre class="code-block__pre"><code>cosign verify binacle/binacle-net:3 \
+  --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com</code></pre>
+            </div>
+            <div class="code-block" data-code-block>
+                <div class="code-block__head"><span class="label" data-code-lang>Bill of materials &middot; bash</span><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+<pre class="code-block__pre"><code>docker buildx imagetools inspect binacle/binacle-net:3</code></pre>
+            </div>
+            <p class="verdict">Use cosign 2.6.0 or later, or 3.0.1 or later. An older binary fails the check the
+                same way a tampered image would.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band band--tint">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">The two flags</p></div>
+        <div class="band__body prose">
+            <h2 class="band__heading">Why both cosign flags matter</h2>
+            <p>Drop <code>--certificate-identity-regexp</code> and you are only asking whether anyone signed the
+                image. Anyone can. The issuer says the identity came from GitHub Actions; the pattern says it
+                was this repository's release workflow.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band statement band--no-edge">
+    <div class="container">
+        <p class="display-2"><span>A pass proves where it came from.</span> <span>Not that it is safe.</span></p>
+        <p class="statement__text muted">A genuine image with a known CVE in it verifies perfectly. For that
+            question, read the bill of materials and scan it.</p>
+    </div>
+</section>
+
+<section class="band band--compact">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Older releases</p></div>
+        <div class="band__body prose">
+            <h2 class="band__heading">Releases before 3.0.0 cannot be verified</h2>
+            <p>They were published before the signing pipeline existed. <code>cosign verify</code> answers
+                <code>no signatures found</code>: there is nothing there to check.</p>
+        </div>
+    </div>
+</section>

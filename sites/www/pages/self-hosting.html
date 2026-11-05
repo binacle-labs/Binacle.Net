@@ -1,0 +1,138 @@
+---
+permalink: /self-hosting/
+title: Self-hosting
+heading: Self-hosting Binacle.Net.
+description: >-
+  Binacle.Net is one image you run on your own machine. It turns on only what you ask for: the API is always
+  there, and everything else is a module with its own files and switches.
+---
+
+<section class="band band--split">
+    <div class="container band__grid">
+        <div class="band__body split split--text-left">
+            <div class="prose">
+                <h1 class="split__title">{{ page.heading }}</h1>
+                <p>Binacle.Net is one image you run on your own machine. It turns on only what you ask for: the
+                    API is always there, and everything else is a module with its own files and switches.</p>
+                <p class="muted">Your customers' dimensions never leave your network, and there is no per-call fee.</p>
+            </div>
+
+            <div class="band__body">
+                <figure><div class="drawing drawing--painted drawing--host">{% include drawings/host.svg %}</div></figure>
+                {% include command.html id="run" %}
+                <p class="verdict">The quick way in. For a real deployment, start from one of the setups below.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="band band--mirrored band--tint band--no-edge">
+    <div class="container band__grid">
+        <div class="band__body split split--text-right">
+            <div class="prose split__text">
+                <p class="label">Setups</p>
+                <h2 class="band__heading">Six setups</h2>
+                <p>Five for Docker and one for Kubernetes, from nothing switched on to everything. Each one is a
+                    folder of files to download and edit.</p>
+                <p><strong>Most deployments want prod.</strong> The docs explain the choice between prod and
+                    service.</p>
+            </div>
+            <div class="doors">
+                <a class="doors__link" href="https://docs.binacle.net/samples/docker/minimal/">
+                    <h3 class="doors__title">Minimal</h3>
+                    <p class="doors__text">The smallest configuration that still answers requests.</p>
+                </a>
+                <a class="doors__link" href="https://docs.binacle.net/samples/docker/quickstart/">
+                    <h3 class="doors__title">Quickstart</h3>
+                    <p class="doors__text">Trying Binacle.Net out, with the docs and the web UI.</p>
+                </a>
+                <a class="doors__link" href="https://docs.binacle.net/samples/docker/prod/">
+                    <h3 class="doors__title">Prod</h3>
+                    <p class="doors__text">The API behind your own backend.</p>
+                </a>
+                <a class="doors__link" href="https://docs.binacle.net/samples/docker/service/">
+                    <h3 class="doors__title">Service</h3>
+                    <p class="doors__text">Binacle.Net offered to callers you do not control.</p>
+                </a>
+                <a class="doors__link" href="https://docs.binacle.net/samples/docker/full/">
+                    <h3 class="doors__title">Full</h3>
+                    <p class="doors__text">Everything on at once, for a machine nobody else can reach.</p>
+                </a>
+                <a class="doors__link" href="https://docs.binacle.net/samples/kubernetes/minimal/">
+                    <h3 class="doors__title">Kubernetes</h3>
+                    <p class="doors__text">A minimal deployment on an existing cluster.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="band band--split band--tint">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Your bin set</p></div>
+        <div class="band__body split split--text-left">
+            <div class="prose">
+                <h2 class="band__heading">Presets.json is your bin set</h2>
+                <p>Every sample ships an example one. Replacing it with your own boxes, lockers or pallets is
+                    the first thing to do; until then the answers describe someone else's packaging.</p>
+                <p>A request then names the preset instead of carrying the boxes.</p>
+            </div>
+            <div class="code-block" data-code-block>
+                <button type="button" class="copy-button code-block__copy" data-copy hidden>Copy</button>
+<pre class="code-block__pre"><code>{
+  "PresetOptions": {
+    "Presets": {
+      "custom-preset-1": {
+        "Bins": [
+          { "ID": "bin-1", "Length": 60, "Width": 40, "Height": 10 },
+          { "ID": "bin-2", "Length": 60, "Width": 40, "Height": 20 }
+        ]
+      }
+    }
+  }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="band band--wide band--no-edge">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Configuration</p></div>
+        <div class="band__body band__body--code-left">
+            <div class="prose">
+                <h2 class="band__heading">Change a setting</h2>
+                <p>Every configuration file lives under <code>/app/Config_Files</code>. There are four ways to
+                    change a setting, and the first one wins:</p>
+                <ul class="band__list">
+                    <li><strong>Environment variables.</strong> For secrets and anything that differs per
+                        deployment.</li>
+                    <li><strong>Production overrides.</strong> A <code>&lt;filename&gt;.Production.json</code>
+                        holding only what you change.</li>
+                    <li><strong>Direct file edits.</strong> Replace the file with a bind mount or a volume.</li>
+                    <li><strong>Connection string fallbacks.</strong> One environment variable per connection
+                        string.</li>
+                </ul>
+            </div>
+            <div class="code-block" data-code-block>
+                <button type="button" class="copy-button code-block__copy" data-copy hidden>Copy</button>
+<pre class="code-block__pre"><code>Settings__Enabled=True
+Settings__Logs__Retention=5</code></pre>
+            </div>
+            <p class="verdict">An environment variable is named after the setting's path, with <code>__</code>
+                between the levels.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">Releases</p></div>
+        <div class="band__body prose">
+            <h2 class="band__heading">Check what you run</h2>
+            <p>Every image from 3.0.0 onward is signed, and carries a software bill of materials and build
+                provenance. <a href="{{ '/verify/' | relative_url }}">Verify a release</a> has the two
+                commands.</p>
+        </div>
+    </div>
+</section>

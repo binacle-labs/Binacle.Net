@@ -1,4 +1,10 @@
 {%- assign block = include.block -%}
+{%- capture response -%}
+<div class="code-block" data-code-block>
+            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">200</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+            <pre class="code-block__pre"><code>{{ block.response | strip | escape }}</code></pre>
+        </div>
+{%- endcapture -%}
 <div class="exchange">
     <div class="exchange__part">
         <div class="code-block" data-code-block>
@@ -6,13 +12,17 @@
             <pre class="code-block__pre"><code>{{ block.request | strip | escape }}</code></pre>
         </div>
     </div>
+    {%- if include.fold %}
+    <details class="exchange__part disclosure">
+        <summary class="disclosure__summary label">Response</summary>
+        {{ response }}
+    </details>
+    {%- else %}
     <div class="exchange__part">
         <p class="label">Response</p>
-        <div class="code-block" data-code-block>
-            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">200</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
-            <pre class="code-block__pre"><code>{{ block.response | strip | escape }}</code></pre>
-        </div>
+        {{ response }}
     </div>
+    {%- endif %}
     {%- if include.verdict %}
     <p class="verdict">{{ include.verdict }}</p>
     {%- endif %}

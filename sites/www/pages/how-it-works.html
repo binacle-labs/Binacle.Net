@@ -81,23 +81,23 @@ description: >-
                 <div class="columns__column">
                     <h3>First Fit Decreasing</h3>
                     <p class="columns__text"><code>FFD</code></p>
-                    {% include verdicts.html
-                       tick="Places each item in the first space it finds that holds it, without looking for a better one"
-                       scales="May leave space unused that a slower search would have filled" %}
+                    {% include trade-off.html
+                       gets="Places each item in the first space it finds that holds it, without looking for a better one"
+                       costs="May leave space unused that a slower search would have filled" %}
                 </div>
                 <div class="columns__column">
                     <h3>Worst Fit Decreasing</h3>
                     <p class="columns__text"><code>WFD</code></p>
-                    {% include verdicts.html
-                       tick="Places each item in the space that leaves the most room around it"
-                       scales="Spreads items out, which helps with distribution more often than with space" %}
+                    {% include trade-off.html
+                       gets="Places each item in the space that leaves the most room around it"
+                       costs="Spreads items out, which helps with distribution more often than with space" %}
                 </div>
                 <div class="columns__column">
                     <h3>Best Fit Decreasing</h3>
                     <p class="columns__text"><code>BFD</code></p>
-                    {% include verdicts.html
-                       tick="Keeps the space left around each placement as small as it can"
-                       scales="Examines the candidate spaces for each item rather than taking the first that fits" %}
+                    {% include trade-off.html
+                       gets="Keeps the space left around each placement as small as it can"
+                       costs="Examines the candidate spaces for each item rather than taking the first that fits" %}
                 </div>
             </div>
 
@@ -137,7 +137,7 @@ description: >-
             <p><strong>v4 is experimental.</strong> It ships in the same image, under <code>/api/v4</code>, and
                 its routes and responses can change in a patch release. Do not integrate against it by
                 accident.</p>
-            <p><a href="https://docs.binacle.net/">The API reference</a> covers both, and the
+            <p><a href="https://docs.binacle.net/api/v3/">The API reference</a> covers both, and the
                 <a href="https://docs.binacle.net/swagger/v3/">v3 OpenAPI document</a> is the contract itself.</p>
         </div>
     </div>

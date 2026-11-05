@@ -5,17 +5,27 @@
 @use "layout/site-header";
 @use "layout/site-footer";
 @use "layout/band";
+@use "layout/hero";
 @use "layout/split";
 @use "layout/columns";
 
+@use "components/actions";
+@use "components/button";
 @use "components/code-block";
 @use "components/command";
 @use "components/copy-button";
+@use "components/disclosure";
+@use "components/doors";
 @use "components/drawing";
 @use "components/exchange";
+@use "components/exchange-list";
+@use "components/fit-row";
 @use "components/http-line";
 @use "components/labelled-list";
 @use "components/note";
+@use "components/path";
+@use "components/statement";
+@use "components/table";
 @use "components/theme-button";
 @use "components/verdict";
 
