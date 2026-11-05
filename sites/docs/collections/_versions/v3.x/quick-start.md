@@ -10,14 +10,23 @@ nav:
 
 One command runs it, one request shows what it does. The setup below turns on **Swagger UI**, **Scalar UI**
 and the **UI Module** so you can also try it from a browser. All three are off by default.
+{:.lede}
 
 ## 🖥️ Run it with Docker
 
-##### 1️⃣ Install Docker
+<ol class="steps doc__steps" markdown="block">
+<li markdown="block">
+
+#### 1️⃣ Install Docker
+{: id="1️⃣-install-docker" }
 
 Download and install Docker from [docker.com](https://www.docker.com/get-started).
 
-##### 2️⃣ Launch Binacle.Net
+</li>
+<li markdown="block">
+
+#### 2️⃣ Launch Binacle.Net
+{: id="2️⃣-launch-binaclenet" }
 
 ```bash
 docker run -d --name binacle-net \
@@ -31,11 +40,18 @@ docker run -d --name binacle-net \
 The tag `{{ page.version_tag }}` follows every minor and patch release in this line and never a breaking change.
 Pin it rather than `latest`, which follows every release, including the next major.
 
-##### 3️⃣ Open it
+</li>
+<li markdown="block">
+
+#### 3️⃣ Open it
+{: id="3️⃣-open-it" }
 
 - Swagger UI: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
 - Scalar UI: [http://localhost:8080/scalar/](http://localhost:8080/scalar/)
 - UI Module: [http://localhost:8080/](http://localhost:8080/) - the packing demo and the ViPaq decoder
+
+</li>
+</ol>
 
 ## 📦 Send a request
 
@@ -57,6 +73,7 @@ curl -s http://localhost:8080/api/v3/pack/by-custom \
     ]
   }'
 ```
+{: data-call="POST /api/v3/pack/by-custom" }
 
 The answer holds one result per bin. For each, `result` says whether everything fit, and `packedItems` says
 where each item landed - its dimensions as placed, and the corner it sits at:
@@ -82,6 +99,7 @@ where each item landed - its dimensions as placed, and the corner it sits at:
   ]
 }
 ```
+{: data-call="200" }
 
 Both bins hold everything; the small one is the answer. `box_2` went in as 10 x 12 x 15 although it was sent
 as 12 x 15 x 10 - items are rotated to fit.
@@ -91,11 +109,12 @@ That is V3, the stable API. [V4]({% vlink /api/v4.md %}) answers the "which bin"
 
 ## ➡️ Where to go next
 
-- [Core Concepts]({% vlink /core-concepts.md %}) - what a dimension must be, and what the algorithms do.
-- [API]({% vlink /api/index.md %}) - every endpoint, for V3 and V4.
-- [Presets]({% vlink /configuration/core/presets.md %}) - your own bins by name, so a request need not carry them.
-- [Samples]({% vlink /samples/index.md %}) - Docker Compose and Kubernetes setups to copy, including one for
-  running behind your own backend.
+<nav class="doors doors--full" aria-label="Where to go next" markdown="0">
+  <a class="doors__link" href="{% vlink /core-concepts.md %}"><h3 class="doors__title">Core Concepts</h3><p class="doors__text">What a dimension must be, and what the algorithms do.</p></a>
+  <a class="doors__link" href="{% vlink /api/index.md %}"><h3 class="doors__title">API</h3><p class="doors__text">Every endpoint, for V3 and V4.</p></a>
+  <a class="doors__link" href="{% vlink /configuration/core/presets.md %}"><h3 class="doors__title">Presets</h3><p class="doors__text">Your own bins by name, so a request need not carry them.</p></a>
+  <a class="doors__link" href="{% vlink /samples/index.md %}"><h3 class="doors__title">Samples</h3><p class="doors__text">Docker Compose and Kubernetes setups to copy, including one for running behind your own backend.</p></a>
+</nav>
 
 Binacle.Net is one container, so it runs on any platform that runs one. Whatever the platform, pin the same
 tag as above.

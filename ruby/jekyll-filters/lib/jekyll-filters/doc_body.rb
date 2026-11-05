@@ -106,7 +106,7 @@ module Jekyll
             code.remove_attribute('class')
             code['data-lang'] = language if language
             pre['class'] = 'code-block__pre'
-            outer.replace(%(<div class="code-block" data-code-block>#{head(language)}#{pre.to_html}</div>))
+            outer.replace(%(<div class="code-block" data-code-block>#{head(language, outer['data-call'])}#{pre.to_html}</div>))
           end
         end
 
@@ -121,10 +121,18 @@ module Jekyll
           end
         end
 
-        def head(language)
+        # A block with no heading above it to read names its call in the markdown, in data-call.
+        def head(language, call)
           label = LANGUAGE_LABELS.fetch(language, language) || 'text'
-          %(<div class="code-block__head"><span class="label" data-code-lang>#{label}</span>) +
+          name = call ? http_line(badges(call)) : %(<span class="label" data-code-lang>#{label}</span>)
+          %(<div class="code-block__head">#{name}) +
             %(<button type="button" class="copy-button" data-copy hidden>Copy</button></div>)
+        end
+
+        def badges(call)
+          method, path = call.split(' ', 2)
+          badge = %(<span class="http-line__badge http-line__badge--plain">#{method}</span>)
+          path ? %(#{badge}<span>#{path}</span>) : badge
         end
 
         # An example's head names the call: the method and path over a request, the status over a response.
@@ -150,10 +158,12 @@ module Jekyll
           before = block.previous_element
           text = before&.name == 'p' ? before.text.strip : ''
           label = block.at_css('[data-code-lang]')
+          return answering unless label
+
           if text.start_with?('Request Example') && call
-            label.replace(http_line(%(<span class="http-line__badge http-line__badge--plain">#{call[1]}</span><span>#{call[2]}</span>)))
+            label.replace(http_line(badges(call[0])))
           elsif text.start_with?('Response Example') || (answering && block.at_css('code[data-lang=json]'))
-            label.replace(http_line('<span class="http-line__badge http-line__badge--plain">200</span>'))
+            label.replace(http_line(badges('200')))
             return true
           end
           answering

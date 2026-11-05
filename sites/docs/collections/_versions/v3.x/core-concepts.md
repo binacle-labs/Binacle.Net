@@ -11,10 +11,15 @@ nav:
 Binacle.Net answers one question: given some bins and some items, which bin holds them, and where does each
 item go. This page is what you need to know before calling it - the shape of the data, the two operations,
 and the algorithms behind them.
+{:.lede}
 
 ## 📏 Dimensions
 
 Every bin and every item is a box: a length, a width and a height. Binacle.Net knows nothing else about them.
+
+<div class="drawing drawing--docs" markdown="0">
+{% include drawings/box.svg %}
+</div>
 
 - **Integers, in one unit.** Centimetres are assumed, but any unit works as long as every bin and every item
   uses the same one. Convert before you send, and round up - a value rounded down describes an item that is
@@ -49,20 +54,26 @@ item goes into.
 ### ⚖️ First Fit Decreasing (FFD)
 Each item goes into the first space it fits in.
 
-- ✅ Fast - it never compares spaces.
-- ⚖️ Can leave room unused, because it takes the first space and not the tightest one.
+<ul class="labelled-list">
+  <li class="labelled-list__item">Fast - it never compares spaces.</li>
+  <li class="labelled-list__item labelled-list__cost"><span class="label">Costs</span>Can leave room unused, because it takes the first space and not the tightest one.</li>
+</ul>
 
 ### 🧊 Worst Fit Decreasing (WFD)
 Each item goes into the space that leaves the most room behind.
 
-- ✅ Spreads items out, which helps when the leftover space matters more than the fit.
-- ⚖️ Rarely the tightest packing.
+<ul class="labelled-list">
+  <li class="labelled-list__item">Spreads items out, which helps when the leftover space matters more than the fit.</li>
+  <li class="labelled-list__item labelled-list__cost"><span class="label">Costs</span>Rarely the tightest packing.</li>
+</ul>
 
 ### 📏 Best Fit Decreasing (BFD)
 Each item goes into the space that leaves the least room behind.
 
-- ✅ The tightest placement it can find for each item.
-- ⚖️ Looks at every candidate space for every item, so it is the slowest of the three.
+<ul class="labelled-list">
+  <li class="labelled-list__item">The tightest placement it can find for each item.</li>
+  <li class="labelled-list__item labelled-list__cost"><span class="label">Costs</span>Looks at every candidate space for every item, so it is the slowest of the three.</li>
+</ul>
 
 ### 🏆 Best
 Runs more than one of the three and keeps the best result. The response says which one produced it. Only
@@ -74,5 +85,7 @@ Runs more than one of the three and keeps the best result. The response says whi
 
 ## ➡️ Where to go next
 
-- [API]({% vlink /api/index.md %}) - the endpoints, and where the algorithm is chosen.
-- [Presets]({% vlink /configuration/core/presets.md %}) - your bin set, so a request need not carry the bins.
+<nav class="doors doors--full" aria-label="Where to go next" markdown="0">
+  <a class="doors__link" href="{% vlink /api/index.md %}"><h3 class="doors__title">API</h3><p class="doors__text">The endpoints, and where the algorithm is chosen.</p></a>
+  <a class="doors__link" href="{% vlink /configuration/core/presets.md %}"><h3 class="doors__title">Presets</h3><p class="doors__text">Your bin set, so a request need not carry the bins.</p></a>
+</nav>

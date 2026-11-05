@@ -1,4 +1,4 @@
-import {initCodeWrap, initCopyButton, initDrawer, initStickySidebar} from "binacle-components";
+import {initCodeWrap, initCopyButton, initDrawer, initLightbox, initStickySidebar} from "binacle-components";
 import {ThemeSwitcherButtonElement, optionsFromDocument} from "theme-switcher";
 import {initSections} from "./sections";
 
@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	initStickySidebar();
 	initVersionSelect();
 	initDialogs();
+	initLightbox();
 	initSections();
 	initCodeWrap();
 	initCopyButton();

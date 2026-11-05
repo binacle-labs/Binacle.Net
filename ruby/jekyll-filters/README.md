@@ -37,7 +37,8 @@ plugins:
   `{now}` does not suit you, but keep `}` out of it - see the gotchas.
 - `doc_body` - turns a rendered docs page into the design's markup: drops the emoji that opens a heading, a
   bullet or a paragraph, makes callouts and code blocks, and puts a class on each block. Heading ids stay as
-  kramdown made them.
+  kramdown made them. A code block with `data-call` on it, `{: data-call="POST /path" }` or `{: data-call="200" }`
+  in the markdown, shows that in its head in place of the language.
 - `doc_sections` - lists a page's `h2`s as `id` and `title`, for an outline. Give it `doc_body`'s result, so the
   titles carry no emoji.
 

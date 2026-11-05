@@ -110,6 +110,22 @@ RSpec.describe Jekyll::SiteFilters::DocBody do
   end
 
   describe 'example heads' do
+    it 'names a call the markdown gives it' do
+      block = %(<div class="language-bash highlighter-rouge" data-call="POST /api/v3/pack"><div class="highlight"><pre class="highlight"><code>curl</code></pre></div></div>)
+      line = body(block).at_css('.code-block__head .http-line')
+
+      expect(line.css('.http-line__badge').text).to eq('POST')
+      expect(line.css('span').last.text).to eq('/api/v3/pack')
+    end
+
+    it 'names a status the markdown gives it' do
+      block = %(<div class="language-json highlighter-rouge" data-call="200"><div class="highlight"><pre class="highlight"><code>{}</code></pre></div></div>)
+      head = body(block).at_css('.code-block__head')
+
+      expect(head.at_css('.http-line__badge').text).to eq('200')
+      expect(head.at_css('[data-code-lang]')).to be_nil
+    end
+
     let(:page) do
       %(<p><code>POST /api/v3/pack</code></p><p><strong>Request Example</strong></p>#{rouge('json', '{}')}) +
         %(<p><strong>Response Example</strong></p>#{rouge('json', '{}')}#{rouge('json', '{}')}) +

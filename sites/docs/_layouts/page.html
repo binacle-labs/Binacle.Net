@@ -3,13 +3,14 @@ layout: default
 ---
 {% include header.html %}
 
-{% assign body = content | doc_body %}
+{%- comment -%} The home page is written by hand and keeps its emoji. {%- endcomment %}
+{% if page.home %}{% assign body = content %}{% else %}{% assign body = content | doc_body %}{% endif %}
 {% assign sections = body | doc_sections %}
 <div class="docs-layout">
     {% include sidebar.html %}
     <div class="drawer-backdrop" data-drawer-close></div>
 
-    <main id="content" class="doc">
+    <main id="content" class="doc{% if page.home %} doc--home{% endif %}">
         {% include outdated-notice.html %}
         <nav class="breadcrumbs label" aria-label="Breadcrumb">
             {%- if page.nav.exclude %}
@@ -24,6 +25,9 @@ layout: default
             {%- endfor %}
             {%- endif %}
         </nav>
+        {% if page.home %}
+        {{ body }}
+        {% else %}
         {%- comment -%} A keycap numbers a menu entry; it is not a picture of the page. {%- endcomment %}
         <h1 class="doc__title" data-doc-title>{% if page.nav.icon and page.nav.exclude == nil %}{% unless page.nav.icon contains '⃣' %}<span class="doc__icon emoji" aria-hidden="true">{{ page.nav.icon }}</span>{% endunless %}{% endif %}{{ page.title }}</h1>
         {% if page.swagger %}
@@ -32,6 +36,7 @@ layout: default
         <div class="doc__body" data-doc-body>
             {{ body }}
         </div>
+        {% endif %}
         {% if page.pager.previous or page.pager.next %}
         <nav class="pager" data-pager aria-label="Previous and next">
             {%- if page.pager.previous %}
@@ -44,7 +49,7 @@ layout: default
         {% endif %}
     </main>
 
-    <nav class="outline{% if sections.size > 1 %} outline--ruled{% endif %}" aria-label="On this page">
+    <nav class="outline{% if sections.size > 1 %} outline--ruled{% endif %}{% if page.home %} outline--hidden{% endif %}" aria-label="On this page">
         {% if sections.size > 1 %}
         <div class="outline__inner">
             <p class="label">On this page</p>

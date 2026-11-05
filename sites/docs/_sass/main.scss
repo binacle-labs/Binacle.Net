@@ -6,23 +6,35 @@
 @use "layout/site-footer";
 @use "layout/docs-layout";
 @use "layout/doc";
+@use "layout/hero";
+@use "layout/split";
 @use "layout/sidebar";
 @use "layout/outline";
 
+@use "components/actions";
 @use "components/breadcrumbs";
 @use "components/button";
 @use "components/callout";
 @use "components/close-button";
 @use "components/code-block";
 @use "components/copy-button";
+@use "components/dimension-line";
+@use "components/doors";
 @use "components/drawer";
 @use "components/drawer-backdrop";
+@use "components/drawing";
 @use "components/emoji";
 @use "components/field";
 @use "components/http-line";
+@use "components/labelled-list";
+@use "components/lightbox";
+@use "components/pack-still";
+@use "components/pack-view";
 @use "components/pager";
 @use "components/section-box";
 @use "components/section-button";
+@use "components/steps";
+@use "components/still";
 @use "components/table";
 @use "components/theme-button";
 
