@@ -106,7 +106,7 @@ SQLitePCLRaw
 Swagger UI
   Copyright 2020-2021 SmartBear Software Inc.
   https://github.com/swagger-api/swagger-ui
-  Vendored at 5.11.0 in assets/lib/swagger-ui, which carries the upstream LICENSE and
+  Vendored at 5.34.1 in assets/lib/swagger-ui, which carries the upstream LICENSE and
   NOTICE. Used by the documentation site only; the API serves its own copy from Swashbuckle.
 
 

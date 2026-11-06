@@ -9,6 +9,11 @@
   {% structured_data %}
 
   <link rel="stylesheet" href="{{ '/lib/swagger-ui/swagger-ui.css' | relative_url }}" />
+  {%- comment -%} Swagger paints a ground only in dark mode, and it wins over this. Its dark mode leaves the scrollbar white. {%- endcomment %}
+  <style>
+    html { background: white; }
+    html.dark-mode { scrollbar-color: #555 #1c2022; }
+  </style>
   {% gtm_head site.gtm %}
 </head>
 <body>

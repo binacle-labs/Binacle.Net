@@ -24,24 +24,23 @@ const ASSETS = {
 };
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.
 //
-// swagger-ui, 4.8 MB: only sites/docs/_layouts/versions/swagger.html reads it. The API serves its own from
-// Swashbuckle.
-// material-dynamic-colors, 72 KB: stays everywhere, because sites/demo/_data/includes.yml keeps a
-// commented-out script tag for it.
+// swagger-ui, 6.2 MB: only sites/docs/_layouts/swagger.html reads it. The API serves its own from Swashbuckle.
+// material-dynamic-colors, 72 KB: demo keeps it, because sites/demo/_data/includes.yml has a commented-out
+// script tag for it.
 // beercss: docs builds on design/ instead.
-// www runs no framework, so it takes the favicons, the mark and the link preview and nothing else.
+// docs and www take the favicons, the mark and the link preview from media/, and nothing else there.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
+const UNUSED_MEDIA = [
+	'assets/media/docker/**',
+	'assets/media/github/**',
+	'assets/media/logo/binacle-logo-16x16.svg',
+	'assets/media/logo/binacle-logo-{16x16a,24x24a,32x32a,48x48a,128x128a,256x256a}.png'
+];
 const IGNORE = {
-	docs: ['assets/lib/beercss/**'],
+	docs: ['assets/lib/beercss/**', 'assets/lib/material-dynamic-colors/**', ...UNUSED_MEDIA],
 	demo: ['assets/lib/swagger-ui/**'],
 	uimodule: ['assets/lib/swagger-ui/**', 'assets/android-chrome-*.png'],
-	www: [
-		'assets/lib/**',
-		'assets/media/docker/**',
-		'assets/media/github/**',
-		'assets/media/logo/binacle-logo-16x16.svg',
-		'assets/media/logo/binacle-logo-{16x16a,24x24a,32x32a,48x48a,128x128a,256x256a}.png'
-	]
+	www: ['assets/lib/**', ...UNUSED_MEDIA]
 };
 
 // ----------------- Begin Functions  ----------------- //

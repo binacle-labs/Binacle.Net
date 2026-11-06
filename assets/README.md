@@ -20,7 +20,7 @@ the vendor's own output, dropped in as-is.
 | Folder | What the sites use it for | Version | Licence |
 |---|---|---|---|
 | `lib/beercss/` | The Material-style CSS framework, plus the Material Symbols fonts | `version` file, `3.11.11` | MIT |
-| `lib/swagger-ui/` | The Swagger UI bundle the docs site embeds | `5.11.0`, recorded here only | Apache-2.0 |
+| `lib/swagger-ui/` | The Swagger UI bundle the docs site embeds | `5.34.1`, recorded here only | Apache-2.0 |
 | `lib/material-dynamic-colors/` | Theme colour generation for beercss | not recorded | Apache-2.0 |
 
 **Every folder carries the upstream `LICENSE`**, and `swagger-ui` its `NOTICE` too. The vendor output arrived

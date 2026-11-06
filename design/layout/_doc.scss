@@ -126,6 +126,31 @@
   margin-top: calc(var(--step) * 0.75);
 }
 
+// A heading that is only a link points to another page, so a list of them stays compact.
+.doc__heading--2:has(> a) {
+  margin-top: calc(var(--step) * 1.5);
+  padding-top: calc(var(--step) * 1.25);
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  + .doc__text {
+    margin-top: calc(var(--step) * 0.35);
+    color: var(--muted);
+    font-size: var(--size-ui);
+  }
+}
+
 // A tinted block in a docs page, from the page column's left edge to the window's right.
 .doc__band {
   --rule: var(--tint-rule);

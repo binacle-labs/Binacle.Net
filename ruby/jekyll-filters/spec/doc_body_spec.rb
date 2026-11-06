@@ -104,6 +104,19 @@ RSpec.describe Jekyll::SiteFilters::DocBody do
       expect(code.text).to eq('"a": 1"b"')
     end
 
+    it 'names a file or a field the markdown gives it, in place of the language' do
+      block = %(<div class="language-json highlighter-rouge" data-name="Presets.json"><div class="highlight"><pre class="highlight"><code>{}</code></pre></div></div>)
+
+      expect(body(block).at_css('[data-code-lang]').text).to eq('Presets.json')
+    end
+
+    it 'wraps a block the markdown marks, and leaves the rest' do
+      block = %(<div class="language-text highlighter-rouge" data-wrap=""><div class="highlight"><pre class="highlight"><code>AAAF</code></pre></div></div>)
+
+      expect(filter.doc_body(block)).to include('<pre class="code-block__pre code-block__pre--wrap" data-wrap="">')
+      expect(filter.doc_body(block.sub(' data-wrap=""', ''))).not_to include('data-wrap')
+    end
+
     it 'escapes the code it moves' do
       expect(body(rouge('text', '&lt;b&gt;')).at_css('code').text).to eq('<b>')
     end
@@ -151,6 +164,12 @@ RSpec.describe Jekyll::SiteFilters::DocBody do
 
       expect(table['class']).to eq('table doc__table')
       expect(table.key?('data-table')).to be(true)
+    end
+
+    it 'gives a cell the mono class when all it holds is mono code' do
+      cells = body(%(<table><tr><td><a href="#a"><code class="mono">GET</code></a></td><td><code class="mono">0</code> is valid</td><td>text</td></tr></table>)).css('td')
+
+      expect(cells.map { |cell| cell['class'] }).to eq(['mono', nil, nil])
     end
 
     it 'names the blocks at the top level and keeps a class they have' do

@@ -12,6 +12,7 @@
 @use "layout/outline";
 
 @use "components/actions";
+@use "components/bit-diagram";
 @use "components/breadcrumbs";
 @use "components/button";
 @use "components/callout";
@@ -19,6 +20,7 @@
 @use "components/code-block";
 @use "components/copy-button";
 @use "components/dimension-line";
+@use "components/disclosure";
 @use "components/doors";
 @use "components/drawer";
 @use "components/drawer-backdrop";
@@ -31,12 +33,17 @@
 @use "components/pack-still";
 @use "components/pack-view";
 @use "components/pager";
+@use "components/panel";
+@use "components/result-list";
+@use "components/result-row";
 @use "components/section-box";
 @use "components/section-button";
 @use "components/steps";
 @use "components/still";
 @use "components/table";
+@use "components/tabs";
 @use "components/theme-button";
+@use "components/verdict";
 
 @use "swagger";
 

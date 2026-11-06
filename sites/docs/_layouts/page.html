@@ -30,8 +30,11 @@ layout: default
         {% else %}
         {%- comment -%} A keycap numbers a menu entry; it is not a picture of the page. {%- endcomment %}
         <h1 class="doc__title" data-doc-title>{% if page.nav.icon and page.nav.exclude == nil %}{% unless page.nav.icon contains '⃣' %}<span class="doc__icon emoji" aria-hidden="true">{{ page.nav.icon }}</span>{% endunless %}{% endif %}{{ page.title }}</h1>
+        {% if page.status %}
+        <p class="doc__meta label">{% for item in page.status %}<span>{{ item.label }}{% if item.value %} <span class="doc__value">{{ item.value }}</span>{% endif %}</span>{% endfor %}</p>
+        {% endif %}
         {% if page.swagger %}
-        <div class="doc__actions"><button type="button" class="button" data-dialog-open="swagger-dialog">Swagger</button></div>
+        <div class="actions doc__actions"><button type="button" class="button" data-dialog-open="swagger-dialog">Swagger</button></div>
         {% endif %}
         <div class="doc__body" data-doc-body>
             {{ body }}
@@ -84,8 +87,11 @@ layout: default
 {% endif %}
 
 {% if page.swagger %}
-<dialog class="swagger-dialog" id="swagger-dialog" aria-label="Swagger">
-    <button type="button" class="close-button close-button--boxed swagger-dialog__close" aria-label="Close" data-dialog-close>&times;</button>
-    <iframe class="swagger-dialog__frame" title="Swagger" src="{% vlink /swagger/{{ page.swagger | downcase }}.md %}"></iframe>
+<dialog class="panel swagger-dialog" id="swagger-dialog" aria-labelledby="swagger-dialog-title">
+    <div class="panel__head">
+        <h2 class="panel__title" id="swagger-dialog-title">Swagger</h2>
+        <button type="button" class="close-button close-button--boxed" aria-label="Close" data-dialog-close>&times;</button>
+    </div>
+    <iframe class="swagger-dialog__frame" data-swagger-frame title="Swagger" src="{% vlink /swagger/{{ page.swagger | downcase }}.md %}"></iframe>
 </dialog>
 {% endif %}

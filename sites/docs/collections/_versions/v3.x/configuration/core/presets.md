@@ -10,8 +10,11 @@ nav:
 ---
 
 A preset is a named bin set. Define it once in `Presets.json` and a request names the preset instead of
-carrying the bins. The shipped file holds example presets; replacing it with your own bins is the first thing
-to do, because until then every answer describes someone else's packaging.
+carrying the bins.
+{:.lede}
+
+The shipped file holds example presets; replacing it with your own bins is the first thing to do, because
+until then every answer describes someone else's packaging.
 
 > Centimetres are assumed, but any unit works as long as every bin and every item uses the same one, as
 > integers. [Core Concepts]({% vlink /core-concepts.md %}) has the rest of what a dimension must be.
@@ -30,11 +33,16 @@ A preset is whatever you pack into, and there are two ways to define it:
 Both are just bins in the file. Keep one preset per set and name it after what it is.
 
 ## 🛠️ Configuration
-Presets are stored in the `Presets.json` file.
+Presets are stored in the `Presets.json` file. This file contains predefined bin configurations that can be
+used directly in your packing operations.
 
-This file contains predefined bin configurations that can be used directly in your packing operations.
+| Where | Path |
+|---|---|
+| Location | `/app/Config_Files`{:.mono} |
+| Full Path | `/app/Config_Files/Presets.json`{:.mono} |
 
-**Default configuration:**
+#### Default configuration
+
 ```json
 {
   "PresetOptions": {
@@ -64,6 +72,7 @@ This file contains predefined bin configurations that can be used directly in yo
   }
 }
 ```
+{: data-name="Presets.json" }
 
 Although you can modify the presets using any method described in the
 [Configuration]({% vlink /configuration/index.md %}#%EF%B8%8F-overriding-configuration) page,
@@ -71,9 +80,6 @@ it's generally recommended to replace the entire file rather than making increme
 
 Please refer to the [Configuration > Direct File Edits]({% vlink /configuration/index.md %}#-direct-file-edits)
 section of the page for more information on overriding configurations.
-
-- 📁 **Location**: `/app/Config_Files`
-- 📌 **Full Path**: `/app/Config_Files/Presets.json`
 
 ---
 
@@ -89,6 +95,13 @@ Below are two methods for overriding the presets file in a Docker environment:
 3. Open your terminal and navigate to the directory containing your modified Presets.json file.
 4. Run the following Docker command to mount the updated presets file:
 
+<div class="tabs" data-tabs="" markdown="block">
+<div class="tabs__list" role="tablist" markdown="0">
+  <button type="button" class="tabs__tab" role="tab" aria-selected="true">Linux and macOS</button>
+  <button type="button" class="tabs__tab" role="tab" aria-selected="false">Windows</button>
+</div>
+<div class="tabs__panel" role="tabpanel" markdown="block">
+
 ```bash
 docker run --name binacle-net \
   -p 8080:8080 \
@@ -97,8 +110,8 @@ docker run --name binacle-net \
   binacle/binacle-net:{{ page.version_tag }}
 ```
 
-> If you are running under **Windows** replace `$(pwd)` with `%cd%` and `\` with `^`, so the command looks like this:
-{: .block-tip}
+</div>
+<div class="tabs__panel" role="tabpanel" hidden="" markdown="block">
 
 ```cmd
 docker run --name binacle-net ^
@@ -107,6 +120,9 @@ docker run --name binacle-net ^
   -v %cd%\Presets.json:/app/Config_Files/Presets.json:ro ^
   binacle/binacle-net:{{ page.version_tag }}
 ```
+
+</div>
+</div>
 
 > Since we are using a bind mount for a single file, the full path must be provided.
 {: .block-note}
@@ -120,16 +136,15 @@ If you prefer to use Docker Compose, follow these steps:
 3. Place the modified Presets.json file in the same directory as your compose.yaml.
 4. Navigate to the directory containing both the Presets.json and compose.yaml files.
 5. Run the following command:
+
 ```bash
 docker compose up
 ```
 
-**Docker Compose File Template**
+#### Docker Compose File Template
 
 > Using the long syntax in the Docker Compose file allows you to specify a relative path rather than an absolute one.
 {: .block-note}
-
-<br>
 
 ```yml
 services:
@@ -146,4 +161,5 @@ services:
       - SWAGGER_UI=True
       - SCALAR_UI=True 
 ```
+{: data-name="compose.yaml" }
 

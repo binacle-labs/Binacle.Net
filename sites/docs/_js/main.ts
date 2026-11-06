@@ -1,5 +1,5 @@
-import {initCodeWrap, initCopyButton, initDrawer, initLightbox, initStickySidebar} from "binacle-components";
-import {ThemeSwitcherButtonElement, optionsFromDocument} from "theme-switcher";
+import {initCodeWrap, initCopyButton, initDrawer, initLightbox, initStickySidebar, initTabs} from "binacle-components";
+import {ThemeSwitcherButtonElement, currentTheme, optionsFromDocument} from "theme-switcher";
 import {initSections} from "./sections";
 
 ThemeSwitcherButtonElement.configure(optionsFromDocument());
@@ -37,13 +37,28 @@ function initDialogs(): void {
 	});
 }
 
+// Swagger is its own page in a frame, so it cannot see the site's theme. It only shows while its dialog is open.
+function initSwaggerTheme(): void {
+	const frame = document.querySelector<HTMLIFrameElement>("[data-swagger-frame]");
+	if (!frame) {
+		return;
+	}
+	const paint = (): void => {
+		frame.contentDocument?.documentElement.classList.toggle("dark-mode", currentTheme() === "dark");
+	};
+	frame.addEventListener("load", paint);
+	document.querySelector('[data-dialog-open="swagger-dialog"]')?.addEventListener("click", paint);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 	openCurrentGroups();
 	initDrawer();
 	initStickySidebar();
 	initVersionSelect();
 	initDialogs();
+	initSwaggerTheme();
 	initLightbox();
+	initTabs();
 	initSections();
 	initCodeWrap();
 	initCopyButton();

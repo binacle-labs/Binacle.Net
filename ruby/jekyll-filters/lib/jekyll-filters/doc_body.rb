@@ -106,7 +106,8 @@ module Jekyll
             code.remove_attribute('class')
             code['data-lang'] = language if language
             pre['class'] = 'code-block__pre'
-            outer.replace(%(<div class="code-block" data-code-block>#{head(language, outer['data-call'])}#{pre.to_html}</div>))
+            wrap(pre) if outer.key?('data-wrap')
+            outer.replace(%(<div class="code-block" data-code-block>#{head(language, outer)}#{pre.to_html}</div>))
           end
         end
 
@@ -121,9 +122,17 @@ module Jekyll
           end
         end
 
-        # A block with no heading above it to read names its call in the markdown, in data-call.
-        def head(language, call)
-          label = LANGUAGE_LABELS.fetch(language, language) || 'text'
+        # One long string has no lines to scroll: it wraps at every width.
+        def wrap(pre)
+          add_class(pre, 'code-block__pre--wrap')
+          pre['data-wrap'] = ''
+        end
+
+        # A block with no heading above it to read names its call in the markdown, in data-call. A file or a
+        # field is named in data-name, in place of the language.
+        def head(language, block)
+          call = block['data-call']
+          label = block['data-name'] || LANGUAGE_LABELS.fetch(language, language) || 'text'
           name = call ? http_line(badges(call)) : %(<span class="label" data-code-lang>#{label}</span>)
           %(<div class="code-block__head">#{name}) +
             %(<button type="button" class="copy-button" data-copy hidden>Copy</button></div>)
@@ -177,7 +186,14 @@ module Jekyll
           @fragment.css('table').each do |table|
             add_class(table, 'table doc__table')
             table['data-table'] = ''
+            table.css('td').each { |cell| add_class(cell, 'mono') if all_mono?(cell) }
           end
+        end
+
+        # Such a cell takes the code's size too, or its row stands taller than the code in it.
+        def all_mono?(cell)
+          code = cell.css('code.mono')
+          code.any? && code.map(&:text).join == cell.text.strip
         end
 
         def name_nested_lists
