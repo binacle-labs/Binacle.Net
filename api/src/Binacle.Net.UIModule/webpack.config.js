@@ -23,7 +23,12 @@ module.exports = (env) => {
 			rules: [
 				{
 					test: /\.ts$/,
-					use: 'ts-loader',
+					// The package's commonjs would load three twice: our require takes its commonjs build, and its
+					// own add-ons import the module one.
+					use: {
+						loader: 'ts-loader',
+						options: {compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
+					},
 					exclude: /node_modules/,
 				},
 			],

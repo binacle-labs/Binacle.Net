@@ -1,7 +1,7 @@
 # binacle-net-ui
 
 The front end behind the two interactive apps on the website - the packing demo and the ViPaq protocol
-decoder. Alpine.js components plus a Three.js visualizer, written in TypeScript.
+decoder. Alpine.js components plus a Three.js 3D view, written in TypeScript.
 
 It exports two Alpine plugins and nothing else:
 
@@ -22,15 +22,28 @@ with the components it needs.
 |---|---|
 | `src/*Plugin.ts` | The two entry points. Each registers one app plus the components that app needs |
 | `src/apps/` | One folder per app - `packingDemo`, `protocolDecoder`. Each owns its own component, the models its page binds to, and anything only it uses |
-| `src/components/` | The reusable components - `visualizer`, `errorsDialog`, `field`, `controls`, `logger`. Each folder is self-contained and exports its public surface from its own `index.ts` |
+| `src/components/` | The reusable components - `packView`, `errorsDialog`, `field`, `logger`. Each folder is self-contained and exports its public surface from its own `index.ts` |
 | `src/shared/` | The few things every layer needs - `defineComponent`, and the base geometry types |
 | `src/types/` | Ambient declarations for Alpine and the globals the pages set |
 | `tools/` | The sample-set generator. `just regen demo-samples` reads `shared/data/demo-samples` and writes `src/apps/packingDemo/sampleData.ts`, which is generated - edit the data, not the file |
 
-**The visualizer owns its own internals.** The Three.js scene work - building the bin, adding and clearing
-items, camera position and field of view, theme colours - lives inside `src/components/visualizer/` rather
-than in a shared folder, so an app cannot reach into it. What it offers an app is its component and the
-`Binacle` contract type, and nothing else.
+**The 3D view owns its own internals.** The Three.js scene work lives inside `src/components/packView/`, so an
+app cannot reach into it. An app talks to it by dispatching `update-scene` with a function that returns a promise
+of a scene:
+
+| Scene | What the view draws |
+|---|---|
+| `{bin}` | The bin alone, before any answer |
+| `{bin, items}` | An answer. Items are the API's shape, with an optional `id` and `kind` |
+| `{bin, items: [], note}` | An answer with nothing in it. The note shows under the view |
+| `null`, or no `bin` | Nothing |
+
+`kindNames` goes beside `items`, and the readout names each item by it. The loader shows while the promise runs.
+
+**The figure's markup belongs to the host.** The view finds its parts by data attributes and fills them:
+`data-pack-view-stage`, `data-pack-view-empty`, `data-bin-dim`, `data-bin-dim-number`, `data-placed` and
+`data-pack-view-controls`. Its colours are CSS custom properties read off the figure, from `design/`. **A host that
+does not load them fails when the view starts**, with an error that names the value.
 
 ## 🚀 Where it runs
 
@@ -61,5 +74,6 @@ jsdom, because the components read `document` and `window` even where the logic 
 `tests/` mirrors `src/`, so a test sits beside the thing it covers. The component tests call each Alpine
 component factory directly with a stub `$dispatch`, rather than starting Alpine.
 
-**The Three.js half is not covered and is not meant to be.** The visualizer and the scene helpers need a WebGL
-context, so a test there could only assert that a call happened.
+**`packView.ts` is not covered and is not meant to be.** It needs a WebGL context, so a test there could only
+assert that a call happened. What needs no WebGL is split out of it and tested - the colours, the camera fit, the
+prints, the position.

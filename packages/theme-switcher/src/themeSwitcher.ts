@@ -46,9 +46,7 @@ export default class ThemeSwitcherButtonElement extends HTMLElement {
 		if (this.button) {
 			label(this.button, mode);
 		}
-		const theme = currentTheme();
-		swapAttributes(theme);
-		window.dispatchEvent(new CustomEvent("themeChanged", {detail: {theme}}));
+		swapAttributes(currentTheme());
 	}
 }
 

@@ -1,6 +1,13 @@
 const path = require('path');
 const dest = 'js';
 
+// tsconfig emits commonjs, and webpack cannot tree-shake or concatenate that. It also loads three twice: our
+// require takes its commonjs build, and its own add-ons import the module one.
+const tsLoader = {
+	loader: 'ts-loader',
+	options: {compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
+};
+
 module.exports = (env, argv) => {
 	const buildType = env.build || 'dist'; // 'dist' or 'watch'
 	const production = buildType === 'dist';
@@ -14,12 +21,7 @@ module.exports = (env, argv) => {
 		entry: {'theme-init': './_js/theme-init.ts'},
 		output: {filename: '[name].js', path: path.resolve(__dirname, dest), clean: false},
 		resolve: {extensions: ['.ts', '.js', '.json']},
-		// esnext here only: tsconfig emits commonjs, and webpack cannot tree-shake or concatenate that -
-		// it costs this bundle its module registry, on a script that blocks the first paint.
-		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: {
-			loader: 'ts-loader',
-			options: {compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
-		}}]},
+		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: tsLoader}]},
 		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		devtool: false,
 	};
@@ -46,7 +48,7 @@ module.exports = (env, argv) => {
 			rules: [
 				{
 					test: /\.ts$/,
-					use: 'ts-loader',
+					use: tsLoader,
 					exclude: /node_modules/,
 				},
 			],

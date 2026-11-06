@@ -49,7 +49,7 @@ public class PageContentTests : IClassFixture<UIModuleBinacleApi>
 		var page = await this.GetPage(path);
 
 		page.ShouldContain(componentName);
-		page.ShouldContain("packing_visualizer");
+		page.ShouldContain("pack_view");
 		page.ShouldContain("errors_dialog");
 	}
 

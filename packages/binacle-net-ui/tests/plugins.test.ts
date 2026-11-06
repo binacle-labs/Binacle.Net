@@ -28,7 +28,7 @@ describe("packingDemoPlugin", () => {
 
 		packingDemoPlugin(alpine);
 
-		expect(data.sort()).toEqual(["errors_dialog", "packing_demo_app", "packing_visualizer"]);
+		expect(data.sort()).toEqual(["errors_dialog", "pack_view", "packing_demo_app"]);
 	});
 
 	test("registers the field naming helpers, which only the form needs", () => {
@@ -55,7 +55,7 @@ describe("protocolDecoderPlugin", () => {
 
 		protocolDecoderPlugin(alpine);
 
-		expect(data.sort()).toEqual(["errors_dialog", "packing_visualizer", "protocol_decoder_app"]);
+		expect(data.sort()).toEqual(["errors_dialog", "pack_view", "protocol_decoder_app"]);
 	});
 
 	// The decoder page has no form, so it carries none of the field machinery.
@@ -78,16 +78,16 @@ describe("protocolDecoderPlugin", () => {
 });
 
 describe("both plugins", () => {
-	// Two pages, one visualizer and one dialog implementation. A host loading both would otherwise get two.
-	test("share the visualizer and the error dialog", () => {
+	// Two pages, one 3D view and one dialog implementation. A host loading both would otherwise get two.
+	test("share the 3D view and the error dialog", () => {
 		const demo = fakeAlpine();
 		const decoder = fakeAlpine();
 
 		packingDemoPlugin(demo.alpine);
 		protocolDecoderPlugin(decoder.alpine);
 
-		expect(demo.data).toContain("packing_visualizer");
-		expect(decoder.data).toContain("packing_visualizer");
+		expect(demo.data).toContain("pack_view");
+		expect(decoder.data).toContain("pack_view");
 		expect(demo.data).toContain("errors_dialog");
 		expect(decoder.data).toContain("errors_dialog");
 	});

@@ -11,6 +11,7 @@ module.exports = {
   testEnvironment: "jsdom",
   moduleNameMapper: {
     "^three/examples/jsm/controls/OrbitControls$": "<rootDir>/tests/stubs/orbitControls.ts",
+    "^three/examples/jsm/lines/(LineMaterial|LineSegments2|LineSegmentsGeometry)$": "<rootDir>/tests/stubs/lines.ts",
   },
   transform: {
     ...tsJestTransformCfg,

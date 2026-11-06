@@ -234,29 +234,6 @@ describe("clicking", () => {
 
 		expect(storage.clear).toHaveBeenCalledTimes(1);
 	});
-
-	test("a themeChanged event carries the new theme", () => {
-		const element = createSwitcher("light");
-		document.body.appendChild(element);
-		const listener = jest.fn();
-		window.addEventListener("themeChanged", listener);
-
-		button(element).click();
-
-		expect(listener.mock.calls[0][0].detail).toEqual({theme: "dark"});
-	});
-
-	test("under auto the event carries the machine's theme, for a listener that knows only two", () => {
-		withSystemDark(true);
-		const element = createSwitcher("dark");
-		document.body.appendChild(element);
-		const listener = jest.fn();
-		window.addEventListener("themeChanged", listener);
-
-		button(element).click();
-
-		expect(listener.mock.calls[0][0].detail).toEqual({theme: "dark"});
-	});
 });
 
 describe("the control", () => {
