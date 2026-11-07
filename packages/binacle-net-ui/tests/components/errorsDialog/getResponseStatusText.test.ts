@@ -1,4 +1,4 @@
-import {getResponseStatusText} from "../../../src/apps/packingDemo/getResponseStatusText";
+import {getResponseStatusText} from "../../../src/components/errorsDialog/getResponseStatusText";
 
 test.each([
 	[400, "Bad Request"],

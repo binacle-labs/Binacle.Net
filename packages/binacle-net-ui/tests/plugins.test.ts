@@ -1,9 +1,10 @@
 import type {Alpine as AlpineType} from "alpinejs";
 
+import {everydayItemsPlugin} from "../src/everydayItemsPlugin";
 import {packingDemoPlugin} from "../src/packingDemoPlugin";
 import {protocolDecoderPlugin} from "../src/protocolDecoderPlugin";
 
-// The two aggregate plugins are the package's whole public surface - a host page imports one, calls
+// The aggregate plugins are the package's whole public surface - a host page imports one, calls
 // Alpine.plugin, and uses the x-data names in its markup. What is asserted here is that list, because the
 // names are what the .cshtml and the Jekyll page write by hand.
 function fakeAlpine() {
@@ -90,5 +91,25 @@ describe("both plugins", () => {
 		expect(decoder.data).toContain("pack_view");
 		expect(demo.data).toContain("errors_dialog");
 		expect(decoder.data).toContain("errors_dialog");
+	});
+});
+
+describe("everydayItemsPlugin", () => {
+	test("registers the three components the items page uses", () => {
+		const {alpine, data} = fakeAlpine();
+
+		everydayItemsPlugin(alpine);
+
+		expect(data.sort()).toEqual(["errors_dialog", "everyday_items_app", "pack_view"]);
+	});
+
+	// Its form has no typed fields, so it carries none of the field machinery.
+	test("registers no field helpers", () => {
+		const {alpine, directives, magics} = fakeAlpine();
+
+		everydayItemsPlugin(alpine);
+
+		expect(directives).toEqual([]);
+		expect(magics).toEqual(["logger"]);
 	});
 });

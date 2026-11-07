@@ -1,11 +1,12 @@
 # binacle-net-ui
 
-The front end behind the two interactive apps on the website - the packing demo and the ViPaq protocol
-decoder. Alpine.js components plus a Three.js 3D view, written in TypeScript.
+The front end behind the interactive apps on the website - *Everyday Items*, the packing demo and the ViPaq
+protocol decoder. Alpine.js components plus a Three.js 3D view, written in TypeScript.
 
-It exports two Alpine plugins and nothing else:
+It exports three Alpine plugins and nothing else:
 
 ```ts
+import {everydayItemsPlugin} from 'binacle-net-ui';
 import {packingDemoPlugin} from 'binacle-net-ui';
 import {protocolDecoderPlugin} from 'binacle-net-ui';
 ```
@@ -20,8 +21,8 @@ with the components it needs.
 
 | Folder | What it is |
 |---|---|
-| `src/*Plugin.ts` | The two entry points. Each registers one app plus the components that app needs |
-| `src/apps/` | One folder per app - `packingDemo`, `protocolDecoder`. Each owns its own component, the models its page binds to, and anything only it uses |
+| `src/*Plugin.ts` | The entry points. Each registers one app plus the components that app needs |
+| `src/apps/` | One folder per app - `everydayItems`, `packingDemo`, `protocolDecoder`. Each owns its own component, the models its page binds to, and anything only it uses |
 | `src/components/` | The reusable components - `packView`, `errorsDialog`, `field`, `logger`. Each folder is self-contained and exports its public surface from its own `index.ts` |
 | `src/shared/` | The few things every layer needs - `defineComponent`, and the base geometry types |
 | `src/types/` | Ambient declarations for Alpine and the globals the pages set |
@@ -39,6 +40,7 @@ of a scene:
 | `null`, or no `bin` | Nothing |
 
 `kindNames` goes beside `items`, and the readout names each item by it. The loader shows while the promise runs.
+Dispatching `highlight-kind` with a kind shows only that kind in colour; `null` shows them all again.
 
 **The figure's markup belongs to the host.** The view finds its parts by data attributes and fills them:
 `data-pack-view-stage`, `data-pack-view-empty`, `data-bin-dim`, `data-bin-dim-number`, `data-placed` and
@@ -53,13 +55,13 @@ webpack pass of each.
 
 | Host | Entries |
 |---|---|
-| [`sites/demo`](../../sites/demo) | `_js/packing_demo.js`, `_js/protocol_decoder.js` |
+| [`sites/demo`](../../sites/demo) | `_js/everyday_items.js`, `_js/packing_demo.js`, `_js/protocol_decoder.js` |
 | [the API's UI module](../../api/src/Binacle.Net.UIModule) | `_js/packing_demo.js`, `_js/protocol_decoder.js` |
 
 `just serve demo` watches the site; `just serve api U` watches the module. **A change here lands on both, and
 neither can be updated without the other** - so widen a signature first, move each host, then narrow.
 
-The packing demo calls a live API through [`binacle-net-client`](../binacle-net-client), which owns the wire
+*Everyday Items* and the packing demo call a live API through [`binacle-net-client`](../binacle-net-client), which owns the wire
 shapes. The site takes the address from `api_url` in its `_config.yml`; the module passes an empty one, which
 means fetch relative from whatever host served the page. The decoder calls nothing
 - it decodes in the browser, through `binacle-vipaq`.

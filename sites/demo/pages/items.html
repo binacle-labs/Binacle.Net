@@ -1,0 +1,119 @@
+---
+title: Everyday Items
+permalink: /items/
+structured_data:
+  type: WebApplication
+  name: Everyday Items
+description: Pick a box, add the things that go in it, and see where each one lands in 3D. Free and open source, no signup.
+demo: true
+scripts:
+  - type: "text/javascript"
+    src: "/js/everyday_items.js"
+excerpt: |
+  Pick a box, add the things that go in it, and see where each one lands. Every item of a kind
+  has the same colour, so you can follow it.
+---
+
+<section class="band" x-data="everyday_items_app({ baseUrl: '{{ site.api_url }}' })">
+  <div class="container">
+    <div class="workbench">
+
+      <div class="workbench__side">
+        <div class="workbench__intro">
+          <div class="prose">
+            <h1>Everyday Items</h1>
+            <p>Pick a box, add the things that go in it, and see where each one lands. Every item of a kind
+              has the same colour, so you can follow it.</p>
+          </div>
+          <ol class="labelled-list labelled-list--key">
+            <li class="labelled-list__item"><span class="label">01 Box</span>One of three sizes.</li>
+            <li class="labelled-list__item"><span class="label">02 Items</span>Add or take away with + and -. The sizes are fixed.</li>
+            <li class="labelled-list__item"><span class="label">03 Pack</span>Tap a kind in the list to see where it went.</li>
+            <li class="labelled-list__item"><span class="label">04 Step through</span>Play the order the items went in, or step one at a time. Drag to turn the view.</li>
+          </ol>
+        </div>
+
+        <form class="form" novalidate @submit.prevent.stop="onSubmit">
+          <fieldset class="form__group">
+            <legend class="form__legend label">Box</legend>
+            <div class="box-picker">
+              <template x-for="box in boxes" :key="box.name">
+                <label class="box-picker__option">
+                  <input class="box-picker__input" type="radio" name="box" :value="box.name" x-model="model.box">
+                  <strong class="box-picker__name" x-text="box.name"></strong>
+                  <span class="mono" x-text="boxSizeText(box)"></span>
+                </label>
+              </template>
+            </div>
+          </fieldset>
+
+          <fieldset class="form__group form__group--list">
+            <legend class="form__legend label">Items</legend>
+            <ul class="kind-list">
+              <template x-for="kind in kinds" :key="kind.kind">
+                <li class="kind-list__item">
+                  <span class="kind-key" :style="kindKeyStyle(kind)" aria-hidden="true"></span>
+                  <span class="kind-list__name"><span x-text="kind.name"></span><span class="mono" x-text="kindSizeText(kind)"></span></span>
+                  <span class="stepper">
+                    <button type="button" class="stepper__button" :disabled="!canRemove(kind)"
+                            :aria-label="'One less ' + kind.name.toLowerCase()" @click="changeCount(kind, -1)">-</button>
+                    <output class="stepper__count" :aria-label="kind.name" x-text="countOf(kind)"></output>
+                    <button type="button" class="stepper__button" :disabled="!canAdd(kind)"
+                            :aria-label="'One more ' + kind.name.toLowerCase()" @click="changeCount(kind, 1)">+</button>
+                  </span>
+                </li>
+              </template>
+            </ul>
+          </fieldset>
+
+          <div class="form__group">
+            <div class="form__actions">
+              <button type="submit" class="button button--primary"
+                      :disabled="submitting"
+                      :aria-busy="submitting ? 'true' : null">Pack</button>
+              <button type="button" class="button button--link" @click="clearAll()">Clear all</button>
+            </div>
+            <p class="form__status" :class="statusIsError ? 'is-error' : ''" aria-live="polite" x-text="status"></p>
+          </div>
+        </form>
+      </div>
+
+      <div class="workbench__view">
+        {% include pack-view.html empty="Add items and press Pack." %}
+
+        <section aria-labelledby="in-box-title">
+          <p class="label" id="in-box-title">In the box</p>
+          <ul class="result-list">
+            <template x-if="!result">
+              <li class="result-list__item result-list__empty">Nothing packed yet. Press Pack.</li>
+            </template>
+            <template x-if="result">
+              <li class="result-list__item">
+                <div class="result-row result-row--static">
+                  <span class="result-row__title"><span x-text="resultTitle(result)"></span> <span class="mono" x-text="resultBinSizeText(result)"></span></span>
+                  <span class="label" x-text="resultItemCountText(result)"></span>
+                  <span class="result-row__fill" :aria-label="'Packed box volume ' + resultBinFillText(result)">
+                    <span class="result-row__fill-track"><span class="result-row__fill-line" :style="'width:' + result.packedBinVolumePercentage + '%'"></span></span>
+                    <span class="result-row__fill-number" x-text="resultBinFillText(result)"></span>
+                  </span>
+                </div>
+              </li>
+            </template>
+            <template x-for="kind in (result ? resultKinds() : [])" :key="kind.kind">
+              <li class="result-list__item">
+                <button type="button" class="kind-result" :aria-pressed="isLit(kind) ? 'true' : 'false'" @click="toggleKind(kind)">
+                  <span class="kind-key" :style="kindKeyStyle(kind)" aria-hidden="true"></span>
+                  <span x-text="kind.name"></span>
+                  <span class="kind-result__count" :class="unfitCountOf(kind) > 0 ? 'is-short' : ''" x-text="kindResultText(kind)"></span>
+                </button>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% include errors-dialog.html %}

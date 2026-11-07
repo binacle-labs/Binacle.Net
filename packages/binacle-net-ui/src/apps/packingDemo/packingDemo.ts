@@ -1,15 +1,13 @@
 import type { Alpine as AlpineType } from 'alpinejs';
 import {defineComponent} from "../../shared/defineComponent";
-import {getResponseStatusText} from "./getResponseStatusText";
 import {largestBin, nextSampleIndex, randomBin, randomItemFor, sampleAt} from "./samples";
 import Bin from "./bin";
 import Item from "./item";
-import ErrorViewModel from "../../components/errorsDialog/error";
+import {errorFromFailure} from "../../components/errorsDialog/errorFromFailure";
 import type {PackScene} from "../../components/packView/packViewComponent";
 import {
 	ApiFailure,
 	BinacleClient,
-	hasValidationErrors,
 	packCompareBinsPath,
 	PackBinResponse,
 	PackCompareResponse,
@@ -178,40 +176,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		}
 	},
 	handleErrorResponse(failure: ApiFailure) {
-		let errorObj = {
-			title: `Error: ${getResponseStatusText(failure.status)}`,
-			errors: []
-		} as ErrorViewModel;
-
-		const problem = failure.problem;
-		if(problem === null){
-			// An empty body means the server sent no details, not that a body failed to parse - a
-			// response that fails to parse throws before it reaches this branch.
-			if(failure.status === 429){
-				errorObj.errors.push('You have been rate limited. Wait a moment, then try again.');
-			}
-			else {
-				errorObj.errors.push('The server did not send any further details about this error.');
-			}
-		}
-		else {
-			if(problem.title){
-				errorObj.title = problem.title;
-			}
-			if(problem.detail){
-				errorObj.errors.push(problem.detail);
-			}
-			if(failure.status === 422 && hasValidationErrors(problem)){
-				const errorsByField = problem.errors ?? {};
-				for(const key in errorsByField){
-					const fieldErrors = errorsByField[key];
-					fieldErrors.forEach((err: string) => {
-						errorObj.errors.push(`${key}: ${err}`);
-					});
-				}
-			}
-		}
-		this.$dispatch('error-occurred', errorObj);
+		this.$dispatch('error-occurred', errorFromFailure(failure));
 	},
 	async getResults(request: PackCustomRequest) : Promise<PackCompareResponse | null> {
 		try {

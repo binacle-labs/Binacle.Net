@@ -31,7 +31,7 @@ Leave `baseUrl` out and requests go to whatever host served the page.
 
 | Folder or file | What it is |
 |---|---|
-| `src/client.ts` | `BinacleClient`. One method per route, today just `packCompareBins` for `POST /api/v4/pack/compare-bins` |
+| `src/client.ts` | `BinacleClient`. One method per route, today `packCompareBins` for `POST /api/v4/pack/compare-bins` and `packPresetBin` for `POST /api/v4/pack/bin/{preset}/{bin}` |
 | `src/types.ts` | The wire contracts, one type per schema in the spec, named after it |
 | `src/response.ts` | `ApiResponse<T>` - the success-or-problem answer every call returns - and how a response body is read |
 | `src/index.ts` | The single entry point. Everything above is re-exported from here |

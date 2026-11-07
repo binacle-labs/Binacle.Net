@@ -4,5 +4,6 @@
 /// <reference path="./src/types/global.d.ts" />
 /// <reference path="./src/types/alpine.d.ts" />
 
+export {everydayItemsPlugin} from "./src/everydayItemsPlugin";
 export {packingDemoPlugin} from "./src/packingDemoPlugin";
 export {protocolDecoderPlugin} from "./src/protocolDecoderPlugin";

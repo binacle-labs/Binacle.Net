@@ -59,6 +59,14 @@ export interface PackCustomRequest {
 	items: Box[];
 }
 
+// What the preset pack routes take: the bins come from the preset. The spec declares one schema per route
+// (PackPresetBinRequest, PackPresetCompareRequest, PackPresetSmallestBinRequest, PackPresetBestBinRequest)
+// and all four carry these same two fields.
+export interface PackPresetRequest {
+	parameters: OperationParameters;
+	items: Box[];
+}
+
 // The result for one bin. This is the whole body of pack/smallest-bin and pack/best-bin, and one entry of
 // pack/compare-bins.
 export interface PackBinResponse {

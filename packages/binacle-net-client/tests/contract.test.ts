@@ -8,6 +8,7 @@ import {
 	PackBinResponse,
 	PackCompareResponse,
 	PackCustomRequest,
+	PackPresetRequest,
 	ProblemDetails,
 } from "../src";
 
@@ -114,6 +115,23 @@ describe("the request type", () => {
 		for (const algorithm of algorithms)
 			expect(mismatches("OperationParameters", {algorithm})).toEqual([]);
 	});
+});
+
+describe("the preset request type", () => {
+	const presetRequest: PackPresetRequest = {
+		parameters: {algorithm: "BFD"},
+		items: [{id: "box_1", quantity: 2, length: 2, width: 5, height: 10}],
+	};
+
+	test("matches PackPresetBinRequest", () => {
+		expect(mismatches("PackPresetBinRequest", presetRequest)).toEqual([]);
+	});
+
+	// The four preset pack routes share one request shape.
+	test.each(["PackPresetCompareRequest", "PackPresetSmallestBinRequest", "PackPresetBestBinRequest"])(
+		"matches %s, which shares the shape", schema => {
+			expect(mismatches(schema, presetRequest)).toEqual([]);
+		});
 });
 
 describe("the response type", () => {

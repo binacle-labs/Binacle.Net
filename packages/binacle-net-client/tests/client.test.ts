@@ -6,6 +6,8 @@ import {
 	PackCompareResponse,
 	PackCustomRequest,
 	packCompareBinsPath,
+	PackPresetRequest,
+	packPresetBinPath,
 } from "../src";
 
 // The client only ever reads ok, status and text(), so a stub is enough and a real Response would need a
@@ -105,6 +107,44 @@ describe("the request", () => {
 
 		expect(ownFetch).toHaveBeenCalledTimes(1);
 		expect(response.ok).toBe(true);
+	});
+});
+
+describe("the preset bin request", () => {
+	function presetRequest(): PackPresetRequest {
+		return {
+			parameters: {algorithm: "BFD"},
+			items: [{id: "box_1", quantity: 1, length: 2, width: 2, height: 2}],
+		};
+	}
+
+	test("names the preset and the bin in the path", async () => {
+		const fetchMock = mockFetch(stubResponse(200, JSON.stringify(compareResponse.results[0])));
+
+		await new BinacleClient({baseUrl: "https://api.example.com"}).packPresetBin("sample", "Large", presetRequest());
+
+		expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/v4/pack/bin/sample/Large");
+	});
+
+	test("escapes a name that is not safe in a path", () => {
+		expect(packPresetBinPath("my preset", "a/b")).toBe("/api/v4/pack/bin/my%20preset/a%2Fb");
+	});
+
+	test("carries the request as JSON, with no bins", async () => {
+		const fetchMock = mockFetch(stubResponse(200, JSON.stringify(compareResponse.results[0])));
+
+		await new BinacleClient().packPresetBin("sample", "Large", presetRequest());
+
+		expect(fetchMock.mock.calls[0][1].method).toBe("POST");
+		expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(presetRequest());
+	});
+
+	test("answers the one bin's result", async () => {
+		mockFetch(stubResponse(200, JSON.stringify(compareResponse.results[0])));
+
+		const response = await new BinacleClient().packPresetBin("sample", "Large", presetRequest());
+
+		expect(successOf(response)).toEqual(compareResponse.results[0]);
 	});
 });
 

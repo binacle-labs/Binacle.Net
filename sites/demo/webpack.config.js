@@ -30,6 +30,7 @@ module.exports = (env, argv) => {
 		mode: production ? 'production': 'development',
 		entry: {
 			main: './_js/main.js',
+			everyday_items: './_js/everyday_items.js',
 			packing_demo: './_js/packing_demo.js',
 			protocol_decoder: './_js/protocol_decoder.js'
 		},
