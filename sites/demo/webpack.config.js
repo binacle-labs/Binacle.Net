@@ -79,17 +79,17 @@ module.exports = (env, argv) => {
 						enforce: true,
 						priority: 10,
 					},
-					// binacle-net-client rides in this chunk rather than its own. Every chunk file is listed
+					// The API client rides in this chunk rather than its own. Every chunk file is listed
 					// by hand in _data/includes.yml, so a new one is dead weight until a script tag names it.
 					binacleNetUi: {
-						test: /[\\/]packages[\\/]binacle-net-(ui|client)[\\/]/,
+						test: /[\\/]packages[\\/](binacle-net-ui|api-client)[\\/]/,
 						name: 'binacle-net-ui',
 						chunks: 'all',
 						enforce: true,
 						priority: 20, // higher than vendors
 					},
 					binacleViPaq: {
-						test: /[\\/]vipaq[\\/]packages[\\/]binacle-vipaq[\\/]/,
+						test: /[\\/]vipaq[\\/]packages[\\/]vipaq[\\/]/,
 						name: 'binacle-vipaq',
 						chunks: 'all',
 						enforce: true,

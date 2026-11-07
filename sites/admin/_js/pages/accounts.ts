@@ -1,4 +1,4 @@
-import {AccountListItem, ServiceClient} from "binacle-net-service-client";
+import {AccountListItem, ServiceClient} from "@binacle/service-client";
 import {Paging} from "../paging";
 import {call, clientFor, goToLogin, loggedIn} from "../session";
 

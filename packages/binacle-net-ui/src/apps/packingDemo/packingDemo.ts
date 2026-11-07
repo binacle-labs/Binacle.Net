@@ -13,7 +13,7 @@ import {
 	PackCompareResponse,
 	PackCustomRequest,
 	UnpackedBox
-} from "binacle-net-client";
+} from "@binacle/api-client";
 
 // The call as it went over the wire, for a host that shows it. The path is relative: the host is the page's
 // to name.

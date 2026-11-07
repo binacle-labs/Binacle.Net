@@ -1,5 +1,5 @@
 import {initCodeWrap, initCopyButton, initDrawer, initLightbox, initStickySidebar, initTabs} from "binacle-components";
-import {ThemeSwitcherButtonElement, currentTheme, optionsFromDocument} from "theme-switcher";
+import {ThemeSwitcherButtonElement, currentTheme, optionsFromDocument} from "@binacle/theme-switcher";
 import {initSections} from "./sections";
 
 ThemeSwitcherButtonElement.configure(optionsFromDocument());

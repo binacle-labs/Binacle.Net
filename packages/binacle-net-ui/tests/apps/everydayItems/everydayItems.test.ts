@@ -1,4 +1,4 @@
-import type {PackBinResponse} from "binacle-net-client";
+import type {PackBinResponse} from "@binacle/api-client";
 
 import {Logger} from "../../../src/components/logger/logger";
 import type {PackScene} from "../../../src/components/packView/packViewComponent";

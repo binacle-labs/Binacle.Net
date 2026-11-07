@@ -3,7 +3,7 @@
 Language-neutral test data read by **both** ViPaq implementations:
 
 - C# - `vipaq/test/Binacle.ViPaq.UnitTests`
-- TS - `vipaq/packages/binacle-vipaq`
+- TS - `vipaq/packages/vipaq`
 
 One file, two consumers. The same inputs are graded against the same answers, so the two implementations can't
 silently drift on the wire. These files are the single source of truth; edit a case here, not in either suite. The
@@ -16,7 +16,7 @@ wire itself is defined in [`../PROTOCOL.md`](../PROTOCOL.md), which stands alone
 - **Unique `Name` per scenario.** It is the join key across languages and the test label on each side: C# passes
   the `Name` and resolves the row from a name-keyed dictionary; TS uses jest `test.each(...)("$Name", ...)`.
   (`header-bytes.json` is the exception: its unique `Header` notation string is the label.)
-- **Compact strings for inputs** (the shared `Binacle.CompactNotation` / `binacle-compact-notation` grammar, one
+- **Compact strings for inputs** (the shared `Binacle.CompactNotation` / `@binacle/compact-notation` grammar, one
   grammar for the whole repo):
   - **Dimensions / bin** - `"LxWxH"`, e.g. `"10x20x30"`.
   - **Coordinates** - `"(X,Y,Z)"`, e.g. `"(4,5,6)"`, always parenthesised.
@@ -76,7 +76,7 @@ just regen vipaq-interop-vectors
 
 The generators own only the derived files: `header/header-bytes.json` and the interop artifacts. **Every other
 vector is hand-authored**, so do not expect a regeneration to reproduce them. C#:
-`vipaq/tools/Binacle.ViPaq.VectorGenerators/`. TS: `vipaq/packages/binacle-vipaq/tools/`. One recipe runs both,
+`vipaq/tools/Binacle.ViPaq.VectorGenerators/`. TS: `vipaq/packages/vipaq/tools/`. One recipe runs both,
 because `interop/cs` and `interop/ts` come off the same `input.json` and regenerating one alone is exactly what
 the integrity tests catch.
 

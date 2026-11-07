@@ -1,11 +1,11 @@
-import {Cookies} from "cookies";
-import type {CookieAttributes} from "cookies";
+import {Cookies} from "./vendor/js-cookie";
+import type {CookieAttributes} from "./vendor/js-cookie";
 
 import {isTheme} from "./theme";
 import type {Theme} from "./theme";
 import type {ThemeStorage, ThemeSwitcherOptions} from "./options";
 
-// The read half stands alone and touches nothing from the cookies package. The pre-paint script in <head>
+// The read half stands alone and touches nothing from js-cookie. The pre-paint script in <head>
 // imports only this, and webpack drops everything below it - which is what keeps that bundle near a
 // kilobyte. Route reading through createStorage and the whole write side rides along.
 export function readStored(options: ThemeSwitcherOptions): Theme | undefined {
@@ -72,7 +72,7 @@ function writeCookie(key: string, attributes: CookieAttributes, theme: Theme): v
 	if (attributes.domain) {
 		Cookies.remove(key, {secure});
 	}
-	// Secure only where the browser will keep it. The cookies default is secure, and the API image is
+	// Secure only where the browser will keep it. js-cookie defaults to secure, and the API image is
 	// commonly served over plain http on a LAN - there the cookie is dropped and the theme resets on every
 	// page load.
 	Cookies.set(key, theme, {...attributes, secure});

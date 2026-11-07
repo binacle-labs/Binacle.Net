@@ -40,18 +40,8 @@ the markup in each site. That one habit causes both faults:
 
 **Smaller faults found 2026-11-07:**
 
-- **`cookies` is a real package on npm**, unrelated to ours. Ours resolves only because it is a workspace. Anyone
-  reading `"cookies": "*"` takes it for the public one.
-- **The names have no rule.** `binacle-*`, `binacle-net-*` and no prefix at all sit side by side.
-- **The entry file moves around.** `theme-switcher`, `binacle-components` and `binacle-vipaq` export from a root
-  `index.ts`; the two clients and `binacle-compact-notation` from `src/index.ts`.
-- **`theme-switcher` has no README.**
-- **The sites' npm names break the naming rule.** `binacle-net-www`, `binacle-net-docs` and `binacle-net-demo` are
-  sites for the whole project, not the API.
 - `initNavFade` in `binacle-components` is exported and tested, and no site calls it yet. It stays: the sites show
   a burger on a phone, but the UI module's header keeps the nav row that scrolls sideways, and its port calls it.
-- The UI module's `package.json` lists `cookies`, `three` and `binacle-vipaq` and imports none of them; only
-  `binacle-net-ui` does.
 
 **What is right today and stays:**
 
@@ -100,26 +90,51 @@ is, stays at level 1 and the component uses it.
 - **One scope, and a site's name says it is a site.** **Decided (the maintainer, 2026-11-07):** *"i wat
   @binacle/design-system  @binacle/sites-www @binacle/api-client"*. Asked about a second scope, `@binacle-net/`, he
   chose this. Earlier that day: *"the sites names go with www not -net-www"*. So `@binacle/sites-docs`,
-  `@binacle/sites-demo` and `@binacle/sites-admin` follow (agent, from the same pattern). The UI module's name is open.
+  `@binacle/sites-demo` and `@binacle/sites-admin` follow (agent, from the same pattern). **Decided (the maintainer,
+  2026-11-07):** the UI module is `@binacle/api-ui-module`, picked from that, `ui-module` and keeping
+  `binacle-net-uimodule`: *"api-ui-module"*.
   Told the sites' names would then differ from their Cloudflare names: *"i think its unmpotrrant change isnt it? go
   with sites-www if it si"*. It is: only the `name` line and `package-lock.json` hold a site's npm name.
 - **The Cloudflare names stay** (agent, 2026-11-07). `tooling/cloudflare/*.wrangler.jsonc` carries `binacle-net-www` and the rest as
   the Cloudflare project name. Renaming one there makes a new project to deploy to, not a rename. Only the npm
   `name` changes.
-- **The name is the folder's path, with `packages/` left out**: `packages/api-client/` is `@binacle/api-client`,
-  `sites/www/` is `@binacle/sites-www` (agent, from his three names). Nx named projects from their path the same way.
+- **A package's name is its folder's name**: `api/packages/api-client/` is `@binacle/api-client`. A site's is
+  `sites-` and its folder: `sites/www/` is `@binacle/sites-www` (agent, from his three names).
+
+## Where a package lives: by slice
+
+**Decided (the maintainer, 2026-11-07):** *"the rule now is packages /ruby for those not having a home or are not
+part of a feature"*, and *"compact notation is a feature small but a feature...shared feature"*. Earlier: *"its by
+slice so it has to stickto vipaq"*, *"the idea is for each slice to hold relatied thiungs togeter"*.
+
+- **A package that belongs to a slice lives in it**, in `<slice>/packages/<name>/`, beside the slice's C# in
+  `<slice>/src/` and its tools in `<slice>/tools/`. `vipaq/` already worked this way.
+- **`packages/` and `ruby/` hold what belongs to no slice** - the sites' shared parts and the Jekyll gems.
+- **Open - his idea, not decided (2026-11-07):** keep the root `packages/` and `ruby/` for generic code only.
+  His words: *"evetryhing binacle must not go in packages or ruby / but in shared or in a slice/ruby
+  /slice/pakcages"*, and *"the root packages and ruby stay generic nothing to do with binacle"*; then *"wait i
+  didnt decide"*. If he takes it: `binacle-robots` and `binacle-docs` to `sites/ruby/`, and the design system and
+  `apps` to `shared/packages/` or `sites/packages/`. The gems' tests run against `ruby/Gemfile`; the runner, CI
+  and Sonar assume `ruby/<gem>`. Cheapest before session 3, while the design system holds only the copy button.
+- **`shared/` is a slice too**, for what several slices use: compact notation's C# and TypeScript sit side by side.
+- No published standard names this layout. Told it leaves the top level split by language - `shared/` C#,
+  `packages/` TypeScript, `ruby/` Ruby - he chose to move compact notation into `shared/` as well.
 
 ## The structure
 
 ```
 packages/
-  theme-switcher/   @binacle/theme-switcher    1   MIT; takes packages/cookies in
-  compact-notation/ @binacle/compact-notation  2   was binacle-compact-notation
-  api-client/       @binacle/api-client        2   was binacle-net-client
-  service-client/   @binacle/service-client    2   was binacle-net-service-client, experimental
+  theme-switcher/   @binacle/theme-switcher    1   MIT; holds js-cookie
   design-system/    @binacle/design-system     3   was design/ and binacle-components
   apps/             @binacle/apps              4   was binacle-net-ui
-vipaq/packages/binacle-vipaq/  @binacle/vipaq  2   the folder stays
+shared/packages/
+  compact-notation/ @binacle/compact-notation  2   was packages/binacle-compact-notation
+api/packages/
+  api-client/       @binacle/api-client        2   was packages/binacle-net-client
+  service-client/   @binacle/service-client    2   was packages/binacle-net-service-client, experimental
+vipaq/packages/
+  vipaq/            @binacle/vipaq             2   was binacle-vipaq
+api/src/Binacle.Net.UIModule/  @binacle/api-ui-module  4
 
 ruby/
   jekyll-*                                     1   unchanged; jekyll-filters loses doc_body,
@@ -261,14 +276,14 @@ packages/apps/
 ### The clients and the formats
 
 ```
-packages/api-client/
+api/packages/api-client/
   package.json  README.md  index.ts
   src/      client.ts  response.ts  types.ts
   spec/     the OpenAPI document the types are checked against
   tests/
 ```
 
-`service-client` takes the same shape, with its own `spec/`. `compact-notation` takes it without `spec/`. `binacle-vipaq` keeps its own, with
+`service-client` takes the same shape, with its own `spec/`. `compact-notation` takes it without `spec/`. `vipaq` keeps its own, with
 `tools/`. `tooling/openapi.just` names the client's `spec/` folder by path.
 
 ### The gems
@@ -380,12 +395,37 @@ and their CSS is unchanged. The jest tests pass. He ran `just test sites` and lo
   and calls none of them. The TypeScript compiles to CommonJS, so `"sideEffects": false` drops nothing. The
   3D view in the design system's `index.ts` would put three.js in every site, unless the main bundles compile
   to ES modules as the pre-paint script already does.
-- **The jest name is the folder, `design-system`, not the npm name.** `tooling/tests/jest.sh` names report files
-  after it, and a `/` makes a folder. The recipe is `ts_design-system_unit`.
+- **The jest name is the npm name without its `/`, `binacle-design-system`.** `tooling/tests/jest.sh` names report files
+  after it, and a `/` makes a folder. The recipe is `ts_binacle-design-system_unit`.
 - **Coverage looked in `src/` only.** The design system's code sits in its Sass groups, so the root
   `jest.config.js` now also collects `components/**`. Each group that gains a `.ts` needs its own line.
 - **Two bridges stay until `docs` and `demo` move:** `design/components/_copy-button.scss` forwards to the
   package, and `binacle-components` re-exports `initCopyButton` from it.
+
+### Session 2, the renames (agent, 2026-11-07)
+
+In the working tree. Every package has its `@binacle/` name and the skeleton, but for three left to their own
+sessions: `binacle-components` until it joins `design-system`, and `binacle-net-ui` until it becomes `apps` (it also
+lacks `"sideEffects": false`). The UI module is `@binacle/api-ui-module`. js-cookie is in
+`theme-switcher/src/vendor/js-cookie/`, with its upstream `LICENSE`; `packages/cookies` and its recipe are gone.
+The UI module's stray `cookies`, `three` and `binacle-vipaq` went with it.
+
+Built before and after, cold: every site's CSS, HTML and pre-paint script are byte for byte the same, but for the
+sitemaps' build time. The other bundles hold the same code; only the module order and the minifier's short names
+moved, because webpack numbers a module from its path. Each package it touched passes `tsc --noEmit`; `ts_theme-switcher_unit`
+passes.
+
+- **The recipes, jest names and CI steps keep `binacle`** - the npm name without its `/`, as the C# recipes take
+  the assembly's: `ts_binacle-compact-notation_unit`, `ts_binacle-api-client_unit`, `ts_binacle-vipaq_unit`. He
+  asked, 2026-11-07: *"the test and just recipes keep binacle"*. `theme-switcher` is the exception, as it is generic: *"theme switcher is
+  not binacle"*, so `ts_theme-switcher_unit`. Each package moved into its slice in the same
+  session.
+- **The chunk names stay.** `binacle-vipaq.js` and `binacle-net-ui.js` are URLs: the smoke tests, the demo's
+  `_data/includes.yml` and `_AppletScripts.cshtml` name them. The chunk rule for `binacle-net-ui` now matches
+  `api-client/` too.
+- **Webpack names its chunk-loading global after the npm name.** `demo`'s is now
+  `webpackChunk_binacle_sites_demo`. Each site's chunks are built together, so nothing reads the old one.
+- **The theme-switcher check below leaves out `src/vendor/`.** js-cookie's own `__defaultAttributes` matches `__`.
 
 ## Done when
 
@@ -395,8 +435,8 @@ and their CSS is unchanged. The jest tests pass. He ran `just test sites` and lo
 - [ ] Every workspace package's name starts `@binacle/`, or, without the scope, the clients keep their names.
       Check: the `name` of each workspace `package.json`.
 - [ ] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.
-- [ ] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src`
-      finds nothing.
+- [x] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src
+      ':!packages/theme-switcher/src/vendor'` finds nothing.
 - [ ] No site lists `theme-switcher` as its own dependency; the design system does.
 - [ ] No folder named `design/` at the root, and no `--load-path=../../design` in any `package.json`.
 - [ ] Each component's Sass and TypeScript sit in one folder of the design system, and its shared include in its

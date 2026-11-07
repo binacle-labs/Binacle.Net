@@ -9,6 +9,7 @@ it, it belongs in that slice instead.
 |---|---|
 | `src/` | Small libraries the whole repo compiles against - geometry, packing vocabulary, compact notation, result types |
 | `data/` | The scenario corpus more than one slice reads, and `Binacle.Data`, which reads it - see [`data/README.md`](data/README.md) |
+| `packages/` | The TypeScript twin of compact notation, `@binacle/compact-notation` - see [its README](packages/compact-notation/README.md) |
 | `test/` | Test infrastructure shared by several suites - the report writer, the benchmark config every bench project runs with, the unit tests of the libraries |
 | `tools/` | The OR-Library converter, which writes `data/bischoff-suite` |
 
@@ -60,7 +61,7 @@ unit tests and the measure projects never restore it.
 
 Parse, format and round-trip tests for `src/Binacle.CompactNotation`. Runs with `just test cs_binacle-compact-notation_unit`.
 The TypeScript twin of that parser lives in
-[`packages/binacle-compact-notation`](../packages/binacle-compact-notation) and runs with `just test ts_binacle-compact-notation_unit`.
+[`packages/compact-notation`](packages/compact-notation) and runs with `just test ts_binacle-compact-notation_unit`.
 
 ## 🛠️ Tools
 

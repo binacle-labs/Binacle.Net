@@ -1,7 +1,7 @@
 import type { Alpine as AlpineType } from 'alpinejs';
 
 import {defineComponent} from "../../shared/defineComponent";
-import {ViPaqSerializer} from "binacle-vipaq";
+import {ViPaqSerializer} from "@binacle/vipaq";
 import DecodedPackingResult from "./decodedPackingResult";
 import {sampleData, SampleData} from "./sampleData";
 

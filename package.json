@@ -16,7 +16,9 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "vipaq/packages/binacle-vipaq",
+    "api/packages/*",
+    "shared/packages/*",
+    "vipaq/packages/*",
     "api/src/Binacle.Net.UIModule",
     "sites/docs",
     "sites/demo",

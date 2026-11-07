@@ -1,5 +1,5 @@
 {
-  "name": "binacle-net-docs",
+  "name": "@binacle/sites-docs",
   "version": "1.0.0",
   "description": "This is the documentation site for Binacle.Net.",
   "scripts": {
@@ -26,7 +26,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "binacle-components": "*",
-    "theme-switcher": "*"
+    "@binacle/theme-switcher": "*",
+    "binacle-components": "*"
   }
 }

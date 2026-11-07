@@ -57,7 +57,7 @@ searches for 3D bin packing, so that is the term used here.
 ├── /lib          # Core 3D bin-packing engine (Binacle.Lib)
 ├── /vipaq        # ViPaq - compact binary format for packing results
 ├── /shared       # Shared libraries, scenario data and the code that reads it
-├── /packages     # JavaScript/TypeScript packages (npm workspaces)
+├── /packages     # TypeScript packages that belong to no one slice (npm workspaces)
 ├── /ruby         # Ruby gems - Jekyll plugins for the sites
 ├── /sites        # Every site (Jekyll)
 │   ├── /www      # binacle.net
@@ -96,8 +96,7 @@ This project carries more than one license. Which one applies depends on which p
 | The data formats - ViPaq, compact notation, [PROTOCOL.md](vipaq/PROTOCOL.md), its test vectors and the geometry primitives they use | [Apache-2.0](vipaq/src/Binacle.ViPaq/LICENSE) |
 | The Ruby gems under [`ruby/`](ruby) | MIT |
 | Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
-| [`packages/theme-switcher`](packages/theme-switcher) | MIT |
-| [`packages/cookies`](packages/cookies) - adapted from js-cookie | MIT |
+| [`packages/theme-switcher`](packages/theme-switcher), with the copy of js-cookie inside it | MIT |
 | [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
 `SPDX-License-Identifier: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`

@@ -1,5 +1,5 @@
 {
-  "name": "binacle-net-demo",
+  "name": "@binacle/sites-demo",
   "version": "1.0.0",
   "description": "This is the website for Binacle.Net",
   "scripts": {
@@ -26,9 +26,9 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "@binacle/theme-switcher": "*",
     "alpinejs": "^3.15.2",
     "binacle-components": "*",
-    "binacle-net-ui": "*",
-    "theme-switcher": "*"
+    "binacle-net-ui": "*"
   }
 }

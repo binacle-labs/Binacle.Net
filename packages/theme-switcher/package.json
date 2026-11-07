@@ -1,7 +1,7 @@
 {
-  "name": "theme-switcher",
+  "name": "@binacle/theme-switcher",
   "version": "1.0.0",
-  "description": "Theme switcher custom element for the Binacle.Net websites",
+  "description": "A theme button custom element - auto, light and dark - and the script that sets the theme before the first paint",
   "main": "index.ts",
   "types": "index.ts",
   "license": "MIT",
@@ -9,9 +9,6 @@
   "sideEffects": false,
   "scripts": {
     "test": "jest"
-  },
-  "dependencies": {
-    "cookies": "*"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

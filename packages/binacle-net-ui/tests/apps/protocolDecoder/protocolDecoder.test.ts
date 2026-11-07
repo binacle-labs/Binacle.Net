@@ -1,5 +1,5 @@
 import type {Alpine as AlpineType} from "alpinejs";
-import {Coordinates, Dimensions, ViPaqSerializer} from "binacle-vipaq";
+import {Coordinates, Dimensions, ViPaqSerializer} from "@binacle/vipaq";
 
 import {Logger} from "../../../src/components/logger/logger";
 import {protocolDecoderApp, protocolDecoderAppPlugin} from "../../../src/apps/protocolDecoder/protocolDecoder";

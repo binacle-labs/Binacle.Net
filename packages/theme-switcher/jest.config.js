@@ -4,11 +4,11 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 
 /** @type {import("jest").Config} **/
 module.exports = {
-  // The npm package name, so `--selectProjects <name>` can run this package on its own through the
-  // root config, and so coverage and test reports are filed under a name that means something.
+  // No binacle: the package is generic. `--selectProjects <name>` runs it on its own, and the test runner
+  // names its report files after it.
   displayName: "theme-switcher",
   testEnvironment: "jsdom",
-  // https, not jsdom's default http: the cookies package defaults to secure, and jsdom hides a secure
+  // https, not jsdom's default http: js-cookie defaults to secure, and jsdom hides a secure
   // cookie from a document on an insecure origin, so the theme would never read back.
   testEnvironmentOptions: {
     url: "https://localhost/",

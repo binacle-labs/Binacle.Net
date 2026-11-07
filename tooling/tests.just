@@ -43,9 +43,8 @@ image:
     just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
-    just test ts_binacle-net-client_unit
+    just test ts_binacle-api-client_unit
     just test ts_binacle-net-ui_unit
-    just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
@@ -60,12 +59,11 @@ image:
 sites:
     just test ts_binacle-compact-notation_unit
     just test ts_binacle-vipaq_unit
-    just test ts_binacle-net-client_unit
-    just test ts_binacle-net-service-client_unit
+    just test ts_binacle-api-client_unit
+    just test ts_binacle-service-client_unit
     just test ts_binacle-net-ui_unit
-    just test ts_cookies_unit
     just test ts_binacle-components_unit
-    just test ts_design-system_unit
+    just test ts_binacle-design-system_unit
     just test ts_theme-switcher_unit
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
@@ -86,13 +84,12 @@ all:
     just test cs_binacle-flux-results_unit
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
-    just test ts_binacle-net-client_unit
-    just test ts_binacle-net-service-client_unit
+    just test ts_binacle-api-client_unit
+    just test ts_binacle-service-client_unit
     just test ts_binacle-net-ui_unit
-    just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test ts_binacle-components_unit
-    just test ts_design-system_unit
+    just test ts_binacle-design-system_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
     just test cs_binacle-net-diagnostics-module_unit
@@ -186,16 +183,13 @@ ts_binacle-compact-notation_unit: (_jest_test 'binacle-compact-notation')
 ts_binacle-vipaq_unit: (_jest_test 'binacle-vipaq')
 
 [private]
-ts_binacle-net-client_unit: (_jest_test 'binacle-net-client')
+ts_binacle-api-client_unit: (_jest_test 'binacle-api-client')
 
 [private]
-ts_binacle-net-service-client_unit: (_jest_test 'binacle-net-service-client')
+ts_binacle-service-client_unit: (_jest_test 'binacle-service-client')
 
 [private]
 ts_binacle-net-ui_unit: (_jest_test 'binacle-net-ui')
-
-[private]
-ts_cookies_unit: (_jest_test 'cookies')
 
 [private]
 ts_theme-switcher_unit: (_jest_test 'theme-switcher')
@@ -204,7 +198,7 @@ ts_theme-switcher_unit: (_jest_test 'theme-switcher')
 ts_binacle-components_unit: (_jest_test 'binacle-components')
 
 [private]
-ts_design-system_unit: (_jest_test 'design-system')
+ts_binacle-design-system_unit: (_jest_test 'binacle-design-system')
 
 # The Ruby tests. The argument is the gem's folder under ruby/.
 

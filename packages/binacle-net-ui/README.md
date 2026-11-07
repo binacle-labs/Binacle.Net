@@ -61,10 +61,10 @@ webpack pass of each.
 `just serve demo` watches the site; `just serve api U` watches the module. **A change here lands on both, and
 neither can be updated without the other** - so widen a signature first, move each host, then narrow.
 
-*Everyday Items* and the packing demo call a live API through [`binacle-net-client`](../binacle-net-client), which owns the wire
+*Everyday Items* and the packing demo call a live API through [`@binacle/api-client`](../../api/packages/api-client), which owns the wire
 shapes. The site takes the address from `api_url` in its `_config.yml`; the module passes an empty one, which
 means fetch relative from whatever host served the page. The decoder calls nothing
-- it decodes in the browser, through `binacle-vipaq`.
+- it decodes in the browser, through `@binacle/vipaq`.
 
 ## 🧪 Tests
 

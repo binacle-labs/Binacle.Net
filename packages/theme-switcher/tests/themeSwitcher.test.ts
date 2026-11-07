@@ -1,4 +1,4 @@
-import {Cookies} from "cookies";
+import {Cookies} from "../src/vendor/js-cookie";
 
 import ThemeSwitcherButtonElement from "../src/themeSwitcher";
 import {DEFAULT_OPTIONS} from "../src/options";

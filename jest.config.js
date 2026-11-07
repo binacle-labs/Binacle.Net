@@ -1,5 +1,5 @@
 // Runs every workspace's tests from the repo root, so coverage paths carry the workspace folder
-// (vipaq/packages/binacle-vipaq/src/x.ts, not src/x.ts). Two workspaces with a file at the same relative
+// (vipaq/packages/vipaq/src/x.ts, not src/x.ts). Two workspaces with a file at the same relative
 // path would otherwise collide and report 0%. See the monorepo note in Sonar's coverage docs.
 //
 // collectCoverageFrom has to live here, not in the per-package configs: in multi-project mode jest ignores
@@ -7,15 +7,14 @@
 /** @type {import("jest").Config} **/
 module.exports = {
   projects: [
-    "<rootDir>/packages/binacle-compact-notation",
+    "<rootDir>/api/packages/api-client",
     "<rootDir>/packages/binacle-components",
-    "<rootDir>/packages/binacle-net-client",
-    "<rootDir>/packages/binacle-net-service-client",
     "<rootDir>/packages/binacle-net-ui",
-    "<rootDir>/packages/cookies",
+    "<rootDir>/shared/packages/compact-notation",
     "<rootDir>/packages/design-system",
+    "<rootDir>/api/packages/service-client",
     "<rootDir>/packages/theme-switcher",
-    "<rootDir>/vipaq/packages/binacle-vipaq",
+    "<rootDir>/vipaq/packages/vipaq",
   ],
   // These globs resolve against each project's own rootDir, not this file's. Repo-root-relative paths
   // here match nothing and produce an empty report.

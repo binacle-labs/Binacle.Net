@@ -7,7 +7,7 @@ import {
 	PackBinResponse,
 	PackCompareResponse,
 	PackCustomRequest
-} from "binacle-net-client";
+} from "@binacle/api-client";
 
 import {Logger} from "../../../src/components/logger/logger";
 import type {PackScene} from "../../../src/components/packView/packViewComponent";

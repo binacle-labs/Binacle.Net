@@ -10,17 +10,17 @@
   },
   "private": true,
   "dependencies": {
+    "@binacle/api-client": "*",
+    "@binacle/vipaq": "*",
     "alpinejs": "^3.15.2",
-    "binacle-net-client": "*",
-    "binacle-vipaq": "*",
     "three": "^0.182.0"
   },
   "devDependencies": {
+    "@binacle/compact-notation": "*",
     "@types/alpinejs": "^3.13.11",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/three": "^0.182.0",
-    "binacle-compact-notation": "*",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.4.5",

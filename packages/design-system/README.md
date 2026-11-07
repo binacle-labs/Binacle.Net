@@ -41,7 +41,7 @@ The markup, once the site's `Gemfile` names the gem by path and its `_config.yml
 From the repo root:
 
 ```
-just test ts_design-system_unit
+just test ts_binacle-design-system_unit
 ```
 
 ## ⚠️ What will bite you

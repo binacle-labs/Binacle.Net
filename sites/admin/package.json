@@ -1,5 +1,5 @@
 {
-  "name": "binacle-net-admin",
+  "name": "@binacle/sites-admin",
   "version": "0.1.0",
   "description": "Experimental, local only. An admin page for the Binacle.Net service API",
   "private": true,
@@ -16,7 +16,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "alpinejs": "^3.15.2",
-    "binacle-net-service-client": "*"
+    "@binacle/service-client": "*",
+    "alpinejs": "^3.15.2"
   }
 }

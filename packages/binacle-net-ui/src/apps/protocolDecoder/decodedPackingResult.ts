@@ -1,4 +1,4 @@
-import {Coordinates, Dimensions} from "binacle-vipaq";
+import {Coordinates, Dimensions} from "@binacle/vipaq";
 
 export default class DecodedPackingResult {
 

@@ -1,4 +1,4 @@
-import {PagedResponse, PageQuery} from "binacle-net-service-client";
+import {PagedResponse, PageQuery} from "@binacle/service-client";
 
 // The state behind a paged table. The page owns the rows; this owns where in the list they came from.
 export class Paging {

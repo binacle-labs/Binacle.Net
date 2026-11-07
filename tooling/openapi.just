@@ -64,8 +64,8 @@ current_docs_folder := shell("sed -n 's/^current: *//p' '" + versions_yml + "'")
 site_swagger := justfile_directory() / "sites" / "docs" / "collections" / "_versions" / current_docs_folder / "swagger"
 
 # The client package is v4 only, so it takes no copy of v3.
-client_spec := justfile_directory() / "packages" / "binacle-net-client" / "spec"
-service_client_spec := justfile_directory() / "packages" / "binacle-net-service-client" / "spec"
+client_spec := justfile_directory() / "api" / "packages" / "api-client" / "spec"
+service_client_spec := justfile_directory() / "api" / "packages" / "service-client" / "spec"
 
 # Generate the documents, then fail if any committed copy has drifted
 check-all-copies: (generate openapi_dir) (generate-service service_dir)

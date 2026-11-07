@@ -1,5 +1,5 @@
 {
-  "name": "binacle-net-www",
+  "name": "@binacle/sites-www",
   "version": "1.0.0",
   "description": "The marketing site for Binacle.Net.",
   "private": true,
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@binacle/design-system": "*",
-    "binacle-components": "*",
-    "theme-switcher": "*"
+    "@binacle/theme-switcher": "*",
+    "binacle-components": "*"
   }
 }

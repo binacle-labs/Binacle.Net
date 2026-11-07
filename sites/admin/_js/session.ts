@@ -1,4 +1,4 @@
-import {ApiProblem, ApiResponse, hasValidationErrors, ServiceClient} from "binacle-net-service-client";
+import {ApiProblem, ApiResponse, hasValidationErrors, ServiceClient} from "@binacle/service-client";
 
 const tokenKey = "binacle-admin-token";
 

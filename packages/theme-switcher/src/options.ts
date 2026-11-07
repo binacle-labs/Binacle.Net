@@ -1,6 +1,6 @@
 import {isTheme} from "./theme";
 import type {DefaultTheme, Theme} from "./theme";
-import type {CookieAttributes} from "cookies";
+import type {CookieAttributes} from "./vendor/js-cookie";
 
 export interface ThemeStorage {
 	read(): Theme | undefined;
@@ -35,7 +35,7 @@ function asStorageKind(value: string | undefined): StorageKind {
 }
 
 // cookie is merged rather than replaced: a caller passing only a domain would otherwise drop expires and
-// get the cookies package's 90 days instead of a year.
+// get js-cookie's 90 days instead of a year.
 export function mergeOptions(over: Partial<ThemeSwitcherOptions>): ThemeSwitcherOptions {
 	return {...DEFAULT_OPTIONS, ...over, cookie: {...DEFAULT_OPTIONS.cookie, ...over.cookie}};
 }

@@ -20,7 +20,7 @@ The shared test vectors are what keep them honest.
 |---|---|
 | [PROTOCOL.md](PROTOCOL.md) | Normative wire-format spec - header, body, widths, value limits, compression |
 | `src/Binacle.ViPaq/` | C# library - the reference implementation, produces the golden bytes |
-| [`packages/binacle-vipaq/`](packages/binacle-vipaq) | TypeScript mirror - see its `README.md` |
+| [`packages/vipaq/`](packages/vipaq) | TypeScript mirror - see its `README.md` |
 | `test-vectors/` | Language-neutral test data read by both suites - see its `README.md` |
 | `test/` | C# unit tests, and the harness's encoders and picks |
 | `measure/` | `Binacle.ViPaq.EncodedSize` - encodes every pack and writes the sizes to `results/` |

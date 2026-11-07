@@ -22,6 +22,13 @@ over versioned REST endpoints.
 | `src/Binacle.Net.ServiceModule.Infrastructure` | - | Database backends (SQLite / PostgreSQL / Azure Tables) |
 | [`src/Binacle.Net.UIModule`](src/Binacle.Net.UIModule) | `UI_MODULE` | Razor Pages demo host - packing demo and ViPaq decoder |
 
+**TypeScript clients** - npm workspaces, imported by the sites and the UI module
+
+| Path | What it is |
+|---|---|
+| [`packages/api-client`](packages/api-client) | `@binacle/api-client`. A client for the v4 API, checked against a copy of its OpenAPI document |
+| [`packages/service-client`](packages/service-client) | `@binacle/service-client`. **Experimental, local only.** The same, for the service API |
+
 ## 🔢 API versions
 
 - **v3** (`/api/v3`) - stable. Do not modify.

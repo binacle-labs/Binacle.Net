@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import {ViPaqSerializer} from "binacle-vipaq";
-import {parseDimensions, parseItems} from "binacle-compact-notation";
+import {ViPaqSerializer} from "@binacle/vipaq";
+import {parseDimensions, parseItems} from "@binacle/compact-notation";
 
 import {sampleData} from "../../../src/apps/protocolDecoder/sampleData";
 

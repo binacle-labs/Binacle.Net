@@ -1,4 +1,4 @@
-import {ServiceClient, SubscriptionGetResponse} from "binacle-net-service-client";
+import {ServiceClient, SubscriptionGetResponse} from "@binacle/service-client";
 import {Paging} from "../paging";
 import {call, clientFor, goToLogin, loggedIn} from "../session";
 

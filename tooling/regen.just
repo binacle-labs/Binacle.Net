@@ -17,7 +17,7 @@ set working-directory := '..'
 # gets through.
 set no-exit-message := true
 
-ts_package := "vipaq/packages/binacle-vipaq"
+ts_package := "vipaq/packages/vipaq"
 ui_package := "packages/binacle-net-ui"
 
 # List the recipes

@@ -1,5 +1,5 @@
 {
-  "name": "binacle-net-uimodule",
+  "name": "@binacle/api-ui-module",
   "version": "1.0.0",
   "description": "The JS bundle and stylesheet the UI module ships inside the Docker image",
   "private": true,
@@ -13,12 +13,9 @@
     "watch:js": "webpack --watch --env build=watch"
   },
   "dependencies": {
+    "@binacle/theme-switcher": "*",
     "alpinejs": "^3.15.2",
-    "binacle-net-ui": "*",
-    "binacle-vipaq": "*",
-    "cookies": "*",
-    "theme-switcher": "*",
-    "three": "^0.182.0"
+    "binacle-net-ui": "*"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",

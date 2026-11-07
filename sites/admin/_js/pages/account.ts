@@ -8,7 +8,7 @@ import {
 	SubscriptionPatchRequest,
 	SubscriptionStatus,
 	SubscriptionType,
-} from "binacle-net-service-client";
+} from "@binacle/service-client";
 import {call, clientFor, goToLogin, loggedIn} from "../session";
 
 export const roles: AccountRole[] = ["Admin", "User", "Guest"];

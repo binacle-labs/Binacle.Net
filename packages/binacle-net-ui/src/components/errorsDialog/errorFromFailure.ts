@@ -1,4 +1,4 @@
-import {ApiFailure, hasValidationErrors} from "binacle-net-client";
+import {ApiFailure, hasValidationErrors} from "@binacle/api-client";
 import ErrorViewModel from "./error";
 import {getResponseStatusText} from "./getResponseStatusText";
 

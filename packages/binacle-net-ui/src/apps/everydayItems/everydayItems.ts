@@ -3,7 +3,7 @@ import {defineComponent} from "../../shared/defineComponent";
 import Dimensions from "../../shared/dimensions";
 import {errorFromFailure} from "../../components/errorsDialog/errorFromFailure";
 import type {PackScene} from "../../components/packView/packViewComponent";
-import {BinacleClient, PackBinResponse, PackPresetRequest} from "binacle-net-client";
+import {BinacleClient, PackBinResponse, PackPresetRequest} from "@binacle/api-client";
 import {BOXES, BoxSize, ItemKind, KINDS, PRESET} from "./kinds";
 
 // The home page's still is this algorithm's answer, so the two pages agree.
