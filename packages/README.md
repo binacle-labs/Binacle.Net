@@ -6,7 +6,7 @@ compact notation in [`shared/packages`](../shared/packages), ViPaq in [`vipaq/pa
 
 They are all npm workspaces; install once from the repo root with `npm install`. A package is imported by its
 npm name, which is `@binacle/` and the folder name - `@binacle/theme-switcher` for `theme-switcher/`.
-`binacle-components` and `binacle-net-ui` keep their old names until they become `design-system` and `apps`.
+`binacle-components` and `binacle-net-ui` keep their old names: the first forwards to `design-system`, the second becomes `apps`.
 
 ## 📦 Packages
 
@@ -14,24 +14,23 @@ npm name, which is `@binacle/` and the folder name - `@binacle/theme-switcher` f
 |---|---|
 | [`binacle-net-ui`](binacle-net-ui) | Alpine.js components and a Three.js visualizer for the interactive packing demo |
 | [`theme-switcher`](theme-switcher) | `@binacle/theme-switcher`. Auto, light and dark theme button, as a `<theme-switcher>` custom element. Holds its own copy of js-cookie |
-| [`binacle-components`](binacle-components) | Page behaviour for the sites: the menu drawer, code wrapping, tabs and more |
-| [`design-system`](design-system) | `@binacle/design-system`. A component's Sass, behaviour and markup in one folder. Holds the copy button so far |
+| [`binacle-components`](binacle-components) | Forwards to `design-system`, for the sites that still import from here |
+| [`design-system`](design-system) | `@binacle/design-system`. The look the sites share: tokens, fonts, the mark, and each block's Sass, behaviour and markup in one folder |
 
-Every package here has tests. From the repo root:
+Every package here but `binacle-components` has tests. From the repo root:
 
 ```
 just test ts_binacle-net-ui_unit       # binacle-net-ui
 just test ts_theme-switcher_unit       # theme-switcher
-just test ts_binacle-components_unit   # binacle-components
-just test ts_binacle-design-system_unit        # design-system
+just test ts_binacle-design-system_unit   # design-system
 ```
 
 ## 🌐 Who imports them
 
 The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
-the packing demo and the ViPaq decoder, those two, [`sites/www`](../sites/www) and [`sites/docs`](../sites/docs)
-use `theme-switcher`, the three sites use `binacle-components`, `www` uses `design-system`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
+the packing demo and the ViPaq decoder, `docs` and `demo` use `theme-switcher` and `binacle-components`,
+[`sites/www`](../sites/www) uses `design-system`, which uses `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
 Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 

@@ -8,6 +8,7 @@ paths:
   - "design/**"
   - "ruby/**"
   - "vipaq/packages/**"
+  - "shared/packages/**"
   - "sites/www/**"
   - "sites/docs/**"
   - "sites/demo/**"
@@ -62,7 +63,7 @@ decide where code goes.
 
 | Level | Knows | Holds |
 |---|---|---|
-| 1 - generic | nothing about Binacle | the `jekyll-*` gems, `theme-switcher` with its js-cookie |
+| 1 - generic | nothing about Binacle | the `jekyll-*` gems, `theme-switcher`, `cookies` |
 | 2 - API and data | the API or the shared formats, not the look | the two clients, compact notation, ViPaq |
 | 3 - brand | the look, not the API | tokens, fonts, the mark, every site component, the 3D view |
 | 4 - apps and sites | anything | the apps, each site, the docs markup filter, the robots.txt body |
@@ -78,11 +79,14 @@ is, stays at level 1 and the component uses it.
 **Decided (the maintainer, 2026-11-07):** *"i hate net-client go with api-client but thats if we can rename to
 @binacle if not the bust go with binacle--net-client and binacle-net-service-cleint"*.
 
-- **npm: every workspace package takes the scope `@binacle/`.** Scoped names come from npm, and Angular, Babel and
+- **npm: every workspace package takes the scope `@binacle/`, but for the generic ones in the root `packages/`.** Scoped names come from npm, and Angular, Babel and
   Vue use them: a scope marks a family of packages as one owner's and cannot clash with a public name. All stay
   `private`, so nothing is registered and the scope works today. Checked 2026-11-07: npm's search finds no package
   published under `@binacle`; whether anyone owns the empty scope could not be seen. That matters only if one is
   ever published.
+- **The root `packages/` takes no scope. Decided (the maintainer, 2026-11-07):** *"whats in packlages dont get @
+  binacle"*. So `theme-switcher` and `cookies`. Both bare names are taken on the public npm registry by other
+  libraries; nothing in `package-lock.json` asks for either, so the workspace link wins.
 - **The API client is `@binacle/api-client`.** If the scope cannot be used, both clients keep today's names,
   `binacle-net-client` and `binacle-net-service-client`.
 - **Gems: `jekyll-*` means generic, `binacle-*` means ours.** The gems already follow it; `doc_body` is the one that
@@ -109,14 +113,23 @@ slice so it has to stickto vipaq"*, *"the idea is for each slice to hold relatie
 
 - **A package that belongs to a slice lives in it**, in `<slice>/packages/<name>/`, beside the slice's C# in
   `<slice>/src/` and its tools in `<slice>/tools/`. `vipaq/` already worked this way.
-- **`packages/` and `ruby/` hold what belongs to no slice** - the sites' shared parts and the Jekyll gems.
-- **Open - his idea, not decided (2026-11-07):** keep the root `packages/` and `ruby/` for generic code only.
-  His words: *"evetryhing binacle must not go in packages or ruby / but in shared or in a slice/ruby
-  /slice/pakcages"*, and *"the root packages and ruby stay generic nothing to do with binacle"*; then *"wait i
-  didnt decide"*. If he takes it: `binacle-robots` and `binacle-docs` to `sites/ruby/`, and the design system and
-  `apps` to `shared/packages/` or `sites/packages/`. The gems' tests run against `ruby/Gemfile`; the runner, CI
-  and Sonar assume `ruby/<gem>`. Cheapest before session 3, while the design system holds only the copy button.
+- **The root `packages/` and `ruby/` hold generic code only**, nothing that knows Binacle. **Decided (the
+  maintainer, 2026-11-07):** *"the idea is yes"*, then *"ruby at root conmtinues to hold generic struff jeykyll- /
+  root packjages cookies themeswitcher"*. His idea: *"evetryhing binacle must not go in packages or ruby / but in
+  shared or in a slice/ruby /slice/pakcages"*.
 - **`shared/` is a slice too**, for what several slices use: compact notation's C# and TypeScript sit side by side.
+  **`design-system` and `apps` go there.** Asked `shared` or `sites`, told `apps` is read by `sites/demo` and the UI
+  module in `api`: *"shared"* (the maintainer, 2026-11-07). `design-system` follows the same reason: three sites
+  read it, and the UI module will.
+- **Not a top-level folder, for now. Decided (the maintainer, 2026-11-07):** *"we go shared for now / it seems its
+  at the threshold of becoming a root folder but maybe not yet lets keep an eye on it"*. It gets one if it grows
+  past one package or is published on its own. Its README says so.
+- **`binacle-docs` and `binacle-robots` go to `sites/ruby/`.** The maintainer, 2026-11-07: *"sites get
+  binacle-docs and binacle-robots which is only used by them"*.
+- **These moves come after session 6, the apps.** The maintainer, 2026-11-07: *"dont make the move now
+  ...acter apps"*. Until then each package stays where it is. The gems' tests run against `ruby/Gemfile`, and
+  the runner, CI and Sonar assume `ruby/<gem>`, so `sites/ruby/` needs its own `Gemfile` or the root one names
+  the new paths; the move session works out which.
 - No published standard names this layout. Told it leaves the top level split by language - `shared/` C#,
   `packages/` TypeScript, `ruby/` Ruby - he chose to move compact notation into `shared/` as well.
 
@@ -124,11 +137,12 @@ slice so it has to stickto vipaq"*, *"the idea is for each slice to hold relatie
 
 ```
 packages/
-  theme-switcher/   @binacle/theme-switcher    1   MIT; holds js-cookie
-  design-system/    @binacle/design-system     3   was design/ and binacle-components
-  apps/             @binacle/apps              4   was binacle-net-ui
+  cookies/          cookies                    1   MIT; js-cookie 3.0.5, out of theme-switcher again
+  theme-switcher/   theme-switcher             1   MIT; depends on cookies
 shared/packages/
   compact-notation/ @binacle/compact-notation  2   was packages/binacle-compact-notation
+  design-system/    @binacle/design-system     3   was design/ and binacle-components
+  apps/             @binacle/apps              4   was binacle-net-ui
 api/packages/
   api-client/       @binacle/api-client        2   was packages/binacle-net-client
   service-client/   @binacle/service-client    2   was packages/binacle-net-service-client, experimental
@@ -139,8 +153,9 @@ api/src/Binacle.Net.UIModule/  @binacle/api-ui-module  4
 ruby/
   jekyll-*                                     1   unchanged; jekyll-filters loses doc_body,
                                                    doc_sections and Nokogiri
-  binacle-robots                               4   unchanged
-  binacle-docs                                 4   was binacle-docs-versions
+sites/ruby/
+  binacle-robots                               4   was ruby/binacle-robots
+  binacle-docs                                 4   was ruby/binacle-docs-versions
 ```
 
 `design/` is gone. A site depends on `design-system`, and on `apps` if it has an app. It no longer depends on
@@ -176,24 +191,28 @@ packages/theme-switcher/
   package.json  LICENSE (MIT)  README.md (new)  index.ts
   src/
     options.ts  storage.ts  theme.ts  themeInit.ts  themeSwitcher.ts
-    vendor/js-cookie/     was packages/cookies, with its own licence note
   tests/
-    vendor/js-cookie/
+
+packages/cookies/
+  package.json  LICENSE (js-cookie's, MIT)  README.md  index.ts
+  src/      api.ts  assign.ts  converter.ts
+  tests/
 ```
 
 - **It stays generic.** Nothing in it may name a Binacle class, attribute value or site. A new option is how a site
   asks for something different.
-- **js-cookie moves in.** It is its only reader, and both are MIT, so the licence does not change. `NOTICE` names
-  `packages/cookies` and its upstream version; it moves with it. The UI module's stray `cookies` dependency goes.
-  It comes back out as `@binacle/cookies` only if another package ever needs it.
+- **js-cookie is its own package, `cookies`.** Session 2 moved it into `theme-switcher/src/vendor/js-cookie/`; it
+  comes back out. The maintainer, 2026-11-07: *"leave js cookie outside separate from theme-swiotchet"*, and asked
+  `js-cookie` or `cookies`: *"cookies"*. `NOTICE` names its path and upstream version, and the recipe is
+  `ts_cookies_unit`, as before session 2.
 
 ### The brand package - `design-system`
 
 **What goes in:** all of `design/`, all of `binacle-components`, and the framework-free part of the 3D view.
 
 ```
-packages/design-system/
-  package.json         the exports map; depends on @binacle/theme-switcher and three
+shared/packages/design-system/
+  package.json         the exports map; depends on theme-switcher and three
   binacle-design-system.gemspec    the Jekyll theme gem: ships _includes/ only
   README.md
   index.scss           @forward every part, for a surface that wants all
@@ -219,8 +238,8 @@ packages/design-system/
   from Hugo Giraudel's Sass Guidelines, the most used layout for a Sass project. They stay.
 - **One folder per BEM block**, named after the block. A block's Sass and its TypeScript sit side by side; its
   shared markup is in `_includes/components/`, because a Jekyll theme gem reads includes from there only.
-- **The theme button uses `theme-switcher`.** `themeButton.ts` defines `<theme-switcher>` with the design's button
-  class and the site's options; `_index.scss` styles it. `themeInit.ts` is the pre-paint script. It gets its own
+- **The theme button uses `theme-switcher`.** `themeButton.ts` defines `<theme-switcher>` with the site's options;
+  the button's class stays in the markup, `data-button-class`. `_index.scss` styles it. `themeInit.ts` is the pre-paint script. It gets its own
   path in the exports map, `@binacle/design-system/theme-init`, so its bundle holds only it and the switcher, not
   the whole package. Its size is checked against today's.
 - **Licence: AGPL-3.0-only**, as `binacle-components` is. Using the MIT switcher from it is allowed.
@@ -234,6 +253,11 @@ packages/design-system/
   names it in `_config.yml` as `theme:`, and loads it from a path in its `Gemfile`. A file of the same name in the
   site wins, so a site can still override one include. One theme per site, so all shared markup is in this gem.
 - **Markup in the UI module is written again**, as Razor partials. Razor cannot read Liquid.
+- **The mark has one copy, here.** Decided (the maintainer, 2026-11-07), on the agent's split: *"for now we go as
+  you suggest"*. `mark/mark.svg` is byte for byte `assets/media/logo/binacle-logo.svg`, and nothing reads this copy.
+  The move session makes the copy step read the mark from here, keeps the address the sites ask for,
+  `/media/logo/binacle-logo.svg`, deletes the copy in `assets/`, and updates the path in `CONTENT-TERMS.md`. The
+  favicons and the logo's PNG sizes stay in `assets/`: each site serves them at fixed addresses from its root.
 - **Fonts are still copied to each site.** A `url()` in built CSS resolves against the page's site, not the
   package. `gulpfile.js` copies `design/fonts/*` today; it reads the new path.
 - **The 3D view splits in two.** `packView.ts` and its pure parts - colours, palette, camera fit, prints,
@@ -246,7 +270,7 @@ packages/design-system/
 ### The apps package - `apps`
 
 ```
-packages/apps/
+shared/packages/apps/
   package.json  README.md
   index.ts                 the three plugins
   src/
@@ -288,10 +312,11 @@ api/packages/api-client/
 
 ### The gems
 
-Every gem keeps Bundler's layout, the one `bundle gem` writes:
+Every gem keeps Bundler's layout, the one `bundle gem` writes. A generic gem is in `ruby/`, one only the sites
+read in `sites/ruby/`:
 
 ```
-ruby/<gem>/
+<ruby folder>/<gem>/
   <gem>.gemspec  README.md  LICENSE
   lib/<gem>.rb        requires the rest, nothing else
   lib/<gem>/          one file per part
@@ -302,7 +327,7 @@ ruby/<gem>/
 `docs` builds the same HTML as before. He ran `just test sites`: it passes (the maintainer, 2026-11-07).
 
 ```
-ruby/binacle-docs/
+sites/ruby/binacle-docs/
   binacle-docs.gemspec      depends on Nokogiri
   lib/binacle-docs.rb
   lib/binacle-docs/
@@ -339,7 +364,8 @@ The old names and paths are written in these places, beside each package's own f
 - `sites/docs/Gemfile` for the docs gem, and each site's `_config.yml` for the theme gem;
 - each site's `_js/theme-init.ts` and main entry, which import `theme-switcher` today;
 - comments that name a package path: `_Header.cshtml`, `sites/www/_js/main.ts`, `PageContentTests.cs`;
-- the READMEs under `packages/` and `ruby/`.
+- the READMEs under `packages/`, `shared/packages/`, `ruby/` and `sites/ruby/`;
+- for a gem leaving `ruby/`: `ruby/Gemfile`, the gem test runner, the CI steps and the Sonar paths.
 
 ## Ordering facts
 
@@ -353,8 +379,8 @@ The old names and paths are written in these places, beside each package's own f
 
 1. **The brand package's name.** **Decided (the maintainer, 2026-11-07):** `design-system`, picked from
    `design-system`, `components`, `ui` and `theme`.
-2. **Where the brand package lives.** **Decided (the maintainer, 2026-11-07):** in `packages/`, *"packages...
-   since it vboroows from packages"*. He had asked whether it could leave `packages/` as a theme.
+2. **Where the brand package lives.** **Decided (the maintainer, 2026-11-07):** in `shared/packages/`, with
+   `apps` - *Where a package lives*. This replaces his earlier answer the same day, `packages/`.
 3. **The apps package's name.** **Decided (the maintainer, 2026-11-07):** `apps`, picked from `apps`, `ui` and
    `widgets`.
 4. **The service client's name.** **Decided (the maintainer, 2026-11-07):** `@binacle/service-client`, picked
@@ -399,8 +425,6 @@ and their CSS is unchanged. The jest tests pass. He ran `just test sites` and lo
   after it, and a `/` makes a folder. The recipe is `ts_binacle-design-system_unit`.
 - **Coverage looked in `src/` only.** The design system's code sits in its Sass groups, so the root
   `jest.config.js` now also collects `components/**`. Each group that gains a `.ts` needs its own line.
-- **Two bridges stay until `docs` and `demo` move:** `design/components/_copy-button.scss` forwards to the
-  package, and `binacle-components` re-exports `initCopyButton` from it.
 
 ### Session 2, the renames (agent, 2026-11-07)
 
@@ -427,22 +451,50 @@ passes.
   `webpackChunk_binacle_sites_demo`. Each site's chunks are built together, so nothing reads the old one.
 - **The theme-switcher check below leaves out `src/vendor/`.** js-cookie's own `__defaultAttributes` matches `__`.
 
+### Session 3, `www` (agent, 2026-11-07)
+
+In the working tree. All of `design/` and all of `binacle-components`' code and tests are in the design system,
+one folder per block; `design/` is gone. `www` reads only the design system: Sass by `pkg:`, behaviour by import,
+the pre-paint script by `@binacle/design-system/theme-init`. It no longer lists `theme-switcher` or
+`binacle-components`.
+
+Built before and after: `www`'s CSS, HTML and pre-paint script are byte for byte the same, but for the sitemap's
+build time. Its `main.js` holds the same modules plus `themeButton.ts`. `docs` and `demo` build to the same CSS and
+HTML, and `main.js` of the same size. `ts_binacle-design-system_unit` passes, with a new test for the theme button.
+
+- **Moved whole, not per site.** Sass finds `components/drawer/_index.scss` from `@use "components/drawer"`, so
+  `docs` and `demo` build on by passing the package as their load path. That beat a forwarding file per moved
+  partial. The two bridges left: that load path, and `binacle-components`, now only re-exports, with no tests,
+  recipe or CI step.
+- **Where a script went:** `navFade.ts` to `layout/site-header/`, `stickySidebar.ts` to `layout/sidebar/`,
+  `codeWrap.ts` to `components/code-block/` though it also wraps `command` words. The block each one works on.
+- **The exports map is `.`, `./theme-init` and `./*`.** `./*` lets `pkg:` find every part without a line each.
+- **`www`'s main webpack config compiles only what it bundles** (`onlyCompileBundledFiles`). Without it, its type
+  check also reads `theme-init.ts`, whose subpath import needs the other config's `moduleResolution: bundler`.
+- **`index.scss` forwards every part that writes CSS**, in load order. Nothing uses it yet; it compiles.
+
+**Left for `docs` and `demo`, one session each:** `pkg:` in `main.scss` and no load path, imports from the design
+system, `initThemeButton`, the pre-paint script's subpath and `onlyCompileBundledFiles`, and their `package.json`
+dependencies. The second deletes `binacle-components`.
+
 ## Done when
 
 - [x] No `jekyll-*` gem names a class, a phrase or a path from one site. Check: `git grep -nE
       'doc__|code-block|callout|http-line' ruby/jekyll-*` finds nothing.
 - [x] `jekyll-filters` has no Nokogiri: `grep -n nokogiri ruby/jekyll-filters/*.gemspec` finds nothing.
-- [ ] Every workspace package's name starts `@binacle/`, or, without the scope, the clients keep their names.
-      Check: the `name` of each workspace `package.json`.
+- [ ] Every workspace package's name starts `@binacle/`, but for `cookies` and `theme-switcher` in the root
+      `packages/`, which have none. Check: the `name` of each workspace `package.json`.
+- [ ] The root `packages/` and `ruby/` hold only generic code. Check: their only packages and gems are `cookies`,
+      `theme-switcher` and the `jekyll-*` gems.
 - [ ] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.
 - [x] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src
       ':!packages/theme-switcher/src/vendor'` finds nothing.
 - [ ] No site lists `theme-switcher` as its own dependency; the design system does.
-- [ ] No folder named `design/` at the root, and no `--load-path=../../design` in any `package.json`.
+- [x] No folder named `design/` at the root, and no `--load-path=../../design` in any `package.json`.
 - [ ] Each component's Sass and TypeScript sit in one folder of the design system, and its shared include in its
       `_includes/components/`.
 - [ ] A site that does not import the 3D view has no three.js in its bundle.
 - [ ] The pre-paint script's bundle is no bigger than today's.
 - [ ] The image still serves the UI module's bundle at the URL the smoke tests check.
 - [ ] Every test recipe and workflow line names a package that exists.
-- [ ] The READMEs under `packages/` and `ruby/` list what is there.
+- [ ] The READMEs under `packages/`, `shared/packages/`, `ruby/` and `sites/ruby/` list what is there.

@@ -1,0 +1,14 @@
+// A row of buttons. Stacked full width on a phone.
+@use "../../abstracts/tiers";
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (width >= tiers.$tablet) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}

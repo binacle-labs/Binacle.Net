@@ -1,0 +1,177 @@
+// A docs page: the title, the breadcrumbs, then a flat body the way markdown renders it - headings, prose and
+// blocks one after another. Text holds the measure; code, tables and drawings may take the column.
+@use "../../abstracts/tiers";
+
+.doc {
+  min-width: 0;
+  padding: calc(var(--step) * 2) 16px calc(var(--step) * 4);
+
+  @media (width >= tiers.$tablet) {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  // Below 1000 the page keeps the width it has beside the menu at 1000, so text and blocks end where they do
+  // there and the empty space sits once, past the page.
+  @media (width < tiers.$wide) {
+    max-width: calc(tiers.$wide - var(--sidebar) - 80px + 2 * var(--gutter));
+  }
+
+  @media (width >= tiers.$wide) {
+    padding: calc(var(--step) * 3) 40px calc(var(--step) * 5);
+  }
+
+  // Any link target clears the header that stays at the top below 1200.
+  [id] {
+    @media (width < tiers.$widest) {
+      scroll-margin-top: calc(var(--hit) + var(--step) * 2);
+    }
+  }
+}
+
+.doc__title {
+  font-size: 40px;
+
+  @media (width >= tiers.$desktop) {
+    font-size: 46px;
+  }
+}
+
+// The page's button, under the title.
+.doc__actions {
+  margin-top: calc(var(--step) * 1.5);
+}
+
+.doc__title .doc__icon {
+  margin-right: 0.3em;
+  font-size: 0.8em;
+}
+
+.doc__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: var(--step);
+}
+
+// A value keeps its own case inside an upper-case label.
+.doc__meta .doc__value {
+  text-transform: none;
+}
+
+// Body text a step down from the prose size, on docs only.
+.doc__body {
+  margin-top: calc(var(--step) * 2);
+  font-size: 15.5px;
+
+  > * + * {
+    margin-top: var(--step);
+  }
+
+  > .lede {
+    font-size: 19px;
+    line-height: 1.55;
+  }
+}
+
+.doc__text,
+.doc__list,
+.doc__heading {
+  max-width: var(--measure-prose);
+}
+
+.doc__heading--2 {
+  margin-top: calc(var(--step) * 4);
+  padding-top: calc(var(--step) * 2);
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: var(--step);
+}
+
+.doc__heading--3 {
+  margin-top: calc(var(--step) * 2.5);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  scroll-margin-top: var(--step);
+}
+
+.doc__heading--4 {
+  margin-top: calc(var(--step) * 2);
+  font-size: var(--size-h3);
+  font-weight: 600;
+}
+
+.doc__rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin-top: calc(var(--step) * 2);
+  margin-bottom: calc(var(--step) * 2);
+}
+
+.doc__quote {
+  max-width: var(--measure-prose);
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.doc__list--nested {
+  margin-top: calc(var(--step) / 2);
+}
+
+.doc__heading + * {
+  margin-top: calc(var(--step) * 0.75);
+}
+
+// A heading that is only a link points to another page, so a list of them stays compact.
+.doc__heading--2:has(> a) {
+  margin-top: calc(var(--step) * 1.5);
+  padding-top: calc(var(--step) * 1.25);
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  + .doc__text {
+    margin-top: calc(var(--step) * 0.35);
+    color: var(--muted);
+    font-size: var(--size-ui);
+  }
+}
+
+// A tinted block in a docs page, from the page column's left edge to the window's right.
+.doc__band {
+  --rule: var(--tint-rule);
+  margin: calc(var(--step) * 3) -16px 0;
+  padding: calc(var(--step) * 2) 16px;
+  background: var(--tint);
+
+  @media (width >= tiers.$tablet) {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  // The shadow carries the tint past a wide window's page edge; the clip keeps it to the right.
+  @media (width >= tiers.$wide) {
+    margin-inline: -40px;
+    padding: calc(var(--step) * 2.5) 40px;
+    box-shadow: 0 0 0 100vmax var(--tint);
+    clip-path: inset(0 -100vmax 0 0);
+  }
+
+  > * + * {
+    margin-top: calc(var(--step) * 1.5);
+  }
+}

@@ -11,8 +11,8 @@ below.
 | Path | What it is |
 |---|---|
 | `pages/` | The pages, plus `404.html` and `robots.txt` |
-| `_sass/` | `main.scss`, which names the partials of `design/` and `@binacle/design-system` this site uses. Compiled by the sass CLI, **not by Jekyll** |
-| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` and `@binacle/design-system` this site calls, the menu drawer among them |
+| `_sass/` | `main.scss`, which names the parts of `@binacle/design-system` this site uses. Compiled by the sass CLI, **not by Jekyll** |
+| `_js/` | The TypeScript source: the parts of `@binacle/design-system` this site calls - the theme button, the menu drawer and the rest - and the pre-paint theme script |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
 | `_layouts/` | `default.html` is the bare document, `page.html` the header, main and footer around a page |
 | `_includes/` | The header and footer, the exchange, the run command, the trade-off list, and `drawings/`, one SVG per picture |
@@ -38,8 +38,8 @@ the sass CLI over `_sass/main.scss` and writes `css/main.css`, the same way `Bin
 the block back and two compilers have a claim on the same files. It also means **`css/` is gitignored** - it
 is build output, like `js/`.
 
-**The look comes from `design/` and `packages/design-system`.** `build:css` passes `design/` as a load path and
-reaches the package by `pkg:`, so a partial this site needs goes in `_sass/main.scss`. The asset copy puts `design/fonts/` in `fonts/`, which is gitignored like `css/`,
+**The look comes from `packages/design-system`.** `build:css` reaches it by `pkg:`, so a part this site needs
+goes in `_sass/main.scss`. The asset copy puts the package's `fonts/` in `fonts/`, which is gitignored like `css/`,
 and skips everything under `assets/` this site does not read: `gulpfile.js` lists it.
 
 **Some includes are not in `_includes/`.** `_config.yml` sets `theme: binacle-design-system`, a gem the

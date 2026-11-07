@@ -4,7 +4,7 @@ import Dimensions from "../../shared/dimensions";
 import PackItem from "./packItem";
 import {createPackView, PackView, ShowOptions} from "./packView";
 
-// The width below which the view stacks above the form, from design/.
+// The width below which the view stacks above the form, from the design system.
 const STACKED = "(width < 800px)";
 
 export interface PackScene extends ShowOptions {

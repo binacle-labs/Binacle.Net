@@ -4,11 +4,11 @@
   "description": "This is the documentation site for Binacle.Net.",
   "scripts": {
     "build": "npm run build:css && npm run build:js",
-    "build:css": "sass --load-path=../../design --no-source-map --style=compressed _sass/main.scss:css/main.css",
+    "build:css": "sass --load-path=../../packages/design-system --no-source-map --style=compressed _sass/main.scss:css/main.css",
     "build:js": "webpack --env build=dist",
     "serve": "bundle exec jekyll serve",
     "watch": "concurrently --names 'css,js' 'npm:watch:css' 'npm:watch:js'",
-    "watch:css": "sass --load-path=../../design --watch _sass/main.scss:css/main.css",
+    "watch:css": "sass --load-path=../../packages/design-system --watch _sass/main.scss:css/main.css",
     "watch:js": "webpack --watch --env build=watch"
   },
   "repository": {

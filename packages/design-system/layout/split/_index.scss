@@ -1,0 +1,59 @@
+// Two halves side by side from 800: the text, and the thing it talks about.
+@use "../../abstracts/tiers";
+
+.split {
+  display: grid;
+  gap: calc(var(--step) * 2);
+
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+}
+
+// The text on the left, the thing it talks about on the right.
+.split--text-left {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+// The same, the thing on the left.
+.split--text-right {
+  @media (width >= tiers.$desktop) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.split--text-right .split__text {
+  @media (width >= tiers.$desktop) {
+    order: 2;
+  }
+}
+
+// A home hero: the text sits level with the middle of the picture.
+.split--centred {
+  @media (width >= tiers.$desktop) {
+    align-items: center;
+  }
+}
+
+// In half the width the heading grows with the window and reaches full size at 1100. Two classes, so it beats
+// display-1, which loads later.
+.split .split__title {
+  @media (width >= tiers.$desktop) {
+    font-size: clamp(36px, calc(6vw - 12px), var(--size-display-2));
+  }
+}
+
+// A tool beside its text, on a home page.
+.split--tool {
+  @media (width >= tiers.$desktop) {
+    align-items: center;
+  }
+}
+
+.doc--home .split__title {
+  font-size: clamp(36px, calc(4vw - 4px), var(--size-display-2));
+}

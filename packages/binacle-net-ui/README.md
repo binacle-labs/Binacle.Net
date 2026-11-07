@@ -44,7 +44,7 @@ Dispatching `highlight-kind` with a kind shows only that kind in colour; `null` 
 
 **The figure's markup belongs to the host.** The view finds its parts by data attributes and fills them:
 `data-pack-view-stage`, `data-pack-view-empty`, `data-bin-dim`, `data-bin-dim-number`, `data-placed` and
-`data-pack-view-controls`. Its colours are CSS custom properties read off the figure, from `design/`. **A host that
+`data-pack-view-controls`. Its colours are CSS custom properties read off the figure, from [`design-system`](../design-system). **A host that
 does not load them fails when the view starts**, with an error that names the value.
 
 ## 🚀 Where it runs

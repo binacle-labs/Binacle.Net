@@ -63,10 +63,6 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-net-ui_unit
 
-      - name: Test - binacle-components
-        if: ${{ !cancelled() }}
-        run: just test ts_binacle-components_unit
-
       - name: Test - binacle-design-system
         if: ${{ !cancelled() }}
         run: just test ts_binacle-design-system_unit

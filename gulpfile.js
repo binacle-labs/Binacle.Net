@@ -25,7 +25,7 @@ const ASSETS = {
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.
 //
 // swagger-ui, 6.2 MB: only sites/docs/_layouts/swagger.html reads it. The API serves its own from Swashbuckle.
-// beercss and material-dynamic-colors: docs and demo build on design/ instead.
+// beercss and material-dynamic-colors: docs and demo build on the design system instead.
 // docs, demo and www take the favicons, the mark and the link preview from media/, and nothing else there.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const UNUSED_MEDIA = [
@@ -66,7 +66,7 @@ function copyAssets(destinationDir, ignore = []) {
 // A font URL resolves from the built CSS, so a site carries its own copy, with the licences the fonts require.
 function copyFonts(destinationDir) {
 	return new Promise((resolve) => {
-		src('design/fonts/*', {encoding: false})
+		src('packages/design-system/fonts/*', {encoding: false})
 			.pipe(dest(destinationDir))
 			.on('end', resolve);
 	});

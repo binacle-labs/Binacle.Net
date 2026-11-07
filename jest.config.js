@@ -8,7 +8,6 @@
 module.exports = {
   projects: [
     "<rootDir>/api/packages/api-client",
-    "<rootDir>/packages/binacle-components",
     "<rootDir>/packages/binacle-net-ui",
     "<rootDir>/shared/packages/compact-notation",
     "<rootDir>/packages/design-system",
@@ -21,6 +20,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.ts",
     "components/**/*.ts",
+    "layout/**/*.ts",
     "!src/**/index.ts",
     // Ambient declarations, so there is no runtime code to reach. Counted, they are permanently 0% and read
     // as untested code. Nothing else is excluded here: code that is merely untested stays in the denominator,

@@ -12,7 +12,7 @@ Its host is <https://demo.binacle.net>.
 | `_data/` | The header's links, the footer, and the script and style includes |
 | `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document and `page.html` the wrapper every page gets |
 | `_includes/drawings/` | The box cards and the home page's packed box, as SVG. A page pulls one in as an include, so its CSS reaches it |
-| `_sass/` | `main.scss`, which names the partials of [`design/`](../../design) this site uses |
+| `_sass/` | `main.scss`, which names the parts of [`packages/design-system`](../../packages/design-system) this site uses |
 | `_js/` | The webpack entry points - `main.js`, `everyday_items.js`, `packing_demo.js`, `protocol_decoder.js`, and `theme-init.ts` for the head |
 
 `css/`, `js/`, `fonts/`, `media/` and the favicons at the root are **generated or copied in** and gitignored -

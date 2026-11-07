@@ -1,7 +1,7 @@
 {
   "name": "@binacle/design-system",
   "version": "1.0.0",
-  "description": "The look of the Binacle sites: each component's Sass, its behaviour and its shared markup",
+  "description": "The look of the Binacle sites: tokens, fonts, the mark, and each component's Sass, behaviour and shared markup",
   "main": "index.ts",
   "types": "index.ts",
   "exports": {
@@ -9,16 +9,17 @@
       "sass": "./index.scss",
       "default": "./index.ts"
     },
-    "./components/copy-button": {
-      "sass": "./components/copy-button/_index.scss",
-      "default": "./components/copy-button/copyButton.ts"
-    }
+    "./theme-init": "./components/theme-button/themeInit.ts",
+    "./*": "./*"
   },
   "license": "AGPL-3.0-only",
   "private": true,
   "sideEffects": false,
   "scripts": {
     "test": "jest"
+  },
+  "dependencies": {
+    "@binacle/theme-switcher": "*"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
