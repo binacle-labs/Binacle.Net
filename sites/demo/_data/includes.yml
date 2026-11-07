@@ -16,20 +16,22 @@ icons:
     href: '/site.webmanifest'
 
 links:
-  - type: 'text/css'
-    rel: 'stylesheet'
-    href: '/lib/beercss/beer.min.css'
-  - type: 'text/css'
-    rel: 'stylesheet'
+  - rel: 'preload'
+    href: '/fonts/familjen-grotesk-latin.woff2'
+    as: 'font'
+    type: 'font/woff2'
+    crossorigin: true
+  - rel: 'preload'
+    href: '/fonts/martian-mono-latin.woff2'
+    as: 'font'
+    type: 'font/woff2'
+    crossorigin: true
+  - rel: 'stylesheet'
+    type: 'text/css'
     href: '/css/main.css'
 
 
 scripts_body_end:
-  - type: 'module'
-    src: '/lib/beercss/beer.min.js'
-# Load only if the site ever needs runtime theme switching.
-#  - src: '/lib/material-dynamic-colors/material-dynamic-colors.min.js'
-#    type: 'module'
   - type: "text/javascript"
     src: "/js/runtime.js"
   - type: 'text/javascript'

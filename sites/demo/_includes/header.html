@@ -1,26 +1,15 @@
-<header class="fixed top responsive max primary">
-    <nav>
-        <div class="s">
-            {% include logo.html %}
-        </div>
-
-        <h5 class="max center-align">{{ site.display_title }}</h5>
-
-        {% assign website = site.data.exits.website %}
-        <a href="{{ website.url }}" title="{{ website.title }}" target="_blank">
-            <i>{{ website.icon }}</i>
-        </a>
-
-        {% for link in site.data.header.links %}
-        <a href="{{ link.url }}" title="{{ link.title }}" target="{{ link.target }}">
-            {% if link.image != nil %}
-            <img src="{{ link.image.url | relative_url }}" alt="{{ link.image.alt }}"  height="{{ link.image.height }}" />
-            {% endif %}
-        </a>
-        {% endfor %}
-
-        <theme-switcher data-button-class="transparent circle">
-
-        </theme-switcher>
+<header class="site-header" data-site-header>
+  <div class="container">
+    <a class="site-header__wordmark" href="{{ '/' | relative_url }}"><img class="site-header__mark" src="{{ site.logo.src | relative_url }}" alt="" width="24" height="24"><span>{{ site.data.header.wordmark }}</span></a>
+    <nav class="site-header__nav" data-site-nav aria-label="Main">
+      {%- for item in site.data.header.nav %}
+      {%- if item.external %}
+      <a class="site-header__link site-header__link--other-site" data-other-site href="{{ item.url }}">{{ item.title }}</a>
+      {%- else %}
+      <a class="site-header__link" href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
+      {%- endif %}
+      {%- endfor %}
     </nav>
+    <theme-switcher data-button-class="theme-button theme-button--end"></theme-switcher>
+  </div>
 </header>

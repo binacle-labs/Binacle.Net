@@ -1,37 +1,13 @@
-<footer class="responsive max secondary-container">
-    <div class="grid">
-       {% for article in site.data.footer.articles %}
-        <article class="s12 m6 transparent">
-            <h5>{{ article.title }}</h5>
-            {% for paragraph in article.content %}
-            <p>
-                {{ paragraph }}
-            </p>
-            {% endfor %}
-        </article>
-       {% endfor %}
-
-        <article class="s12 m6 transparent">
-            <h5>Links</h5>
-            <nav class="wrap">
-                <a class="underline" href="{{ site.data.exits.docs.url }}" target="_blank">{{ site.data.exits.docs.title }}</a>
-                <a class="underline" href="{{ site.data.exits.website.url }}" target="_blank">{{ site.data.exits.website.title }}</a>
-                {% for item in site.data.exits.elsewhere %}
-                <a class="underline" href="{{ item.url }}" target="_blank">{{ item.title }}</a>
-                {% endfor %}
-            </nav>
-        </article>
-    </div>
-
-    <nav class="center-align wrap small-text">
-        <span>{{ site.data.footer.copyright | expand_year }}</span>
-        <a href="{{ site.data.footer.license.url }}" target="{{ site.data.footer.license.target }}">
-            {{ site.data.footer.license.title }}
-        </a>
-        {% for badge in site.data.footer.badges %}
-        <a href="{{ badge.url }}" target="{{ badge.target }}">
-            <img src="{{ badge.image.url }}" alt="{{ badge.image.alt }}"/>
-        </a>
-        {% endfor %}
-    </nav>
+<footer class="site-footer site-footer--no-edge">
+  <div class="container">
+    <p class="site-footer__line label">
+      <span>{{ site.data.footer.copyright | expand_year }}</span>
+      <a class="site-footer__link" href="{{ site.data.footer.license.url }}">{{ site.data.footer.license.title }}</a>
+    </p>
+    <p class="site-footer__line label">
+      {%- for link in site.data.footer.links %}
+      <a class="site-footer__link{% if link.external %} site-footer__link--external{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor %}
+    </p>
+  </div>
 </footer>

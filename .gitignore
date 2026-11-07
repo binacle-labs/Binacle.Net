@@ -78,9 +78,11 @@ sites/docs/*.png
 ## UI module - wwwroot is entirely generated. Sources are _sass/ and _js/; `just build publish` fills it.
 api/src/Binacle.Net.UIModule/wwwroot
 
-## Demo site
+## Demo site - the sass CLI writes css/ from _sass/, as on www.
 artifacts/demo
 sites/demo/js
+sites/demo/css
+sites/demo/fonts
 sites/demo/media
 sites/demo/lib
 sites/demo/*.ico
@@ -92,8 +94,8 @@ sites/demo/*.png
 artifacts/admin
 sites/admin/js
 
-## Marketing site - css/ joins js/ here, unlike the other two sites. Jekyll compiles no sass on www; the
-## sass CLI writes css/main.css from _sass/, so it is build output like the bundle.
+## Marketing site - Jekyll compiles no sass here; the sass CLI writes css/main.css from _sass/, so it is build
+## output like the bundle.
 artifacts/www
 sites/www/js
 sites/www/css

@@ -1,34 +1,88 @@
 ---
 title: Binacle.Net Demo
 seo_title: Try the 3D bin packing API in your browser - Binacle.Net
+heading: Pick a box to start
 description: Try Binacle.Net in your browser. Put in your own box sizes and a list of items and watch them packed in 3D, or decode a ViPaq string. No signup.
-layout: homepage
 permalink: /
 excerpt: |
   Try the 3D bin packing API in your browser. Put in your own bins and items and watch them packed, or
   decode a ViPaq string into a 3D view.
+boxes:
+  - name: Small
+    size: 62 x 45 x 8 cm
+  - name: Medium
+    size: 62 x 45 x 17 cm
+  - name: Large
+    size: 62 x 45 x 36 cm
 ---
 
-<article class="middle-align center-align">
-  <div>
-    <h1>{{ page.title }}</h1>
-    <p>
-      Binacle.Net answers which box an order goes in, in milliseconds. Two demos - pick one.
-    </p>
-  </div>
-</article>
+<section class="band band--split">
+    <div class="container band__grid">
+        <div class="band__body split hero split--text-left split--centred">
+            <div class="hero__copy">
+                <h1 class="split__title display-1">{{ page.heading }}</h1>
+                <div class="prose prose--marketing">
+                    <p>Binacle.Net answers which box an order goes in. Pick one of three boxes, add some everyday
+                        things, and see where each one goes.</p>
+                </div>
+                <nav class="box-cards" aria-label="Boxes">
+                    {%- for box in page.boxes %}
+                    <a class="box-card" href="{{ '/items/' | relative_url }}?box={{ box.name }}">
+                        <span class="box-card__face drawing drawing--painted">{% include drawings/box-{{ box.name | downcase }}.svg %}</span>
+                        <strong class="box-card__name">{{ box.name }}</strong>
+                        <span class="mono">{{ box.size }}</span>
+                    </a>
+                    {%- endfor %}
+                </nav>
+                <p class="actions"><a class="button button--primary" href="{{ '/items/' | relative_url }}">Pack a box</a></p>
+            </div>
+            <figure class="pack-view">
+                <button type="button" class="still" data-lightbox="home-still" aria-label="Open the picture larger">
+                    {% include drawings/home-still.svg %}
+                </button>
+                <figcaption class="pack-view__strip">
+                    <span class="dimension-line dimension-line--small dimension-line--strip"><span class="dimension-line__tick"></span><span class="dimension-line__number">62 x 45 x 36</span><span class="dimension-line__tick"></span></span>
+                    <span>Sixteen everyday items, the large box</span>
+                </figcaption>
+            </figure>
+            <dialog class="lightbox" id="home-still" aria-label="Sixteen everyday items packed in the large box">
+                {% include drawings/home-still.svg class="lightbox__still" %}
+                <div class="lightbox__bar"><span>Sixteen everyday items in the large box, 62&nbsp;x&nbsp;45&nbsp;x&nbsp;36&nbsp;cm</span><button type="button" class="button button--link" data-close>Close</button></div>
+            </dialog>
+        </div>
+    </div>
+</section>
 
-{% assign applets = site.pages | where: 'applet', true | sort: 'order' %}
-<div class="grid medium-space">
-  {% for item in applets %}
-  <article class="s12 m6 no-padding">
-    <a href="{{ item.url | relative_url }}" class="card wave padding">
-      <div class="row">
-        <i>{{ item.icon }}</i>
-        <h5 class="max">{{ item.title }}</h5>
-      </div>
-      <p>{{ item.summary }}</p>
-    </a>
-  </article>
-  {% endfor %}
-</div>
+<section class="band band--tint band--no-edge">
+    <div class="container">
+        <div class="band__body">
+            <h2 class="band__heading">More ways to try it</h2>
+            <nav class="doors doors--row" aria-label="More demos">
+                <a class="doors__link" href="{{ '/packing/' | relative_url }}">
+                    <h3 class="doors__title">Custom Sizes</h3>
+                    <p class="doors__text">Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them.</p>
+                </a>
+                <a class="doors__link" href="{{ '/vipaq/' | relative_url }}">
+                    <h3 class="doors__title">ViPaq Decoder</h3>
+                    <p class="doors__text">Decode, analyze, and visualize packing layouts with the ViPaq Protocol</p>
+                </a>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="band band--wide band--no-edge" id="run">
+    <div class="container band__grid">
+        <div class="band__label"><p class="label">For developers</p></div>
+        <div class="band__body">
+            <div class="prose">
+                <h2 class="band__heading">Run it yourself</h2>
+                <p>One command starts Binacle.Net on your machine. <a href="https://docs.binacle.net/quick-start/">The Quick Start</a> has the rest.</p>
+            </div>
+            <div class="command band__command" data-command>
+                <pre class="command__pre"><span class="command__prompt">$ </span><code id="run-text">docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3</code></pre>
+                <button type="button" class="copy-button command__copy" data-copy="run-text" hidden>Copy</button>
+            </div>
+        </div>
+    </div>
+</section>

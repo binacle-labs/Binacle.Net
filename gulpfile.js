@@ -25,10 +25,8 @@ const ASSETS = {
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.
 //
 // swagger-ui, 6.2 MB: only sites/docs/_layouts/swagger.html reads it. The API serves its own from Swashbuckle.
-// material-dynamic-colors, 72 KB: demo keeps it, because sites/demo/_data/includes.yml has a commented-out
-// script tag for it.
-// beercss: docs builds on design/ instead.
-// docs and www take the favicons, the mark and the link preview from media/, and nothing else there.
+// beercss and material-dynamic-colors: docs and demo build on design/ instead.
+// docs, demo and www take the favicons, the mark and the link preview from media/, and nothing else there.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const UNUSED_MEDIA = [
 	'assets/media/docker/**',
@@ -38,7 +36,7 @@ const UNUSED_MEDIA = [
 ];
 const IGNORE = {
 	docs: ['assets/lib/beercss/**', 'assets/lib/material-dynamic-colors/**', ...UNUSED_MEDIA],
-	demo: ['assets/lib/swagger-ui/**'],
+	demo: ['assets/lib/**', ...UNUSED_MEDIA],
 	uimodule: ['assets/lib/swagger-ui/**', 'assets/android-chrome-*.png'],
 	www: ['assets/lib/**', ...UNUSED_MEDIA]
 };
@@ -78,7 +76,7 @@ function copyFonts(destinationDir) {
 
 // Tasks
 task('copy-assets-to-demo', async function(){
-	return copyAssets('sites/demo', IGNORE.demo);
+	return Promise.all([copyAssets('sites/demo', IGNORE.demo), copyFonts('sites/demo/fonts')]);
 });
 
 task('copy-assets-to-docs', async function(){

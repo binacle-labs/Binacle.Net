@@ -1,20 +1,17 @@
-articles:
-  - title: "Help Binacle.Net"
-    content:
-      - "It's an open source project that aims to remain open source and free forever."
-      - "Help it grow, visit the <a class=\"underline\" href=\"https://github.com/binacle-labs/Binacle.Net\">GitHub</a> and give it a star."
-
-badges:
-  - title: "Docker Image Version"
-    url: "https://hub.docker.com/r/binacle/binacle-net"
-    target: "_blank"
-    image:
-      url: "https://img.shields.io/docker/v/binacle/binacle-net?sort=semver&logo=docker&logoSize=auto&labelColor=white&color=blue&cacheSeconds=3600"
-      alt: "Docker Image Version"
-
-copyright: "© 2023-{now} Chris Mavrommatis / Binacle.Net. All Rights Reserved"
+copyright: "(c) 2023-{now} Chris Mavrommatis"
 
 license:
-  title: "GNU Affero General Public License v3.0"
+  title: "AGPL-3.0"
   url: "https://github.com/binacle-labs/Binacle.Net/blob/main/LICENSE.AGPL-3.0"
-  target: "_blank"
+
+links:
+  - title: 'Binacle.Net'
+    url: 'https://www.binacle.net'
+  - title: 'Documentation'
+    url: 'https://docs.binacle.net'
+  - title: 'GitHub'
+    url: 'https://github.com/binacle-labs/Binacle.Net'
+    external: true
+  - title: 'Docker Hub'
+    url: 'https://hub.docker.com/r/binacle/binacle-net'
+    external: true

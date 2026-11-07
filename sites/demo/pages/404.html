@@ -1,27 +1,20 @@
 ---
 title: Page Not Found
 permalink: /404.html
-layout: page
 sitemap:
   exclude: true
 excerpt: |
   The requested page could not be found.
 ---
 
-{% include header.html %}
-{% include navbar/index.html %}
-
-<main class="responsive padding">
-    <article class="medium middle-align center-align">
-        <div>
-            <i class="extra error-text">error</i>
-            <h1 class="error-text">Error 404</h1>
+<section class="band">
+    <div class="container">
+        <div class="band__body prose">
+            <h1>Error 404</h1>
             <p>The requested page could not be found.</p>
+            <p class="muted">Try <a href="{{ '/items/' | relative_url }}">Everyday Items</a>,
+                <a href="{{ '/packing/' | relative_url }}">Custom Sizes</a> or the
+                <a href="{{ '/vipaq/' | relative_url }}">ViPaq Decoder</a>.</p>
         </div>
-    </article>
-</main>
-
-
-{% include footer.html %}
-
-
+    </div>
+</section>

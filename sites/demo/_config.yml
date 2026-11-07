@@ -2,8 +2,6 @@
 # Site settings
 ################################################################
 title                   : "Binacle.Net"
-# What the header and the index call this host. site.title stays the brand, for <title> and og:site_name.
-display_title           : "Binacle.Net Demo"
 description             : >-
   Binacle.Net answers which box an order goes in, in milliseconds. Try the free and open source 3D bin
   packing API in your browser - no signup.
@@ -18,7 +16,7 @@ api_url                 : "https://localhost:7194"
 gtm                     : ''
 
 logo:
-  src                  : /media/logo/binacle-logo-16x16.svg
+  src                  : /media/logo/binacle-logo.svg
   alt                  : "Binacle.Net Logo"
 
 # The link-preview image every page falls back to. A page overrides it with og_image.
@@ -36,12 +34,8 @@ plugins_dir         : _plugins       # takes an array of strings and loads plugi
 layouts_dir         : _layouts
 includes_dir        : _includes
 data_dir            : _data
-sass:
-  sass_dir          : _sass
-  cache             : false
-  style             : compressed
-  # A source map ships sourcesContent - every comment in _sass, served to anyone.
-  sourcemap         : never
+# No `sass:` block: the sass CLI compiles _sass/main.scss to css/main.css from package.json. Adding one gives two
+# compilers a claim on the same files.
 
 ################################################################
 # Handling Reading
@@ -147,7 +141,7 @@ defaults:
       path           : "pages/**"
       type           : "pages"
     values:
-      layout          : "default"
+      layout          : "page"
       locale          : "en_US"
       hreflang        : "en"
       sitemap:

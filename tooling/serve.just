@@ -98,10 +98,10 @@ services-down *args:
 # Docs site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
 docs: (_serve-n-watch 'sites/docs')
 
-# Demo site: jekyll serve + webpack watch, one terminal (Ctrl-C stops both)
+# Demo site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
 demo: (_serve-n-watch 'sites/demo')
 
-# Three processes for docs and www, not two: their `npm run watch` is itself a concurrently pair, because the
+# Three processes for docs, demo and www, not two: their `npm run watch` is itself a concurrently pair, because the
 # sass CLI compiles the stylesheet there and Jekyll does not.
 
 # Marketing site: jekyll serve + sass and webpack watches, one terminal (Ctrl-C stops all three)
