@@ -18,7 +18,7 @@ set working-directory := '..'
 set no-exit-message := true
 
 ts_package := "vipaq/packages/vipaq"
-ui_package := "packages/apps"
+apps_package := "shared/packages/apps"
 
 # List the recipes
 default:
@@ -45,9 +45,9 @@ vipaq-interop-vectors:
     dotnet run --project vipaq/tools/Binacle.ViPaq.VectorGenerators
     npx ts-node --project {{ ts_package }}/tsconfig.json {{ ts_package }}/tools/generateVectors.ts
 
-# shared/data/demo-samples -> the demo's sample set in packages/apps
+# shared/data/demo-samples -> the demo's sample set in shared/packages/apps
 demo-samples:
-    npx ts-node --project {{ ui_package }}/tsconfig.json {{ ui_package }}/tools/generateSamples.ts
+    npx ts-node --project {{ apps_package }}/tsconfig.json {{ apps_package }}/tools/generateSamples.ts
 
 # Every generator is deterministic and its output is committed, so a clean tree after a full run is the whole
 # check. Nothing in CI calls this.
@@ -65,7 +65,7 @@ check: all
         ':(glob)vipaq/test-vectors/header/**/*.json'
         ':(glob)vipaq/test-vectors/interop/cs/**/*.json'
         ':(glob)vipaq/test-vectors/interop/ts/**/*.json'
-        'packages/apps/src/apps/packingDemo/sampleData.ts'
+        'shared/packages/apps/src/packingDemo/sampleData.ts'
     )
 
     changed="$(git status --porcelain -- "${generated[@]}")"

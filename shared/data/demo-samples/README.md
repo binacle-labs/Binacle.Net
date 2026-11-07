@@ -9,7 +9,7 @@ entries are that sample's bins, and every entry repeats the same items. The file
 `00-two-winners.json` is the one the demo page opens on - numbered `00` so it sorts first without renaming the
 rest.
 
-`just regen demo-samples` reassembles these files into `packages/apps/src/apps/packingDemo/sampleData.ts`,
+`just regen demo-samples` reassembles these files into `shared/packages/apps/src/packingDemo/sampleData.ts`,
 which the demo imports. A file whose entries disagree on their items fails that run rather than being taken
 from the first entry.
 

@@ -11,7 +11,7 @@ handed to shellcheck. A `.sh` file is both.
 | File | What it does |
 |---|---|
 | `dotnet.sh` | Runs one C# test project. Appends `DOTNET_TEST_ARGS`; takes a label for a project that runs more than once, so the two runs do not overwrite each other's files |
-| `rspec.sh` | Runs one gem's specs from inside the gem folder, against the Jekyll `ruby/Gemfile` locks |
+| `rspec.sh` | Runs one gem's specs from inside the gem folder, against the Jekyll its bundle locks - `ruby/Gemfile` or `sites/ruby/Gemfile` |
 | `jest.sh` | Runs one TypeScript package by its jest `displayName` |
 | `ruby-coverage.rb` | Not a script - what `rspec.sh` loads through `RUBYOPT` to start SimpleCov before the gem is required. Never loaded by a gem |
 

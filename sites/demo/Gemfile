@@ -14,7 +14,7 @@ gem "jekyll", "~> 4.4.1"
 gem "webrick"
 gem "kramdown-parser-gfm"
 gem "jekyll-include-cache"
-gem "binacle-design-system", path: "../../packages/design-system"
+gem "binacle-design-system", path: "../../shared/packages/design-system"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 # gem "minima", "~> 2.5"
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
@@ -26,7 +26,7 @@ group :jekyll_plugins do
   gem "jekyll-tidy"
   gem "jekyll-gtm", path: "../../ruby/jekyll-gtm"
   gem "jekyll-filters", path: "../../ruby/jekyll-filters"
-  gem "binacle-robots", path: "../../ruby/binacle-robots"
+  gem "binacle-robots", path: "../ruby/binacle-robots"
   gem "jekyll-multi-sitemap", path: "../../ruby/jekyll-multi-sitemap"
   gem "jekyll-resource-tags", path: "../../ruby/jekyll-resource-tags"
   gem "jekyll-page-meta", path: "../../ruby/jekyll-page-meta"

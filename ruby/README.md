@@ -1,7 +1,8 @@
 # Ruby Gems
 
-Custom Jekyll plugins for the sites in `sites/`. Each site loads them from its own `Gemfile` as a local
-path dependency, so none of them is published anywhere.
+Generic Jekyll plugins: none of them knows Binacle, so any Jekyll site could load them. The sites in `sites/`
+load them from their own `Gemfile` as a local path dependency, so none of them is published anywhere. The gems
+only the sites read are in [`sites/ruby`](../sites/ruby).
 
 Two lines wire a gem into a site: one in that site's `Gemfile`, inside `group :jekyll_plugins`, and one
 under `plugins:` in its `_config.yml`. Drop either and the plugin does not load.
@@ -88,29 +89,9 @@ they are.
 The built path is readable as `site.webmanifest.url`, and `{% webmanifest_link %}` writes the head element
 from it. `jekyll-webmanifest/README.md` has the config and the tag.
 
-### 🤖 `binacle-robots`
-
-The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal
-preamble, the Article 4 rights reservation and `User-Agent: *`; the `Sitemap:` lines come from
-`{% sitemap_links %}` on the next line. There is no config - a body that can be configured per site is a
-body that can differ per site.
-
-Like `binacle-docs`, the name says it is not portable. `binacle-robots/README.md` has the file
-shape and the traps.
-
-### 📚 `binacle-docs`
-
-The one gem here written for a single site. It carries the version scheme of `sites/docs` - a generator
-stamps `title_suffix` and `robots` onto every versioned document, and `{% vlink %}` links to a file inside
-the version the page belongs to. Its `doc_body` and `doc_sections` filters turn a rendered page into the
-docs' markup and list its sections.
-
-The vocabulary is hardcoded on purpose: making it configurable would put a scheme only one site uses in
-front of all of them. `binacle-docs/README.md` has the two site keys it needs.
-
 ## 🧪 Tests
 
-Every gem here shares one bundle, `ruby/Gemfile`. Install it once:
+Every gem here shares one bundle, `ruby/Gemfile`; `sites/ruby/` has its own. Install it once:
 
 ```bash
 cd ruby && bundle install

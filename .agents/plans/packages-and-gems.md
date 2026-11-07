@@ -1,7 +1,7 @@
 ---
 description: Restructure and rename the npm packages and Ruby gems by what each one knows and who uses it, not by language - and give each site component one home for its Sass, TypeScript and markup.
-state: ready
-waits-on: "nothing - the trial in Trying it passed; the rest is next. state and horizon written by an agent from his answers, strike them if wrong"
+state: done
+waits-on: "nothing. state written by an agent, strike it if wrong"
 horizon: now
 paths:
   - "packages/**"
@@ -126,10 +126,8 @@ slice so it has to stickto vipaq"*, *"the idea is for each slice to hold relatie
   past one package or is published on its own. Its README says so.
 - **`binacle-docs` and `binacle-robots` go to `sites/ruby/`.** The maintainer, 2026-11-07: *"sites get
   binacle-docs and binacle-robots which is only used by them"*.
-- **These moves come after session 6, the apps.** The maintainer, 2026-11-07: *"dont make the move now
-  ...acter apps"*. Until then each package stays where it is. The gems' tests run against `ruby/Gemfile`, and
-  the runner, CI and Sonar assume `ruby/<gem>`, so `sites/ruby/` needs its own `Gemfile` or the root one names
-  the new paths; the move session works out which.
+- **`sites/ruby/` has its own bundle.** **Decided (the maintainer, 2026-11-08):** *"own"*, picked from its own
+  `Gemfile` and lock, Bundler's convention, and `ruby/Gemfile` naming the new paths.
 - No published standard names this layout. Told it leaves the top level split by language - `shared/` C#,
   `packages/` TypeScript, `ruby/` Ruby - he chose to move compact notation into `shared/` as well.
 
@@ -287,7 +285,7 @@ shared/packages/apps/
 - **Each plugin sits in its app's folder**, as `plugin.ts`.
 - **No `src/apps/` folder.** **Decided (the maintainer, 2026-11-08):** *"ok drop"*. Asked about the
   `packages/apps/src/apps/` stutter: the package's name already says what it holds. `components/` stays apart from
-  `shared/`, so a reusable Alpine component and a helper do not mix. Session 7 drops it, with the move.
+  `shared/`, so a reusable Alpine component and a helper do not mix.
 - **The package holds apps only.** **The maintainer, 2026-11-08:** *"if the packge does hgold anything other that
   apps we need to rename the package"*.
 - **The app folders keep their names.** `packingDemo` is the page now called *Custom Sizes*; renaming the folder
@@ -441,7 +439,6 @@ passes.
   `api-client/` too.
 - **Webpack names its chunk-loading global after the npm name.** `demo`'s is now
   `webpackChunk_binacle_sites_demo`. Each site's chunks are built together, so nothing reads the old one.
-- **The theme-switcher check below leaves out `src/vendor/`.** js-cookie's own `__defaultAttributes` matches `__`.
 
 ### Session 3, `www` (agent, 2026-11-07)
 
@@ -516,8 +513,7 @@ Built before and after, cold: `www`'s `main.js` 15.7 to 10.1 KB, `docs`' 19.5 to
 `demo` and the UI module the same size in every file. Every pre-paint script byte for byte the same. Both packages
 pass `tsc --noEmit`. He asked the agent to run `just test sites`: it passes (2026-11-08).
 
-**The second half:** `binacle-net-ui` is `@binacle/apps`, in `packages/apps/` until session 7 moves it and drops
-`src/apps/`. The plugins
+**The second half:** `binacle-net-ui` is `@binacle/apps`. The plugins
 sit in their app folders. The recipe and jest name is `binacle-apps`, so `ts_binacle-apps_unit`. The UI module
 takes the theme button from the design system, `initThemeButton`, and no longer lists `theme-switcher`. The chunk
 keeps its name, `binacle-net-ui.js`; a comment beside it in both webpack configs says why.
@@ -530,24 +526,47 @@ it passes (2026-11-08).
 - **Build cold to measure.** Both configs keep a webpack filesystem cache, and a warm one hid the
   `sideEffects` cost above until the cache was deleted.
 
+### Session 7, the moves (agent, 2026-11-08)
+
+In the working tree. `design-system` and `apps` are in `shared/packages/`, the apps straight under `src/`.
+`binacle-docs` and `binacle-robots` are in `sites/ruby/`, with their own `Gemfile`, lock, `.rubocop.yml` and
+`ruby.rbproj`. js-cookie is `packages/cookies` again, recipe `ts_cookies_unit`; `theme-switcher` and `cookies`
+have no scope. The mark has one copy, `design-system/mark/mark.svg`; `gulpfile.js` copies it to each target as
+`media/logo/binacle-logo.svg`.
+
+Built before and after, cold: every site's and the UI module's CSS and HTML the same, but for the sitemaps' build
+time; the JS the same size, only module numbers moved. The mark lands byte for byte where it did. The four
+packages pass `tsc --noEmit`; `just regen demo-samples` writes the same file; the two moved gems' specs pass. He asked
+the agent to run `just test sites` and `just test image`: both pass (2026-11-08).
+
+- **`rspec.sh` takes the gem's folder from the repo root**, `ruby/jekyll-gtm` or `sites/ruby/binacle-docs`.
+- **Sonar.** `sonar.coverage.exclusions` named `sites/**`, which would have hidden the moved gems; it names the
+  four sites now. `sites/ruby/ruby.rbproj` sets its own `sonar.ruby.coverage.reportPaths`, one `../` more, by
+  `SonarQubeSetting`. Not proven until a Sonar run on the branch reads the two gems' coverage.
+- **CI** gets a second Ruby setup step, for `sites/ruby/`, in `shared-site-tests.yml` and `sonar-analysis.yml`.
+- **The image's test list now runs `ts_binacle-design-system_unit`.** The UI module bundles the design system
+  since session 6, and neither `just test image` nor `shared-image-tests.yml` ran its tests.
+- **The lock file kept both old folders** as `extraneous` entries, as before. Removed by hand.
+
 ## Done when
 
 - [x] No `jekyll-*` gem names a class, a phrase or a path from one site. Check: `git grep -nE
       'doc__|code-block|callout|http-line' ruby/jekyll-*` finds nothing.
 - [x] `jekyll-filters` has no Nokogiri: `grep -n nokogiri ruby/jekyll-filters/*.gemspec` finds nothing.
-- [ ] Every workspace package's name starts `@binacle/`, but for `cookies` and `theme-switcher` in the root
+- [x] Every workspace package's name starts `@binacle/`, but for `cookies` and `theme-switcher` in the root
       `packages/`, which have none. Check: the `name` of each workspace `package.json`.
-- [ ] The root `packages/` and `ruby/` hold only generic code. Check: their only packages and gems are `cookies`,
+- [x] The root `packages/` and `ruby/` hold only generic code. Check: their only packages and gems are `cookies`,
       `theme-switcher` and the `jekyll-*` gems.
-- [ ] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.
-- [x] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src
-      ':!packages/theme-switcher/src/vendor'` finds nothing.
+- [x] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.
+- [x] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src`
+      finds nothing.
 - [x] No site lists `theme-switcher` as its own dependency; the design system does.
 - [x] No folder named `design/` at the root, and no `--load-path=../../design` in any `package.json`.
-- [ ] Each component's Sass and TypeScript sit in one folder of the design system, and its shared include in its
+- [x] Each component's Sass and TypeScript sit in one folder of the design system, and its shared include in its
       `_includes/components/`.
 - [x] A site that does not import the 3D view has no three.js in its bundle.
 - [x] The pre-paint script's bundle is no bigger than today's.
-- [ ] The image still serves the UI module's bundle at the URL the smoke tests check.
-- [ ] Every test recipe and workflow line names a package that exists.
-- [ ] The READMEs under `packages/`, `shared/packages/`, `ruby/` and `sites/ruby/` list what is there.
+- [ ] The image still serves the UI module's bundle at the URL the smoke tests check. The bundle builds under
+      its old name; the smoke tests have not run on it.
+- [x] Every test recipe and workflow line names a package that exists.
+- [x] The READMEs under `packages/`, `shared/packages/`, `ruby/` and `sites/ruby/` list what is there.

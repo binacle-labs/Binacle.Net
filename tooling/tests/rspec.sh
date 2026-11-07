@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# Runs one gem's tests. Bundler walks up from the gem folder and finds ruby/Gemfile, so every gem runs
-# against the same Jekyll the sites are locked to.
-#   rspec.sh <gem folder under ruby/>
+# Runs one gem's tests. Bundler walks up from the gem folder and finds the Gemfile above it - ruby/Gemfile
+# or sites/ruby/Gemfile.
+#   rspec.sh <gem folder, from the repo root>
 #
-# Starting from ruby/ itself does not work. rspec has to start inside the gem for its spec_helper to be found.
+# Starting from the Gemfile's folder does not work. rspec has to start inside the gem for its spec_helper to
+# be found.
 #
 # No -e. The exit code is kept below, so the coverage file still gets moved out of a failed run.
 set -uo pipefail
 
-gem="$1"
+dir="$1"
+gem="$(basename "$dir")"
 
 if [[ -z "${COVERAGE_FORMAT:-}" ]]; then
-    cd "ruby/$gem" && exec bundle exec rspec
+    cd "$dir" && exec bundle exec rspec
 fi
 
 # SimpleCov names its file after the formatter, so the extension is what tells them apart.
@@ -33,7 +35,7 @@ root="$(pwd)"
 export COVERAGE_DIR="$coverage/$gem"
 export RUBYOPT="-r$root/tooling/tests/ruby-coverage.rb ${RUBYOPT:-}"
 
-cd "ruby/$gem" || exit 1
+cd "$dir" || exit 1
 bundle exec rspec --format progress --format json --out "$results/$gem.rspec.json"
 rc=$?
 

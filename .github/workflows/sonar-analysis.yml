@@ -83,11 +83,16 @@ jobs:
       - name: Setup - Node
         uses: ./.github/actions/setup-node
 
-      # `just coverage all` runs the gem tests too, and without this they cannot start.
+      # `just coverage all` runs the gem tests too, and without these they cannot start.
       - name: Setup - Ruby
         uses: ./.github/actions/setup-ruby
         with:
           working-directory: ruby
+
+      - name: Setup - Ruby, the site gems
+        uses: ./.github/actions/setup-ruby
+        with:
+          working-directory: sites/ruby
 
       - name: Install npm packages
         run: npm ci --ignore-scripts

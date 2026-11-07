@@ -8,9 +8,10 @@
 module.exports = {
   projects: [
     "<rootDir>/api/packages/api-client",
-    "<rootDir>/packages/apps",
+    "<rootDir>/shared/packages/apps",
     "<rootDir>/shared/packages/compact-notation",
-    "<rootDir>/packages/design-system",
+    "<rootDir>/packages/cookies",
+    "<rootDir>/shared/packages/design-system",
     "<rootDir>/api/packages/service-client",
     "<rootDir>/packages/theme-switcher",
     "<rootDir>/vipaq/packages/vipaq",

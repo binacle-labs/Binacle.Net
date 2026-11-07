@@ -38,12 +38,12 @@ the sass CLI over `_sass/main.scss` and writes `css/main.css`, the same way `Bin
 the block back and two compilers have a claim on the same files. It also means **`css/` is gitignored** - it
 is build output, like `js/`.
 
-**The look comes from `packages/design-system`.** `build:css` reaches it by `pkg:`, so a part this site needs
+**The look comes from `shared/packages/design-system`.** `build:css` reaches it by `pkg:`, so a part this site needs
 goes in `_sass/main.scss`. The asset copy puts the package's `fonts/` in `fonts/`, which is gitignored like `css/`,
 and skips everything under `assets/` this site does not read: `gulpfile.js` lists it.
 
 **Some includes are not in `_includes/`.** `_config.yml` sets `theme: binacle-design-system`, a gem the
-`Gemfile` loads from `packages/design-system`, and Jekyll reads its `_includes/` after this site's. The copy
+`Gemfile` loads from `shared/packages/design-system`, and Jekyll reads its `_includes/` after this site's. The copy
 button comes from there. An include here of the same name wins.
 
 **Every code block on the site is a real response.** They live in `_data/exchange.yml`, and that file says how

@@ -45,6 +45,8 @@ image:
     just test ts_binacle-vipaq_unit
     just test ts_binacle-api-client_unit
     just test ts_binacle-apps_unit
+    just test ts_binacle-design-system_unit
+    just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
@@ -63,6 +65,7 @@ sites:
     just test ts_binacle-service-client_unit
     just test ts_binacle-apps_unit
     just test ts_binacle-design-system_unit
+    just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
@@ -86,6 +89,7 @@ all:
     just test ts_binacle-api-client_unit
     just test ts_binacle-service-client_unit
     just test ts_binacle-apps_unit
+    just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test ts_binacle-design-system_unit
     just test cs_binacle-net_unit
@@ -190,42 +194,45 @@ ts_binacle-service-client_unit: (_jest_test 'binacle-service-client')
 ts_binacle-apps_unit: (_jest_test 'binacle-apps')
 
 [private]
+ts_cookies_unit: (_jest_test 'cookies')
+
+[private]
 ts_theme-switcher_unit: (_jest_test 'theme-switcher')
 
 [private]
 ts_binacle-design-system_unit: (_jest_test 'binacle-design-system')
 
-# The Ruby tests. The argument is the gem's folder under ruby/.
+# The Ruby tests. The argument is the gem's folder, from the repo root.
 
 [private]
-rb_binacle-docs_unit: (_rspec_test 'binacle-docs')
+rb_binacle-docs_unit: (_rspec_test 'sites/ruby/binacle-docs')
 
 [private]
-rb_binacle-robots_unit: (_rspec_test 'binacle-robots')
+rb_binacle-robots_unit: (_rspec_test 'sites/ruby/binacle-robots')
 
 [private]
-rb_jekyll-breadcrumb-trail_unit: (_rspec_test 'jekyll-breadcrumb-trail')
+rb_jekyll-breadcrumb-trail_unit: (_rspec_test 'ruby/jekyll-breadcrumb-trail')
 
 [private]
-rb_jekyll-filters_unit: (_rspec_test 'jekyll-filters')
+rb_jekyll-filters_unit: (_rspec_test 'ruby/jekyll-filters')
 
 [private]
-rb_jekyll-gtm_unit: (_rspec_test 'jekyll-gtm')
+rb_jekyll-gtm_unit: (_rspec_test 'ruby/jekyll-gtm')
 
 [private]
-rb_jekyll-multi-sitemap_unit: (_rspec_test 'jekyll-multi-sitemap')
+rb_jekyll-multi-sitemap_unit: (_rspec_test 'ruby/jekyll-multi-sitemap')
 
 [private]
-rb_jekyll-page-meta_unit: (_rspec_test 'jekyll-page-meta')
+rb_jekyll-page-meta_unit: (_rspec_test 'ruby/jekyll-page-meta')
 
 [private]
-rb_jekyll-resource-tags_unit: (_rspec_test 'jekyll-resource-tags')
+rb_jekyll-resource-tags_unit: (_rspec_test 'ruby/jekyll-resource-tags')
 
 [private]
-rb_jekyll-structured-data_unit: (_rspec_test 'jekyll-structured-data')
+rb_jekyll-structured-data_unit: (_rspec_test 'ruby/jekyll-structured-data')
 
 [private]
-rb_jekyll-webmanifest_unit: (_rspec_test 'jekyll-webmanifest')
+rb_jekyll-webmanifest_unit: (_rspec_test 'ruby/jekyll-webmanifest')
 
 # One C# test project, with a label for a project run more than once
 [private]
@@ -234,8 +241,8 @@ _dotnet_test project label="":
 
 # One gem's specs
 [private]
-_rspec_test gem:
-    @tooling/tests/rspec.sh {{ quote(gem) }}
+_rspec_test folder:
+    @tooling/tests/rspec.sh {{ quote(folder) }}
 
 # One TypeScript package, by its jest displayName
 [private]

@@ -37,7 +37,8 @@ documentation.
   Each directory carries its own LICENSE file; vipaq/PROTOCOL.md carries an SPDX header.
 
 - The Ruby gems are licensed under the MIT License
-  Every gem under ruby/. They are Jekyll plugins, built to be used by any site.
+  Every gem under ruby/ and sites/ruby/. They are Jekyll plugins; the ones in ruby/ are
+  built to be used by any site.
   Each gem carries its own LICENSE file.
 
 - The sample deployments and the build tooling are licensed under the MIT License
@@ -181,9 +182,8 @@ Beer CSS                          https://github.com/beercss/beercss
                                   assets/lib/beercss, which carries the upstream LICENSE.
 three.js                          https://github.com/mrdoob/three.js
 js-cookie                         https://github.com/js-cookie/js-cookie
-                                  Vendored and modified from v3.0.5 in
-                                  packages/theme-switcher/src/vendor/js-cookie, which carries
-                                  the upstream LICENSE. The others above ship unmodified.
+                                  Vendored and modified from v3.0.5 in packages/cookies, which
+                                  carries the upstream LICENSE. The others above ship unmodified.
 
 Build, test and documentation tooling, not shipped:
 

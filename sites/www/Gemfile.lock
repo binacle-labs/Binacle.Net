@@ -1,15 +1,4 @@
 PATH
-  remote: ../../packages/design-system
-  specs:
-    binacle-design-system (1.0.0)
-
-PATH
-  remote: ../../ruby/binacle-robots
-  specs:
-    binacle-robots (1.0.0)
-      jekyll (>= 4.2)
-
-PATH
   remote: ../../ruby/jekyll-filters
   specs:
     jekyll-filters (1.0.0)
@@ -49,6 +38,17 @@ PATH
   remote: ../../ruby/jekyll-webmanifest
   specs:
     jekyll-webmanifest (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../../shared/packages/design-system
+  specs:
+    binacle-design-system (1.0.0)
+
+PATH
+  remote: ../ruby/binacle-robots
+  specs:
+    binacle-robots (1.0.0)
       jekyll (>= 4.2)
 
 GEM

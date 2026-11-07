@@ -1,0 +1,7 @@
+# The same rules as the generic gems. Run `rubocop` from sites/ruby/ itself.
+inherit_from: ../../ruby/.rubocop.yml
+
+# An inherited Exclude resolves against ruby/, so it has to be said again here.
+AllCops:
+  Exclude:
+    - '*/spec/fixtures/**/*'

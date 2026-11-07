@@ -32,7 +32,7 @@ feature check, so with the flag off none of this is registered and nothing here 
 ## 🛠️ Both demos come from the shared package
 
 The packing form, the 3D visualizer and the decoder are TypeScript, in
-[`packages/apps`](../../../packages/apps). The demo site's copies are built from the same
+[`shared/packages/apps`](../../../shared/packages/apps). The demo site's copies are built from the same
 source, so a fix lands on both. Everything around them - the pages, the navigation, the copy - is this
 module's alone and is free to differ.
 

@@ -61,6 +61,7 @@ install:
     cd sites/demo && bundle install
     cd sites/www && bundle install
     cd ruby && bundle install
+    cd sites/ruby && bundle install
     @just assets
 
 # Copy assets/ into the three sites and the UI module - run it after changing anything under assets/

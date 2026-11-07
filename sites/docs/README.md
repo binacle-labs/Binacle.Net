@@ -12,7 +12,7 @@ The documentation site, built with [Jekyll](https://jekyllrb.com/). It hosts the
 | `_data/` | Site data. `versions.yml` is the version list: which one is current, where each renders, what docker tag each pulls |
 | `_redirects` | Old urls and where they went, one per line. Cloudflare reads it from the output root |
 | `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document, `page.html` the wrapper every page gets. `_includes/drawings/` holds the pictures, one SVG each, coloured by the page's CSS. A page with `home: true` in its front matter brings its own title and skips `doc_body` |
-| `_sass/` | This site's stylesheets. `main.scss` names what it takes from [`packages/design-system`](../../packages/design-system). The sass command compiles them into `css/` |
+| `_sass/` | This site's stylesheets. `main.scss` names what it takes from [`shared/packages/design-system`](../../shared/packages/design-system). The sass command compiles them into `css/` |
 | `_js/` | TypeScript and JavaScript sources. Webpack bundles them into `js/` |
 
 `css/`, `js/`, `fonts/`, `lib/`, `media/` and the favicons at the root are **generated or copied in** and
@@ -48,7 +48,7 @@ command with no tag, or a selector row with no name.
 
 - **`{% vlink %}`, not `{% link %}`**, for anything inside a version. It joins the path onto the page's own
   version, so the same guide can link its neighbour without naming a version number. The tag comes from the
-  `binacle-docs` gem in [`ruby/`](../../ruby), with the generator that stamps the version keys and the
+  `binacle-docs` gem in [`sites/ruby/`](../ruby), with the generator that stamps the version keys and the
   `doc_body` filter that gives each page its markup.
 - **`pages/404.html` carries `permalink: /404.html`.** Cloudflare is configured with `not_found_handling:
   "404-page"`, which looks for that exact name in the site root.

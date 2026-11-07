@@ -9,7 +9,7 @@ logos. Edit the originals here; the copies in the sites are overwritten on every
 |---|---|
 | `*.png`, `*.ico` | Favicons, the apple touch icon and the android chrome icons. Served from the site root, so the names matter |
 | `lib/` | Vendored third-party front-end libraries, checked in rather than installed |
-| `media/` | Logos and marks - `logo/` (ours, every size), `github/` and `docker/` (theirs) |
+| `media/` | Logos and marks - `logo/` (ours: the PNG sizes and the small SVG; the main mark is in [`shared/packages/design-system/mark`](../shared/packages/design-system/mark)), `github/` and `docker/` (theirs) |
 | `assets.proj` | A no-build project so these files show up in the solution. It compiles nothing |
 
 ## 📦 The vendored libraries
@@ -41,7 +41,8 @@ just assets                      # after changing anything here
 That runs every gulp task in the root `gulpfile.js`, which copy every `.js`, `.css`, `.woff2`, image and
 icon - and each vendored `LICENSE` - into [`sites/docs/`](../sites/docs) and the UI module's `wwwroot/`, and
 only the icons and the logo files they read into [`sites/demo/`](../sites/demo) and [`sites/www/`](../sites/www). It is
-also part of `just install`, so a fresh clone gets them without asking.
+also part of `just install`, so a fresh clone gets them without asking. It also copies the mark from the design
+system into every target, as `media/logo/binacle-logo.svg`.
 
 **Every target gets the same layout - `lib/`, `media/` and the icons at the root.** What differs is only what
 each one skips, and `gulpfile.js` holds that in one `IGNORE` block with the measurement behind each line.

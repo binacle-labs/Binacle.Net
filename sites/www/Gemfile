@@ -7,14 +7,14 @@ gem "jekyll", "~> 4.4.1"
 gem "webrick"
 gem "kramdown-parser-gfm"
 gem "jekyll-include-cache"
-gem "binacle-design-system", path: "../../packages/design-system"
+gem "binacle-design-system", path: "../../shared/packages/design-system"
 
 # Jekyll compiles no sass on this site - the sass CLI does, from package.json. See README.md.
 group :jekyll_plugins do
   gem "jekyll-tidy"
   gem "jekyll-gtm", path: "../../ruby/jekyll-gtm"
   gem "jekyll-filters", path: "../../ruby/jekyll-filters"
-  gem "binacle-robots", path: "../../ruby/binacle-robots"
+  gem "binacle-robots", path: "../ruby/binacle-robots"
   gem "jekyll-multi-sitemap", path: "../../ruby/jekyll-multi-sitemap"
   gem "jekyll-resource-tags", path: "../../ruby/jekyll-resource-tags"
   gem "jekyll-page-meta", path: "../../ruby/jekyll-page-meta"

@@ -1,37 +1,37 @@
 # Packages
 
-The TypeScript packages that belong to no one slice: the sites' shared parts. A package that belongs to a
-slice lives in that slice's own `packages/` folder - the API clients in [`api/packages`](../api/packages),
-compact notation in [`shared/packages`](../shared/packages), ViPaq in [`vipaq/packages`](../vipaq/packages).
+The generic TypeScript packages: they know nothing about Binacle, so any site could use them. Code that knows
+Binacle lives with the slice it belongs to - the API clients in [`api/packages`](../api/packages), ViPaq in
+[`vipaq/packages`](../vipaq/packages), and what several slices share, the design system and the apps among it,
+in [`shared/packages`](../shared/packages).
 
-They are all npm workspaces; install once from the repo root with `npm install`. A package is imported by its
-npm name, which is `@binacle/` and the folder name - `@binacle/theme-switcher` for `theme-switcher/`.
+They are npm workspaces; install once from the repo root with `npm install`. A package here is imported by its
+folder name, with no scope - `theme-switcher` for `theme-switcher/`.
 
 ## 📦 Packages
 
 | Package | What it is |
 |---|---|
-| [`apps`](apps) | `@binacle/apps`. The interactive apps - *Everyday Items*, the packing demo and the ViPaq decoder - as Alpine.js plugins, with the 3D view's wrapper |
-| [`theme-switcher`](theme-switcher) | `@binacle/theme-switcher`. Auto, light and dark theme button, as a `<theme-switcher>` custom element. Holds its own copy of js-cookie |
-| [`design-system`](design-system) | `@binacle/design-system`. The look the sites share: tokens, fonts, the mark, and each block's Sass, behaviour and markup in one folder |
+| [`cookies`](cookies) | Read, write and remove cookies. A copy of js-cookie v3.0.5, changed a little |
+| [`theme-switcher`](theme-switcher) | Auto, light and dark theme button, as a `<theme-switcher>` custom element, and the script that sets the theme before the first paint. Uses `cookies` |
 
-Every package here has tests. From the repo root:
+Both are MIT. Every package here has tests. From the repo root:
 
 ```
-just test ts_binacle-apps_unit         # apps
+just test ts_cookies_unit              # cookies
 just test ts_theme-switcher_unit       # theme-switcher
-just test ts_binacle-design-system_unit   # design-system
 ```
 
 ## 🌐 Who imports them
 
-The sites and the API's UI module pull them in by package name and webpack bundles them:
-[`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `apps` for
-the packing demo and the ViPaq decoder, all three sites - [`sites/www`](../sites/www),
-[`sites/docs`](../sites/docs) and `demo` - use `design-system`, which uses `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
-Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
-[`assets/`](../assets), not these.)
+The design system in [`shared/packages/design-system`](../shared/packages/design-system) uses `theme-switcher`
+for its theme button. No site imports either one directly.
 
 **None of them has a build step.** Each host compiles the TypeScript from source with its own webpack and
-ts-loader, so a change here lands on every host at once and none of them can be updated on its own. That is
-also why an edit here is only proven by building the hosts, not by building the package.
+ts-loader, so a change here lands on every host at once. That is also why an edit here is only proven by
+building the hosts, not by building the package.
+
+## ⚠️ What will bite you
+
+**Both names are taken on the public npm registry** by other libraries. They resolve here only because they are
+workspaces. Do not publish either under its bare name.

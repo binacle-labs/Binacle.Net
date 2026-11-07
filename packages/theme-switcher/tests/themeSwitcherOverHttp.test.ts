@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  * @jest-environment-options {"url": "http://localhost/"}
  */
-import {Cookies} from "../src/vendor/js-cookie";
+import {Cookies} from "cookies";
 
 import ThemeSwitcherButtonElement from "../src/themeSwitcher";
 import {DEFAULT_OPTIONS} from "../src/options";

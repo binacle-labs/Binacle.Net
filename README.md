@@ -94,9 +94,10 @@ This project carries more than one license. Which one applies depends on which p
 | The code - API, packing engine, browser UI | [AGPL-3.0-only](LICENSE.AGPL-3.0) |
 | Documentation, images and other content | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | The data formats - ViPaq, compact notation, [PROTOCOL.md](vipaq/PROTOCOL.md), its test vectors and the geometry primitives they use | [Apache-2.0](vipaq/src/Binacle.ViPaq/LICENSE) |
-| The Ruby gems under [`ruby/`](ruby) | MIT |
+| The Ruby gems under [`ruby/`](ruby) and [`sites/ruby/`](sites/ruby) | MIT |
 | Sample deployments ([`samples/`](samples)) and build tooling ([`tooling/`](tooling)) | MIT |
-| [`packages/theme-switcher`](packages/theme-switcher), with the copy of js-cookie inside it | MIT |
+| [`packages/theme-switcher`](packages/theme-switcher) | MIT |
+| [`packages/cookies`](packages/cookies) - adapted from js-cookie | MIT |
 | [`shared/src/Binacle.FluxResults`](shared/src/Binacle.FluxResults) | MIT |
 
 `SPDX-License-Identifier: AGPL-3.0-only AND CC-BY-4.0 AND Apache-2.0 AND MIT`

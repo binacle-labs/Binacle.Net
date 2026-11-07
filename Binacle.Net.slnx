@@ -143,6 +143,7 @@
   </Project>
   <Project Path="ruby/ruby.rbproj" />
   <Folder Name="/sites/">
+    <Project Path="sites/ruby/ruby.rbproj" />
     <Project Path="sites/docs/docs.proj" Type="Shared">
       <Platform Project="AnyCPU" />
     </Project>

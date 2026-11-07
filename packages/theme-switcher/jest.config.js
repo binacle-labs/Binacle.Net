@@ -8,7 +8,7 @@ module.exports = {
   // names its report files after it.
   displayName: "theme-switcher",
   testEnvironment: "jsdom",
-  // https, not jsdom's default http: js-cookie defaults to secure, and jsdom hides a secure
+  // https, not jsdom's default http: cookies are secure by default, and jsdom hides a secure
   // cookie from a document on an insecure origin, so the theme would never read back.
   testEnvironmentOptions: {
     url: "https://localhost/",

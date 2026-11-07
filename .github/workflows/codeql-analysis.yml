@@ -37,7 +37,7 @@ jobs:
           - actions
           - csharp
           - javascript-typescript
-          # The Jekyll plugins under ruby/, and the sites' own.
+          # The Jekyll plugins under ruby/ and sites/ruby/, and the sites' own.
           - ruby
 
     steps:

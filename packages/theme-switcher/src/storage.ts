@@ -1,5 +1,5 @@
-import {Cookies} from "./vendor/js-cookie";
-import type {CookieAttributes} from "./vendor/js-cookie";
+import {Cookies} from "cookies";
+import type {CookieAttributes} from "cookies";
 
 import {isTheme} from "./theme";
 import type {Theme} from "./theme";

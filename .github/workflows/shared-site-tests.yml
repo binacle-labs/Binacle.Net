@@ -35,11 +35,17 @@ jobs:
       - name: Install npm packages
         run: npm ci --ignore-scripts
 
-      # ruby/, not a site: the gems share one Gemfile there and the sites have their own.
+      # Not a site: the generic gems share one Gemfile in ruby/, the gems only the sites read another in
+      # sites/ruby/, and each site has its own.
       - name: Setup - Ruby
         uses: ./.github/actions/setup-ruby
         with:
           working-directory: ruby
+
+      - name: Setup - Ruby, the site gems
+        uses: ./.github/actions/setup-ruby
+        with:
+          working-directory: sites/ruby
 
       # !cancelled() so every test still runs after one fails - you see all the red, not just the first.
       - name: Test - binacle-compact-notation
@@ -66,6 +72,10 @@ jobs:
       - name: Test - binacle-design-system
         if: ${{ !cancelled() }}
         run: just test ts_binacle-design-system_unit
+
+      - name: Test - cookies
+        if: ${{ !cancelled() }}
+        run: just test ts_cookies_unit
 
       - name: Test - theme-switcher
         if: ${{ !cancelled() }}

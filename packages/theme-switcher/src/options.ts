@@ -1,6 +1,6 @@
 import {isTheme} from "./theme";
 import type {DefaultTheme, Theme} from "./theme";
-import type {CookieAttributes} from "./vendor/js-cookie";
+import type {CookieAttributes} from "cookies";
 
 export interface ThemeStorage {
 	read(): Theme | undefined;

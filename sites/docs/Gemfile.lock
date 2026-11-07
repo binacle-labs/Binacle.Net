@@ -1,17 +1,4 @@
 PATH
-  remote: ../../ruby/binacle-docs
-  specs:
-    binacle-docs (1.0.0)
-      jekyll (>= 4.2)
-      nokogiri (~> 1.12)
-
-PATH
-  remote: ../../ruby/binacle-robots
-  specs:
-    binacle-robots (1.0.0)
-      jekyll (>= 4.2)
-
-PATH
   remote: ../../ruby/jekyll-breadcrumb-trail
   specs:
     jekyll-breadcrumb-trail (1.0.0)
@@ -57,6 +44,19 @@ PATH
   remote: ../../ruby/jekyll-webmanifest
   specs:
     jekyll-webmanifest (1.0.0)
+      jekyll (>= 4.2)
+
+PATH
+  remote: ../ruby/binacle-docs
+  specs:
+    binacle-docs (1.0.0)
+      jekyll (>= 4.2)
+      nokogiri (~> 1.12)
+
+PATH
+  remote: ../ruby/binacle-robots
+  specs:
+    binacle-robots (1.0.0)
       jekyll (>= 4.2)
 
 GEM

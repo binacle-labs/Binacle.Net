@@ -1,4 +1,4 @@
-import {Cookies} from "../src/vendor/js-cookie";
+import {Cookies} from "cookies";
 
 import initTheme from "../src/themeInit";
 import {optionsFromDocument} from "../src/options";

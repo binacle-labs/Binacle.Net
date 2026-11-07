@@ -1,5 +1,5 @@
 {
-  "name": "@binacle/theme-switcher",
+  "name": "theme-switcher",
   "version": "1.0.0",
   "description": "A theme button custom element - auto, light and dark - and the script that sets the theme before the first paint",
   "main": "index.ts",
@@ -9,6 +9,9 @@
   "sideEffects": false,
   "scripts": {
     "test": "jest"
+  },
+  "dependencies": {
+    "cookies": "*"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

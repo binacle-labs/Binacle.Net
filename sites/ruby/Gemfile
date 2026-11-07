@@ -1,0 +1,15 @@
+source "https://rubygems.org"
+
+# Coverage, the same three as ruby/Gemfile. The specs load it through tooling/tests/ruby-coverage.rb and it
+# stays off unless COVERAGE_FORMAT is set.
+gem "simplecov", require: false
+gem "simplecov-cobertura", require: false
+gem "simplecov_json_formatter", require: false
+
+# Style, with the config in .rubocop.yml beside this file. Not wired to any test or any workflow.
+gem "rubocop", require: false
+
+# One bundle for the gems only the sites read. Bundler walks up from a gem's own directory and finds this
+# file, so `bundle exec rspec` works from inside either of them.
+gemspec path: "binacle-docs"
+gemspec path: "binacle-robots"

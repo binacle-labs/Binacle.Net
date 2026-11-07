@@ -1,17 +1,4 @@
 PATH
-  remote: binacle-docs
-  specs:
-    binacle-docs (1.0.0)
-      jekyll (>= 4.2)
-      nokogiri (~> 1.12)
-
-PATH
-  remote: binacle-robots
-  specs:
-    binacle-robots (1.0.0)
-      jekyll (>= 4.2)
-
-PATH
   remote: jekyll-breadcrumb-trail
   specs:
     jekyll-breadcrumb-trail (1.0.0)
@@ -120,8 +107,6 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.10)
     logger (1.7.0)
     mercenary (0.4.0)
-    nokogiri (1.19.4-x86_64-linux-gnu)
-      racc (~> 1.4)
     parallel (2.1.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
@@ -184,8 +169,6 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
-  binacle-docs!
-  binacle-robots!
   jekyll-breadcrumb-trail!
   jekyll-filters!
   jekyll-gtm!

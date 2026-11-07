@@ -11,6 +11,7 @@ built with webpack and TypeScript beside them.
 | [`demo/`](demo) | The demo site - the packing demo, the ViPaq decoder, and the pages around them |
 | [`www/`](www) | The marketing site - what Binacle.Net does, and who it is for |
 | [`admin/`](admin) | **Experimental, local only - not published.** A page to manage a local ServiceModule's accounts. No build recipe, no assets copy, no workflow names it |
+| [`ruby/`](ruby) | Not a site: the Jekyll gems only these sites read - the docs' version scheme and markup, and the `robots.txt` body |
 
 Each has its own `README.md`, `Gemfile` and `package.json`. **All three `package.json` files are root npm
 workspace members**, so one `npm install` at the root covers them and none has a lock file of its own. Ruby is
@@ -46,4 +47,5 @@ The wrangler config for each lives in [`tooling/cloudflare/`](../tooling/cloudfl
 uploads has to match the `destination` in that site's `_config.yml`.
 
 Shared static assets live in [`assets/`](../assets) and are copied in by gulp; the custom Liquid filters and
-Google Tag Manager tags come from the local gems in [`ruby/`](../ruby).
+Google Tag Manager tags come from the local gems in [`ruby/`](../ruby), and the gems only these sites read
+from [`ruby/`](ruby) here.

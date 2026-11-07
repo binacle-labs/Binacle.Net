@@ -1,0 +1,20 @@
+<!-- Exists only so the Sonar scanner is offered these gems' sources, as ruby/ruby.rbproj does for the
+     generic ones. NoTargets compiles nothing. -->
+<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- vendor/ is the bundle CI installs, so without the exclude the build swallows every gem we depend on. -->
+        <Content Include="**\*.rb" Exclude="vendor\**" />
+    </ItemGroup>
+
+    <!-- The ruby report path resolves against this project's folder, so it climbs one more level than the
+         one in tooling/ci/sonar-analysis.xml. -->
+    <ItemGroup>
+        <SonarQubeSetting Include="sonar.ruby.coverage.reportPaths">
+            <Value>../../artifacts/coverage/sonar/ruby.json</Value>
+        </SonarQubeSetting>
+    </ItemGroup>
+</Project>

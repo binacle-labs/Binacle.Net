@@ -1,4 +1,6 @@
 const {src, dest, task} = require('gulp');
+const fs = require('fs');
+const path = require('path');
 
 
 const ASSETS = {
@@ -26,7 +28,7 @@ const ASSETS = {
 //
 // swagger-ui, 6.2 MB: only sites/docs/_layouts/swagger.html reads it. The API serves its own from Swashbuckle.
 // beercss and material-dynamic-colors: docs and demo build on the design system instead.
-// docs, demo and www take the favicons, the mark and the link preview from media/, and nothing else there.
+// docs, demo and www take the favicons and the link preview from media/, and nothing else there.
 // The two android icons go to the three sites, which name them in a web app manifest. The UI module has none.
 const UNUSED_MEDIA = [
 	'assets/media/docker/**',
@@ -66,27 +68,35 @@ function copyAssets(destinationDir, ignore = []) {
 // A font URL resolves from the built CSS, so a site carries its own copy, with the licences the fonts require.
 function copyFonts(destinationDir) {
 	return new Promise((resolve) => {
-		src('packages/design-system/fonts/*', {encoding: false})
+		src('shared/packages/design-system/fonts/*', {encoding: false})
 			.pipe(dest(destinationDir))
 			.on('end', resolve);
 	});
+}
+
+// The mark lives in the design system, but the sites still ask for it at its old address.
+function copyMark(destinationDir) {
+	const target = path.join(destinationDir, 'media/logo/binacle-logo.svg');
+	fs.mkdirSync(path.dirname(target), {recursive: true});
+	return fs.promises.copyFile('shared/packages/design-system/mark/mark.svg', target);
 }
 
 // ----------------- End Functions  ----------------- //
 
 // Tasks
 task('copy-assets-to-demo', async function(){
-	return Promise.all([copyAssets('sites/demo', IGNORE.demo), copyFonts('sites/demo/fonts')]);
+	return Promise.all([copyAssets('sites/demo', IGNORE.demo), copyFonts('sites/demo/fonts'), copyMark('sites/demo')]);
 });
 
 task('copy-assets-to-docs', async function(){
-	return Promise.all([copyAssets('sites/docs', IGNORE.docs), copyFonts('sites/docs/fonts')]);
+	return Promise.all([copyAssets('sites/docs', IGNORE.docs), copyFonts('sites/docs/fonts'), copyMark('sites/docs')]);
 });
 
 task('copy-assets-to-www', async function(){
-	return Promise.all([copyAssets('sites/www', IGNORE.www), copyFonts('sites/www/fonts')]);
+	return Promise.all([copyAssets('sites/www', IGNORE.www), copyFonts('sites/www/fonts'), copyMark('sites/www')]);
 });
 
 task('copy-assets-to-uimodule', async function(){
-	return copyAssets('api/src/Binacle.Net.UIModule/wwwroot', IGNORE.uimodule);
+	const target = 'api/src/Binacle.Net.UIModule/wwwroot';
+	return Promise.all([copyAssets(target, IGNORE.uimodule), copyMark(target)]);
 });
