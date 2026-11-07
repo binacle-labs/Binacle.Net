@@ -39,7 +39,7 @@ public class PageContentTests : IClassFixture<UIModuleBinacleApi>
 		page.ShouldContain("href=\"/instance\"");
 	}
 
-	// The x-data names are registered in packages/binacle-net-ui. Renamed on one side only, the page renders
+	// The x-data names are registered in packages/apps. Renamed on one side only, the page renders
 	// and does nothing at all.
 	[Theory]
 	[InlineData("/packing", "packing_demo_app")]

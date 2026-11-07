@@ -6,20 +6,19 @@ compact notation in [`shared/packages`](../shared/packages), ViPaq in [`vipaq/pa
 
 They are all npm workspaces; install once from the repo root with `npm install`. A package is imported by its
 npm name, which is `@binacle/` and the folder name - `@binacle/theme-switcher` for `theme-switcher/`.
-`binacle-net-ui` keeps its old name until it becomes `apps`.
 
 ## 📦 Packages
 
 | Package | What it is |
 |---|---|
-| [`binacle-net-ui`](binacle-net-ui) | Alpine.js components and a Three.js visualizer for the interactive packing demo |
+| [`apps`](apps) | `@binacle/apps`. The interactive apps - *Everyday Items*, the packing demo and the ViPaq decoder - as Alpine.js plugins, with the 3D view's wrapper |
 | [`theme-switcher`](theme-switcher) | `@binacle/theme-switcher`. Auto, light and dark theme button, as a `<theme-switcher>` custom element. Holds its own copy of js-cookie |
 | [`design-system`](design-system) | `@binacle/design-system`. The look the sites share: tokens, fonts, the mark, and each block's Sass, behaviour and markup in one folder |
 
 Every package here has tests. From the repo root:
 
 ```
-just test ts_binacle-net-ui_unit       # binacle-net-ui
+just test ts_binacle-apps_unit         # apps
 just test ts_theme-switcher_unit       # theme-switcher
 just test ts_binacle-design-system_unit   # design-system
 ```
@@ -27,7 +26,7 @@ just test ts_binacle-design-system_unit   # design-system
 ## 🌐 Who imports them
 
 The sites and the API's UI module pull them in by package name and webpack bundles them:
-[`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
+[`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `apps` for
 the packing demo and the ViPaq decoder, all three sites - [`sites/www`](../sites/www),
 [`sites/docs`](../sites/docs) and `demo` - use `design-system`, which uses `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
 Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in

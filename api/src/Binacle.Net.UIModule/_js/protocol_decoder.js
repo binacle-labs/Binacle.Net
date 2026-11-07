@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import {protocolDecoderPlugin} from 'binacle-net-ui';
+import {protocolDecoderPlugin} from '@binacle/apps';
 Alpine.plugin(protocolDecoderPlugin);
 
 // The samples panel. The component owns the strings; this only opens the list and copies one.

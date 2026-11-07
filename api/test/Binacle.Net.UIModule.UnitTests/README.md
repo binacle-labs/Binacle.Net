@@ -1,7 +1,7 @@
 # Binacle.Net.UIModule unit tests
 
 The demo UI's own C# - the applet list, the four page models and the error page. Everything interactive on a
-page is TypeScript in `packages/binacle-net-ui` and is tested there; nothing here renders a `.cshtml`.
+page is TypeScript in `packages/apps` and is tested there; nothing here renders a `.cshtml`.
 
 | Folder | What it is |
 |---|---|

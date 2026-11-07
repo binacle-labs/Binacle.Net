@@ -59,9 +59,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-service-client_unit
 
-      - name: Test - binacle-net-ui
+      - name: Test - binacle-apps
         if: ${{ !cancelled() }}
-        run: just test ts_binacle-net-ui_unit
+        run: just test ts_binacle-apps_unit
 
       - name: Test - binacle-design-system
         if: ${{ !cancelled() }}

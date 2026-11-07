@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import {packingDemoPlugin} from 'binacle-net-ui';
+import {packingDemoPlugin} from '@binacle/apps';
 Alpine.plugin(packingDemoPlugin);
 
 // The request panel. The component hands over method, path and body; the host is this page's origin, because

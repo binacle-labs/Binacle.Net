@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import {protocolDecoderPlugin} from 'binacle-net-ui';
+import {protocolDecoderPlugin} from '@binacle/apps';
 Alpine.plugin(protocolDecoderPlugin);
 
 const COPIED_FOR_MS = 1500;

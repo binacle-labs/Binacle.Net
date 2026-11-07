@@ -1,16 +1,12 @@
 const path = require('path');
 const dest = 'js';
 
-// tsconfig emits commonjs, and webpack cannot tree-shake or concatenate that. It also loads three twice: our
-// require takes its commonjs build, and its own add-ons import the module one.
-// Bundled files only: the head script's import resolves under its own config's settings alone.
+// The entries are .js, so ts-loader takes the commonjs tsconfig of the first package it meets. Commonjs cannot be
+// tree-shaken, and it loads three twice: our require takes its commonjs build, and its add-ons import the module one.
+// Bundled files only: the head script is not this config's to check.
 const tsLoader = {
 	loader: 'ts-loader',
 	options: {onlyCompileBundledFiles: true, compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
-};
-const headTsLoader = {
-	loader: 'ts-loader',
-	options: {compilerOptions: {module: 'esnext', moduleResolution: 'bundler'}},
 };
 
 module.exports = (env, argv) => {
@@ -26,7 +22,7 @@ module.exports = (env, argv) => {
 		entry: {'theme-init': './_js/theme-init.ts'},
 		output: {filename: '[name].js', path: path.resolve(__dirname, dest), clean: false},
 		resolve: {extensions: ['.ts', '.js', '.json']},
-		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: headTsLoader}]},
+		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: 'ts-loader'}]},
 		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		devtool: false,
 	};
@@ -84,10 +80,11 @@ module.exports = (env, argv) => {
 						enforce: true,
 						priority: 10,
 					},
-					// The API client rides in this chunk rather than its own. Every chunk file is listed
-					// by hand in _data/includes.yml, so a new one is dead weight until a script tag names it.
+					// The API client and the 3D view ride in this chunk rather than their own. Every chunk file
+					// is listed by hand in _data/includes.yml, so a new one is dead weight until a script tag names it.
 					binacleNetUi: {
-						test: /[\\/]packages[\\/](binacle-net-ui|api-client)[\\/]/,
+						test: /[\\/]packages[\\/](apps|api-client|design-system[\\/]components[\\/]pack-view)[\\/]/,
+						// A URL the pages and the smoke tests ask for, so it keeps the package's old name.
 						name: 'binacle-net-ui',
 						chunks: 'all',
 						enforce: true,

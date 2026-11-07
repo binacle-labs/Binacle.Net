@@ -26,8 +26,8 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "@binacle/apps": "*",
     "@binacle/design-system": "*",
-    "alpinejs": "^3.15.2",
-    "binacle-net-ui": "*"
+    "alpinejs": "^3.15.2"
   }
 }

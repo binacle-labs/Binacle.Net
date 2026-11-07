@@ -19,11 +19,13 @@
     "test": "jest"
   },
   "dependencies": {
-    "@binacle/theme-switcher": "*"
+    "@binacle/theme-switcher": "*",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
+    "@types/three": "^0.182.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.4.5",

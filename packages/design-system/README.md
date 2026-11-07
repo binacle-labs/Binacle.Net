@@ -19,7 +19,7 @@ markup in `_includes/`. A site builds its own CSS from the parts it needs. Nothi
 | `mark/` | the logo, and the small mark for icons |
 | `_includes/components/` | a component's shared markup, for the Jekyll sites |
 | `index.scss` | forwards every part that writes CSS, for a surface that wants all of them |
-| `index.ts` | re-exports every init function |
+| `index.ts` | re-exports every init function, and the 3D view's `createPackView` with its types |
 | `binacle-design-system.gemspec` | makes the folder a Jekyll theme gem, so a site can read `_includes/` |
 | `tests/` | the jest tests, in the same folders as the code |
 
@@ -97,6 +97,12 @@ import {initTheme} from "@binacle/design-system/theme-init";
 
 `currentTheme` comes from the root too, so a site that reads the theme does not depend on `theme-switcher` itself.
 
+**The 3D view** is `createPackView`, from the root as well. It draws with three.js and knows nothing of Alpine; the
+apps wrap it. The figure's markup belongs to the host. The view finds its parts by data attributes and fills them:
+`data-pack-view-stage`, `data-pack-view-empty`, `data-bin-dim`, `data-bin-dim-number`, `data-placed` and
+`data-pack-view-controls`. Its colours are custom properties read off the figure, from `components/pack-view/`.
+**A host that does not load them fails when the view starts**, with an error that names the value.
+
 The markup, once the site's `Gemfile` names the gem by path and its `_config.yml` sets
 `theme: binacle-design-system`:
 
@@ -133,9 +139,12 @@ depend on it; moving a rule there can change the look.
 weight on the same element, so their `@use` lines can come in any order. A rule placed in the wrong file is how
 that breaks.
 
-**A subpath import type-checks only with the newer module resolution.** The sites' `tsconfig.json` uses the
-older one, which ignores `exports` in `package.json`. So a site imports the behaviour from the root, and only the
-pre-paint bundle, whose webpack config sets `moduleResolution: bundler`, imports `theme-init`.
+**A host must build its scripts as ES modules.** Webpack drops the parts a site does not call only from ES
+modules. Built as CommonJS, every site would carry the 3D view and all of three.js.
+
+**`packView.ts` is not covered and is not meant to be.** It needs a WebGL context, so a test there could only
+assert that a call happened. What needs no WebGL is split out of it and tested - the colours, the camera fit, the
+prints, the position.
 
 **The gem ships `_includes/` only.** Jekyll loads plugins only from gems a theme names as dependencies, so Ruby
 code does not belong here.

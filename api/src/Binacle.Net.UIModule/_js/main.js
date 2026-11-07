@@ -1,6 +1,5 @@
-import { ThemeSwitcherButtonElement, optionsFromDocument } from "@binacle/theme-switcher";
+import {initThemeButton} from "@binacle/design-system";
 
 document.addEventListener('DOMContentLoaded', function () {
-    ThemeSwitcherButtonElement.configure(optionsFromDocument());
-    customElements.define('theme-switcher', ThemeSwitcherButtonElement);
+    initThemeButton();
 });

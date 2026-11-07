@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
 
-import {everydayItemsPlugin} from 'binacle-net-ui';
+import {everydayItemsPlugin} from '@binacle/apps';
 Alpine.plugin(everydayItemsPlugin);
 Alpine.start();

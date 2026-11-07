@@ -8,7 +8,7 @@
 module.exports = {
   projects: [
     "<rootDir>/api/packages/api-client",
-    "<rootDir>/packages/binacle-net-ui",
+    "<rootDir>/packages/apps",
     "<rootDir>/shared/packages/compact-notation",
     "<rootDir>/packages/design-system",
     "<rootDir>/api/packages/service-client",

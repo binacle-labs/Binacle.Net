@@ -167,7 +167,7 @@ The same skeleton, so a reader who knows one knows all:
 
 ```
 <package>/
-  package.json     name, "private": true, "main": "index.ts", "sideEffects": false
+  package.json     name, "private": true, "main": "index.ts", and "sideEffects": false where a build proves it helps
   README.md        what it is, who uses it
   LICENSE          only where the licence differs from the repository's
   index.ts         the public surface: re-exports only, no code
@@ -262,7 +262,7 @@ shared/packages/design-system/
   package. `gulpfile.js` copies `design/fonts/*` today; it reads the new path.
 - **The 3D view splits in two.** `packView.ts` and its pure parts - colours, palette, camera fit, prints,
   positions - import only three and the shared coordinate and dimension types, so they are level 3 and move here,
-  with `shared/coordinates.ts` and `shared/dimensions.ts`. `packViewComponent.ts` is the Alpine wrapper; it stays
+  with `coordinates.ts` and `dimensions.ts`, into `components/pack-view/`. `packViewComponent.ts` is the Alpine wrapper; it stays
   with the apps. `docs` reads the view's Sass and not its TypeScript, which already works this way.
 - **The tabs.** `tabs.ts` does not follow the ARIA tabs pattern from the W3C: no arrow keys, no `aria-controls`. It
   moves as it is; fixing it is its own work.
@@ -277,20 +277,27 @@ shared/packages/apps/
     packingDemo/           Custom Sizes, with its plugin.ts
     protocolDecoder/       the ViPaq Decoder, with its plugin.ts
     everydayItems/         Everyday Items, with its plugin.ts
-    shared/
-      errorsDialog/  field/  logger/
-      packViewComponent.ts  defineComponent.ts  dictionary.ts
+    components/            errorsDialog/  field/  logger/  packView/
+    shared/                defineComponent.ts  dictionary.ts
+    types/
   tools/generateSamples.ts
-  tests/
+  tests/                   mirrors src/
 ```
 
-- **Each plugin moves into its app's folder.** Today they sit loose in `src/`.
+- **Each plugin sits in its app's folder**, as `plugin.ts`.
+- **No `src/apps/` folder.** **Decided (the maintainer, 2026-11-08):** *"ok drop"*. Asked about the
+  `packages/apps/src/apps/` stutter: the package's name already says what it holds. `components/` stays apart from
+  `shared/`, so a reusable Alpine component and a helper do not mix. Session 7 drops it, with the move.
+- **The package holds apps only.** **The maintainer, 2026-11-08:** *"if the packge does hgold anything other that
+  apps we need to rename the package"*.
 - **The app folders keep their names.** `packingDemo` is the page now called *Custom Sizes*; renaming the folder
   changes no URL and no `x-data` name, so it is not worth it on its own.
 - **Everyday Items stays here** though only `demo` uses it. It shares the helpers and the view wrapper, and the
   sites have no test setup. Choose to move it into `sites/demo/` only if `demo` gets one.
 - **The errors dialog imports `@binacle/api-client`**, so it is level 4 and cannot go to the brand package.
-- **`"sideEffects": false`** is missing today. Without it webpack may keep code a host does not call.
+- **No `"sideEffects": false`.** Built cold with and without it: webpack already leaves *Everyday Items* out of
+  the UI module, and with the flag it skips the package's `index.ts`, so the chunk splits into nine modules where
+  it was one - 0.5 KB more on `demo`, 0.3 KB on the UI module, nothing dropped.
 - **The built bundle's name is a URL.** The image serves `_content/Binacle.Net.UIModule/js/binacle-net-ui.js`, and
   `tooling/smoke/full.hurl` and `quickstart.hurl` check it. A rename of the package does not have to rename the
   bundle; rename both or neither.
@@ -390,12 +397,6 @@ The old names and paths are written in these places, beside each package's own f
    vipaq binacle compact notation"*. The docs cover more than the API, so they are `binacle`. Asked to confirm:
    *"ok"*.
 
-## What could stop it
-
-- Webpack keeps three.js in a site that never imports the 3D view while the bundles are CommonJS (*What the
-  trial found*). Then the 3D view stays in the apps package.
-- The pre-paint script may grow once it is bundled from a bigger package, even through its own export path.
-
 ## Trying it
 
 **One component, one surface, all three parts.** The copy button has Sass, TypeScript and markup. Move it into the
@@ -413,14 +414,6 @@ and their CSS is unchanged. The jest tests pass. He ran `just test sites` and lo
   `include_cached`, so `jekyll-include-cache` has nothing to clash with.
 - **An include's final newline lands in the page.** Inline in a `div`, it moved `</div>` to its own line. The
   include ends on a `{%- comment -%}` to eat it.
-- **A subpath import does not type-check on the sites.** Their `tsconfig.json` uses the old module resolution,
-  which ignores `exports`. `www` imports from the package root. With `moduleResolution: bundler` the subpath
-  passes. The pre-paint script's own path, `@binacle/design-system/theme-init`, needs that setting in its
-  webpack override.
-- **Nothing is tree-shaken today.** `www`'s bundle already carries tabs, lightbox, sticky sidebar and nav fade,
-  and calls none of them. The TypeScript compiles to CommonJS, so `"sideEffects": false` drops nothing. The
-  3D view in the design system's `index.ts` would put three.js in every site, unless the main bundles compile
-  to ES modules as the pre-paint script already does.
 - **The jest name is the npm name without its `/`, `binacle-design-system`.** `tooling/tests/jest.sh` names report files
   after it, and a `/` makes a folder. The recipe is `ts_binacle-design-system_unit`.
 - **Coverage looked in `src/` only.** The design system's code sits in its Sass groups, so the root
@@ -429,8 +422,7 @@ and their CSS is unchanged. The jest tests pass. He ran `just test sites` and lo
 ### Session 2, the renames (agent, 2026-11-07)
 
 In the working tree. Every package has its `@binacle/` name and the skeleton, but for three left to their own
-sessions: `binacle-components` until it joins `design-system`, and `binacle-net-ui` until it becomes `apps` (it also
-lacks `"sideEffects": false`). The UI module is `@binacle/api-ui-module`. js-cookie is in
+sessions: `binacle-components` until it joins `design-system`, and `binacle-net-ui` until it becomes `apps`. The UI module is `@binacle/api-ui-module`. js-cookie is in
 `theme-switcher/src/vendor/js-cookie/`, with its upstream `LICENSE`; `packages/cookies` and its recipe are gone.
 The UI module's stray `cookies`, `three` and `binacle-vipaq` went with it.
 
@@ -501,6 +493,43 @@ time. `main.js` is the same size and holds the same modules plus `themeButton.ts
 - **The lock file kept the deleted folder** as an `extraneous` entry after `npm install`. Removed by hand; a second
   `npm install` leaves it out.
 
+### Session 6, the 3D view and the apps (agent, 2026-11-08)
+
+In the working tree. **His answer (the maintainer, 2026-11-08):** *"ok 4d view is part of the design system...
+and yes the idea is sites only load what they need from the design system... id expect www and docs not to load
+threejs"*. The agent read it as ES modules: only they let webpack drop what a site does not call.
+
+- **Every site builds as ES modules**: `module: esnext`, `moduleResolution: bundler` in each `tsconfig.json`, as
+  the UI module had. The pre-paint configs lost their override, and `www` and `docs` their `onlyCompileBundledFiles`.
+- **The drawing code is in `components/pack-view/`**, beside its Sass: `packView.ts`, the colours, palette, camera
+  fit, prints, positions, icons, `packItem.ts`, `coordinates.ts`, `dimensions.ts`, and their tests. `index.ts`
+  exports `createPackView` and the types. `packViewComponent.ts`, the Alpine wrapper, stays in `apps`.
+- **`demo` and the UI module keep their loader override.** Their entries are `.js`, so ts-loader takes the
+  tsconfig of the first package it meets, which emits CommonJS. Naming the site's own tsconfig fails: it does not
+  hold the packages' type declarations, and the UI module's folder has no `.ts` at all.
+- **three's deep imports end `.js`.** Its types resolve `three/examples/jsm/...` under the new resolution only
+  with the extension. The jest stubs match both.
+- **The `binacle-net-ui.js` chunk rule names `design-system/components/pack-view/` too.** Without it the view
+  lands in an unnamed chunk no page loads.
+
+Built before and after, cold: `www`'s `main.js` 15.7 to 10.1 KB, `docs`' 19.5 to 14.3 KB, no three.js in either.
+`demo` and the UI module the same size in every file. Every pre-paint script byte for byte the same. Both packages
+pass `tsc --noEmit`. He asked the agent to run `just test sites`: it passes (2026-11-08).
+
+**The second half:** `binacle-net-ui` is `@binacle/apps`, in `packages/apps/` until session 7 moves it and drops
+`src/apps/`. The plugins
+sit in their app folders. The recipe and jest name is `binacle-apps`, so `ts_binacle-apps_unit`. The UI module
+takes the theme button from the design system, `initThemeButton`, and no longer lists `theme-switcher`. The chunk
+keeps its name, `binacle-net-ui.js`; a comment beside it in both webpack configs says why.
+
+Built before and after, cold: every file of `demo` and the UI module the same size, only module numbers moved.
+`tsc --noEmit` passes; `just regen demo-samples` writes the same file. He asked the agent to run `just test sites`:
+it passes (2026-11-08).
+
+- **The lock file kept the old folder** as an `extraneous` entry, as in session 5. Removed by hand.
+- **Build cold to measure.** Both configs keep a webpack filesystem cache, and a warm one hid the
+  `sideEffects` cost above until the cache was deleted.
+
 ## Done when
 
 - [x] No `jekyll-*` gem names a class, a phrase or a path from one site. Check: `git grep -nE
@@ -513,12 +542,12 @@ time. `main.js` is the same size and holds the same modules plus `themeButton.ts
 - [ ] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.
 - [x] `theme-switcher` names no Binacle class, value or site: `git grep -niE 'binacle|__' packages/theme-switcher/src
       ':!packages/theme-switcher/src/vendor'` finds nothing.
-- [ ] No site lists `theme-switcher` as its own dependency; the design system does.
+- [x] No site lists `theme-switcher` as its own dependency; the design system does.
 - [x] No folder named `design/` at the root, and no `--load-path=../../design` in any `package.json`.
 - [ ] Each component's Sass and TypeScript sit in one folder of the design system, and its shared include in its
       `_includes/components/`.
-- [ ] A site that does not import the 3D view has no three.js in its bundle.
-- [ ] The pre-paint script's bundle is no bigger than today's.
+- [x] A site that does not import the 3D view has no three.js in its bundle.
+- [x] The pre-paint script's bundle is no bigger than today's.
 - [ ] The image still serves the UI module's bundle at the URL the smoke tests check.
 - [ ] Every test recipe and workflow line names a package that exists.
 - [ ] The READMEs under `packages/`, `shared/packages/`, `ruby/` and `sites/ruby/` list what is there.

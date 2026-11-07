@@ -13,9 +13,9 @@
     "watch:js": "webpack --watch --env build=watch"
   },
   "dependencies": {
-    "@binacle/theme-switcher": "*",
-    "alpinejs": "^3.15.2",
-    "binacle-net-ui": "*"
+    "@binacle/apps": "*",
+    "@binacle/design-system": "*",
+    "alpinejs": "^3.15.2"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",

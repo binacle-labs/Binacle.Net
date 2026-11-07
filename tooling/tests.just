@@ -44,7 +44,7 @@ image:
     just test cs_binacle-vipaq_unit
     just test ts_binacle-vipaq_unit
     just test ts_binacle-api-client_unit
-    just test ts_binacle-net-ui_unit
+    just test ts_binacle-apps_unit
     just test ts_theme-switcher_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
@@ -61,7 +61,7 @@ sites:
     just test ts_binacle-vipaq_unit
     just test ts_binacle-api-client_unit
     just test ts_binacle-service-client_unit
-    just test ts_binacle-net-ui_unit
+    just test ts_binacle-apps_unit
     just test ts_binacle-design-system_unit
     just test ts_theme-switcher_unit
     just test rb_binacle-docs_unit
@@ -85,7 +85,7 @@ all:
     just test ts_binacle-vipaq_unit
     just test ts_binacle-api-client_unit
     just test ts_binacle-service-client_unit
-    just test ts_binacle-net-ui_unit
+    just test ts_binacle-apps_unit
     just test ts_theme-switcher_unit
     just test ts_binacle-design-system_unit
     just test cs_binacle-net_unit
@@ -187,7 +187,7 @@ ts_binacle-api-client_unit: (_jest_test 'binacle-api-client')
 ts_binacle-service-client_unit: (_jest_test 'binacle-service-client')
 
 [private]
-ts_binacle-net-ui_unit: (_jest_test 'binacle-net-ui')
+ts_binacle-apps_unit: (_jest_test 'binacle-apps')
 
 [private]
 ts_theme-switcher_unit: (_jest_test 'theme-switcher')

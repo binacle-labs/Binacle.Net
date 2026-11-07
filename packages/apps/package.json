@@ -1,0 +1,32 @@
+{
+  "name": "@binacle/apps",
+  "version": "1.0.0",
+  "description": "The interactive apps on the demo site and the UI module, as Alpine.js plugins",
+  "main": "index.ts",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binacle-labs/Binacle.Net.git"
+  },
+  "private": true,
+  "dependencies": {
+    "@binacle/api-client": "*",
+    "@binacle/design-system": "*",
+    "@binacle/vipaq": "*",
+    "alpinejs": "^3.15.2"
+  },
+  "devDependencies": {
+    "@binacle/compact-notation": "*",
+    "@types/alpinejs": "^3.13.11",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}

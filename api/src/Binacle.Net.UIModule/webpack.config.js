@@ -56,11 +56,12 @@ module.exports = (env) => {
 						enforce: true,
 						priority: 10,
 					},
-					// The API client rides in this chunk rather than its own. Every chunk file is listed
-					// by hand in _AppletScripts.cshtml, so a new one is dead weight until a script tag
+					// The API client and the 3D view ride in this chunk rather than their own. Every chunk file
+					// is listed by hand in _AppletScripts.cshtml, so a new one is dead weight until a script tag
 					// names it.
 					binacleNetUi: {
-						test: /[\\/]packages[\\/](binacle-net-ui|api-client)[\\/]/,
+						test: /[\\/]packages[\\/](apps|api-client|design-system[\\/]components[\\/]pack-view)[\\/]/,
+						// A URL the pages and the smoke tests ask for, so it keeps the package's old name.
 						name: 'binacle-net-ui',
 						chunks: 'all',
 						enforce: true,

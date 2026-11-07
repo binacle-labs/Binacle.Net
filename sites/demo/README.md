@@ -36,7 +36,7 @@ Run `just install` once on a fresh clone, and `just assets` after changing anyth
 ## 🧩 The three demos
 
 Each is a page in `pages/` marked `demo: true`, with their behaviour in a `_js/` entry point that imports the
-shared packages from [`packages/`](../../packages) - `binacle-net-ui` for all three,
+shared packages from [`packages/`](../../packages) - `@binacle/apps` for all three,
 `design-system` for the site chrome. They are resolved through the npm workspace, not copied, so editing a
 package changes the site on the next webpack pass.
 

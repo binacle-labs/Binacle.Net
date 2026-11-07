@@ -9,18 +9,13 @@ module.exports = (env, argv) => {
 	console.log(`Environment Build: ${buildType}`);
 
 
-	// A second config, not a second entry: the esnext override below applies to the head script alone.
+	// A second config, as on the other two sites: the head script ships alone and without a source map.
 	const themeInit = {
 		mode: production ? 'production' : 'development',
 		entry: {'theme-init': './_js/theme-init.ts'},
 		output: {filename: '[name].js', path: path.resolve(__dirname, dest), clean: false},
 		resolve: {extensions: ['.ts', '.js', '.json']},
-		// esnext here only: tsconfig emits commonjs, and webpack cannot tree-shake or concatenate that -
-		// it costs this bundle its module registry, on a script that blocks the first paint.
-		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: {
-			loader: 'ts-loader',
-			options: {compilerOptions: {module: 'esnext', moduleResolution: 'bundler'}},
-		}}]},
+		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: 'ts-loader'}]},
 		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		devtool: false,
 	};
@@ -45,8 +40,7 @@ module.exports = (env, argv) => {
 			rules: [
 				{
 					test: /\.ts$/,
-					// Bundled files only: the head script's import resolves under the other config's settings alone.
-					use: {loader: 'ts-loader', options: {onlyCompileBundledFiles: true}},
+					use: 'ts-loader',
 					exclude: /node_modules/,
 				},
 			],
