@@ -48,7 +48,8 @@ command with no tag, or a selector row with no name.
 
 - **`{% vlink %}`, not `{% link %}`**, for anything inside a version. It joins the path onto the page's own
   version, so the same guide can link its neighbour without naming a version number. The tag comes from the
-  `binacle-docs-versions` gem in [`ruby/`](../../ruby), with the generator that stamps the version keys.
+  `binacle-docs` gem in [`ruby/`](../../ruby), with the generator that stamps the version keys and the
+  `doc_body` filter that gives each page its markup.
 - **`pages/404.html` carries `permalink: /404.html`.** Cloudflare is configured with `not_found_handling:
   "404-page"`, which looks for that exact name in the site root.
 

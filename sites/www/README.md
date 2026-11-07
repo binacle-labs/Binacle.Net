@@ -11,8 +11,8 @@ below.
 | Path | What it is |
 |---|---|
 | `pages/` | The pages, plus `404.html` and `robots.txt` |
-| `_sass/` | `main.scss`, which names the partials of `design/` this site uses. Compiled by the sass CLI, **not by Jekyll** |
-| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` this site calls, the menu drawer among them |
+| `_sass/` | `main.scss`, which names the partials of `design/` and `@binacle/design-system` this site uses. Compiled by the sass CLI, **not by Jekyll** |
+| `_js/` | The TypeScript source: the theme, and the parts of `binacle-components` and `@binacle/design-system` this site calls, the menu drawer among them |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
 | `_layouts/` | `default.html` is the bare document, `page.html` the header, main and footer around a page |
 | `_includes/` | The header and footer, the exchange, the run command, the trade-off list, and `drawings/`, one SVG per picture |
@@ -38,9 +38,13 @@ the sass CLI over `_sass/main.scss` and writes `css/main.css`, the same way `Bin
 the block back and two compilers have a claim on the same files. It also means **`css/` is gitignored** - it
 is build output, like `js/`.
 
-**The look comes from `design/` at the repo root.** `build:css` passes it as a load path, so a partial this site
-needs goes in `_sass/main.scss`. The asset copy puts `design/fonts/` in `fonts/`, which is gitignored like `css/`,
+**The look comes from `design/` and `packages/design-system`.** `build:css` passes `design/` as a load path and
+reaches the package by `pkg:`, so a partial this site needs goes in `_sass/main.scss`. The asset copy puts `design/fonts/` in `fonts/`, which is gitignored like `css/`,
 and skips everything under `assets/` this site does not read: `gulpfile.js` lists it.
+
+**Some includes are not in `_includes/`.** `_config.yml` sets `theme: binacle-design-system`, a gem the
+`Gemfile` loads from `packages/design-system`, and Jekyll reads its `_includes/` after this site's. The copy
+button comes from there. An include here of the same name wins.
 
 **Every code block on the site is a real response.** They live in `_data/exchange.yml`, and that file says how
 to re-run them. A response that looks plausible but is not what the API returns is the one thing this audience

@@ -32,7 +32,7 @@ group :jekyll_plugins do
   gem "jekyll-structured-data", path: "../../ruby/jekyll-structured-data"
   gem "jekyll-webmanifest", path: "../../ruby/jekyll-webmanifest"
   gem "jekyll-breadcrumb-trail", path: "../../ruby/jekyll-breadcrumb-trail"
-  gem "binacle-docs-versions", path: "../../ruby/binacle-docs-versions"
+  gem "binacle-docs", path: "../../ruby/binacle-docs"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -1,14 +1,14 @@
 {%- assign block = include.block -%}
 {%- capture response -%}
 <div class="code-block" data-code-block>
-            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">200</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">200</span></p>{% include components/copy-button.html %}</div>
             <pre class="code-block__pre"><code>{{ block.response | strip | escape }}</code></pre>
         </div>
 {%- endcapture -%}
 <div class="exchange">
     <div class="exchange__part">
         <div class="code-block" data-code-block>
-            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">{{ block.method }}</span><span>{{ block.path }}</span></p><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+            <div class="code-block__head"><p class="http-line code-block__http-line"><span class="http-line__badge http-line__badge--plain">{{ block.method }}</span><span>{{ block.path }}</span></p>{% include components/copy-button.html %}</div>
             <pre class="code-block__pre"><code>{{ block.request | strip | escape }}</code></pre>
         </div>
     </div>

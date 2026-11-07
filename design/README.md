@@ -85,6 +85,8 @@ another partial loaded it earlier, the build stops with *already loaded, so it c
 `.band__body.band__body--code-left`. Their rules win by that extra class; taking it off changes which rule wins.
 `.split .split__title` has one for the same reason: it has to beat `display-1`, which loads later.
 
+**`components/_copy-button.scss` only forwards** to [`packages/design-system`](../packages/design-system). Edit the copy button there.
+
 **Load `utilities/` last.** A type style shares its element with a block - `band__body prose` - and both set
 `gap`. Written on purpose, the type style has to win, so it comes after every block.
 

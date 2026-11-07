@@ -1,7 +1,7 @@
 ---
 description: Restructure and rename the npm packages and Ruby gems by what each one knows and who uses it, not by language - and give each site component one home for its Sass, TypeScript and markup.
 state: ready
-waits-on: "nothing - the trial in Trying it is the first piece. state and horizon written by an agent from his answers, strike them if wrong"
+waits-on: "nothing - the trial in Trying it passed; the rest is next. state and horizon written by an agent from his answers, strike them if wrong"
 horizon: now
 paths:
   - "packages/**"
@@ -32,11 +32,9 @@ the markup in each site. That one habit causes both faults:
   markup with the Sass class names, such as `drawer__sites` and `code-block__line`, so the three are kept in step
   by hand.
 - **One where it should be split.** A folder that means "the Ruby" takes any Ruby. So:
-  - `doc_body` and `doc_sections` sit in `ruby/jekyll-filters`, a generic gem every site loads. `doc_body` writes
-    the docs' own classes (`doc__text`, `code-block__pre`, `callout`, `http-line`), a Copy button with its word,
-    looks for the docs' phrases *Request Example* and *Response Example*, and assumes every response is a 200.
-    Only docs uses either. It also brings Nokogiri, an HTML parser, to all four sites. The maintainer,
-    2026-11-06: *"i dont like that we pout site specific classes into ruby gems that are generic"*.
+  - `doc_body` and `doc_sections`, which write the docs' own classes and phrases, sat in `ruby/jekyll-filters`, a
+    generic gem every site loads, and brought Nokogiri to all four sites. Now moved to `binacle-docs`. The
+    maintainer, 2026-11-06: *"i dont like that we pout site specific classes into ruby gems that are generic"*.
   - `binacle-net-ui` says it is *the UI module's implementation in TS*. It holds the apps, their Alpine helpers,
     the 3D view, which is a site component like the drawer, and *Everyday Items*, which only `demo` uses.
 
@@ -47,8 +45,7 @@ the markup in each site. That one habit causes both faults:
 - **The names have no rule.** `binacle-*`, `binacle-net-*` and no prefix at all sit side by side.
 - **The entry file moves around.** `theme-switcher`, `binacle-components` and `binacle-vipaq` export from a root
   `index.ts`; the two clients and `binacle-compact-notation` from `src/index.ts`.
-- **`theme-switcher` has no README**, and `binacle-docs-versions`' module is `Binacle::DocsVersions` where the gem
-  naming guide asks for `Binacle::Docs::Versions` (*The gems*).
+- **`theme-switcher` has no README.**
 - **The sites' npm names break the naming rule.** `binacle-net-www`, `binacle-net-docs` and `binacle-net-demo` are
   sites for the whole project, not the API.
 - `initNavFade` in `binacle-components` is exported and tested, and no site calls it yet. It stays: the sites show
@@ -286,7 +283,8 @@ ruby/<gem>/
   spec/               mirrors lib/
 ```
 
-**`binacle-docs-versions` becomes `binacle-docs`**: everything Ruby that only `docs` uses.
+**Done (agent, 2026-11-07): `binacle-docs-versions` is `binacle-docs`**, everything Ruby that only `docs` uses.
+`docs` builds the same HTML as before. He ran `just test sites`: it passes (the maintainer, 2026-11-07).
 
 ```
 ruby/binacle-docs/
@@ -294,15 +292,17 @@ ruby/binacle-docs/
   lib/binacle-docs.rb
   lib/binacle-docs/
     versions/          today's files: generator, pages, urls, versioned_file, vlink_tag, error
-    pager.rb
+    pager.rb           Binacle::Docs::Pager
     markup/            doc_body.rb, sections.rb (was headings.rb)
-  spec/
+  spec/                versions/, markup/, pager_spec.rb; fixtures/ stays at the top
 ```
 
 - **The module becomes `Binacle::Docs`**, with `Binacle::Docs::Versions` and `Binacle::Docs::Markup`. The RubyGems
   naming guide: a dash in a gem name is a nested module. Today's `Binacle::DocsVersions` breaks that.
 - **`jekyll-filters` goes back to generic** - plain text, title case, dates. Its gemspec drops Nokogiri; its README
   drops the two filters.
+- **The class that rewrites a page is `Converter`**, inside `Binacle::Docs::Markup::DocBody`. It was `Markup`, which
+  now names the module above it.
 - **`doc_body`'s class list must match the design system's Sass.** That is level 4 using level 3 names, which the
   rule allows. A theme gem cannot hold plugins - Jekyll loads only plugin gems a theme names as dependencies - so
   the filter cannot live inside the design system's gem.
@@ -351,11 +351,8 @@ The old names and paths are written in these places, beside each package's own f
 
 ## What could stop it
 
-- The `pkg:` importer and the `exports` conditions may not resolve through npm workspace links as the docs say.
-- A Jekyll theme gem from a local path may not find its includes, or may clash with `jekyll-include-cache`.
-- `jekyll-tidy` rewrites the same output as `doc_body`, so their order matters after the move.
-- Webpack may keep three.js in a site that never imports the 3D view, unless the package is ES modules with no
-  side effects. Then the 3D view stays in the apps package.
+- Webpack keeps three.js in a site that never imports the 3D view while the bundles are CommonJS (*What the
+  trial found*). Then the 3D view stays in the apps package.
 - The pre-paint script may grow once it is bundled from a bigger package, even through its own export path.
 
 ## Trying it
@@ -364,11 +361,37 @@ The old names and paths are written in these places, beside each package's own f
 design system and have `www` take it by `pkg:`, by import and by include. If a part fails, that part stays where
 it is and this plan says why.
 
+### What the trial found (agent, 2026-11-07)
+
+All three parts work. `packages/design-system/` holds the copy button; `www` takes it. Built before and after:
+`www`'s CSS is byte for byte the same, its HTML the same but for the sitemap's build time. `docs` and `demo` build
+and their CSS is unchanged. The jest tests pass. He ran `just test sites` and looked at `www` served: *"ok"* (the maintainer, 2026-11-07).
+
+- **`pkg:` and the `sass` condition resolve through the workspace link.** Sass 1.103 is installed.
+- **The theme gem works from a path.** `www`'s `Gemfile` names it, `_config.yml` sets `theme:`. No site calls
+  `include_cached`, so `jekyll-include-cache` has nothing to clash with.
+- **An include's final newline lands in the page.** Inline in a `div`, it moved `</div>` to its own line. The
+  include ends on a `{%- comment -%}` to eat it.
+- **A subpath import does not type-check on the sites.** Their `tsconfig.json` uses the old module resolution,
+  which ignores `exports`. `www` imports from the package root. With `moduleResolution: bundler` the subpath
+  passes. The pre-paint script's own path, `@binacle/design-system/theme-init`, needs that setting in its
+  webpack override.
+- **Nothing is tree-shaken today.** `www`'s bundle already carries tabs, lightbox, sticky sidebar and nav fade,
+  and calls none of them. The TypeScript compiles to CommonJS, so `"sideEffects": false` drops nothing. The
+  3D view in the design system's `index.ts` would put three.js in every site, unless the main bundles compile
+  to ES modules as the pre-paint script already does.
+- **The jest name is the folder, `design-system`, not the npm name.** `tooling/tests/jest.sh` names report files
+  after it, and a `/` makes a folder. The recipe is `ts_design-system_unit`.
+- **Coverage looked in `src/` only.** The design system's code sits in its Sass groups, so the root
+  `jest.config.js` now also collects `components/**`. Each group that gains a `.ts` needs its own line.
+- **Two bridges stay until `docs` and `demo` move:** `design/components/_copy-button.scss` forwards to the
+  package, and `binacle-components` re-exports `initCopyButton` from it.
+
 ## Done when
 
-- [ ] No `jekyll-*` gem names a class, a phrase or a path from one site. Check: `git grep -nE
+- [x] No `jekyll-*` gem names a class, a phrase or a path from one site. Check: `git grep -nE
       'doc__|code-block|callout|http-line' ruby/jekyll-*` finds nothing.
-- [ ] `jekyll-filters` has no Nokogiri: `grep -n nokogiri ruby/jekyll-filters/*.gemspec` finds nothing.
+- [x] `jekyll-filters` has no Nokogiri: `grep -n nokogiri ruby/jekyll-filters/*.gemspec` finds nothing.
 - [ ] Every workspace package's name starts `@binacle/`, or, without the scope, the clients keep their names.
       Check: the `name` of each workspace `package.json`.
 - [ ] Every npm package has the skeleton in *Inside every npm package*: a root `index.ts`, a README.

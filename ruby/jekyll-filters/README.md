@@ -35,14 +35,6 @@ plugins:
 - `capitalize_all` - capitalizes every word.
 - `expand_year` - replaces `{now}` with the year of the build. Pass your own placeholder as an argument if
   `{now}` does not suit you, but keep `}` out of it - see the gotchas.
-- `doc_body` - turns a rendered docs page into the design's markup: drops the emoji that opens a heading, a
-  bullet or a paragraph, makes callouts and code blocks, and puts a class on each block. Heading ids stay as
-  kramdown made them. A code block with `data-call` on it, `{: data-call="POST /path" }` or `{: data-call="200" }`
-  in the markdown, shows that in its head in place of the language. `data-name` shows a file or field name there
-  instead, and `data-wrap=""` wraps one long string. In a `}` inside an attribute, write `\}`. A table cell that
-  holds only code marked `{:.mono}` takes the class `mono` too.
-- `doc_sections` - lists a page's `h2`s as `id` and `title`, for an outline. Give it `doc_body`'s result, so the
-  titles carry no emoji.
 
 Write the placeholder into your data and let the filter fill it in:
 

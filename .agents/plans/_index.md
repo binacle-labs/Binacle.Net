@@ -27,10 +27,16 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
+- file: licensing-review.md
+  description: "Review which licence each part of the repository carries, starting with binacle-docs, which is one site's code under the MIT licence the generic gems use."
+  state: deferred
+  waits-on: "his call. He asked for binacle-docs to be AGPL, then (the maintainer, 2026-11-07): \\"we ill fix licensing later\\". state and horizon written by an agent, strike them if wrong"
+  horizon: undecided
+  paths: ["NOTICE", "README.md", "ruby/**/LICENSE", "ruby/**/*.gemspec", "packages/**/package.json", "packages/**/*.gemspec"]
 - file: packages-and-gems.md
   description: "Restructure and rename the npm packages and Ruby gems by what each one knows and who uses it, not by language - and give each site component one home for its Sass, TypeScript and markup."
   state: ready
-  waits-on: "nothing - the trial in Trying it is the first piece. state and horizon written by an agent from his answers, strike them if wrong"
+  waits-on: "nothing - the trial in Trying it passed; the rest is next. state and horizon written by an agent from his answers, strike them if wrong"
   horizon: now
   paths: ["packages/**", "design/**", "ruby/**", "vipaq/packages/**", "sites/www/**", "sites/docs/**", "sites/demo/**", "api/src/Binacle.Net.UIModule/**"]
 - file: results-across-slices.md

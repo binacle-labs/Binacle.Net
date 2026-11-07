@@ -13,6 +13,7 @@ module.exports = {
     "<rootDir>/packages/binacle-net-service-client",
     "<rootDir>/packages/binacle-net-ui",
     "<rootDir>/packages/cookies",
+    "<rootDir>/packages/design-system",
     "<rootDir>/packages/theme-switcher",
     "<rootDir>/vipaq/packages/binacle-vipaq",
   ],
@@ -20,6 +21,7 @@ module.exports = {
   // here match nothing and produce an empty report.
   collectCoverageFrom: [
     "src/**/*.ts",
+    "components/**/*.ts",
     "!src/**/index.ts",
     // Ambient declarations, so there is no runtime code to reach. Counted, they are permanently 0% and read
     // as untested code. Nothing else is excluded here: code that is merely untested stays in the denominator,

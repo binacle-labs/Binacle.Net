@@ -1,0 +1,5 @@
+<button type="button" class="copy-button{% if include.class %} {{ include.class }}{% endif %}" data-copy{% if include.copy %}="{{ include.copy }}"{% endif %} hidden>Copy</button>
+{%- comment -%}
+  copy: the id of the element to copy; left out, the code in the block around it. class: more classes.
+  Last, so its dash eats the file's final newline and the button sits inline where it is included.
+{%- endcomment -%}

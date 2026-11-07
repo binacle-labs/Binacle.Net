@@ -65,8 +65,9 @@ sites:
     just test ts_binacle-net-ui_unit
     just test ts_cookies_unit
     just test ts_binacle-components_unit
+    just test ts_design-system_unit
     just test ts_theme-switcher_unit
-    just test rb_binacle-docs-versions_unit
+    just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
     just test rb_jekyll-breadcrumb-trail_unit
     just test rb_jekyll-filters_unit
@@ -91,6 +92,7 @@ all:
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
     just test ts_binacle-components_unit
+    just test ts_design-system_unit
     just test cs_binacle-net_unit
     just test cs_binacle-net-kernel_unit
     just test cs_binacle-net-diagnostics-module_unit
@@ -99,7 +101,7 @@ all:
     just test cs_binacle-net-ui-module_integration
     just test cs_binacle-net_integration
     just test cs_binacle-net-service-module_integration Sqlite
-    just test rb_binacle-docs-versions_unit
+    just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
     just test rb_jekyll-breadcrumb-trail_unit
     just test rb_jekyll-filters_unit
@@ -201,10 +203,13 @@ ts_theme-switcher_unit: (_jest_test 'theme-switcher')
 [private]
 ts_binacle-components_unit: (_jest_test 'binacle-components')
 
+[private]
+ts_design-system_unit: (_jest_test 'design-system')
+
 # The Ruby tests. The argument is the gem's folder under ruby/.
 
 [private]
-rb_binacle-docs-versions_unit: (_rspec_test 'binacle-docs-versions')
+rb_binacle-docs_unit: (_rspec_test 'binacle-docs')
 
 [private]
 rb_binacle-robots_unit: (_rspec_test 'binacle-robots')

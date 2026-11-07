@@ -31,13 +31,13 @@ description: >-
                     the same way.</p>
             </div>
             <div class="code-block" data-code-block>
-                <div class="code-block__head"><span class="label" data-code-lang>Signature &middot; bash</span><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+                <div class="code-block__head"><span class="label" data-code-lang>Signature &middot; bash</span>{% include components/copy-button.html %}</div>
 <pre class="code-block__pre"><code>cosign verify binacle/binacle-net:3 \
   --certificate-identity-regexp '^https://github\.com/binacle-labs/Binacle\.Net/\.github/workflows/release-docker-image\.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com</code></pre>
             </div>
             <div class="code-block" data-code-block>
-                <div class="code-block__head"><span class="label" data-code-lang>Bill of materials &middot; bash</span><button type="button" class="copy-button" data-copy hidden>Copy</button></div>
+                <div class="code-block__head"><span class="label" data-code-lang>Bill of materials &middot; bash</span>{% include components/copy-button.html %}</div>
 <pre class="code-block__pre"><code>docker buildx imagetools inspect binacle/binacle-net:3</code></pre>
             </div>
             <p class="verdict">Use cosign 2.6.0 or later, or 3.0.1 or later. An older binary fails the check the

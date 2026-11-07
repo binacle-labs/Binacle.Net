@@ -135,7 +135,7 @@ plugins             :
   - jekyll-structured-data
   - jekyll-webmanifest
   - jekyll-breadcrumb-trail
-  - binacle-docs-versions
+  - binacle-docs
 
 ################################################################
 # Front Matter Defaults

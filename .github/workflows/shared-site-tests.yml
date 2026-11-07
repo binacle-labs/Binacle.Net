@@ -71,13 +71,17 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_binacle-components_unit
 
+      - name: Test - design-system
+        if: ${{ !cancelled() }}
+        run: just test ts_design-system_unit
+
       - name: Test - theme-switcher
         if: ${{ !cancelled() }}
         run: just test ts_theme-switcher_unit
 
-      - name: Test - binacle-docs-versions
+      - name: Test - binacle-docs
         if: ${{ !cancelled() }}
-        run: just test rb_binacle-docs-versions_unit
+        run: just test rb_binacle-docs_unit
 
       - name: Test - binacle-robots
         if: ${{ !cancelled() }}

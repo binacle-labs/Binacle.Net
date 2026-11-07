@@ -13,7 +13,8 @@ from the repo root with `npm install`.
 | `binacle-compact-notation` | Parses and formats the compact strings (`"60x40x30"`, `"108x76x30 [40]"`). TypeScript mirror of C# `Binacle.CompactNotation` |
 | `cookies` | Cookie read/write helpers. A vendored fork of js-cookie v3.0.5, MIT, kept close to upstream |
 | `theme-switcher` | Auto, light and dark theme button, as a `<theme-switcher>` custom element |
-| [`binacle-components`](binacle-components) | Page behaviour for the sites: the menu drawer, code wrapping, copy buttons, tabs and more. Nothing imports it yet |
+| [`binacle-components`](binacle-components) | Page behaviour for the sites: the menu drawer, code wrapping, tabs and more |
+| [`design-system`](design-system) | `@binacle/design-system`. A component's Sass, behaviour and markup in one folder. Holds the copy button so far |
 
 Every package has tests. From the repo root:
 
@@ -25,6 +26,7 @@ just test ts_binacle-net-ui_unit          # binacle-net-ui
 just test ts_cookies_unit         # cookies
 just test ts_theme-switcher_unit  # theme-switcher
 just test ts_binacle-components_unit  # binacle-components
+just test ts_design-system_unit       # design-system
 ```
 
 `binacle-compact-notation` has to agree with
@@ -36,7 +38,7 @@ between them. Its leaf is named after `shared` for that reason, not after this f
 The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
 the packing demo and the ViPaq decoder, those two, [`sites/www`](../sites/www) and [`sites/docs`](../sites/docs)
-use `theme-switcher`, the three sites use `binacle-components`, and the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`.
+use `theme-switcher`, the three sites use `binacle-components`, `www` uses `design-system`, and the local-only [`sites/admin`](../sites/admin) uses `binacle-net-service-client`.
 Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 

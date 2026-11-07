@@ -95,17 +95,18 @@ preamble, the Article 4 rights reservation and `User-Agent: *`; the `Sitemap:` l
 `{% sitemap_links %}` on the next line. There is no config - a body that can be configured per site is a
 body that can differ per site.
 
-Like `binacle-docs-versions`, the name says it is not portable. `binacle-robots/README.md` has the file
+Like `binacle-docs`, the name says it is not portable. `binacle-robots/README.md` has the file
 shape and the traps.
 
-### 📚 `binacle-docs-versions`
+### 📚 `binacle-docs`
 
 The one gem here written for a single site. It carries the version scheme of `sites/docs` - a generator
 stamps `title_suffix` and `robots` onto every versioned document, and `{% vlink %}` links to a file inside
-the version the page belongs to.
+the version the page belongs to. Its `doc_body` and `doc_sections` filters turn a rendered page into the
+docs' markup and list its sections.
 
 The vocabulary is hardcoded on purpose: making it configurable would put a scheme only one site uses in
-front of all of them. `binacle-docs-versions/README.md` has the two site keys it needs.
+front of all of them. `binacle-docs/README.md` has the two site keys it needs.
 
 ## 🧪 Tests
 

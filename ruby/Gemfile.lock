@@ -1,8 +1,9 @@
 PATH
-  remote: binacle-docs-versions
+  remote: binacle-docs
   specs:
-    binacle-docs-versions (1.0.0)
+    binacle-docs (1.0.0)
       jekyll (>= 4.2)
+      nokogiri (~> 1.12)
 
 PATH
   remote: binacle-robots
@@ -21,7 +22,6 @@ PATH
   specs:
     jekyll-filters (1.0.0)
       jekyll (>= 4.2)
-      nokogiri (~> 1.12)
 
 PATH
   remote: jekyll-gtm
@@ -184,7 +184,7 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
-  binacle-docs-versions!
+  binacle-docs!
   binacle-robots!
   jekyll-breadcrumb-trail!
   jekyll-filters!

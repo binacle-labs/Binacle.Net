@@ -11,7 +11,7 @@ and does nothing on a page that has none, so a site's entry calls only the parts
 | `src/drawer.ts` | `initDrawer` | The menu drawer. Builds one from the header's links, and opens and closes every `[data-drawer]` |
 | `src/navFade.ts` | `initNavFade` | Marks the sides of the phone nav that have more, so the CSS can fade them |
 | `src/stickySidebar.ts` | `initStickySidebar` | Shortens a sticky menu as the footer comes into the window |
-| `src/copyButton.ts` | `initCopyButton` | Shows the copy buttons and makes them work |
+| - | `initCopyButton` | Re-exported from [`design-system`](../design-system), where the copy button now lives |
 | `src/codeWrap.ts` | `initCodeWrap` | Sets where commands, inline code and code lines may break |
 | `src/tabs.ts` | `initTabs` | One panel per tab, in order |
 | `src/lightbox.ts` | `initLightbox` | Opens a still in the dialog it names |

@@ -1,5 +1,6 @@
 {%- assign id = include.id | default: 'run' -%}
+{%- assign copy_id = id | append: "-text" -%}
 <div class="command{% if include.class %} {{ include.class }}{% endif %}" data-command>
     <pre class="command__pre"><span class="command__prompt">$ </span><code id="{{ id }}-text">{{ site.data.exchange.command.text | strip }}</code></pre>
-    <button type="button" class="copy-button command__copy" data-copy="{{ id }}-text" hidden>Copy</button>
+    {% include components/copy-button.html class="command__copy" copy=copy_id %}
 </div>
