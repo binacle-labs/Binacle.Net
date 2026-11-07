@@ -57,9 +57,9 @@ export function pathSegments(path: string): Segment[] {
 	return segments;
 }
 
-const SEGMENTS_BY_KIND = new Map<number, Segment[]>(
+const SEGMENTS_BY_ITEM_TYPE = new Map<string, Segment[]>(
 	Object.values(PRINTS).map(print => [
-		print.kind,
+		print.itemType,
 		print.paths.reduce<Segment[]>((all, path) => all.concat(pathSegments(path)), [])
 	])
 );
@@ -84,9 +84,9 @@ export function largestPair(faces: Face[]): Face[] {
 	return [faces[first], faces[first + 1]];
 }
 
-// Scene sides, not API sides: the scene's y is up, so height comes before width. Null for a kind with no picture.
-export function printPositions(kind: number, length: number, height: number, width: number): number[] | null {
-	const segments = SEGMENTS_BY_KIND.get(kind);
+// Scene sides, not API sides: the scene's y is up, so height comes before width. Null for an item type with no picture.
+export function printPositions(itemType: string, length: number, height: number, width: number): number[] | null {
+	const segments = SEGMENTS_BY_ITEM_TYPE.get(itemType);
 	if (!segments) {
 		return null;
 	}

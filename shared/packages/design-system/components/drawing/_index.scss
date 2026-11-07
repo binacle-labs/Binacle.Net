@@ -314,10 +314,10 @@
   --ground: var(--tint);
 }
 
-// A drawing of named things takes the demo's kind colours.
+// A drawing of named things takes the category colours.
 @for $i from 1 through 6 {
-  .drawing__item.drawing__item--kind-#{$i} {
-    --face: var(--kind-#{$i});
+  .drawing__item.drawing__item--category-#{$i} {
+    --face: var(--category-#{$i});
   }
 }
 

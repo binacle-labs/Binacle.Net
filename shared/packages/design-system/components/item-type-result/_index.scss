@@ -1,6 +1,6 @@
-// One kind in the result: how many of it went in. A press shows only that kind in the view.
+// One item type in the result: how many of it went in. A press shows only that item type in the view.
 
-.kind-result {
+.item-type-result {
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr) auto;
   align-items: center;
@@ -26,7 +26,7 @@
   }
 }
 
-.kind-result .kind-result__count {
+.item-type-result .item-type-result__count {
   font-family: var(--font-mono);
   font-size: var(--size-label);
   color: var(--muted);

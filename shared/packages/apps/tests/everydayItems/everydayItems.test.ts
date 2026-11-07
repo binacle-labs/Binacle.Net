@@ -3,7 +3,7 @@ import type {PackBinResponse} from "@binacle/api-client";
 import {Logger} from "../../src/components/logger/logger";
 import type {PackScene} from "../../src/components/packView/packViewComponent";
 import {boxAsked, everydayItemsApp, sizeText} from "../../src/everydayItems/everydayItems";
-import {BOXES, KINDS} from "../../src/everydayItems/kinds";
+import {BOXES, ITEM_TYPES} from "../../src/everydayItems/itemTypes";
 
 interface Dispatched {
 	name: string;
@@ -84,7 +84,7 @@ function lastScene(dispatched: Dispatched[]): Promise<PackScene | null> {
 	return (scenes[scenes.length - 1].detail as SceneThunk)();
 }
 
-function only(app: EverydayItems, counts: Record<number, number>) {
+function only(app: EverydayItems, counts: Record<string, number>) {
 	app.model.counts = counts;
 }
 
@@ -146,7 +146,7 @@ describe("opening the page", () => {
 describe("the steppers", () => {
 	test("add and take away one", () => {
 		const {app} = createApp();
-		const mug = KINDS[4];
+		const mug = ITEM_TYPES[4];
 
 		app.changeCount(mug, 1);
 		expect(app.countOf(mug)).toBe(3);
@@ -156,7 +156,7 @@ describe("the steppers", () => {
 
 	test("stop at nought and at nine", () => {
 		const {app} = createApp();
-		const kettle = KINDS[0];
+		const kettle = ITEM_TYPES[0];
 
 		app.changeCount(kettle, -1);
 		expect(app.canRemove(kettle)).toBe(false);
@@ -189,10 +189,10 @@ describe("the request", () => {
 		expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/v4/pack/bin/sample/Large");
 	});
 
-	test("asks for Best Fit Decreasing, with each kind once by its name", async () => {
+	test("asks for Best Fit Decreasing, with each item type once by its name", async () => {
 		const fetchMock = mockFetch(stubResponse(200, packed()));
 		const {app} = createApp();
-		only(app, {1: 2, 6: 1});
+		only(app, {"Boxed kettle": 2, "Phone box": 1});
 
 		await app.onSubmit();
 
@@ -229,7 +229,7 @@ describe("the request", () => {
 });
 
 describe("the answer", () => {
-	test("draws the items coloured by kind, named by the kind list", async () => {
+	test("draws the items by item type, each with its colour", async () => {
 		mockFetch(stubResponse(200, packed()));
 		const {app, dispatched} = createApp();
 
@@ -237,9 +237,9 @@ describe("the answer", () => {
 		const scene = await lastScene(dispatched);
 
 		expect(scene?.bin).toEqual({id: "Large", length: 62, width: 45, height: 36});
-		expect(scene?.items?.map(item => item.kind)).toEqual([1, 6]);
+		expect(scene?.items?.map(item => item.itemType)).toEqual(["Boxed kettle", "Phone box"]);
+		expect(scene?.items?.map(item => item.category)).toEqual([1, 6]);
 		expect(scene?.items?.[0]).not.toHaveProperty("id");
-		expect(scene?.kindNames).toEqual(KINDS.map(kind => kind.name));
 		expect(scene?.reveal).toBe(true);
 	});
 
@@ -258,24 +258,24 @@ describe("the answer", () => {
 			unpackedItems: [{id: "Boxed kettle", quantity: 1}],
 		})));
 		const {app} = createApp();
-		only(app, {1: 2, 6: 1});
+		only(app, {"Boxed kettle": 2, "Phone box": 1});
 
 		await app.onSubmit();
 
 		expect(app.status).toBe("2 of 3 items fit. 1 did not.");
-		expect(app.kindResultText(KINDS[0])).toBe("1 of 2 packed - 1 did not fit");
-		expect(app.unfitCountOf(KINDS[0])).toBe(1);
-		expect(app.kindResultText(KINDS[5])).toBe("1 of 1 packed");
+		expect(app.itemTypeResultText(ITEM_TYPES[0])).toBe("1 of 2 packed - 1 did not fit");
+		expect(app.unfitCountOf(ITEM_TYPES[0])).toBe(1);
+		expect(app.itemTypeResultText(ITEM_TYPES[5])).toBe("1 of 1 packed");
 	});
 
-	test("lists only the kinds asked for", async () => {
+	test("lists only the item types asked for", async () => {
 		mockFetch(stubResponse(200, packed()));
 		const {app} = createApp();
-		only(app, {1: 2, 6: 1});
+		only(app, {"Boxed kettle": 2, "Phone box": 1});
 
 		await app.onSubmit();
 
-		expect(app.resultKinds().map(kind => kind.name)).toEqual(["Boxed kettle", "Phone box"]);
+		expect(app.resultItemTypes().map(itemType => itemType.name)).toEqual(["Boxed kettle", "Phone box"]);
 	});
 
 	test("the summary row reads the box, its size, the count and the fill", async () => {
@@ -345,24 +345,24 @@ describe("a failure", () => {
 	});
 });
 
-describe("pressing a kind in the answer", () => {
-	test("shows that kind alone, and a second press shows them all", async () => {
+describe("pressing an item type in the answer", () => {
+	test("shows that item type alone, and a second press shows them all", async () => {
 		mockFetch(stubResponse(200, packed()));
 		const {app, dispatched} = createApp();
 		await app.onSubmit();
 
-		app.toggleKind(KINDS[0]);
-		expect(app.isLit(KINDS[0])).toBe(true);
-		app.toggleKind(KINDS[0]);
+		app.toggleItemType(ITEM_TYPES[0]);
+		expect(app.isLit(ITEM_TYPES[0])).toBe(true);
+		app.toggleItemType(ITEM_TYPES[0]);
 
-		expect(dispatched.filter(x => x.name === "highlight-kind").map(x => x.detail)).toEqual([1, null]);
+		expect(dispatched.filter(x => x.name === "highlight-item-type").map(x => x.detail)).toEqual(["Boxed kettle", null]);
 	});
 
 	test("a new answer starts with none pressed", async () => {
 		mockFetch(stubResponse(200, packed()));
 		const {app} = createApp();
 		await app.onSubmit();
-		app.toggleKind(KINDS[0]);
+		app.toggleItemType(ITEM_TYPES[0]);
 
 		await app.onSubmit();
 
@@ -378,6 +378,6 @@ describe("the words", () => {
 	test("an item's size carries its unit", () => {
 		const {app} = createApp();
 
-		expect(app.kindSizeText(KINDS[0])).toBe("24 x 20 x 28 cm");
+		expect(app.itemTypeSizeText(ITEM_TYPES[0])).toBe("24 x 20 x 28 cm");
 	});
 });

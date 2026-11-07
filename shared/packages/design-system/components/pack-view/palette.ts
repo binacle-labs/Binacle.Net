@@ -1,4 +1,4 @@
-import {faceColors, KINDS, printColor, RAMP_STEPS} from "./colors";
+import {CATEGORIES, faceColors, printColor, RAMP_STEPS} from "./colors";
 
 export default interface Palette {
 	ground: string;
@@ -6,7 +6,7 @@ export default interface Palette {
 	itemLine: string;
 	ramp: string[][];
 	rest: string[];
-	kinds: string[][];
+	categories: string[][];
 	prints: string[];
 }
 
@@ -25,7 +25,7 @@ export function readPalette(element: Element): Palette {
 		itemLine: token("--item-line") || ground,
 		ramp: steps(RAMP_STEPS, step => faceColors(token(`--item-${step}`))),
 		rest: faceColors(token("--item-rest")),
-		kinds: steps(KINDS, step => faceColors(token(`--kind-${step}`))),
-		prints: Array.from({length: KINDS}, (_, index) => printColor(token(`--kind-${index + 1}`)))
+		categories: steps(CATEGORIES, step => faceColors(token(`--category-${step}`))),
+		prints: Array.from({length: CATEGORIES}, (_, index) => printColor(token(`--category-${index + 1}`)))
 	};
 }

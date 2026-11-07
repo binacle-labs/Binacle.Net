@@ -1,5 +1,5 @@
 export const RAMP_STEPS = 6;
-export const KINDS = 6;
+export const CATEGORIES = 6;
 
 const TOP_LIFT = 0.08;
 const RIGHT_DROP = 0.09;
@@ -53,10 +53,10 @@ export function rampStep(index: number, count: number): number {
 	return count <= 1 ? 0 : Math.round(index * (RAMP_STEPS - 1) / (count - 1));
 }
 
-// At rest every item is in colour; while stepping only the last one placed is. A lit kind overrides both.
-export function isInColor(index: number, kind: number | undefined, shown: number, count: number, lit: number | null): boolean {
+// At rest every item is in colour; while stepping only the last one placed is. A lit item type overrides both.
+export function isInColor(index: number, itemType: string | undefined, shown: number, count: number, lit: string | null): boolean {
 	if (lit) {
-		return kind === lit;
+		return itemType === lit;
 	}
 	return shown === count || index === shown - 1;
 }

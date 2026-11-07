@@ -17,7 +17,6 @@ const PLAY_LABEL = "Play the placement order";
 const STOP_LABEL = "Stop";
 
 export interface ShowOptions {
-	kindNames?: string[];
 	note?: string;
 }
 
@@ -25,7 +24,7 @@ export interface PackView {
 	preview(bin: Dimensions): void;
 	show(bin: Dimensions, items: PackItem[], options?: ShowOptions): void;
 	wait(bin: Dimensions | null): void;
-	highlight(kind: number | null): void;
+	highlight(itemType: string | null): void;
 	clear(): void;
 }
 
@@ -49,8 +48,8 @@ function edges(geometry: BufferGeometry, color: string, offset = 0): LineSegment
 	}));
 }
 
-function printLines(kind: number, item: PackItem, color: string): LineSegments2 | null {
-	const positions = printPositions(kind, item.length, item.height, item.width);
+function printLines(itemType: string, item: PackItem, color: string): LineSegments2 | null {
+	const positions = printPositions(itemType, item.length, item.height, item.width);
 	if (!positions) {
 		return null;
 	}
@@ -128,9 +127,8 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 	let binLines: LineSegments2 | null = null;
 	let shown = 0;
 	let timer: number | null = null;
-	let kindNames: string[] = [];
 	let note = "";
-	let lit: number | null = null;
+	let lit: string | null = null;
 	let waiting = false;
 
 	function readColors() {
@@ -207,7 +205,7 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 
 		const outline = edges(geometry, palette.itemLine);
 		mesh.add(outline);
-		const print = item.kind ? printLines(item.kind, item, palette.prints[item.kind - 1]) : null;
+		const print = item.itemType && item.category ? printLines(item.itemType, item, palette.prints[item.category - 1]) : null;
 		if (print) {
 			mesh.add(print);
 		}
@@ -216,15 +214,15 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 
 	function paint() {
 		drawn.forEach(({mesh, outline, print}, index) => {
-			const {kind} = items[index];
-			const own = kind ? palette.kinds[kind - 1] : palette.ramp[rampStep(index, items.length)];
-			const inColor = isInColor(index, kind, shown, items.length, lit);
+			const {itemType, category} = items[index];
+			const own = category ? palette.categories[category - 1] : palette.ramp[rampStep(index, items.length)];
+			const inColor = isInColor(index, itemType, shown, items.length, lit);
 			const faces = inColor ? own : palette.rest;
 			mesh.material.forEach((material, face) => material.color.set(faces[face]));
 			outline.material.color.set(palette.itemLine);
 			if (print) {
 				print.visible = inColor;
-				print.material.color.set(palette.prints[kind! - 1]);
+				print.material.color.set(palette.prints[category! - 1]);
 			}
 		});
 	}
@@ -248,7 +246,7 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 	// Built from elements, not markup: an item's id is whatever the user typed.
 	function itemReadout(element: HTMLElement) {
 		const item = items[shown - 1];
-		const name = item.id || (item.kind ? kindNames[item.kind - 1] : "");
+		const name = item.id || item.itemType || "";
 
 		const count = document.createElement("span");
 		count.className = "pack-view__count";
@@ -398,7 +396,6 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 		stop();
 		waiting = false;
 		figure.classList.remove("pack-view--waiting");
-		kindNames = options.kindNames ?? [];
 		note = options.note ?? "";
 		lit = null;
 		drawn.forEach(({mesh}) => dispose(mesh));
@@ -419,8 +416,8 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 		show(newBin, newItems, options) {
 			load(newBin, newItems, newItems.length, options);
 		},
-		highlight(kind) {
-			lit = kind || null;
+		highlight(itemType) {
+			lit = itemType || null;
 			paint();
 			render();
 		},

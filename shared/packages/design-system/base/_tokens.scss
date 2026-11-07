@@ -56,13 +56,13 @@ $font-path: "fonts/" !default;
   --item-6: oklch(0.468 0.08 247.2);
   // Items placed before the latest one, during playback.
   --item-rest: oklch(0.86 0.012 247.2);
-  // The demo colours items by kind. Lightness is spread so the kinds stay apart for red-green colour blindness.
-  --kind-1: oklch(0.62 0.095 250);
-  --kind-2: oklch(0.56 0.11 32);
-  --kind-3: oklch(0.82 0.10 90);
-  --kind-4: oklch(0.68 0.09 142);
-  --kind-5: oklch(0.74 0.07 198);
-  --kind-6: oklch(0.50 0.085 345);
+  // Colours that tell things apart, as the demo's item types. Lightness is spread so they stay apart for red-green colour blindness.
+  --category-1: oklch(0.62 0.095 250);
+  --category-2: oklch(0.56 0.11 32);
+  --category-3: oklch(0.82 0.10 90);
+  --category-4: oklch(0.68 0.09 142);
+  --category-5: oklch(0.74 0.07 198);
+  --category-6: oklch(0.50 0.085 345);
   // The line round each item in the 3D view.
   --item-line: #8c857a;
   --bin-line: var(--muted);
@@ -126,12 +126,12 @@ $font-path: "fonts/" !default;
   --item-5: oklch(0.682 0.08 247.2);
   --item-6: oklch(0.62 0.08 247.2);
   --item-rest: oklch(0.36 0.008 80);
-  --kind-1: oklch(0.70 0.085 247);
-  --kind-2: oklch(0.58 0.10 42);
-  --kind-3: oklch(0.66 0.10 85);
-  --kind-4: oklch(0.74 0.08 140);
-  --kind-5: oklch(0.78 0.075 200);
-  --kind-6: oklch(0.62 0.08 350);
+  --category-1: oklch(0.70 0.085 247);
+  --category-2: oklch(0.58 0.10 42);
+  --category-3: oklch(0.66 0.10 85);
+  --category-4: oklch(0.74 0.08 140);
+  --category-5: oklch(0.78 0.075 200);
+  --category-6: oklch(0.62 0.08 350);
   --item-line: #5a5349;
   // The 3D view's bin: between muted and ink, muted alone is too weak on the dark tint.
   --bin-line: #ccc7bd;

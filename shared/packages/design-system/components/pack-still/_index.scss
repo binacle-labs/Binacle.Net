@@ -31,8 +31,8 @@
 }
 
 @for $i from 1 through 6 {
-  .pack-still .pack-still__item--kind-#{$i} {
-    --k: var(--kind-#{$i});
+  .pack-still .pack-still__item--category-#{$i} {
+    --k: var(--category-#{$i});
   }
 }
 

@@ -1,13 +1,13 @@
-// The kinds of item, each with its colour key, its name and size, and how many go in.
+// The item types, each with its colour key, its name and size, and how many go in.
 @use "../../abstracts/tiers";
 
-.kind-list {
+.item-type-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.kind-list__item {
+.item-type-list__item {
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr) auto;
   align-items: center;
@@ -21,7 +21,7 @@
 }
 
 // The size sits beside the name, so a row is one hit tall. It drops under the name only when there is no room.
-.kind-list__name {
+.item-type-list__name {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;

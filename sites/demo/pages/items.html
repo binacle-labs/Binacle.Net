@@ -49,17 +49,17 @@ excerpt: |
 
           <fieldset class="form__group form__group--list">
             <legend class="form__legend label">Items</legend>
-            <ul class="kind-list">
-              <template x-for="kind in kinds" :key="kind.kind">
-                <li class="kind-list__item">
-                  <span class="kind-key" :style="kindKeyStyle(kind)" aria-hidden="true"></span>
-                  <span class="kind-list__name"><span x-text="kind.name"></span><span class="mono" x-text="kindSizeText(kind)"></span></span>
+            <ul class="item-type-list">
+              <template x-for="itemType in itemTypes" :key="itemType.name">
+                <li class="item-type-list__item">
+                  <span class="item-type-key" :style="itemTypeKeyStyle(itemType)" aria-hidden="true"></span>
+                  <span class="item-type-list__name"><span x-text="itemType.name"></span><span class="mono" x-text="itemTypeSizeText(itemType)"></span></span>
                   <span class="stepper">
-                    <button type="button" class="stepper__button" :disabled="!canRemove(kind)"
-                            :aria-label="'One less ' + kind.name.toLowerCase()" @click="changeCount(kind, -1)">-</button>
-                    <output class="stepper__count" :aria-label="kind.name" x-text="countOf(kind)"></output>
-                    <button type="button" class="stepper__button" :disabled="!canAdd(kind)"
-                            :aria-label="'One more ' + kind.name.toLowerCase()" @click="changeCount(kind, 1)">+</button>
+                    <button type="button" class="stepper__button" :disabled="!canRemove(itemType)"
+                            :aria-label="'One less ' + itemType.name.toLowerCase()" @click="changeCount(itemType, -1)">-</button>
+                    <output class="stepper__count" :aria-label="itemType.name" x-text="countOf(itemType)"></output>
+                    <button type="button" class="stepper__button" :disabled="!canAdd(itemType)"
+                            :aria-label="'One more ' + itemType.name.toLowerCase()" @click="changeCount(itemType, 1)">+</button>
                   </span>
                 </li>
               </template>
@@ -99,12 +99,12 @@ excerpt: |
                 </div>
               </li>
             </template>
-            <template x-for="kind in (result ? resultKinds() : [])" :key="kind.kind">
+            <template x-for="itemType in (result ? resultItemTypes() : [])" :key="itemType.name">
               <li class="result-list__item">
-                <button type="button" class="kind-result" :aria-pressed="isLit(kind) ? 'true' : 'false'" @click="toggleKind(kind)">
-                  <span class="kind-key" :style="kindKeyStyle(kind)" aria-hidden="true"></span>
-                  <span x-text="kind.name"></span>
-                  <span class="kind-result__count" :class="unfitCountOf(kind) > 0 ? 'is-short' : ''" x-text="kindResultText(kind)"></span>
+                <button type="button" class="item-type-result" :aria-pressed="isLit(itemType) ? 'true' : 'false'" @click="toggleItemType(itemType)">
+                  <span class="item-type-key" :style="itemTypeKeyStyle(itemType)" aria-hidden="true"></span>
+                  <span x-text="itemType.name"></span>
+                  <span class="item-type-result__count" :class="unfitCountOf(itemType) > 0 ? 'is-short' : ''" x-text="itemTypeResultText(itemType)"></span>
                 </button>
               </li>
             </template>

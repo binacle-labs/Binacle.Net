@@ -38,7 +38,7 @@ export const packViewComponent = defineComponent(() => {
 		} else if (!scene.items) {
 			view.preview(scene.bin);
 		} else {
-			view.show(scene.bin, scene.items, {kindNames: scene.kindNames, note: scene.note});
+			view.show(scene.bin, scene.items, {note: scene.note});
 		}
 		if (scene?.reveal) {
 			reveal();
@@ -63,8 +63,8 @@ export const packViewComponent = defineComponent(() => {
 				}
 			}
 		},
-		highlight(kind: number | null) {
-			view.highlight(kind);
+		highlight(itemType: string | null) {
+			view.highlight(itemType);
 		},
 		init() {
 			figure = this.$el;

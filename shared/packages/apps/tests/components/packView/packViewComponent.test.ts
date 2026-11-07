@@ -61,15 +61,15 @@ describe("updating the scene", () => {
 
 		await component.updateScene(answer({bin, items}));
 
-		expect(view.show).toHaveBeenCalledWith(bin, items, {kindNames: undefined, note: undefined});
+		expect(view.show).toHaveBeenCalledWith(bin, items, {note: undefined});
 	});
 
-	test("the kind names and the note go with the answer", async () => {
+	test("the note goes with the answer", async () => {
 		const {component, view} = createComponent();
 
-		await component.updateScene(answer({bin, items, kindNames: ["Mug"], note: "Note"}));
+		await component.updateScene(answer({bin, items, note: "Note"}));
 
-		expect(view.show).toHaveBeenCalledWith(bin, items, {kindNames: ["Mug"], note: "Note"});
+		expect(view.show).toHaveBeenCalledWith(bin, items, {note: "Note"});
 	});
 
 	test("a bin with no items draws the bin alone", async () => {
@@ -86,7 +86,7 @@ describe("updating the scene", () => {
 
 		await component.updateScene(answer({bin, items: [], note: "Nothing fits"}));
 
-		expect(view.show).toHaveBeenCalledWith(bin, [], {kindNames: undefined, note: "Nothing fits"});
+		expect(view.show).toHaveBeenCalledWith(bin, [], {note: "Nothing fits"});
 		expect(view.preview).not.toHaveBeenCalled();
 	});
 
@@ -210,12 +210,12 @@ describe("a failed update", () => {
 	});
 });
 
-describe("highlighting a kind", () => {
+describe("highlighting an item type", () => {
 	test("passes on to the view", () => {
 		const {component, view} = createComponent();
 
-		component.highlight(2);
+		component.highlight("Shoebox");
 
-		expect(view.highlight).toHaveBeenCalledWith(2);
+		expect(view.highlight).toHaveBeenCalledWith("Shoebox");
 	});
 });

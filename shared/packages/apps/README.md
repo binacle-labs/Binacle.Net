@@ -34,12 +34,13 @@ dispatches `update-scene` with a function that returns a promise of a scene:
 | Scene | What the view draws |
 |---|---|
 | `{bin}` | The bin alone, before any answer |
-| `{bin, items}` | An answer. Items are the API's shape, with an optional `id` and `kind` |
+| `{bin, items}` | An answer. Items are the API's shape, with an optional `id`, `itemType` and `category` |
 | `{bin, items: [], note}` | An answer with nothing in it. The note shows under the view |
 | `null`, or no `bin` | Nothing |
 
-`kindNames` goes beside `items`, and the readout names each item by it. The loader shows while the promise runs.
-Dispatching `highlight-kind` with a kind shows only that kind in colour; `null` shows them all again.
+`category` picks the item's colour, and `itemType` its picture and the name the readout shows. The loader shows
+while the promise runs. Dispatching `highlight-item-type` with an item type's name shows only that item type in
+colour; `null` shows them all again.
 
 The figure's markup and colours are the host's: [`design-system`](../design-system) says what the view needs.
 

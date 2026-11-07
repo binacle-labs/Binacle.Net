@@ -84,9 +84,9 @@ describe("isInColor", () => {
 		expect(isInColor(1, undefined, 2, 3, null)).toBe(true);
 	});
 
-	test("a lit kind greys every other kind, at rest too", () => {
-		expect(isInColor(0, 2, 3, 3, 2)).toBe(true);
-		expect(isInColor(1, 3, 3, 3, 2)).toBe(false);
-		expect(isInColor(2, undefined, 3, 3, 2)).toBe(false);
+	test("a lit item type greys every other item type, at rest too", () => {
+		expect(isInColor(0, "Shoebox", 3, 3, "Shoebox")).toBe(true);
+		expect(isInColor(1, "Cereal box", 3, 3, "Shoebox")).toBe(false);
+		expect(isInColor(2, undefined, 3, 3, "Shoebox")).toBe(false);
 	});
 });
