@@ -4,5 +4,6 @@ export {initDrawer} from "./components/drawer/drawer";
 export {initLightbox} from "./components/lightbox/lightbox";
 export {initTabs} from "./components/tabs/tabs";
 export {initThemeButton} from "./components/theme-button/themeButton";
+export {currentTheme} from "@binacle/theme-switcher";
 export {initStickySidebar} from "./layout/sidebar/stickySidebar";
 export {initNavFade} from "./layout/site-header/navFade";

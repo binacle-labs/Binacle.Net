@@ -40,13 +40,13 @@ layout: default
             {{ body }}
         </div>
         {% endif %}
-        {% if page.pager.previous or page.pager.next %}
+        {% if page.prev_next.previous or page.prev_next.next %}
         <nav class="pager" data-pager aria-label="Previous and next">
-            {%- if page.pager.previous %}
-            <a class="pager__link" rel="prev" href="{{ page.pager.previous.url | relative_url }}"><span class="label">Previous</span><span class="pager__title">{{ page.pager.previous.title }}</span></a>
+            {%- if page.prev_next.previous %}
+            <a class="pager__link" rel="prev" href="{{ page.prev_next.previous.url | relative_url }}"><span class="label">Previous</span><span class="pager__title">{{ page.prev_next.previous.title }}</span></a>
             {%- endif %}
-            {%- if page.pager.next %}
-            <a class="pager__link" rel="next" href="{{ page.pager.next.url | relative_url }}"><span class="label">Next</span><span class="pager__title">{{ page.pager.next.title }}</span></a>
+            {%- if page.prev_next.next %}
+            <a class="pager__link" rel="next" href="{{ page.prev_next.next.url | relative_url }}"><span class="label">Next</span><span class="pager__title">{{ page.prev_next.next.title }}</span></a>
             {%- endif %}
         </nav>
         {% endif %}

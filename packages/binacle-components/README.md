@@ -1,7 +1,7 @@
 # binacle-components
 
-Forwards to [`design-system`](../design-system), where the page behaviour the sites share now lives. `docs` and
-`demo` still import from here; `www` imports from the design system.
+Forwards to [`design-system`](../design-system), where the page behaviour the sites share now lives. `demo`
+still imports from here; `www` and `docs` import from the design system.
 
 ## 🚀 How you use it
 

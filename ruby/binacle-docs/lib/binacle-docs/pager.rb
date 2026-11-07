@@ -16,7 +16,8 @@ module Binacle
       def stamp
         entries = [home, *walk(nil)].compact
         entries.each_with_index do |entry, position|
-          entry[:doc].data['pager'] = {
+          # Not 'pager': Jekyll asks every page for one, for its own pagination, and warns.
+          entry[:doc].data['prev_next'] = {
             'previous' => link(entries, position - 1, position.positive?),
             'next' => link(entries, position + 1, position < entries.size - 1)
           }.compact

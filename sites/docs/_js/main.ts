@@ -1,9 +1,16 @@
-import {initCodeWrap, initCopyButton, initDrawer, initLightbox, initStickySidebar, initTabs} from "binacle-components";
-import {ThemeSwitcherButtonElement, currentTheme, optionsFromDocument} from "@binacle/theme-switcher";
+import {
+	currentTheme,
+	initCodeWrap,
+	initCopyButton,
+	initDrawer,
+	initLightbox,
+	initStickySidebar,
+	initTabs,
+	initThemeButton,
+} from "@binacle/design-system";
 import {initSections} from "./sections";
 
-ThemeSwitcherButtonElement.configure(optionsFromDocument());
-customElements.define("theme-switcher", ThemeSwitcherButtonElement);
+initThemeButton();
 
 function initVersionSelect(): void {
 	document.querySelectorAll<HTMLSelectElement>("[data-versionselect]").forEach((select) => {

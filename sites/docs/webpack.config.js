@@ -18,7 +18,7 @@ module.exports = (env, argv) => {
 		// it costs this bundle its module registry, on a script that blocks the first paint.
 		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: {
 			loader: 'ts-loader',
-			options: {compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
+			options: {compilerOptions: {module: 'esnext', moduleResolution: 'bundler'}},
 		}}]},
 		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		devtool: false,
@@ -44,7 +44,8 @@ module.exports = (env, argv) => {
 			rules: [
 				{
 					test: /\.ts$/,
-					use: 'ts-loader',
+					// Bundled files only: the head script's import resolves under the other config's settings alone.
+					use: {loader: 'ts-loader', options: {onlyCompileBundledFiles: true}},
 					exclude: /node_modules/,
 				},
 			],

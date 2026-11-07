@@ -4,7 +4,7 @@
 components, plus the fonts and the mark. Each block keeps its Sass and its behaviour in one folder, and its shared
 markup in `_includes/`. A site builds its own CSS from the parts it needs. Nothing here is built on its own.
 
-`www` reads it by `pkg:` and by import. `docs` and `demo` still pass this folder as a Sass load path and import
+`www` and `docs` read it by `pkg:` and by import. `demo` still passes this folder as a Sass load path and imports
 the behaviour through [`binacle-components`](../binacle-components), which forwards here.
 
 ## 📂 What is in it
@@ -95,6 +95,8 @@ The behaviour, from the package root. The pre-paint script has its own path, so 
 import {initCopyButton, initDrawer, initThemeButton} from "@binacle/design-system";
 import {initTheme} from "@binacle/design-system/theme-init";
 ```
+
+`currentTheme` comes from the root too, so a site that reads the theme does not depend on `theme-switcher` itself.
 
 The markup, once the site's `Gemfile` names the gem by path and its `_config.yml` sets
 `theme: binacle-design-system`:

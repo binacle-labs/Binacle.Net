@@ -473,9 +473,23 @@ HTML, and `main.js` of the same size. `ts_binacle-design-system_unit` passes, wi
   check also reads `theme-init.ts`, whose subpath import needs the other config's `moduleResolution: bundler`.
 - **`index.scss` forwards every part that writes CSS**, in load order. Nothing uses it yet; it compiles.
 
-**Left for `docs` and `demo`, one session each:** `pkg:` in `main.scss` and no load path, imports from the design
-system, `initThemeButton`, the pre-paint script's subpath and `onlyCompileBundledFiles`, and their `package.json`
-dependencies. The second deletes `binacle-components`.
+### Session 4, `docs` (agent, 2026-11-07)
+
+In the working tree. `docs` reads only the design system, the way `www` does: Sass by `pkg:`, behaviour by import,
+`initThemeButton`, the pre-paint script by its subpath, `onlyCompileBundledFiles`. It no longer lists
+`theme-switcher` or `binacle-components`.
+
+Built before and after: CSS, HTML and pre-paint script byte for byte the same, but for the sitemap's build time.
+`main.js` holds the same modules plus `themeButton.ts`, and the design system's `index.ts` in place of
+`binacle-components`'. `ts_binacle-design-system_unit` passes.
+
+- **The design system re-exports `currentTheme`.** `docs` reads it to theme the Swagger frame. Without it `docs`
+  would list `theme-switcher` again.
+- **No theme gem.** `docs` has no Liquid include of the copy button; `binacle-docs` writes its markup.
+- **`docs`' vendors chunk stays.** It was empty before and is still; the workspace packages resolve to
+  `packages/`, not `node_modules/`.
+
+**Left for `demo`:** the same steps, then deleting `binacle-components`.
 
 ## Done when
 

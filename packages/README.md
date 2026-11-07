@@ -29,8 +29,8 @@ just test ts_binacle-design-system_unit   # design-system
 
 The sites and the API's UI module pull them in by package name and webpack bundles them:
 [`sites/demo`](../sites/demo) and [the UI module](../api/src/Binacle.Net.UIModule) use `binacle-net-ui` for
-the packing demo and the ViPaq decoder, `docs` and `demo` use `theme-switcher` and `binacle-components`,
-[`sites/www`](../sites/www) uses `design-system`, which uses `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
+the packing demo and the ViPaq decoder, `demo` uses `theme-switcher` and `binacle-components`,
+[`sites/www`](../sites/www) and [`sites/docs`](../sites/docs) use `design-system`, which uses `theme-switcher`, and the local-only [`sites/admin`](../sites/admin) uses `@binacle/service-client`.
 Nothing is copied: the import resolves through the workspace. (`just assets` is a different job - it copies the static files in
 [`assets/`](../assets), not these.)
 

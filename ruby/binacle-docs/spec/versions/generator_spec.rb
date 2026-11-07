@@ -25,11 +25,11 @@ RSpec.describe Binacle::Docs::Versions::VersionGenerator do
 
   describe 'the pager' do
     it 'links a page to the next in its version' do
-      expect(doc(build_site, 'v1.x/index.md').data['pager']['next']['url']).to start_with('/version/')
+      expect(doc(build_site, 'v1.x/index.md').data['prev_next']['next']['url']).to start_with('/version/')
     end
 
     it 'holds no static file' do
-      urls = build_site.documents.filter_map { |item| item.data['pager'] }.flat_map(&:values).map { |link| link['url'] }
+      urls = build_site.documents.filter_map { |item| item.data['prev_next'] }.flat_map(&:values).map { |link| link['url'] }
 
       expect(urls).not_to be_empty
       expect(urls.grep(/\.json\z/)).to be_empty
