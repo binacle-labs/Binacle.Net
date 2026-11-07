@@ -33,6 +33,7 @@ collections_dir     : collections
 plugins_dir         : _plugins       # takes an array of strings and loads plugins in that order
 layouts_dir         : _layouts
 includes_dir        : _includes
+theme               : binacle-design-system   # shared includes; one here of the same name wins
 data_dir            : _data
 # No `sass:` block: the sass CLI compiles _sass/main.scss to css/main.css from package.json. Adding one gives two
 # compilers a claim on the same files.

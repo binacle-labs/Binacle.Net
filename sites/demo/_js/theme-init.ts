@@ -1,3 +1,3 @@
-import {initTheme} from "@binacle/theme-switcher";
+import {initTheme} from "@binacle/design-system/theme-init";
 
 initTheme();

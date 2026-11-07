@@ -1,9 +1,7 @@
-import { initCodeWrap, initCopyButton, initDrawer, initLightbox } from "binacle-components";
-import { ThemeSwitcherButtonElement, optionsFromDocument } from "@binacle/theme-switcher";
+import { initCodeWrap, initCopyButton, initDrawer, initLightbox, initThemeButton } from "@binacle/design-system";
 
 document.addEventListener('DOMContentLoaded', function () {
-    ThemeSwitcherButtonElement.configure(optionsFromDocument());
-    customElements.define('theme-switcher', ThemeSwitcherButtonElement);
+    initThemeButton();
     initDrawer();
     initCodeWrap();
     initCopyButton();

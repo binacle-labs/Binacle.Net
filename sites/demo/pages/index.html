@@ -81,7 +81,7 @@ boxes:
             </div>
             <div class="command band__command" data-command>
                 <pre class="command__pre"><span class="command__prompt">$ </span><code id="run-text">docker run -d --name binacle-net -p 8080:8080 -e SWAGGER_UI=True -e SCALAR_UI=True -e UI_MODULE=True binacle/binacle-net:3</code></pre>
-                <button type="button" class="copy-button command__copy" data-copy="run-text" hidden>Copy</button>
+                {% include components/copy-button.html class="command__copy" copy="run-text" %}
             </div>
         </div>
     </div>

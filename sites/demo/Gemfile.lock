@@ -1,4 +1,9 @@
 PATH
+  remote: ../../packages/design-system
+  specs:
+    binacle-design-system (1.0.0)
+
+PATH
   remote: ../../ruby/binacle-robots
   specs:
     binacle-robots (1.0.0)
@@ -130,6 +135,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  binacle-design-system!
   binacle-robots!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)

@@ -4,8 +4,7 @@
 components, plus the fonts and the mark. Each block keeps its Sass and its behaviour in one folder, and its shared
 markup in `_includes/`. A site builds its own CSS from the parts it needs. Nothing here is built on its own.
 
-`www` and `docs` read it by `pkg:` and by import. `demo` still passes this folder as a Sass load path and imports
-the behaviour through [`binacle-components`](../binacle-components), which forwards here.
+`www`, `docs` and `demo` read it by `pkg:` and by import.
 
 ## 📂 What is in it
 

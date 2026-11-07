@@ -41,7 +41,7 @@ the markup in each site. That one habit causes both faults:
 
 **Smaller faults found 2026-11-07:**
 
-- `initNavFade` in `binacle-components` is exported and tested, and no site calls it yet. It stays: the sites show
+- `initNavFade` in the design system is exported and tested, and no site calls it yet. It stays: the sites show
   a burger on a phone, but the UI module's header keeps the nav row that scrolls sideways, and its port calls it.
 
 **What is right today and stays:**
@@ -242,7 +242,7 @@ shared/packages/design-system/
   the button's class stays in the markup, `data-button-class`. `_index.scss` styles it. `themeInit.ts` is the pre-paint script. It gets its own
   path in the exports map, `@binacle/design-system/theme-init`, so its bundle holds only it and the switcher, not
   the whole package. Its size is checked against today's.
-- **Licence: AGPL-3.0-only**, as `binacle-components` is. Using the MIT switcher from it is allowed.
+- **Licence: AGPL-3.0-only**, as `binacle-components` was. Using the MIT switcher from it is allowed.
 - **Sass is reached by the `pkg:` importer**, from the Sass team, in Dart Sass since 1.71. A site writes
   `@use 'pkg:@binacle/design-system/components/drawer'` and Sass finds it through `node_modules`, as Node finds a
   package. This replaces `--load-path=../../design` in each site's `build:css` and `watch:css` scripts; they gain
@@ -462,10 +462,6 @@ Built before and after: `www`'s CSS, HTML and pre-paint script are byte for byte
 build time. Its `main.js` holds the same modules plus `themeButton.ts`. `docs` and `demo` build to the same CSS and
 HTML, and `main.js` of the same size. `ts_binacle-design-system_unit` passes, with a new test for the theme button.
 
-- **Moved whole, not per site.** Sass finds `components/drawer/_index.scss` from `@use "components/drawer"`, so
-  `docs` and `demo` build on by passing the package as their load path. That beat a forwarding file per moved
-  partial. The two bridges left: that load path, and `binacle-components`, now only re-exports, with no tests,
-  recipe or CI step.
 - **Where a script went:** `navFade.ts` to `layout/site-header/`, `stickySidebar.ts` to `layout/sidebar/`,
   `codeWrap.ts` to `components/code-block/` though it also wraps `command` words. The block each one works on.
 - **The exports map is `.`, `./theme-init` and `./*`.** `./*` lets `pkg:` find every part without a line each.
@@ -489,7 +485,21 @@ Built before and after: CSS, HTML and pre-paint script byte for byte the same, b
 - **`docs`' vendors chunk stays.** It was empty before and is still; the workspace packages resolve to
   `packages/`, not `node_modules/`.
 
-**Left for `demo`:** the same steps, then deleting `binacle-components`.
+### Session 5, `demo` (agent, 2026-11-07)
+
+In the working tree. `demo` reads only the design system, the way `www` does: Sass by `pkg:`, behaviour by import,
+`initThemeButton`, the pre-paint script by its subpath, and the theme gem for the home page's copy button.
+`binacle-components` is deleted. No site lists `theme-switcher` now; the UI module still does, until session 6.
+
+Built before and after, cold: CSS, HTML and pre-paint script byte for byte the same, but for the sitemap's build
+time. `main.js` is the same size and holds the same modules plus `themeButton.ts`; only their order moved.
+
+- **The *ViPaq* page's copy button stays inline.** Alpine drives its label and its click, which the include cannot
+  take.
+- **`demo`'s main config compiles only what it bundles**, as on `www` and `docs`. The pre-paint config gets its own
+  loader with `moduleResolution: bundler`; the main one keeps `node`.
+- **The lock file kept the deleted folder** as an `extraneous` entry after `npm install`. Removed by hand; a second
+  `npm install` leaves it out.
 
 ## Done when
 

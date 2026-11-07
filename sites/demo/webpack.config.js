@@ -3,9 +3,14 @@ const dest = 'js';
 
 // tsconfig emits commonjs, and webpack cannot tree-shake or concatenate that. It also loads three twice: our
 // require takes its commonjs build, and its own add-ons import the module one.
+// Bundled files only: the head script's import resolves under its own config's settings alone.
 const tsLoader = {
 	loader: 'ts-loader',
-	options: {compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
+	options: {onlyCompileBundledFiles: true, compilerOptions: {module: 'esnext', moduleResolution: 'node'}},
+};
+const headTsLoader = {
+	loader: 'ts-loader',
+	options: {compilerOptions: {module: 'esnext', moduleResolution: 'bundler'}},
 };
 
 module.exports = (env, argv) => {
@@ -21,7 +26,7 @@ module.exports = (env, argv) => {
 		entry: {'theme-init': './_js/theme-init.ts'},
 		output: {filename: '[name].js', path: path.resolve(__dirname, dest), clean: false},
 		resolve: {extensions: ['.ts', '.js', '.json']},
-		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: tsLoader}]},
+		module: {rules: [{test: /\.ts$/, exclude: /node_modules/, use: headTsLoader}]},
 		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		devtool: false,
 	};
