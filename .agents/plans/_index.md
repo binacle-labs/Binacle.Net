@@ -22,17 +22,17 @@ you need, and trim or delete it once the work lands. `state:` and `waits-on:` sa
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
-- file: components-library.md
-  description: "One package that holds each site component whole - its Sass, its TypeScript and its markup - and each surface builds only the components it uses."
-  state: deferred
-  waits-on: "the maintainer picking it up - he chose to try it later, 2026-10-31. horizon: undecided - written by an agent, strike it if wrong"
-  horizon: undecided
-  paths: ["packages/**", "sites/www/**", "sites/docs/**", "sites/demo/**", "api/src/Binacle.Net.UIModule/**", "ruby/**"]
 - file: image-base-slimming.md
   description: "Harden and slim the base image - the base is now 90% of it"
   state: idea
   waits-on: "nobody - it is an idea. horizon: future - chosen by an agent, strike it if wrong"
   horizon: future
+- file: packages-and-gems.md
+  description: "Restructure and rename the npm packages and Ruby gems by what each one knows and who uses it, not by language - and give each site component one home for its Sass, TypeScript and markup."
+  state: ready
+  waits-on: "nothing - the trial in Trying it is the first piece. state and horizon written by an agent from his answers, strike them if wrong"
+  horizon: now
+  paths: ["packages/**", "design/**", "ruby/**", "vipaq/packages/**", "sites/www/**", "sites/docs/**", "sites/demo/**", "api/src/Binacle.Net.UIModule/**"]
 - file: results-across-slices.md
   description: "A home for results that compare two slices - ViPaq's encode time against lib's pack time, what one request costs end to end"
   state: idea
