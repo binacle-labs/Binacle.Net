@@ -1,13 +1,9 @@
 ---
-title: Packing Demo
+title: Custom Sizes
 permalink: /packing/
-applet: true
-order: 1
 structured_data:
   type: WebApplication
-  name: Packing Demo
-icon: deployed_code
-summary: Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them.
+  name: Custom Sizes
 description: Put in your own box sizes and a list of items, pick an algorithm, and watch Binacle.Net pack them in 3D. Free and open source, no signup.
 demo: true
 scripts:
@@ -18,246 +14,114 @@ excerpt: |
   Each algorithm searches differently, so the same items can land in different places.
 ---
 
-<p>
-  Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them in 3D.
-  Each algorithm searches differently, so the same items can land in different places.
-</p>
+<section class="band" x-data="packing_demo_app({ baseUrl: '{{ site.api_url }}' })">
+  <div class="container">
+    <div class="workbench">
 
-<div x-data="packing_demo_app({ baseUrl: '{{ site.api_url }}' })">
-
-  <form method="post" class="grid" @submit.prevent.stop="onSubmit">
-    <article class="s12 primary-container">
-      <fieldset x-field-prefix="bin">
-        <legend>Bins</legend>
-        <template x-for="(bin, index) in model.bins" :key="index">
-          <div :class="index >= 1 ? 'row-container' : ''">
-            <div class="row">
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Length') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.length"
-                         :id="$fieldId('length', index)"
-                         :name="$fieldName('length', index)"/>
-                  <label :for="$fieldId('length', index)">Length</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Width') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.width"
-                         :id="$fieldId('width', index)"
-                         :name="$fieldName('width', index)"/>
-                  <label :for="$fieldId('width', index)">Width</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Height') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.height"
-                         :id="$fieldId('height', index)"
-                         :name="$fieldName('height', index)"/>
-                  <label :for="$fieldId('height', index)">Height</label>
-                </div>
-              </div>
-              <button type="button" class="transparent circle" x-on:click="removeBin(index)">
-                <i>delete</i>
-              </button>
-            </div>
-            <div class="">
-              <template x-for="(error, errIndex) in bin.allErrorMessages" :key="errIndex">
-                <div class="error-text" x-text="error"></div>
-              </template>
-            </div>
+      <div class="workbench__side">
+        <div class="workbench__intro">
+          <div class="prose">
+            <h1>Custom Sizes</h1>
+            <p>Put in your own bins and items, pick an algorithm, and watch Binacle.Net pack them in 3D.
+              Each algorithm searches differently, so the same items can land in different places.</p>
           </div>
-        </template>
-      </fieldset>
-      <nav>
-        <button class="border" type="button" x-bind="addBin">
-          <i>add</i>
-          <span>Add bin</span>
-        </button>
-        <div class="max"></div>
-        <button class="transparent destructive" type="button" x-bind="clearAllBins">
-          <span>Clear all</span>
-        </button>
-      </nav>
-    </article>
+          <ol class="labelled-list labelled-list--key">
+            <li class="labelled-list__item"><span class="label">01 Bins</span>The boxes you have. Every bin is tried.</li>
+            <li class="labelled-list__item"><span class="label">02 Items</span>What goes in them, with how many of each.</li>
+            <li class="labelled-list__item"><span class="label">03 Get results</span>One row per bin: how full it is and what did not fit.</li>
+            <li class="labelled-list__item"><span class="label">04 Step through</span>Play the order the items went in, or step one at a time. Drag to turn the view.</li>
+          </ol>
+        </div>
 
-    <article class="s12 secondary-container">
-      <fieldset x-field-prefix="item">
-        <legend>Items</legend>
-        <template x-for="(item, index) in model.items" :key="index">
-          <div :class="index >= 1 ? 'row-container' : ''" x-id="['item', '_', index, '_']">
-            <div class="row">
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Length') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.length"
-                         :id="$fieldId('length', index)"
-                         :name="$fieldName('length', index)"/>
-                  <label :for="$fieldId('length', index)">Length</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Width') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.width"
-                         :id="$fieldId('width', index)"
-                         :name="$fieldName('width', index)"/>
-                  <label :for="$fieldId('width', index)">Width</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Height') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.height"
-                         :id="$fieldId('height', index)"
-                         :name="$fieldName('height', index)"/>
-                  <label :for="$fieldId('height', index)">Height</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Quantity') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.quantity"
-                         :id="$fieldId('quantity', index)"
-                         :name="$fieldName('quantity', index)"/>
-                  <label :for="$fieldId('quantity', index)">Quantity</label>
-                </div>
-              </div>
-              <button type="button" class="transparent circle" x-on:click="removeItem(index)">
-                <i>delete</i>
-              </button>
+        <form class="form" novalidate @submit.prevent.stop="onSubmit">
+          <fieldset class="form__group" x-field-prefix="bin">
+            <legend class="form__legend label">Bins</legend>
+            {% include size-rows.html rows="model.bins" name="bin" fields="length,width,height" remove="removeBin" %}
+            <div class="form__actions">
+              <button type="button" class="button" x-bind="addBin">Add bin</button>
+              <button type="button" class="button button--link" x-bind="clearAllBins">Clear all</button>
             </div>
-            <div class="">
-              <template x-for="(error, errIndex) in item.allErrorMessages" :key="errIndex">
-                <div class="error-text" x-text="error"></div>
-              </template>
+          </fieldset>
+
+          <fieldset class="form__group" x-field-prefix="item">
+            <legend class="form__legend label">Items</legend>
+            {% include size-rows.html rows="model.items" name="item" fields="length,width,height,quantity" remove="removeItem" %}
+            <div class="form__actions">
+              <button type="button" class="button" x-bind="addItem">Add item</button>
+              <button type="button" class="button button--link" x-bind="clearAllItems">Clear all</button>
             </div>
-          </div>
-        </template>
+          </fieldset>
 
-      </fieldset>
-      <nav>
-        <button class="border" type="button" x-bind="addItem">
-          <i>add</i>
-          <span>Add item</span>
-        </button>
-        <div class="max"></div>
-        <button class="transparent destructive" type="button" x-bind="clearAllItems">
-          <span>Clear all</span>
-        </button>
-      </nav>
-    </article>
-
-    <fieldset class="s12">
-      <div class="grid">
-        <div class="s12 m6">
-          <div class="field">
-            <select x-model="model.algorithm" name="algorithm" id="algorithm">
-              <template x-for="(item, index) in algorithms" :key="index">
-                <option :value="item.value" x-text="item.text"></option>
-              </template>
-            </select>
-            <i>arrow_drop_down</i>
+          <div class="form__group">
+            <label class="field">
+              <span class="field__label">Algorithm</span>
+              <select class="field__select" name="algorithm" id="algorithm" x-model="model.algorithm">
+                <template x-for="item in algorithms" :key="item.value">
+                  <option :value="item.value" x-text="item.text"></option>
+                </template>
+              </select>
+            </label>
+            <div class="form__actions">
+              <button type="submit" class="button button--primary"
+                      :disabled="submitting"
+                      :aria-busy="submitting ? 'true' : null"
+                      x-text="submitButtonText()">Get results</button>
+              <button type="button" class="button" x-bind="randomize">Randomize</button>
+            </div>
+            <p class="form__status" :class="formErrors.length > 0 ? 'is-error' : ''" aria-live="polite"
+               x-text="formErrors.length > 0 ? formErrors.join(' ') : submitStatus"></p>
           </div>
-        </div>
-        <div class="s5 m2 row">
-          <button class="transparent max" type="button" x-bind="randomize">
-            <span>Randomize</span>
-          </button>
-        </div>
-        <div class="s7 m4 row">
-          <button class="max" type="submit"
-                  :disabled="submitting"
-                  :aria-busy="submitting ? 'true' : null">
-            <span x-text="submitButtonText()">Get results</span>
-          </button>
-        </div>
-        <div class="s12" aria-live="polite">
-          <div x-text="submitStatus"></div>
-          <template x-for="(error, index) in formErrors" :key="index">
-            <div class="error-text" x-text="error"></div>
-          </template>
-        </div>
+        </form>
       </div>
-    </fieldset>
-  </form>
 
-  <div class="grid">
-    <div class="s12">
-      {% include pack-view.html %}
-    </div>
-  </div>
+      <div class="workbench__view">
+        {% include pack-view.html empty="Get results to see the packing." %}
 
-  <div class="grid">
-    <div class="s12">
-      <article class="surface-variant">
-        <fieldset>
-          <legend>Results</legend>
-          <template x-if="results.length <= 0">
-            <span>No Results</span>
-          </template>
-          <template x-for="(result, index) in results" :key="index">
-            <a href="#"
-               class="row wave padding"
-               :class="isSelected(result) ? 'surface-container border' : ''"
-               :aria-current="isSelected(result) ? 'true' : null"
-               @click.prevent.stop="selectResult(result)">
-              <i class="large"
-                 :class="colorClass(result) + '-text'">package_2</i>
-              <div class="grid no-space max">
-								<span class="s4" x-text="resultTitle(result)">
-								</span>
-                <span class="s8 right-align" x-text="resultBinPercentageText(result)">
-								</span>
-                <progress value="0" :value="result.packedBinVolumePercentage" max="100"
-                          class="s12 surface-container-lowest"
-                          :class="colorClass(result) + '-text'">
-                </progress>
-
-                <div class="s4" x-text="resultStatusText(result)">
-                </div>
-                <template x-if="showsAlgorithmUsed()">
-                  <div class="s4" x-text="resultAlgorithmText(result)">
-                  </div>
-                </template>
-                <template x-if="!resultIsFullyPacked(result)">
-                  <div :class="showsAlgorithmUsed() ? 's4 right-align' : 's8 right-align'"
-                       x-text="resultItemPercentageText(result)">
-                  </div>
-                </template>
-              </div>
-              <template x-if="hasUnpackedItems(result)">
-                <div style="position:relative;z-index:10">
-                  <button type="button"
-                          class="transparent circle"
-                          :aria-label="unpackedItemsTitle(result)"
-                          @click.prevent.stop="$el.focus()">
-                    <i>info</i>
-                  </button>
-                  <div class="tooltip max large-space">
-                    <p x-text="unpackedItemsTitle(result)"></p>
-                    <template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
-                      <p x-text="unpackedItemText(unpackedItem)"></p>
+        <section aria-labelledby="results-title">
+          <p class="label" id="results-title">Results</p>
+          <ul class="result-list">
+            <template x-if="results.length <= 0">
+              <li class="result-list__item result-list__empty">No results yet. Press Get results.</li>
+            </template>
+            <template x-for="(result, index) in results" :key="index">
+              <li class="result-list__item">
+                <button type="button" class="result-row"
+                        :aria-current="isSelected(result) ? 'true' : null"
+                        @click="selectResult(result)">
+                  <span class="result-row__title"><span class="mono" x-text="resultBinSizeText(result)"></span></span>
+                  <span class="label" x-text="resultItemCountText(result)"></span>
+                  <span class="result-row__fill" :aria-label="'Packed bin volume ' + resultBinFillText(result)">
+                    <span class="result-row__fill-track"><span class="result-row__fill-line" :style="'width:' + result.packedBinVolumePercentage + '%'"></span></span>
+                    <span class="result-row__fill-number" x-text="resultBinFillText(result)"></span>
+                  </span>
+                  <span class="result-row__meta">
+                    <span x-text="resultStatusText(result)"></span>
+                    <template x-if="showsAlgorithmUsed()">
+                      <span x-text="resultAlgorithmName(result)"></span>
                     </template>
-                  </div>
-                </div>
-              </template>
-            </a>
-          </template>
-        </fieldset>
-      </article>
+                    <template x-if="showsItemsFill(result)">
+                      <span x-text="resultItemsFillText(result)"></span>
+                    </template>
+                  </span>
+                </button>
+                <template x-if="hasUnpackedItems(result)">
+                  <details class="result-list__unfit">
+                    <summary class="result-list__unfit-summary" x-text="unpackedItemsTitle(result)"></summary>
+                    <ul class="result-list__unfit-list">
+                      <template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
+                        <li><span x-text="unpackedItem.quantity"></span> of <span class="mono" x-text="unpackedItemSizeText(unpackedItem)"></span></li>
+                      </template>
+                    </ul>
+                  </details>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </div>
+
     </div>
   </div>
-
-</div>
+</section>
 
 {% include errors-dialog.html %}

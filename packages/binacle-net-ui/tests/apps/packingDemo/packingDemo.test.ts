@@ -10,6 +10,7 @@ import {
 } from "binacle-net-client";
 
 import {Logger} from "../../../src/components/logger/logger";
+import type {PackScene} from "../../../src/components/packView/packViewComponent";
 import {packingDemoApp, packingDemoAppPlugin, PackingDemoOptions} from "../../../src/apps/packingDemo/packingDemo";
 import {sampleData} from "../../../src/apps/packingDemo/sampleData";
 import {largestBin, sampleAt} from "../../../src/apps/packingDemo/samples";
@@ -23,12 +24,13 @@ interface Dispatched {
 	detail: any;
 }
 
-type SceneThunk = () => Promise<{bin: unknown; items: unknown} | null>;
+type SceneThunk = () => Promise<PackScene | null>;
 
 type PackingDemo = ReturnType<typeof packingDemoApp> & {
 	$dispatch: (event: string, detail?: any) => void;
 	$logger: Logger;
 	$watch: (key: string, callback: () => void) => void;
+	$nextTick: (callback: () => void) => void;
 };
 
 // Alpine hands the component a reactive proxy, so $watch sees writes anywhere under the watched value. The
@@ -62,15 +64,17 @@ function deepWatched<T extends object>(target: T, onChange: () => void, seen: We
 function createApp(options: PackingDemoOptions = {}) {
 	const dispatched: Dispatched[] = [];
 	const logger = {info: jest.fn(), log: jest.fn(), warn: jest.fn(), error: jest.fn()};
+	const ticks: (() => void)[] = [];
 	const app = packingDemoApp(options) as PackingDemo;
 	app.$dispatch = (name: string, detail?: any) => {dispatched.push({name, detail});};
+	app.$nextTick = (callback: () => void) => {ticks.push(callback);};
 	app.$logger = logger as unknown as Logger;
 	app.$watch = (key: string, callback: () => void) => {
 		const seen = new WeakMap<object, any>();
 		(app as any)[key] = deepWatched((app as any)[key], callback, seen);
 	};
 
-	return {app, dispatched, logger};
+	return {app, dispatched, logger, ticks};
 }
 
 // The client reads the body with text() and parses it itself, so the stub carries the raw text. No body at
@@ -1205,14 +1209,30 @@ describe("the scene the results feed", () => {
 
 	test("the scene gets the selected bin and its packed items", async () => {
 		const {app, dispatched} = createApp();
-		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 0, y: 0, z: 0}];
+		const item = {length: 2, width: 2, height: 2, x: 0, y: 0, z: 0};
 		arrangeValidModel(app);
-		mockFetch(stubResponse(200, packingResponse([packedData({packedItems})])));
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: [{id: "2x2x2-1", ...item}]})])));
 
 		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
-		expect(scene).toEqual({bin: {id: "10x10x10", length: 10, width: 10, height: 10}, items: packedItems});
+		expect(scene).toEqual({
+			bin: {id: "10x10x10", length: 10, width: 10, height: 10},
+			items: [item],
+			note: "",
+			reveal: true
+		});
+	});
+
+	test("a result with nothing in it says why under the view", async () => {
+		const {app, dispatched} = createApp();
+		arrangeValidModel(app);
+		mockFetch(stubResponse(200, packingResponse([packedData({status: "NotPacked", packedItems: []})])));
+
+		await app.onSubmit();
+		const scene = await sceneThunk(dispatched)();
+
+		expect(scene!.note).toBe("Not packed");
 	});
 
 	test("a result with no packed items gives the scene an empty list", async () => {
@@ -1247,7 +1267,7 @@ describe("the scene the results feed", () => {
 		expect(app.results).toEqual([]);
 	});
 
-	test("a body with no data leaves the scene empty", async () => {
+	test("a body with no data leaves the bin drawn alone", async () => {
 		const {app, dispatched} = createApp();
 		arrangeValidModel(app);
 		mockFetch(stubResponse(200, packingResponse(null)));
@@ -1255,7 +1275,28 @@ describe("the scene the results feed", () => {
 		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
-		expect(scene).toBeNull();
+		expect(scene).toEqual({bin: {length: 10, width: 10, height: 10}});
+	});
+
+	test("a failed request leaves the bin drawn alone", async () => {
+		const {app, dispatched} = createApp();
+		arrangeValidModel(app);
+		mockFailingFetch(new TypeError("Failed to fetch"));
+
+		await app.onSubmit();
+		const scene = await sceneThunk(dispatched)();
+
+		expect(scene).toEqual({bin: {length: 10, width: 10, height: 10}});
+	});
+
+	test("the scene goes out before the answer is in, so the loader shows", () => {
+		const {app, dispatched} = createApp();
+		arrangeValidModel(app);
+		globalThis.fetch = jest.fn(() => new Promise(() => undefined)) as unknown as typeof fetch;
+
+		void app.onSubmit();
+
+		expect(dispatched.map(x => x.name)).toEqual(["update-scene"]);
 	});
 
 	test("a failed request clears the selection", async () => {
@@ -1292,13 +1333,272 @@ describe("picking a result from the list", () => {
 
 	test("hands the scene that result's bin and items", async () => {
 		const {app, dispatched} = createApp();
-		const packedItems = [{id: "2x2x2-1", length: 2, width: 2, height: 2, quantity: 1, x: 1, y: 2, z: 3}];
-		const result = packedData({packedItems});
+		const item = {length: 2, width: 2, height: 2, x: 1, y: 2, z: 3};
+		const result = packedData({packedItems: [{id: "2x2x2-1", ...item}]});
 
 		app.selectResult(result);
 
 		const scene = await sceneThunk(dispatched)();
-		expect(scene).toEqual({bin: result.bin, items: packedItems});
+		expect(scene).toEqual({bin: result.bin, items: [item], note: ""});
+	});
+});
+
+describe("the bin alone, before an answer", () => {
+	function scenes(dispatched: Dispatched[]) {
+		return dispatched.filter(x => x.name === "update-scene");
+	}
+
+	function answered(app: PackingDemo) {
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+		return app.onSubmit();
+	}
+
+	test("waits a tick to go out, or the view is not listening yet", () => {
+		const {app, dispatched} = createApp();
+
+		app.init();
+
+		expect(scenes(dispatched)).toEqual([]);
+	});
+
+	test("the page opens on the first bin", async () => {
+		const {app, dispatched, ticks} = createApp();
+		app.init();
+
+		ticks.forEach(tick => tick());
+		const scene = await sceneThunk(dispatched)();
+
+		const bin = app.model.bins[0];
+		expect(scene).toEqual({bin: {length: bin.length, width: bin.width, height: bin.height}});
+	});
+
+	test("a bin with an error is passed over", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10), new Bin(5, 6, 7)];
+
+		const scene = app.binScene();
+
+		expect(scene).toEqual({bin: {length: 5, width: 6, height: 7}});
+	});
+
+	test("the sides are numbers even when the model holds strings", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin("5" as any, "6" as any, "7" as any)];
+
+		const scene = app.binScene();
+
+		expect(scene).toEqual({bin: {length: 5, width: 6, height: 7}});
+	});
+
+	test("with no good bin the scene has none, which clears the view", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 0, 0)];
+
+		const scene = app.binScene();
+
+		expect(scene).toEqual({});
+	});
+
+	test("editing the bin draws it again", async () => {
+		const {app, dispatched, ticks} = createApp();
+		app.init();
+		ticks.forEach(tick => tick());
+
+		app.model.bins[0].length = 77;
+
+		const sent = scenes(dispatched);
+		const scene = await sent[sent.length - 1].detail();
+		expect(scene.bin.length).toBe(77);
+	});
+
+	test("editing an item leaves the view alone, or the camera would reset", () => {
+		const {app, dispatched, ticks} = createApp();
+		app.init();
+		ticks.forEach(tick => tick());
+		const before = scenes(dispatched).length;
+
+		app.model.items[0].length = 3;
+
+		expect(scenes(dispatched).length).toBe(before);
+	});
+
+	test("any edit drops the answer", async () => {
+		const {app} = createApp();
+		app.init();
+		await answered(app);
+
+		app.model.items[0].length = 3;
+
+		expect(app.results).toEqual([]);
+		expect(app.selectedResult).toBeNull();
+	});
+
+	test("an edit that drops an answer goes back to the bin alone", async () => {
+		const {app, dispatched, ticks} = createApp();
+		app.init();
+		ticks.forEach(tick => tick());
+		await answered(app);
+		const before = scenes(dispatched).length;
+
+		app.model.items[0].length = 3;
+
+		expect(scenes(dispatched).length).toBe(before + 1);
+	});
+
+	test("an answer to a form that changed while it was out is thrown away", async () => {
+		const {app} = createApp();
+		app.init();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+
+		const submit = app.onSubmit();
+		app.model.bins[0].length = 77;
+		await submit;
+
+		expect(app.results).toEqual([]);
+		expect(app.submitting).toBe(false);
+	});
+
+	test("an edit while an answer is out takes the view back from the loader", async () => {
+		const {app, dispatched} = createApp();
+		app.init();
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+
+		const submit = app.onSubmit();
+		const before = scenes(dispatched).length;
+		app.model.items[0].length = 3;
+		await submit;
+
+		expect(scenes(dispatched).length).toBe(before + 1);
+	});
+});
+
+describe("showing what is wrong in a row", () => {
+	test("a row being typed in keeps quiet", () => {
+		const {app} = createApp();
+
+		expect(app.showsErrors(false)).toBe(false);
+	});
+
+	test("a row that has been left speaks", () => {
+		const {app} = createApp();
+
+		expect(app.showsErrors(true)).toBe(true);
+	});
+
+	test("a failed submit makes every row speak", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		void app.onSubmit();
+
+		expect(app.showsErrors(false)).toBe(true);
+	});
+
+	test("a failed submit on a bad field says to fix the marked fields", () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(0, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1)];
+
+		void app.onSubmit();
+
+		expect(app.formErrors).toEqual(["Fix the fields marked in red."]);
+	});
+
+	test("a fresh sample quietens the rows", () => {
+		const {app} = createApp();
+		app.submitFailed = true;
+
+		app.showSample(1);
+
+		expect(app.showsErrors(false)).toBe(false);
+	});
+
+	test("an edit clears the message", () => {
+		const {app} = createApp();
+		app.init();
+		app.formErrors = ["Add at least one bin."];
+
+		app.model.items[0].length = 3;
+
+		expect(app.formErrors).toEqual([]);
+	});
+});
+
+describe("the words on a result row", () => {
+	test("the size is the bin's sides", () => {
+		const {app} = createApp();
+
+		expect(app.resultBinSizeText(packedData())).toBe("10 x 10 x 10");
+	});
+
+	test.each([
+		[0, "0 items"],
+		[1, "1 item"],
+		[2, "2 items"]
+	])("%i packed reads as %s", (count, text) => {
+		const {app} = createApp();
+		const box = {id: "a", length: 1, width: 1, height: 1, x: 0, y: 0, z: 0};
+
+		expect(app.resultItemCountText(packedData({packedItems: Array(count).fill(box)}))).toBe(text);
+	});
+
+	test("no packed items list counts as none", () => {
+		const {app} = createApp();
+
+		expect(app.resultItemCountText(packedData({packedItems: null}))).toBe("0 items");
+	});
+
+	test("the fill keeps two decimals", () => {
+		const {app} = createApp();
+
+		expect(app.resultBinFillText(packedData({packedBinVolumePercentage: 65}))).toBe("65.00%");
+	});
+
+	test("the items volume keeps two decimals", () => {
+		const {app} = createApp();
+
+		const text = app.resultItemsFillText(packedData({packedItemsVolumePercentage: 69.33}));
+
+		expect(text).toBe("Packed items volume 69.33%");
+	});
+
+	test.each([
+		["PartiallyPacked", true],
+		["FullyPacked", false],
+		["NotPacked", false]
+	])("%s showing the items volume is %s", (status, shows) => {
+		const {app} = createApp();
+
+		expect(app.showsItemsFill(packedData({status: status as BinPackResultStatus}))).toBe(shows);
+	});
+
+	test("the winner is named as the dropdown names it", () => {
+		const {app} = createApp();
+
+		expect(app.resultAlgorithmName(packedData({algorithmUsed: "BFD"}))).toBe("Best Fit Decreasing");
+	});
+
+	test("a winner the page does not know prints as its code", () => {
+		const {app} = createApp();
+
+		expect(app.resultAlgorithmName(packedData({algorithmUsed: "XYZ"}))).toBe("XYZ");
+	});
+
+	test("an item left out reads as the size that was sent", async () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10)];
+		app.model.items = [new Item(20, 3, 2, 4)];
+		mockFetch(stubResponse(200, packingResponse([packedData()])));
+		await app.onSubmit();
+
+		expect(app.unpackedItemSizeText({id: "20x3x2-4", quantity: 4})).toBe("20 x 3 x 2");
+	});
+
+	test("an item nobody sent falls back to its id", () => {
+		const {app} = createApp();
+
+		expect(app.unpackedItemSizeText({id: "unknown", quantity: 1})).toBe("unknown");
 	});
 });
 
@@ -1450,8 +1750,7 @@ describe("naming the algorithm that won", () => {
 		expect(app.showsAlgorithmUsed()).toBe(true);
 	});
 
-	// The dropdown moves on its own; the results on the page did not change with it.
-	test("changing the dropdown after a run leaves the row alone", async () => {
+	test("changing the dropdown after a run drops the answer", async () => {
 		const {app} = createApp();
 		app.init();
 		app.model.algorithm = "Best";
@@ -1460,7 +1759,7 @@ describe("naming the algorithm that won", () => {
 
 		app.model.algorithm = "FFD";
 
-		expect(app.showsAlgorithmUsed()).toBe(true);
+		expect(app.results).toEqual([]);
 	});
 
 	test("a run with no results names nothing", async () => {

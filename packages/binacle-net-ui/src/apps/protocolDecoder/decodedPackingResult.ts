@@ -24,7 +24,7 @@ export default class DecodedPackingResult {
 			return sum + (item.length * item.width * item.height);
 		}, 0);
 	}
-	packedBinVolumePercentage(){
+	packedBinVolumeShare(){
 		const packedVolume = this.itemsVolume();
 		const binVolume = this.binVolume();
 		// The bin comes from a base64 token a visitor pastes in, so a zero side is reachable and would
@@ -32,6 +32,9 @@ export default class DecodedPackingResult {
 		if (binVolume <= 0) {
 			return 0;
 		}
-		return Math.round((packedVolume / binVolume) * 100);
+		return (packedVolume / binVolume) * 100;
+	}
+	packedBinVolumePercentage(){
+		return Math.round(this.packedBinVolumeShare());
 	}
 }

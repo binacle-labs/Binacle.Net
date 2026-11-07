@@ -1,7 +1,7 @@
-// What the panel, the menu drawer and the docs sidebar share when they sit over the page.
+// What the modal, the panel, the menu drawer and the docs sidebar share when they sit over the page.
 @use "tiers";
 
-// The head of a panel or drawer: its title, and the close button at the right.
+// The head of a modal, panel or drawer: its title, and the close button at the right.
 @mixin head {
   display: flex;
   flex: none;
@@ -10,6 +10,21 @@
   gap: 16px;
   padding: calc(var(--step) * 1.5) 16px var(--step);
   border-bottom: 1px solid var(--rule);
+
+  @media (width >= tiers.$tablet) {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+}
+
+// The body of a modal or panel. Only it scrolls, so the head stays put.
+@mixin body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--step) * 1.5);
+  padding: var(--step) 16px calc(var(--step) * 2);
+  overflow-y: auto;
+  font-size: var(--size-ui);
 
   @media (width >= tiers.$tablet) {
     padding-left: var(--gutter);

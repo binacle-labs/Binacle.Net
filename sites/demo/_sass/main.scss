@@ -7,11 +7,14 @@
 @use "layout/band";
 @use "layout/hero";
 @use "layout/split";
+@use "layout/workbench";
 
 @use "components/actions";
 @use "components/box-card";
 @use "components/box-cards";
 @use "components/button";
+@use "components/close-button";
+@use "components/code-block";
 @use "components/command";
 @use "components/copy-button";
 @use "components/dimension-line";
@@ -19,9 +22,18 @@
 @use "components/drawer";
 @use "components/drawer-backdrop";
 @use "components/drawing";
+@use "components/field";
+@use "components/field-row";
+@use "components/form";
+@use "components/labelled-list";
 @use "components/lightbox";
+@use "components/modal";
 @use "components/pack-still";
 @use "components/pack-view";
+@use "components/panel";
+@use "components/result-list";
+@use "components/result-row";
+@use "components/sample";
 @use "components/still";
 @use "components/theme-button";
 

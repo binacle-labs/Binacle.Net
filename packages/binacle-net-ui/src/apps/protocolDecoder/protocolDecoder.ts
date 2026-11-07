@@ -27,6 +27,8 @@ export const protocolDecoderApp = defineComponent(() => ({
 	results: [] as DecodedPackingResult[],
 	selectedResult: null as DecodedPackingResult | null,
 	samples: sampleData as SampleData[],
+	// What went wrong with the string in the box. It reads beside the box, not in a dialog.
+	status: '',
 	init(){
 		this.loadSavedResults().forEach(encodedResult => {
 			const data = Uint8Array.from(atob(encodedResult), x => x.charCodeAt(0));
@@ -73,15 +75,15 @@ export const protocolDecoderApp = defineComponent(() => ({
 		localStorage.setItem(SAVED_RESULTS_KEY, JSON.stringify(payload));
 	},
 	addResult(){
+		this.status = '';
 		if (!this.model.result) {
-			this.$dispatch('error-occurred', ['No ViPaq data to deserialize']);
+			this.status = 'No ViPaq data to deserialize';
 			return;
 		}
 
 		const found = this.results.find(x => x.encodedResult === this.model.result);
 		if(found){
-			this.$dispatch('error-occurred', ['This ViPaq data has already been added']);
-			this.model.result = null;
+			this.status = 'This ViPaq data has already been added';
 			return;
 		}
 
@@ -94,19 +96,19 @@ export const protocolDecoderApp = defineComponent(() => ({
 
 					this.$logger.info("[Binacle] ViPaq data", result);
 					this.results.push(decodedResult);
-					if (this.results.length === 1) {
-						this.selectResult(decodedResult);
-					}
+					this.selectResult(decodedResult);
 					this.model.result = null;
 					this.saveResults();
 				})
-				.catch(error => {
-					this.$dispatch('error-occurred', ['Error deserializing ViPaq data', error]);
-				});
+				.catch(error => this.failToDecode(error));
 		} catch (error) {
-			this.$dispatch('error-occurred', ['Error deserializing ViPaq data', error]);
+			this.failToDecode(error);
 		}
 
+	},
+	failToDecode(error: unknown) {
+		this.$logger.error("[Binacle] Error deserializing ViPaq data", error);
+		this.status = 'Error deserializing ViPaq data';
 	},
 	isSelected(result: DecodedPackingResult): boolean {
 		return this.selectedResult === result;
@@ -133,6 +135,16 @@ export const protocolDecoderApp = defineComponent(() => ({
 	},
 	resultBinPercentageText(result: DecodedPackingResult){
 		return `Packed Bin Volume: ${result.packedBinVolumePercentage()}%`;
+	},
+	resultBinSizeText(result: DecodedPackingResult){
+		return `${result.bin.length} x ${result.bin.width} x ${result.bin.height}`;
+	},
+	resultItemCountText(result: DecodedPackingResult){
+		return result.items.length === 1 ? '1 item' : `${result.items.length} items`;
+	},
+	// Two decimals, as on the packing demo.
+	resultBinFillText(result: DecodedPackingResult){
+		return `${result.packedBinVolumeShare().toFixed(2)}%`;
 	}
 
 }));

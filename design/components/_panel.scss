@@ -1,5 +1,4 @@
-// A panel that slides over the page from the right. No shadow: the ink edge and the dimmed page do the work.
-@use "../abstracts/tiers";
+// A panel that slides over the page from the right. No shadow: the edge and the dimmed page do the work.
 @use "../abstracts/overlays";
 
 .panel {
@@ -13,7 +12,8 @@
   margin: 0;
   padding: 0;
   border: 0;
-  border-left: 1px solid var(--ink);
+  // An ink edge turns near white in dark.
+  border-left: 1px solid var(--rule);
   background: var(--paper);
   color: var(--ink);
   overflow: hidden;
@@ -39,15 +39,5 @@
 }
 
 .panel__body {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--step) * 1.5);
-  padding: var(--step) 16px calc(var(--step) * 2);
-  overflow-y: auto;
-  font-size: var(--size-ui);
-
-  @media (width >= tiers.$tablet) {
-    padding-left: var(--gutter);
-    padding-right: var(--gutter);
-  }
+  @include overlays.body;
 }

@@ -183,25 +183,14 @@ describe("saving results", () => {
 
 describe("adding a result", () => {
 	test("no token tells the user there is nothing to decode", () => {
-		const {decoder, dispatched} = createDecoder();
+		const {decoder} = createDecoder();
 
 		decoder.addResult();
 
-		expect(dispatched).toEqual([{name: "error-occurred", detail: ["No ViPaq data to deserialize"]}]);
+		expect(decoder.status).toBe("No ViPaq data to deserialize");
 	});
 
 	test("a token already in the list is refused", async () => {
-		const {decoder, dispatched} = createDecoder();
-		const token = await encodeToken();
-		decoder.results = [new DecodedPackingResult(token, bin, items)];
-		decoder.model.result = token;
-
-		decoder.addResult();
-
-		expect(dispatched).toEqual([{name: "error-occurred", detail: ["This ViPaq data has already been added"]}]);
-	});
-
-	test("a token already in the list clears the input", async () => {
 		const {decoder} = createDecoder();
 		const token = await encodeToken();
 		decoder.results = [new DecodedPackingResult(token, bin, items)];
@@ -209,17 +198,28 @@ describe("adding a result", () => {
 
 		decoder.addResult();
 
-		expect(decoder.model.result).toBeNull();
+		expect(decoder.status).toBe("This ViPaq data has already been added");
+	});
+
+	test("a token already in the list stays in the input", async () => {
+		const {decoder} = createDecoder();
+		const token = await encodeToken();
+		decoder.results = [new DecodedPackingResult(token, bin, items)];
+		decoder.model.result = token;
+
+		decoder.addResult();
+
+		expect(decoder.model.result).toBe(token);
 	});
 
 	test("a token that is not base64 surfaces an error", async () => {
-		const {decoder, dispatched} = createDecoder();
+		const {decoder} = createDecoder();
 		decoder.model.result = "!!! not base64 !!!";
 
 		decoder.addResult();
 		await settle();
 
-		expect(dispatched[0].detail[0]).toBe("Error deserializing ViPaq data");
+		expect(decoder.status).toBe("Error deserializing ViPaq data");
 	});
 
 	test("a token that is not base64 adds nothing", async () => {
@@ -233,13 +233,35 @@ describe("adding a result", () => {
 	});
 
 	test("base64 that is not a ViPaq blob surfaces an error", async () => {
-		const {decoder, dispatched} = createDecoder();
+		const {decoder} = createDecoder();
 		decoder.model.result = tooShortToken;
 
 		decoder.addResult();
 		await settle();
 
-		expect(dispatched[0].detail[0]).toBe("Error deserializing ViPaq data");
+		expect(decoder.status).toBe("Error deserializing ViPaq data");
+	});
+
+	test("a good token clears the last error", async () => {
+		const {decoder} = createDecoder();
+		decoder.status = "Error deserializing ViPaq data";
+		decoder.model.result = await encodeToken();
+
+		decoder.addResult();
+		await settle();
+
+		expect(decoder.status).toBe("");
+	});
+
+	test("a later token is the one drawn", async () => {
+		const {decoder} = createDecoder();
+		decoder.results = [new DecodedPackingResult("older", bin, items)];
+		decoder.model.result = await encodeToken();
+
+		decoder.addResult();
+		await settle();
+
+		expect(decoder.selectedResult).toBe(decoder.results[1]);
 	});
 
 	test("a valid token is decoded into the result list", async () => {
@@ -441,6 +463,34 @@ describe("result labels", () => {
 		const text = decoder.resultBinPercentageText(result);
 
 		expect(text).toBe("Packed Bin Volume: 4%");
+	});
+});
+
+describe("the words on a result row", () => {
+	const result = new DecodedPackingResult("token", bin, items);
+
+	test("the size is the bin's sides", () => {
+		const {decoder} = createDecoder();
+
+		expect(decoder.resultBinSizeText(result)).toBe("10 x 10 x 10");
+	});
+
+	test("the count names the items", () => {
+		const {decoder} = createDecoder();
+
+		expect(decoder.resultItemCountText(result)).toBe("2 items");
+	});
+
+	test("one item reads as one", () => {
+		const {decoder} = createDecoder();
+
+		expect(decoder.resultItemCountText(new DecodedPackingResult("token", bin, items.slice(0, 1)))).toBe("1 item");
+	});
+
+	test("the fill keeps two decimals", () => {
+		const {decoder} = createDecoder();
+
+		expect(decoder.resultBinFillText(result)).toBe("3.50%");
 	});
 });
 

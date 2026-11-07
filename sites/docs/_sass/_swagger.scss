@@ -2,8 +2,6 @@
 
 .swagger-dialog {
   width: min(1100px, calc(100% - var(--hit)));
-  // The panel's ink edge turns near white against Swagger's dark page.
-  border-left-color: var(--rule);
 }
 
 .swagger-dialog__frame {

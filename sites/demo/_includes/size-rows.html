@@ -1,0 +1,27 @@
+{% assign fields = include.fields | split: "," %}
+<div class="form__group">
+  <template x-for="(row, index) in {{ include.rows }}" :key="index">
+    <div class="form__row" x-data="{ touched: false }" @change="touched = true">
+      <div class="field-row">
+        {% for field in fields %}
+        <label class="field">
+          <span class="field__label">{{ field | capitalize }}</span>
+          <input class="field__input" type="number" inputmode="numeric" min="1"
+                 x-model.number="row.{{ field }}"
+                 :id="$fieldId('{{ field }}', index)"
+                 :name="$fieldName('{{ field }}', index)"
+                 :aria-invalid="showsErrors(touched) && !row.isFieldValid('{{ field }}') ? 'true' : null"
+                 :aria-describedby="showsErrors(touched) && !row.isFieldValid('{{ field }}') ? $fieldId('error', index) : null"/>
+        </label>
+        {% endfor %}
+        <button type="button" class="close-button close-button--bin"
+                :aria-label="'Remove {{ include.name }} ' + (index + 1)"
+                :title="'Remove {{ include.name }} ' + (index + 1)"
+                @click="{{ include.remove }}(index)"></button>
+      </div>
+      <template x-if="showsErrors(touched) && row.hasErrors()">
+        <p class="field-row__error" :id="$fieldId('error', index)" x-text="row.allErrorMessages[0]"></p>
+      </template>
+    </div>
+  </template>
+</div>

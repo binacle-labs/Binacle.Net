@@ -102,6 +102,83 @@ describe("updating the scene", () => {
 	});
 });
 
+describe("a slow scene overtaken by a newer one", () => {
+	function slow() {
+		let finish: (scene: PackScene) => void = () => undefined;
+		let fail: (reason: Error) => void = () => undefined;
+		const promise = new Promise<PackScene>((resolve, reject) => {
+			finish = resolve;
+			fail = reject;
+		});
+		return {thunk: () => promise, finish: (scene: PackScene) => finish(scene), fail: (reason: Error) => fail(reason)};
+	}
+
+	test("does not draw over it", async () => {
+		const {component, view} = createComponent();
+		const old = slow();
+		const update = component.updateScene(old.thunk);
+		await component.updateScene(answer({bin}));
+
+		old.finish({bin, items});
+		await update;
+
+		expect(view.show).not.toHaveBeenCalled();
+	});
+
+	test("does not clear it when it fails", async () => {
+		const {component, view} = createComponent();
+		const old = slow();
+		const update = component.updateScene(old.thunk);
+		await component.updateScene(answer({bin}));
+
+		old.fail(new Error("failed"));
+		await update;
+
+		expect(view.clear).not.toHaveBeenCalled();
+	});
+});
+
+describe("revealing the view", () => {
+	function atWidth(stacked: boolean, reducedMotion = false) {
+		window.matchMedia = jest.fn((query: string) => ({
+			matches: query.includes("reduce") ? reducedMotion : stacked
+		})) as unknown as typeof window.matchMedia;
+	}
+
+	test.each([
+		["stacked", true, 1],
+		["side by side", false, 0]
+	])("%s scrolls %s", async (_name, stacked, times) => {
+		const {component, figure} = createComponent();
+		figure.scrollIntoView = jest.fn();
+		atWidth(stacked);
+
+		await component.updateScene(answer({bin, items, reveal: true}));
+
+		expect(figure.scrollIntoView).toHaveBeenCalledTimes(times);
+	});
+
+	test("a scene that does not ask stays put", async () => {
+		const {component, figure} = createComponent();
+		figure.scrollIntoView = jest.fn();
+		atWidth(true);
+
+		await component.updateScene(answer({bin, items}));
+
+		expect(figure.scrollIntoView).not.toHaveBeenCalled();
+	});
+
+	test("a reader who asks for less motion gets no smooth scroll", async () => {
+		const {component, figure} = createComponent();
+		figure.scrollIntoView = jest.fn();
+		atWidth(true, true);
+
+		await component.updateScene(answer({bin, items, reveal: true}));
+
+		expect(figure.scrollIntoView).toHaveBeenCalledWith({behavior: "auto", block: "start"});
+	});
+});
+
 describe("a failed update", () => {
 	const failure = new Error("failed");
 

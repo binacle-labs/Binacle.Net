@@ -5,6 +5,7 @@ import {largestBin, nextSampleIndex, randomBin, randomItemFor, sampleAt} from ".
 import Bin from "./bin";
 import Item from "./item";
 import ErrorViewModel from "../../components/errorsDialog/error";
+import type {PackScene} from "../../components/packView/packViewComponent";
 import {
 	ApiFailure,
 	BinacleClient,
@@ -13,8 +14,6 @@ import {
 	PackBinResponse,
 	PackCompareResponse,
 	PackCustomRequest,
-	PackedBox,
-	Bin as ApiBin,
 	UnpackedBox
 } from "binacle-net-client";
 
@@ -67,6 +66,11 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	sampleIndex: 0,
 	submitting: false,
 	submitStatus: '',
+	// Set by a failed submit: every row then shows what is wrong, not only the rows already left.
+	submitFailed: false,
+	// Goes up on every edit, so an answer can tell the form changed while it was out.
+	formVersion: 0,
+	previewedBinId: '',
 	// Set the moment a valid submit goes out, and left standing whatever the answer was.
 	lastRequest: null as SentRequest | null,
 	init() {
@@ -75,13 +79,47 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		this.model.algorithm = this.algorithms[0].value;
 		// $watch is deep, so this is the one place that catches every edit - randomize, a sample, a keystroke,
 		// a bin added or cleared.
-		this.$watch('model', () => {
-			this.submitStatus = '';
-		});
+		this.$watch('model', () => this.onFormEdited());
+		// The view is a child of this component, so it is not listening until the next tick.
+		this.$nextTick(() => this.showBin());
+	},
+	// An answer belongs to the form it was asked for, so any edit drops it.
+	onFormEdited() {
+		const answerDropped = this.results.length > 0 || this.submitting;
+		this.formVersion++;
+		this.submitStatus = '';
+		this.formErrors = [];
+		this.results = [];
+		this.selectedResult = null;
+		this.resultsAlgorithm = '';
+		// Redrawing resets the camera, so an edit that leaves the bin as it is does not redraw.
+		if (answerDropped || (this.firstValidBin()?.id ?? '') !== this.previewedBinId) {
+			this.showBin();
+		}
+	},
+	firstValidBin() {
+		return this.model.bins.find(bin => !bin.hasErrors()) ?? null;
+	},
+	binScene(): PackScene {
+		const bin = this.firstValidBin();
+		if (!bin) {
+			return {};
+		}
+		return {bin: {length: Number(bin.length), width: Number(bin.width), height: Number(bin.height)}};
+	},
+	showBin() {
+		const scene = this.binScene();
+		this.previewedBinId = this.firstValidBin()?.id ?? '';
+		this.$dispatch('update-scene', async () => scene);
+	},
+	// A row keeps quiet while it is being typed in.
+	showsErrors(touched: boolean) {
+		return touched || this.submitFailed;
 	},
 	showSample(index: number) {
 		const sample = sampleAt(index);
 		this.sampleIndex = index;
+		this.submitFailed = false;
 		this.model.bins = sample.bins;
 		this.model.items = sample.items;
 	},
@@ -196,10 +234,15 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	async onSubmit() {
 		this.formErrors = this.listErrors();
 		if (!this.isValid()) {
+			this.submitFailed = true;
+			if (this.formErrors.length < 1) {
+				this.formErrors = ['Fix the fields marked in red.'];
+			}
 			this.submitStatus = '';
 			this.$logger.error("[Binacle] Model is not valid");
 			return;
 		}
+		this.submitFailed = false;
 		// Set before the request, so the button and the status line change in the click's own frame.
 		this.submitting = true;
 		this.submitStatus = 'Packing...';
@@ -226,46 +269,52 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 
 		this.lastRequest = {method: 'POST', path: packCompareBinsPath, body: request};
 
-		let scene: {bin: ApiBin | undefined; items: PackedBox[]} | null = null;
+		// Started before the dispatch, so the loader runs for the whole wait, and the answer does not depend on
+		// a view listening.
+		const scene = this.packScene(request);
+		this.$dispatch('update-scene', () => scene);
+		await scene;
+	},
+	async packScene(request: PackCustomRequest): Promise<PackScene> {
+		const version = this.formVersion;
+		let response: PackCompareResponse | null = null;
 		try {
 			this.$logger.log('[Binacle] Packing request sent', request);
-			const response = await this.getResults(request);
+			response = await this.getResults(request);
 			this.$logger.log('[Binacle] Packing results received', response);
-			if (!response || !response.results) {
-				this.results = [];
-				this.selectedResult = null;
-				this.resultsAlgorithm = '';
-				this.submitStatus = 'No results.';
-			} else {
-				const firstSuccessfulResult = response.results.find(x => !!x.bin);
-				this.results = response.results;
-				this.selectedResult = firstSuccessfulResult || null;
-				this.resultsAlgorithm = request.parameters.algorithm;
-				this.submitStatus = this.results.length > 0 ? '' : 'No results.';
-				scene = {
-					bin: firstSuccessfulResult?.bin,
-					items: firstSuccessfulResult?.packedItems || []
-				};
-			}
 		} finally {
-			// Cleared once the response is in hand, not inside the thunk below - nothing runs that thunk
-			// unless a visualizer is listening for update-scene, and the button must not depend on one.
 			this.submitting = false;
 		}
 
-		this.$dispatch('update-scene', async () => scene);
+		if (version !== this.formVersion) {
+			return this.binScene();
+		}
+		if (!response || !response.results) {
+			this.results = [];
+			this.selectedResult = null;
+			this.resultsAlgorithm = '';
+			this.submitStatus = 'No results.';
+			return this.binScene();
+		}
+
+		const firstSuccessfulResult = response.results.find(x => !!x.bin);
+		this.results = response.results;
+		this.selectedResult = firstSuccessfulResult || null;
+		this.resultsAlgorithm = request.parameters.algorithm;
+		this.submitStatus = this.results.length > 0 ? '' : 'No results.';
+		return firstSuccessfulResult ? {...this.sceneOf(firstSuccessfulResult), reveal: true} : this.binScene();
+	},
+	sceneOf(result: PackBinResponse): PackScene {
+		// An item's id here is only its size, which the readout already prints.
+		const items = (result.packedItems ?? []).map(({id, ...item}) => item);
+		return {bin: result.bin, items, note: items.length > 0 ? '' : this.resultStatusText(result)};
 	},
 	isSelected(result: PackBinResponse) {
 		return this.selectedResult === result;
 	},
 	selectResult(result: PackBinResponse) {
 		this.selectedResult = result;
-		this.$dispatch('update-scene', async () => {
-			return {
-				bin: result?.bin,
-				items: result?.packedItems || []
-			};
-		});
+		this.$dispatch('update-scene', async () => this.sceneOf(result));
 	},
 	colorClass(result: PackBinResponse) {
 		if (result.status === 'FullyPacked') {
@@ -299,6 +348,27 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	resultIsFullyPacked(result: PackBinResponse) {
 		return result.status === 'FullyPacked';
 	},
+	resultBinSizeText(result: PackBinResponse) {
+		return `${result.bin.length} x ${result.bin.width} x ${result.bin.height}`;
+	},
+	resultItemCountText(result: PackBinResponse) {
+		const count = result.packedItems?.length ?? 0;
+		return count === 1 ? '1 item' : `${count} items`;
+	},
+	// Two decimals, as the API sends them: JSON drops the zeros of a 65.00.
+	resultBinFillText(result: PackBinResponse) {
+		return `${result.packedBinVolumePercentage.toFixed(2)}%`;
+	},
+	resultItemsFillText(result: PackBinResponse) {
+		return `Packed items volume ${result.packedItemsVolumePercentage.toFixed(2)}%`;
+	},
+	// Fully packed it is always 100, and with nothing packed always 0.
+	showsItemsFill(result: PackBinResponse) {
+		return result.status === 'PartiallyPacked';
+	},
+	resultAlgorithmName(result: PackBinResponse) {
+		return algorithmTexts[result.algorithmUsed] ?? result.algorithmUsed;
+	},
 	submitButtonText() {
 		return this.submitting ? 'Working...' : 'Get results';
 	},
@@ -314,5 +384,10 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	},
 	unpackedItemText(item: UnpackedBox) {
 		return `${item.quantity} x ${item.id}`;
+	},
+	// The API only hands back the id, so the size comes from what was sent.
+	unpackedItemSizeText(item: UnpackedBox) {
+		const sent = this.lastRequest?.body.items.find(x => x.id === item.id);
+		return sent ? `${sent.length} x ${sent.width} x ${sent.height}` : item.id;
 	}
 }));

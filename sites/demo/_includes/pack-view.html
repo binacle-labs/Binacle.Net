@@ -1,24 +1,10 @@
-<article id="visualizer-container"
-         class="no-padding tertiary-container"
-         x-data="pack_view"
-         @update-scene.window="updateScene($event.detail)"
-         x-ref="visualizercontainer">
-  <article class="medium no-padding transparent" id="renderer-container" x-ref="renderercontainer"></article>
-  <progress id="loader" class="circle absolute center middle"></progress>
-  <div>
-    <nav class="no-space">
-
-      <template x-for="control in controls.all()" :key="control.id">
-        <button type="button"
-                :id="control.id"
-                class="border tertiary-container max"
-                :class="control.classes"
-                :disabled="control.enabled ? null : 'disabled'"
-                @click="control.onClick"
-                >
-        <i x-text="control.icon"></i>
-        </button>
-      </template>
-    </nav>
+<figure class="pack-view" x-data="pack_view" @update-scene.window="updateScene($event.detail)">
+  <div class="pack-view__stage" data-pack-view-stage>
+    <p class="pack-view__empty" data-pack-view-empty>{{ include.empty }}</p>
   </div>
-</article>
+  <figcaption class="pack-view__strip">
+    <span class="dimension-line dimension-line--small dimension-line--strip" data-bin-dim hidden><span class="dimension-line__tick"></span><span class="dimension-line__number" data-bin-dim-number></span><span class="dimension-line__tick"></span></span>
+    <span class="pack-view__status" data-placed></span>
+  </figcaption>
+  <div class="pack-view__controls" data-pack-view-controls aria-label="Placement order"></div>
+</figure>
