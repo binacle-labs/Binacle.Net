@@ -23,7 +23,7 @@ one app together with the components it needs; each app keeps its own, as `plugi
 | Folder | What it is |
 |---|---|
 | `src/everydayItems/`, `src/packingDemo/`, `src/protocolDecoder/` | One folder per app. Each owns its plugin, its own component, the models its page binds to, and anything only it uses |
-| `src/components/` | The reusable components - `packView`, the 3D view's wrapper, then `errorsDialog`, `field`, `logger`. Each folder is self-contained and exports its public surface from its own `index.ts` |
+| `src/components/` | The reusable components - `packView`, the 3D view's wrapper, then `errorsDialog`, `field`, `logger`. Each folder is self-contained |
 | `src/shared/` | The few things every layer needs - `defineComponent` and `dictionary` |
 | `src/types/` | Ambient declarations for Alpine and the globals the pages set |
 | `tools/` | The sample-set generator. `just regen demo-samples` reads `shared/data/demo-samples` and writes `src/packingDemo/sampleData.ts`, which is generated - edit the data, not the file |
@@ -34,12 +34,12 @@ dispatches `update-scene` with a function that returns a promise of a scene:
 | Scene | What the view draws |
 |---|---|
 | `{bin}` | The bin alone, before any answer |
-| `{bin, items}` | An answer. Items are the API's shape, with an optional `id`, `itemType` and `category` |
+| `{bin, items}` | An answer. Items are the API's shape, with an optional `itemType`, `name` and `category` |
 | `{bin, items: [], note}` | An answer with nothing in it. The note shows under the view |
 | `null`, or no `bin` | Nothing |
 
-`category` picks the item's colour, and `itemType` its picture and the name the readout shows. The loader shows
-while the promise runs. Dispatching `highlight-item-type` with an item type's name shows only that item type in
+`category` picks the item's colour, `itemType` its picture, and `name` what the readout shows. The loader shows
+while the promise runs. Dispatching `highlight-item-type` with an item type's id shows only that item type in
 colour; `null` shows them all again.
 
 The figure's markup and colours are the host's: [`design-system`](../design-system) says what the view needs.

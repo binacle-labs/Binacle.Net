@@ -5,7 +5,7 @@ verified: 2026-09-28
 check: The exported surface matches src/index.ts; the endpoint list matches the methods on BinacleClient; spec/v4.json is byte-identical to the docs site's copy for the current version; the ajv options and the schema names asserted still match tests/contract.test.ts; the recipes named here match tooling/openapi.just
 also_update:
   - packages
-  - packages/binacle-net-ui
+  - shared/apps
 paths:
   - "packages/**"
 ---

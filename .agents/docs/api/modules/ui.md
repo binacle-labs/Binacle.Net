@@ -23,8 +23,8 @@ Not relevant to core API or Lib work. Skip this doc unless you are working on th
 **Razor Pages. No Blazor, no SignalR circuit, no server-side component state.** `AddRazorPages()` and
 `MapRazorPages().WithStaticAssets()` are the whole registration.
 
-**All interactivity is Alpine.js**, from TypeScript compiled out of `packages/binacle-net-ui`. The module
-holds no demo logic of its own — see `$packages/binacle-net-ui`.
+**All interactivity is Alpine.js**, from TypeScript compiled out of `shared/packages/apps`. The module
+holds no demo logic of its own — see `$shared/apps`.
 
 `<AddRazorSupportForMvc>true</AddRazorSupportForMvc>` is required in the csproj. Without it the `.cshtml`
 files are never discovered from the host app and every route 404s.
@@ -91,7 +91,7 @@ none of `vendors`, `three` or the two package chunks.
 **The module is a root npm workspace member.** `binacle-net-ui`, `binacle-vipaq`, `cookies` and
 `theme-switcher` resolve to symlinks in the root `node_modules`. One root `npm ci` covers the module; it has
 no lock file of its own. Why that matters for `three`, and why a warm webpack cache can hide a type error, is
-in `$packages/binacle-net-ui` — it is a property of the package, not of this host.
+in `$shared/apps` — it is a property of the package, not of this host.
 
 **Nothing on a page is fetched from the internet.** Three.js and Alpine are bundled, beercss and the fonts are
 copied in, and the footer carries no remote badges. The only external URLs in the rendered HTML are anchors a

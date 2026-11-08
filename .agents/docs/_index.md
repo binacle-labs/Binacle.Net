@@ -136,9 +136,6 @@ table of [README.md](README.md).
 - file: packages/binacle-net-client.md
   description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
   paths: ["packages/**"]
-- file: packages/binacle-net-ui.md
-  description: "packages/binacle-net-ui — Alpine.js apps and components plus a Three.js visualizer for the packing demo. The apps/components/shared split, the plugins, and the window.binacle global."
-  paths: ["packages/**"]
 - file: packages/dependencies.md
   description: "TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which."
   paths: ["packages/**"]
@@ -166,6 +163,9 @@ table of [README.md](README.md).
 - file: shared/README.md
   description: "Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)"
   paths: ["shared/**"]
+- file: shared/apps.md
+  description: "shared/packages/apps (@binacle/apps) - the Alpine.js apps behind Everyday Items, the packing demo and the ViPaq decoder. The names the hosts write by hand, the events, the call seam, and what each host build must set."
+  paths: ["shared/packages/apps/**"]
 - file: shared/dependencies.md
   description: "Shared slice dependency tree — Geometry (the BCL-only leaf everything geometric bottoms out on), CompactNotation, Packing, FluxResults, Reporting, and Binacle.Data, the algorithm scenario hub; who references them and who sees internals."
   paths: ["shared/**"]

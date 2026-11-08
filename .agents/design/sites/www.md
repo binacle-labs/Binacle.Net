@@ -1,8 +1,8 @@
 ---
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
-verified: 2026-09-29
-check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it; W10 against sites/www/_includes/drawings/, whose SVGs carry no fill attribute outside a mask, and every page pulling its drawing in with an include
+verified: 2026-11-08
+check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, the second webpack config in webpack.config.js, and _js/theme-init.ts importing @binacle/design-system/theme-init; W3 against _sass/main.scss and the build:css script in package.json; W4 against theme-switcher in _includes/header.html being defined by main.js; W5 against exchange.html still being an include and every page calling it; W7 against the scope table on the home and cartonization pages; W9 against the fit-row__verdicts lists holding the verdicts as text, and the header's img taking site.logo.src; W10 against sites/www/_includes/drawings/, whose SVGs carry no fill attribute outside a mask, and every page pulling its drawing in with an include
 paths:
   - "sites/www/**"
 ---
@@ -37,16 +37,14 @@ on `<html>` and not a class on `<body>`, on this site and on the other three.
 
 **It is a second webpack config, not a second entry.** On docs and demo the main config splits every entry
 into a runtime chunk and a vendors chunk, and a head script has to be one self-contained file. www's main
-config does not split; here the second config is what keeps the `esnext` override below to this bundle alone. Both write into `js/`, so
-the main config's `clean` keeps `theme-init.js` - without that the two race and the file is deleted after
-it is written.
+config does not split; it keeps the second config so all three sites build the head script the same way, alone
+and with no source map. Both write into `js/`, so the main config's `clean` keeps `theme-init.js` - without
+that the two race and the file is deleted after it is written.
 
-It overrides ts-loader to `module: 'esnext'` for this bundle alone - the tsconfigs emit commonjs, which
-webpack can neither tree-shake nor concatenate. Without that the bundle is twice the size and the package
-needs a second entry point to keep the switcher element out of it. **1.21 KiB minified, 587 gzipped.**
-What is in it and why is `$packages`.
+`_js/theme-init.ts` imports `@binacle/design-system/theme-init`, the package's entry for the head script, so the
+switcher element stays out of it. What is in it and why is `$packages`.
 
-**Nothing stored, and the stylesheet's `prefers-color-scheme` query decides** - which is the toggle
+**With nothing stored, the stylesheet's `prefers-color-scheme` query decides** - which is the toggle
 defaulting to the machine. `data-default-theme` on `<html>` is the last resort, for a browser reporting no
 preference at all.
 
@@ -57,21 +55,20 @@ block for that reason**, and `css/` is gitignored because it is build output.
 
 ## W4 - the pages are complete with JavaScript off
 
-The theme toggle in `_includes/header.html` is hidden until `main.js` reveals it. **A control that does
-nothing is worse than no control.** Anything added later follows the same rule.
+The theme toggle in `_includes/header.html` is a `<theme-switcher>` element that `main.js` defines. Until then
+it is empty, so with JavaScript off there is no button. **A control that does nothing is worse than no
+control.** Anything added later follows the same rule.
 
 ## W5 - the exchange card is an include so its payloads cannot rot
 
 `_includes/exchange.html` appears on all four pages and reads from one `_data/exchange.yml`. **Inline copies
 would be re-run on one page and go stale on the other three.**
 
-Every exchange in that file was really run. The JSON goes through `markdownify` so Rouge marks it up; the
-classes Rouge emits are mapped in `_sass/_code.scss`, confirmed against a real build on 23 Aug 2026 -
-`.nl` key names, `.s2` strings, `.mi`/`.mf` numbers, `.p` punctuation, `.w` whitespace, `.kc` true/false/null.
+Every exchange in that file was really run. The JSON is escaped into a plain code block, with no highlighting.
 
 ```liquid
-{% include exchange.html id="hero" block=site.data.exchange.fit
-   verdict="The 40x30x20 locker holds all three items. The small one does not." %}
+{% include exchange.html block=site.data.exchange.fit fold=true
+   verdict="The medium locker holds all three items. The small one takes only one of them." %}
 ```
 
 ## W6 - every example is v3, and that is a contract question
@@ -89,8 +86,9 @@ the image, so the request carries only the order, **which is the shape a real in
 response does not carry coordinates. **Remove the sentence and the page promises something the card does not
 show.**
 
-**`pages/index.html`, the multi-box paragraph.** It becomes false the day Binacle.Net distributes an order
-across several boxes. **Whoever ships that feature deletes it.**
+**The scope table on `pages/index.html` and `pages/cartonization.html`**: "works one box at a time", and
+"How do I split an order across boxes?" under what it does not answer. Both become false the day Binacle.Net
+distributes an order across several boxes. **Whoever ships that feature changes them.**
 
 ## W8 - four schema types are rejected, so nobody adds them back
 
@@ -99,20 +97,14 @@ across several boxes. **Whoever ships that feature deletes it.**
 withdrawn, and it invites writing fake questions), `WebSite` + `SearchAction` (no site search), and `HowTo`
 (deprecated).
 
-## W9 - the glyphs are the whole image budget
+## W9 - a verdict is a word, and the mark is the vector file
 
-A tick and a balance mark. Hand-drawn, `currentColor`, stroke only, defined once in `_includes/glyphs.html`
-and referenced with `<use>`. **No icon font.**
+Under each drawing, the `fit-row__verdicts` list gives each box the API's own result, `AllItemsFit` or
+`NotAllItemsFit`, as text. **No glyph stands in for it**, so a screen reader reads the same verdict a sighted
+reader sees.
 
-`_includes/verdicts.html` carries a visually hidden word on each line. **The glyph carries the meaning, so
-without it a screen reader gets two identical bullets.**
-
-```liquid
-{% include verdicts.html tick="..." scales="..." %}
-```
-
-The mark in `_includes/header.html` is the vector file, never a downscaled png - **the raster copies turn to
-mush below 48px** and the header renders at 28.
+The mark in `_includes/header.html` is `site.logo.src`, the SVG, never a downscaled png - **the raster copies
+turn to mush below 48px**, and the header draws it well below that.
 
 ## W10 - each drawing is an include file, not an image
 

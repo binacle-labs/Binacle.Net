@@ -4,7 +4,7 @@ description: TypeScript packages under packages/ (npm workspaces) — UI compone
 verified: 2026-11-05
 check: The package list, their descriptions and the private flag match each packages/*/package.json; the Related Tests table names every package under packages/ that has a suite, with the alias tooling/tests.just gives it
 also_update:
-  - packages/binacle-net-ui
+  - shared/apps
   - packages/binacle-net-client
   - sites/demo
   - api/modules/ui
@@ -22,7 +22,7 @@ the package root.
 
 | Package | Description |
 |---|---|
-| `binacle-net-ui` | Alpine.js + Three.js frontend for the packing demo and ViPaq decoder — see `$packages/binacle-net-ui` |
+| `binacle-net-ui` | Alpine.js + Three.js frontend for the packing demo and ViPaq decoder — see `$shared/apps` |
 | `binacle-net-client` | Hand-written TypeScript client for the v4 API, with a committed copy of the OpenAPI document and a contract test against it — see `$packages/binacle-net-client` |
 | `binacle-net-service-client` | **Experimental, local only.** The same shape as `binacle-net-client`, for the ServiceModule's token and admin routes, with its own committed document and contract test. Its one host is `sites/admin`, which nothing builds or deploys |
 | `binacle-compact-notation` | Compact text notation for Binacle geometry — TS mirror of C# `Binacle.CompactNotation`; used by `binacle-vipaq` (tools/tests) and `binacle-net-ui` (its sample generator) |
@@ -36,7 +36,7 @@ The ViPaq TypeScript mirror lives at `vipaq/packages/binacle-vipaq/` — see `$v
 
 Alpine.js components + Three.js visualizer for the packing demo and ViPaq decoder. Full reference —
 components, plugins, model layers, the `window.binacle` global, and how to add a component — is in
-`$packages/binacle-net-ui`. **Consumed as TS source by two hosts**, each with its own webpack config:
+`$shared/apps`. **Consumed as TS source by two hosts**, each with its own webpack config:
 `sites/demo/` and the UIModule (`$api/modules/ui`). One implementation, two pages — a change lands on both.
 
 ## binacle-compact-notation

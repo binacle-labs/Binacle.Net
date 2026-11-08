@@ -1,18 +1,17 @@
 ---
 id: sites/site-theming-css
-description: The CSS side of the theme on all three sites - why the attribute is on html, why every dark block also lands on body, and the two rules that keep the switcher element from being a box or a dead control.
-verified: 2026-09-29
-check: T1 against the @media (prefers-color-scheme: dark) block in sites/www/_sass/_tokens.scss and the when-dark mixin in sites/docs/_sass/_theme-modes.scss and sites/demo/_sass/_theme-modes.scss; T2 against the body selectors inside that mixin, which must stay paired with the :root ones; T3 against :root[data-theme="light"] { color-scheme: light } on all three sites; T4 against theme-switcher and theme-switcher:not(:defined) in sites/www/_sass/_layout.scss and both _theme.scss files
+description: The CSS side of the theme on every surface - why the attribute is on html and the system query lives in the stylesheet, how color-scheme follows the choice, and why the switcher element is not a box.
+verified: 2026-11-08
+check: T1 and T2 against the :root block, the -dark mixin, :root[data-theme="dark"] and the prefers-color-scheme block in shared/packages/design-system/base/_tokens.scss; T3 against theme-switcher { display: contents } in components/theme-button/_index.scss, and the element being empty in each surface's header
 paths:
-  - "sites/www/_sass/**"
-  - "sites/docs/_sass/**"
-  - "sites/demo/_sass/**"
+  - "shared/packages/design-system/base/_tokens.scss"
+  - "shared/packages/design-system/components/theme-button/**"
 ---
 
 # The theme, from the stylesheet's side
 
-**These were comments in the three sites' sass until 4 Sep 2026.** The script half - why the pre-paint read is
-a separate blocking bundle and why it cannot touch `document.body` - is `$sites/www-design#W2`.
+The design system's tokens hold the theme for all three sites and the UI module. The script half - why the
+pre-paint read is a separate blocking bundle and why it cannot touch `document.body` - is `$sites/www-design#W2`.
 
 ## T1 - no attribute at all is a state, and only CSS can carry it
 
@@ -20,24 +19,19 @@ The theme is `data-theme` on the `html` element. **No attribute means follow the
 state an attribute or a class cannot express, and that is why the `prefers-color-scheme` query lives in the
 stylesheet rather than in JavaScript.
 
-## T2 - on docs and demo every dark block lands on `body` as well as `html`
+Dark applies in two cases: `data-theme="dark"`, or no `light` choice on a dark machine. Both include one
+`-dark` mixin, so the two cannot drift apart.
 
-**BeerCSS declares its own tokens on the `body` element.** A declaration on `body` beats one inherited from
-`html` whatever the specificity - they are different elements, so specificity never comes into it. BeerCSS
-also stamps light or dark on `body` itself when it finds neither, which is now always.
+## T2 - `color-scheme` moves with the theme
 
-The `when-dark` mixin exists so the pairing cannot be forgotten in one block and remembered in another. www
-has no BeerCSS and needs no `body` selector.
+`color-scheme: light` sits in the `:root` block and `color-scheme: dark` in the dark mixin. **A reader who picks
+light on a dark machine gets light scrollbars and form controls**, because the dark block never applies to
+them. A separate light rule is not needed.
 
-## T3 - a stored light choice has to move `color-scheme` too
+## T3 - the switcher element is not a box
 
-`:root[data-theme="light"] { color-scheme: light; }` on all three sites. Without it a reader who picks light
-on a dark machine keeps dark scrollbars and dark form controls on a light page.
+**`theme-switcher { display: contents; }`** - the element only hosts the button. The button has to sit
+directly in the header's row, where the header's layout expects it.
 
-## T4 - two rules keep the switcher element honest
-
-**`theme-switcher { display: contents; }`** - the element is a definition point, not a box. The button it
-renders has to sit directly in the header's layout, where the host's classes expect it.
-
-**`theme-switcher:not(:defined) { display: none; }`** - until the script defines it the element is not a
-control, just its own contents. A dead control is worse than no control.
+The element is empty in the markup; the script writes the button into it. **With JavaScript off there is no
+button**, and a dead control is worse than no control.
