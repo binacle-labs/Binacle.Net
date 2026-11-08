@@ -16,7 +16,7 @@ export default class Box {
 		this.height = height;
 	}
 
-	public get id(): string {
+	public get size(): string {
 		return `${this.length}x${this.width}x${this.height}`;
 	}
 
@@ -38,11 +38,12 @@ export default class Box {
 		return errors.errorMessages;
 	}
 
+	// `field` is the property the input binds to; `label` starts the message.
 	getDimensions() {
 		return [
-			{name: 'Length', value: Number(this.length)},
-			{name: 'Width', value: Number(this.width)},
-			{name: 'Height', value: Number(this.height)},
+			{field: 'length', label: 'Length', value: Number(this.length)},
+			{field: 'width', label: 'Width', value: Number(this.width)},
+			{field: 'height', label: 'Height', value: Number(this.height)},
 		];
 	}
 
@@ -51,23 +52,23 @@ export default class Box {
 
 		const dimensions = this.getDimensions();
 
-		dimensions.forEach(dimension => {
-			if (dimension.value === null || dimension.value === undefined) {
-				errors.push(dimension.name, `${dimension.name} is required`);
+		dimensions.forEach(({field, label, value}) => {
+			if (value === null || value === undefined) {
+				errors.push(field, `${label} is required`);
 			}
 
-			if (Number.isNaN(dimension.value)) {
-				errors.push(dimension.name,`${dimension.name} must be a number`);
+			if (Number.isNaN(value)) {
+				errors.push(field, `${label} must be a number`);
 			}
 
-			if (!Number.isInteger(dimension.value)) {
-				errors.push(dimension.name,`${dimension.name} must be an integer`);
+			if (!Number.isInteger(value)) {
+				errors.push(field, `${label} must be an integer`);
 			}
 
-			if (dimension.value < Box.minAllowedDimension || dimension.value > Box.maxAllowedDimension) {
+			if (value < Box.minAllowedDimension || value > Box.maxAllowedDimension) {
 				errors.push(
-					dimension.name,
-					`${dimension.name} must be between ${Box.minAllowedDimension} and ${Box.maxAllowedDimension}`,
+					field,
+					`${label} must be between ${Box.minAllowedDimension} and ${Box.maxAllowedDimension}`,
 				);
 			}
 		});

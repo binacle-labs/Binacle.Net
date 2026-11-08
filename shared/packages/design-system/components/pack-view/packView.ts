@@ -243,10 +243,9 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 		render();
 	}
 
-	// Built from elements, not markup: an item's id is whatever the user typed.
 	function itemReadout(element: HTMLElement) {
 		const item = items[shown - 1];
-		const name = item.id || item.itemType || "";
+		const name = item.itemType ?? "";
 
 		const count = document.createElement("span");
 		count.className = "pack-view__count";

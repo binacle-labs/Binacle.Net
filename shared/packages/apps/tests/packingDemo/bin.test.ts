@@ -9,12 +9,12 @@ test("a bin is a box", () => {
 	expect(isBox).toBe(true);
 });
 
-test("a bin carries the box id", () => {
+test("a bin carries the box size", () => {
 	const bin = new Bin(10, 20, 30);
 
-	const id = bin.id;
+	const size = bin.size;
 
-	expect(id).toBe("10x20x30");
+	expect(size).toBe("10x20x30");
 });
 
 test("a bin carries the box validation", () => {

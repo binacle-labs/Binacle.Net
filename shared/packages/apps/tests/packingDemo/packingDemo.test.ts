@@ -182,8 +182,8 @@ describe("init", () => {
 		second.init();
 
 		expect(first.sampleIndex).toBe(0);
-		expect(second.model.bins.map(bin => bin.id)).toEqual(first.model.bins.map(bin => bin.id));
-		expect(second.model.items.map(item => item.id)).toEqual(first.model.items.map(item => item.id));
+		expect(second.model.bins.map(bin => bin.size)).toEqual(first.model.bins.map(bin => bin.size));
+		expect(second.model.items.map(item => item.size)).toEqual(first.model.items.map(item => item.size));
 	});
 
 	test("editing the seeded model leaves the set alone", () => {
@@ -561,7 +561,7 @@ describe("editing the lists", () => {
 
 		app.removeBin(1);
 
-		expect(app.model.bins.map(b => b.id)).toEqual(["10x10x10", "30x30x30"]);
+		expect(app.model.bins.map(b => b.size)).toEqual(["10x10x10", "30x30x30"]);
 	});
 
 	test("clearing the bins empties the list", () => {
@@ -579,7 +579,7 @@ describe("editing the lists", () => {
 
 		app.removeItem(0);
 
-		expect(app.model.items.map(i => i.id)).toEqual(["2x2x2-1"]);
+		expect(app.model.items.map(i => i.size)).toEqual(["2x2x2"]);
 	});
 
 	test("clearing the items empties the list", () => {
@@ -630,8 +630,8 @@ describe("randomize", () => {
 		app.randomize["@click"].call(app);
 
 		const picked = sampleAt(app.sampleIndex);
-		expect(app.model.bins.map(bin => bin.id)).toEqual(picked.bins.map(bin => bin.id));
-		expect(app.model.items.map(item => item.id)).toEqual(picked.items.map(item => item.id));
+		expect(app.model.bins.map(bin => bin.size)).toEqual(picked.bins.map(bin => bin.size));
+		expect(app.model.items.map(item => item.size)).toEqual(picked.items.map(item => item.size));
 	});
 
 	test("the new bins and items are fresh objects", () => {
@@ -663,11 +663,11 @@ describe("randomize", () => {
 	test("the bins and items on screen change with it", () => {
 		const {app} = createApp();
 		app.init();
-		const before = app.model.bins.map(bin => bin.id).join();
+		const before = app.model.bins.map(bin => bin.size).join();
 
 		app.randomize["@click"].call(app);
 
-		expect(app.model.bins.map(bin => bin.id).join()).not.toBe(before);
+		expect(app.model.bins.map(bin => bin.size).join()).not.toBe(before);
 	});
 
 	test("the picked set is submittable", () => {
@@ -813,9 +813,22 @@ describe("the request", () => {
 		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins).toEqual([
-			{id: "10x20x30", length: 10, width: 20, height: 30},
-			{id: "40x50x60", length: 40, width: 50, height: 60},
+			{id: "bin-1", length: 10, width: 20, height: 30},
+			{id: "bin-2", length: 40, width: 50, height: 60},
 		]);
+	});
+
+	test("two rows of the same size get ids of their own", async () => {
+		const {app} = createApp();
+		app.model.bins = [new Bin(10, 10, 10), new Bin(10, 10, 10)];
+		app.model.items = [new Item(2, 2, 2, 1), new Item(2, 2, 2, 1)];
+		const fetchMock = mockFetch(stubResponse(200, packingResponse([])));
+
+		await app.onSubmit();
+
+		const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+		expect(body.bins.map((bin: {id: string}) => bin.id)).toEqual(["bin-1", "bin-2"]);
+		expect(body.items.map((item: {id: string}) => item.id)).toEqual(["item-1", "item-2"]);
 	});
 
 	// x-model without the .number modifier stores the input's string, and the API declares these as int.
@@ -830,7 +843,7 @@ describe("the request", () => {
 		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).bins[0])
-			.toEqual({id: "10x20x30", length: 10, width: 20, height: 30});
+			.toEqual({id: "bin-1", length: 10, width: 20, height: 30});
 	});
 
 	test("sends item dimensions and quantity as numbers even when the model holds strings", async () => {
@@ -844,7 +857,7 @@ describe("the request", () => {
 		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items[0])
-			.toEqual({id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5});
+			.toEqual({id: "item-1", length: 2, width: 3, height: 4, quantity: 5});
 	});
 
 	test("maps the item view models to plain api items, quantity included", async () => {
@@ -856,7 +869,7 @@ describe("the request", () => {
 		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body).items).toEqual([
-			{id: "2x3x4-5", length: 2, width: 3, height: 4, quantity: 5},
+			{id: "item-1", length: 2, width: 3, height: 4, quantity: 5},
 		]);
 	});
 });
@@ -912,7 +925,7 @@ describe("the request a host can show", () => {
 
 		await app.onSubmit();
 
-		expect(app.lastRequest?.body.bins).toEqual([{id: "10x10x10", length: 10, width: 10, height: 10}]);
+		expect(app.lastRequest?.body.bins).toEqual([{id: "bin-1", length: 10, width: 10, height: 10}]);
 	});
 });
 
@@ -1150,14 +1163,14 @@ describe("the scene the results feed", () => {
 		const {app, dispatched} = createApp();
 		const item = {length: 2, width: 2, height: 2, x: 0, y: 0, z: 0};
 		arrangeValidModel(app);
-		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: [{id: "2x2x2-1", ...item}]})])));
+		mockFetch(stubResponse(200, packingResponse([packedData({packedItems: [{id: "item-1", ...item}]})])));
 
 		await app.onSubmit();
 		const scene = await sceneThunk(dispatched)();
 
 		expect(scene).toEqual({
 			bin: {id: "10x10x10", length: 10, width: 10, height: 10},
-			items: [item],
+			items: [{id: "item-1", ...item}],
 			note: "",
 			reveal: true
 		});
@@ -1273,12 +1286,12 @@ describe("picking a result from the list", () => {
 	test("hands the scene that result's bin and items", async () => {
 		const {app, dispatched} = createApp();
 		const item = {length: 2, width: 2, height: 2, x: 1, y: 2, z: 3};
-		const result = packedData({packedItems: [{id: "2x2x2-1", ...item}]});
+		const result = packedData({packedItems: [{id: "item-1", ...item}]});
 
 		app.selectResult(result);
 
 		const scene = await sceneThunk(dispatched)();
-		expect(scene).toEqual({bin: result.bin, items: [item], note: ""});
+		expect(scene).toEqual({bin: result.bin, items: result.packedItems, note: ""});
 	});
 });
 
@@ -1531,7 +1544,7 @@ describe("the words on a result row", () => {
 		mockFetch(stubResponse(200, packingResponse([packedData()])));
 		await app.onSubmit();
 
-		expect(app.unpackedItemSizeText({id: "20x3x2-4", quantity: 4})).toBe("20 x 3 x 2");
+		expect(app.unpackedItemSizeText({id: "item-1", quantity: 4})).toBe("20 x 3 x 2");
 	});
 
 	test("an item nobody sent falls back to its id", () => {
@@ -1683,14 +1696,17 @@ describe("the items a result could not fit", () => {
 	});
 
 	// 02-packs-nowhere is the sample that exists to show a partial pack - the volume fits, the geometry does not.
-	test("the partial-pack sample names what was left out", () => {
+	test("the partial-pack sample names what was left out", async () => {
 		const {app} = createApp();
 		const sample = sampleData.find(x => x.name === "02-packs-nowhere")!;
-		const item = new Item(...sample.items[0]);
-		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
+		app.model.bins = [new Bin(...sample.bins[0])];
+		app.model.items = [new Item(...sample.items[0])];
+		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "item-1", quantity: 2}]});
+		mockFetch(stubResponse(200, packingResponse([result])));
+		await app.onSubmit();
 
 		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 2 items");
-		expect(app.unpackedItemsOf(result).map(x => x.quantity)).toEqual([2]);
+		expect(app.unpackedItemsOf(result).map(x => app.unpackedItemSizeText(x))).toEqual(["20 x 20 x 20"]);
 	});
 
 	test("the partial-pack sample is still in the set", () => {

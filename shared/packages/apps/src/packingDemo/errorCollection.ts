@@ -8,10 +8,8 @@ export default class ErrorCollection {
 	}
 
 	push(fieldName: string, message: string) {
-		// to lower
-		const normalizedFieldName = fieldName.toLowerCase();
-		this.fields[normalizedFieldName] = this.fields[normalizedFieldName] || [];
-		this.fields[normalizedFieldName].push(message);
+		this.fields[fieldName] = this.fields[fieldName] || [];
+		this.fields[fieldName].push(message);
 	}
 
 	get errorMessages() {
@@ -25,8 +23,7 @@ export default class ErrorCollection {
 	}
 
 	hasError(fieldName: string) {
-		const normalizedFieldName = fieldName.toLowerCase();
-		return (this.fields[normalizedFieldName]?.length ?? 0) > 0;
+		return (this.fields[fieldName]?.length ?? 0) > 0;
 	}
 
 	hasErrors() {

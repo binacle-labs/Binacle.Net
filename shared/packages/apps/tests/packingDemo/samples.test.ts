@@ -8,10 +8,6 @@ const rolls = 5000;
 
 const everyIndex = Array.from({length: sampleCount}, (_, index) => index);
 
-function duplicates(ids: string[]) {
-	return ids.filter((id, index) => ids.indexOf(id) !== index);
-}
-
 // The set is generated from shared/data/demo-samples, so a bad file there is a 422 on the demo page and
 // nothing else here would catch it.
 describe("the sample set", () => {
@@ -44,22 +40,6 @@ describe("the sample set", () => {
 		expect(empty).toEqual([]);
 	});
 
-	test("no sample repeats a bin id", () => {
-		const samples = everyIndex.map(index => sampleAt(index));
-
-		const repeated = samples.flatMap(sample => duplicates(sample.bins.map(bin => bin.id)));
-
-		expect(repeated).toEqual([]);
-	});
-
-	test("no sample repeats an item id", () => {
-		const samples = everyIndex.map(index => sampleAt(index));
-
-		const repeated = samples.flatMap(sample => duplicates(sample.items.map(item => item.id)));
-
-		expect(repeated).toEqual([]);
-	});
-
 	test("every dimension is one the API accepts", () => {
 		const samples = everyIndex.map(index => sampleAt(index));
 
@@ -90,8 +70,8 @@ describe("sampleAt", () => {
 		const first = sampleAt(0);
 		const second = sampleAt(0);
 
-		expect(second.bins.map(bin => bin.id)).toEqual(first.bins.map(bin => bin.id));
-		expect(second.items.map(item => item.id)).toEqual(first.items.map(item => item.id));
+		expect(second.bins.map(bin => bin.size)).toEqual(first.bins.map(bin => bin.size));
+		expect(second.items.map(item => item.size)).toEqual(first.items.map(item => item.size));
 	});
 
 	test("hands back a new Bin and Item every call", () => {

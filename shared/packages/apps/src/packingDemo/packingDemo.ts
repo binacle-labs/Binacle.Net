@@ -68,7 +68,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	submitFailed: false,
 	// Goes up on every edit, so an answer can tell the form changed while it was out.
 	formVersion: 0,
-	previewedBinId: '',
+	previewedBinSize: '',
 	// Set the moment a valid submit goes out, and left standing whatever the answer was.
 	lastRequest: null as SentRequest | null,
 	init() {
@@ -91,7 +91,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		this.selectedResult = null;
 		this.resultsAlgorithm = '';
 		// Redrawing resets the camera, so an edit that leaves the bin as it is does not redraw.
-		if (answerDropped || (this.firstValidBin()?.id ?? '') !== this.previewedBinId) {
+		if (answerDropped || (this.firstValidBin()?.size ?? '') !== this.previewedBinSize) {
 			this.showBin();
 		}
 	},
@@ -107,7 +107,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	},
 	showBin() {
 		const scene = this.binScene();
-		this.previewedBinId = this.firstValidBin()?.id ?? '';
+		this.previewedBinSize = this.firstValidBin()?.size ?? '';
 		this.$dispatch('update-scene', async () => scene);
 	},
 	// A row keeps quiet while it is being typed in.
@@ -211,14 +211,15 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 				algorithm: this.model.algorithm,
 			},
 			// x-model hands back the input's string, and the API declares these as int.
-			bins: this.model.bins.map(x => ({
-				id: x.id,
+			// Ids go by place: the API rejects a repeated id, and two rows may share a size.
+			bins: this.model.bins.map((x, index) => ({
+				id: `bin-${index + 1}`,
 				length: Number(x.length),
 				width: Number(x.width),
 				height: Number(x.height)
 			})),
-			items: this.model.items.map(x => ({
-				id: x.id,
+			items: this.model.items.map((x, index) => ({
+				id: `item-${index + 1}`,
 				length: Number(x.length),
 				width: Number(x.width),
 				height: Number(x.height),
@@ -264,8 +265,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		return firstSuccessfulResult ? {...this.sceneOf(firstSuccessfulResult), reveal: true} : this.binScene();
 	},
 	sceneOf(result: PackBinResponse): PackScene {
-		// An item's id here is only its size, which the readout already prints.
-		const items = (result.packedItems ?? []).map(({id, ...item}) => item);
+		const items = result.packedItems ?? [];
 		return {bin: result.bin, items, note: items.length > 0 ? '' : this.resultStatusText(result)};
 	},
 	isSelected(result: PackBinResponse) {

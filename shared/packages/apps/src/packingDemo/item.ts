@@ -7,13 +7,9 @@ export default class Item extends Box {
 		this.quantity = quantity;
 	}
 
-	get id() {
-		return `${super.id}-${this.quantity}`;
-	}
-
 	getDimensions() {
 		const dimensions = super.getDimensions();
-		dimensions.push({name: 'Quantity', value: Number(this.quantity)});
+		dimensions.push({field: 'quantity', label: 'Quantity', value: Number(this.quantity)});
 		return dimensions;
 	}
 

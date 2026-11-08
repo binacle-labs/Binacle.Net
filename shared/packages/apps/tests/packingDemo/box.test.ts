@@ -1,25 +1,25 @@
 import Box from "../../src/packingDemo/box";
 
-describe("id", () => {
+describe("size", () => {
 	test("joins the three sides with x", () => {
 		const box = new Box(10, 20, 30);
 
-		const id = box.id;
+		const size = box.size;
 
-		expect(id).toBe("10x20x30");
+		expect(size).toBe("10x20x30");
 	});
 });
 
 describe("getDimensions", () => {
-	test("names the three sides and coerces the values with Number", () => {
+	test("names the three sides by property and by label, and coerces the values with Number", () => {
 		const box = new Box("10" as unknown as number, 20, 30);
 
 		const dimensions = box.getDimensions();
 
 		expect(dimensions).toEqual([
-			{name: "Length", value: 10},
-			{name: "Width", value: 20},
-			{name: "Height", value: 30},
+			{field: "length", label: "Length", value: 10},
+			{field: "width", label: "Width", value: 20},
+			{field: "height", label: "Height", value: 30},
 		]);
 	});
 });
@@ -136,7 +136,7 @@ describe("isFieldValid", () => {
 	test("is false for the field that failed", () => {
 		const box = new Box(0, 20, 30);
 
-		const valid = box.isFieldValid("Length");
+		const valid = box.isFieldValid("length");
 
 		expect(valid).toBe(false);
 	});
@@ -144,23 +144,23 @@ describe("isFieldValid", () => {
 	test("is true for a field that passed", () => {
 		const box = new Box(0, 20, 30);
 
-		const valid = box.isFieldValid("Width");
+		const valid = box.isFieldValid("width");
 
 		expect(valid).toBe(true);
 	});
 
-	test("matches the field name whatever its case", () => {
+	test("is keyed by the property, not by the word the message shows", () => {
 		const box = new Box(0, 20, 30);
 
-		const valid = box.isFieldValid("length");
+		const valid = box.isFieldValid("Length");
 
-		expect(valid).toBe(false);
+		expect(valid).toBe(true);
 	});
 
 	test("is true for a name no dimension uses", () => {
 		const box = new Box(0, 20, 30);
 
-		const valid = box.isFieldValid("Depth");
+		const valid = box.isFieldValid("depth");
 
 		expect(valid).toBe(true);
 	});
