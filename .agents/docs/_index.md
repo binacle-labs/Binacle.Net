@@ -131,14 +131,14 @@ table of [README.md](README.md).
 
 ```yaml
 - file: packages/README.md
-  description: "TypeScript packages under packages/ (npm workspaces) — UI components, the v4 API client, the experimental service client, compact-notation mirror, cookie utilities, theme switching, and the sites' page behaviour."
+  description: "The TypeScript npm workspaces - where each package lives, and the two generic ones under packages/, cookies and theme-switcher, in full."
   paths: ["packages/**"]
 - file: packages/binacle-net-client.md
   description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
   paths: ["packages/**"]
 - file: packages/dependencies.md
-  description: "TypeScript packages dependency tree — the npm workspaces and which package imports (and declares) which."
-  paths: ["packages/**"]
+  description: "TypeScript packages dependency tree - the npm workspaces and which package imports (and declares) which."
+  paths: ["packages/**", "api/packages/**", "shared/packages/**", "vipaq/packages/**"]
 ```
 
 ## Ruby
