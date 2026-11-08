@@ -19,18 +19,14 @@ the vendor's own output, dropped in as-is.
 
 | Folder | What the sites use it for | Version | Licence |
 |---|---|---|---|
-| `lib/beercss/` | The Material-style CSS framework, plus the Material Symbols fonts | `version` file, `3.11.11` | MIT |
 | `lib/swagger-ui/` | The Swagger UI bundle the docs site embeds | `5.34.1`, recorded here only | Apache-2.0 |
-| `lib/material-dynamic-colors/` | Theme colour generation for beercss | not recorded | Apache-2.0 |
 
-**Every folder carries the upstream `LICENSE`**, and `swagger-ui` its `NOTICE` too. The vendor output arrived
-with no copyright header in it - beercss ships none and the swagger-ui bundle has none either - so the file
-beside it is the only notice there is. **Do not delete it when upgrading.** `gulpfile.js` has a `licenses`
-glob so it travels with the copy into every site and into the UI module's `wwwroot/`, which is how it reaches
-the published image.
+**Every folder carries the upstream `LICENSE`**, and `swagger-ui` its `NOTICE` too. The bundle arrived with no
+copyright header in it, so the files beside it are the only notice there is. **Do not delete them when
+upgrading.** `gulpfile.js` has a `licenses` glob so they travel with the copy.
 
-**To upgrade one, replace the files and update its `version` file.** Only beercss has one - if you upgrade
-either of the others, add it, because the table above is then the only record of what shipped.
+**To upgrade one, replace the files and update its version in the table above.** The table is the only record
+of what shipped.
 
 ## 🚀 Copying them into the sites
 
@@ -53,9 +49,6 @@ someone removes it by hand.
 
 ## 📦 The UI module reads this folder too
 
-`api/src/Binacle.Net.UIModule/wwwroot/` is generated in full and gitignored - `just assets` fills its `lib/`
-and `media/`, and the module's own build fills `js/` and `css/`. **Nothing under that `wwwroot/` is edited by
+`api/src/Binacle.Net.UIModule/wwwroot/` is generated in full and gitignored - `just assets` fills its tab icon,
+`fonts/` and the mark in `media/`, and the module's own build fills `js/` and `css/`. **Nothing under that `wwwroot/` is edited by
 hand**; the module's sources are `_sass/` and `_js/` beside it.
-
-So upgrading a library here upgrades the module as well, which was not true before: it used to keep its own
-checked-in copy of beercss, and that copy sat three versions behind this one for as long as it existed.

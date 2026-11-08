@@ -130,12 +130,6 @@ export const protocolDecoderApp = defineComponent(() => ({
 			}
 		}
 	},
-	resultTitle(result: DecodedPackingResult){
-		return `Bin: ${result.bin.length}x${result.bin.width}x${result.bin.height}`;
-	},
-	resultBinPercentageText(result: DecodedPackingResult){
-		return `Packed Bin Volume: ${result.packedBinVolumePercentage()}%`;
-	},
 	resultBinSizeText(result: DecodedPackingResult){
 		return `${result.bin.length} x ${result.bin.width} x ${result.bin.height}`;
 	},

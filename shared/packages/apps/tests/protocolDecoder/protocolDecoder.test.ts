@@ -446,26 +446,6 @@ describe("selecting a result", () => {
 	});
 });
 
-describe("result labels", () => {
-	test("the title is the bin's dimensions", () => {
-		const {decoder} = createDecoder();
-		const result = new DecodedPackingResult("one", bin, items);
-
-		const title = decoder.resultTitle(result);
-
-		expect(title).toBe("Bin: 10x10x10");
-	});
-
-	test("the bin percentage is the packed share, rounded", () => {
-		const {decoder} = createDecoder();
-		const result = new DecodedPackingResult("one", bin, items);
-
-		const text = decoder.resultBinPercentageText(result);
-
-		expect(text).toBe("Packed Bin Volume: 4%");
-	});
-});
-
 describe("the words on a result row", () => {
 	const result = new DecodedPackingResult("token", bin, items);
 

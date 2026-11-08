@@ -1,17 +1,13 @@
-<div class="dialog-code" x-data="errors_dialog('One or more Errors occured!')" @@error-occurred.window="onErrorOccurred($event.detail)">
-	<div class="overlay" :class="hasErrors() ? 'active' : ''" @@click.prevent.stop="closeDialog()">
-		<dialog class="modal" :class="hasErrors() ? 'active' : ''">
-			<h5 x-text="title"></h5>
-			<div>
-				<template x-for="(error, index) in errors" :key="index">
-					<div x-text="error"></div>
-				</template>
-			</div>
-			<nav class="right-align no-space">
-				<button type="button" @@click.prevent.stop="closeDialog()">
-					<span>Close</span>
-				</button>
-			</nav>
-		</dialog>
-	</div>
+<div x-data="errors_dialog('One or more Errors occured!')" x-on:error-occurred.window="onErrorOccurred($event.detail)">
+	<dialog class="modal" aria-labelledby="errors-title" x-on:click.self="closeDialog()">
+		<div class="modal__head">
+			<h2 class="modal__title" id="errors-title" x-text="title"></h2>
+			<button type="button" class="close-button close-button--boxed" aria-label="Close" x-on:click="closeDialog()">&times;</button>
+		</div>
+		<div class="modal__body">
+			<template x-for="(error, index) in errors" :key="index">
+				<p x-text="error"></p>
+			</template>
+		</div>
+	</dialog>
 </div>

@@ -27,7 +27,6 @@ const ASSETS = {
 // What each target does not get. Everything else in assets/ goes everywhere, so only the weight differs.
 //
 // swagger-ui, 6.2 MB: only sites/docs/_layouts/swagger.html reads it. The API serves its own from Swashbuckle.
-// beercss and material-dynamic-colors: docs, demo and the UI module build on the design system instead.
 // docs, demo and www take the favicons and the link preview from media/, and nothing else there.
 // The two android icons go to the three sites, which name them in a web app manifest.
 // The UI module links favicon.ico alone; its mark comes from the design system.
@@ -37,7 +36,7 @@ const UNUSED_MEDIA = [
 	'assets/media/logo/binacle-logo-{16x16a,24x24a,32x32a,48x48a,128x128a,256x256a}.png'
 ];
 const IGNORE = {
-	docs: ['assets/lib/beercss/**', 'assets/lib/material-dynamic-colors/**', ...UNUSED_MEDIA],
+	docs: [...UNUSED_MEDIA],
 	demo: ['assets/lib/**', ...UNUSED_MEDIA],
 	uimodule: ['assets/lib/**', 'assets/media/**', 'assets/android-chrome-*.png', 'assets/apple-touch-icon.png', 'assets/favicon-*.png'],
 	www: ['assets/lib/**', ...UNUSED_MEDIA]

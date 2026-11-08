@@ -281,37 +281,12 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 		this.selectedResult = result;
 		this.$dispatch('update-scene', async () => this.sceneOf(result));
 	},
-	colorClass(result: PackBinResponse) {
-		if (result.status === 'FullyPacked') {
-			return 'green';
-		}
-		if (result.status === 'PartiallyPacked') {
-			return 'orange';
-		}
-		return 'red';
-	},
 	resultStatusText(result: PackBinResponse) {
 		return resultStatusTexts[result.status] ?? 'Unknown';
-	},
-	// A code the table does not know prints as the code. It is short, and it is the only answer there is.
-	resultAlgorithmText(result: PackBinResponse) {
-		return `Winner: ${algorithmTexts[result.algorithmUsed] ?? result.algorithmUsed}`;
 	},
 	// With one heuristic asked for, every row would repeat the dropdown a line below it.
 	showsAlgorithmUsed() {
 		return this.resultsAlgorithm === 'Best';
-	},
-	resultTitle(result: PackBinResponse) {
-		return `Bin: ${result.bin.id}`;
-	},
-	resultBinPercentageText(result: PackBinResponse) {
-		return `Packed Bin Volume: ${result.packedBinVolumePercentage}%`;
-	},
-	resultItemPercentageText(result: PackBinResponse) {
-		return `Packed Items Volume: ${result.packedItemsVolumePercentage}%`
-	},
-	resultIsFullyPacked(result: PackBinResponse) {
-		return result.status === 'FullyPacked';
 	},
 	resultBinSizeText(result: PackBinResponse) {
 		return `${result.bin.length} x ${result.bin.width} x ${result.bin.height}`;
@@ -331,6 +306,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	showsItemsFill(result: PackBinResponse) {
 		return result.status === 'PartiallyPacked';
 	},
+	// A code the table does not know prints as the code. It is short, and it is the only answer there is.
 	resultAlgorithmName(result: PackBinResponse) {
 		return algorithmTexts[result.algorithmUsed] ?? result.algorithmUsed;
 	},
@@ -346,9 +322,6 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	unpackedItemsTitle(result: PackBinResponse) {
 		const count = this.unpackedItemsOf(result).reduce((total, item) => total + item.quantity, 0);
 		return count === 1 ? 'Could not fit 1 item' : `Could not fit ${count} items`;
-	},
-	unpackedItemText(item: UnpackedBox) {
-		return `${item.quantity} x ${item.id}`;
 	},
 	// The API only hands back the id, so the size comes from what was sent.
 	unpackedItemSizeText(item: UnpackedBox) {

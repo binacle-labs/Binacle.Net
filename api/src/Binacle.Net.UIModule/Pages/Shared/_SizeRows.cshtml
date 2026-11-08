@@ -1,0 +1,28 @@
+@model SizeRows
+<div class="form__group">
+	<template x-for="(row, index) in @Model.Rows" :key="index">
+		<div class="form__row" x-data="{ touched: false }" x-on:change="touched = true">
+			<div class="field-row">
+				@foreach (var field in Model.Fields)
+				{
+					<label class="field">
+						<span class="field__label">@(char.ToUpperInvariant(field[0]) + field[1..])</span>
+						<input class="field__input" type="number" inputmode="numeric" min="1"
+						       x-model.number="row.@(field)"
+						       :id="$fieldId('@field', index)"
+						       :name="$fieldName('@field', index)"
+						       :aria-invalid="showsErrors(touched) && !row.isFieldValid('@field') ? 'true' : null"
+						       :aria-describedby="showsErrors(touched) && !row.isFieldValid('@field') ? $fieldId('error', index) : null"/>
+					</label>
+				}
+				<button type="button" class="close-button close-button--bin"
+				        :aria-label="'Remove @Model.Name ' + (index + 1)"
+				        :title="'Remove @Model.Name ' + (index + 1)"
+				        x-on:click="@(Model.Remove)(index)"></button>
+			</div>
+			<template x-if="showsErrors(touched) && row.hasErrors()">
+				<p class="field-row__error" :id="$fieldId('error', index)" x-text="row.allErrorMessages[0]"></p>
+			</template>
+		</div>
+	</template>
+</div>

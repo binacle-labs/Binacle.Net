@@ -22,8 +22,7 @@
        - Build output: bin/, obj/, artifacts/, and the site equivalents sites/*/js and sites/*/media
          (webpack bundles and copied assets). All gitignored, so CI never sees them anyway.
        - Measured results: lib/results/ and vipaq/results/. Markdown, not code.
-       - Vendored: assets/lib/ and its build-time copies under sites/*/lib - alpine, beercss,
-         material-dynamic-colors, swagger-ui. 8157 ncloc and 274 issues in the 2026-08-08 run, none ours to fix,
+       - Vendored: assets/lib/ and its build-time copies under sites/*/lib - swagger-ui. 8157 ncloc and 274 issues in the 2026-08-08 run, none ours to fix,
          and 2329 uncovered lines that were most of the missing coverage.
        - Vendored: ruby/vendor/ and sites/ruby/vendor/, which CI creates - `bundler-cache: true` installs
          each bundle into vendor/bundle before the scan. 3524 ncloc and 65 issues in the 2026-08-27 run, including every one of

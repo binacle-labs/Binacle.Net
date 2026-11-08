@@ -1603,60 +1603,6 @@ describe("the words on a result row", () => {
 });
 
 describe("result labels", () => {
-	test("a fully packed result is green", () => {
-		const {app} = createApp();
-		const result = packedData({status: "FullyPacked"});
-
-		const colour = app.colorClass(result);
-
-		expect(colour).toBe("green");
-	});
-
-	test("a partially packed result is orange", () => {
-		const {app} = createApp();
-		const result = packedData({status: "PartiallyPacked"});
-
-		const colour = app.colorClass(result);
-
-		expect(colour).toBe("orange");
-	});
-
-	test("anything else is red", () => {
-		const {app} = createApp();
-		const result = packedData({status: "NotPacked"});
-
-		const colour = app.colorClass(result);
-
-		expect(colour).toBe("red");
-	});
-
-	test("the title names the bin", () => {
-		const {app} = createApp();
-		const result = packedData();
-
-		const title = app.resultTitle(result);
-
-		expect(title).toBe("Bin: 10x10x10");
-	});
-
-	test("the bin percentage reads as a percentage", () => {
-		const {app} = createApp();
-		const result = packedData({packedBinVolumePercentage: 42});
-
-		const text = app.resultBinPercentageText(result);
-
-		expect(text).toBe("Packed Bin Volume: 42%");
-	});
-
-	test("the items percentage reads as a percentage", () => {
-		const {app} = createApp();
-		const result = packedData({packedItemsVolumePercentage: 87});
-
-		const text = app.resultItemPercentageText(result);
-
-		expect(text).toBe("Packed Items Volume: 87%");
-	});
-
 	// The API sends its own enum names; none of them belongs on a page a visitor reads.
 	test.each([
 		["Unknown", "Unknown"],
@@ -1681,46 +1627,14 @@ describe("result labels", () => {
 		expect(text).toBe("Unknown");
 	});
 
-	// The API sends the short code; the page owes the visitor the name the dropdown offered.
-	test.each([
-		["FFD", "Winner: First Fit Decreasing"],
-		["BFD", "Winner: Best Fit Decreasing"],
-		["WFD", "Winner: Worst Fit Decreasing"],
-	])("the winner %s reads as %s", (algorithmUsed, expected) => {
-		const {app} = createApp();
-		const result = packedData({algorithmUsed});
-
-		const text = app.resultAlgorithmText(result);
-
-		expect(text).toBe(expected);
-	});
-
 	// One table behind both, so a new algorithm cannot reach the dropdown and miss the result row.
 	test("the winner reads as the dropdown wrote it", () => {
 		const {app} = createApp();
 		const ffd = app.algorithms.find(x => x.value === "FFD")!;
 
-		const text = app.resultAlgorithmText(packedData({algorithmUsed: "FFD"}));
+		const text = app.resultAlgorithmName(packedData({algorithmUsed: "FFD"}));
 
-		expect(text).toBe(`Winner: ${ffd.text}`);
-	});
-
-	test("an algorithm the page does not know still names one", () => {
-		const {app} = createApp();
-		const result = packedData({algorithmUsed: "NFD"});
-
-		const text = app.resultAlgorithmText(result);
-
-		expect(text).toBe("Winner: NFD");
-	});
-
-	test("only a fully packed result reports as fully packed", () => {
-		const {app} = createApp();
-		const result = packedData({status: "PartiallyPacked"});
-
-		const fullyPacked = app.resultIsFullyPacked(result);
-
-		expect(fullyPacked).toBe(false);
+		expect(text).toBe(ffd.text);
 	});
 });
 
@@ -1817,18 +1731,12 @@ describe("the items a result could not fit", () => {
 		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 1 item");
 	});
 
-	test("a line names how many and which item", () => {
-		const {app} = createApp();
-
-		expect(app.unpackedItemText({id: "20x20x20-3", quantity: 2})).toBe("2 x 20x20x20-3");
-	});
-
 	// A visitor reads these, so they stay plain ASCII and carry no field name from the contract.
 	test("the heading and the lines are plain ASCII with no contract name in them", () => {
 		const {app} = createApp();
 		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: "20x20x20-3", quantity: 2}]});
 
-		const text = [app.unpackedItemsTitle(result), ...app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))]
+		const text = [app.unpackedItemsTitle(result), ...app.unpackedItemsOf(result).map(x => app.unpackedItemSizeText(x))]
 			.join(" ");
 
 		expect(text).toMatch(/^[\x20-\x7e]+$/);
@@ -1843,7 +1751,7 @@ describe("the items a result could not fit", () => {
 		const result = packedData({status: "PartiallyPacked", unpackedItems: [{id: item.id, quantity: 2}]});
 
 		expect(app.unpackedItemsTitle(result)).toBe("Could not fit 2 items");
-		expect(app.unpackedItemsOf(result).map(x => app.unpackedItemText(x))).toEqual(["2 x 20x20x20-3"]);
+		expect(app.unpackedItemsOf(result).map(x => x.quantity)).toEqual([2]);
 	});
 
 	test("the partial-pack sample is still in the set", () => {

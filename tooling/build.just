@@ -35,6 +35,8 @@ default:
 
 # Publish the API framework-dependent for linux-x64, into artifacts/binacle-net
 publish:
+    # dotnet publish never deletes, so a file removed from the source would still ship.
+    rm -rf {{ publish_dir }}
     npm run copy-assets-to-uimodule
     cd api/src/Binacle.Net.UIModule && npm run build
     dotnet publish {{ api_project }} -c Release -o {{ publish_dir }} --no-self-contained --runtime linux-x64

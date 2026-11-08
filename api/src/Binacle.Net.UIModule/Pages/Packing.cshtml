@@ -4,284 +4,126 @@
 	ViewData["Title"] = Model.Applet.Title;
 }
 
-<h1>@Model.Applet.Title</h1>
+<section class="band" x-data="packing_demo_app({ baseUrl: '@Model.ApiBaseUrl' })">
+	<div class="container">
+		<div class="workbench">
 
-<p>@Model.Applet.Description</p>
+			<div class="workbench__side">
+				<div class="workbench__intro">
+					<div class="prose">
+						<h1>@Model.Applet.Title</h1>
+						<p>@Model.Applet.Description</p>
+					</div>
+					<ol class="labelled-list labelled-list--key">
+						<li class="labelled-list__item"><span class="label">01 Bins</span>The boxes you have. Every bin is tried.</li>
+						<li class="labelled-list__item"><span class="label">02 Items</span>What goes in them, with how many of each.</li>
+						<li class="labelled-list__item"><span class="label">03 Get results</span>One row per bin: how full it is and what did not fit.</li>
+						<li class="labelled-list__item"><span class="label">04 Step through</span>Play the order the items went in, or step one at a time. Drag to turn the view.</li>
+						<li class="labelled-list__item"><span class="label">05 Request</span>The call the page made, as a curl command to copy.</li>
+					</ol>
+				</div>
 
-<div x-data="packing_demo_app({ baseUrl: '@Model.ApiBaseUrl' })">
+				<form class="form" novalidate x-on:submit.prevent.stop="onSubmit">
+					<fieldset class="form__group" x-field-prefix="bin">
+						<legend class="form__legend label">Bins</legend>
+						<partial name="_SizeRows" model='new SizeRows("model.bins", "bin", ["length", "width", "height"], "removeBin")'/>
+						<div class="form__actions">
+							<button type="button" class="button" x-bind="addBin">Add bin</button>
+							<button type="button" class="button button--link" x-bind="clearAllBins">Clear all</button>
+						</div>
+					</fieldset>
 
-  @* Nothing here posts - Alpine handles submit and calls the API. The token would be dead weight. *@
-  <form method="post" asp-antiforgery="false" class="grid" x-on:submit.prevent.stop="onSubmit">
-    <article class="s12 primary-container">
-      <fieldset x-field-prefix="bin">
-        <legend>Bins</legend>
-        <template x-for="(bin, index) in model.bins" :key="index">
-          <div :class="index >= 1 ? 'row-container' : ''">
-            <div class="row">
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Length') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.length"
-                         :id="$fieldId('length', index)"
-                         :name="$fieldName('length', index)"/>
-                  <label :for="$fieldId('length', index)">Length</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Width') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.width"
-                         :id="$fieldId('width', index)"
-                         :name="$fieldName('width', index)"/>
-                  <label :for="$fieldId('width', index)">Width</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="bin.isFieldValid('Height') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="bin.height"
-                         :id="$fieldId('height', index)"
-                         :name="$fieldName('height', index)"/>
-                  <label :for="$fieldId('height', index)">Height</label>
-                </div>
-              </div>
-              <button type="button" class="transparent circle" x-on:click="removeBin(index)">
-                <i>delete</i>
-              </button>
-            </div>
-            <div class="">
-              <template x-for="(error, errIndex) in bin.allErrorMessages" :key="errIndex">
-                <div class="error-text" x-text="error"></div>
-              </template>
-            </div>
-          </div>
-        </template>
-      </fieldset>
-      <nav>
-        <button class="border" type="button" x-bind="addBin">
-          <i>add</i>
-          <span>Add bin</span>
-        </button>
-        <div class="max"></div>
-        <button class="transparent destructive" type="button" x-bind="clearAllBins">
-          <span>Clear all</span>
-        </button>
-      </nav>
-    </article>
+					<fieldset class="form__group" x-field-prefix="item">
+						<legend class="form__legend label">Items</legend>
+						<partial name="_SizeRows" model='new SizeRows("model.items", "item", ["length", "width", "height", "quantity"], "removeItem")'/>
+						<div class="form__actions">
+							<button type="button" class="button" x-bind="addItem">Add item</button>
+							<button type="button" class="button button--link" x-bind="clearAllItems">Clear all</button>
+						</div>
+					</fieldset>
 
-    <article class="s12 secondary-container">
-      <fieldset x-field-prefix="item">
-        <legend>Items</legend>
-        <template x-for="(item, index) in model.items" :key="index">
-          <div :class="index >= 1 ? 'row-container' : ''" x-id="['item', '_', index, '_']">
-            <div class="row">
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Length') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.length"
-                         :id="$fieldId('length', index)"
-                         :name="$fieldName('length', index)"/>
-                  <label :for="$fieldId('length', index)">Length</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Width') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.width"
-                         :id="$fieldId('width', index)"
-                         :name="$fieldName('width', index)"/>
-                  <label :for="$fieldId('width', index)">Width</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Height') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.height"
-                         :id="$fieldId('height', index)"
-                         :name="$fieldName('height', index)"/>
-                  <label :for="$fieldId('height', index)">Height</label>
-                </div>
-              </div>
-              <div class="max">
-                <div class="field label small padless" :class="item.isFieldValid('Quantity') ? '' : 'invalid'">
-                  <input type="number"
-                         class="small padless"
-                         x-model.number="item.quantity"
-                         :id="$fieldId('quantity', index)"
-                         :name="$fieldName('quantity', index)"/>
-                  <label :for="$fieldId('quantity', index)">Quantity</label>
-                </div>
-              </div>
-              <button type="button" class="transparent circle" x-on:click="removeItem(index)">
-                <i>delete</i>
-              </button>
-            </div>
-            <div class="">
-              <template x-for="(error, errIndex) in item.allErrorMessages" :key="errIndex">
-                <div class="error-text" x-text="error"></div>
-              </template>
-            </div>
-          </div>
-        </template>
+					<div class="form__group">
+						<label class="field">
+							<span class="field__label">Algorithm</span>
+							<select class="field__select" name="algorithm" id="algorithm" x-model="model.algorithm">
+								<template x-for="item in algorithms" :key="item.value">
+									<option :value="item.value" x-text="item.text"></option>
+								</template>
+							</select>
+						</label>
+						<div class="form__actions">
+							<button type="submit" class="button button--primary"
+							        :disabled="submitting"
+							        :aria-busy="submitting ? 'true' : null"
+							        x-text="submitButtonText()">Get results</button>
+							<button type="button" class="button" x-bind="randomize">Randomize</button>
+						</div>
+						<p class="form__status" :class="formErrors.length > 0 ? 'is-error' : ''" aria-live="polite"
+						   x-text="formErrors.length > 0 ? formErrors.join(' ') : submitStatus"></p>
+					</div>
+				</form>
+			</div>
 
-      </fieldset>
-      <nav>
-        <button class="border" type="button" x-bind="addItem">
-          <i>add</i>
-          <span>Add item</span>
-        </button>
-        <div class="max"></div>
-        <button class="transparent destructive" type="button" x-bind="clearAllItems">
-          <span>Clear all</span>
-        </button>
-      </nav>
-    </article>
+			<div class="workbench__view">
+				<partial name="_PackView" model='"Get results to see the packing."'/>
 
-    <fieldset class="s12">
-      <div class="grid">
-        <div class="s12 m6">
-          <div class="field label">
-            <select x-model="model.algorithm" name="algorithm" id="algorithm">
-              <template x-for="(item, index) in algorithms" :key="index">
-                <option :value="item.value" x-text="item.text"></option>
-              </template>
-            </select>
-            <label for="algorithm">Algorithm</label>
-            <i>arrow_drop_down</i>
-          </div>
-        </div>
-        <div class="s5 m2 row">
-          <button class="transparent max" type="button" x-bind="randomize">
-            <span>Randomize</span>
-          </button>
-        </div>
-        <div class="s7 m4 row">
-          <button class="max" type="submit"
-                  :disabled="submitting"
-                  :aria-busy="submitting ? 'true' : null">
-            <span x-text="submitButtonText()">Get results</span>
-          </button>
-        </div>
-        <div class="s12" aria-live="polite">
-          <div x-text="submitStatus"></div>
-          <template x-for="(error, index) in formErrors" :key="index">
-            <div class="error-text" x-text="error"></div>
-          </template>
-        </div>
-      </div>
-    </fieldset>
-  </form>
+				<section aria-labelledby="results-title">
+					<p class="label" id="results-title">Results</p>
+					<ul class="result-list">
+						<template x-if="results.length <= 0">
+							<li class="result-list__item result-list__empty">No results yet. Press Get results.</li>
+						</template>
+						<template x-for="(result, index) in results" :key="index">
+							<li class="result-list__item">
+								<button type="button" class="result-row"
+								        :aria-current="isSelected(result) ? 'true' : null"
+								        x-on:click="selectResult(result)">
+									<span class="result-row__title"><span class="mono" x-text="resultBinSizeText(result)"></span></span>
+									<span class="label" x-text="resultItemCountText(result)"></span>
+									<span class="result-row__fill" :aria-label="'Packed bin volume ' + resultBinFillText(result)">
+										<span class="result-row__fill-track"><span class="result-row__fill-line" :style="'width:' + result.packedBinVolumePercentage + '%'"></span></span>
+										<span class="result-row__fill-number" x-text="resultBinFillText(result)"></span>
+									</span>
+									<span class="result-row__meta">
+										<span x-text="resultStatusText(result)"></span>
+										<template x-if="showsAlgorithmUsed()">
+											<span x-text="resultAlgorithmName(result)"></span>
+										</template>
+										<template x-if="showsItemsFill(result)">
+											<span x-text="resultItemsFillText(result)"></span>
+										</template>
+									</span>
+								</button>
+								<template x-if="hasUnpackedItems(result)">
+									<details class="result-list__unfit">
+										<summary class="result-list__unfit-summary" x-text="unpackedItemsTitle(result)"></summary>
+										<ul class="result-list__unfit-list">
+											<template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
+												<li><span x-text="unpackedItem.quantity"></span> of <span class="mono" x-text="unpackedItemSizeText(unpackedItem)"></span></li>
+											</template>
+										</ul>
+									</details>
+								</template>
+							</li>
+						</template>
+					</ul>
 
-  <div class="grid">
-    <div class="s12">
-      <partial name="_PackingVisualizer"/>
-    </div>
-  </div>
+					@* `request_fold` is registered in _js/packing_demo.js and nests under the demo's scope, so it reads
+					   `lastRequest`. *@
+					<details class="disclosure request-fold" x-data="request_fold" :hidden="!lastRequest">
+						<summary class="disclosure__summary request-fold__summary label">Request</summary>
+						<p class="muted">The call this page just made, against the instance serving it.</p>
+						<div class="code-block" data-code-block>
+							<button type="button" class="copy-button code-block__copy" data-copy hidden>Copy</button>
+							<pre class="code-block__pre code-block__pre--wrap" data-wrap><code x-html="curl(lastRequest)"></code></pre>
+						</div>
+					</details>
+				</section>
+			</div>
 
-  @* `request_panel` is registered in _js/packing_demo.js and nests under the demo's scope, so it reads
-     `lastRequest`. The dialog is fixed, so it can sit inside the results card. *@
-  <div class="grid" x-data="request_panel">
-    <div class="s12">
-      <article class="surface-variant">
-        <fieldset>
-          <legend>Results</legend>
-          <template x-if="results.length <= 0">
-            <span>No Results</span>
-          </template>
-          <template x-for="(result, index) in results" :key="index">
-            <a href="#"
-               class="row wave padding max"
-               :class="isSelected(result) ? 'surface-container border' : ''"
-               :aria-current="isSelected(result) ? 'true' : null"
-               x-on:click.prevent.stop="selectResult(result)">
-              <i class="large"
-                 :class="colorClass(result) + '-text'">package_2</i>
-              <div class="grid no-space max">
-								<span class="s4" x-text="resultTitle(result)">
-								</span>
-                <span class="s8 right-align" x-text="resultBinPercentageText(result)">
-								</span>
-                @* value="0" is not a default - it is what keeps the bar determinate. Alpine skips its own assignment
-                   when el.value already equals the bound one, and an indeterminate progress reads 0, so a
-                   0% result would never get the attribute and beercss animates every progress that lacks it. *@
-                <progress value="0" :value="result.packedBinVolumePercentage" max="100"
-                          class="s12 surface-container-lowest"
-                          :class="colorClass(result) + '-text'">
-                </progress>
-
-                <div class="s4" x-text="resultStatusText(result)">
-                </div>
-                <template x-if="showsAlgorithmUsed()">
-                  <div class="s4" x-text="resultAlgorithmText(result)">
-                  </div>
-                </template>
-                <template x-if="!resultIsFullyPacked(result)">
-                  <div :class="showsAlgorithmUsed() ? 's4 right-align' : 's8 right-align'"
-                       x-text="resultItemPercentageText(result)">
-                  </div>
-                </template>
-              </div>
-              @* beercss's own tooltip, so it positions itself against the trigger. The 2026-08-27 attempt
-                 listed the items inline and grew the row, which is why this floats instead. The wrapper is
-                 what beercss hovers - `.tooltip` has to be a direct child of it - and z-index over the row
-                 is the same trick the ViPaq delete button uses.
-                 `position:relative` is not optional: `.tooltip` is absolute, so without it the panel
-                 anchors to some ancestor up the page instead of to this button. *@
-              <template x-if="hasUnpackedItems(result)">
-                <div style="position:relative;z-index:10">
-                  @* Focusing on click is what opens it on a tap - Safari does not focus a clicked button.
-                     `.prevent.stop` keeps the click off the row; Alpine needs a non-empty expression. *@
-                  <button type="button"
-                          class="transparent circle"
-                          :aria-label="unpackedItemsTitle(result)"
-                          x-on:click.prevent.stop="$el.focus()">
-                    <i>info</i>
-                  </button>
-                  <div class="tooltip max large-space">
-                    <p x-text="unpackedItemsTitle(result)"></p>
-                    <template x-for="(unpackedItem, unpackedIndex) in unpackedItemsOf(result)" :key="unpackedIndex">
-                      <p x-text="unpackedItemText(unpackedItem)"></p>
-                    </template>
-                  </div>
-                </div>
-              </template>
-            </a>
-          </template>
-        </fieldset>
-        <nav class="right-align no-space" x-show="lastRequest">
-          <button class="border surface-container" type="button" x-on:click.prevent.stop="show()">
-            <i>code</i>
-            <span>Request</span>
-          </button>
-        </nav>
-      </article>
-
-      @* The call that was just made, for the reader to paste. Same overlay-and-dialog shape as _ErrorsDialog. *@
-      <div class="overlay" :class="open ? 'active' : ''" x-on:click.prevent.stop="hide()"></div>
-      <dialog class="right medium" :class="open ? 'active' : ''">
-        <h5>Request</h5>
-        <p>The call this page just made, against the instance serving it.</p>
-        <pre style="white-space:pre-wrap" x-text="curl(lastRequest)"></pre>
-        <nav class="right-align">
-          <button class="border surface-container" type="button" x-show="canCopy()" x-on:click.prevent.stop="copy(lastRequest)">
-            <i>content_copy</i>
-            <span>Copy</span>
-          </button>
-          <button class="border surface-container" type="button" x-on:click.prevent.stop="hide()">
-            <span>Close</span>
-          </button>
-        </nav>
-      </dialog>
-    </div>
-  </div>
-
-</div>
+		</div>
+	</div>
+</section>
 
 <partial name="_ErrorsDialog"/>
 

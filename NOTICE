@@ -110,13 +110,6 @@ Swagger UI
   Vendored at 5.34.1 in assets/lib/swagger-ui, which carries the upstream LICENSE and
   NOTICE. Used by the documentation site only; the API serves its own copy from Swashbuckle.
 
-
-
-Material Dynamic Colors
-  Copyright 2021 Google LLC
-  https://github.com/material-foundation/material-dynamic-color
-  Vendored in assets/lib/material-dynamic-colors, which carries the upstream LICENSE.
-
 --------------------------------------------------------------------------------
 BSD-3-Clause License Components
 --------------------------------------------------------------------------------
@@ -177,9 +170,6 @@ OpenApiExamples                   https://github.com/ChrisMavrommatis/OpenApiExa
 Shipped in the browser UI and the websites:
 
 Alpine.js                         https://github.com/alpinejs/alpine
-Beer CSS                          https://github.com/beercss/beercss
-                                  Copyright (c) 2021 Beer css! Vendored at 3.11.11 in
-                                  assets/lib/beercss, which carries the upstream LICENSE.
 three.js                          https://github.com/mrdoob/three.js
 js-cookie                         https://github.com/js-cookie/js-cookie
                                   Vendored and modified from v3.0.5 in packages/cookies, which

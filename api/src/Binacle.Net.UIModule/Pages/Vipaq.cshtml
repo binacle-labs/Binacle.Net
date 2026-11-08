@@ -4,91 +4,106 @@
 	this.ViewData["Title"] = Model.Applet.Title;
 }
 
-<h1>@Model.Applet.Title</h1>
-
-<p>@Model.Applet.Description</p>
-
 @* `samples_panel` is registered in _js/protocol_decoder.js and nests under the decoder's scope, so it reads
-   `samples`. *@
-<div class="grid" x-data="protocol_decoder_app">
-	<article class="no-padding s12 m5 l3 result-container" x-data="samples_panel" @@keyup.enter.prevent.stop="addResult">
-		<article class="medium transparent result-input-container">
-			<div class="field label textarea border max-height">
-				<textarea name="result" id="result" x-model="model.result" class="word-wrap" placeholder=""></textarea>
-				<label for="result">Add Result</label>
+   `samples` and can add one. *@
+<div x-data="protocol_decoder_app">
+	<section class="band" x-data="samples_panel">
+		<div class="container">
+			<div class="workbench">
+
+				<div class="workbench__side">
+					<div class="workbench__intro">
+						<div class="prose">
+							<h1>@Model.Applet.Title</h1>
+							<p>@Model.Applet.Description</p>
+						</div>
+						<ol class="labelled-list labelled-list--key">
+							<li class="labelled-list__item"><span class="label">01 Paste</span>A ViPaq string from a Binacle.Net response, or one from Samples.</li>
+							<li class="labelled-list__item"><span class="label">02 Add result</span>It is drawn in 3D and kept in the list below the view.</li>
+							<li class="labelled-list__item"><span class="label">03 Step through</span>Play the order the items went in. Drag to turn the view.</li>
+						</ol>
+					</div>
+
+					<form class="form" x-on:submit.prevent>
+						<div class="form__group">
+							<label class="field">
+								<span class="field__label">ViPaq string</span>
+								<textarea class="field__textarea" name="result" id="result" rows="6"
+								          placeholder="Paste a ViPaq string" spellcheck="false" autocomplete="off"
+								          x-model="model.result"
+								          x-effect="model.result; fitToText($el)"
+								          x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); addResult(); }"></textarea>
+							</label>
+							<div class="form__actions">
+								<button type="button" class="button button--primary" x-on:click="addResult">Add result</button>
+								<button type="button" class="button" x-on:click="show">Samples</button>
+							</div>
+							<p class="form__status" :class="status ? 'is-error' : ''" aria-live="polite" x-text="status"></p>
+						</div>
+					</form>
+				</div>
+
+				<div class="workbench__view">
+					<partial name="_PackView" model='"Add a ViPaq string to see the packing."'/>
+
+					<section aria-labelledby="results-title">
+						<p class="label" id="results-title">Saved results</p>
+						<ul class="result-list">
+							<template x-if="results.length <= 0">
+								<li class="result-list__item result-list__empty">No results yet. Paste a string, or open Samples.</li>
+							</template>
+							<template x-for="result in results" :key="result.encodedResult">
+								<li class="result-list__item result-list__item--removable">
+									<button type="button" class="result-row"
+									        :aria-current="isSelected(result) ? 'true' : null"
+									        x-on:click="selectResult(result)">
+										<span class="result-row__title">Bin <span class="mono" x-text="resultBinSizeText(result)"></span></span>
+										<span class="label" x-text="resultItemCountText(result)"></span>
+										<span class="result-row__fill" :aria-label="'Packed bin volume ' + resultBinFillText(result)">
+											<span class="result-row__fill-track"><span class="result-row__fill-line" :style="'width:' + resultBinFillText(result)"></span></span>
+											<span class="result-row__fill-number" x-text="resultBinFillText(result)"></span>
+										</span>
+									</button>
+									<button type="button" class="close-button" aria-label="Delete this result" x-on:click="deleteResult(result)">&times;</button>
+								</li>
+							</template>
+						</ul>
+					</section>
+				</div>
+
 			</div>
-		</article>
-		<div>
-			<nav class="no-space left-padding right-padding">
-				<button type="button" class="border surface-container max" @@click.prevent.stop="addResult">
-					<i>library_add</i>
-				</button>
-			</nav>
-			<nav class="no-space left-padding right-padding bottom-padding">
-				<button type="button" class="border surface-container max" @@click.prevent.stop="show()">
-					<i>folder_open</i>
-					<span>Samples</span>
-				</button>
-			</nav>
 		</div>
 
-		@* Known-good strings to copy into the input. No add button on purpose: the point is the string itself.
-		   Same overlay-and-dialog shape as _ErrorsDialog. *@
-		<div class="overlay" :class="open ? 'active' : ''" @@click.prevent.stop="hide()"></div>
-		<dialog class="right medium" :class="open ? 'active' : ''">
-			<h5>Samples</h5>
-			<p>Each is the ViPaq string of a packed bin. Copy one and paste it into the input.</p>
-			<template x-for="sample in samples" :key="sample.name">
-				<article class="surface-container">
-					<h6 class="small" x-text="sample.name"></h6>
-					<pre class="small-text" style="white-space:pre-wrap;overflow-wrap:anywhere" x-text="sample.encoded"></pre>
-					<nav class="right-align no-space">
-						<button class="border surface-container" type="button" x-show="canCopy()" @@click.prevent.stop="copy(sample)">
-							<i>content_copy</i>
-							<span>Copy</span>
-						</button>
-					</nav>
-				</article>
-			</template>
-			<nav class="right-align no-space">
-				<button class="border surface-container" type="button" @@click.prevent.stop="hide()">
-					<span>Close</span>
-				</button>
-			</nav>
+		@* Known-good strings. Use adds one; Copy is for pasting it somewhere else. *@
+		<dialog class="panel" aria-labelledby="samples-title" x-ref="panel" x-on:click.self="hide">
+			<div class="panel__head">
+				<h2 class="panel__title" id="samples-title">Samples</h2>
+				<button type="button" class="close-button close-button--boxed" aria-label="Close" x-on:click="hide">&times;</button>
+			</div>
+			<div class="panel__body">
+				<p class="muted">Each is the ViPaq string of a packed bin. Copy one and paste it into the input.</p>
+				<div>
+					<template x-for="sample in samples" :key="sample.name">
+						<div class="sample">
+							<div class="sample__head">
+								<h3 class="sample__name" x-text="sample.name"></h3>
+								<button type="button" class="button" x-on:click="use(sample)">Use</button>
+							</div>
+							<div class="code-block">
+								<button type="button" class="copy-button code-block__copy"
+								        :class="copied === sample.name ? 'is-copied' : ''"
+								        :hidden="!canCopy()"
+								        title="Copy"
+								        x-on:click="copy(sample)"
+								        x-text="copied === sample.name ? 'Copied' : 'Copy'"></button>
+								<pre class="code-block__pre code-block__pre--wrap" x-text="sample.encoded"></pre>
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
 		</dialog>
-	</article>
-
-	<div class="s12 m7 l9">
-		<partial name="_PackingVisualizer"/>
-	</div>
-
-	<article class="s12 surface-variant">
-		<fieldset class="scroll" style="block-size: 30rem;">
-			<legend>Saved Results</legend>
-			<template x-if="results.length <= 0">
-				<span>No Results</span>
-			</template>
-			<template x-for="(result, index) in results" :key="index">
-				<a class="row wave padding max"
-				   :class="isSelected(result) ? 'surface-container border' : ''"
-				   @@click.prevent.stop="selectResult(result)">
-					<i class="large">package_2</i>
-					<div class="grid no-space max">
-						<span class="s4" x-text="resultTitle(result)"></span>
-						<span class="s8 right-align" x-text="resultBinPercentageText(result)"></span>
-						@* value="0" keeps the bar determinate - without it beercss animates a 0% result. Same
-						   trap as the packing page, which carries the long version. *@
-						<progress value="0" :value="result.packedBinVolumePercentage()" max="100"
-						          class="s12 surface-container-lowest"></progress>
-						<div class="s4" x-text="result.items.length + ' Items'"></div>
-					</div>
-					<button type="button" class="transparent circle" style="z-index:10" @@click.prevent.stop="deleteResult(result)">
-						<i>delete</i>
-					</button>
-				</a>
-			</template>
-		</fieldset>
-	</article>
+	</section>
 </div>
 
 <partial name="_ErrorsDialog"/>
