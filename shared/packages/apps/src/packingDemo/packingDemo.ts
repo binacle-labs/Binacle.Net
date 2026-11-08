@@ -1,6 +1,6 @@
 import type { Alpine as AlpineType } from 'alpinejs';
 import {defineComponent} from "../shared/defineComponent";
-import {largestBin, nextSampleIndex, randomBin, randomItemFor, sampleAt} from "./samples";
+import {nextSampleIndex, sampleAt} from "./samples";
 import Bin from "./bin";
 import Item from "./item";
 import {errorFromFailure} from "../components/errorsDialog/errorFromFailure";
@@ -140,15 +140,9 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	removeBin(index: number) {
 		this.model.bins.splice(index, 1);
 	},
-	// A fresh roll when there are none, so nothing here has to handle an empty list.
-	sizingBin() {
-		return this.model.bins.length > 0 ? largestBin(this.model.bins) : randomBin();
-	},
 	addBin: {
 		['@click']() {
-			// A copy, not a roll: a fourth candidate is only worth comparing if it keeps the same footprint.
-			const last = this.model.bins[this.model.bins.length - 1];
-			this.model.bins.push(last ? Bin.copyOf(this.model.bins, last) : randomBin());
+			this.model.bins.push(new Bin(null, null, null));
 		}
 	},
 	clearAllBins: {
@@ -161,7 +155,7 @@ export const packingDemoApp = defineComponent((options: PackingDemoOptions = {})
 	},
 	addItem: {
 		['@click']() {
-			this.model.items.push(randomItemFor(this.sizingBin(), 1));
+			this.model.items.push(new Item(null, null, null, 1));
 		}
 	},
 	clearAllItems: {

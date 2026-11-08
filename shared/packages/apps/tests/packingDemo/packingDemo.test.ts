@@ -13,7 +13,7 @@ import {Logger} from "../../src/components/logger/logger";
 import type {PackScene} from "../../src/components/packView/packViewComponent";
 import {packingDemoApp, packingDemoAppPlugin, PackingDemoOptions} from "../../src/packingDemo/packingDemo";
 import {sampleData} from "../../src/packingDemo/sampleData";
-import {largestBin, sampleAt} from "../../src/packingDemo/samples";
+import {sampleAt} from "../../src/packingDemo/samples";
 import Bin from "../../src/packingDemo/bin";
 import Item from "../../src/packingDemo/item";
 
@@ -167,9 +167,11 @@ describe("init", () => {
 
 		app.init();
 
-		const bin = largestBin(app.model.bins);
-		expect(app.model.items.every(i => i.length <= bin.length && i.width <= bin.width && i.height <= bin.height))
-			.toBe(true);
+		const volume = (b: Bin) => Number(b.length) * Number(b.width) * Number(b.height);
+		const bin = app.model.bins.reduce((largest, b) => volume(b) > volume(largest) ? b : largest);
+		const fits = (i: Item) =>
+			Number(i.length) <= Number(bin.length) && Number(i.width) <= Number(bin.width) && Number(i.height) <= Number(bin.height);
+		expect(app.model.items.every(fits)).toBe(true);
 	});
 
 	test("opens on sample zero, the same set every time", () => {
@@ -522,69 +524,33 @@ describe("pressing the submit button", () => {
 });
 
 describe("adding a bin", () => {
-	test("copies the last bin rather than rolling a new one", () => {
-		const {app} = createApp();
-		app.model.bins = [new Bin(60, 60, 60), new Bin(31, 32, 33)];
-
-		app.addBin["@click"].call(app);
-
-		const added = app.model.bins[2];
-		expect([added.length, added.width, added.height]).toEqual([31, 32, 33]);
-	});
-
-	// The API rejects two bins with the same id.
-	test("the copy does not take the id of the bin it copied", () => {
+	test("adds an empty bin", () => {
 		const {app} = createApp();
 		app.model.bins = [new Bin(31, 32, 33)];
 
 		app.addBin["@click"].call(app);
 
-		expect(app.model.bins[1].id).not.toBe(app.model.bins[0].id);
+		const added = app.model.bins[1];
+		expect([added.length, added.width, added.height]).toEqual([null, null, null]);
 	});
 
-	test("a run of copies all get their own id", () => {
+	test("an empty bin does not replace the bin on view", () => {
 		const {app} = createApp();
 		app.model.bins = [new Bin(31, 32, 33)];
 
 		app.addBin["@click"].call(app);
-		app.addBin["@click"].call(app);
-		app.addBin["@click"].call(app);
 
-		const ids = app.model.bins.map(b => b.id);
-		expect(new Set(ids).size).toBe(4);
+		expect(app.firstValidBin()).toBe(app.model.bins[0]);
 	});
 
-	test("removing a copy does not free its id for the next one", () => {
+	test("an empty bin stops the submit", () => {
 		const {app} = createApp();
 		app.model.bins = [new Bin(31, 32, 33)];
-		app.addBin["@click"].call(app);
-		app.addBin["@click"].call(app);
-		app.removeBin(1);
+		app.model.items = [new Item(1, 1, 1, 1)];
 
 		app.addBin["@click"].call(app);
 
-		const ids = app.model.bins.map(b => b.id);
-		expect(new Set(ids).size).toBe(3);
-	});
-
-	test("the copy is a new instance", () => {
-		const {app} = createApp();
-		const last = new Bin(31, 32, 33);
-		app.model.bins = [last];
-
-		app.addBin["@click"].call(app);
-
-		expect(app.model.bins[1]).not.toBe(last);
-	});
-
-	test("with no bins it rolls one inside the sample bounds", () => {
-		const {app} = createApp();
-		app.model.bins = [];
-
-		app.addBin["@click"].call(app);
-
-		const rolled = app.model.bins[0];
-		expect([rolled.length, rolled.width, rolled.height].every(side => side >= 30 && side <= 60)).toBe(true);
+		expect(app.isValid()).toBe(false);
 	});
 });
 
@@ -625,41 +591,14 @@ describe("editing the lists", () => {
 		expect(app.model.items).toEqual([]);
 	});
 
-	test("a new item is sized to fit the largest bin", () => {
-		const {app} = createApp();
-		app.model.bins = [new Bin(40, 40, 40), new Bin(60, 60, 60)];
-
-		app.addItem["@click"].call(app);
-
-		const added = app.model.items[0];
-		expect([added.length, added.width, added.height].every(side => side <= 30)).toBe(true);
-	});
-
-	test("a new item has a quantity of one", () => {
+	test("a new item is empty, with a quantity of one", () => {
 		const {app} = createApp();
 		app.model.bins = [new Bin(40, 40, 40)];
 
 		app.addItem["@click"].call(app);
 
-		expect(app.model.items[0].quantity).toBe(1);
-	});
-
-	test("the sizing bin is the largest by volume", () => {
-		const {app} = createApp();
-		app.model.bins = [new Bin(60, 10, 10), new Bin(30, 30, 30), new Bin(10, 60, 10)];
-
-		const bin = app.sizingBin();
-
-		expect(bin.id).toBe("30x30x30");
-	});
-
-	test("with no bins the sizing bin is a rolled one", () => {
-		const {app} = createApp();
-		app.model.bins = [];
-
-		const bin = app.sizingBin();
-
-		expect([bin.length, bin.width, bin.height].every(side => side >= 30 && side <= 60)).toBe(true);
+		const added = app.model.items[0];
+		expect([added.length, added.width, added.height, added.quantity]).toEqual([null, null, null, 1]);
 	});
 });
 

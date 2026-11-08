@@ -1,16 +1,16 @@
-import type {Dimensions} from "@binacle/design-system";
 import ErrorCollection from "./errorCollection";
 
 
-export default class Box implements Dimensions {
+// Null is a field not filled in yet: a row added by hand starts blank.
+export default class Box {
 	static minAllowedDimension = 1;
 	static maxAllowedDimension = 65535;
 
-	public length: number;
-	public width: number
-	public height: number;
+	public length: number | null;
+	public width: number | null;
+	public height: number | null;
 
-	constructor(length: number, width: number, height: number) {
+	constructor(length: number | null, width: number | null, height: number | null) {
 		this.length = length;
 		this.width = width;
 		this.height = height;

@@ -1,11 +1,7 @@
 import Bin from "../../src/packingDemo/bin";
 import Item from "../../src/packingDemo/item";
-import {largestBin, nextSampleIndex, randomBin, randomItemFor, sampleAt, sampleCount} from "../../src/packingDemo/samples";
+import {nextSampleIndex, sampleAt, sampleCount} from "../../src/packingDemo/samples";
 import {sampleData} from "../../src/packingDemo/sampleData";
-
-// The rolled numbers, restated here so a change to samples.ts has to be a deliberate change to the test.
-const minBinSide = 30;
-const maxBinSide = 60;
 
 // Enough rolls that a one-in-a-thousand break shows up, few enough that the file stays under a second.
 const rolls = 5000;
@@ -15,71 +11,6 @@ const everyIndex = Array.from({length: sampleCount}, (_, index) => index);
 function duplicates(ids: string[]) {
 	return ids.filter((id, index) => ids.indexOf(id) !== index);
 }
-
-describe("randomBin", () => {
-	test("every side is a whole number inside the bin range", () => {
-		const bins = Array.from({length: rolls}, () => randomBin());
-
-		const sides = bins.flatMap(bin => [bin.length, bin.width, bin.height]);
-
-		const outOfRange = sides.filter(side => !Number.isInteger(side) || side < minBinSide || side > maxBinSide);
-		expect(outOfRange).toEqual([]);
-	});
-});
-
-describe("largestBin", () => {
-	test("picks the bin with the greatest volume", () => {
-		const bins = [new Bin(30, 30, 30), new Bin(60, 50, 40), new Bin(40, 40, 40)];
-
-		const largest = largestBin(bins);
-
-		expect(largest).toBe(bins[1]);
-	});
-
-	test("keeps the first bin when two share the greatest volume", () => {
-		const bins = [new Bin(40, 30, 20), new Bin(20, 30, 40)];
-
-		const largest = largestBin(bins);
-
-		expect(largest).toBe(bins[0]);
-	});
-
-	test("returns the only bin of a single-bin set", () => {
-		const bins = [new Bin(31, 32, 33)];
-
-		const largest = largestBin(bins);
-
-		expect(largest).toBe(bins[0]);
-	});
-
-	test("says what is wrong when handed no bins", () => {
-		expect(() => largestBin([])).toThrow("largestBin needs at least one bin");
-	});
-});
-
-describe("randomItemFor", () => {
-	test("no side is more than half the matching bin side", () => {
-		const bin = new Bin(60, 45, 31);
-
-		const items = Array.from({length: rolls}, () => randomItemFor(bin, 1));
-
-		const oversized = items.filter(
-			item =>
-				item.length > Math.floor(bin.length / 2) ||
-				item.width > Math.floor(bin.width / 2) ||
-				item.height > Math.floor(bin.height / 2)
-		);
-		expect(oversized).toEqual([]);
-	});
-
-	test("keeps the quantity it was given", () => {
-		const bin = new Bin(50, 50, 50);
-
-		const item = randomItemFor(bin, 7);
-
-		expect(item.quantity).toBe(7);
-	});
-});
 
 // The set is generated from shared/data/demo-samples, so a bad file there is a 422 on the demo page and
 // nothing else here would catch it.
