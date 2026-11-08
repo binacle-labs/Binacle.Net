@@ -2,7 +2,7 @@
 id: ci-cd/decisions/D18
 description: two test suites, split by what ships
 status: pending
-verified: 2026-09-29
+verified: 2026-11-09
 check: D18 against the test lists in tooling/tests.just and the steps in shared-image-tests.yml and shared-site-tests.yml, which must together name every test and share exactly the javascript ones that ship in both, and against deploy-site.yml's first job
 paths:
   - ".github/workflows/shared-image-tests.yml"
@@ -17,23 +17,24 @@ paths:
 `shared-site-tests.yml` runs the tests for what ends up in a Jekyll site. The release pipeline calls the first;
 the site deploy calls the second; the pull request gate calls both.
 
-**Why:** a release should run the tests for what it releases. The ten Jekyll plugins under `ruby/` cannot reach
-the image, so a release paying for them buys nothing, and every step added to the suite the release calls is a
+**Why:** a release should run the tests for what it releases. The Jekyll plugins under `ruby/` and `sites/ruby/`
+cannot reach the image, so a release paying for them buys nothing, and every step added to the suite the release calls is a
 step every release pays for. The mirror was worse: the gems ran on no pipeline at all, so a broken plugin was
 first seen half way through a deploy.
 
 **The cut is one rule, not a judgement per test: the image gets the .NET tests plus the javascript tests, and
-a site gets everything that is not .NET.** Checked against the manifests on 2026-08-27 — every site pulls all
-five javascript packages, `demo` through `binacle-net-ui` to `binacle-vipaq` to `binacle-compact-notation`, all
-three through `theme-switcher` to `cookies`. **`binacle-net-service-client` is the one on the site side only** -
-added 2026-09-18, bundled by `sites/admin` alone, which is local only; the image never carries it.
+a site gets everything that is not .NET.** Checked against the manifests on 2026-11-09 — every site pulls
+`@binacle/design-system`, and through it `theme-switcher` and `cookies`; `demo` also pulls `@binacle/apps`, and
+through it `@binacle/api-client` and `@binacle/vipaq` to `@binacle/compact-notation`. The image pulls the same
+packages through the UI module. **`@binacle/service-client` is the one on the site side only** - added
+2026-09-18, bundled by `sites/admin` alone, which is local only; the image never carries it.
 
 **The javascript tests the image ships are in both files, and that is not duplication to remove.** They ship
 in the image and they ship in the sites, so both sides prove them. Together the two files name every test in
 `tooling/tests.just`.
 
 **The pull request gate's path filter overlaps for the same reason — recorded 2026-08-28.** `just ci
-changed-paths` prints `code=` and `site=`, and `packages/`, `shared/` and `vipaq/` set both. That is right:
+changed-paths` prints `code=` and `site=`, and `packages/`, `api/packages/`, `shared/` and `vipaq/` set both. That is right:
 those directories ship in the image and in the sites, so a change to one has to prove both.
 
 **A site deploy runs the site suite as its own first job**, for the same reason the release runs the image

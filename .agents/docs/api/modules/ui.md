@@ -1,8 +1,8 @@
 ---
 id: api/modules/ui
 description: UIModule — optional Razor Pages demo host. Routes, the webpack and sass build, the applet list, and how error pages are decided.
-verified: 2026-09-29
-check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds; `_js/packing_demo.js` still registers `request_panel` and Pages/Packing.cshtml still nests it inside the demo's x-data and reads `lastRequest`
+verified: 2026-11-09
+check: Routes match the @page directives under Pages/; the DI registrations match ModuleDefinition.cs, and every UIModuleOptions property and its shipped value are in the Configuration table; the script and stylesheet paths in Pages/Shared/_Layout.cshtml and _AppletScripts.cshtml match the webpack entries and cacheGroups in webpack.config.js; the partials listed match Pages/Shared/; the build table matches the copy-assets-to-uimodule task in gulpfile.js and the module's package.json scripts; the workspace names match the module's package.json and those of the packages it names; the applet list matches Services/AppletsService.cs; the switch list in Models/FeatureSwitch.cs matches the feature flag table in api/configuration; a grep for Blazor, IJSRuntime or .razor in the module returns nothing; the instance page still makes no browser fetch, so `_js/` carries no instance entry and `test ! -f api/src/Binacle.Net.UIModule/_js/instance.js` holds; `_js/packing_demo.js` still registers `request_fold` and Pages/Packing.cshtml still nests it inside the demo's x-data and reads `lastRequest`
 also_update:
   - packages
   - api/configuration
@@ -36,25 +36,26 @@ internal types. `Applet`, `AppletsService`, `UIModuleOptions` and every PageMode
 
 | Route | Page | What it does |
 |---|---|---|
-| `/` | `Index` | Three cards, one per applet. The whole card is the link; the page has no button |
-| `/packing` | `Packing` | The packing demo. Calls the pack API from the browser, and prints the call it made as a `curl` line |
-| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. A `Samples` panel lists known-good strings to copy. Calls nothing |
-| `/instance` | `Instance` | Version, the switch list, the presets this instance loaded, and a link to GitHub Discussions |
+| `/` | `Index` | The default sample drawn as a still, a readout of this instance - version, each switch, the preset count - a band per demo, and links to the instance page and to Swagger and Scalar when they are on |
+| `/packing` | `Packing` | The packing demo. Calls the pack API from the browser, and shows the call it made as a `curl` command |
+| `/vipaq` | `Vipaq` | Pastes a ViPaq-encoded result and renders it. A `Samples` drawer lists known-good strings to use or copy. Calls nothing |
+| `/instance` | `Instance` | Version, environment and runtime, the switch list, the presets this instance loaded with a drawing of each box, and a link to GitHub Discussions |
 | `/error/{errorCode?}` | `Error` | The error page, and the `UseStatusCodePagesWithReExecute` target |
 
 `RouteOptions.LowercaseUrls` is true globally. **Every internal link uses the `asp-page` tag helper, never a
 literal path**, so a route change is one edit in the `@page` directive.
 
-`Pages/Shared/` holds the chrome: `_Layout`, `_Header`, `_Navbar`, `_Footer`, plus `_PackingVisualizer`,
-`_ErrorsDialog` and `_AppletScripts`. `_AppletScripts` is the one copy of the library load order, so the two
-demo pages cannot drift.
+`Pages/Shared/` holds the chrome - `_Layout`, `_Header`, `_Footer` - and the partials the pages share:
+`_PackView` (the 3D view), `_HomeStill` (the home page's drawing), `_SizeRows` (one list of size fields, bins or
+items), `_ErrorsDialog` and `_AppletScripts`. The header's links come from the applet list.
+`_AppletScripts` is the one copy of the library load order, so the two demo pages cannot drift.
 
 **Alpine's `@click` and `@submit` are `@@click` and `@@submit` in a `.cshtml` file.** `x-on:` forms need no
 escaping.
 
-**An icon is a bare `<i>` with no class.** beercss sets `--font-icon` on the element itself, and neither
-`material-symbols` nor `material-symbols-outlined` is a selector it defines — the second appears in
-`beer.min.css` only as a woff2 filename.
+**The look is the design system's.** `_sass/main.scss` only `@use`s blocks from `@binacle/design-system`, and the
+pages use the same class names as the three sites. `_js/main.js` starts the design system's theme button, nav
+fade, code wrap, copy button and lightbox on every page.
 
 ## The build
 
@@ -62,38 +63,39 @@ escaping.
 
 | Producer | Fills | From |
 |---|---|---|
-| `just assets` (gulp) | `lib/`, `media/`, the root icons | repo-root `assets/` |
-| `npm run build:css` (dart-sass) | `css/main.css` | `_sass/main.scss` |
+| `npm run copy-assets-to-uimodule` (gulp; `just assets` runs it) | `favicon.ico`, `fonts/`, `media/logo/binacle-logo.svg` | the favicon from repo-root `assets/`; the fonts and the mark from `shared/packages/design-system` |
+| `npm run build:css` (dart-sass) | `css/main.css` | `_sass/main.scss`, which reads the design system |
 | `npm run build:js` (webpack) | `js/` | `_js/` — three entries |
 
 `just build publish` runs all three before `dotnet publish`, because static web assets are collected at
 publish time. **A missing bundle fails nothing** — the image ships pages that return 200 and do nothing —
 which is why `full.hurl` and `quickstart.hurl` request every page route, every entry bundle, the four shared
 chunks `_AppletScripts.cshtml` loads, and the stylesheet directly, against a built image. **The shared chunks
-are asserted separately from the entries** — a demo entry is 227 bytes and everything it needs is in
-`vendors`, `three`, `binacle-net-ui` and `binacle-vipaq`, so an entry alone answering 200 proves nothing.
+are asserted separately from the entries** — a demo entry holds almost nothing, and everything it needs is in
+`vendors`, `three`, `binacle-net-ui` and `binacle-vipaq`, so an entry alone answering 200 proves nothing. Why
+`binacle-net-ui` keeps the old package's name is `$shared/apps`.
 
 The webpack entries are `main`, `packing_demo` and `protocol_decoder`. The chunk names and priorities match
 `sites/demo/webpack.config.js`; both compile the same package source, so there is one implementation and only
 the config is duplicated.
 
-**The request panel is this host's, not the package's.** `_js/packing_demo.js` registers a second Alpine
-component, `request_panel`, beside the plugin: it turns the demo's `lastRequest` - method, path, body, set by
-`packing_demo_app` on every valid submit - into one `curl` line against `window.location.origin`, and copies
-it where the clipboard API exists. `Pages/Packing.cshtml` wraps the results card in it: a `Request` button,
-shown once a call has gone out, opens a beercss right `dialog` - the same overlay-and-dialog shape as
-`_ErrorsDialog` - holding the line and a Copy button. The demo site has no panel; the reasoning is
-`$packages/decisions#P3`.
+**The request fold is this host's, not the package's.** `_js/packing_demo.js` registers a second Alpine
+component, `request_fold`, beside the plugin: it turns the demo's `lastRequest` - method, path, body, set by
+`packing_demo_app` on every valid submit - into a `curl` command against `window.location.origin`, one element
+per line so a wrapped line hangs under its start. `Pages/Packing.cshtml` puts it under the results: a `Request`
+fold, hidden until a call has gone out, holding the command in a code block with the design system's Copy
+button. The demo site has none; the reasoning is `$packages/decisions#P3`.
 
 **The instance page has no entry of its own.** It renders server-side and loads `runtime` + `main` only —
 none of `vendors`, `three` or the two package chunks.
 
-**The module is a root npm workspace member.** `binacle-net-ui`, `binacle-vipaq`, `cookies` and
-`theme-switcher` resolve to symlinks in the root `node_modules`. One root `npm ci` covers the module; it has
-no lock file of its own. Why that matters for `three`, and why a warm webpack cache can hide a type error, is
+**The module is a root npm workspace member, `@binacle/api-ui-module`.** It names `@binacle/apps`,
+`@binacle/design-system` and `alpinejs`; through them it also takes `@binacle/api-client`, `@binacle/vipaq`,
+`theme-switcher` and `cookies`. Each workspace one resolves to a symlink in the root `node_modules`. One root
+`npm ci` covers the module; it has no lock file of its own. Why that matters for `three`, and why a warm webpack cache can hide a type error, is
 in `$shared/apps` — it is a property of the package, not of this host.
 
-**Nothing on a page is fetched from the internet.** Three.js and Alpine are bundled, beercss and the fonts are
+**Nothing on a page is fetched from the internet.** Three.js and Alpine are bundled, the fonts and the mark are
 copied in, and the footer carries no remote badges. The only external URLs in the rendered HTML are anchors a
 person clicks. **An air-gapped install is a normal way to run this**, so a new remote asset is a defect.
 
@@ -133,6 +135,9 @@ snapshot and not a live provider is `$api/decisions#D6`.
 | Service | Lifetime | What it does |
 |---|---|---|
 | `AppletsService` | Singleton | The applet list — title, icon, copy and Razor Page name for each demo |
+
+`CartonDrawing` is a static helper, not a service: it draws each preset's boxes as SVG on the server for the
+instance page. All of one preset's boxes share a scale.
 
 `Applet.Page` is a **page name for `asp-page`, not a path**. `AppletPageModel` takes a page's title and copy
 from the same list, so the index cards and the page cannot disagree.

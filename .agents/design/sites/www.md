@@ -35,9 +35,9 @@ with no `defer` and no `async` on purpose.
 **It cannot touch `document.body`** - the parser has not reached it - which is why the theme is `data-theme`
 on `<html>` and not a class on `<body>`, on this site and on the other three.
 
-**It is a second webpack config, not a second entry.** On docs and demo the main config splits every entry
-into a runtime chunk and a vendors chunk, and a head script has to be one self-contained file. www's main
-config does not split; it keeps the second config so all three sites build the head script the same way, alone
+**It is a second webpack config, not a second entry.** On demo the main config splits every entry into a
+runtime chunk and a vendors chunk, and a head script has to be one self-contained file. www's and docs' main
+configs do not split; they keep the second config so all three sites build the head script the same way, alone
 and with no source map. Both write into `js/`, so the main config's `clean` keeps `theme-init.js` - without
 that the two race and the file is deleted after it is written.
 

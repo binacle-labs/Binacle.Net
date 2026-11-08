@@ -49,12 +49,18 @@ listing that asks for one status silently misses the other:
 |---|---|---|---|
 | Accepted | `csharpsquid:S6418` | `ServiceModule/v0/Contracts/Auth/TokenResponse.cs` | 35 |
 | Accepted | `csharpsquid:S2068` | `ServiceModule/v0/Contracts/Admin/AccountGetResponse.cs` | 94 |
-| Accepted | `typescript:S2245` | `packages/binacle-net-ui/src/apps/packingDemo/getRandomInt.ts` | 4 |
+| Accepted | `typescript:S2245` | `shared/packages/apps/src/packingDemo/getRandomInt.ts` | 4 |
 | Accepted | `Web:S6850` | `UIModule/Pages/Shared/_ErrorsDialog.cshtml` | 4 |
 | Accepted | `csharpsquid:S125` | `vipaq/src/Binacle.ViPaq/ViPaqBase64Extensions.cs` | 6 |
 | False positive | `Web:UnsupportedTagsInHtml5Check` | `UIModule/Pages/Shared/_Navbar.cshtml` | 1 |
-| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/apps/protocolDecoder/protocolDecoder.ts` | 30 |
-| False positive | `typescript:S7758` | `packages/binacle-net-ui/src/apps/protocolDecoder/protocolDecoder.ts` | 87 |
+| False positive | `typescript:S7758` | `shared/packages/apps/src/protocolDecoder/protocolDecoder.ts` | 34 |
+| False positive | `typescript:S7758` | `shared/packages/apps/src/protocolDecoder/protocolDecoder.ts` | 91 |
+
+**Four rows are not yet what the API returns.** The three TypeScript rows give where the code is now. They
+were marked when the two files sat in `packages/binacle-net-ui/src/apps/`, at lines 4, 30 and 87, and the API
+returns those until the move reaches `main`. `_Navbar.cshtml` is deleted; `_Header.cshtml` took its place and
+may raise the same finding. SonarCloud may not carry a mark across a move: on the first analysis that sees it,
+read all eight back, mark again any that came back open, and fix this table.
 
 **Accepted and False positive are not the same claim.** Accepted says the rule is right and we are keeping
 the code anyway. False positive says the rule is wrong about this line. Use the second only when it is, or
