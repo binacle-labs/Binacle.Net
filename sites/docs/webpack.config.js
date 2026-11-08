@@ -1,14 +1,15 @@
 const path = require('path');
 const dest = 'js';
 
+// No splitChunks, as on www. The page loads main.js alone, and a vendors chunk it never loads stops main.js
+// from running.
 module.exports = (env, argv) => {
 	const buildType = env.build || 'dist'; // 'dist' or 'watch'
 	const production = buildType === 'dist';
 	console.log(`Environment Build: ${buildType}`);
 
 
-	// A second config, not a second entry: the head script has to be one self-contained file, and the main
-	// config splits every entry into a runtime chunk and a vendors chunk.
+	// A second config: the head script ships alone and without a source map.
 	const themeInit = {
 		mode: production ? 'production' : 'development',
 		entry: {'theme-init': './_js/theme-init.ts'},
@@ -46,23 +47,7 @@ module.exports = (env, argv) => {
 		},
 		plugins: [
 		],
-		optimization: {
-			minimize: production ? true : false,
-			splitChunks: {
-				chunks: 'all',
-				automaticNameDelimiter: '-',
-				minSize: 20000,
-				cacheGroups: {
-					vendors: {
-						test: /[\\/]node_modules[\\/]/,
-						name: 'vendors',
-						chunks: 'all',
-						enforce: true,
-						priority: 10,
-					}
-				},
-			},
-		},
+		optimization: {minimize: production, splitChunks: false, runtimeChunk: false},
 		cache: {
 			type: 'filesystem',
 		},

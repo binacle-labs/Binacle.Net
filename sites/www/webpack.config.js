@@ -1,7 +1,7 @@
 const path = require('path');
 const dest = 'js';
 
-// No splitChunks and no vendors group, unlike the other two sites. One workspace dependency, the design system,
+// No splitChunks and no vendors group, unlike demo. One workspace dependency, the design system,
 // is not worth a vendors chunk.
 module.exports = (env, argv) => {
 	const buildType = env.build || 'dist'; // 'dist' or 'watch'

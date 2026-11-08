@@ -240,7 +240,7 @@ page_meta:
 ################################################################
 breadcrumbs:
   exclude: ["version", "*.*"]
-  title_from: [title]
+  title_from: [menu_title, title]
   home:
     title: Docs
 
