@@ -4,20 +4,19 @@
 	ViewData["Title"] = Model.Title;
 }
 
-<article class="medium middle-align center-align">
-	<div>
-		<i class="extra error-text">error</i>
-		<h1 class="error-text">@Model.Title</h1>
-		<p>@Model.Message</p>
-		<nav class="center-align">
-			<a asp-page="/Index" class="button">Back to the home page</a>
-		</nav>
+<section class="band">
+	<div class="container band__grid">
+		<div class="band__label"></div>
+		<div class="band__body prose">
+			<h1>@Model.Title</h1>
+			<p>@Model.Message</p>
+			<div class="actions">
+				<a class="button" asp-page="/Index">Back to the home page</a>
+			</div>
+			@if (Model.RequestId is not null)
+			{
+				<p class="label">Request ID: <code>@Model.RequestId</code></p>
+			}
+		</div>
 	</div>
-</article>
-
-@if (Model.RequestId is not null)
-{
-	<article>
-		<p>Request ID: <code>@Model.RequestId</code></p>
-	</article>
-}
+</section>

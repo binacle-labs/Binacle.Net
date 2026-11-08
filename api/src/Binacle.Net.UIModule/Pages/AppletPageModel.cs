@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Binacle.Net.UIModule.Pages;
 
-// The title and copy of a demo page come from AppletsService, so the index cards and the page itself cannot
+// The title and copy of a demo page come from AppletsService, so the home page and the page itself cannot
 // disagree.
 internal abstract class AppletPageModel : PageModel
 {

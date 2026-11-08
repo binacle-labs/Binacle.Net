@@ -5,13 +5,14 @@ namespace Binacle.Net.UIModule.Models;
 //
 // The service module is left out on purpose: it is not advertised, and the documentation site has no page for
 // it. The demo UI is left out because you are looking at it.
-internal record FeatureSwitch(string Feature, string Name, string Setting)
+// Label is the short name the home page's band shows.
+internal record FeatureSwitch(string Feature, string Name, string Label, string Setting)
 {
 	public static IReadOnlyList<FeatureSwitch> All { get; } =
 	[
-		new("SwaggerUI", "Swagger UI", "SWAGGER_UI=True"),
-		new("ScalarUI", "Scalar UI", "SCALAR_UI=True"),
-		new("HealthChecks", "Health check", "HealthChecks__Enabled=True"),
-		new("DebugEndpoint", "Debug endpoint", "DEBUG_ENDPOINT=True"),
+		new("SwaggerUI", "Swagger UI", "Swagger", "SWAGGER_UI=True"),
+		new("ScalarUI", "Scalar UI", "Scalar", "SCALAR_UI=True"),
+		new("HealthChecks", "Health check", "Health", "HealthChecks__Enabled=True"),
+		new("DebugEndpoint", "Debug endpoint", "Debug", "DEBUG_ENDPOINT=True"),
 	];
 }

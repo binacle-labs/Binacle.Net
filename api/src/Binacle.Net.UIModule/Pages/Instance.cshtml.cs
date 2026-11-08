@@ -45,7 +45,14 @@ internal class InstanceModel : AppletPageModel
 	// Sorted here, once, so the view stays a plain loop. This is the same instance the health check and
 	// /_debug read - filled once at startup, so it can go stale against /api/v4/presets. See Program.cs.
 	public IReadOnlyList<InstancePreset> Presets
-		=> this.instanceOptions.Value.Presets.Presets
+		=> field ??= this.instanceOptions.Value.Presets.Presets
 			.OrderBy(preset => preset.Name, StringComparer.Ordinal)
 			.ToList();
+
+	// Only numbers and fixed class names go into the drawing, so it is safe to write out raw.
+	public static IReadOnlyList<string> DrawingsFor(InstancePreset preset)
+		=> CartonDrawing.ForBins(preset.Bins);
+
+	public static string BoxCount(InstancePreset preset)
+		=> preset.Bins.Count == 1 ? "1 box" : $"{preset.Bins.Count} boxes";
 }

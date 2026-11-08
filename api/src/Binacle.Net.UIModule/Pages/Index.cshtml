@@ -4,27 +4,119 @@
 	ViewData["Title"] = "Binacle.Net";
 }
 
-<h1>Binacle.Net</h1>
-
-<p>Two demos and a look at the instance you are running. Pick one.</p>
-
-@* The whole card is the link, so there is no button on this page. *@
-<div class="grid medium-space">
-	@foreach (var applet in Model.Applets)
-	{
-		var summary = Model.SummaryFor(applet);
-		<article class="s12 m6 l4 no-padding">
-			<a asp-page="@applet.Page" class="card wave padding">
-				<div class="row">
-					<i>@applet.Icon</i>
-					<h5 class="max">@applet.Title</h5>
+<section class="band band--split">
+	<div class="container band__grid">
+		<div class="band__body split hero split--text-left split--centred">
+			<div class="hero__copy">
+				<h1 class="split__title display-1">Binacle.Net</h1>
+				<div class="prose prose--marketing">
+					<p>Binacle.Net answers which box an order goes in. Give it your box sizes and a list of items and it
+						returns the smallest box that holds them, and where every item sits.</p>
 				</div>
-				<p>@applet.ShortDescription</p>
-				@if (summary is not null)
+				<p class="actions">
+					<a class="button button--primary" asp-page="@Model.Packing.Page">@Model.Packing.Title</a>
+					<a class="button" asp-page="@Model.Vipaq.Page">@Model.Vipaq.Title</a>
+				</p>
+			</div>
+			<figure class="pack-view">
+				<button type="button" class="still" data-lightbox="home-still" aria-label="Open the picture larger">
+					<partial name="_HomeStill" model="@("")"/>
+				</button>
+				<figcaption class="pack-view__strip">
+					<span class="dimension-line dimension-line--small dimension-line--strip"><span class="dimension-line__tick"></span><span class="dimension-line__number">45 x 30 x 25</span><span class="dimension-line__tick"></span></span>
+					<span>13 items, the default sample</span>
+				</figcaption>
+			</figure>
+			<dialog class="lightbox" id="home-still" aria-label="The default sample, larger">
+				<partial name="_HomeStill" model="@("lightbox__still")"/>
+				<div class="lightbox__bar"><span>The default sample: 13 items in a 45&nbsp;x&nbsp;30&nbsp;x&nbsp;25 bin</span><button type="button" class="button button--link" data-close>Close</button></div>
+			</dialog>
+		</div>
+	</div>
+</section>
+
+<section class="band band--status">
+	<div class="container band__grid status-readout">
+		<p class="label status-readout__head status-readout__head--column"><a class="status-readout__link" asp-page="@Model.Instance.Page">This instance</a></p>
+		<dl class="status-readout__cells">
+			<div class="status-readout__cell"><dt class="label">Version</dt><dd class="status-readout__value">@Model.Version</dd></div>
+			@foreach (var featureSwitch in Model.Switches)
+			{
+				var path = Model.PathFor(featureSwitch);
+				<div class="status-readout__cell">
+					<dt class="label">@featureSwitch.Label</dt>
+					@if (!Model.IsOn(featureSwitch))
+					{
+						<dd class="status-readout__value status-readout__value--off">off</dd>
+					}
+					else if (path is null)
+					{
+						<dd class="status-readout__value status-readout__value--on">on</dd>
+					}
+					else
+					{
+						<dd class="status-readout__value status-readout__value--on"><a href="@path" target="_blank" rel="noopener">on</a></dd>
+					}
+				</div>
+			}
+			<div class="status-readout__cell"><dt class="label">Presets</dt><dd class="status-readout__value"><a asp-page="@Model.Instance.Page" asp-fragment="presets">@Model.PresetCount</a></dd></div>
+		</dl>
+	</div>
+</section>
+
+<section class="band band--split">
+	<div class="container band__grid">
+		<div class="band__body split split--tool split--text-left">
+			<div class="prose">
+				<h2 class="band__heading">@Model.Packing.Title</h2>
+				<p>@Model.Packing.Description</p>
+				<p class="actions"><a class="button" asp-page="@Model.Packing.Page">Open @Model.Packing.Title</a></p>
+			</div>
+			<ol class="labelled-list labelled-list--key labelled-list--lined">
+				<li class="labelled-list__item"><span class="label">01 Bins</span>The boxes you have. Every bin is tried.</li>
+				<li class="labelled-list__item"><span class="label">02 Items</span>What goes in them, with how many of each.</li>
+				<li class="labelled-list__item"><span class="label">03 Get results</span>One row per bin: how full it is and what did not fit.</li>
+				<li class="labelled-list__item"><span class="label">04 Step through</span>Play the order the items went in, or step one at a time. Drag to turn the view.</li>
+				<li class="labelled-list__item"><span class="label">05 Request</span>The call the page made, as a curl command to copy.</li>
+			</ol>
+		</div>
+	</div>
+</section>
+
+<section class="band band--mirrored">
+	<div class="container band__grid">
+		<div class="band__body split split--tool split--text-right">
+			<div class="prose split__text">
+				<h2 class="band__heading">@Model.Vipaq.Title</h2>
+				<p>@Model.Vipaq.Description</p>
+				<p class="actions"><a class="button" asp-page="@Model.Vipaq.Page">Open @Model.Vipaq.Title</a></p>
+			</div>
+			<ol class="labelled-list labelled-list--key labelled-list--lined">
+				<li class="labelled-list__item"><span class="label">01 Paste</span>A ViPaq string from a Binacle.Net response, or one from Samples.</li>
+				<li class="labelled-list__item"><span class="label">02 Add result</span>It is drawn in 3D and kept in the list below the view.</li>
+				<li class="labelled-list__item"><span class="label">03 Step through</span>Play the order the items went in. Drag to turn the view.</li>
+			</ol>
+		</div>
+	</div>
+</section>
+
+<section class="band">
+	<div class="container">
+		<div class="band__body">
+			<h2 class="band__heading">This instance</h2>
+			<nav class="doors doors--row" aria-label="This instance">
+				<a class="doors__link" asp-page="@Model.Instance.Page">
+					<h3 class="doors__title">@Model.Instance.Title</h3>
+					<p class="doors__text">@Model.Instance.ShortDescription</p>
+				</a>
+				@foreach (var door in Model.ReferenceDoors)
 				{
-					<p class="small-text"><code>@summary</code></p>
+					<a class="doors__link" href="@door.Path">
+						<h3 class="doors__title">@door.Title</h3>
+						<p class="doors__text">The API reference. Try requests in the browser.</p>
+					</a>
 				}
-			</a>
-		</article>
-	}
-</div>
+			</nav>
+		</div>
+	</div>
+</section>

@@ -1,14 +1,17 @@
-@* One line. Everything this used to say is on the page already - the version and the links into this
-   instance are on the instance page, and nothing here asks the reader for anything.
-
-   The links carry no colour class on purpose: a *-container background pairs with on-*-container, which they
-   inherit. Naming any other colour here breaks in one theme or the other. *@
-<footer class="secondary-container">
-	<nav class="center-align wrap small-text">
-		<span>&copy; 2023-@DateTime.Now.Year Chris Mavrommatis</span>
-		<span>Binacle.Net @Metadata.Version</span>
-		<a class="underline" href="@($"{Metadata.GitHub}/blob/main/{Metadata.LicenseFile}")" target="_blank">@Metadata.LicenseId</a>
-		<a class="underline" href="@Metadata.GitHub" target="_blank">GitHub</a>
-		<a class="underline" href="@Metadata.Dockerhub" target="_blank">Docker Hub</a>
-	</nav>
+@* The licence link is baked into every shipped image, so its address cannot move. *@
+<footer class="site-footer" data-site-footer>
+	<div class="container">
+		<p class="site-footer__line label">
+			<span>(c) 2023-@DateTime.Now.Year Chris Mavrommatis</span>
+			<span>Binacle.Net @Metadata.Version</span>
+			<a class="site-footer__link" href="@($"{Metadata.GitHub}/blob/main/{Metadata.LicenseFile}")">@Metadata.LicenseId</a>
+		</p>
+		<p class="site-footer__line label">
+			<a class="site-footer__link" href="@Metadata.Website">Binacle.Net</a>
+			<a class="site-footer__link" href="@Metadata.Docs">Documentation</a>
+			<a class="site-footer__link" href="@Metadata.Demo">Demo</a>
+			<a class="site-footer__link site-footer__link--external" href="@Metadata.GitHub">GitHub</a>
+			<a class="site-footer__link site-footer__link--external" href="@Metadata.Dockerhub">Docker Hub</a>
+		</p>
+	</div>
 </footer>

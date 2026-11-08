@@ -4,102 +4,113 @@
 	ViewData["Title"] = Model.Applet.Title;
 }
 
-<h1>@Model.Applet.Title</h1>
+<section class="band band--split">
+	<div class="container band__grid">
+		<div class="band__body split split--text-left">
+			<div class="prose">
+				<h1 class="split__title">@Model.Applet.Title</h1>
+				<p>@Model.Applet.Description</p>
+			</div>
+			<div>
+				<p class="label">Build</p>
+				<table class="table table--pairs" data-table>
+					<tbody>
+					<tr><th scope="row">Version</th><td class="mono">@Model.Version</td></tr>
+					<tr><th scope="row">Environment</th><td class="mono">@Model.Environment</td></tr>
+					<tr><th scope="row">Runtime</th><td class="mono">@Model.Runtime</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</section>
 
-<p>@Model.Applet.Description</p>
-
-<div class="grid">
-	<article class="s12 m6">
-		<h5>Build</h5>
-		<table class="border">
-			<tbody>
-			<tr>
-				<th scope="row">Version</th>
-				<td class="right-align"><code>@Model.Version</code></td>
-			</tr>
-			<tr>
-				<th scope="row">Environment</th>
-				<td class="right-align"><code>@Model.Environment</code></td>
-			</tr>
-			<tr>
-				<th scope="row">Runtime</th>
-				<td class="right-align"><code>@Model.Runtime</code></td>
-			</tr>
-			</tbody>
-		</table>
-	</article>
-
-	<article class="s12 m6">
-		<h5>Switches</h5>
-		<table class="border">
-			<tbody>
-			@foreach (var featureSwitch in Model.Switches)
-			{
-				var isOn = Model.IsOn(featureSwitch);
-				var path = Model.PathFor(featureSwitch);
-				<tr>
-					<th scope="row">@featureSwitch.Name</th>
-					<td>
+<section class="band">
+	<div class="container band__grid">
+		<div class="band__label"><p class="label">Switches</p></div>
+		<div class="band__body">
+			<table class="table table--pairs" data-table>
+				<thead>
+				<tr><th scope="col">Switch</th><th scope="col">State</th><th scope="col">Where</th></tr>
+				</thead>
+				<tbody>
+				@foreach (var featureSwitch in Model.Switches)
+				{
+					var isOn = Model.IsOn(featureSwitch);
+					var path = Model.PathFor(featureSwitch);
+					<tr>
+						<th scope="row">@featureSwitch.Name</th>
 						@if (isOn)
 						{
-							<span class="bold green-text">on</span>
+							<td class="mono" data-label="State">on</td>
+							<td class="mono" data-label="Where">
+								@if (path is not null)
+								{
+									<a href="@path">@path</a>
+								}
+							</td>
 						}
 						else
 						{
-							<span class="italic">off</span>
+							<td class="mono table__off" data-label="State">off</td>
+							<td class="mono table__off" data-label="Where">@featureSwitch.Setting</td>
 						}
-					</td>
-					<td class="right-align">
-						@if (isOn && path is not null)
-						{
-							<a href="@path">@path</a>
-						}
-						else if (!isOn)
-						{
-							<code>@featureSwitch.Setting</code>
-						}
-					</td>
-				</tr>
-			}
-			</tbody>
-		</table>
-	</article>
-
-	<article class="s12" id="presets">
-		<h5>Presets <span class="small-text">@(Model.Presets.Count == 1 ? "1 loaded" : $"{Model.Presets.Count} loaded")</span></h5>
-		@if (Model.Presets.Count == 0)
-		{
-			<p>None. Add them to Presets.json and restart, or pack against your own boxes in the packing demo.</p>
-		}
-		else
-		{
-			<table class="border">
-				<thead>
-				<tr>
-					<th scope="col">Preset</th>
-					<th scope="col">Boxes</th>
-					<th scope="col" class="right-align">Sizes</th>
-				</tr>
-				</thead>
-				<tbody>
-				@foreach (var preset in Model.Presets)
-				{
-					var boxLabel = preset.Bins.Count == 1 ? "1 box" : $"{preset.Bins.Count} boxes";
-					var sizes = string.Join(", ", preset.Bins.Select(bin => $"{bin.Id} {bin.Length}x{bin.Width}x{bin.Height}"));
-					<tr>
-						<th scope="row"><code>@preset.Name</code></th>
-						<td>@boxLabel</td>
-						<td class="right-align small-text">@sizes</td>
 					</tr>
 				}
 				</tbody>
 			</table>
-		}
-	</article>
-</div>
+		</div>
+	</div>
+</section>
+
+<section class="band band--wide" id="presets">
+	<div class="container band__grid">
+		<div class="band__label"><p class="label">@Model.Presets.Count loaded</p></div>
+		<div class="band__body">
+			<div class="prose">
+				<h2 class="band__heading">Presets</h2>
+				@if (Model.Presets.Count == 0)
+				{
+					<p>None. Add them to Presets.json and restart, or pack against your own boxes in the packing demo.</p>
+				}
+			</div>
+			@* Ids by position: a preset's name is free text and may not make a valid id. *@
+			@if (Model.Presets.Count > 0)
+			{
+				<div class="preset-cards">
+					@for (var i = 0; i < Model.Presets.Count; i++)
+					{
+						var preset = Model.Presets[i];
+						<button type="button" class="box-card box-card--preset" data-lightbox="preset-@i"><strong class="box-card__name"><code>@preset.Name</code></strong><span class="mono">@InstanceModel.BoxCount(preset)</span></button>
+					}
+				</div>
+				@for (var i = 0; i < Model.Presets.Count; i++)
+				{
+					var preset = Model.Presets[i];
+					var drawings = InstanceModel.DrawingsFor(preset);
+					<dialog class="lightbox lightbox--preset" id="preset-@i" aria-label="@preset.Name, @InstanceModel.BoxCount(preset)">
+						<div class="box-cards lightbox__cards">
+							@for (var b = 0; b < preset.Bins.Count; b++)
+							{
+								var bin = preset.Bins[b];
+								<div class="box-card box-card--static"><span class="box-card__face drawing drawing--painted">@Html.Raw(drawings[b])</span><strong class="box-card__name">@bin.Id</strong><span class="mono">@($"{bin.Length}x{bin.Width}x{bin.Height}")</span></div>
+							}
+						</div>
+						<div class="lightbox__bar"><span><code class="lightbox__code">@preset.Name</code> @InstanceModel.BoxCount(preset)</span><button type="button" class="button button--link" data-close>Close</button></div>
+					</dialog>
+				}
+			}
+		</div>
+	</div>
+</section>
 
 @* The only ask in the module, and it is on the one page read by someone who already runs this. The URL is
    baked into every image, so it has to keep resolving. *@
-<p class="small-text">
-	Running this? <a class="underline" href="@($"{Metadata.GitHub}/discussions")" target="_blank">Say hello</a>
-</p>
+<section class="band band--compact">
+	<div class="container band__grid">
+		<div class="band__label"></div>
+		<div class="band__body prose">
+			<p>Running this? <a href="@($"{Metadata.GitHub}/discussions")">Say hello</a></p>
+		</div>
+	</div>
+</section>

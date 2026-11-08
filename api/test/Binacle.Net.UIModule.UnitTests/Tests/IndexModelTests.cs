@@ -1,4 +1,5 @@
 using Binacle.Net.Kernel.Instance;
+using Binacle.Net.Kernel.Instance.Models;
 using Binacle.Net.UIModule.Models;
 using Binacle.Net.UIModule.Pages;
 using Binacle.Net.UIModule.Services;
@@ -6,63 +7,67 @@ using Microsoft.Extensions.Options;
 
 namespace Binacle.Net.UIModule.UnitTests;
 
-// The home page's instance card is the only card carrying a live number. It counts what is on against
-// FeatureSwitch.All, so a switch missing from that list makes the denominator wrong rather than the page fail.
-[Trait("Behavioral Tests", "Ensures the index cards report the instance without a browser call")]
+// The home page's band reports the instance from the server. It reads the same switch list as This Instance,
+// so the two pages cannot disagree.
+[Trait("Behavioral Tests", "Ensures the home page reports the instance without a browser call")]
 public class IndexModelTests
 {
-	private static IndexModel IndexWith(params string[] enabledFeatures)
+	private static IndexModel IndexWith(params (string Feature, string? Path)[] enabled)
 	{
 		var instanceOptions = new InstanceOptions();
-		foreach (var feature in enabledFeatures)
+		foreach (var (feature, path) in enabled)
 		{
-			instanceOptions.AddFeature(feature);
+			instanceOptions.AddFeature(feature, path);
 		}
 
 		return new IndexModel(new AppletsService(), Options.Create(instanceOptions));
 	}
 
 	[Fact]
-	public void The_Summary_Counts_Nothing_On_A_Bare_Instance()
+	public void The_Band_Lists_The_Same_Switches_As_This_Instance()
 	{
 		var page = IndexWith();
 
-		var summary = page.InstanceSummary;
-
-		summary.ShouldEndWith($"0 of {FeatureSwitch.All.Count} switched on");
+		page.Switches.ShouldBe(FeatureSwitch.All);
 	}
 
 	[Fact]
-	public void The_Summary_Counts_Only_The_Switches_The_Page_Lists()
+	public void An_On_Switch_Links_To_Where_It_Answers()
 	{
-		var page = IndexWith("SwaggerUI", "HealthChecks", "UIModule");
+		var page = IndexWith(("HealthChecks", "/healthz"));
 
-		var summary = page.InstanceSummary;
+		var health = page.Switches.Single(x => x.Feature == "HealthChecks");
 
-		summary.ShouldEndWith($"2 of {FeatureSwitch.All.Count} switched on");
+		page.IsOn(health).ShouldBeTrue();
+		page.PathFor(health).ShouldBe("/healthz");
 	}
 
 	[Fact]
-	public void The_Summary_Leads_With_The_Version()
+	public void The_Preset_Count_Is_What_The_Instance_Loaded()
+	{
+		var instanceOptions = new InstanceOptions();
+		instanceOptions.SetPresets(new PresetsValue([
+			new InstancePreset("a", [new InstancePresetBin("S", 1, 1, 1)]),
+			new InstancePreset("b", [new InstancePresetBin("S", 1, 1, 1)]),
+		]));
+		var page = new IndexModel(new AppletsService(), Options.Create(instanceOptions));
+
+		page.PresetCount.ShouldBe(2);
+	}
+
+	[Fact]
+	public void No_Reference_Door_On_A_Bare_Instance()
 	{
 		var page = IndexWith();
 
-		var summary = page.InstanceSummary;
-
-		summary.ShouldStartWith($"{Metadata.Version} - ");
+		page.ReferenceDoors.ShouldBeEmpty();
 	}
 
-	// Only the instance card has anything the server can add. The other two would have to fetch to say
-	// anything, and the home page loads no script.
 	[Fact]
-	public void Only_The_Instance_Card_Carries_A_Summary()
+	public void A_Reference_Door_Shows_Only_When_It_Is_On()
 	{
-		var page = IndexWith();
+		var page = IndexWith(("SwaggerUI", "/swagger"), ("HealthChecks", "/healthz"));
 
-		var summaries = page.Applets.ToDictionary(x => x.Page, page.SummaryFor);
-
-		summaries["/Instance"].ShouldNotBeNullOrWhiteSpace();
-		summaries["/Packing"].ShouldBeNull();
-		summaries["/Vipaq"].ShouldBeNull();
+		page.ReferenceDoors.ShouldBe([("Swagger", "/swagger")]);
 	}
 }

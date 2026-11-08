@@ -16,14 +16,14 @@ feature check, so with the flag off none of this is registered and nothing here 
 | Folder | What it is |
 |---|---|
 | `Pages/` | Every page - `Index`, `Packing`, `Vipaq`, `Instance`, `Error` - and the chrome under `Pages/Shared/` |
-| `Models/`, `Services/` | The applet list the cards and the navigation are built from, and the instance page's switch list |
+| `Models/`, `Services/` | The applet list the home page and the navigation are built from, the instance page's switch list, and the drawing of each preset box |
 | `_sass/` | The stylesheet source, compiled to `wwwroot/css/main.css` |
 | `_js/` | The webpack entries - `main`, and one per demo page - bundled into `wwwroot/js/` |
 | `wwwroot/` | Generated. Never edit anything in here |
 
 | Route | What it serves |
 |---|---|
-| `/` | Three cards, one per applet. The whole card is the link |
+| `/` | The default sample packed, the instance's switches, and a band per demo |
 | `/packing` | The packing demo |
 | `/vipaq` | The ViPaq decoder |
 | `/instance` | Version, what is switched on, and the presets this instance loaded |
@@ -38,14 +38,15 @@ module's alone and is free to differ.
 
 They run in the browser and call the API over relative URLs, so this module makes no server-side HTTP calls
 and needs no configuration file. The instance page is the exception to the browser part: it renders its preset
-list on the server, from the Kernel's `InstanceOptions`. That list is filled once at startup, so it can go stale
+list on the server, from the Kernel's `InstanceOptions`, and draws each box there. That list is filled once at startup, so it can go stale
 against `GET /api/v4/presets` until a restart.
 
 ## ⚠️ `wwwroot/` is generated, and nothing in it is yours
 
 It is rebuilt from three places and gitignored whole:
 
-- `just assets` copies [`assets/`](../../../assets) into `lib/`, `media/` and the icons at the root.
+- `just assets` copies the favicon from [`assets/`](../../../assets), and the fonts and the mark from the
+  [design system](../../../shared/packages/design-system), into `fonts/` and `media/`.
 - `npm run build:css` compiles `_sass/main.scss` into `css/main.css`.
 - `npm run build:js` bundles `_js/` into `js/`.
 

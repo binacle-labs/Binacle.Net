@@ -1,3 +1,29 @@
-@use 'theme';
-@use 'components';
-@use 'forms';
+@use "pkg:@binacle/design-system/base/tokens" with ($font-path: "/_content/Binacle.Net.UIModule/fonts/");
+@use "pkg:@binacle/design-system/base/elements";
+
+@use "pkg:@binacle/design-system/layout/container";
+@use "pkg:@binacle/design-system/layout/site-header";
+@use "pkg:@binacle/design-system/layout/site-footer";
+@use "pkg:@binacle/design-system/layout/band";
+@use "pkg:@binacle/design-system/layout/hero";
+@use "pkg:@binacle/design-system/layout/split";
+
+@use "pkg:@binacle/design-system/components/actions";
+@use "pkg:@binacle/design-system/components/box-card";
+@use "pkg:@binacle/design-system/components/box-cards";
+@use "pkg:@binacle/design-system/components/button";
+@use "pkg:@binacle/design-system/components/dimension-line";
+@use "pkg:@binacle/design-system/components/doors";
+@use "pkg:@binacle/design-system/components/drawing";
+@use "pkg:@binacle/design-system/components/labelled-list";
+@use "pkg:@binacle/design-system/components/lightbox";
+@use "pkg:@binacle/design-system/components/pack-still";
+@use "pkg:@binacle/design-system/components/pack-view";
+@use "pkg:@binacle/design-system/components/preset-cards";
+@use "pkg:@binacle/design-system/components/status-readout";
+@use "pkg:@binacle/design-system/components/still";
+@use "pkg:@binacle/design-system/components/table";
+@use "pkg:@binacle/design-system/components/theme-button";
+
+// Last: a type style shares its element with a block and has to win.
+@use "pkg:@binacle/design-system/utilities/typography";

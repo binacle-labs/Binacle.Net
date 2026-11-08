@@ -1,21 +1,19 @@
-<header class="fixed top responsive max primary">
-	<nav>
-		<div class="s">
-			<a asp-page="/Index">
-				<img class="large" src="/_content/Binacle.Net.UIModule/media/logo/binacle-logo-16x16.svg" alt="Binacle.Net">
-			</a>
-		</div>
+@inject AppletsService AppletsService
+@{
+	var currentPage = (string?)ViewContext.RouteData.Values["page"];
+}
 
-		<h5 class="max center-align">Binacle.Net</h5>
-
-		<a href="@Metadata.GitHub" title="Check out my GitHub" target="_blank">
-			<img src="/_content/Binacle.Net.UIModule/media/github/github-mark-white.png" alt="Github" height="20">
-		</a>
-		<a href="@Metadata.Dockerhub" title="Visit Binacle.Net on Dockerhub" target="_blank">
-			<img src="/_content/Binacle.Net.UIModule/media/docker/docker-mark-white.png" alt="Docker" height="20">
-		</a>
-
-		@* The design system's theme button, defined in main.js. It renders its own button. *@
-		<theme-switcher class="transparent circle"></theme-switcher>
-	</nav>
+@* data-nav-row keeps the nav as one row that scrolls sideways on a phone, with no burger. *@
+<header class="site-header" data-site-header data-nav-row>
+	<div class="container">
+		<a class="site-header__wordmark" asp-page="/Index"><img class="site-header__mark" src="/_content/Binacle.Net.UIModule/media/logo/binacle-logo.svg" alt="" width="24" height="24"><span>Binacle.Net</span></a>
+		<nav class="site-header__nav" data-site-nav aria-label="Main">
+			@foreach (var applet in AppletsService.Applets)
+			{
+				var current = string.Equals(currentPage, applet.Page, StringComparison.OrdinalIgnoreCase);
+				<a class="site-header__link" asp-page="@applet.Page" aria-current="@(current ? "page" : null)">@applet.Title</a>
+			}
+		</nav>
+		<theme-switcher data-button-class="theme-button"></theme-switcher>
+	</div>
 </header>

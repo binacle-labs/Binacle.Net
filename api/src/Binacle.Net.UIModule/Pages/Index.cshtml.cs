@@ -17,19 +17,32 @@ internal class IndexModel : PageModel
 		this.instanceOptions = instanceOptions;
 	}
 
-	public IReadOnlyList<Applet> Applets => this.appletsService.Applets;
+	public Applet Packing => this.AppletFor("/Packing");
+	public Applet Vipaq => this.AppletFor("/Vipaq");
+	public Applet Instance => this.AppletFor("/Instance");
 
-	// The instance card carries what the server already knows. The preset count is not here on purpose: it
-	// comes from the API in the browser, and the home page loads no script.
-	public string InstanceSummary
-	{
-		get
-		{
-			var on = FeatureSwitch.All.Count(x => this.instanceOptions.Value.IsFeatureEnabled(x.Feature));
-			return $"{Metadata.Version} - {on} of {FeatureSwitch.All.Count} switched on";
-		}
-	}
+	public string Version => Metadata.Version;
 
-	public string? SummaryFor(Applet applet)
-		=> applet.Page == "/Instance" ? this.InstanceSummary : null;
+	// The same list This Instance shows, so the two pages cannot disagree.
+	public IReadOnlyList<FeatureSwitch> Switches => FeatureSwitch.All;
+
+	public bool IsOn(FeatureSwitch featureSwitch)
+		=> this.instanceOptions.Value.IsFeatureEnabled(featureSwitch.Feature);
+
+	public string? PathFor(FeatureSwitch featureSwitch)
+		=> this.instanceOptions.Value.PathFor(featureSwitch.Feature);
+
+	public int PresetCount => this.instanceOptions.Value.Presets.Presets.Count;
+
+	// A reference gets a door only when it is on: a door to a page that is not there is a dead end.
+	public IReadOnlyList<(string Title, string Path)> ReferenceDoors
+		=> FeatureSwitch.All
+			.Where(x => x.Feature is "SwaggerUI" or "ScalarUI")
+			.Select(x => (Title: x.Label, Path: this.PathFor(x)))
+			.Where(x => x.Path is not null)
+			.Select(x => (x.Title, x.Path!))
+			.ToList();
+
+	private Applet AppletFor(string page)
+		=> this.appletsService.Applets.First(x => x.Page == page);
 }

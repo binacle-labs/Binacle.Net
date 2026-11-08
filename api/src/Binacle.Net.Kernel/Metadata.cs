@@ -12,6 +12,9 @@ public static class Metadata
 
 	public const string GitHub = "https://github.com/binacle-labs/Binacle.Net";
 	public const string Dockerhub = "https://hub.docker.com/r/binacle/binacle-net";
+	public const string Website = "https://www.binacle.net";
+	public const string Docs = "https://docs.binacle.net";
+	public const string Demo = "https://demo.binacle.net";
 
 	// The version is a deploy fact, not a build fact: the docker image is the only artifact, so BINACLE_VERSION
 	// (from ARG VERSION in the Dockerfile, fed by the release tag) is the only version that exists. The
