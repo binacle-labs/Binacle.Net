@@ -2,7 +2,7 @@
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
 verified: 2026-09-29
-check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it
+check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, and the second webpack config in webpack.config.js; W3 against _sass/main.scss and the build:css script in package.json; W5 against exchange.html still being an include and every page calling it; W10 against sites/www/_includes/drawings/, whose SVGs carry no fill attribute outside a mask, and every page pulling its drawing in with an include
 paths:
   - "sites/www/**"
 ---
@@ -113,3 +113,21 @@ without it a screen reader gets two identical bullets.**
 
 The mark in `_includes/header.html` is the vector file, never a downscaled png - **the raster copies turn to
 mush below 48px** and the header renders at 28.
+
+## W10 - each drawing is an include file, not an image
+
+Every picture on the site is an SVG file in `_includes/drawings/`, one per drawing, and each page includes its own:
+`{% include drawings/hero.svg %}`. No site build draws them; the files are committed as they are.
+
+**Decided (the maintainer, 2026-11-05):** "we do partials" - asked whether the drawings stay pasted into each page
+or move into include files.
+
+**The SVG carries no colour.** Every shape has a class and no `fill` - the only `fill` is a fade mask's - and the
+design system's `drawing` block paints them, `drawing--painted` on the wrapping div. Included, the SVG is part of
+the page, so the page's CSS reaches it - the built page is the same as one with the drawing pasted in. **The two
+other ways to reuse an SVG both break it:** as an `<img>` the page's CSS cannot reach inside, and it draws a black
+shape; through `<use>` the shapes sit in a shadow tree the page's selectors do not match, and the walls lose their
+paint.
+
+**The home hero is two files**, the whole locker bank and its crop for a phone. The `drawing-pair` that holds them
+stays in the page, not in either file.
