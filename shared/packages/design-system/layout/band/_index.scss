@@ -20,17 +20,15 @@ main {
 
 // A change of ground is already an edge, so it needs no line.
 .band--deep,
-.band--deep + .band {
+.band--deep + .band,
+.band--tint + .band:not(.band--tint),
+.band:not(.band--tint, .band--deep) + .band--tint {
   border-top-color: transparent;
 }
 
 .band--tint {
   --rule: var(--tint-rule);
   background: var(--tint);
-}
-
-.band--no-edge {
-  border-top-color: transparent;
 }
 
 .band--numbered {

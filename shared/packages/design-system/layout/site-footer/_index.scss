@@ -1,8 +1,13 @@
 @use "../../abstracts/grounds";
 
+// The footer is the deep ground, so only a deep band above it keeps the line.
 .site-footer {
   @include grounds.deep;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid transparent;
+}
+
+main:has(> .band--deep:last-child) + .site-footer {
+  border-top-color: var(--rule);
 }
 
 .site-footer__line {
@@ -22,11 +27,6 @@
   &:hover {
     text-decoration: underline;
   }
-}
-
-// A ground change is already an edge.
-.site-footer--no-edge {
-  border-top-color: transparent;
 }
 
 .site-footer .container {
