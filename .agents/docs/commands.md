@@ -1,7 +1,7 @@
 ---
 id: commands
 description: How to set up a clone, run the API and the sites, run tests and benchmarks, and build the Docker image
-verified: 2026-11-05
+verified: 2026-11-09
 check: Tests match tooling/tests.just; coverage recipes match tooling/coverage.just; openapi recipes match tooling/openapi.just; agents recipes match tooling/agents.just; regen recipes match tooling/regen.just; serve recipes match tooling/serve.just; measure recipes match tooling/measure.just; bench recipes match tooling/bench.just; smoke recipes match tooling/smoke.just; build recipes match tooling/build.just; check recipes match tooling/check.just; ci recipes match tooling/ci.just and each names an existing tooling/ci/*.sh; install/assets match the root justfile; aliases and scripts match tooling/*.sh; compose service list matches tooling/serve.services.yml; the Prerequisites section still only points at DEVELOPMENT.md and repeats no versions or install commands
 paths:
   - "justfile"
@@ -27,7 +27,7 @@ at it. This section exists only to say where it is.
 ## Set up a fresh clone
 
 ```bash
-just install                           # npm workspaces, the gems for docs, demo, www and ruby/, then the asset copy
+just install                           # npm workspaces, the gems for docs, demo, www, ruby/ and sites/ruby/, then the asset copy
 just assets                            # only the asset copy - after changing anything under assets/
 ```
 
@@ -97,15 +97,15 @@ just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorag
 # TypeScript
 just test ts_binacle-compact-notation_unit
 just test ts_binacle-vipaq_unit
-just test ts_binacle-net-client_unit
-just test ts_binacle-net-service-client_unit
-just test ts_binacle-net-ui_unit
+just test ts_binacle-api-client_unit
+just test ts_binacle-service-client_unit
+just test ts_binacle-apps_unit
 just test ts_cookies_unit
 just test ts_theme-switcher_unit
-just test ts_binacle-components_unit
+just test ts_binacle-design-system_unit
 
 # Ruby - the gems. `just test sites` and `just test all` run them.
-just test rb_binacle-docs-versions_unit
+just test rb_binacle-docs_unit
 just test rb_binacle-robots_unit
 just test rb_jekyll-breadcrumb-trail_unit
 just test rb_jekyll-filters_unit
@@ -199,7 +199,7 @@ just openapi sync-all-copies           # generate, then write every committed co
 
 `check-all-copies` diffs the generated documents against the four committed copies:
 `sites/docs/collections/_versions/<current>/swagger/v3.json` and `v4.json`,
-`packages/binacle-net-client/spec/v4.json`, and `packages/binacle-net-service-client/spec/service.json`. The
+`api/packages/api-client/spec/v4.json`, and `api/packages/service-client/spec/service.json`. The
 v4 client takes no copy of v3, and the service client takes only the service document. The current docs
 version is read from `current:` in `sites/docs/_data/versions.yml`; the frozen version folders below
 it are records of what those releases documented and are never compared. `shared-image-tests.yml` runs the
@@ -400,9 +400,9 @@ Then run it with `just image up`, which prepares the bind-mounted folders first.
 
 `docs`, `demo` and `www` are the build half of `just serve <site>` — same site, built once instead of
 served and watched. **The deploy workflow calls these and hands `artifacts/<site>` straight to the host**, so
-what they build is what gets served. Three steps in a fixed order: copy the assets, run webpack over `_js/`, then
+what they build is what gets served. Three steps in a fixed order: copy the assets, `npm run build` over `_sass/` and `_js/`, then
 `jekyll build` with `_config.yml,_config.prod.yml`. **Skipping any of them still produces a site**, just one
-with no scripts and no logo, because `js/`, `lib/` and `media/` are gitignored and filled by the first two
+with no styles, no scripts and no logo, because `css/`, `js/`, `fonts/` and `media/` are gitignored and filled by the first two
 steps. The prod config overrides the three values that differ off localhost: the site url, the api url and the
 analytics container.
 

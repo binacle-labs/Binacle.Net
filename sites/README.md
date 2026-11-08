@@ -17,22 +17,22 @@ Each has its own `README.md`, `Gemfile` and `package.json`. **All three `package
 workspace members**, so one `npm install` at the root covers them and none has a lock file of its own. Ruby is
 still per site. `just install` from the repo root runs the root install and then `bundle install` in each.
 
-**`www` is the odd one out.** It runs no CSS framework and compiles its own stylesheet with the sass CLI
-rather than through Jekyll, so `css/` is build output there and committed source on the other two. Its
-[`README.md`](www) says what else differs.
+**The look comes from [`shared/packages/design-system`](../shared/packages/design-system).** Each site's
+`_sass/main.scss` names the parts it uses, and the sass CLI compiles it rather than Jekyll, so `css/` is build
+output on all three.
 
 ## 🛠️ Building and serving
 
 From the repo root, one pair of recipes per site:
 
 ```bash
-just serve docs                  # jekyll serve + webpack watch, one Ctrl-C stops both
+just serve docs                  # jekyll serve + sass and webpack watches, one Ctrl-C stops all three
 just build docs                  # the same site built once, into artifacts/docs
 ```
 
 `serve demo`, `build demo`, `serve www` and `build www` are the same for the other two. A build is three
-steps in a fixed order - copy the shared assets, compile the scripts (and on `www` the stylesheet too), then
-`jekyll build` - and **skipping any of them still produces a site**, just one with no scripts and no logo.
+steps in a fixed order - copy the shared assets, compile the stylesheet and the scripts, then
+`jekyll build` - and **skipping any of them still produces a site**, just one with no styles, no scripts and no logo.
 Use the recipes rather than calling `jekyll` yourself.
 
 Output goes to `artifacts/<site>` at the repo root, which is what gets deployed.

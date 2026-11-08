@@ -60,9 +60,9 @@ image version="local": publish
       --label "org.opencontainers.image.created=${created}" \
       -t "binacle-net:{{ version }}" .
 
-# Three steps in a fixed order: the asset copy fills the site's gitignored lib/ and media/, webpack compiles
-# _js/ into its gitignored js/, then jekyll assembles. `jekyll build` on its own succeeds and ships a site
-# with no scripts and no logo.
+# Three steps in a fixed order: the asset copy fills the site's gitignored media/ and fonts/, npm run build
+# compiles _sass/ and _js/ into its gitignored css/ and js/, then jekyll assembles. `jekyll build` on its own
+# succeeds and ships a site with no styles, no scripts and no logo.
 #
 # Both config files: _config.yml holds everything, _config.prod.yml overrides the three values that differ
 # off localhost. Jekyll merges later files over earlier ones.

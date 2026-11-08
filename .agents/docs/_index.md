@@ -178,7 +178,7 @@ table of [README.md](README.md).
   description: "Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site."
   paths: ["sites/**"]
 - file: sites/demo.md
-  description: "The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/."
+  description: "The published Jekyll demo site at sites/demo/ - a box picker home and the three interactive demos, Everyday Items, Custom Sizes and the ViPaq decoder. The look it takes from the design system, its bundles and its assets. `$sites/demo` always means sites/demo/."
   paths: ["sites/demo/**"]
 - file: sites/docs.md
   description: "The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/."

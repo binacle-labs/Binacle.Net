@@ -1,40 +1,50 @@
 ---
 id: sites/demo
-description: The published Jekyll demo site at sites/demo/ — a chooser index and the two interactive demos, the packing demo and the ViPaq decoder. `$sites/demo` always means sites/demo/.
-verified: 2026-09-29
-check: Collections, JS bundles and plugin list match sites/demo/_config.yml and sites/demo/js/; sites/demo/_includes/ still has no seo.html and pages/index.html still prints item.summary on the cards; the demo/prefetch script split still matches sites/demo/_data/includes.yml; the sitemaps: block in _config.yml still writes one file and /sitemap.xml still lists the three pages; artifacts/demo/lib/ after `just build demo` holds exactly the vendor folders listed, and gulpfile.js's IGNORE map still explains what is missing
+description: The published Jekyll demo site at sites/demo/ - a box picker home and the three interactive demos, Everyday Items, Custom Sizes and the ViPaq decoder. The look it takes from the design system, its bundles and its assets. `$sites/demo` always means sites/demo/.
+verified: 2026-11-08
+check: The page list and permalinks match sites/demo/pages/; _sass/main.scss holds only @use lines into @binacle/design-system; _config.yml has no `sass:` block, sets theme binacle-design-system and lists the same plugins as below; the nav is _data/header.yml; the bundle table matches the entries and cacheGroups in webpack.config.js; the demo/prefetch split still matches _data/includes.yml and _layouts/default.html; the sitemaps: block still writes one file from pages; gulpfile.js still gives demo no assets/lib; the name in tooling/cloudflare/demo.wrangler.jsonc is still binacle-net-demo
 also_update:
-  - packages
+  - shared/apps
 paths:
   - "sites/demo/**"
 ---
 
 # Demo Site
 
-**`$sites/demo` is the `sites/demo/` folder** — the published demo site. It is off limits from a coding
-session.
+**`$sites/demo` is the `sites/demo/` folder** - the published demo site, at `demo.binacle.net`. It is off
+limits from a coding session.
 
-Jekyll site at `sites/demo/`. The public demo site for Binacle.Net.
-Built with Jekyll + webpack + TypeScript. Output goes to `../../artifacts/demo`.
-
-Run locally, or build it once:
+Output goes to `../../artifacts/demo`. Worker `binacle-net-demo`.
 
 ```bash
-just serve demo   # jekyll serve (port 7196) + webpack watch, one Ctrl-C stops both
+just serve demo   # jekyll serve (port 7196) + sass and webpack watches, one Ctrl-C stops all three
 just build demo   # the same site built once, into artifacts/demo
 ```
+
+## The look comes from the design system
+
+**The site holds no CSS of its own.** `_sass/main.scss` is a list of `@use` lines, each one part of
+`@binacle/design-system`. A part the site needs is added to that list, not written here. Why the package is
+built this way is `$shared/design-system`.
+
+**Some includes are not in `_includes/`.** `theme: binacle-design-system` in `_config.yml` makes Jekyll read the
+package's `_includes/` after this site's. The copy button comes from there. An include here of the same name
+wins.
 
 ## Pages
 
 | Page | Route | What it is |
 |---|---|---|
-| `pages/index.html` | `/` | The chooser — one card per tool, and the card is the link |
-| `pages/packing.html` | `/packing/` | The packing demo |
+| `pages/index.html` | `/` | Pick a box: three box cards, each opening *Everyday Items* with `?box=` set, and tiles to the other two demos |
+| `pages/items.html` | `/items/` | *Everyday Items* - pick a box, add things, see where each lands |
+| `pages/packing.html` | `/packing/` | *Custom Sizes* - your own bins and items, and the algorithm |
 | `pages/vipaq.html` | `/vipaq/` | The ViPaq decoder |
 | `pages/404.html` | `/404.html` | Error page |
 
-**There is no collection for the tools.** They are pages carrying `applet: true` and an `order`, and the
-chooser and the nav menu key off that flag.
+**The nav is `_data/header.yml`**, written by hand. A new page is not in it until it is added there.
+
+The three demo pages carry `demo: true` and name their own entry script under `scripts:` in front matter. The
+apps behind them, and the names their markup must use, are `$shared/apps`.
 
 **There is no sitemap file and no sitemaps collection.** `jekyll-multi-sitemap` generates `/sitemap.xml` from
 the `sitemaps:` block in `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and
@@ -49,20 +59,18 @@ Webpack bundles from `sites/demo/_js/` and npm packages into `sites/demo/js/`:
 
 | Bundle | What it is |
 |---|---|
-| `main.js` | Site-wide JS (theme, navigation) |
-| `packing_demo.js` | Interactive packing demo — calls the Binacle.Net API |
-| `protocol_decoder.js` | ViPaq protocol decoder — decodes pack results without calling the API |
-| `binacle-net-ui.js` | Built from `packages/binacle-net-ui` — UI components and 3D visualizer |
-| `binacle-vipaq.js` | Built from `vipaq/packages/binacle-vipaq` — TypeScript ViPaq decoder |
-| `runtime.js` | Webpack runtime, loaded on every page |
-| `vendors.js` | Shared npm dependencies, loaded on every page |
-| `three.js` | Three.js on its own, **601 KiB** — demo pages only |
+| `main.js` | Site-wide: the design system's theme button, menu drawer, code wrap, copy buttons and lightbox |
+| `everyday_items.js`, `packing_demo.js`, `protocol_decoder.js` | One per demo page. Each starts Alpine with its app's plugin; the decoder's also holds the *Samples* drawer |
+| `binacle-net-ui.js` | `@binacle/apps`, the API client and the design system's 3D view, in one chunk. Why it keeps that name is `$shared/apps` |
+| `binacle-vipaq.js` | `vipaq/packages/vipaq`, the TypeScript ViPaq decoder |
+| `three.js` | Three.js on its own, by far the largest - demo pages only |
+| `runtime.js`, `vendors.js` | The webpack runtime and the other npm dependencies, Alpine among them. Every page |
 | `theme-init.js` | The pre-paint theme read, loaded blocking in `<head>` |
 
-`main`, `packing_demo` and `protocol_decoder` are the entry points of the main webpack config; the rest of
-that config's output is split chunks and package builds. `theme-init` is a second config in the same file,
-built from `_js/theme-init.ts`, because the head script has to be one self-contained file with no runtime or
-vendors chunk. The main config's `clean` keeps `theme-init.js` so the two do not delete each other.
+The four page scripts are the entry points of the main webpack config; the rest of that config's output is
+split chunks. `theme-init` is a second config in the same file, built from `_js/theme-init.ts`, which calls the
+design system's `theme-init` entry: the head script has to be one self-contained file with no runtime or vendors
+chunk. The main config's `clean` keeps `theme-init.js` so the two do not delete each other.
 
 **The demo bundles are split out on purpose, and `sites/demo/_data/includes.yml` is the one list that decides
 it.** `runtime.js`, `main.js` and `vendors.js` load on every page. `three.js`, `binacle-net-ui.js` and
@@ -76,33 +84,20 @@ list, so arriving at a demo costs no download. Both halves read the one list, so
 
 Nine, in `_config.yml` order: `jekyll-tidy`, `jekyll-gtm`, `jekyll-filters`, `binacle-robots`,
 `jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
-`jekyll-webmanifest`. The two the docs site loads and this one does not are `binacle-docs-versions` and
-`jekyll-breadcrumb-trail` — a flat site has no version picker and no trail to draw.
+`jekyll-webmanifest`. The two the docs site loads and this one does not are `jekyll-breadcrumb-trail` and
+`binacle-docs` - a flat site has no trail and no versions. `binacle-robots` is one of the site gems,
+`$sites/ruby`.
 
-**The head is `{% page_meta %}` then `{% structured_data %}`, and there is no seo include.** The two demo
-pages name their node with `structured_data: type: WebApplication` in front matter; the `offers`,
+**The head is `{% page_meta %}` then `{% structured_data %}`, and there is no seo include.** Each demo page
+names its node with `structured_data: type: WebApplication` in front matter; the `offers`,
 `applicationCategory`, `operatingSystem` and `browserRequirements` under it come from
 `structured_data: defaults:` in `_config.yml`, and the `organization:` block there is byte-identical to the
 one in www and docs.
 
-**`description` is the search sentence and `summary` is the card copy.** The chooser on `/` prints
-`item.summary`; putting the card blurb back on `description` ships it as a search snippet.
+## Fonts and assets
 
-## Vendor Libs
-
-`sites/demo/lib/` holds two vendor folders — `beercss` and `material-dynamic-colors` — and **only BeerCSS is
-loaded**, as a stylesheet and a module in `sites/demo/_data/includes.yml`.
-
-- **material-dynamic-colors** is present and commented out there; uncomment it only when the site needs runtime
-  theme switching.
-- **`swagger-ui` is in `assets/` but never copied here.** `gulpfile.js` carries a per-target `IGNORE` map: the
-  docs site's swagger layout is the only thing that loads it, so it reaches `sites/docs/` alone. That map is
-  also what keeps it out of the image.
-
-Alpine.js arrives as an npm dependency bundled by webpack; there is no vendored copy.
-
-**Three.js is not in `vendors.js`** — it is its own bundle, for the reason in the table above.
-
-Built size is **3.0 MB**, of which 1.14 MB is three Material Symbols `woff2` files. `beer.min.css` declares
-four `@font-face` families and a browser downloads only the one a page uses, so that weight is in the deploy
-and not in the page load.
+**No vendored library reaches this site.** `gulpfile.js` gives `demo` nothing from `assets/lib/`; Alpine and
+Three.js come from npm through webpack. `just assets` copies the favicons and the link preview from `assets/`,
+the two fonts from the design system into `fonts/`, and the design system's mark to
+`media/logo/binacle-logo.svg`, the address `logo.src` in `_config.yml` names. `_data/includes.yml` preloads both
+fonts.

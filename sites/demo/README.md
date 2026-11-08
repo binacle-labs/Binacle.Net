@@ -8,7 +8,6 @@ Its host is <https://demo.binacle.net>.
 | Path | What it is |
 |---|---|
 | `pages/` | The whole site - the chooser `index.html`, `items.html`, `packing.html`, `vipaq.html`, `404.html`, `robots.txt` |
-| `collections/_sitemaps/` | The sitemap source. One file, one collection |
 | `_data/` | The header's links, the footer, and the script and style includes |
 | `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document and `page.html` the wrapper every page gets |
 | `_includes/drawings/` | The box cards and the home page's packed box, as SVG. A page pulls one in as an include, so its CSS reaches it |
@@ -36,8 +35,8 @@ Run `just install` once on a fresh clone, and `just assets` after changing anyth
 ## 🧩 The three demos
 
 Each is a page in `pages/` marked `demo: true`, with their behaviour in a `_js/` entry point that imports the
-shared packages from [`packages/`](../../packages) - `@binacle/apps` for all three,
-`design-system` for the site chrome. They are resolved through the npm workspace, not copied, so editing a
+shared packages from [`shared/packages/`](../../shared/packages) - `@binacle/apps` for all three,
+`design-system` for the look and the site chrome. They are resolved through the npm workspace, not copied, so editing a
 package changes the site on the next webpack pass.
 
 *Everyday Items* and *Custom Sizes* call a running API. `api_url` in `_config.yml` points it at the local one; `_config.prod.yml`
