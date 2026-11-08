@@ -111,8 +111,9 @@ benchmarks, and build the Docker image.
 - Shared (`$shared`) — Binacle.Data scenario data & compact formats; OR-Library data
 - ViPaq (`$vipaq`) — `Binacle.ViPaq` binary format and TypeScript mirror
 - Packages (`$packages`) — TypeScript npm packages
-- Ruby (`$ruby`) — Ruby/Jekyll plugins
+- Ruby (`$ruby`) — the generic Ruby/Jekyll plugins
 - Sites (`$sites`) — every published site, and what they share
+- Site Gems (`$sites/ruby`) — the two gems only the sites read, `binacle-robots` and `binacle-docs`
 - Docs Site (`$sites/docs`) — the published Jekyll site at `sites/docs/`
 - Demo Site (`$sites/demo`) — the published Jekyll site at `sites/demo/`
 - WWW Site (`$sites/www`) — the published Jekyll site at `sites/www/`

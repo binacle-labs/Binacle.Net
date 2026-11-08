@@ -145,7 +145,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: ruby/README.md
-  description: "Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site."
+  description: "Ruby gems under ruby/ — the generic Jekyll plugins the sites under sites/ load, and which sites load which. The two only the sites read are in sites/ruby/."
   paths: ["ruby/**"]
 ```
 
@@ -183,6 +183,9 @@ table of [README.md](README.md).
 - file: sites/docs.md
   description: "The published Jekyll documentation site at sites/docs/ — versioned API docs with Swagger UI embed. `$sites/docs` always means sites/docs/, never .agents/docs/."
   paths: ["sites/docs/**"]
+- file: sites/ruby.md
+  description: "sites/ruby/ - the two gems only the Binacle sites read, binacle-robots and binacle-docs. What each stamps and writes, what fails the build, and how their bundle differs from ruby/."
+  paths: ["sites/ruby/**"]
 - file: sites/www.md
   description: "The published Jekyll marketing site at sites/www/ - its pages, the look it takes from the design system, the exchange data every API sample comes from, and what bites."
   paths: ["sites/www/**"]

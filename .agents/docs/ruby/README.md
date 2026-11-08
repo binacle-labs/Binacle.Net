@@ -1,8 +1,8 @@
 ---
 id: ruby
-description: Ruby gems under ruby/ — the Jekyll plugins the sites under sites/ load, which sites load which, and the one that belongs to a single site.
-verified: 2026-09-28
-check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; docs, demo and www still load jekyll-filters and jekyll-gtm through their Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder, and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
+description: Ruby gems under ruby/ — the generic Jekyll plugins the sites under sites/ load, and which sites load which. The two only the sites read are in sites/ruby/.
+verified: 2026-11-08
+check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; docs, demo and www still load jekyll-filters and jekyll-gtm through their Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder; the Binacle-named gems are not under ruby/; and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
 ---
@@ -11,6 +11,9 @@ paths:
 
 Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` and `sites/www/`. The local-only
 `sites/admin/` also loads `jekyll-filters`, `jekyll-resource-tags` and `jekyll-page-meta`.
+
+**Every gem here names no product**, so any Jekyll site could load it. The two that carry the sites' own words
+and markup, `binacle-robots` and `binacle-docs`, are in `sites/ruby/` - `$sites/ruby`.
 
 | Gem | What it adds | Loaded by |
 |---|---|---|
@@ -22,8 +25,6 @@ Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` an
 | `jekyll-structured-data` | One Liquid tag: `{% structured_data %}` | all three sites |
 | `jekyll-breadcrumb-trail` | A generator that resolves `page.breadcrumb_trail`, and `{% breadcrumbs %}` | **docs only** |
 | `jekyll-webmanifest` | A generator that writes the manifest file, and `{% webmanifest_link %}` | all three sites |
-| `binacle-robots` | One Liquid tag: `{% robots %}`, the shared `robots.txt` body | all three sites |
-| `binacle-docs-versions` | A generator that stamps two version keys, and `{% vlink %}` | **docs only** |
 
 **Every gem has the same shape**: `<name>.gemspec`, one entry file at `lib/<name>.rb` that Jekyll requires by
 gem name, and everything else under `lib/<name>/` with the gem prefix dropped from the filenames.
@@ -259,87 +260,17 @@ reserved keys, `manifest.rb` builds the members, `json.rb` serialises, `generato
   `lib/element.rb` would sit on the shared load path where another gem's file of that name could shadow it.
 - **One module per gem, inside `Jekyll`** — `Jekyll::MultiSitemap`, `Jekyll::GTM`, `Jekyll::PageMeta`,
   `Jekyll::ResourceTags`, `Jekyll::StructuredData`, `Jekyll::BreadcrumbTrail`, `Jekyll::Webmanifest`,
-  `Jekyll::SiteFilters`. The two product-named gems sit in `Binacle::` instead — `Binacle::DocsVersions`,
-  `Binacle::Robots`.
+  `Jekyll::SiteFilters`.
 - **`# frozen_string_literal: true` at the top of every `.rb`**, gemspecs and specs included.
 - **`ruby/.rubocop.yml` covers every gem.** It disables `Metrics`, allows any hyphenated entry filename and
   sets the line length to 120. Nothing runs it. What it reports is under "Running the specs".
-
-## binacle-robots
-
-**The second gem named for the product rather than for Jekyll**, and for the same reason: what it carries
-belongs to one publisher. `{% robots %}` writes the `robots.txt` body - the content-signal preamble, the
-Article 4 rights reservation under EU directive 2019/790, and `User-Agent: *`.
-
-**It was worth a gem for what the text is, not for its size.** Three hand-kept copies of a legal statement
-drift, and the copy that drifts is the one that stops saying what was meant. Nobody would notice until they
-read all three side by side.
-
-**A tag, not a generator**, because it needs the sitemap urls and a generator could not be ordered after
-the one that produces them. `$ruby/decisions#R6`.
-
-**No config.** A body that can be configured per site is a body that can differ per site.
-
-**The text is a data file**, `lib/binacle-robots/robots.txt`, read once at load and written out unchanged.
-Nothing is substituted into it. The tag emits no trailing newline - the newline after it in the site's file
-supplies that, and `{%- robots -%}` would eat it and change the bytes.
-
-**The content signals are commented out**, and a spec pins that. Turning them on is a decision, and it would
-reach all three sites at once.
-
-Source: `ruby/binacle-robots/lib/binacle-robots/` — `body.rb` reads the file, `tag.rb` writes it.
-
-## binacle-docs-versions
-
-**The one gem here written for a single site**, and named for it rather than for Jekyll. It carries the
-version scheme of `sites/docs` — the front matter key `version`, the data path `versions.current` and the
-collection folder `_versions` — all hardcoded, because a shared gem holding one site's vocabulary is the
-thing this split exists to avoid.
-
-**A generator decides every url under `_versions/`** - the `current` folder at the site root, every other at
-`/version/<url_segment>/<rest>`, the segment read off `_data/versions.yml` beside the folder's id, a page as a
-folder with an index, a static file under its own name. A `permalink` a page writes is overwritten. Static files get a settable url through
-`VersionedFile`, a `StaticFile` subclass, because Jekyll's own ignores data. **It also stamps plain keys**,
-all at `:high` priority. On every document under `_versions/<folder>/`:
-`version` (the folder name - no config block has to say it), `version_tag` and `version_label` (from the list
-entry beside that id in `_data/versions.yml`; every entry carries `url_segment`, `label` and `version_tag`, and
-a folder with no entry or an entry missing a key stops the build), and `version_urls` (this page's url in
-every other version, or that version's index where the page is missing - for the selector). On every version
-that is not `current`: `title_suffix` (`(v2.1.1)`, from the label) and `robots: noindex, follow` - the current
-version's url carries no version, so its title carries none, and it is the one that is indexed. On every page whose layout is `redirect`:
-`redirect_to`, `canonical` and `robots: noindex`. `jekyll-page-meta` writes them all out and knows nothing
-about versions. The generator also **fails the build when two files render at one url** - Jekyll only warns -
-and **prints the pages the previous version has that the current one lacks**, the redirect list for a major.
-`site.documents` holds the collection's static files too, so the stamps land on their `data`.
-**It never overwrites a key the page already set**, which is how the swagger pages keep `noindex, nofollow`
-from their `defaults:` scope.
-
-**The redirect stamps are why no head under `sites/` composes its own.**
-`sites/docs/_layouts/redirect.html` would otherwise build its title, canonical and `robots` inline, because its canonical
-points at `/version/<current>/` rather than at itself and front matter cannot hold a value that moves. The
-generator computes that url once; the layout reads `page.redirect_to` for the script, the meta refresh and
-the visible link, and `jekyll-page-meta` reads `canonical` for the head. **Stamping only the canonical would
-have left the layout computing the same url a second time** - the exact split this design exists to stop.
-
-**`versions.current` has to name a version the site has, or the build stops.** A `current` that matches
-nothing would noindex every page while the sitemap still lists them, and nothing else would say so. A
-missing `current` stops the build too, for the mirror reason: it would leave every old version indexable.
-The suffix is stamped from the page's own `version` and does not read `current` at all.
-
-**`{% vlink /path %}` lives here**, with a spec suite - nothing runs a `.rb` under `sites/`. It takes an optional version id first
-(`{% vlink v2.x /index.md %}`), so a page links another line's page by file and the build fails if the file is
-not there; no page builds a `/version/` url by hand.
-
-**Removing this gem is a silent regression**: every old-version page loses its `noindex` and every versioned
-title loses its version.
-
-Source: `ruby/binacle-docs-versions/lib/binacle-docs-versions/` — `generator.rb` and `vlink_tag.rb`.
 
 ## Running the specs
 
 Each gem has an RSpec suite under `spec/` and declares `rspec` as a development dependency in its gemspec.
 
-**One `Gemfile` covers every gem, at `ruby/`, and no gem has one of its own.** It names each gem with
+**One `Gemfile` covers every gem here, at `ruby/`, and no gem has one of its own.** `sites/ruby/` has a second
+one for its two gems, with its own lock. It names each gem with
 `gemspec path:`, which also pulls in that gemspec's development dependencies. `ruby/Gemfile.lock` is
 committed, so every spec run uses the same Jekyll — 4.4.1 — rather than whatever the machine has installed.
 
@@ -358,8 +289,8 @@ there.
 
 **Style is `ruby/.rubocop.yml`, one config for every gem.** Rubocop is in the bundle, and **nothing runs
 it** - there is no recipe and no pipeline step. Run it by hand with `cd ruby && bundle exec rubocop`. **It
-does not come back clean.** 41 offences over 110 files, measured 4 Sep 2026, 31 of them autocorrectable and
-none of it decided on:
+does not come back clean.** 41 offences over 110 files, measured 4 Sep 2026 while the two site gems were still
+under `ruby/`, 31 of them autocorrectable and none of it decided on:
 
 | Count | Cop |
 |---|---|
@@ -380,7 +311,7 @@ required — which is the whole requirement, since SimpleCov measures nothing th
 **RUBYOPT rather than a require in each `spec_helper`, and that is the point.** A gem installed from a package
 index has no parent directory to require, so a shared helper above the gem folders would break the rule that
 every gem drops into an unrelated site. No gemspec gained a development dependency either — the three gems are
-in `ruby/Gemfile`, because coverage is the build's concern and not the gem's.
+in `ruby/Gemfile` and `sites/ruby/Gemfile`, because coverage is the build's concern and not the gem's.
 
 **It is off unless `COVERAGE_FORMAT` is set**, so a plain `bundle exec rspec` still writes no files. The
 recipe sets it: `cobertura` for the local table and the HTML report, `sonar` for the JSON SonarCloud reads.
@@ -388,9 +319,13 @@ One flat file per gem lands in `artifacts/coverage/<format>/`, named after the g
 jest tests produce.
 
 **The setup file requires `bundler/setup` before simplecov.** On a laptop the gems are usually installed
-globally and it looks unnecessary; on CI the bundle is installed into `ruby/vendor/bundle`, so nothing is on
+globally and it looks unnecessary; on CI each bundle is installed into `vendor/bundle` beside its `Gemfile`, so nothing is on
 the load path until bundler puts it there. Without that line the first gem dies with
 `cannot load such file -- simplecov`.
 
-**`sonar.ruby.coverage.reportPaths` is what makes Sonar read it.** Nothing in the analysis settings excludes
-`ruby/`, so without that line every gem line counts as uncovered.
+**`sonar.ruby.coverage.reportPaths` is what makes Sonar read it.** It takes no wildcard, so
+`tooling/coverage.run.sh` merges every gem's report into one `ruby.json`, the site gems' too. Nothing in the
+analysis settings excludes `ruby/` or `sites/ruby/`, so without that line every gem line counts as uncovered.
+**Each folder has its own `ruby.rbproj`**, which is what offers its sources to the scanner. The setting sits in
+`tooling/ci/sonar-analysis.xml` for `ruby/`, and in `sites/ruby/ruby.rbproj` for the site gems, one level
+deeper.
