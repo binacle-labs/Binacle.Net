@@ -245,7 +245,7 @@ function createScene(figure: HTMLElement, stage: HTMLElement, renderer: WebGLRen
 
 	function itemReadout(element: HTMLElement) {
 		const item = items[shown - 1];
-		const name = item.itemType ?? "";
+		const name = item.name ?? "";
 
 		const count = document.createElement("span");
 		count.className = "pack-view__count";

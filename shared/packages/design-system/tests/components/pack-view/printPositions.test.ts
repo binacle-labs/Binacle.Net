@@ -54,13 +54,13 @@ describe("largestPair", () => {
 
 describe("printPositions", () => {
 	test("an item type with no picture has nothing to draw", () => {
-		expect(printPositions("Bicycle", 10, 10, 10)).toBeNull();
+		expect(printPositions("bicycle", 10, 10, 10)).toBeNull();
 	});
 
 	test("every Everyday Items item type has a picture", () => {
-		const itemTypes = Object.values(PRINTS).map(print => print.itemType).sort();
+		const itemTypes = Object.keys(PRINTS).sort();
 
-		expect(itemTypes).toEqual(["Boxed kettle", "Cereal box", "Hardback book", "Mug box", "Phone box", "Shoebox"]);
+		expect(itemTypes).toEqual(["book", "cereal", "kettle", "mug", "phone", "shoe"]);
 		for (const itemType of itemTypes) {
 			expect(printPositions(itemType, 10, 10, 10)).not.toBeNull();
 		}
@@ -68,14 +68,14 @@ describe("printPositions", () => {
 
 	// A wide flat item: the top and the underside are the largest faces.
 	test("lies on the largest pair of faces, just off them", () => {
-		const positions = printPositions("Boxed kettle", 20, 2, 10)!;
+		const positions = printPositions("kettle", 20, 2, 10)!;
 		const heights = points(positions).map(([, y]) => Math.abs(y));
 
 		expect(heights.every(height => Math.abs(height - 1.02) < 1e-9)).toBe(true);
 	});
 
 	test("stays inside the face", () => {
-		const positions = printPositions("Boxed kettle", 20, 2, 10)!;
+		const positions = printPositions("kettle", 20, 2, 10)!;
 
 		for (const [x, , z] of points(positions)) {
 			expect(Math.abs(x)).toBeLessThan(10);

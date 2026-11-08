@@ -1,5 +1,6 @@
 // A drawn picture: a bin and its items, a locker bank, a carton. It carries its own ground in both themes.
 // The rules keep their order on purpose: a later one overrides an earlier one of the same weight.
+@use "../../abstracts/item-colors";
 @use "../../abstracts/tiers";
 
 .drawing {
@@ -315,7 +316,7 @@
 }
 
 // A drawing of named things takes the category colours.
-@for $i from 1 through 6 {
+@for $i from 1 through item-colors.$categories {
   .drawing__item.drawing__item--category-#{$i} {
     --face: var(--category-#{$i});
   }

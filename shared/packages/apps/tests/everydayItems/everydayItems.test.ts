@@ -68,8 +68,8 @@ function packed(overrides: Partial<PackBinResponse> = {}): PackBinResponse {
 		bin: {id: "Large", length: 62, width: 45, height: 36},
 		algorithmUsed: "BFD",
 		packedItems: [
-			{id: "Boxed kettle", length: 24, width: 20, height: 28, x: 0, y: 0, z: 0},
-			{id: "Phone box", length: 17, width: 9, height: 5, x: 24, y: 0, z: 0},
+			{id: "kettle", length: 24, width: 20, height: 28, x: 0, y: 0, z: 0},
+			{id: "phone", length: 17, width: 9, height: 5, x: 24, y: 0, z: 0},
 		],
 		unpackedItems: null,
 		packedItemsVolumePercentage: 100,
@@ -189,18 +189,18 @@ describe("the request", () => {
 		expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/v4/pack/bin/sample/Large");
 	});
 
-	test("asks for Best Fit Decreasing, with each item type once by its name", async () => {
+	test("asks for Best Fit Decreasing, with each item type once by its id", async () => {
 		const fetchMock = mockFetch(stubResponse(200, packed()));
 		const {app} = createApp();
-		only(app, {"Boxed kettle": 2, "Phone box": 1});
+		only(app, {kettle: 2, phone: 1});
 
 		await app.onSubmit();
 
 		expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
 			parameters: {algorithm: "BFD"},
 			items: [
-				{id: "Boxed kettle", quantity: 2, length: 24, width: 20, height: 28},
-				{id: "Phone box", quantity: 1, length: 17, width: 9, height: 5},
+				{id: "kettle", quantity: 2, length: 24, width: 20, height: 28},
+				{id: "phone", quantity: 1, length: 17, width: 9, height: 5},
 			],
 		});
 	});
@@ -237,7 +237,8 @@ describe("the answer", () => {
 		const scene = await lastScene(dispatched);
 
 		expect(scene?.bin).toEqual({id: "Large", length: 62, width: 45, height: 36});
-		expect(scene?.items?.map(item => item.itemType)).toEqual(["Boxed kettle", "Phone box"]);
+		expect(scene?.items?.map(item => item.itemType)).toEqual(["kettle", "phone"]);
+		expect(scene?.items?.map(item => item.name)).toEqual(["Boxed kettle", "Phone box"]);
 		expect(scene?.items?.map(item => item.category)).toEqual([1, 6]);
 		expect(scene?.items?.[0]).not.toHaveProperty("id");
 		expect(scene?.reveal).toBe(true);
@@ -255,10 +256,10 @@ describe("the answer", () => {
 	test("when some do not fit, counts them", async () => {
 		mockFetch(stubResponse(200, packed({
 			status: "PartiallyPacked",
-			unpackedItems: [{id: "Boxed kettle", quantity: 1}],
+			unpackedItems: [{id: "kettle", quantity: 1}],
 		})));
 		const {app} = createApp();
-		only(app, {"Boxed kettle": 2, "Phone box": 1});
+		only(app, {kettle: 2, phone: 1});
 
 		await app.onSubmit();
 
@@ -271,11 +272,11 @@ describe("the answer", () => {
 	test("lists only the item types asked for", async () => {
 		mockFetch(stubResponse(200, packed()));
 		const {app} = createApp();
-		only(app, {"Boxed kettle": 2, "Phone box": 1});
+		only(app, {kettle: 2, phone: 1});
 
 		await app.onSubmit();
 
-		expect(app.resultItemTypes().map(itemType => itemType.name)).toEqual(["Boxed kettle", "Phone box"]);
+		expect(app.resultItemTypes().map(itemType => itemType.id)).toEqual(["kettle", "phone"]);
 	});
 
 	test("the summary row reads the box, its size, the count and the fill", async () => {
@@ -355,7 +356,7 @@ describe("pressing an item type in the answer", () => {
 		expect(app.isLit(ITEM_TYPES[0])).toBe(true);
 		app.toggleItemType(ITEM_TYPES[0]);
 
-		expect(dispatched.filter(x => x.name === "highlight-item-type").map(x => x.detail)).toEqual(["Boxed kettle", null]);
+		expect(dispatched.filter(x => x.name === "highlight-item-type").map(x => x.detail)).toEqual(["kettle", null]);
 	});
 
 	test("a new answer starts with none pressed", async () => {

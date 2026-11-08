@@ -1,4 +1,5 @@
 // A still of the 3D view as one SVG for both themes: its faces, shades and prints worked out as the view does.
+@use "../../abstracts/item-colors";
 
 .pack-still {
   display: block;
@@ -30,13 +31,13 @@
   stroke: var(--bin-line);
 }
 
-@for $i from 1 through 6 {
+@for $i from 1 through item-colors.$categories {
   .pack-still .pack-still__item--category-#{$i} {
     --k: var(--category-#{$i});
   }
 }
 
-@for $i from 1 through 6 {
+@for $i from 1 through item-colors.$ramp-steps {
   .pack-still .pack-still__item--step-#{$i} {
     --k: var(--item-#{$i});
   }

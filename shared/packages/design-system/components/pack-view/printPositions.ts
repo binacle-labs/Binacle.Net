@@ -58,8 +58,8 @@ export function pathSegments(path: string): Segment[] {
 }
 
 const SEGMENTS_BY_ITEM_TYPE = new Map<string, Segment[]>(
-	Object.values(PRINTS).map(print => [
-		print.itemType,
+	Object.entries(PRINTS).map(([itemType, print]) => [
+		itemType,
 		print.paths.reduce<Segment[]>((all, path) => all.concat(pathSegments(path)), [])
 	])
 );

@@ -10,14 +10,9 @@ import {BOXES, BoxSize, ITEM_TYPES, ItemType, PRESET} from "./itemTypes";
 const ALGORITHM = 'BFD';
 const MAX_COUNT = 9;
 const OPENING_BOX = 'Large';
-const OPENING_COUNTS: Record<string, number> = {
-	"Boxed kettle": 1,
-	"Shoebox": 1,
-	"Cereal box": 2,
-	"Hardback book": 2,
-	"Mug box": 2,
-	"Phone box": 3,
-};
+const OPENING_COUNTS: Record<string, number> = Object.fromEntries(
+	ITEM_TYPES.map(itemType => [itemType.id, itemType.openingCount])
+);
 
 export function everydayItemsAppPlugin(Alpine: AlpineType) {
 	Alpine.data('everyday_items_app', everydayItemsApp);
@@ -67,7 +62,7 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 		return BOXES.find(box => box.name === this.model.box) ?? BOXES[BOXES.length - 1];
 	},
 	countOf(itemType: ItemType) {
-		return this.model.counts[itemType.name] ?? 0;
+		return this.model.counts[itemType.id] ?? 0;
 	},
 	totalCount() {
 		return ITEM_TYPES.reduce((total, itemType) => total + this.countOf(itemType), 0);
@@ -79,7 +74,7 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 		return this.countOf(itemType) < MAX_COUNT;
 	},
 	changeCount(itemType: ItemType, by: number) {
-		this.model.counts[itemType.name] = Math.max(0, Math.min(MAX_COUNT, this.countOf(itemType) + by));
+		this.model.counts[itemType.id] = Math.max(0, Math.min(MAX_COUNT, this.countOf(itemType) + by));
 	},
 	clearAll() {
 		this.model.counts = {};
@@ -128,7 +123,7 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 		return {
 			parameters: {algorithm: ALGORITHM},
 			items: ITEM_TYPES.filter(itemType => this.countOf(itemType) > 0).map(itemType => ({
-				id: itemType.name,
+				id: itemType.id,
 				quantity: this.countOf(itemType),
 				...sizeOf(itemType),
 			})),
@@ -153,12 +148,11 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 
 		this.result = result;
 		this.setStatus(this.resultStatusText(result));
-		// The id is the item type's name.
-		const items = (result.packedItems ?? []).map(({id, ...item}) => ({
-			...item,
-			itemType: id,
-			category: this.itemTypeNamed(id)?.category,
-		}));
+		// The answer names each item by the id it was sent with: its item type's.
+		const items = (result.packedItems ?? []).map(({id, ...item}) => {
+			const itemType = this.itemTypeWithId(id);
+			return {...item, itemType: id, name: itemType?.name, category: itemType?.category};
+		});
 		return {bin: result.bin, items, reveal};
 	},
 	async getResult(box: BoxSize, request: PackPresetRequest): Promise<PackBinResponse | null> {
@@ -179,11 +173,11 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 			return null;
 		}
 	},
-	itemTypeNamed(name: string): ItemType | undefined {
-		return ITEM_TYPES.find(itemType => itemType.name === name);
+	itemTypeWithId(id: string): ItemType | undefined {
+		return ITEM_TYPES.find(itemType => itemType.id === id);
 	},
 	unfitCountOf(itemType: ItemType) {
-		return this.result?.unpackedItems?.find(item => item.id === itemType.name)?.quantity ?? 0;
+		return this.result?.unpackedItems?.find(item => item.id === itemType.id)?.quantity ?? 0;
 	},
 	resultStatusText(result: PackBinResponse) {
 		const unfit = (result.unpackedItems ?? []).reduce((total, item) => total + item.quantity, 0);
@@ -226,11 +220,11 @@ export const everydayItemsApp = defineComponent((options: EverydayItemsOptions =
 		return unfit > 0 ? `${packed} - ${unfit} did not fit` : packed;
 	},
 	isLit(itemType: ItemType) {
-		return this.lit === itemType.name;
+		return this.lit === itemType.id;
 	},
 	// A second press on the same row shows every item type again.
 	toggleItemType(itemType: ItemType) {
-		this.lit = this.isLit(itemType) ? null : itemType.name;
+		this.lit = this.isLit(itemType) ? null : itemType.id;
 		this.$dispatch('highlight-item-type', this.lit);
 	},
 }));

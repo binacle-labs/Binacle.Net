@@ -50,7 +50,7 @@ excerpt: |
           <fieldset class="form__group form__group--list">
             <legend class="form__legend label">Items</legend>
             <ul class="item-type-list">
-              <template x-for="itemType in itemTypes" :key="itemType.name">
+              <template x-for="itemType in itemTypes" :key="itemType.id">
                 <li class="item-type-list__item">
                   <span class="item-type-key" :style="itemTypeKeyStyle(itemType)" aria-hidden="true"></span>
                   <span class="item-type-list__name"><span x-text="itemType.name"></span><span class="mono" x-text="itemTypeSizeText(itemType)"></span></span>
@@ -99,7 +99,7 @@ excerpt: |
                 </div>
               </li>
             </template>
-            <template x-for="itemType in (result ? resultItemTypes() : [])" :key="itemType.name">
+            <template x-for="itemType in (result ? resultItemTypes() : [])" :key="itemType.id">
               <li class="result-list__item">
                 <button type="button" class="item-type-result" :aria-pressed="isLit(itemType) ? 'true' : 'false'" @click="toggleItemType(itemType)">
                   <span class="item-type-key" :style="itemTypeKeyStyle(itemType)" aria-hidden="true"></span>

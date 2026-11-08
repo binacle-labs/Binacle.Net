@@ -1,4 +1,32 @@
-import {faceColors, isInColor, oklchToHex, parseOklch, printColor, rampStep} from "../../../components/pack-view/colors";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import {
+	CATEGORIES,
+	faceColors,
+	isInColor,
+	oklchToHex,
+	parseOklch,
+	printColor,
+	RAMP_STEPS,
+	rampStep
+} from "../../../components/pack-view/colors";
+
+const root = path.join(__dirname, "../../..");
+const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
+
+function sassNumber(source: string, name: string): number {
+	const match = source.match(new RegExp(`\\$${name}:\\s*(\\d+);`));
+	if (!match) {
+		throw new Error(`No $${name} found`);
+	}
+	return Number(match[1]);
+}
+
+function tokenNumbers(source: string, prefix: string): number[] {
+	return [...source.matchAll(new RegExp(`--${prefix}-(\\d+):`, "g"))].map(match => Number(match[1]));
+}
+
+const oneTo = (count: number) => Array.from({length: count}, (_, index) => index + 1);
 
 describe("parseOklch", () => {
 	test("reads the three numbers of a token", () => {
@@ -88,5 +116,21 @@ describe("isInColor", () => {
 		expect(isInColor(0, "Shoebox", 3, 3, "Shoebox")).toBe(true);
 		expect(isInColor(1, "Cereal box", 3, 3, "Shoebox")).toBe(false);
 		expect(isInColor(2, undefined, 3, 3, "Shoebox")).toBe(false);
+	});
+});
+
+// The tokens, the Sass loops and the view each hold how many there are. A colour missing from one gives an item
+// no colour, with no error.
+describe("the colour counts", () => {
+	const counts = read("abstracts/_item-colors.scss");
+	const [light, dark] = read("base/_tokens.scss").split("@mixin -dark");
+
+	test.each([
+		["category", "categories", CATEGORIES],
+		["item", "ramp-steps", RAMP_STEPS],
+	])("--%s- tokens, $%s and the view agree", (prefix, variable, count) => {
+		expect(sassNumber(counts, variable)).toBe(count);
+		expect(tokenNumbers(light, prefix)).toEqual(oneTo(count));
+		expect(tokenNumbers(dark, prefix)).toEqual(oneTo(count));
 	});
 });

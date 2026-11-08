@@ -10,7 +10,7 @@ markup in `_includes/`. A site builds its own CSS from the parts it needs. Nothi
 
 | Path | What it is |
 |---|---|
-| `abstracts/` | Sass that outputs no CSS: the tier boundaries, and mixins for the deep ground, the strong line, and the panel and drawer |
+| `abstracts/` | Sass that outputs no CSS: the tier boundaries, how many item colours there are, and mixins for the deep ground, the strong line, and the panel and drawer |
 | `base/` | the custom properties for both themes, and the bare elements |
 | `layout/` | one folder per block that frames a page: the page width, header, footer, bands, hero, split, columns, the tool page, and the docs page with its sidebar and outline |
 | `components/` | one folder per block that sits inside a page: buttons, code, tables, the drawing, the 3D view, forms, callouts and the rest |
