@@ -1,7 +1,7 @@
 ---
 id: build-topology
 description: Build & workspace topology — the .slnx solution, npm workspaces, gulp asset copy, Directory.Build.props (including the SonarQubeTestProject rule for support projects), central package management, the global.json test-runner opt-in, the publish/Dockerfile chain, and the NoTargets content projects
-verified: 2026-10-01
+verified: 2026-11-09
 check: Every solution folder and project list matches Binacle.Net.slnx; the cross-slice edges against the site Gemfiles, the webpack configs and gulpfile.js, and the global-Using claim against a grep for `<Using Include=` over **/*.csproj; Directory.Build.props, Directory.Packages.props, global.json and Dockerfile match the repo root; the content .proj list resolves to files that exist; the root package.json scripts and devDependencies match
 also_update:
   - commands
@@ -22,7 +22,7 @@ Docker build. For the commands themselves see `$commands`.
 
 ## Solution — `Binacle.Net.slnx`
 
-The repo uses the XML `.slnx` solution format. Its projects - `.csproj`, `.proj`, `.dcproj` and one `.rbproj` - are
+The repo uses the XML `.slnx` solution format. Its projects - `.csproj`, `.proj`, `.dcproj` and `.rbproj` - are
 grouped by solution folder, mirroring the repo slices:
 
 - `/lib/src/`, `/lib/data/`, `/lib/test/`, `/lib/measure/`, `/lib/bench/` — `Binacle.Lib` (the only src project), `Binacle.Lib.Data` (the result-selection scenarios), `Binacle.Lib.UnitTests` + `Binacle.Lib.Testing`, `Binacle.Lib.PackingEfficiency`, and the benchmark projects (`Binacle.Lib.Benchmarks.Algorithms`, `.ParallelAlgorithms`, `.ParallelBins`, `.ParallelOverhead`, `.ResultSelection`, `.Scaling`)
@@ -30,7 +30,7 @@ grouped by solution folder, mirroring the repo slices:
 - `/vipaq/src/`, `/vipaq/data/`, `/vipaq/test/`, `/vipaq/measure/`, `/vipaq/bench/`, `/shared/src/`, `/shared/data/`, `/shared/test/` — ViPaq + `Binacle.ViPaq.Data` + `Binacle.ViPaq.UnitTests` and `Binacle.ViPaq.Testing` + `Binacle.ViPaq.EncodedSize` + `Binacle.ViPaq.Benchmarks` + `Binacle.Geometry`, `Binacle.CompactNotation`, `Binacle.Packing` and `Binacle.FluxResults` (in `shared/src`) + `Binacle.Data` (in `shared/data`) + `Binacle.Reporting`, `Binacle.Benchmarking`, `Binacle.CompactNotation.UnitTests` and `Binacle.FluxResults.UnitTests` (in `shared/test`)
 - `/vipaq/tools/` (`Binacle.ViPaq.VectorGenerators`, `Binacle.ViPaq.PackedDataGenerator`), `/shared/tools/` (`Binacle.OrLibrary.Converter`) — standalone generators, not referenced by the shipped projects
 - `/samples/`, `/samples/docker/` (`.dcproj` — quickstart, minimal, full, service, prod), `/samples/kubernetes/` (one `.proj`), `/api/` (requests), `/artifacts/`
-- `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`, `sites/admin/admin.proj`
+- `/sites/` — `sites/docs/docs.proj`, `sites/demo/demo.proj`, `sites/www/www.proj`, `sites/admin/admin.proj`, and the site gems' `sites/ruby/ruby.rbproj`
 - Outside any solution folder: `assets/assets.proj`, `tooling/tooling.proj`, `ruby/ruby.rbproj`
 - `/_root/` — loose files (`.dockerignore`, `.editorconfig`, `.gitignore`, `.netconfig`, `Directory.Build.props`, `Directory.Packages.props`, `Dockerfile`, `global.json`, `gulpfile.js`, `package.json`, README)
 
@@ -119,13 +119,13 @@ standalone runner executable.
 
 ## JS workspaces & asset copy
 
-Root `package.json` (name `binacle-net`, `private`) declares the workspaces: `packages/*`,
-`vipaq/packages/binacle-vipaq`, `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo`, `sites/www` and
-`sites/admin`.
+Root `package.json` (name `binacle-net`, `private`) declares the workspaces: `packages/*`, `api/packages/*`,
+`shared/packages/*`, `vipaq/packages/*`, `api/src/Binacle.Net.UIModule`, `sites/docs`, `sites/demo`, `sites/www`
+and `sites/admin`.
 
 **Every javascript build in the repo is a member, and `package-lock.json` at the root is the only lock file.**
-One `npm ci` installs all of them. That is what keeps a single copy of `three` in the tree: `binacle-net-ui`
-imports it and so does each host, and two copies in one bundle make a mesh from one fail `instanceof` against
+One `npm ci` installs all of them, with one copy of each package. That matters most for `three`: only the design
+system's 3D view imports it, but two copies in one bundle would make a mesh from one fail `instanceof` against
 the other.
 
 Root dev dependencies are `gulp` and `concurrently` (the latter is what lets one `just serve` run jekyll and
@@ -139,8 +139,9 @@ webpack together under a single Ctrl-C), and its only scripts are the asset-copy
 `just assets` runs all four, and `just install` runs it after the npm and bundler installs.
 
 `gulpfile.js` copies shared `assets/` (images, js, css, fonts, and the vendored `LICENSE`/`NOTICE` files) into
-the docs, demo and www sites and the UI module's `wwwroot/`. `sites/admin` gets no copy. One `IGNORE` block holds what each target skips, with the weight it saves beside each line — `www`
-skips `lib/` outright, because that site runs no CSS framework. Each of the four runs its own webpack build —
+the docs, demo and www sites and the UI module's `wwwroot/`. Each target also gets the fonts and the mark from
+`shared/packages/design-system`. `sites/admin` gets no copy. One `IGNORE` block holds what each target skips, with
+the reason beside it — only docs takes `lib/`, which now holds swagger-ui alone. Each of the four runs its own webpack build —
 see docs site (`$sites/docs`), demo site (`$sites/demo`), marketing site (`$sites/www`) and the UI module
 (`$api/modules/ui`).
 
@@ -192,21 +193,26 @@ so they carry no `.proj` and no solution folder. Open the markdown directly.
 
 Derived 2026-08-17 from every `*.csproj`, `package.json`, `Binacle.Net.slnx`, both Gemfiles, both webpack
 configs, the `Dockerfile`, the gulpfile and the `just` modules, then verified three ways — XML parse, an
-independent shell re-derivation, and npm's own resolver. Re-checked 2026-08-27.
+independent shell re-derivation, and npm's own resolver. Re-checked 2026-08-27; the JavaScript and Gemfile edges
+again 2026-11-09, by reading the manifests.
 
 - **`lib` and `vipaq` are not standalone.** Both sit on `shared/src/Binacle.Geometry` in `src`, not only in
   tests.
-- **There is no upward edge.** Nothing under `shared/` references `lib/` or `api/`.
+- **No C# edge goes upward.** No project under `shared/` references `lib/` or `api/`. **The JavaScript does:**
+  `shared/packages/apps` depends on `@binacle/api-client` in `api/packages/` and on `@binacle/vipaq`.
 - **`vipaq/tools` reaches into both `lib` and `shared`.**
-- **The sites are not graph leaves.** Their Gemfiles load `../../ruby/jekyll-*` by path, and
-  `sites/demo/webpack.config.js` names `packages/binacle-net-ui` and `vipaq/packages/binacle-vipaq`. "Agents
-  must not edit it" and "it is a leaf in the graph" are different claims.
+- **The sites are not graph leaves.** Their Gemfiles load `../../ruby/jekyll-*` and `../ruby/binacle-*` by
+  path, demo's and www's also the design system as a gem, and the `package.json` of docs, demo and www names
+  `@binacle/design-system`. `sites/demo/webpack.config.js` names the folders of `apps`, `api-client`, the design
+  system's `pack-view` and `vipaq/packages/vipaq` to split its chunks. "Agents must not edit it" and "it is a
+  leaf in the graph" are different claims.
 - **`api/src/Binacle.Net.UIModule` is a JavaScript consumer too.** It has its own `package.json`,
-  `tsconfig.json` and `webpack.config.js`, and that config names the same two packages `sites/demo` does. A
+  `tsconfig.json` and `webpack.config.js`, and that config names the same folders `sites/demo` does. A
   slice that was C#-only sits on both graphs.
-- **There is no cycle between `packages` and `vipaq`.** Shipped code flows one way; only test support and tool
-  files cross back. `binacle-compact-notation` sitting in `dependencies` rather than `devDependencies` in
-  `vipaq/packages/binacle-vipaq/package.json` is the single line that makes npm's graph look cyclic.
+- **There is no cycle between `shared/packages` and `vipaq`.** Shipped code flows one way, `apps` to `vipaq`;
+  only test support and tool files cross back. `@binacle/compact-notation` sitting in `dependencies` rather than
+  `devDependencies` in `vipaq/packages/vipaq/package.json` is the single line that makes the two folders look
+  cyclic.
 - **`.github` is a slice and sits above `tooling`.** It hashes `.config/dotnet-tools.json` and names
   `tooling/ci/sonar-analysis.xml`.
 

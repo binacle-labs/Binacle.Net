@@ -21,8 +21,9 @@ The maintainer, 2026-09-29: "D5 yes its used as a testing ground".
 
 **One caller ships in the image. Until 2026-09-10 there were two.**
 
-**The packing demo calls `/api/v4/pack/compare-bins`** through `packages/binacle-net-client`, which both hosts
-bundle - so the shipped `/packing` page is a v4 consumer, where until 2026-09-09 it called v3.
+**The packing demo calls `/api/v4/pack/compare-bins`** through `@binacle/api-client`, which
+`@binacle/apps` imports and both hosts bundle - so the shipped `/packing` page is a v4 consumer, where until
+2026-09-09 it called v3.
 
 **The second one is gone.** `api/src/Binacle.Net.UIModule/_js/instance.js` fetched `/api/v4/presets` from the
 browser until D6 replaced it with server-side state on 2026-09-10 and deleted the file. The reasoning below
@@ -33,7 +34,7 @@ The marketing site tells a reader v4 can change in a patch release and not to in
 accident, so the image doing exactly that is worth writing down rather than leaving for someone to find.
 
 **Note the grep in `check:` does not see the demo's call.** It searches the module's own source, and the demo's
-call lives in `packages/binacle-net-ui` and `packages/binacle-net-client`, reaching the image only through
+call lives in `shared/packages/apps` and `api/packages/api-client`, reaching the image only through
 the bundle. Anyone re-verifying this record from the grep alone will count one caller and be wrong.
 
 **It is accepted, not overlooked.** Three reasons.
@@ -47,7 +48,7 @@ configured with. If a v4 change broke the shape, that page stops listing presets
 no data written.
 
 **The demo's blast radius is bigger and is the accepted cost.** A v4 change to `pack/compare-bins` breaks the
-`/packing` page for everyone running the image, and the contract test in `packages/binacle-net-client` is
+`/packing` page for everyone running the image, and the contract test in `api/packages/api-client` is
 what turns that from a silent break into a failing build - it validates the hand-written types against the
 committed copy of the v4 document.
 

@@ -225,7 +225,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   paths: ["sites/demo/**", "sites/docs/**"]
 - file: sites/demo-and-image-boundary.md
   description: "The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is"
-  paths: ["sites/demo/**", "packages/binacle-net-ui/**", "api/src/Binacle.Net.UIModule/**"]
+  paths: ["sites/demo/**", "shared/packages/apps/**", "api/src/Binacle.Net.UIModule/**"]
 - file: sites/docs-and-demo.md
   description: "Why the docs and demo templates are shaped this way - the version in a page title, the demo scripts and their prefetch, the outdated-version notice, and the breadcrumb separator."
   paths: ["sites/demo/**", "sites/docs/**"]

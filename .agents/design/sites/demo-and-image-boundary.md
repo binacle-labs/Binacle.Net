@@ -1,11 +1,11 @@
 ---
 id: sites/demo-and-image-boundary
 description: The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is
-verified: 2026-09-29
-check: the shared/not-shared table against packages/binacle-net-ui, sites/demo and api/src/Binacle.Net.UIModule - the eight duplicated file pairs are the row that moves; diff -w each pair to keep the identical-vs-drifted split honest
+verified: 2026-11-09
+check: the shared/not-shared table against shared/packages/apps, sites/demo and api/src/Binacle.Net.UIModule; the duplicated pairs - the packing and ViPaq pages, the errors dialog, 3D view and size rows partials, the packing and ViPaq page scripts - diff -w each to keep the list of differences honest
 paths:
   - "sites/demo/**"
-  - "packages/binacle-net-ui/**"
+  - "shared/packages/apps/**"
   - "api/src/Binacle.Net.UIModule/**"
 ---
 
@@ -14,9 +14,12 @@ paths:
 **Permanent.** The two demo tools ship inside the Docker image at `/`, behind the `UI_MODULE` flag, and on the
 demo site. There is **one implementation and two hosts**.
 
-| Shared - one source, `packages/binacle-net-ui` | Not shared - diverges freely |
+| Shared - one source, `shared/packages/apps` | Not shared - diverges freely |
 |---|---|
-| the packing form, the 3D visualizer, the errors dialog, the ViPaq decoder | the index page, the navigation, the chrome, the copy, the metadata |
+| the packing form, the ViPaq decoder, the errors dialog, the wiring of the 3D view | the home page, the navigation, the chrome, the copy, the metadata |
+
+The look, and the 3D view itself, come from `shared/packages/design-system`, which both hosts read the same way.
+*Everyday Items* is in the package too, but only the demo site hosts it.
 
 **Why the line sits there.** Nobody minds two different home pages. **Everyone minds fixing the packing form
 twice.**
@@ -36,9 +39,10 @@ costs the image nothing.
 **Inside it** is a change to the shared package. It lands on the image on its next build, so the image is part
 of the decision even when the work looks like site work.
 
-**One live example.** Printing the HTTP call the demo just made is a panel inside the tool, so it lands on
-both hosts - and the host named in the snippet differs between them, which is the thing to decide before
-building it.
+**One live example: the request under the results.** The package keeps the call it just made as `lastRequest` -
+method, path and body - and stops there. The image's own markup and script turn it into a curl command against
+the page's origin, in a *Request* fold. The demo site does not show it. Because the package hands it out as
+data, the demo site can add it later without touching the package.
 
 ## The two hosts serve different states
 
@@ -65,8 +69,8 @@ will look like the easy option on the day.
 
 **Anything of that kind is chrome around the tool, not inside it.**
 
-**It also makes the rate limit worth rendering properly.** Anonymous callers share one bucket, so a 429
-already happens and currently reads as "nothing happened". The errors dialog has to say what actually failed.
+**Anonymous callers share one rate-limit bucket**, so a 429 already happens. The errors dialog says so: a 429
+with no body reads as rate limited, wait and try again.
 
 ## The ordering claim this makes
 
@@ -76,14 +80,25 @@ form on one side and they stop being the same page - and the cheapest way out st
 
 ## The half that is not shared and should be
 
-**The markup exists twice.** `sites/demo/` and `api/src/Binacle.Net.UIModule/` carry the same packing page,
-ViPaq page, **four** scss files and two partials - eight file pairs. The TypeScript underneath is shared and the markup is not, **which is the shape that breaks
+**The markup exists twice.** `sites/demo/` and `api/src/Binacle.Net.UIModule/` each carry the packing page, the
+ViPaq page and three partials - the errors dialog, the 3D view and the size rows - and the script behind each
+of the two pages. The package underneath is shared and these are not, **which is the shape that breaks
 silently**: the package is green, one host renders, the other does not.
 
-**None of the scss pairs is byte-identical any more.** `_theme.scss`, `_theme-modes.scss` and `_forms.scss`
-differ only in comments: the UI module's copies keep theirs, the site's moved to design. `_components.scss`
-and both pages have drifted in rules. **That is the duplication working exactly as it fails** - nothing tells
-you which differences are deliberate.
+**The stylesheets are no longer in it.** Each host's is one `main.scss` that pulls in the design system's
+blocks; the two lists differ only by the blocks each host's pages use.
+
+**No pair is identical, and today every difference is meant:**
+
+- the template language - a Liquid include on one side, a Razor partial on the other. Razor reads `@` as its
+  own, so the image writes Alpine's `@click` as `x-on:click`;
+- the copy and metadata - front matter on the site, `AppletsService` in the image;
+- the *Request* fold and its step line, in the image only;
+- the demo's 3D view also listens for the item-type highlight, which *Everyday Items* sends;
+- comments.
+
+**Nothing checks that list.** The next difference that is a slip will look the same as these. **That is the
+duplication working exactly as it fails** - nothing tells you which differences are deliberate.
 
 **It ends in a decision, not a build.**
 
