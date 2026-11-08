@@ -54,7 +54,7 @@ over a later edit.
 
 ## The API call
 
-**Every call goes through `@binacle/api-client`** (`$packages/binacle-net-client`). No URL and no wire shape is
+**Every call goes through `@binacle/api-client`** (`$api/api-client`). No URL and no wire shape is
 written here.
 
 - *Everyday Items* calls `packPresetBin` on the `sample` preset, with the box's name and `BFD`.

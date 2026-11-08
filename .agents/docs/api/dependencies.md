@@ -96,8 +96,8 @@ Tests  (all xUnit v3, all OutputType Exe)
 
 5. **`UIModule` references nothing but `Kernel`.** Both its demos are TypeScript running in the browser, so it
    talks to the API over HTTP like any other client and needs no packing, ViPaq or compact-notation reference.
-   **It is a node on the JavaScript graph too** — its own `package.json` names `binacle-net-ui`,
-   `binacle-vipaq`, `cookies`, `theme-switcher`, `alpinejs` and `three` (`$build-topology`).
+   **It is a node on the JavaScript graph too** — its own `package.json` names `@binacle/apps`,
+   `@binacle/design-system` and `alpinejs`, and reaches the rest through those two (`$packages/dependencies`).
 
 6. **`Binacle.Net` reaches `Binacle.Packing` and `Binacle.Geometry` transitively, and imports both globally.**
    Its csproj carries `<Using Include="Binacle.Packing" />` and `<Using Include="Binacle.Geometry" />`, so

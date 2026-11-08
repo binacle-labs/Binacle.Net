@@ -2,7 +2,7 @@
 id: vipaq/history
 description: ViPaq design history — superseded throwaway-prototype measurements (2026-07-05), the earlier framings of decisions that were later amended or reversed, and where the test files the v2 rebuild deleted ended up. Reference only, not current truth.
 verified: 2026-09-29
-check: The measurements are frozen and are never re-measured. What can rot is checked — every path in "Where the deleted test files went" still resolves under `vipaq/test/Binacle.ViPaq.UnitTests/` or `vipaq/packages/binacle-vipaq/`, and every claim about what the real library has since measured still matches `$vipaq/findings`. It declares no `paths:` on purpose, so a session working on live ViPaq code is not handed numbers that no longer describe it.
+check: The measurements are frozen and are never re-measured. What can rot is checked — every path in "Where the deleted test files went" still resolves under `vipaq/test/Binacle.ViPaq.UnitTests/` or `vipaq/packages/vipaq/`, and every claim about what the real library has since measured still matches `$vipaq/findings`. It declares no `paths:` on purpose, so a session working on live ViPaq code is not handed numbers that no longer describe it.
 ---
 
 # ViPaq — design history
@@ -94,7 +94,7 @@ Recovered 2026-08-13 from comments during the comment-thinning pass. The v2 rebu
 files and folded their cases into new ones. Nothing recorded where they went, so "was this ever covered?" had no
 answer outside the comments that are now gone.
 
-C# paths are relative to `vipaq/test/Binacle.ViPaq.UnitTests/`, TypeScript paths to `vipaq/packages/binacle-vipaq/`.
+C# paths are relative to `vipaq/test/Binacle.ViPaq.UnitTests/`, TypeScript paths to `vipaq/packages/vipaq/`.
 The named vector files are under `vipaq/test-vectors/`.
 
 | Deleted | Absorbed by | What happened to the cases |

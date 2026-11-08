@@ -5,7 +5,7 @@ verified: 2026-11-09
 check: The package table matches the workspaces globs in the root package.json and each package.json name; packages/ holds only cookies and theme-switcher; theme-switcher's only importer is the design system; the head bundle reaches it through @binacle/design-system/theme-init; the jsdom and https notes match each jest.config.js; the test aliases match tooling/tests.just
 also_update:
   - shared/apps
-  - packages/binacle-net-client
+  - api/api-client
   - sites/demo
   - api/modules/ui
 paths:
@@ -25,7 +25,7 @@ the slice they belong to and take the `@binacle/` scope:
 |---|---|---|
 | `cookies` | `packages/` | below |
 | `theme-switcher` | `packages/` | below |
-| `@binacle/api-client` | `api/packages/` | `$packages/binacle-net-client` |
+| `@binacle/api-client` | `api/packages/` | `$api/api-client` |
 | `@binacle/service-client` | `api/packages/` | **Experimental, local only.** Its one host is `sites/admin`, which nothing builds or deploys |
 | `@binacle/compact-notation` | `shared/packages/` | its README |
 | `@binacle/design-system` | `shared/packages/` | `$shared/design-system` |

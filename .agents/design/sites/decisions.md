@@ -48,8 +48,8 @@ development build, not shipping the map.
 
 **Decided (the maintainer, 2026-09-11):** "1 ok ... 3 ok 4 ok but an agen will have to change and merge the changelog or mark whats 2.1.x only" (answering: no common layer, the six common pages move into `v3.x`, a selector on every page, `v2.0.x` and `v2.1.x` become one `v2.x`)
 
-**Set by the maintainer on 2026-09-11 and 2026-09-12; landed 2026-09-12** across `ruby/binacle-docs-versions`
-and `sites/docs`. Three rules replaced the old scheme: one folder per major (`v1.x`, `v2.x`, `v3.x`); the
+**Set by the maintainer on 2026-09-11 and 2026-09-12; landed 2026-09-12** across the version gem,
+now `binacle-docs` in `sites/ruby/`, and `sites/docs`. Three rules replaced the old scheme: one folder per major (`v1.x`, `v2.x`, `v3.x`); the
 folder named by `current` renders with no prefix and every other under `/version/<url_segment>/`; no page
 renders once for every version.
 

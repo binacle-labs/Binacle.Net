@@ -1,8 +1,8 @@
 ---
 id: vipaq/typescript
-description: Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library
+description: Binacle.ViPaq TypeScript mirror (vipaq/packages/vipaq) — public API and how it differs from the C# library
 verified: 2026-09-29
-check: TS API signatures, the package root index.ts re-exports and every row of the divergence table match vipaq/packages/binacle-vipaq/
+check: TS API signatures, the package root index.ts re-exports and every row of the divergence table match vipaq/packages/vipaq/
 also_update:
   - vipaq
 paths:
@@ -11,7 +11,7 @@ paths:
 
 # ViPaq — TypeScript Mirror
 
-`vipaq/packages/binacle-vipaq` is a **hand-maintained** TypeScript reimplementation of the ViPaq format — no
+`@binacle/vipaq`, in `vipaq/packages/vipaq`, is a **hand-maintained** TypeScript reimplementation of the ViPaq format — no
 codegen, no shared schema. It mirrors the C# file structure by hand, and the two are kept byte-compatible by hand.
 Any change to the C# wire must be replicated here. The normative format is `vipaq/PROTOCOL.md`; see
 `$vipaq` for the C# side.

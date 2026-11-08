@@ -28,6 +28,9 @@ table of [README.md](README.md).
 - file: api/README.md
   description: "Index for API slice docs — endpoints, contracts, service, kernel, presets, and module docs (Diagnostics, ServiceModule, UIModule)"
   paths: ["api/**"]
+- file: api/api-client.md
+  description: "@binacle/api-client in api/packages/api-client - the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
+  paths: ["api/packages/api-client/**"]
 - file: api/configuration.md
   description: "Config file layout, env-var conventions, override precedence, and feature flag list"
   paths: ["api/src/Binacle.Net/Config_Files/**", "api/src/Binacle.Net/Configuration/**"]
@@ -133,9 +136,6 @@ table of [README.md](README.md).
 - file: packages/README.md
   description: "The TypeScript npm workspaces - where each package lives, and the two generic ones under packages/, cookies and theme-switcher, in full."
   paths: ["packages/**"]
-- file: packages/binacle-net-client.md
-  description: "packages/binacle-net-client — the hand-written TypeScript client for the v4 API, its committed copy of the OpenAPI document, and the contract test that holds the two together."
-  paths: ["packages/**"]
 - file: packages/dependencies.md
   description: "TypeScript packages dependency tree - the npm workspaces and which package imports (and declares) which."
   paths: ["packages/**", "api/packages/**", "shared/packages/**", "vipaq/packages/**"]
@@ -215,6 +215,6 @@ table of [README.md](README.md).
   description: "ViPaq project dependency tree — who references whom, who can see internals, and the deliberate walls (UnitTests references ViPaq.Data, never Testing; no test project references a generator)."
   paths: ["vipaq/**"]
 - file: vipaq/typescript.md
-  description: "Binacle.ViPaq TypeScript mirror (vipaq/packages/binacle-vipaq) — public API and how it differs from the C# library"
+  description: "Binacle.ViPaq TypeScript mirror (vipaq/packages/vipaq) — public API and how it differs from the C# library"
   paths: ["vipaq/**"]
 ```

@@ -36,8 +36,8 @@ to the newest patch, so it needs no edit when 3.0.1 ships.
 keep it newest first** - Jekyll's own ordering sorts by path and would put v3.10.x before v3.2.x. `current`
 names the current folder and decides which version is indexable.
 
-**There is no per-version `defaults` block in `_config.yml` any more.** `binacle-docs-versions` stamps
-`version` and `version_tag` from the list, and the build stops on a folder the list does not have. The keys
+**There is no per-version `defaults` block in `_config.yml` any more.** `binacle-docs` stamps
+`version` from the folder, and `version_label` and `version_tag` from the list, and the build stops on a folder the list does not have. The keys
 are in `$sites/docs`.
 
 ## C3 - `cookie_domain` is production-only, and that is not an oversight

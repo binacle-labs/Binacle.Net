@@ -12,7 +12,7 @@ paths:
 # ViPaq — Cross-Language Wire Testing
 
 **What it guarantees:** the C# `Binacle.ViPaq` library and its hand-maintained TypeScript mirror
-(`vipaq/packages/binacle-vipaq`) stay **wire-compatible** — bytes written by one are readable by the other. The
+(`vipaq/packages/vipaq`) stay **wire-compatible** — bytes written by one are readable by the other. The
 mechanism is **shared reference vectors** in `vipaq/test-vectors/`: one set of JSON inputs+answers read by *both*
 test suites, so each is graded against the same answer key and the two can't silently drift.
 
@@ -42,7 +42,7 @@ every other file is hand-authored.
   case under each codec → `interop/cs/{raw,deflate,gzip}.json`), `CompactJson.cs` (one-object-per-line writer),
   plus `IVectorGenerator.cs` / `Contracts.cs`. Geometry comes from the shared `Binacle.CompactNotation` +
   `Binacle.Geometry`.
-- **TS** — `vipaq/packages/binacle-vipaq/tools/`: `generateVectors.ts` (mirrors `Program.cs`),
+- **TS** — `vipaq/packages/vipaq/tools/`: `generateVectors.ts` (mirrors `Program.cs`),
   `interopArtifactGenerator.ts` (same inputs → `interop/ts/{raw,deflate,gzip}.json`), `Artifact.ts`.
 
 `just regen vipaq-interop-vectors` runs both, in that order — one recipe, because regenerating one half alone is exactly what
@@ -59,7 +59,7 @@ valid DEFLATE stream. Raw artifacts are byte-identical and can be compared direc
 - **C#** `vipaq/test/Binacle.ViPaq.UnitTests/Tests/Interop/`:
   - `InteropDecodeTests` — decodes each language's `{raw,deflate,gzip}` artifacts back to the `input.json` case.
   - `InteropIntegrityTests` — each artifact file's `Name` set must equal `input.json`'s (catches a stale regen).
-- **TS** `vipaq/packages/binacle-vipaq/tests/`: `interop.test.ts` (decodes the artifacts) and
+- **TS** `vipaq/packages/vipaq/tests/`: `interop.test.ts` (decodes the artifacts) and
   `interopIntegrity.test.ts` (the same `Name`-set guard).
 
 ## Reference docs (canonical)

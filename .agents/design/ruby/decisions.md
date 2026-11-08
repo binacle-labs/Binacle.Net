@@ -1,10 +1,11 @@
 ---
 id: ruby/decisions
 description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator.
-verified: 2026-08-24
-check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in binacle-docs-versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter
+verified: 2026-11-09
+check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter
 paths:
   - "ruby/**"
+  - "sites/ruby/**"
 ---
 
 # Ruby gems — decisions ledger
@@ -30,8 +31,8 @@ guards on another's constant being defined.**
 |---|---|---|
 | `jekyll-page-meta` | `page.meta.title` `.description` `.canonical` `.image` | its own tag, and structured data |
 | `jekyll-breadcrumb-trail` | `page.breadcrumb_trail` | its own tag, and `jekyll-structured-data` |
-| `binacle-docs-versions` | `page.title_suffix` | `jekyll-page-meta`'s resolver, into the title |
-| `binacle-docs-versions`, or the page | `page.robots` | `jekyll-page-meta`'s tag, and `jekyll-structured-data` |
+| `binacle-docs` | `page.title_suffix` | `jekyll-page-meta`'s resolver, into the title |
+| `binacle-docs`, or the page | `page.robots` | `jekyll-page-meta`'s tag, and `jekyll-structured-data` |
 | `jekyll-multi-sitemap` | `site.sitemaps.urls` | its own `{% sitemap_links %}` |
 | `jekyll-webmanifest` | `site.webmanifest.url` | its own link tag |
 
@@ -70,8 +71,9 @@ the right trade — a shared gem carrying one site's vocabulary is the thing thi
 ### R4 — the prefix says whether the gem is portable
 
 **`jekyll-` means another site could load it.** `binacle-` means it carries something only this organisation
-wants — `binacle-docs-versions` holds one site's version scheme, `binacle-robots` holds a rights reservation.
-A `jekyll-` prefix on either would advertise something nobody else has a use for.
+wants — `binacle-docs` holds the docs site's version scheme, `binacle-robots` holds a rights reservation.
+A `jekyll-` prefix on either would advertise something nobody else has a use for. The `binacle-` gems sit in
+`sites/ruby/`, not `ruby/` (`$sites/ruby`).
 
 Avoid a name already on rubygems: `jekyll-sitemap`, `jekyll-seo-tag`, `jekyll-feed` and `jekyll-breadcrumbs`
 are all taken, which is why the gems here are named after the job rather than the obvious noun. **The names

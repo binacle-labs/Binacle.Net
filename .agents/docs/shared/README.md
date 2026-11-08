@@ -1,7 +1,7 @@
 ---
 id: shared
 description: Shared slice — Binacle.Data (algorithm scenario data, compact-string formats, the set classes, the one embedded-resource reader) and shared/data (the fixture corpus more than one slice reads)
-verified: 2026-09-28
+verified: 2026-11-09
 check: Key arrays, compact-string parsers (Result is a per-algorithm map, not a bare string), and the set class names and methods match shared/data/Binacle.Data; the embedded-resource folders in Binacle.Data.csproj match the folders under shared/data and the Keys arrays in the three DataProvider.cs files, DemoSamples listing every file in shared/data/demo-samples; OR-Library files match shared/data
 also_update:
   - lib/tests
@@ -12,7 +12,12 @@ paths:
 
 # Shared
 
-`shared/` holds code used across more than one slice. Two parts:
+`shared/` holds the code and data more than one slice uses: the C# libraries in `src/`, the scenario data in
+`data/`, the TypeScript packages in `packages/`, the shared test projects in `test/` and the OR-Library converter
+in `tools/`. `shared/README.md` has a row for each. The project graph is `$shared/dependencies`; the apps package
+is `$shared/apps`.
+
+This page covers the scenario data:
 
 - `shared/data/Binacle.Data` — the scenario data and the code that reads it (reader, parsers, models, set classes)
 - `shared/data` — the scenario JSON that more than one slice reads (`bischoff-suite/`, `custom-problems/`,
@@ -59,8 +64,8 @@ undoed it".
 **Demo-samples is a regression baseline, not an independent check.** Its `Result` was written by running the
 packer, so `PackingDemoSamplesTests` proves the algorithms still land where they did, not that they are
 right. A new file under `shared/data/demo-samples/` is embedded on its own but is not read until its key is
-added to `DemoSamples.DataProvider.Keys`. The set is also read by the demo component in
-`packages/binacle-net-ui/` and by ViPaq, which reads the *packed* form from `vipaq/data/packed/demo-samples/`
+added to `DemoSamples.DataProvider.Keys`. `just regen demo-samples` also writes the set into the demo's samples
+in `shared/packages/apps` (`$shared/apps`). ViPaq reads the *packed* form, from `vipaq/data/packed/demo-samples/`
 through `Binacle.ViPaq.Data`.
 
 **The set folders in the IDE are not on disk.** Every scenario JSON lives under `shared/data/` and is pulled in
@@ -71,7 +76,7 @@ the manifest name stays what the reader expects, one flat entry per folder — a
 **Why these three sets are here and result-selection is not.** A fixture set lives in `shared/data` when more
 than one slice reads it. Bischoff and custom-problems qualify twice over: the api integration suite and the lib
 tests both read them through this project, and the ViPaq packed-data generator reads the same files by path at
-run time. Demo-samples is read by the lib tests, the demo component and ViPaq. Result-selection had one
+run time. Demo-samples is read by the lib tests, the apps package's sample generator and ViPaq. Result-selection had one
 consumer, so it lives in `lib/data`.
 
 ## The embedded-resource reader
