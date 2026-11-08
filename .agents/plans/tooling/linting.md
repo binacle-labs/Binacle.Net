@@ -5,6 +5,8 @@ waits-on: "a decision to lint every language in this repository to the same stan
 horizon: undecided
 paths:
   - "packages/**"
+  - "shared/packages/**"
+  - "api/packages/**"
   - "sites/**"
   - "api/src/Binacle.Net.UIModule/**"
   - "vipaq/packages/**"
