@@ -31,7 +31,7 @@ are fetched when their `when:` fires. See [README.md](README.md) for the trigger
   load: on-trigger
   paths: ["**/README.md"]
 - file: icon-headings-in-public-docs.md
-  description: "Public markdown uses one emoji icon on each section heading, matching README.md and the docs site."
+  description: "Public markdown uses one emoji icon on each section heading, matching README.md. The docs site keeps them in its markdown but shows only the page's own icon."
   when: "writing or editing a heading in a public markdown file"
   load: on-trigger
   paths: ["README.md", "**/README.md", "SECURITY.md", "DEVELOPMENT.md", "CONTRIBUTING.md", ".github/dockerhub-overview.md", "samples/**", "sites/**"]

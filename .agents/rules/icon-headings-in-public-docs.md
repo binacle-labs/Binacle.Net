@@ -1,5 +1,5 @@
 ---
-description: Public markdown uses one emoji icon on each section heading, matching README.md and the docs site.
+description: Public markdown uses one emoji icon on each section heading, matching README.md. The docs site keeps them in its markdown but shows only the page's own icon.
 load: on-trigger
 when: writing or editing a heading in a public markdown file
 paths:
@@ -23,8 +23,9 @@ Every section heading in a public markdown file opens with one emoji, then a spa
 ```
 
 **This is the house style and it is not decoration.** `README.md` and every page on the docs site are written
-this way. A reader lands on a long page, scrolls, and the icons are what let them find the section they came
-for without reading the headings. Dropping them makes a page that is harder to scan, not more serious.
+this way; the docs site shows them differently, below. A reader lands on a long page, scrolls, and the icons
+are what let them find the section they came for without reading the headings. Dropping them makes a page that
+is harder to scan, not more serious.
 
 ## How to apply it
 
@@ -36,6 +37,14 @@ for without reading the headings. Dropping them makes a page that is harder to s
 - **One icon, never two.** And never inside a sentence, a list item, a table cell or a link.
 - **A heading still has to work with the icon stripped.** Terminals, `grep` output and some readers drop it.
   The words carry the meaning; the icon only speeds up finding them.
+
+## On the docs site
+
+**The markdown keeps its icons, but the reader does not see them.** The build drops the emoji that opens a
+heading, a paragraph or a list item (`doc_body` in `sites/ruby/binacle-docs`), and shows only the page's
+`nav.icon`, on its title and its top-level menu entry. So keep the icons a docs page has, but a new heading
+there may go without one. Give a new top-level page a `nav.icon`. A keycap (`1️⃣`) in `nav.icon` numbers the
+menu entry and never shows on the title. The home page is written by hand and keeps every emoji it has.
 
 ## Where it does not apply
 

@@ -221,7 +221,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: sites/decisions.md
-  description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate."
+  description: "Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, why the docs site keeps one folder per major with the current line at the root, where the docs icons go, why Swagger UI keeps its own look, and why an old line is restyled but never reworded. What a review would otherwise re-litigate."
   paths: ["sites/demo/**", "sites/docs/**"]
 - file: sites/demo-and-image-boundary.md
   description: "The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is"

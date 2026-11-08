@@ -75,6 +75,15 @@ so a page can carry a title that is unique across the site while the sidebar kee
 sample pages named `Minimal` under different parents read fine in a tree and collide in a `<title>`.
 **`nav.parent` still matches on `title`, not on `menu_title`**, so renaming a page that has children breaks the tree.
 
+## Icons {#icons}
+
+**The markdown keeps its emoji; the page shows only the page's own.** `doc_body`, in `sites/ruby/binacle-docs`,
+drops the emoji that opens a heading, a paragraph, a list item or a list item's first link. A page's `nav.icon`
+goes on its title (`_layouts/page.html`) and, on a top-level page, on its sidebar entry (`_includes/menu.html`).
+A keycap (`1️⃣`) numbers a menu entry and never goes on a title. The home page, `home: true`, skips `doc_body`
+and keeps every emoji it is written with. The design system's `emoji` block tones them down per theme.
+Why: `$sites/decisions#S13`.
+
 ## Versioning model
 
 **One folder per major, and the current one renders at the root.** Folders are `vMAJOR.x` - `v1.x`, `v2.x`,
@@ -82,6 +91,11 @@ sample pages named `Minimal` under different parents read fine in a tree and col
 pages, with an "added in 3.1.0" note where a reader on an older patch needs one. Semver says a minor only adds,
 so a reader never sees something their image lost, only something it does not have yet. A major copies the
 folder; the old one is never touched again. The reasoning is `$sites/decisions#S11`.
+
+**An old line takes the new look, never new words.** Every folder shares the layouts, includes and styles, so a
+restyle reaches them all; the markdown of a closed line stays as it was. The `v2.x` and `v1.x` home pages are
+lists of headings that are only links, and `.doc__heading--2:has(> a)` in the design system's `layout/doc` sets
+them small and close. Why: `$sites/decisions#S15`.
 
 **Nothing in a folder says where it renders.** `binacle-docs-versions` decides every URL from
 `_data/versions.yml`, static files included, and overwrites any `permalink` a page writes. The folder named by
@@ -218,9 +232,21 @@ raise `ENOENT` and kills `just serve docs`. So a watch run leaves stale bundles 
 `just build docs` is what clears them. The production `clean` keeps `theme-init.js`, because the two configs
 run in parallel into the one directory.
 
-Vendor libs the docs site loads:
-- BeerCSS — theming (`/lib/beercss/`, via `sites/docs/_data/includes.yml`)
-- Swagger UI — embedded OpenAPI explorer, loaded in the `swagger.html` layout
+**Swagger UI is the one vendor library**, and only `_layouts/swagger.html` loads it. Docs does **not** use
+Alpine.js or material-dynamic-colors. Don't assume they're available here.
 
-Note: docs does **not** use Alpine.js or material-dynamic-colors (neither is referenced anywhere under
-`sites/docs/`). Don't assume they're available here.
+**There is no live 3D view.** The home page's picture is a still inside the design system's `pack-view` frame,
+and the site loads no three.js.
+
+## Swagger UI {#swagger}
+
+**A page with `swagger:` in its front matter gets a *Swagger* button.** It opens a wide `panel`, the drawer from
+the right, with the Swagger page in an iframe (`_layouts/page.html`). The page around it takes the design
+system; the frame keeps Swagger UI's own look, and `_sass/_swagger.scss` sets only its size. The vendored
+version is in `assets/README.md`.
+
+**The frame follows the site's theme.** A page in a frame cannot read the site's theme, so `initSwaggerTheme`
+in `_js/main.ts` sets Swagger's own `dark-mode` class on the frame's root, on load and on every open. Opened
+on its own, at `/swagger/v3/`, the page stays light: Swagger UI does not read the system theme.
+`_layouts/swagger.html` paints the light ground and the dark scrollbar Swagger leaves out. Why:
+`$sites/decisions#S14`.

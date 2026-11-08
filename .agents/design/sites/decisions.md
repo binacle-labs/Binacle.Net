@@ -1,8 +1,8 @@
 ---
 id: sites/decisions
-description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, and why the docs site keeps one folder per major with the current line at the root. What a review would otherwise re-litigate.
+description: Decisions behind the demo and documentation sites — the link-preview pair, title order, what the demo host calls itself, why the demo has no collections, the two footer calls, why the docs site keeps one folder per major with the current line at the root, where the docs icons go, why Swagger UI keeps its own look, and why an old line is restyled but never reworded. What a review would otherwise re-litigate.
 verified: 2026-11-05
-check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose one collection is versions; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major and no permalink line, against sites/docs/collections/, which must hold _versions alone, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag
+check: S1 against the og_image in both sites' _config.yml and the twitter_card default in jekyll-page-meta, which must still agree; S2 against the page_meta title_separator in both _config.yml files; S3 against display_title in sites/demo/_config.yml and its use in _includes/header.html; S4 against sites/demo/_config.yml, which must declare no collections: key at all, and against sites/docs/_config.yml, whose one collection is versions; S8 against smart_quotes in sites/docs/_config.yml, which must still be set under kramdown; S9 against sites/docs/, every version folder, includes and _data included, which must hold no en dash and no em dash outside lib/swagger-ui; S11 against sites/docs/collections/_versions/, which must hold one folder per major and no permalink line, against sites/docs/collections/, which must hold _versions alone, and against sites/docs/_data/versions.yml, where every entry carries id, url_segment, label and version_tag; S13 against doc_body in sites/ruby/binacle-docs, which drops an opening emoji, and the nav.icon on the title in sites/docs/_layouts/page.html and on level 0 of _includes/menu.html; S14 against the swagger-dialog panel in _layouts/page.html, initSwaggerTheme in _js/main.ts and no !important in _sass/_swagger.scss; S15 against git diff main -- sites/docs/collections/_versions/v2.x and v1.x, which must change no word, and .doc__heading--2:has(> a) in the design system's layout/doc
 paths:
   - "sites/demo/**"
   - "sites/docs/**"
@@ -137,6 +137,34 @@ CORS is the third child - the shape Diagnostics already had.
 
 **What would reopen it:** a page that is genuinely the same in every line and changes often enough that
 three copies drift - the answer then is a generated include, not a common collection.
+
+### S13 - an icon on the page title and the top menu entries, nowhere else
+
+**Decided (the maintainer, 2026-10-23):** "icons are done", shown one toned emoji on the page title and on each
+top menu entry. On the markdown (2026-10-25): "we keep but not hard rule".
+
+An emoji opening every heading and menu entry made the new look read as the old site. His aim, 2026-10-23: "I
+want to achieve a clean and engaging look and I find icons bring out character and attention to the docs." So
+the icons stay, in two places, toned down per theme. The markdown is left as it is written and the build drops
+the rest, so no page had to be rewritten. How: `$sites/docs#icons`.
+
+### S14 - Swagger UI keeps its own look, in a drawer that follows the theme
+
+**Decided (the maintainer, 2026-11-06):** "trial but i dont think its called trial thater thatn modal or drawer /
+we also need the dark mode i believe". On the drawer's left edge (2026-11-07): "grey".
+
+Restyling Swagger UI means overriding its bundle, and each override can break at its next release. So the page
+around it converts and the frame keeps the vendor's look. The bundle was raised to a version with a dark mode so
+the frame can follow the site's theme. The edge is `--rule`, not ink. How: `$sites/docs#swagger`.
+
+### S15 - an old line is restyled, never reworded
+
+**Decided (the maintainer, 2026-11-07):** "i want the v2 and older docs home pages to remain their style but make
+it a smaller a bit compact not the tiled style in version 3 but do give it a lift".
+
+The layouts are shared, so every line takes the new look, and that is meant. Its words are a record of what was
+true for that release (S11), so none change. The `v2.x` and `v1.x` home pages keep their link headings, smaller
+and closer, with every heading id, so old links still land. How: `$sites/docs`, *Versioning model*.
 
 ## Pending
 
