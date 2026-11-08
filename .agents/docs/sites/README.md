@@ -2,7 +2,7 @@
 id: sites
 description: Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site.
 verified: 2026-09-29
-check: The directory list matches sites/, admin included; the three published sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and the www carve-outs still hold
+check: The directory list matches sites/, admin included; the three published sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and none of the three published sites' _config.yml has a `sass:` block
 also_update:
   - commands
   - ci-cd
@@ -56,10 +56,7 @@ Read this once, then the per-site doc for what differs.
   levels, so it is what a move breaks first.
 - **Deployed by hand, one workflow for all three.** `workflow_dispatch` only, with the site picked at dispatch.
   It builds the site, link checks what it built, and hands that same directory to the host — see `$ci-cd`.
-
-## Where `www` breaks the pattern
-
-Two of the lines above do not hold for it, both on purpose. **Jekyll compiles no sass there** — the
-sass CLI does, from `package.json`, so `css/` is build output and gitignored rather than committed source.
-And it **runs no CSS framework**, so the gulp copy skips `assets/lib/` for that target. `$sites/www` has both
-in full.
+- **Jekyll compiles no sass on the three published sites.** No `_config.yml` there has a `sass:` block; the
+  sass CLI compiles `_sass/main.scss` from `build:css` in `package.json`, reading `@binacle/design-system` by
+  `pkg:`. A `sass:` block put back gives two compilers a claim on the same files. `css/`, `js/` and `fonts/` are
+  build output and gitignored.

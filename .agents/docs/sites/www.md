@@ -1,8 +1,8 @@
 ---
 id: sites/www
-description: The published Jekyll marketing site at sites/www/ — four pages, no CSS framework, and the only site whose sass Jekyll does not compile.
-verified: 2026-10-09
-check: The page list and permalinks match sites/www/pages/; _config.yml still has no `sass:` block and package.json still carries build:css; sites/www/_includes/ still has no seo or schema file and _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block in _config.yml still writes one file and the built /sitemap.xml still lists exactly the four pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json; --action and --accent are still separate from --primary and --tertiary in _sass/_tokens.scss
+description: The published Jekyll marketing site at sites/www/ - its pages, the look it takes from the design system, the exchange data every API sample comes from, and what bites.
+verified: 2026-11-08
+check: The page list and permalinks match sites/www/pages/; _sass/main.scss holds only @use lines into @binacle/design-system and _js/main.ts only calls it; _config.yml has no `sass:` block and sets theme binacle-design-system; _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block still writes one file from pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json, and its command still names the major tag; the name in tooling/cloudflare/www.wrangler.jsonc is still binacle-net-www
 paths:
   - "sites/www/**"
 ---
@@ -19,31 +19,24 @@ just serve www    # jekyll serve (port 7197) + sass and webpack watches, one Ctr
 just build www    # the same site built once, into artifacts/www
 ```
 
-## What is different from the other two sites
+## The look comes from the design system
 
-Three things, each on purpose.
+**The site holds no CSS and almost no script of its own.** `_sass/main.scss` is a list of `@use` lines, each
+one part of `@binacle/design-system`; `_js/main.ts` calls the package's scripts. A part the site needs is added
+to that list, not written here. Why the package is built this way is `$shared/design-system`.
 
-**Jekyll compiles no sass here.** `_config.yml` carries no `sass:` block. `npm run build:css` runs the sass
-CLI over `_sass/main.scss` and writes `css/main.css` — the same pattern as `api/src/Binacle.Net.UIModule`,
-which is the only other surface in the repo that compiles its own sass. Two consequences: putting the block
-back gives two compilers a claim on the same files, and **`css/` is gitignored** here, because it is build
-output. On `docs` and `demo` it is committed source.
-
-**No CSS framework and one npm dependency.** `docs` and `demo` run BeerCSS; this one is plain CSS. Its
-only workspace import is `theme-switcher`, shared with the other three hosts. The gulp
-asset copy skips `assets/lib/` entirely for this target, so BeerCSS and material-dynamic-colors never arrive.
-There is no component library to reach for.
-
-**`npm run watch` is itself a `concurrently` pair** — sass and webpack — so `just serve www` runs three
-processes where the other two run two.
+**Some includes are not in `_includes/`.** `theme: binacle-design-system` in `_config.yml` makes Jekyll read the
+package's `_includes/` after this site's. The copy button comes from there. An include here of the same name
+wins.
 
 ## Content structure
 
 | Path | What it is |
 |---|---|
-| `pages/` | The four pages, plus `404.html` and `robots.txt` |
-| `_data/exchange.yml` | Every request and response the site shows, as data |
-| `_includes/` | Header, footer, and the page parts: `exchange`, `command`, `verdicts`, `glyphs` |
+| `pages/` | The pages, plus `404.html` and `robots.txt` |
+| `_data/exchange.yml` | Every API request and response the site shows, and the `docker run` command |
+| `_data/header.yml`, `_data/footer.yml` | The nav and the footer links |
+| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, and `drawings/`, one SVG per picture |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its
@@ -53,10 +46,12 @@ processes where the other two run two.
 
 | Path | Page |
 |---|---|
-| `/` | homepage — the problem, one exchange, the scope table, the command |
+| `/` | homepage — the problem, what it answers, the trade-offs, one exchange, the command |
 | `/cartonization/` | the trade's own word for choosing a box |
 | `/parcel-lockers/` | whether an order fits a locker compartment |
 | `/how-it-works/` | fit and pack, the three algorithms, what a yes and a no mean |
+| `/self-hosting/` | running the image: the setups, `Presets.json`, changing a setting |
+| `/verify/` | checking an image is the one the release workflow built |
 | `/404.html` | permalink kept at the root — Cloudflare's `not_found_handling` wants it there |
 | `/robots.txt`, `/sitemap.xml` | per host |
 
@@ -88,14 +83,16 @@ three, and it is never derived from `url`. `sameAs` points at the GitHub org and
 `BreadcrumbList`, `FAQPage`, `WebSite` + `SearchAction` and `HowTo` were all considered and rejected - the
 reasons are `$sites/www-design#W8`.
 
-## Every code block is a real response
+## Every API example is a real response
 
-`_data/exchange.yml` holds every request and response on the site. How to re-run them is in the design
-records, not in the data file. Nothing is hand-written. **A response that looks plausible but is not what the API returns is the one lie
-this audience catches**, and they are the least likely to forgive it.
+`_data/exchange.yml` holds every request and response on the site. How to re-run them is in that file. Nothing
+is hand-written. **A response that looks plausible but is not what the API returns is the one lie this audience
+catches**, and they are the least likely to forgive it.
 
 It is one data file and one include (`_includes/exchange.html`) rather than markup in each page, because the
-card appears on all four pages: inline copies get re-run in one page and rot in the other three.
+same card appears on several pages: inline copies get re-run in one page and rot in the others. The other code
+blocks - the `cosign` and `docker buildx` lines on `/verify/`, the settings on `/self-hosting/` - are commands
+and config, not API answers, and sit in their pages.
 
 **Every example is v3.** v4 is marked experimental (`ApiV4Document.IsExperimental`), and a marketing page must
 not hand a stranger an unstable contract. The v3 routes are `fit/by-custom`, `fit/by-preset/{preset}`, `pack/by-custom`,
@@ -108,90 +105,49 @@ placement is wrong.
 **`parameters` is required on every fit and pack body.** A request without it returns 400, so it cannot be
 trimmed out of an example to make one shorter.
 
-Four exchanges are in the file, one per job: the homepage fit against two lockers, a `by-preset` call for
-`/cartonization/`, a three-compartment call for `/parcel-lockers/`, and a `pack` call with coordinates for
-`/how-it-works/`.
+One exchange per job: the homepage fit against two lockers, a `by-preset` call for `/cartonization/`, a
+three-compartment call for `/parcel-lockers/`, and a `pack` call with coordinates for `/how-it-works/`.
 
-## The stylesheet, and the two tokens that are not the palette
+## The JavaScript
 
-Plain CSS, no framework. `_sass/` is five partials plus `main.scss`: `_tokens`,
-`_base`, `_layout`, `_code`, `_content`.
+`_js/main.ts`, built as `js/main.js`, starts the design system's theme button, menu drawer, code wrap and copy
+buttons. The pre-paint theme read is its own bundle, `js/theme-init.js`, loaded
+blocking in `<head>` - `$sites/www-design#W2`.
 
-**Colour is rationed and the rationing is the design.** Blue is the answer - links, the primary button, one
-3px structural rule per page. Orange is what you type, and only that: the `POST` chip and the `$` prompt. Violet is accents only - the small-caps eyebrow above each `h2`, and the rule
-on a caveat callout. **There is no coloured header bar and no coloured footer.** Do not repaint this; large
-flat fills are why the other two sites read as framework demos.
-
-**`--action` and `--accent` are deliberately not `--primary` and `--tertiary`.** The palette's dark variants
-are darkened so they recede, which is right for a rule or a border and wrong for anything a reader has to read
-or press: `#3c5d8b` as a button fill makes the call to action a dead grey-blue, and `#5b2d70` as label text on
-`#101010` is unreadable. `--action` is `#448aff` at full strength in both themes; `--accent` is the violet
-that carries a word. **The blue button takes a near-black label** because white on `#448aff` measures about
-3.4:1 and fails; near-black gives 5.79:1.
-
-**The neutrals are derived** with `color-mix` from `--bg` and `--fg`, which is what keeps the palette at four
-hues while giving the site a full text ramp. No brand hue is ever the colour of running text.
-
-**Prose runs 62ch inside a 1080px shell.** Documentation runs 90-100ch, and the difference is the cheapest
-signal separating the two registers. **Never put `shell` and `prose` on the same element** - the narrower cap
-wins and then `margin-inline: auto` centres it, so the column floats to the middle of the viewport while every
-other band stays left. Nest them.
-
-**The hero is one column.** Two columns do not survive the payload: a real `fit` response is wider than a
-45% column, so the card chops off mid-token.
-Any grid holding a code pane also needs `min-width: 0` on its children - a grid item defaults to
-`min-width: auto` and will grow its track to the intrinsic width of a `<pre>`.
-
-## The JavaScript, and there is very little
-
-`_js/main.ts`, built as `js/main.js`, two behaviours, both degrading cleanly:
-
-- **A theme toggle.** `packages/theme-switcher`, the same element the other three hosts use. The pre-paint
-  read is *not* in this file — it is its own bundle, `js/theme-init.js`, loaded blocking in `<head>`.
-- **Clipboard copy controls.** The `docker run` line is the primary conversion on all four pages.
-
-Both controls are `hidden` in the markup and revealed by the script. **All four pages must be complete with
-JavaScript off**, and a control that cannot work is worse than no control.
+**Every page must be complete with JavaScript off.** The copy buttons are `hidden` in the markup and shown by
+the script, and the drawer's burger is made by the script. A control that cannot work is worse than no control.
 
 ## What will bite
 
 **The Worker name is set once.** Renaming `binacle-net-www` after the first deploy creates a second Worker,
 leaves the first running, and detaches the custom domain.
 
-**The three-step build order is not optional**, and it matters more here than on the other two: Jekyll does
-not compile the sass, so a clean `jekyll build` proves nothing about whether the site has styles.
-`just build www` does all three steps.
+**The three-step build order is not optional.** Jekyll does not compile the sass (`$sites`), so a clean
+`jekyll build` proves nothing about whether the site has styles. `just build www` does all three steps.
 
-**The exchange card is the most valuable element on the site, and it is one card.** One border, one radius,
-five rows: the ask, the request, a `RESPONSE` seam, the response, and a plain-English verdict. The seam is
-what makes it one exchange instead of two code blocks; the verdict row is the whole reason it is marketing
-rather than documentation. Code is two-tone only - keys muted, values full text, punctuation lighter. **No
-syntax rainbow.**
+**The exchange card is one card**: the request, the response, and an optional plain-English verdict. With
+`fold=true` the response sits closed behind *Response*. The verdict is what makes it marketing rather than
+documentation.
 
-**`sitemap.xml` lists this site's four pages and nothing else.** The old `/apps/*` paths are served from here
+**`sitemap.xml` lists this site's pages and nothing else.** The old `/apps/*` paths are served from here
 as redirects to the demo host; a sitemap listing them is a sitemap full of 301s, which Search Console
 reports as an error.
 
 **The `docker run` line names `binacle/binacle-net:3`, the major tag.** It follows every minor and patch in
-the line, so a minor release does not touch it. That command is the primary conversion on all four pages; a
-tag that does not exist fails it with `manifest unknown`.
+the line, so a minor release does not touch it. That command is the primary conversion on the site; a tag
+that does not exist fails it with `manifest unknown`.
 
-**`demo.binacle.net` answers**, and it is linked from the nav, the footer and `/how-it-works/`. The link check
-runs offline and will not catch a host that stops answering.
+**The `docker run` line is one line in `_data/exchange.yml`, with no backslash continuations.** The command
+block keeps newlines, so a continuation would show as a broken line on a phone. The block breaks it between
+words instead.
 
-**The code panes scroll on a phone and that is deliberate.** Wrapping fails: a wrapped line starts at a different indent from the line it continues, so the JSON's own structure stops being
-readable and the hero card grew to roughly 1900px tall. What helps instead is room and smaller type - the
-card goes gutter to gutter below 720px and the code drops to 0.8125rem. **Do not "fix" this by wrapping it again.**
+**`demo.binacle.net` answers**, and it is linked from the nav, the footer, the home hero and `/how-it-works/`.
+The link check runs offline and will not catch a host that stops answering.
 
-**The `docker run` line is one line in `_data/exchange.yml`, with no backslash continuations.** They wrap into
-nonsense on a phone - `pre-wrap` keeps both the newlines and the continuation indents and then wraps on top of
-them.
+**Below 800px the nav folds into a drawer** behind a burger the script adds. With JavaScript off the nav stays
+in the header as its own row, which scrolls sideways.
 
-**The mobile header is an explicit grid, not the flex row.** Left to source order the nav spans both columns,
-takes row 2, and pushes the theme control onto a row of its own - a four-row, 200px header before the reader
-reaches anything. Placed explicitly it is 144px.
-
-**The old `/apps/*` paths redirect from `sites/www/_redirects`.** Six lines, each a 301 to the demo host:
+**The old `/apps/*` paths redirect from `sites/www/_redirects`.** Each is a 301 to the demo host:
 `/apps/packing-demo` to `/packing/`, `/apps/protocol-decoder` to `/vipaq/`, `/apps` to the demo root, each
 with and without the trailing slash. `_redirects` is in the `include:` list in `_config.yml`, so it ships
 with the build.

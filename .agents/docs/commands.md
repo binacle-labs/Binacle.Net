@@ -32,8 +32,8 @@ just assets                            # only the asset copy - after changing an
 ```
 
 `assets` copies `assets/**` into the docs, demo and www sites and into the UI module's `wwwroot/` via gulp. Each serves its
-own copy, so a changed logo does not show up until this runs. **`sites/www` gets a smaller set** — the gulp
-target skips `assets/lib/`, because that site runs no CSS framework; see `$sites/www`.
+own copy, so a changed logo does not show up until this runs. **Only `sites/docs` gets `assets/lib/`**, which
+holds Swagger UI; `gulpfile.js` lists what each target skips.
 
 ## Run from source
 
