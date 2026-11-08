@@ -209,6 +209,14 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
   paths: ["ruby/**"]
 ```
 
+## Shared
+
+```yaml
+- file: shared/design-system.md
+  description: "Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space. What a later change would otherwise undo."
+  paths: ["shared/packages/design-system/**"]
+```
+
 ## Sites
 
 ```yaml

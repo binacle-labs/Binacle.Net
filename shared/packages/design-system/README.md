@@ -4,7 +4,7 @@
 components, plus the fonts and the mark. Each block keeps its Sass and its behaviour in one folder, and its shared
 markup in `_includes/`. A site builds its own CSS from the parts it needs. Nothing here is built on its own.
 
-`www`, `docs` and `demo` read it by `pkg:` and by import.
+`www`, `docs`, `demo` and the UI module read it by `pkg:` and by import.
 
 ## 📂 What is in it
 
