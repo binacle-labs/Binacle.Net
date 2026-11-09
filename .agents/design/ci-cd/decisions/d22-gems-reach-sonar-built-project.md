@@ -2,10 +2,11 @@
 id: ci-cd/decisions/D22
 description: the gems reach Sonar through a built project, and the project type is what decides that
 status: pending
-verified: 2026-09-29
-check: D22 against Binacle.Net.slnx, whose rbproj ProjectType must stay BasedOn C# and not Shared, and against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/
+verified: 2026-11-10
+check: D22 against Binacle.Net.slnx, whose rbproj ProjectType must stay BasedOn C# and not Shared and which must list both rbproj files, against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/, and against sites/ruby/ruby.rbproj, whose own SonarQubeSetting path must stay relative to sites/ruby/
 paths:
   - "ruby/ruby.rbproj"
+  - "sites/ruby/ruby.rbproj"
   - "Binacle.Net.slnx"
   - "tooling/ci/sonar-analysis.xml"
 ---
@@ -14,6 +15,8 @@ paths:
 
 `ruby/ruby.rbproj` exists for one reason: to list the gem sources as `Content` so the scanner is offered
 them. `Microsoft.Build.NoTargets`, so it compiles nothing. It excludes `vendor/**`, the bundle CI installs.
+`sites/ruby/ruby.rbproj` does the same for the site gems, `binacle-docs` and `binacle-robots`. Everything
+below holds for both; the measurements were taken on `ruby/`, before the second one existed.
 
 **Without it Sonar saw no Ruby at all.** The run of 2026-08-27 23:08 reported `10 languages detected` and no
 `Sensor Ruby` line anywhere; the run after it, with the project, reported `11` and analysed 99 `.rb` files.
@@ -62,6 +65,7 @@ whatever it is named. So the extension is a readability choice, not a functional
 
 **One knock-on: the ruby coverage path is the odd one out.** A report path is resolved against the base
 directory of the module the sensor runs in. The C# and javascript sensors run in the root module; the
-SimpleCov sensor runs in `ruby/`, this project's folder, and said so —
+SimpleCov sensor runs in each Ruby project's folder, and said so for `ruby/` —
 `SimpleCov report not found: 'artifacts/coverage/sonar/*.json'`. So that one property opens with `../` while
-the other two do not. Every report is still written to `artifacts/coverage/sonar`.
+the other two do not, and `sites/ruby/ruby.rbproj` sets its own, with `../../`. Every report is still written
+to `artifacts/coverage/sonar`. The `sites/ruby/` path has not been through a Sonar run yet.

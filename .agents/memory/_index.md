@@ -58,9 +58,9 @@ conventions, decisions, gotchas. See [README.md](README.md) for when and how to 
   when: "changing ServiceModule test-host configuration"
   paths: ["api/test/Binacle.Net.ServiceModule.IntegrationTests/**"]
 - file: sonar-ruby-coverage-paths.md
-  description: "sonar.ruby.coverage.reportPaths takes no wildcard and resolves against the ruby/ module, not the repo root - the other two coverage properties beside it do neither"
+  description: "sonar.ruby.coverage.reportPaths takes no wildcard and resolves against the Ruby module it runs in, ruby/ or sites/ruby/, not the repo root - the other two coverage properties beside it do neither"
   when: "changing a coverage report path in the Sonar settings, or adding a gem"
-  paths: ["tooling/ci/sonar-analysis.xml", "tooling/coverage.run.sh"]
+  paths: ["tooling/ci/sonar-analysis.xml", "tooling/coverage.run.sh", "ruby/ruby.rbproj", "sites/ruby/ruby.rbproj"]
 - file: sonar-scope-exclusions.md
   description: "sonar.exclusions and friends are scope exclusions, not issue ignores - they are allowed and already in use"
   when: "reading or editing the exclusion lists in tooling/ci/sonar-analysis.xml"

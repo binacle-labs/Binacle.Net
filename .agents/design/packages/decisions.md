@@ -1,10 +1,11 @@
 ---
 id: packages/decisions
-description: Packages decisions ledger - why the v4 client is hand-written rather than generated, why the visualizer owns its own internals instead of sharing a utils folder, and why the request panel is the UI module's and the component only hands over the request.
-verified: 2026-09-28
-check: P1 against packages/binacle-net-client - no generator in its devDependencies, spec/v4.json present and byte-identical to the docs site's copy of the current version, and tests/contract.test.ts still validating fixtures against it; against tooling/openapi.just, where check-all-copies must diff that copy and sync-all-copies must write it. P2 against packages/binacle-net-ui/src - no utils/ or core/ folder, components/visualizer/index.ts exporting only the component and the Binacle type, and no file under apps/ importing a path inside components/visualizer/. P3 against packages/binacle-net-ui/src/apps/packingDemo/packingDemo.ts, which sets lastRequest with a relative path and formats nothing, and against api/src/Binacle.Net.UIModule/_js/packing_demo.js, which holds the curl formatting and reads window.location.origin. P4 against packages/binacle-net-ui/src/apps/protocolDecoder/sampleData.ts, five entries, and tests/apps/protocolDecoder/sampleData.test.ts, which reads vipaq/data/packed/demo-samples, holds each entry to its packed bin and checks each fills three quarters of it
+description: Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request.
+verified: 2026-11-10
+check: P1 against api/packages/api-client - no generator in its devDependencies, spec/v4.json present and byte-identical to the docs site's copy of the current version, tests/contract.test.ts still validating fixtures against it with ajv, and src/client.ts still the only routes the apps call; against tooling/openapi.just, where check-all-copies must diff that copy and sync-all-copies must write it, and against .github/workflows, where only shared-image-tests.yml runs check-all-copies and nothing runs sync-all-copies. P2 against shared/packages/apps/src - no utils/ or core/ folder - and shared/packages/design-system/index.ts, which exports createPackView and the 3D view's types and nothing else from components/pack-view/; no file under shared/packages/apps/src imports a path inside it. P3 against shared/packages/apps/src/packingDemo/packingDemo.ts, which sets lastRequest with a relative path and formats nothing, against api/src/Binacle.Net.UIModule/_js/packing_demo.js, which registers request_fold, holds the curl formatting and reads window.location.origin, and against Pages/Packing.cshtml, which puts the fold under the results. P4 against shared/packages/apps/src/protocolDecoder/sampleData.ts, five entries, tests/protocolDecoder/sampleData.test.ts, which reads vipaq/data/packed/demo-samples, holds each entry to its packed bin and checks each fills three quarters of it, and the Samples drawer in sites/demo/pages/vipaq.html and the UI module's Pages/Vipaq.cshtml
 paths:
-  - "packages/**"
+  - "api/packages/api-client/**"
+  - "shared/packages/apps/**"
 ---
 
 # Packages - decisions ledger
@@ -20,15 +21,16 @@ they *are* is the docs under `$packages`; this file is the reasoning.
 written package that can be testable against generated spec?", and on the copies: "check-all-copies = runs in
 CI / sync-all-copies = never runs in CI only humans run it once and the spec is commited".
 
-`packages/binacle-net-client` is written by hand. No generator, no codegen step, no generator in the
-dependency tree. A test validates the hand-written types against a committed copy of the v4 OpenAPI document
-instead.
+`@binacle/api-client`, in `api/packages/api-client`, is written by hand. No generator, no codegen step, no
+generator in the dependency tree. A test validates the hand-written types against a committed copy of the v4
+OpenAPI document instead.
 
 **Generating was the obvious alternative and it was measured.** The published documents are already
 generation-quality and linted for it, so a generated client is one command. Three things argued against it:
 
-- **The UI calls one endpoint.** After the demo moved to v4 it calls `pack/compare-bins` and nothing else,
-  out of sixteen v4 endpoints. A generator would maintain about thirty lines of types.
+- **The UI calls few endpoints.** When this was decided the demo called `pack/compare-bins` and nothing else,
+  out of sixteen v4 endpoints. *Everyday Items* has since added `pack/bin/{preset}/{bin}`. A generator would
+  maintain a short file of types.
 - **v4's contracts share bases**, so those sixteen endpoints are roughly six distinct shapes. Adding
   `pack/smallest-bin` and `pack/best-bin` later is a method each and no new response type, because
   `PackBinResponse` is already the whole body of both.
@@ -53,40 +55,44 @@ that our own UI stopped hand-rolling `fetch` calls in a component.
 committed source for some other reason - today they are build output, and the client's copy exists because
 the package should not reach into the documentation site to find one.
 
-### P3 - the request panel is the UI module's, and the component only hands over the request
+### P3 - the request fold is the UI module's, and the component only hands over the request
 
 **Decided (the maintainer, 2026-09-14):** "we will only do it for UiModule". The packing page inside the
-image shows the call it just made; the demo site does not. `packing_demo_app` exposes `lastRequest` - method, path, body - and nothing
-else changed in the shared package. The formatting and the host live in `_js/packing_demo.js`, the module's
-own entry, as a second Alpine component the page nests under the demo's scope.
+image shows the call it just made; the demo site does not. `packing_demo_app` exposes `lastRequest` - method,
+path, body - and formats nothing. The formatting and the host live in `_js/packing_demo.js`, the module's own
+entry, as a second Alpine component, `request_fold`, that the page nests under the demo's scope. The package
+reads `lastRequest` itself in one place: the API answers an unfit item by id only, so its size comes from
+what was sent.
 
-**A panel on the right, not under the results** - the maintainer, 2026-09-15: "i was thinking a popover
-panel on the right". A `Request` button on
-the results card opens a beercss right `dialog`, the same overlay-and-dialog shape `_ErrorsDialog` already
-uses, so nothing new is styled ahead of the rebrand. The first shape was an article under the results; it
-pushed the page down by the height of the request every run, and the request is read once, not watched.
+**A fold under the results.** `Pages/Packing.cshtml` puts a `Request` fold under the results, hidden until a
+call has gone out, holding the command in a code block with the design system's Copy button. It is closed
+until opened, so it does not push the page down. Two shapes came before it: an article under the results,
+which pushed the page down by the height of the request every run, and a right-side dialog - the maintainer,
+2026-09-15: "i was thinking a popover panel on the right". No quote here covers the move from the dialog to
+the fold.
 
 **Four questions were open, and each answer sits where it was taken.**
 
-- **One `curl` line, not raw HTTP and not a language snippet.** The panel is checked by pasting what it
+- **One `curl` command, not raw HTTP and not a language snippet.** The fold is checked by pasting what it
   prints into a terminal, and `curl` is what the Docker Hub quick start already hands a reader. The
   formatting is in the module's entry.
 - **The host is `window.location.origin`.** The module always calls the API it is served from -
   `ModuleDefinition.cs` sets `ApiBaseUrl` to empty - so the page's own origin is the only host that is true,
   and it is one the reader can call. `lastRequest.path` stays relative for the same reason: which host
   answered is the page's to say, never the component's, and the test holds it relative even with a `baseUrl`.
-- **The panel is around the component, not in it.** In the shared component it would land on the demo site
+- **The fold is around the component, not in it.** In the shared component it would land on the demo site
   too, printing a public host nobody will call from their own code. The seam it needed - reading the
   component's state - is one property, set on every valid submit and left standing whatever the answer was,
   so a failed call still shows what was sent.
-- **Request only.** The visualizer and the result list already show the response; a second copy of it would
-  double the panel for nothing.
+- **Request only.** The 3D view and the result list already show the response; a second copy of it would
+  double the fold for nothing.
 
 **What the module's half costs.** `_js/packing_demo.js` has no test harness - the package's jest does not
-reach it. The formatter is twelve lines, its output was parsed by `bash -n` once, and the rebuild plus the
-by-eye paste is what proves it. If that half grows, it moves into a tested file.
+reach it. The formatter started as a few lines checked once by `bash -n` and by eye. It has since grown: it
+wraps the command word by word and weights the JSON. The rule here was that it moves into a tested file when
+it grows; that has not happened yet.
 
-**What would change this.** The demo site wanting the panel after all - then the formatting moves into the
+**What would change this.** The demo site wanting the fold after all - then the formatting moves into the
 package as a method on the component, and the origin becomes an option the host passes in.
 
 ### P4 - the decoder's samples are packed demo examples, held to the packed data by a test
@@ -95,14 +101,13 @@ package as a method on the component, and the origin becomes an option the host 
 too large dimensions", then "lets do a sidebar with a samples buton below the + a full lenth button ... a copy
 button, and no add... we want to encourage the user to copy and paste it".
 
-The ViPaq decoder offers known-good strings. Five, in
-`src/apps/protocolDecoder/sampleData.ts`, and the component exposes them as `samples` and nothing else. The
-module page shows them in a right-side panel behind a full-width `Samples` button under the add button: each
-name, its string in a selectable block, and a Copy button. **No add button, on purpose** - the visitor is meant
-to copy the string and paste it, because seeing and handling the string is the point of the page. Three
-earlier shapes were built and reversed on 2026-09-15: chips under the input, a menu that decoded on click, and
-a menu that filled the input. The page's own script holds the open state and the copy; the component owns them, so the demo site gets the same
-five from the bundle once its page carries the button.
+The ViPaq decoder offers known-good strings. Five, in `src/protocolDecoder/sampleData.ts`, and the component exposes them as `samples` and nothing else.
+Both hosts show them in a drawer from the right, opened by a `Samples` button beside `Add result`: each name,
+its string in a selectable block, a Copy button, and a **Use** button that adds the string as a result. **Use
+goes against "no add" above**, and no quote here covers it. Three earlier shapes were built and reversed on
+2026-09-15: chips under the input, a menu that decoded on click, and a menu that filled the input. Each
+host's page script holds the open state, the copy and Use; the component owns the strings, so both hosts get
+the same five from the bundle.
 
 **Each is one placed bin out of `vipaq/data/packed/demo-samples`**, the packed results the demo's own worked
 examples generate, and a test serializes that placement and holds the string to it. A string that drifts from
@@ -118,28 +123,31 @@ results are exactly that, already generated and already proved.
 generator would need the same list. If five stops being enough, the list moves to a `regen` recipe over the
 packed data.
 
-**The chips were also rejected** - too big and in the wrong place. The menu takes no space until opened.
+**The chips were also rejected** - too big and in the wrong place. The drawer takes no space until opened.
 
 ## Pending
 
 What the packages do and why. No quote from the maintainer covers these yet.
 
-### P2 - the visualizer owns its internals, and that is why there is no shared utils folder
+### P2 - the 3D view owns its internals, and that is why there is no shared utils folder
 
-`packages/binacle-net-ui` is `apps/`, `components/` and `shared/`. There is no `utils/`, and that absence is
-the decision.
+`@binacle/apps` is `components/`, `shared/`, `types/` and one folder per app. There is no `utils/`, and that
+absence is the decision.
 
 **The measurement that produced it, taken 2026-09-09: of the 25 files in the old `src/utils/`, 19 were used
-only by the visualizer** or by another visualizer util - the scene helpers, camera maths, materials, origins
-and loading state. Of the remaining six, three belonged to the packing demo's sample data, one to `field`,
-one to the demo alone, and exactly one - `defineComponent` - was genuinely shared.
+only by the visualizer** - the 3D view before the rebrand - or by another visualizer util: the scene helpers,
+camera maths, materials, origins and loading state. Of the remaining six, three belonged to the packing demo's
+sample data, one to `field`, one to the demo alone, and exactly one - `defineComponent` - was genuinely
+shared.
 
 **So there was never a shared utility layer to keep.** There was a visualizer with its implementation spread
 across a folder anything could import from, which is worse than a naming problem: nothing stopped an app
 reaching into visualizer internals, because they looked like general helpers.
 
-The visualizer now exposes its component and the `Binacle` contract type from its own `index.ts`, and
-nothing else. A third app consumes it without being able to reach inside.
+**The 3D view now lives in the design system**, in `components/pack-view/`, and the design system's `index.ts`
+exports `createPackView` and its types and nothing else from that folder. `@binacle/apps` wraps it as the
+`pack_view` Alpine component in its own `components/packView/`. No app source reaches inside; one test,
+`tests/everydayItems/itemTypes.test.ts`, imports the item prints from inside it to check them.
 
 **The barrels went with the move.** The old `index.ts` in each of `core/`, `utils/`, `models/` and
 `viewModels/` re-exported nearly everything, so most imports named a barrel rather than a file and the

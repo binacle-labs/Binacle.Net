@@ -93,7 +93,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: ci-cd/decisions/d22-gems-reach-sonar-built-project.md
   description: "the gems reach Sonar through a built project, and the project type is what decides that"
   status: pending
-  paths: ["ruby/ruby.rbproj", "Binacle.Net.slnx", "tooling/ci/sonar-analysis.xml"]
+  paths: ["ruby/ruby.rbproj", "sites/ruby/ruby.rbproj", "Binacle.Net.slnx", "tooling/ci/sonar-analysis.xml"]
 - file: ci-cd/decisions/d23-one-required-check.md
   description: "one required check, and the maintainer bypasses it"
   status: decided
@@ -197,8 +197,8 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: packages/decisions.md
-  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, why the visualizer owns its own internals instead of sharing a utils folder, and why the request panel is the UI module's and the component only hands over the request."
-  paths: ["packages/**"]
+  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request."
+  paths: ["api/packages/api-client/**", "shared/packages/apps/**"]
 ```
 
 ## Ruby
@@ -213,7 +213,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: shared/design-system.md
-  description: "Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space. What a later change would otherwise undo."
+  description: "Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo."
   paths: ["shared/packages/design-system/**"]
 ```
 
@@ -238,6 +238,9 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 - file: sites/site-theming-css.md
   description: "The CSS side of the theme on every surface - why the attribute is on html and the system query lives in the stylesheet, how color-scheme follows the choice, and why the switcher element is not a box."
   paths: ["shared/packages/design-system/base/_tokens.scss", "shared/packages/design-system/components/theme-button/**"]
+- file: sites/templates.md
+  description: "How the three Jekyll sites name and place their template files - one base layout and wrappers, where a partial sits says how far it reaches, and when a partial takes a generic name. The class names follow BEM; the template files do not have to."
+  paths: ["sites/www/_layouts/**", "sites/www/_includes/**", "sites/docs/_layouts/**", "sites/docs/_includes/**", "sites/demo/_layouts/**", "sites/demo/_includes/**"]
 - file: sites/webmanifest.md
   description: "Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither."
   paths: ["sites/**", "gulpfile.js"]

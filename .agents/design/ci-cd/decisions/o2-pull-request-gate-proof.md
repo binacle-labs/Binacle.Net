@@ -32,7 +32,8 @@ being re-derived in four files, which is how three of them ended up disagreeing.
 | 2026-08-27, from Sonar — run `ad2e96b8` | 71.1%, 70.6% line — 1892 uncovered of 6429. New code reads **77.0%** against the 80% gate | none. All four suites reached Sonar, which is what the UI harness was waiting to see |
 | 2026-08-31, from Sonar | **over 80% on new code — the fixed gate passes on `main`.** The exact percentage was not read; the maintainer confirmed the crossing. Four ServiceModule repositories left 0% because the Sonar workflow ran Sqlite only, and it now starts azurite and postgres | the three below |
 
-**The 2026-08-22 detail**, hand-written code only:
+**The 2026-08-22 detail**, hand-written code only. The paths are as they were then: `packages/binacle-net-ui`
+is now `shared/packages/apps`, and the design system's 3D view has replaced the visualizer that was in it.
 
 | Area | Lines | Covered | |
 |---|---|---|---|
@@ -75,7 +76,9 @@ mapped, which is gated on `SWAGGER_UI` or `SCALAR_UI`, so they wait on the integ
 transformers under `Kernel/OpenApi/Transformers/` are at 100% from `api/test/Binacle.Net.Kernel.UnitTests/OpenApi/`,
 against hand-built transformer contexts and no host.
 
-**`binacle-net-ui`'s uncovered third is the Three.js half** — `core/packingVisualizer.ts` and the scene
-helpers in `utils/`. They need a WebGL context, so a test there could only assert that a call happened. They
-stay in the denominator: excluding them would be the same act as the Sonar coverage exclusions rejected
-above, one layer down. The only exclusion anywhere is `.d.ts`, which carries no runtime code.
+**The 3D view's WebGL half is left untested** — `shared/packages/design-system/components/pack-view/packView.ts`,
+which builds the renderer and the scene. It needs a WebGL context, so a test there could only assert that a
+call happened. The maths beside it - the camera fit, the colours, the print and scene positions - has tests in
+the design system's `tests/components/pack-view/`. The untested half stays in the denominator: excluding it
+would be the same act as the Sonar coverage exclusions rejected above, one layer down. The root
+`jest.config.js` leaves out only the `index.ts` barrels under `src/` and `.d.ts` files.

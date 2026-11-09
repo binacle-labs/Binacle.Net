@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-# Coverage, for every gem at once. The specs load it through spec_coverage.rb and it stays off unless
+# Coverage, for every gem at once. The specs load it through tooling/tests/ruby-coverage.rb and it stays off unless
 # COVERAGE_FORMAT is set. Two formatters because the consumers want different files: cobertura for the local
 # table and the html report, json for Sonar.
 gem "simplecov", require: false
