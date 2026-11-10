@@ -1,4 +1,4 @@
-// Below 640 a table stops being a table: each row becomes label and value. Not in docs, at the end.
+// Below 640 a table stops being a table: each row becomes label and value. Docs tables do not: see the last rule.
 @use "../../abstracts/tiers";
 @use "../../abstracts/lines";
 

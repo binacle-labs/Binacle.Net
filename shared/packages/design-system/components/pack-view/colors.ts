@@ -14,7 +14,7 @@ export function parseOklch(value: string): [number, number, number] {
 	return [Number(numbers[0]), Number(numbers[1]), Number(numbers[2])];
 }
 
-// three cannot read oklch(), so the tokens become hex here.
+// three.js cannot read oklch(), so the tokens become hex here.
 export function oklchToHex(l: number, c: number, h: number): string {
 	const a = c * Math.cos(h * Math.PI / 180);
 	const b = c * Math.sin(h * Math.PI / 180);

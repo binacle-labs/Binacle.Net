@@ -56,7 +56,8 @@ $font-path: "fonts/" !default;
   --item-6: oklch(0.468 0.08 247.2);
   // Items placed before the latest one, during playback.
   --item-rest: oklch(0.86 0.012 247.2);
-  // Colours that tell things apart, as the demo's item types. Lightness is spread so they stay apart for red-green colour blindness.
+  // Colours that tell things apart, as the demo's item types.
+  // Lightness is spread so they stay apart for red-green colour blindness.
   --category-1: oklch(0.62 0.095 250);
   --category-2: oklch(0.56 0.11 32);
   --category-3: oklch(0.82 0.10 90);
@@ -133,7 +134,7 @@ $font-path: "fonts/" !default;
   --category-5: oklch(0.78 0.075 200);
   --category-6: oklch(0.62 0.08 350);
   --item-line: #5a5349;
-  // The 3D view's bin: between muted and ink, muted alone is too weak on the dark tint.
+  // The 3D view's bin: between muted and ink, since muted alone is too weak on the dark tint.
   --bin-line: #ccc7bd;
 }
 

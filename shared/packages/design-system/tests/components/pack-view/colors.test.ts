@@ -33,7 +33,7 @@ describe("parseOklch", () => {
 		expect(parseOklch("oklch(0.88 0.08 247.2)")).toEqual([0.88, 0.08, 247.2]);
 	});
 
-	// An unset token reads as an empty string. It has to say so, not fail later inside three.
+	// An unset token reads as an empty string. It has to say so, not fail later inside three.js.
 	test("throws on a value that is not oklch", () => {
 		expect(() => parseOklch("")).toThrow("Expected an oklch() value");
 	});

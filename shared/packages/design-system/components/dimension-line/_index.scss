@@ -18,7 +18,7 @@
     background: var(--muted);
   }
 
-  // The display above would show it otherwise.
+  // The display rule above would beat the hidden attribute.
   &[hidden] {
     display: none;
   }

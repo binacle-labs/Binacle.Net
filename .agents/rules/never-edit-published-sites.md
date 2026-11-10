@@ -1,5 +1,5 @@
 ---
-description: Everything under sites/ publishes to the internet and is written in its own session. Three carve-outs - the four repo-facing READMEs, security fixes to sample files, and the rebrand port.
+description: Everything under sites/ publishes to the internet and is written in its own session. Two carve-outs - the four repo-facing READMEs, and security fixes to sample files.
 load: always
 when: before editing anything under sites/
 paths:
@@ -27,10 +27,6 @@ not a page, not a layout, not front matter.
 manifests, config json. When an analyser flags one as vulnerable, a coding session may fix the **file**.
 Narrow on purpose: it must touch no prose, no front matter and no `.md`, and it must match what repo-root
 `samples/` already does. Record every use of it in the plan that owns the work.
-
-**A third carve-out: the rebrand port.** On a branch whose name starts `features/rebrand`, a session doing the
-port may write under `sites/`, for the work the port plans name. Copy and any other work stay under this rule.
-Asked whether rebrand sessions may write there, the maintainer, 2026-11-05: "Allow for the port".
 
 **Why:** a change made in passing gets published without anyone reviewing it as public writing. The READMEs are
 excluded from all three builds, so they are repo files that happen to sit under `sites/`. The sample carve-out
