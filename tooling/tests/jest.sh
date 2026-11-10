@@ -36,3 +36,8 @@ for produced in "$coverage/$package"/*; do
     mv "$produced" "$coverage/$package.${produced##*.}"
 done
 rmdir "$coverage/$package"
+
+# jest names each package after a folder, so several of ours are all "main" and merge into one report row.
+if [[ "$reporter" = cobertura ]]; then
+    sed -i "s|<package name=\"[^\"]*\"|<package name=\"$package\"|g" "$coverage/$package.xml"
+fi
