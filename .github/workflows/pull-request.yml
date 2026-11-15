@@ -97,7 +97,8 @@ jobs:
     name: Site build
     needs: changes
     if: ${{ needs.changes.outputs.site == 'yes' }}
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: no Ruby 3.4.7 build exists for Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
       contents: read

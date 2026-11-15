@@ -20,7 +20,8 @@ concurrency:
 jobs:
   analyze:
     name: Analyse and publish
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: no Ruby 3.4.7 build exists for Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     # Full build plus every suite under coverage. The slowest workflow here.
     timeout-minutes: 45
     permissions:
