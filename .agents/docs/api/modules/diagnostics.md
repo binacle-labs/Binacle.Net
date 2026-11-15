@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-09-29
+verified: 2026-11-16
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
 also_update:
   - api/configuration
@@ -197,7 +197,7 @@ Top-level fields:
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
 - `Endpoint` (string, e.g. `http://localhost:4317`)
-- `Protocol` — `"grpc"` (default) or `"http/protobuf"`
+- `Protocol` — `"grpc"` (default) or `"http/protobuf"`. The older `"httpProtobuf"` is still accepted. Anything else fails validation at startup.
 
 The recommended way to configure OTLP is via the standard OpenTelemetry .NET SDK env vars
 (e.g. `OTEL_EXPORTER_OTLP_ENDPOINT`). See the [OTLP exporter docs](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md#environment-variables).

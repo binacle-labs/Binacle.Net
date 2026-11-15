@@ -17,7 +17,7 @@ internal class OtlpExporterConfigurationOptions
 		return this.Protocol switch
 		{
 			"grpc" => OtlpExportProtocol.Grpc,
-			"httpProtobuf" => OtlpExportProtocol.HttpProtobuf,
+			"http/protobuf" or "httpProtobuf" => OtlpExportProtocol.HttpProtobuf,
 			_ => throw new ArgumentOutOfRangeException(nameof(this.Protocol), this.Protocol, null)
 		};
 	}

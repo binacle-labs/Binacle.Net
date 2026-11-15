@@ -23,8 +23,8 @@ internal class OtlpExporterConfigurationsOptionsValidator : AbstractValidator<Ot
 		When(x =>  !string.IsNullOrEmpty(x.Protocol), () =>
 		{
 			RuleFor(x => x.Protocol)
-				.Must(x => x == "grpc" || x == "httpProtobuf")
-				.WithMessage("The protocol must be either 'grpc' or 'httpProtobuf'");
+				.Must(x => x is "grpc" or "http/protobuf" or "httpProtobuf")
+				.WithMessage("The protocol must be either 'grpc' or 'http/protobuf'");
 		});
 		
 	}
