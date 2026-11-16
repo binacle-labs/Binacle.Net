@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.1] - 2026-11-16
 
 ### 🧪 Diagnostics Module
 - **`Otlp.Protocol` accepts `"http/protobuf"`, the value the documentation gives.** Only `"httpProtobuf"` was accepted, so a config copied from the docs failed validation at startup. `"httpProtobuf"` still works.  
