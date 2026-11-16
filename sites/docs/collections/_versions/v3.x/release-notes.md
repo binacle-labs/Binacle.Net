@@ -23,6 +23,25 @@ Release notes for the **v3.x** line, newest release first. Every release in this
 
 ---
 
+## v3.1.1
+
+*Released 16 November 2026 - [release on GitHub](https://github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.1)*
+
+### 🧪 Diagnostics Module
+- **`Otlp.Protocol` accepts `"http/protobuf"`, the value the documentation gives.** Only `"httpProtobuf"` was
+  accepted, so a config copied from the docs failed validation at startup. `"httpProtobuf"` still works.
+
+### 🏗️ Internal Work
+- **Patch updates to the NuGet packages inside the image.** ASP.NET Core and Microsoft.Extensions 10.0.15,
+  Microsoft.Data.Sqlite 10.0.15, Dapper 2.1.89 and Scalar 2.17.14. The `Microsoft.OpenApi` and bundled SQLite pins
+  moved up to what those packages now require.
+- **Build and test dependencies updated**: the GitHub Actions, the npm dev tools (including a critical `handlebars`
+  advisory) and the Ruby gems behind the sites.
+- **The site jobs in CI run on Ubuntu 24.04.** `ubuntu-latest` moved to 26.04, which has no build of the Ruby version
+  the sites use.
+
+---
+
 ## v3.1.0
 
 *Released 8 October 2026 - [release on GitHub](https://github.com/binacle-labs/Binacle.Net/releases/tag/v3.1.0)*
