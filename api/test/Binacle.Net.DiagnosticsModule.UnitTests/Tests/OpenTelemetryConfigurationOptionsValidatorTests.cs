@@ -1,5 +1,6 @@
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using Binacle.Net.DiagnosticsModule.Configuration.Validators;
+using OpenTelemetry.Exporter;
 
 namespace Binacle.Net.DiagnosticsModule.UnitTests;
 
@@ -21,7 +22,8 @@ public class OpenTelemetryConfigurationOptionsValidatorTests
 	[InlineData(null)] // unset falls back to grpc in GetOtlpExportProtocol
 	[InlineData("")]
 	[InlineData("grpc")]
-	[InlineData("httpProtobuf")]
+	[InlineData("http/protobuf")]
+	[InlineData("httpProtobuf")] // the old spelling, kept so existing config still starts
 	public void A_supported_otlp_protocol_is_accepted(string? protocol)
 	{
 		this.validator.Validate(OptionsWith(protocol: protocol)).IsValid.ShouldBeTrue();
@@ -31,9 +33,20 @@ public class OpenTelemetryConfigurationOptionsValidatorTests
 	[InlineData("http")]
 	[InlineData("HttpProtobuf")] // the check is case sensitive
 	[InlineData("gRPC")]
+	[InlineData("http/json")]
 	public void An_unsupported_otlp_protocol_fails_validation(string protocol)
 	{
 		this.validator.Validate(OptionsWith(protocol: protocol)).IsValid.ShouldBeFalse();
+	}
+
+	[Theory]
+	[InlineData(null, OtlpExportProtocol.Grpc)]
+	[InlineData("grpc", OtlpExportProtocol.Grpc)]
+	[InlineData("http/protobuf", OtlpExportProtocol.HttpProtobuf)]
+	[InlineData("httpProtobuf", OtlpExportProtocol.HttpProtobuf)]
+	public void A_supported_otlp_protocol_maps_to_the_exporter_protocol(string? protocol, OtlpExportProtocol expected)
+	{
+		new OtlpExporterConfigurationOptions { Protocol = protocol }.GetOtlpExportProtocol().ShouldBe(expected);
 	}
 
 	[Theory]
