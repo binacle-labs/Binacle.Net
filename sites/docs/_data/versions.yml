@@ -27,8 +27,8 @@ current: v3.x
 
 list:
   - id: v3.x
-    url_segment: 3.1.0
-    label: v3.1.0
+    url_segment: 3.1.1
+    label: v3.1.1
     version_tag: "3"
   - id: v2.x
     url_segment: 2.1.1
