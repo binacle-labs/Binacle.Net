@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-11-16
+verified: 2026-11-17
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
 also_update:
   - api/configuration
@@ -191,13 +191,15 @@ Config file: `Config_Files/DiagnosticsModule/OpenTelemetry.json`.
 
 Top-level fields:
 - `ServiceNamespace` — service namespace label (default: `"binacle"`).
-- `ServiceInstanceId` — unique instance ID (default: `"1"`).
+- `ServiceInstanceId` — unique instance ID (default: `null`, so the SDK generates a new one each start).
 - `AdditionalAttributes` — key-value attributes attached to all telemetry.
 
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
 - `Endpoint` (string, e.g. `http://localhost:4317`)
 - `Protocol` — `"grpc"` (default) or `"http/protobuf"`. The older `"httpProtobuf"` is still accepted. Anything else fails validation at startup.
+- `Metrics`, `Tracing`, `Logging` (bool, default true) — per-signal OTLP switches. In the model and the shipped
+  JSON; `ModuleDefinition` does not read them yet.
 
 The recommended way to configure OTLP is via the standard OpenTelemetry .NET SDK env vars
 (e.g. `OTEL_EXPORTER_OTLP_ENDPOINT`). See the [OTLP exporter docs](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md#environment-variables).
@@ -208,8 +210,11 @@ Azure Monitor exporter (`AzureMonitor`):
 - `EnableLiveMetrics` (bool, default false)
 - `SamplingRatio` (float, default 1 = 100%)
 
-Each signal group (`Metrics`, `Tracing`, `Logging`) also accepts `AdditionalAttributes` and a list
-of additional meters/sources to include.
+`Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
+
+`Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
+3.2.0, removed in 4.0.0). They are no longer in the shipped JSON. The top-level `AdditionalAttributes` covers
+every signal.
 
 ## Packing logs
 
