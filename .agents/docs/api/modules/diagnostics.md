@@ -194,12 +194,22 @@ Top-level fields:
 - `ServiceInstanceId` — unique instance ID (default: `null`, so the SDK generates a new one each start).
 - `AdditionalAttributes` — key-value attributes attached to all telemetry.
 
+The resource always carries `host.name` and `process.pid`, set in code before `AdditionalAttributes`, so a value
+there overrides them.
+
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
 - `Endpoint` (string, e.g. `http://localhost:4317`)
 - `Protocol` — `"grpc"` (default) or `"http/protobuf"`. The older `"httpProtobuf"` is still accepted. Anything else fails validation at startup.
-- `Metrics`, `Tracing`, `Logging` (bool, default true) — per-signal OTLP switches. In the model and the shipped
-  JSON; `ModuleDefinition` does not read them yet.
+- `Metrics`, `Tracing`, `Logging` (bool, default true) — per-signal OTLP switches. Azure Monitor ignores them.
+  - All three on: `UseOtlpExporter`. It also reads the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` variables.
+  - Any off: `AddOtlpExporter` for each signal still on. The per-signal variables are then not read.
+  - All three off: a startup warning, nothing sent over OTLP.
+
+With `Endpoint` set and `http/protobuf`, each signal goes to `/v1/metrics`, `/v1/traces` or `/v1/logs` after any
+path already on the endpoint (`http://host:4318/smth/` gives `/smth/v1/traces`). gRPC uses the endpoint as given.
+With no `Endpoint` in config, the SDK reads `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL` itself,
+and `Protocol` from config is not used.
 
 The recommended way to configure OTLP is via the standard OpenTelemetry .NET SDK env vars
 (e.g. `OTEL_EXPORTER_OTLP_ENDPOINT`). See the [OTLP exporter docs](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md#environment-variables).
@@ -210,11 +220,14 @@ Azure Monitor exporter (`AzureMonitor`):
 - `EnableLiveMetrics` (bool, default false)
 - `SamplingRatio` (float, default 1 = 100%)
 
+The `Binacle.Net` trace source (`Diagnostics.ActivitySource` in the Kernel) is always on, added in code.
+Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
+by segment). `/_debug` is traced.
 `Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
 
 `Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
 3.2.0, removed in 4.0.0). They are no longer in the shipped JSON. The top-level `AdditionalAttributes` covers
-every signal.
+every signal. When OpenTelemetry is on, a startup warning names each one that has values.
 
 ## Packing logs
 
