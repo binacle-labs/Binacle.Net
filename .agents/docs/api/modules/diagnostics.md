@@ -44,7 +44,7 @@ Exporters: OTLP and/or Azure Monitor — each enabled independently via config.
 
 **Packing logs** — conditional on `PackingLogsConfigurationOptions.Enabled`.
 When enabled: registers a channel-based log processor for algorithm operation logs.
-`BinacleService` writes to this channel via `IOptionalDependency<Channel<...>>` — it's a no-op when disabled.
+`PackingLogBinacleService` writes to this channel via `IOptionalDependency<Channel<...>>` — it's a no-op when disabled.
 
 **Health checks** — always registered. Includes the `SystemHealthCheck` class, registered under the
 name `"System"` with tag `"Core"` (failure status `Unhealthy`). Use the name `"System"` — not the class
@@ -232,7 +232,10 @@ Azure Monitor exporter (`AzureMonitor`):
 - `EnableLiveMetrics` (bool, default false)
 - `SamplingRatio` (float, default 1 = 100%)
 
-The `Binacle.Net` trace source (`Diagnostics.ActivitySource` in the Kernel) is always on, added in code.
+Every meter and trace source named `Binacle.Net*` is always on, added in code through `TelemetryNames.Wildcard`
+(`$api/kernel`, Telemetry). That covers the API's `Binacle.Net` source and meter (`$api/service`, Telemetry) and
+this module's `Binacle.Net.DiagnosticsModule` meter. Tested in
+`api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/ModuleTelemetryWildcardTests.cs`.
 Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
 by segment). The map also disables the request metrics for that path (see the health-check list above). `/_debug` is traced.
 `Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
@@ -268,6 +271,15 @@ Registration: `AddOptionsBasedPackingLogProcessor()` — no arguments — in Dia
 `AddLogProcessor<AlgorithmOperationLogChannelRequest, PackingLogEntry>` wants, resolving
 `IOptions<PackingLogsConfigurationOptions>` inside each so the config is read from DI rather than passed in.
 Gated by `PackingLogs.Enabled`.
+
+The channel factory resolves `PackingLogMetrics` (`Telemetry/PackingLogMetrics.cs`, a singleton), whose two
+instruments are on the `Binacle.Net.DiagnosticsModule` meter (`Telemetry/Diagnostics.cs`):
+- `binacle.packing_log.dropped_entries` (counter, `{entry}`) - only with `ChannelLimit` set. The channel uses
+  `DropWrite`, so a write to a full queue reports success and the entry is lost. The counter is the
+  `itemDropped` callback of `Channel.CreateBounded`.
+- `binacle.packing_log.queued_entries` (observable up-down counter, `{entry}`) - `channel.Reader.Count`.
+
+Tested in `api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/PackingLogMetricsTests.cs`.
 
 ### Config
 

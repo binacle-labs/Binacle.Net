@@ -1,3 +1,4 @@
+using Binacle.Net.Kernel.Telemetry;
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using OpenTelemetry.Metrics;
 
@@ -16,6 +17,7 @@ internal static class OpenTelemetryMetricsExtensions
 			.ConfigureResource(resource => resource.AddOptionalAdditionalAttributes(options))
 			.AddRuntimeInstrumentation()
 			.AddAspNetCoreInstrumentation()
+			.AddMeter(TelemetryNames.Wildcard)
 			.AddMeters(options.AdditionalMeters)
 		);
 

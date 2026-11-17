@@ -1,3 +1,4 @@
+using Binacle.Net.Kernel.Telemetry;
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ internal static class OpenTelemetryTracingExtensions
 			.ConfigureResource(resource => resource.AddOptionalAdditionalAttributes(options))
 			.AddAspNetCoreInstrumentation(instrumentation => instrumentation.ConfigureAspNetCoreInstrumentation(options))
 			.AddHttpClientInstrumentation(instrumentation => instrumentation.ConfigureHttpClientInstrumentation(options))
-			.AddSource(Diagnostics.ActivitySource.Name)
+			.AddSource(TelemetryNames.Wildcard)
 			.AddSources(options.AdditionalSources)
 		);
 

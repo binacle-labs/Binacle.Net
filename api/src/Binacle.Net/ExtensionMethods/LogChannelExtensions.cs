@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using Binacle.Net.Kernel.Logs.Models;
 using Binacle.Net.DiagnosticsModule.Logs.Models;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.ExtensionMethods;
 

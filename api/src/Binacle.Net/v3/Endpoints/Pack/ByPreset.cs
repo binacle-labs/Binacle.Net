@@ -8,6 +8,7 @@ using Binacle.Net.v3.ExtensionMethods;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OpenApiExamples.ExtensionMethods;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.v3.Endpoints.Pack;
 

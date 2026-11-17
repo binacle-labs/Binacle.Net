@@ -8,6 +8,7 @@ using Binacle.Net.v4.Contracts.Fit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OpenApiExamples.ExtensionMethods;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.v4.Endpoints.Fit;
 

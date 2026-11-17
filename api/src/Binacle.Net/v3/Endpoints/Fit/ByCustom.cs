@@ -5,6 +5,7 @@ using Binacle.Net.v3.Contracts;
 using Binacle.Net.Services;
 using Binacle.Net.v3.ExtensionMethods;
 using OpenApiExamples.ExtensionMethods;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.v3.Endpoints.Fit;
 

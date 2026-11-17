@@ -19,12 +19,6 @@ public static class TimedOperationExtensions
 	}
 	
 	public static TimedActivityOperation BeginTimedActivityOperation(
-		this ILogger logger, string message)
-	{
-		return BeginTimedActivityOperation(logger, LogLevel.Information, message, Binacle.Net.Diagnostics.ActivitySource);
-	}
-	
-	public static TimedActivityOperation BeginTimedActivityOperation(
 		this ILogger logger, string message, ActivitySource activitySource)
 	{
 		return BeginTimedActivityOperation(logger, LogLevel.Information, message, activitySource);

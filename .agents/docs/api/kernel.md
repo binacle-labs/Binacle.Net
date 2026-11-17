@@ -87,8 +87,17 @@ Registered as open generic in `Program.cs`:
 services.AddTransient(typeof(IOptionalDependency<>), typeof(OptionalDependency<>));
 ```
 
-Used by `BinacleService` to optionally write to the packing log channel without failing if DiagnosticsModule
+Used by `PackingLogBinacleService` to optionally write to the packing log channel without failing if DiagnosticsModule
 packing logs are disabled.
+
+## Decorate
+
+`services.Decorate<TService, TDecorator>()` (`Dependencies/ExtensionMethods`, namespace `Binacle.Net`) replaces the
+last non-keyed registration of `TService` with `TDecorator` wrapped around it, and keeps its lifetime. The
+decorator takes the inner service as a constructor argument and its other arguments from DI. Each call adds an
+outer layer. It throws when `TService` is not registered. The container does not dispose the inner instance.
+
+Tested in `api/test/Binacle.Net.Kernel.UnitTests/Dependencies/Tests/DecorateTests.cs`.
 
 ## Feature.Manager
 
@@ -267,9 +276,25 @@ Timed operations (in `Kernel/Logging`):
 
 - `logger.BeginTimedOperation("template", args)` → returns an `IDisposable`; on dispose it logs
   `"{template} completed in {OperationDurationMs}ms"`. Default level Information.
-- `logger.BeginTimedActivityOperation("message")` → same, and also starts an `Activity` (tracing span) named
-  `message` on `Binacle.Net.Diagnostics.ActivitySource`. One `using` gives both a timed log and a span.
+- `logger.BeginTimedActivityOperation("message", activitySource)` → same, and also starts an `Activity` (tracing
+  span) named `message` on the given source. One `using` gives both a timed log and a span. Its `Activity`
+  property is that span, or `null` when nothing listens. The Kernel has no source of its own: each module passes
+  its own (Telemetry, below).
 - `logger.EnrichState(...)` — wraps a dictionary / string set into a `BeginScope` for structured-log enrichment.
+
+## Telemetry
+
+`Kernel/Telemetry/` holds what every module shares. Nothing in it knows about packing.
+
+- `TelemetryNames.Prefix` is `Binacle.Net`. Each module names its own meter and trace source with it: `Binacle.Net`
+  for the API, `Binacle.Net.DiagnosticsModule`, and later `Binacle.Net.ServiceModule`.
+- `TelemetryNames.Wildcard` (`Binacle.Net*`) is what the DiagnosticsModule passes to `AddMeter` and `AddSource`,
+  so a new module's meter or source is collected without a change to the OpenTelemetry setup.
+- `TelemetryNames.ErrorType` is `error.type`, the OpenTelemetry tag for a failed operation.
+- `HistogramBuckets.Seconds` - bucket advice for a duration in seconds, 0.001 to 10. The SDK's default buckets are
+  sized for milliseconds.
+- `activity.RecordError(exception)` - sets the status to `Error` with the message and adds the exception as an
+  event. Does nothing on a `null` activity.
 
 ## Logs (generic pipeline)
 
@@ -296,7 +321,7 @@ reference to `Binacle.CompactNotation` — a feature plugs in its own request an
 The concrete packing feature (the request/entry types and their registration) lives in DiagnosticsModule — see
 `$api/modules/diagnostics`.
 
-`BinacleService` is the live producer: it injects `IOptionalDependency<Channel<AlgorithmOperationLogChannelRequest>>`
+`PackingLogBinacleService` (`$api/service`, Telemetry) is the live producer: it injects `IOptionalDependency<Channel<AlgorithmOperationLogChannelRequest>>`
 and writes via `WriteToChannelAsync(...)`, which **no-ops when the channel isn't registered** (i.e. when the
 DiagnosticsModule packing-log feature is off).
 

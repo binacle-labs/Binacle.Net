@@ -60,7 +60,7 @@ table of [README.md](README.md).
   paths: ["api/src/Binacle.Net/Configuration/BinPresetOptions.cs", "api/src/Binacle.Net/Config_Files/Presets.json"]
 - file: api/service.md
   description: "IBinacleService — method reference for SingleBinAsync, MultipleBinsAsync, SmallestBinAsync, BestBinAsync; return types, call pattern, and algorithm selection"
-  paths: ["api/src/Binacle.Net/Services/**"]
+  paths: ["api/src/Binacle.Net/Services/**", "api/src/Binacle.Net/Telemetry/**"]
 - file: api/tests.md
   description: "api/test integration tests — layout, v3/v4 HTTP conventions, validBinId, preset keys, special bins, base-class asserts, and test host config"
   paths: ["api/test/**"]

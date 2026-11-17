@@ -89,6 +89,8 @@ internal class MyEndpoint : IGroupedEndpoint<ApiV4EndpointGroup>
 }
 ```
 
+`Diagnostics` is the API's own source, in `Binacle.Net.Telemetry` - see `$api/service`, Telemetry.
+
 Tags group endpoints in OpenAPI. Current tags: `Fit`, `Pack`, `Presets`.
 
 ## Request Validation Flow
