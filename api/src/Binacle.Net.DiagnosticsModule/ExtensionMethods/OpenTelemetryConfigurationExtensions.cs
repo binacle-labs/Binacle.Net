@@ -25,6 +25,8 @@ internal static class OpenTelemetryConfigurationExtensions
 				serviceInstanceId: options.ServiceInstanceId
 			)
 			.AddHostAndProcess()
+			// Read again so OTEL_RESOURCE_ATTRIBUTES and OTEL_SERVICE_NAME beat the values above.
+			.AddEnvironmentVariableDetector()
 			.AddOptionalAdditionalAttributes(options)
 		);
 

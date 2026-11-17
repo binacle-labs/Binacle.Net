@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### 🧪 Diagnostics Module
+- **Each OpenTelemetry signal can be turned off on its own for OTLP.** `Otlp.Metrics`, `Otlp.Tracing` and `Otlp.Logging` are new keys, each `true` by default, so an existing config sends the same as before. A signal turned off is not exported over OTLP at all. Azure Monitor ignores these keys and still gets all three. With all three off, OTLP sends nothing and a warning is logged at startup.  
+- **With any of the three off, the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` environment variables are not read.** The signals still on share the one endpoint from `Otlp.Endpoint` or `OTEL_EXPORTER_OTLP_ENDPOINT`. With all three on they work as before.  
+- **`ServiceInstanceId` is now `null` by default, so each start gets its own unique id.** It shipped as `"1"`, which made every running copy look like the same one. If a dashboard or alert filters on `"1"`, change it, or set `ServiceInstanceId` yourself to keep one id across restarts.  
+- **The `AdditionalAttributes` under `Metrics`, `Tracing` and `Logging` are deprecated.** They still work, and a warning is logged at startup when one has values. Move the values to the top-level `AdditionalAttributes`, which applies to every signal. They will be removed in 4.0.0.  
+- **Packing spans are now sent in production.** The `Binacle.Net` trace source was only listed in the Development config, so other environments never sent the pack and fit spans. It is now always on, and `Tracing.AdditionalSources` is only for extra sources.  
+- **The resource now carries `host.name` and `process.pid`.** Before, only log records carried the machine name and process id, so traces and metrics had no host at all. A value set in `AdditionalAttributes` still wins.  
+- **`OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME` now work.** They were read, but lost to the values Binacle sets, so `host.name`, `process.pid`, the instance id and the service name could not be changed through them. They now win over Binacle's defaults and over `ServiceInstanceId`. The top-level `AdditionalAttributes` still wins over them. With Azure Monitor, `OTEL_SERVICE_NAME` also changes the role name.  
+- **Health-check requests no longer appear in traces or in the HTTP request metrics.** Each probe made a span and counted as a request, which buried real traffic under probes. The health checks themselves are unchanged.  
+
+### 🏗️ Internal Work
+- **The OpenTelemetry packages inside the image moved from 1.18 to 1.21.**  
+- **Minor and patch updates to the other NuGet packages inside the image**: Scalar 2.21.0, Swagger UI 10.3.1, FluentValidation 12.2.0, Azure.Data.Tables 12.13.0, Microsoft.OpenApi 2.13.1 and the bundled SQLite build 2.1.14.  
+- **Test and build dependencies updated**: code coverage 18.12.0, Grpc.Tools 2.85.0 and the time provider testing package 10.11.0.  
+
 ## [3.1.1] - 2026-11-16
 
 ### 🧪 Diagnostics Module

@@ -177,7 +177,8 @@ public static class ModuleDefinition
 
 						return healthChecksOptions.Value.RestrictedChecks.Contains(check.Name);
 					}
-				});
+				})
+				.DisableHttpMetrics();
 		}
 	}
 }

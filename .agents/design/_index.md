@@ -25,8 +25,11 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: api/decisions.md
-  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, and why the instance page renders its presets from a startup snapshot rather than a live provider."
+  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, why the instance page renders its presets from a startup snapshot rather than a live provider, and why OpenTelemetry's switches, endpoint paths and resource order are what they are."
   paths: ["api/**"]
+- file: api/findings.md
+  description: "API findings — the scratch-test evidence behind the OpenTelemetry decisions (exporter switching, endpoint paths, env vars, resource order)."
+  paths: ["api/src/Binacle.Net.DiagnosticsModule/**"]
 ```
 
 ## CI/CD

@@ -67,6 +67,7 @@ this is wired at all** and the path 404s:
 - Maps `/_health` (configurable path) with full JSON response via `UIResponseWriter`
 - Health status codes: `Healthy/Degraded → 200`, `Unhealthy → 503`
 - The `RestrictedChecks` allow-list is applied as the map's `Predicate`
+- `.DisableHttpMetrics()` on the map, so probes are not counted in the ASP.NET Core request metrics
 
 This module registers two `InstanceOptions` entries, each with the path it answers on. `DebugEndpoint` is added
 in the builder phase behind `DEBUG_ENDPOINT`, the same way `SWAGGER_UI` and `SCALAR_UI` do in `Program.cs`.
@@ -194,8 +195,17 @@ Top-level fields:
 - `ServiceInstanceId` — unique instance ID (default: `null`, so the SDK generates a new one each start).
 - `AdditionalAttributes` — key-value attributes attached to all telemetry.
 
-The resource always carries `host.name` and `process.pid`, set in code before `AdditionalAttributes`, so a value
-there overrides them.
+The resource always carries `host.name` and `process.pid`. Who wins, lowest first:
+
+1. Binacle's values: `service.name` `"Binacle.Net"`, `ServiceNamespace`, `ServiceInstanceId`, `host.name`,
+   `process.pid`.
+2. `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME`. The SDK reads them before the code runs, so
+   `ConfigureResource` reads them again with `AddEnvironmentVariableDetector()` after step 1. Without that they
+   lose to step 1. They also beat the `ServiceInstanceId` key. `OTEL_SERVICE_NAME` beats a `service.name` inside
+   `OTEL_RESOURCE_ATTRIBUTES`.
+3. The top-level `AdditionalAttributes`.
+
+The detector reads `IConfiguration`, so the tests feed it in-memory values instead of real environment variables.
 
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
@@ -222,7 +232,7 @@ Azure Monitor exporter (`AzureMonitor`):
 
 The `Binacle.Net` trace source (`Diagnostics.ActivitySource` in the Kernel) is always on, added in code.
 Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
-by segment). `/_debug` is traced.
+by segment). The map also disables the request metrics for that path (see the health-check list above). `/_debug` is traced.
 `Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
 
 `Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
