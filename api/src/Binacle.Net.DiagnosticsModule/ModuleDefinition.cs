@@ -1,4 +1,5 @@
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
+using Binacle.Net.DiagnosticsModule.Configuration.Validators;
 using Binacle.Net.DiagnosticsModule.ExtensionMethods;
 using Binacle.Net.DiagnosticsModule.Middleware;
 using Binacle.Net.DiagnosticsModule.Services;
@@ -70,6 +71,7 @@ public static class ModuleDefinition
 
 		if (openTelemetryOptions?.IsEnabled() ?? false)
 		{
+			OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid(openTelemetryOptions);
 			Log.Information("OpenTelemetry is enabled.");
 
 			builder.Services

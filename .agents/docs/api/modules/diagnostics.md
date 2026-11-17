@@ -209,7 +209,9 @@ The detector reads `IConfiguration`, so the tests feed it in-memory values inste
 
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
-- `Endpoint` (string, e.g. `http://localhost:4317`)
+- `Endpoint` (string, e.g. `http://localhost:4317`). With `Enabled`, it must be an absolute `http` or `https` URL.
+  The module reads these options while registering services, before `ValidateOnStart` runs, so it calls
+  `OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid` first. Without that, `new Uri()` throws a raw error.
 - `Protocol` — `"grpc"` (default) or `"http/protobuf"`. The older `"httpProtobuf"` is still accepted. Anything else fails validation at startup.
 - `Metrics`, `Tracing`, `Logging` (bool, default true) — per-signal OTLP switches. Azure Monitor ignores them.
   - All three on: `UseOtlpExporter`. It also reads the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` variables.

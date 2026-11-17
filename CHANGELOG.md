@@ -11,6 +11,7 @@
 - **The resource now carries `host.name` and `process.pid`.** Before, only log records carried the machine name and process id, so traces and metrics had no host at all. A value set in `AdditionalAttributes` still wins.  
 - **`OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME` now work.** They were read, but lost to the values Binacle sets, so `host.name`, `process.pid`, the instance id and the service name could not be changed through them. They now win over Binacle's defaults and over `ServiceInstanceId`. The top-level `AdditionalAttributes` still wins over them. With Azure Monitor, `OTEL_SERVICE_NAME` also changes the role name.  
 - **Health-check requests no longer appear in traces or in the HTTP request metrics.** Each probe made a span and counted as a request, which buried real traffic under probes. The health checks themselves are unchanged.  
+- **`Otlp.Endpoint` is now checked at startup.** With OTLP on, it must be an absolute `http` or `https` URL, such as `http://localhost:4317`. Before, nothing checked it, and a value that is not a URL threw a raw `UriFormatException`. A bad `Otlp.Protocol` next to an endpoint also threw a raw exception before its own check ran. Both now stop startup with a clear message naming the key.  
 
 ### 🏗️ Internal Work
 - **The OpenTelemetry packages inside the image moved from 1.18 to 1.21.**  
