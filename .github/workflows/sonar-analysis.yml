@@ -20,7 +20,8 @@ concurrency:
 jobs:
   analyze:
     name: Analyse and publish
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: no Ruby 3.4.7 build exists for Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     # Full build plus every suite under coverage. The slowest workflow here.
     timeout-minutes: 45
     permissions:
@@ -67,7 +68,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Java
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           distribution: temurin
           java-version: 17

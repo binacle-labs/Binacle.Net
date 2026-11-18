@@ -30,7 +30,8 @@ jobs:
   deploy:
     name: Build and deploy the site
     needs: suite
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: no Ruby 3.4.7 build exists for Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
       contents: read
