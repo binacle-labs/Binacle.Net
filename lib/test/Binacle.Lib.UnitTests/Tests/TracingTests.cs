@@ -15,12 +15,14 @@ public class TracingTests : IDisposable
 
 	public TracingTests()
 	{
-		// Other tests in the run also call the processors, so only spans under this test's root are kept.
+		// Other tests in the run also call the processors, so only spans under this test's root are kept. Until the
+		// root starts, traceId is default, which is also the parent trace id of every span with no parent.
 		this.listener = new ActivityListener
 		{
 			ShouldListenTo = source => source.Name == "Binacle.Lib" || source == this.testSource,
 			Sample = (ref ActivityCreationOptions<ActivityContext> options) =>
-				options.Source == this.testSource || options.Parent.TraceId == this.traceId
+				options.Source == this.testSource
+				|| (this.traceId != default && options.Parent.TraceId == this.traceId)
 					? ActivitySamplingResult.AllDataAndRecorded
 					: ActivitySamplingResult.None,
 			ActivityStopped = activity => this.activities.Enqueue(activity)
@@ -63,7 +65,9 @@ public class TracingTests : IDisposable
 				.Process(Bins()[1], Items(), pack).Values);
 		}
 
-		var lib = this.activities.Where(x => x.Source.Name == "Binacle.Lib").ToList();
+		var lib = this.activities
+			.Where(x => x.Source.Name == "Binacle.Lib" && x.TraceId == this.traceId)
+			.ToList();
 
 		var bins = lib.Where(x => x.DisplayName == "process bins").ShouldHaveSingleItem();
 		bins.GetTagItem("binacle.lib.processor").ShouldBe("loop");

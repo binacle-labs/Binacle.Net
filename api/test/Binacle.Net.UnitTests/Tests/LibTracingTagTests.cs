@@ -29,12 +29,14 @@ public class LibTracingTagTests : IDisposable
 			.AddBinacleServices()
 			.BuildServiceProvider();
 
-		// Other tests in the run also call the lib, so only spans under this test's root are kept.
+		// Other tests in the run also call the lib, so only spans under this test's root are kept. Until the root
+		// starts, traceId is default, which is also the parent trace id of every span with no parent.
 		this.listener = new ActivityListener
 		{
 			ShouldListenTo = source => source.Name == "Binacle.Lib" || source == this.testSource,
 			Sample = (ref ActivityCreationOptions<ActivityContext> options) =>
-				options.Source == this.testSource || options.Parent.TraceId == this.traceId
+				options.Source == this.testSource
+				|| (this.traceId != default && options.Parent.TraceId == this.traceId)
 					? ActivitySamplingResult.AllDataAndRecorded
 					: ActivitySamplingResult.None,
 			ActivityStopped = activity => this.activities.Enqueue(activity)
@@ -74,7 +76,9 @@ public class LibTracingTagTests : IDisposable
 			result = await service.SingleBinAsync(SmallBin(), Items(), parameters, TestContext.Current.CancellationToken);
 		}
 
-		var lib = this.activities.Where(x => x.Source.Name == "Binacle.Lib").ToList();
+		var lib = this.activities
+			.Where(x => x.Source.Name == "Binacle.Lib" && x.TraceId == this.traceId)
+			.ToList();
 
 		var processor = lib.Where(x => x.DisplayName == "process algorithms").ShouldHaveSingleItem();
 		processor.GetTagItem(PackingTags.Operation).ShouldBe(PackingTags.ToTag(operation));
