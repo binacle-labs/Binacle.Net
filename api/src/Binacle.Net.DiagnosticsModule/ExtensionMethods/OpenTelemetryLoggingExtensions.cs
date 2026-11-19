@@ -12,8 +12,10 @@ internal static class OpenTelemetryLoggingExtensions
 	{
 		builder.WarnIfDeprecatedAttributes(options, "Logging");
 
-		builder.Builder.WithLogging(logging => logging
-			.ConfigureResource(resource => resource.AddOptionalAdditionalAttributes(options))
+		builder.Builder.WithLogging(
+			logging => logging.ConfigureResource(resource => resource.AddOptionalAdditionalAttributes(options)),
+			// Without this the body is the template, with {placeholders}, not the rendered message.
+			loggerOptions => loggerOptions.IncludeFormattedMessage = true
 		);
 
 		return builder;

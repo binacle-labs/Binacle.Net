@@ -53,6 +53,40 @@ public class OpenTelemetryResourceTests
 	}
 
 	[Fact]
+	public void The_resource_has_the_host_environment_lowercased()
+	{
+		var attributes = ResourceFor(new OpenTelemetryConfigurationOptions(), new Dictionary<string, string?>());
+
+		attributes["deployment.environment.name"].ShouldBe("staging");
+	}
+
+	[Fact]
+	public void The_resource_attributes_variable_beats_the_host_environment()
+	{
+		var environment = new Dictionary<string, string?>
+		{
+			["OTEL_RESOURCE_ATTRIBUTES"] = "deployment.environment.name=from-env"
+		};
+
+		var attributes = ResourceFor(new OpenTelemetryConfigurationOptions(), environment);
+
+		attributes["deployment.environment.name"].ShouldBe("from-env");
+	}
+
+	[Fact]
+	public void Additional_attributes_beat_the_host_environment()
+	{
+		var options = new OpenTelemetryConfigurationOptions
+		{
+			AdditionalAttributes = new Dictionary<string, object> { ["deployment.environment.name"] = "from-config" }
+		};
+
+		var attributes = ResourceFor(options, new Dictionary<string, string?>());
+
+		attributes["deployment.environment.name"].ShouldBe("from-config");
+	}
+
+	[Fact]
 	public void The_resource_attributes_variable_beats_the_defaults_and_the_instance_id_key()
 	{
 		var options = new OpenTelemetryConfigurationOptions { ServiceInstanceId = "from-key" };
@@ -114,7 +148,7 @@ public class OpenTelemetryResourceTests
 		var builder = services
 			.AddOpenTelemetry()
 			.WithLogger(new LoggerConfiguration().CreateLogger())
-			.ConfigureResource(options);
+			.ConfigureResource(options, "Staging");
 
 		builder.Builder.WithTracing(_ => { });
 

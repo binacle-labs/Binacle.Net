@@ -11,7 +11,7 @@ internal static class PackingTags
 	public const string ItemCount = "binacle.packing.item.count";
 	public const string ItemQuantity = "binacle.packing.item.quantity";
 
-	public const string AllAlgorithms = "all";
+	public const string BestAlgorithm = "best";
 
 	public static string ToTag(AlgorithmOperation operation) => operation switch
 	{

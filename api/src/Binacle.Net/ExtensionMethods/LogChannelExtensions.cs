@@ -33,7 +33,7 @@ internal static class LogChannelExtensions
 		);
 	}
 
-	internal static async ValueTask WriteToChannelAsync<TBin, TBox, TParams>(
+	internal static ValueTask WriteToChannelAsync<TBin, TBox, TParams>(
 		this Channel<AlgorithmOperationLogChannelRequest>? logChannel,
 		List<TBin> bins,
 		List<TBox> items,
@@ -47,26 +47,21 @@ internal static class LogChannelExtensions
 	{
 		if (logChannel is null)
 		{
-			return;
+			return ValueTask.CompletedTask;
 		}
 
-		using var channelActivity = Diagnostics.ActivitySource.StartActivity("Send Channel Request");
+		using var channelActivity = Diagnostics.ActivitySource.StartActivity("queue packing_log");
 
 		try
 		{
-			await logChannel
-				.Writer
-				.WriteAsync(
-					AlgorithmOperationLogChannelRequest.From(bins, items, parameters, results)
-				);
+			// False once the packing log has stopped. Its meter counts that, so it is not logged per request.
+			logChannel.Writer.TryWrite(AlgorithmOperationLogChannelRequest.From(bins, items, parameters, results));
 		}
 		catch (Exception ex)
 		{
-			if (logger is null)
-			{
-				return;
-			}
-			logger.LogError(ex, "Error while writing to channel");
+			logger?.LogError(ex, "Error while writing to channel");
 		}
+
+		return ValueTask.CompletedTask;
 	}
 }

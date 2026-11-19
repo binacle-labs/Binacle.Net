@@ -58,8 +58,6 @@ internal class ByPreset : IGroupedEndpoint<ApiV3EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Fit by Preset: v3");
-		
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			if (!presetOptions.Value.Presets.TryGetValue(preset, out var presetOption))
@@ -75,7 +73,7 @@ internal class ByPreset : IGroupedEndpoint<ApiV3EndpointGroup>
 				cancellationToken
 			);
 
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					FitResponse.Create(

@@ -12,6 +12,7 @@ public static class ActivityExtensions
 		}
 
 		activity.SetStatus(ActivityStatusCode.Error, exception.Message);
+		activity.SetTag(TelemetryNames.ErrorType, TelemetryNames.ErrorTypeOf(exception));
 		activity.AddException(exception);
 	}
 }

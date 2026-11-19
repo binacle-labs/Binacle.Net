@@ -7,16 +7,16 @@ namespace Binacle.Net.Telemetry;
 internal sealed class PackingMetrics
 {
 	public const string DurationName = "binacle.packing.operation.duration";
-	public const string SizeName = "binacle.packing.operation.size";
+	public const string ItemsName = "binacle.packing.operation.items";
 	public const string ResultsName = "binacle.packing.results";
 
 	private readonly Histogram<double> duration;
-	private readonly Histogram<int> size;
+	private readonly Histogram<int> items;
 	private readonly Counter<long> results;
 
 	public PackingMetrics(IMeterFactory meterFactory)
 	{
-		var meter = meterFactory.Create(Diagnostics.Name);
+		var meter = meterFactory.Create(new MeterOptions(Diagnostics.Name) { Version = Metadata.Version });
 
 		this.duration = meter.CreateHistogram(
 			DurationName,
@@ -25,8 +25,8 @@ internal sealed class PackingMetrics
 			advice: new InstrumentAdvice<double> { HistogramBucketBoundaries = HistogramBuckets.Seconds }
 		);
 
-		this.size = meter.CreateHistogram(
-			SizeName,
+		this.items = meter.CreateHistogram(
+			ItemsName,
 			unit: "{item}",
 			description: "Items in one operation, counting each unit of quantity.",
 			advice: new InstrumentAdvice<int>
@@ -42,14 +42,14 @@ internal sealed class PackingMetrics
 		);
 	}
 
-	public void RecordSize(int quantity, string operation, string mode)
+	public void RecordItems(int quantity, string operation, string mode)
 	{
 		var tags = new TagList
 		{
 			{ PackingTags.Operation, operation },
 			{ PackingTags.Mode, mode }
 		};
-		this.size.Record(quantity, tags);
+		this.items.Record(quantity, tags);
 	}
 
 	public void RecordDuration(TimeSpan elapsed, in TagList tags) => this.duration.Record(elapsed.TotalSeconds, tags);

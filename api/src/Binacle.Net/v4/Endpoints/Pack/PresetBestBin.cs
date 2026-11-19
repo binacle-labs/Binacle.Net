@@ -59,8 +59,6 @@ internal class PresetBestBin : IGroupedEndpoint<ApiV4EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Pack Preset Best Bin: v4");
-
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			if (!presetOptions.Value.TryGetPreset(preset, out var presetOption))
@@ -91,7 +89,7 @@ internal class PresetBestBin : IGroupedEndpoint<ApiV4EndpointGroup>
 				);
 			}
 
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					PackBinResponse.From(

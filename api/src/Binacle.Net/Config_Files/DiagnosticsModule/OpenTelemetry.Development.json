@@ -3,6 +3,11 @@
 		"Otlp": {
 			"Enabled": true,
 			"Endpoint": "http://localhost:18889"
+		},
+		"Tracing": {
+			"AdditionalSources": [
+				"Binacle.Lib"
+			]
 		}
 	}
 }

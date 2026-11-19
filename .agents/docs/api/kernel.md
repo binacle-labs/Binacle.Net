@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-09-29
+verified: 2026-11-19
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -291,10 +291,11 @@ Timed operations (in `Kernel/Logging`):
 - `TelemetryNames.Wildcard` (`Binacle.Net*`) is what the DiagnosticsModule passes to `AddMeter` and `AddSource`,
   so a new module's meter or source is collected without a change to the OpenTelemetry setup.
 - `TelemetryNames.ErrorType` is `error.type`, the OpenTelemetry tag for a failed operation.
+  `TelemetryNames.ErrorTypeOf(exception)` is its value: the exception's full type name.
 - `HistogramBuckets.Seconds` - bucket advice for a duration in seconds, 0.001 to 10. The SDK's default buckets are
   sized for milliseconds.
-- `activity.RecordError(exception)` - sets the status to `Error` with the message and adds the exception as an
-  event. Does nothing on a `null` activity.
+- `activity.RecordError(exception)` - sets the status to `Error` with the message, sets `error.type`, and adds the
+  exception as an event. Does nothing on a `null` activity.
 
 ## Logs (generic pipeline)
 
@@ -306,9 +307,14 @@ reference to `Binacle.CompactNotation` — a feature plugs in its own request an
 - `LogsProcessor<TRequest, TLog>` (`Logs/Services`, `where TRequest : ILogEntryConvertible<TLog>`) — a generic
   `BackgroundService`. Drains a `Channel<TRequest>`, calls `request.ToLogEntry(timeProvider.GetUtcNow())`,
   JSON-serialises the entry, and appends one line to a dated file. Knows nothing about any feature's types.
+  It reads with `TryRead` outside the `try`, so one exception loses at most one entry and a cancelled read loses
+  none.
+  When it stops - too many consecutive failures, or host shutdown - it completes the channel, so later writes
+  are refused, and calls `OnDiscarded` for each entry still queued.
 - `LogsProcessorOptions<TChannelRequest>` (`Logs/Models`) — `Path` / `FileNameFormat` / `DateFormat` +
-  `MaxConsecutiveAllowedExceptions` (default 10) and `RetentionDays` (nullable, default null). The type param
-  only keys the DI registration.
+  `MaxConsecutiveAllowedExceptions` (default 10), `RetentionDays` (nullable, default null), and three optional
+  hooks, each called once per entry: `OnWritten`, `OnWriteFailed` (with the exception), and `OnDiscarded`. They let
+  a feature count entries without the Kernel knowing its metrics. The type param only keys the DI registration.
 - `LogsRetentionProcessor<TRequest>` (`Logs/Services`) — a second `BackgroundService` that deletes files past
   `RetentionDays`. It runs its own loop and never touches the write channel, so a slow sweep cannot stall
   logging. `RetentionDays` null means it does nothing: these logs are an archive, so deletion is opt-in.

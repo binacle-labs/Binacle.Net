@@ -50,8 +50,6 @@ internal class ByCustom : IGroupedEndpoint<ApiV3EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Pack by Custom: v3");
-		
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			var operationResults = await binacleService.MultipleBinsAsync(
@@ -62,7 +60,7 @@ internal class ByCustom : IGroupedEndpoint<ApiV3EndpointGroup>
 				cancellationToken
 			);
 
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					PackResponse.Create(

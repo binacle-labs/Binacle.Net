@@ -21,7 +21,6 @@ internal sealed class PackingScope : IDisposable
 	public static PackingScope Start(
 		PackingMetrics metrics,
 		ILogger logger,
-		string name,
 		PackingMode mode,
 		Algorithm? algorithm,
 		int binCount,
@@ -41,10 +40,12 @@ internal sealed class PackingScope : IDisposable
 		{
 			{ PackingTags.Operation, operation },
 			{ PackingTags.Mode, modeTag },
-			{ PackingTags.RequestAlgorithm, algorithm.HasValue ? PackingTags.ToTag(algorithm.Value) : PackingTags.AllAlgorithms }
+			{ PackingTags.RequestAlgorithm, algorithm.HasValue ? PackingTags.ToTag(algorithm.Value) : PackingTags.BestAlgorithm }
 		};
 
-		var timedOperation = logger.BeginTimedActivityOperation(name, Diagnostics.ActivitySource);
+		var timedOperation = logger.BeginTimedActivityOperation(
+			LogLevel.Debug, $"{operation} {modeTag}", Diagnostics.ActivitySource
+		);
 		if (timedOperation.Activity is { IsAllDataRequested: true } activity)
 		{
 			foreach (var tag in tags)
@@ -57,7 +58,7 @@ internal sealed class PackingScope : IDisposable
 			activity.SetTag(PackingTags.ItemQuantity, quantity);
 		}
 
-		metrics.RecordSize(quantity, operation, modeTag);
+		metrics.RecordItems(quantity, operation, modeTag);
 
 		return new PackingScope(metrics, timedOperation, tags);
 	}
@@ -74,7 +75,7 @@ internal sealed class PackingScope : IDisposable
 		catch (Exception ex)
 		{
 			var errorTags = this.tags;
-			errorTags.Add(TelemetryNames.ErrorType, ex.GetType().FullName);
+			errorTags.Add(TelemetryNames.ErrorType, TelemetryNames.ErrorTypeOf(ex));
 			this.metrics.RecordDuration(Stopwatch.GetElapsedTime(start), errorTags);
 
 			this.timedOperation.Activity.RecordError(ex);

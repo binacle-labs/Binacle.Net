@@ -17,6 +17,7 @@ internal static class LogProcessorServiceCollectionExtensions
 			optionsFactory: sp =>
 			{
 				var options = sp.GetRequiredService<IOptions<PackingLogsConfigurationOptions>>().Value;
+				var metrics = sp.GetRequiredService<PackingLogMetrics>();
 
 				return new LogsProcessorOptions<AlgorithmOperationLogChannelRequest>
 				{
@@ -24,6 +25,9 @@ internal static class LogProcessorServiceCollectionExtensions
 					FileNameFormat = options.FileName!,
 					DateFormat = options.DateFormat!,
 					RetentionDays = options.RetentionDays,
+					OnWritten = metrics.EntryWritten,
+					OnWriteFailed = metrics.EntryFailed,
+					OnDiscarded = metrics.EntryDiscarded,
 				};
 			},
 			channelFactory: sp =>
@@ -31,11 +35,12 @@ internal static class LogProcessorServiceCollectionExtensions
 				var options = sp.GetRequiredService<IOptions<PackingLogsConfigurationOptions>>().Value;
 				var metrics = sp.GetRequiredService<PackingLogMetrics>();
 
+				int? capacity = options.ChannelLimit is > 0 ? options.ChannelLimit : null;
 				Channel<AlgorithmOperationLogChannelRequest> channel;
-				if (options.ChannelLimit is > 0)
+				if (capacity is not null)
 				{
 					channel = Channel.CreateBounded<AlgorithmOperationLogChannelRequest>(
-						new BoundedChannelOptions(options.ChannelLimit.Value)
+						new BoundedChannelOptions(capacity.Value)
 						{
 							FullMode = BoundedChannelFullMode.DropWrite,
 							SingleReader = true,
@@ -50,15 +55,16 @@ internal static class LogProcessorServiceCollectionExtensions
 					channel = Channel.CreateUnbounded<AlgorithmOperationLogChannelRequest>(
 						new UnboundedChannelOptions
 						{
-							SingleReader = true,
+							// A single-reader unbounded channel cannot count, and queue.size needs Reader.Count.
+							SingleReader = false,
 							SingleWriter = false,
 							AllowSynchronousContinuations = false
 						});
 				}
 
-				metrics.ObserveQueue(channel);
+				metrics.ObserveQueue(channel, capacity);
 
-				return channel;
+				return new RefusalCountingChannel<AlgorithmOperationLogChannelRequest>(channel, metrics.EntryDiscarded);
 			});
 	}
 }

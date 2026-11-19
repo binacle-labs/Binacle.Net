@@ -14,7 +14,8 @@ internal static class OpenTelemetryConfigurationExtensions
 
 	public static BinacleOpenTelemetryBuilder ConfigureResource(
 		this BinacleOpenTelemetryBuilder builder,
-		OpenTelemetryConfigurationOptions options
+		OpenTelemetryConfigurationOptions options,
+		string environmentName
 	)
 	{
 		builder.Builder.ConfigureResource(resource => resource
@@ -25,6 +26,7 @@ internal static class OpenTelemetryConfigurationExtensions
 				serviceInstanceId: options.ServiceInstanceId
 			)
 			.AddHostAndProcess()
+			.AddDeploymentEnvironment(environmentName)
 			// Read again so OTEL_RESOURCE_ATTRIBUTES and OTEL_SERVICE_NAME beat the values above.
 			.AddEnvironmentVariableDetector()
 			.AddOptionalAdditionalAttributes(options)
@@ -39,6 +41,16 @@ internal static class OpenTelemetryConfigurationExtensions
 		{
 			["host.name"] = Environment.MachineName,
 			["process.pid"] = Environment.ProcessId
+		};
+
+		return builder.AddAttributes(attributes);
+	}
+
+	public static ResourceBuilder AddDeploymentEnvironment(this ResourceBuilder builder, string environmentName)
+	{
+		var attributes = new Dictionary<string, object>
+		{
+			["deployment.environment.name"] = environmentName.ToLowerInvariant()
 		};
 
 		return builder.AddAttributes(attributes);

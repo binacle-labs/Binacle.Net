@@ -63,8 +63,6 @@ internal class PresetBin : IGroupedEndpoint<ApiV4EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Pack Preset Bin: v4");
-		
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			if (!presetOptions.Value.TryGetPresetBin(preset, bin, out var binOption))
@@ -95,7 +93,7 @@ internal class PresetBin : IGroupedEndpoint<ApiV4EndpointGroup>
 				);
 			}
 			
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					PackBinResponse.From(

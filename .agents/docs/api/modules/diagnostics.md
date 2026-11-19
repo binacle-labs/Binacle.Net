@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-11-17
+verified: 2026-11-19
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
 also_update:
   - api/configuration
@@ -137,6 +137,19 @@ Property: `Application: Binacle.Net`.
 
 Override logging by creating `Serilog.Production.json` at `/app/Config_Files/DiagnosticsModule/`.
 
+**To OpenTelemetry:** `writeToProviders: true` hands every Serilog event to the OTel logger provider, so
+Serilog's levels decide first. Each record carries the template's values and the Serilog properties as
+attributes, plus the trace and span id. `IncludeFormattedMessage` is set in `OpenTelemetryLoggingExtensions`;
+without it the body is the raw template, `pack single_bin completed in {OperationDurationMs}ms`. Seen in the
+Aspire dashboard, 2026-11-19.
+
+The body is Serilog's own rendering, which quotes string values: `Now listening on: "https://localhost:7194"`.
+Serilog has no setting for it. The console drops the quotes because its template uses `{Message:lj}`.
+
+**The packing timed line** - `{operation} {mode} completed in {OperationDurationMs}ms` - is Debug, so it is off
+at the default level. `Override: Binacle.Net.Telemetry → Debug` brings it back. `OperationDurationMs` stays in
+milliseconds: it is a log value, not a metric, and changing it breaks anyone grepping the file.
+
 ## Health checks
 
 Default: **disabled**. Default path: `/_health`.
@@ -195,10 +208,11 @@ Top-level fields:
 - `ServiceInstanceId` — unique instance ID (default: `null`, so the SDK generates a new one each start).
 - `AdditionalAttributes` — key-value attributes attached to all telemetry.
 
-The resource always carries `host.name` and `process.pid`. Who wins, lowest first:
+The resource always carries `host.name`, `process.pid` and `deployment.environment.name`, the host environment
+lowercased (`production`, `development`). Who wins, lowest first:
 
 1. Binacle's values: `service.name` `"Binacle.Net"`, `ServiceNamespace`, `ServiceInstanceId`, `host.name`,
-   `process.pid`.
+   `process.pid`, `deployment.environment.name`.
 2. `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME`. The SDK reads them before the code runs, so
    `ConfigureResource` reads them again with `AddEnvironmentVariableDetector()` after step 1. Without that they
    lose to step 1. They also beat the `ServiceInstanceId` key. `OTEL_SERVICE_NAME` beats a `service.name` inside
@@ -232,13 +246,26 @@ Azure Monitor exporter (`AzureMonitor`):
 - `EnableLiveMetrics` (bool, default false)
 - `SamplingRatio` (float, default 1 = 100%)
 
+Azure Monitor maps only the `service.*` and `k8s.*` resource attributes onto its records (exporter 1.8.3).
+`deployment.environment.name`, `host.name` and `process.pid` reach it only through its `_OTELRESOURCE_` metric,
+which `OTEL_DOTNET_AZURE_MONITOR_ENABLE_RESOURCE_METRICS` turns on.
+
 Every meter and trace source named `Binacle.Net*` is always on, added in code through `TelemetryNames.Wildcard`
 (`$api/kernel`, Telemetry). That covers the API's `Binacle.Net` source and meter (`$api/service`, Telemetry) and
 this module's `Binacle.Net.DiagnosticsModule` meter. Tested in
 `api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/ModuleTelemetryWildcardTests.cs`.
+Each carries `Metadata.Version` as its scope version. `IMeterFactory` caches by name, version and tags, so every
+`Create` of one meter must pass the same version. The `Binacle.Lib` source has no version: its assembly is not
+stamped, and the resource's `service.version` already names the release.
 Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
 by segment). The map also disables the request metrics for that path (see the health-check list above). `/_debug` is traced.
 `Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
+
+**`Binacle.Lib` spans are off by default.** The lib's source is not `Binacle.Net*`, so the wildcard misses it. That
+is on purpose: there is one span per processor call and one `build result` per result, so a smallest-bin run over
+50 bins with 3 algorithms sends about 150 spans for one request. Turn them on with
+`Tracing.AdditionalSources: ["Binacle.Lib"]`. `OpenTelemetry.Development.json` does, so they show in dev.
+The span names and tags are in `$lib/processors#diagnostics`.
 
 `Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
 3.2.0, removed in 4.0.0). They are no longer in the shipped JSON. The top-level `AdditionalAttributes` covers
@@ -272,12 +299,20 @@ Registration: `AddOptionsBasedPackingLogProcessor()` — no arguments — in Dia
 `IOptions<PackingLogsConfigurationOptions>` inside each so the config is read from DI rather than passed in.
 Gated by `PackingLogs.Enabled`.
 
-The channel factory resolves `PackingLogMetrics` (`Telemetry/PackingLogMetrics.cs`, a singleton), whose two
-instruments are on the `Binacle.Net.DiagnosticsModule` meter (`Telemetry/Diagnostics.cs`):
-- `binacle.packing_log.dropped_entries` (counter, `{entry}`) - only with `ChannelLimit` set. The channel uses
-  `DropWrite`, so a write to a full queue reports success and the entry is lost. The counter is the
-  `itemDropped` callback of `Channel.CreateBounded`.
-- `binacle.packing_log.queued_entries` (observable up-down counter, `{entry}`) - `channel.Reader.Count`.
+Both factories resolve `PackingLogMetrics` (`Telemetry/PackingLogMetrics.cs`, a singleton), whose instruments are
+on the `Binacle.Net.DiagnosticsModule` meter (`Telemetry/Diagnostics.cs`):
+- `binacle.packing_log.processed` (counter, `{entry}`) - one per entry, by `error.type`:
+  - none when written - the options' `OnWritten` hook;
+  - `queue_full` when dropped - the `itemDropped` callback of `Channel.CreateBounded`, so only with `ChannelLimit`
+    set. `DropWrite` reports success to the writer, so without the count a full queue loses entries unseen;
+  - the exception's full type name when the write threw - the `OnWriteFailed` hook;
+  - `already_shutdown` when the processor has stopped - the `OnDiscarded` hook for what was left in the queue, and
+    `RefusalCountingChannel` (`Telemetry/`) for each later write the completed channel refuses. The factory
+    returns the channel wrapped in it. The app writes with `TryWrite`, so a refused write is not logged.
+- `binacle.packing_log.queue.size` (observable up-down counter, `{entry}`) - `channel.Reader.Count`. The
+  unbounded channel is built with `SingleReader = false`, because a single-reader unbounded channel cannot count.
+- `binacle.packing_log.queue.capacity` (observable up-down counter, `{entry}`) - `ChannelLimit`, only when the
+  queue is bounded.
 
 Tested in `api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/PackingLogMetricsTests.cs`.
 

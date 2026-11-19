@@ -1,7 +1,7 @@
 ---
 id: api/service
 description: IBinacleService — method reference for SingleBinAsync, MultipleBinsAsync, SmallestBinAsync, BestBinAsync; return types, call pattern, and algorithm selection
-verified: 2026-11-18
+verified: 2026-11-19
 check: The Telemetry section matches api/src/Binacle.Net/Telemetry/ - names, tags, units and buckets - and the wrapping order in AddBinacleServices(); Method signatures, including the trailing CancellationToken, match api/src/Binacle.Net/Services/IBinacleService.cs; the call pattern matches a v4 endpoint handler; GetAlgorithm and ForFittingOperation/ForPackingOperation match api/src/Binacle.Net/v4/Contracts/OperationParameters.cs
 paths:
   - "api/src/Binacle.Net/Services/**"
@@ -105,19 +105,26 @@ See Result Selection (`$lib/result-selection`) for how `BestAlgorithm`, `Smalles
 | `BinacleService` | `Services/` | nothing - packing only |
 
 The order is set in `AddBinacleServices()` with `Decorate` (`$api/kernel`); the last call is the outermost. The log write is outside the instrumented call, so the duration is
-the packing alone, and the `Send Channel Request` span is not a child of the operation span.
+the packing alone, and the `queue packing_log` span is a sibling of the operation span, not its child.
 
 `InstrumentedBinacleService` opens a `PackingScope` (`Telemetry/PackingScope.cs`) per call. The scope starts the
-span through `BeginTimedActivityOperation`, records the size, times `RunAsync(...)` around the inner call, then
-`Record(...)` takes the result or results.
+span through `BeginTimedActivityOperation`, records the items, times `RunAsync(...)` around the inner call, then
+`Record(...)` takes the result or results. The span is named `{operation} {mode}` from the two tag values, e.g.
+`pack single_bin`. The same text is the timed log line's message.
 
-The API's source and meter are both `Binacle.Net` (`Telemetry/Diagnostics.cs`, `internal`). The endpoint spans
-use the same source. The meter is created through `IMeterFactory` in `PackingMetrics` (`Telemetry/PackingMetrics.cs`):
+One request makes this span tree, all on the `Binacle.Net` source under the HTTP server span:
+- `{operation} {mode}` - the packing call.
+- `queue packing_log` - the packing log write (`ExtensionMethods/LogChannelExtensions.cs`), with packing logs on.
+- `create response` - building the response, in each v3 and v4 endpoint handler.
+
+The endpoints start no span of their own. The HTTP server span already carries the route.
+
+The API's source and meter are both `Binacle.Net` (`Telemetry/Diagnostics.cs`, `internal`). The meter is created through `IMeterFactory` in `PackingMetrics` (`Telemetry/PackingMetrics.cs`):
 
 | Instrument | Type | Unit | Tags |
 |---|---|---|---|
 | `binacle.packing.operation.duration` | histogram, buckets 0.001-10 | `s` | operation, mode, request.algorithm; `error.type` on a throw |
-| `binacle.packing.operation.size` | histogram, buckets 1-10000 | `{item}` | operation, mode |
+| `binacle.packing.operation.items` | histogram, buckets 1-10000 | `{item}` | operation, mode |
 | `binacle.packing.results` | counter, one per result returned | `{result}` | operation, mode, request.algorithm, result.algorithm, result.status |
 
 The duration buckets are `HistogramBuckets.Seconds` from the Kernel (`$api/kernel`, Telemetry).
@@ -125,15 +132,18 @@ The duration buckets are `HistogramBuckets.Seconds` from the Kernel (`$api/kerne
 Tag keys and values are in `PackingTags` (`Telemetry/PackingTags.cs`), each key under `binacle.packing.`:
 - `operation`: `fit`, `pack`.
 - `mode`: `single_bin`, `multiple_bins`, `smallest_bin`, `best_bin`.
-- `request.algorithm`: `ffd`, `wfd`, `bfd`, or `all` when none is given.
-- `result.algorithm`: `ffd`, `wfd`, `bfd`. Under `all` it is the one the selector picked.
+- `request.algorithm`: `ffd`, `wfd`, `bfd`, or `best` when none is given. Every method without an algorithm picks one
+  result. `MultipleBinsAsync` picks the best algorithm for each bin, so it returns one result per bin, not one per
+  algorithm.
+- `result.algorithm`: `ffd`, `wfd`, `bfd`. Under `best` it is the one the selector picked.
 - `result.status`: `fully_packed`, `partially_packed`, `not_packed`, `early_exit`.
 
-The size is the sum of `Quantity`, not the number of item lines.
+The items value is the sum of `Quantity`, not the number of item lines.
 
 The span also gets `bin.count`, `item.count` and `item.quantity`, and for a single result `result.algorithm` and
 `result.status`. These are set only when the span records data. On a throw inside `RunAsync`, the span status is
-`Error` with the exception message, and the exception is added as an event.
+`Error` with the exception message, the exception is added as an event, and the span gets the same `error.type`
+as the duration. Both take it from `TelemetryNames.ErrorTypeOf` (`$api/kernel`, Telemetry).
 
-Tested in `api/test/Binacle.Net.UnitTests/Tests/PackingTelemetryTests.cs`, including that the SDK uses the
-bucket advice and that the log write is outside the operation span.
+Tested in `api/test/Binacle.Net.UnitTests/Tests/PackingTelemetryTests.cs`, including the span name for each
+method, that the SDK uses the bucket advice and that the log write is outside the operation span.

@@ -32,7 +32,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Single Bin Operation", PackingMode.SingleBin, algorithm, 1, items, parameters);
+		using var scope = this.Start(PackingMode.SingleBin, algorithm, 1, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.SingleBinAsync(algorithm, bin, items, parameters, cancellationToken)
 		);
@@ -50,7 +50,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Single Bin Operation", PackingMode.SingleBin, null, 1, items, parameters);
+		using var scope = this.Start(PackingMode.SingleBin, null, 1, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.SingleBinAsync(bin, items, parameters, cancellationToken)
 		);
@@ -69,7 +69,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Multiple Bin Operation", PackingMode.MultipleBins, algorithm, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.MultipleBins, algorithm, bins.Count, items, parameters);
 		var results = await scope.RunAsync(() =>
 			this.inner.MultipleBinsAsync(algorithm, bins, items, parameters, cancellationToken)
 		);
@@ -87,7 +87,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Multiple Bin Operation", PackingMode.MultipleBins, null, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.MultipleBins, null, bins.Count, items, parameters);
 		var results = await scope.RunAsync(() =>
 			this.inner.MultipleBinsAsync(bins, items, parameters, cancellationToken)
 		);
@@ -106,7 +106,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Smallest Bin Operation", PackingMode.SmallestBin, algorithm, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.SmallestBin, algorithm, bins.Count, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.SmallestBinAsync(algorithm, bins, items, parameters, cancellationToken)
 		);
@@ -124,7 +124,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Smallest Bin Operation", PackingMode.SmallestBin, null, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.SmallestBin, null, bins.Count, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.SmallestBinAsync(bins, items, parameters, cancellationToken)
 		);
@@ -143,7 +143,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Best Bin Operation", PackingMode.BestBin, algorithm, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.BestBin, algorithm, bins.Count, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.BestBinAsync(algorithm, bins, items, parameters, cancellationToken)
 		);
@@ -161,7 +161,7 @@ internal class InstrumentedBinacleService : IBinacleService
 		where TBox : class, IWithID, IWithQuantity, IIdentifiableItem
 		where TParams : class, IOperationParameters, ILogParametersProvider
 	{
-		using var scope = this.Start("Best Bin Operation", PackingMode.BestBin, null, bins.Count, items, parameters);
+		using var scope = this.Start(PackingMode.BestBin, null, bins.Count, items, parameters);
 		var result = await scope.RunAsync(() =>
 			this.inner.BestBinAsync(bins, items, parameters, cancellationToken)
 		);
@@ -170,11 +170,10 @@ internal class InstrumentedBinacleService : IBinacleService
 	}
 
 	private PackingScope Start(
-		string name,
 		PackingMode mode,
 		Algorithm? algorithm,
 		int binCount,
 		IReadOnlyList<IWithQuantity> items,
 		IOperationParameters parameters
-	) => PackingScope.Start(this.metrics, this.logger, name, mode, algorithm, binCount, items, parameters);
+	) => PackingScope.Start(this.metrics, this.logger, mode, algorithm, binCount, items, parameters);
 }

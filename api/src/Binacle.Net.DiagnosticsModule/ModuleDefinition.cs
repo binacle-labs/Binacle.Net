@@ -77,7 +77,7 @@ public static class ModuleDefinition
 			builder.Services
 				.AddOpenTelemetry()
 				.WithLogger(Log.Logger)
-				.ConfigureResource(openTelemetryOptions)
+				.ConfigureResource(openTelemetryOptions, builder.Environment.EnvironmentName)
 				.WithMetrics(openTelemetryOptions.Metrics)
 				.WithTracing(openTelemetryOptions.Tracing)
 				.WithLogging(openTelemetryOptions.Logging)

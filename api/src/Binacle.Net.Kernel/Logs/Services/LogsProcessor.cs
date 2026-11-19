@@ -40,48 +40,72 @@ internal class LogsProcessor<TRequest, TLog> : BackgroundService
 		this.logger.LogInformation("{Status} logs processor for {LogProcessorRequest}", "Starting",
 			typeof(TRequest).Name);
 
-		while (await this.channel.Reader.WaitToReadAsync(stoppingToken).ConfigureAwait(false))
+		try
 		{
-			try
+			while (await this.channel.Reader.WaitToReadAsync(stoppingToken).ConfigureAwait(false))
 			{
-				var request = await this.channel.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
-				var log = request.ToLogEntry(this.timeProvider.GetUtcNow());
-
-				var date = this.timeProvider.GetLocalNow();
-				var fileName = string.Format(
-					this.options.FileNameFormat,
-					date.ToString(this.options.DateFormat)
-				);
-				var logFile = Path.Combine(logDirectory, fileName);
-				var json = JsonSerializer.Serialize(log);
-
-				await using (var writer = new StreamWriter(logFile, append: true))
+				// Outside the try: only an entry already read can be lost.
+				if (!this.channel.Reader.TryRead(out var request))
 				{
-					await writer.WriteLineAsync(json.AsMemory(), stoppingToken).ConfigureAwait(false);
-					// Ensure data is written to disk
-					await writer.FlushAsync(stoppingToken).ConfigureAwait(false);
+					continue;
 				}
 
-				exceptionsCount = 0;
-			}
-			catch (Exception ex)
-			{
-				this.logger.LogError(ex, "An error occurred while processing logs for {LogProcessorRequest}",
-					typeof(TRequest).Name);
-				exceptionsCount++;
-
-				if (exceptionsCount >= this.options.MaxConsecutiveAllowedExceptions)
+				try
 				{
-					this.logger.LogCritical(
-						"Too many consecutive exceptions, stopping the processor for {LogProcessorRequest}",
+					var log = request.ToLogEntry(this.timeProvider.GetUtcNow());
+
+					var date = this.timeProvider.GetLocalNow();
+					var fileName = string.Format(
+						this.options.FileNameFormat,
+						date.ToString(this.options.DateFormat)
+					);
+					var logFile = Path.Combine(logDirectory, fileName);
+					var json = JsonSerializer.Serialize(log);
+
+					await using (var writer = new StreamWriter(logFile, append: true))
+					{
+						await writer.WriteLineAsync(json.AsMemory(), stoppingToken).ConfigureAwait(false);
+						// Ensure data is written to disk
+						await writer.FlushAsync(stoppingToken).ConfigureAwait(false);
+					}
+
+					exceptionsCount = 0;
+					this.options.OnWritten?.Invoke();
+				}
+				catch (Exception ex)
+				{
+					this.options.OnWriteFailed?.Invoke(ex);
+					this.logger.LogError(ex, "An error occurred while processing logs for {LogProcessorRequest}",
 						typeof(TRequest).Name);
-					break;
+					exceptionsCount++;
+
+					if (exceptionsCount >= this.options.MaxConsecutiveAllowedExceptions)
+					{
+						this.logger.LogCritical(
+							"Too many consecutive exceptions, stopping the processor for {LogProcessorRequest}",
+							typeof(TRequest).Name);
+						break;
+					}
 				}
 			}
+		}
+		finally
+		{
+			this.Discard();
 		}
 
 		this.logger.LogInformation("{Status} logs processor for {LogProcessorRequest}", "Stopped",
 			typeof(TRequest).Name);
+	}
+
+	// Once completed, the channel refuses new writes, so nothing queues behind a processor that is gone.
+	private void Discard()
+	{
+		this.channel.Writer.TryComplete();
+		while (this.channel.Reader.TryRead(out _))
+		{
+			this.options.OnDiscarded?.Invoke();
+		}
 	}
 
 	private void EnsureDirectoryExists(string logDirectory)

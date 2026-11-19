@@ -28,8 +28,7 @@ public class ParallelBinProcessor : IBinProcessor
 		where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
 	{
 		using var activity = Diagnostics.ActivitySource
-			.StartActivity($"Process Bins: Parallel");
-		activity?.SetTag("Operation", parameters.Operation);
+			.StartProcessorActivity("process bins", DiagnosticsTags.Parallel, parameters.Operation);
 
 		// One bin per thread, and the bin count is only known here, so the default cap resolves here too.
 		var degree = this.maxDegreeOfParallelism ?? ParallelLimits.Degree(bins.Count);

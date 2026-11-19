@@ -8,4 +8,6 @@ public static class TelemetryNames
 	public const string Wildcard = Prefix + "*";
 
 	public const string ErrorType = "error.type";
+
+	public static string ErrorTypeOf(Exception exception) => exception.GetType().FullName ?? exception.GetType().Name;
 }

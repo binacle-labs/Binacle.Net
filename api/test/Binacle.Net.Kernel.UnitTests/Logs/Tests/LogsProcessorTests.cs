@@ -185,6 +185,70 @@ public class LogsProcessorTests : IDisposable
 		this.host.LogFiles().ShouldBeEmpty();
 	}
 
+	[Fact]
+	public async Task Each_entry_calls_written_or_failed_once()
+	{
+		var written = 0;
+		var failed = new List<Exception>();
+		var options = new LogsProcessorOptions<Request>
+		{
+			Path = LogsHost.LogsFolder,
+			FileNameFormat = "packing-{0}.ndjson",
+			DateFormat = "yyyy-MM-dd",
+			OnWritten = () => written++,
+			OnWriteFailed = failed.Add,
+		};
+
+		await this.Drain(
+			options,
+			At(Now),
+			true,
+			new Request("first"),
+			new Request("bad", Throws: true),
+			new Request("second")
+		);
+
+		written.ShouldBe(2);
+		failed.ShouldHaveSingleItem().ShouldBeOfType<InvalidOperationException>();
+	}
+
+	// The channel is left open, so only the processor can complete it.
+	[Fact]
+	public async Task A_stopped_processor_completes_the_channel_and_discards_what_is_left()
+	{
+		var failed = 0;
+		var discarded = 0;
+		var options = new LogsProcessorOptions<Request>
+		{
+			Path = LogsHost.LogsFolder,
+			FileNameFormat = "packing-{0}.ndjson",
+			DateFormat = "yyyy-MM-dd",
+			MaxConsecutiveAllowedExceptions = 2,
+			OnWriteFailed = _ => failed++,
+			OnDiscarded = () => discarded++,
+		};
+		var channel = Channel.CreateUnbounded<Request>();
+		channel.Writer.TryWrite(new Request("bad", Throws: true));
+		channel.Writer.TryWrite(new Request("worse", Throws: true));
+		channel.Writer.TryWrite(new Request("left"));
+		channel.Writer.TryWrite(new Request("also left"));
+
+		var processor = new LogsProcessor<Request, Entry>(
+			channel,
+			this.host,
+			At(Now),
+			options,
+			NullLogger<LogsProcessor<Request, Entry>>.Instance
+		);
+		await processor.StartAsync(CancellationToken.None);
+		await processor.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(10));
+
+		failed.ShouldBe(2);
+		discarded.ShouldBe(2);
+		channel.Writer.TryWrite(new Request("too late")).ShouldBeFalse();
+		channel.Reader.Completion.IsCompleted.ShouldBeTrue();
+	}
+
 	// A file where the directory should be. Nothing can be written after that, but the process must come up.
 	[Fact]
 	public async Task A_log_directory_that_cannot_be_created_does_not_bring_the_host_down()
