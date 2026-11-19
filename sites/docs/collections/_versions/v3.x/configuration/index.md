@@ -37,7 +37,7 @@ if a browser calls the API directly, since until you do, no origin is allowed th
 
 There are four ways to change a setting. Which one to use depends on what the setting is:
 
-- 🔹 **Environment variables** - highest priority. Use them for secrets and anything that differs per deployment.
+- 🔹 **Environment variables** - beat every file. Use them for secrets and anything that differs per deployment.
 - 📝 **Production overrides** (`<filename>.Production.json`) - a file holding only the settings you change.
 - 📄 **Direct file edits** - replace the file itself with a bind mount or a volume.
 - 🔄 **Connection string fallbacks** - a dedicated environment variable for each connection string.
@@ -107,12 +107,15 @@ DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413
 
 When more than one method sets the same value, the highest row wins:
 
-| Order | Method                     | Setting (`Logs.Retention`)      | Connection string (`ConnectionStrings.Database`)              |
-|-------|----------------------------|---------------------------------|---------------------------------------------------------------|
-| 1     | Environment variable       | `Settings__Logs__Retention=5`   | `ConnectionStrings__Database=endpoint=https://localhost:1413` |
-| 2     | Production override        | `Settings.Production.json`      | `ConnectionStrings.Production.json`                           |
-| 3     | Direct file edit           | `Settings.json`                 | `ConnectionStrings.json`                                      |
-| 4     | Connection string fallback | -                               | `DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413`  |
+| Order | Method                     | Setting (`Logs.Retention`)      | Connection string (`ConnectionStrings.Database`)               |
+|-------|----------------------------|---------------------------------|----------------------------------------------------------------|
+| 1     | Command line               | `--Settings:Logs:Retention=5`   | `--ConnectionStrings:Database=endpoint=https://localhost:1413` |
+| 2     | Environment variable       | `Settings__Logs__Retention=5`   | `ConnectionStrings__Database=endpoint=https://localhost:1413`  |
+| 3     | Production override        | `Settings.Production.json`      | `ConnectionStrings.Production.json`                            |
+| 4     | Direct file edit           | `Settings.json`                 | `ConnectionStrings.json`                                       |
+| 5     | Connection string fallback | -                               | `DATABASE_CONNECTION_STRING=endpoint=https://localhost:1413`   |
+
+Before 3.2.0, a config file beat the command line.
 
 ## 🔧 Modules
 
@@ -135,7 +138,7 @@ Logging, health checks, packing logs and telemetry. Always on; only logging is e
 - [📜 Logging]({% vlink /configuration/diagnostics-module/logging.md %})
 - [❤️‍🩹 Health Checks]({% vlink /configuration/diagnostics-module/health-checks.md %})
 - [📦 Packing Logs]({% vlink /configuration/diagnostics-module/packing-logs.md %})
-- [📡 OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry.md %})
+- [📡 OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %})
 
 ### 🛡️ Service Module
 

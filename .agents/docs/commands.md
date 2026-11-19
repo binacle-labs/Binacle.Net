@@ -217,8 +217,7 @@ the documents carry no `/api/auth/token` path — the shape the committed specs 
 different v3 and v4: `/api/auth/token` appears in both and every rate-limited endpoint gains a `429`. So it
 writes to its own folder, `artifacts/openapi-service/`, and only the service file is copied out. The module
 will not start without a store and JWT settings, so the recipe passes throwaway ones by environment variable
-(a sqlite file beside the output; `Development` is not used because it picks Postgres, which needs a running
-server).
+(a sqlite file beside the output; `Development` is not used because it picks Azurite first).
 
 Generation is off by default (`-p:GenerateOpenApi=true`, set by the recipe) so an ordinary build doesn't start
 the app host. The destination is `-p:OpenApiDir`; MSBuild resolves a relative one against the **project**
