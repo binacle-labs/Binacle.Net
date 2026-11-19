@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-11-19
+verified: 2026-11-20
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs; the scopes table matches the three Diagnostics.cs files (Binacle.Net, this module, Binacle.Lib) and each Create call's version
 also_update:
   - api/configuration
@@ -345,9 +345,11 @@ on the `Binacle.Net.DiagnosticsModule` meter (`Telemetry/Diagnostics.cs`):
   - `queue_full` when dropped - the `itemDropped` callback of `Channel.CreateBounded`, so only with `ChannelLimit`
     set. `DropWrite` reports success to the writer, so without the count a full queue loses entries unseen;
   - the exception's full type name when the write threw - the `OnWriteFailed` hook;
-  - `already_shutdown` when the processor has stopped - the `OnDiscarded` hook for what was left in the queue, and
+  - `already_shutdown` when the processor has stopped - the `OnDiscarded` hook for what was not written, and
     `RefusalCountingChannel` (`Telemetry/`) for each later write the completed channel refuses. The factory
     returns the channel wrapped in it. The app writes with `TryWrite`, so a refused write is not logged.
+    A normal host stop writes the queue first, for up to 5 seconds, so only what is left then counts. A
+    processor stopped by too many failed writes counts its whole queue.
 - `binacle.packing_log.queue.size` (observable up-down counter, `{entry}`) - `channel.Reader.Count`. The
   unbounded channel is built with `SingleReader = false`, because a single-reader unbounded channel cannot count.
 - `binacle.packing_log.queue.capacity` (observable up-down counter, `{entry}`) - `ChannelLimit`, only when the

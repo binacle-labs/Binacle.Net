@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-11-19
+verified: 2026-11-20
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -314,8 +314,11 @@ reference to `Binacle.CompactNotation` — a feature plugs in its own request an
   JSON-serialises the entry, and appends one line to a dated file. Knows nothing about any feature's types.
   It reads with `TryRead` outside the `try`, so one exception loses at most one entry and a cancelled read loses
   none.
-  When it stops - too many consecutive failures, or host shutdown - it completes the channel, so later writes
-  are refused, and calls `OnDiscarded` for each entry still queued.
+  When it stops it completes the channel, so later writes are refused. On host shutdown it then writes what is
+  queued, until the `DrainDeadline` constant (5 seconds) passes on its `TimeProvider`. Writes never take
+  `stoppingToken`, so the write in progress at a stop finishes. After too many consecutive failures it skips the
+  drain. Either way it calls `OnDiscarded` once for each entry not written: still queued, or cut off by the
+  deadline.
 - `LogsProcessorOptions<TChannelRequest>` (`Logs/Models`) — `Path` / `FileNameFormat` / `DateFormat` +
   `MaxConsecutiveAllowedExceptions` (default 10), `RetentionDays` (nullable, default null), and three optional
   hooks, each called once per entry: `OnWritten`, `OnWriteFailed` (with the exception), and `OnDiscarded`. They let
