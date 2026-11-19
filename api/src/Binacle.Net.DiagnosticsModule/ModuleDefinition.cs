@@ -41,17 +41,22 @@ public static class ModuleDefinition
 			.CreateBootstrapLogger();
 	}
 	
-	public static void AddDiagnosticsModule(this WebApplicationBuilder builder)
+	public static void AddDiagnosticsModuleConfiguration(this WebApplicationBuilder builder)
 	{
-		Log.Information("{ModuleName} module. Status {Status}", "Diagnostics", "Initializing");
-
-		// Logging
 		builder.AddJsonConfiguration(
 			filePath: "DiagnosticsModule/Serilog.json",
 			environmentFilePath: $"DiagnosticsModule/Serilog.{builder.Environment.EnvironmentName}.json",
 			optional: false,
 			reloadOnChange: true
 		);
+		builder.AddJsonConfigurationFile<OpenTelemetryConfigurationOptions>();
+		builder.AddJsonConfigurationFile<PackingLogsConfigurationOptions>();
+		builder.AddJsonConfigurationFile<HealthCheckConfigurationOptions>();
+	}
+
+	public static void AddDiagnosticsModule(this WebApplicationBuilder builder)
+	{
+		Log.Information("{ModuleName} module. Status {Status}", "Diagnostics", "Initializing");
 
 		// overwrite default logger
 		builder.Host.UseSerilog((context, services, loggerConfiguration) =>
@@ -65,7 +70,7 @@ public static class ModuleDefinition
 			includeInternalTypes: true);
 
 		// Open Telemetry
-		builder.AddValidatableJsonConfigurationOptions<OpenTelemetryConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<OpenTelemetryConfigurationOptions>();
 
 		var openTelemetryOptions = builder.Configuration.GetConfigurationOptions<OpenTelemetryConfigurationOptions>();
 
@@ -86,7 +91,7 @@ public static class ModuleDefinition
 		}
 
 		// Packing Logs
-		builder.AddValidatableJsonConfigurationOptions<PackingLogsConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<PackingLogsConfigurationOptions>();
 
 		var packingLogsOptionsIsEnabled = builder.Configuration
 			.GetSection(PackingLogsConfigurationOptions.SectionName)
@@ -99,7 +104,7 @@ public static class ModuleDefinition
 		}
 
 		// Health Checks
-		builder.AddValidatableJsonConfigurationOptions<HealthCheckConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<HealthCheckConfigurationOptions>();
 
 		// Add health checks
 		builder.Services

@@ -53,14 +53,10 @@ public static class ConfigurationExtensions
 			builder.Configuration
 				.AddJsonFile(environmentFilePath, optional: true, reloadOnChange: reloadOnChange);
 		}
-		
-		builder.Configuration
-			.AddEnvironmentVariables();
 	}
-	
-	public static void AddValidatableJsonConfigurationOptions<TOptions>(
-		this IHostApplicationBuilder builder,
-		Action<TOptions>? postConfigure = null
+
+	public static void AddJsonConfigurationFile<TOptions>(
+		this IHostApplicationBuilder builder
 		)
 		where TOptions : class, IConfigurationOptions
 	{
@@ -73,10 +69,14 @@ public static class ConfigurationExtensions
 			builder.Configuration
 				.AddJsonFile(environmentFilePath, optional: true, reloadOnChange: TOptions.ReloadOnChange);
 		}
-			
-		builder.Configuration
-			.AddEnvironmentVariables();
-		
+	}
+
+	public static void AddValidatableConfigurationOptions<TOptions>(
+		this IHostApplicationBuilder builder,
+		Action<TOptions>? postConfigure = null
+		)
+		where TOptions : class, IConfigurationOptions
+	{
 		var optionsBuilder = builder.Services
 			.AddOptions<TOptions>()
 			.Bind(builder.Configuration.GetSection(TOptions.SectionName))

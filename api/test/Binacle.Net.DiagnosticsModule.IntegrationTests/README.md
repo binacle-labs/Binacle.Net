@@ -12,11 +12,6 @@ listeners, which skip the OpenTelemetry setup. This is where that setup is prove
 just test cs_binacle-net-diagnostics-module_integration
 ```
 
-**What will bite you.** The module reads the OpenTelemetry and packing-log switches while it registers, right
-after it adds its own JSON file, so in-memory config loses there. The fixture sets those few as environment
-variables, which are added after each JSON file. Everything else goes in as in-memory config, as in the other
-test projects.
-
 OpenTelemetry is only set up when an exporter is on. OTLP is on with all three signals off, so nothing leaves
 the process, and the in-memory exporters are added beside it.
 

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### ⚙️ Core Changes
+- **The command line now beats environment variables and config files.** Before, a config file beat it, so `--OpenTelemetry:Otlp:Enabled=true` lost to a `false` in `OpenTelemetry.json`. Environment variables still beat every config file.  
+
 ### 🧪 Diagnostics Module
 - **Each OpenTelemetry signal can be turned off on its own for OTLP.** `Otlp.Metrics`, `Otlp.Tracing` and `Otlp.Logging` are new keys, each `true` by default, so an existing config sends the same as before. A signal turned off is not exported over OTLP at all. Azure Monitor ignores these keys and still gets all three. With all three off, OTLP sends nothing and a warning is logged at startup.  
 - **With any of the three off, the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` environment variables are not read.** The signals still on share the one endpoint from `Otlp.Endpoint` or `OTEL_EXPORTER_OTLP_ENDPOINT`. With all three on they work as before.  

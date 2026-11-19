@@ -1,8 +1,8 @@
 ---
 id: api/configuration
 description: Config file layout, env-var conventions, override precedence, and feature flag list
-verified: 2026-09-29
-check: The file tree matches api/src/Binacle.Net/Config_Files/ and the AddJsonConfiguration calls in Program.cs; the Cors and ForwardedHeaders keys match their options classes in Configuration/ and the mapping in ExtensionMethods/ForwardedHeadersExtensions.cs; the feature flag table matches every Feature.IsEnabled call site in api/src
+verified: 2026-11-19
+check: The file tree matches api/src/Binacle.Net/Config_Files/ and the AddJsonConfiguration calls in Program.cs; the Precedence table matches the source order in Program.cs and each module's AddXModuleConfiguration(); the Cors and ForwardedHeaders keys match their options classes in Configuration/ and the mapping in ExtensionMethods/ForwardedHeadersExtensions.cs; the feature flag table matches every Feature.IsEnabled call site in api/src
 also_update:
   - api/modules/service
   - api/modules/diagnostics
@@ -140,7 +140,7 @@ The startup log prints the expanded trust list, so the flags are never opaque.
 
 ## Override Conventions
 
-**Env vars** — use `__` to separate nested keys. This is the highest-priority override.
+**Env vars** — use `__` to separate nested keys. They beat every file; only the command line beats them.
 
 ```bash
 Settings__Logs__Retention=5
@@ -176,9 +176,23 @@ Higher number wins.
 | Priority | Method | Example (Logs.Retention) | Example (ConnectionStrings.Database) |
 |---|---|---|---|
 | 1 (lowest) | Connection-string fallback | N/A | `DATABASE_CONNECTION_STRING=...` |
-| 2 | Direct file edit (`Settings.json`) | `Settings.json` | `ConnectionStrings.json` |
-| 3 | Production override (`Settings.Production.json`) | `Settings.Production.json` | `ConnectionStrings.Production.json` |
-| 4 (highest) | Environment variable | `Settings__Logs__Retention=5` | `ConnectionStrings__Database=...` |
+| 2 | Base file | `Settings.json` | `ConnectionStrings.json` |
+| 3 | Environment file | `Settings.Production.json` | `ConnectionStrings.Production.json` |
+| 4 | User secrets, Development only, with `SERVICE_MODULE=True` | `secrets.json` | `secrets.json` |
+| 5 | Environment variable | `Settings__Logs__Retention=5` | `ConnectionStrings__Database=...` |
+| 6 (highest) | Command line | `--Settings:Logs:Retention=5` | `--ConnectionStrings:Database=...` |
+
+`Program.cs` adds every JSON file first, then environment variables and the command line once. Each
+environment file loads right after its base file. Between two files that set the same key, the later one wins:
+the core's files load first, then the DiagnosticsModule's, then the ServiceModule's. A module that is off loads
+none of its files.
+
+User secrets beat the files only because `AddServiceModuleConfiguration()` adds them after its own files. The
+host also loads them by default, below every file, so with the ServiceModule off they lose to any file.
+
+Feature flags are read before any module file loads, from `appsettings.json`, its environment file,
+environment variables and the command line. A flag set in a module file does nothing. How a flag reads:
+`$api/modules`.
 
 ## Feature Flags
 

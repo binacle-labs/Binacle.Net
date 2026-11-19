@@ -195,11 +195,16 @@ Base interface for strongly-typed config classes loaded from JSON files.
 Provides: `FilePath`, `SectionName`, `Optional`, `ReloadOnChange`, and `GetEnvironmentFilePath(env)`.
 Config is loaded relative to `Config_Files/` (set as base path in `Program.cs`).
 
-Register a validated options class with `services.AddValidatableJsonConfigurationOptions<TOptions>()`
-(`Configuration/ExtensionsMethods/ConfigurationExtensions.cs`): it adds the JSON file + env override + env vars,
-binds the section, and runs FluentValidation at startup (`ValidateFluently().ValidateOnStart()`). Used in
-`Program.cs` for `BinPresetOptions` and `ForwardedHeadersConfigurationOptions`, and by each module's
-`ModuleDefinition`. CORS does not use it - see below.
+Register a validated options class with two calls on the builder
+(`Configuration/ExtensionsMethods/ConfigurationExtensions.cs`):
+
+- `AddJsonConfigurationFile<TOptions>()` adds the JSON file and its `{Environment}` variant.
+- `AddValidatableConfigurationOptions<TOptions>()` binds the section and runs FluentValidation at startup
+  (`ValidateFluently().ValidateOnStart()`). An optional `postConfigure` runs after binding.
+
+Neither adds environment variables. Where those come in is in `$api/configuration`. Used in `Program.cs` for
+`BinPresetOptions` and `ForwardedHeadersConfigurationOptions`, and by DiagnosticsModule and ServiceModule: the
+file in `AddXModuleConfiguration`, the binding in `AddXModule`. CORS uses neither - see below.
 
 ## Cors
 

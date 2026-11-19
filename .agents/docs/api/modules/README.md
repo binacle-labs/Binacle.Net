@@ -1,7 +1,7 @@
 ---
 id: api/modules
 description: Optional module system — feature flags, structure, available modules
-verified: 2026-09-29
+verified: 2026-11-19
 check: The Add/Use pair and IModuleMarker of each Binacle.Net.*Module* project exist where stated; the flag reading rules match Kernel/Features/ (both providers, FeatureManager, FeatureManagerConfiguration); the launch profiles match api/src/Binacle.Net/Properties/launchSettings.json
 also_update:
   - api
@@ -46,11 +46,14 @@ Three rules decide what a flag reads as, and each one bites:
 Each module follows the same pattern:
 
 ```csharp
+public static void AddXModuleConfiguration(this WebApplicationBuilder builder) { ... }
 public static void AddXModule(this WebApplicationBuilder builder) { ... }
 public static void UseXModule(this WebApplication app) { ... }
 ```
 
-`AddXModule` handles: config, DI, validators, OpenAPI docs.
+`AddXModuleConfiguration` adds the module's config files. `Program.cs` calls it beside the other files, before
+environment variables (`$api/configuration`). UIModule has no config files and no such method.
+`AddXModule` handles: options binding and validation, DI, validators, OpenAPI docs.
 `UseXModule` wires up middleware and endpoints.
 
 If you add a new module, create its own `IModuleMarker` in that module's assembly — it is the marker used for

@@ -19,8 +19,7 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>
 {
 	public const string HealthCheckPath = "/_health";
 
-	// Read while the module registers, after it adds its own JSON file. Only environment variables are added later.
-	private static readonly Dictionary<string, string?> RegistrationValues = new()
+	private static readonly Dictionary<string, string?> ConfigurationValues = new()
 	{
 		// OpenTelemetry is set up only when an exporter is on. All three signals off: nothing leaves the process.
 		{ "OpenTelemetry:Otlp:Enabled", bool.TrueString },
@@ -28,10 +27,6 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>
 		{ "OpenTelemetry:Otlp:Tracing", bool.FalseString },
 		{ "OpenTelemetry:Otlp:Logging", bool.FalseString },
 		{ "PackingLogs:Enabled", bool.TrueString },
-	};
-
-	private static readonly Dictionary<string, string?> ConfigurationValues = new()
-	{
 		{ "HealthChecks:Enabled", bool.TrueString },
 		{ "HealthChecks:Path", HealthCheckPath },
 		// The packing call logs at Debug.
@@ -40,7 +35,6 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>
 
 	public BinacleApi()
 	{
-		SetEnvironmentVariables(RegistrationValues);
 		this.Client = this.CreateClient();
 	}
 
@@ -58,13 +52,8 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>
 
 		builder
 			.UseEnvironment("Test")
-			// Read before WebApplication.CreateBuilder(args) runs in Program.cs.
-			.UseConfiguration(configuration)
-			.ConfigureAppConfiguration(configurationBuilder =>
-			{
-				// Overrides whatever WebApplication.CreateBuilder(args) added.
-				configurationBuilder.AddInMemoryCollection(ConfigurationValues);
-			});
+			// Reaches Program.cs as args, so it beats every config file while the modules register.
+			.UseConfiguration(configuration);
 
 		builder.ConfigureTestServices(services =>
 		{
@@ -77,19 +66,5 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>
 	public void FlushMetrics()
 	{
 		this.Services.GetRequiredService<MeterProvider>().ForceFlush();
-	}
-
-	public override async ValueTask DisposeAsync()
-	{
-		await base.DisposeAsync();
-		SetEnvironmentVariables(RegistrationValues.ToDictionary(pair => pair.Key, _ => (string?)null));
-	}
-
-	private static void SetEnvironmentVariables(Dictionary<string, string?> values)
-	{
-		foreach (var (key, value) in values)
-		{
-			Environment.SetEnvironmentVariable(key.Replace(":", "__"), value);
-		}
 	}
 }

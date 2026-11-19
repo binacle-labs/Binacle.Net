@@ -24,27 +24,33 @@ namespace Binacle.Net.ServiceModule;
 
 public static class ModuleDefinition
 {
-	public static void AddServiceModule(this WebApplicationBuilder builder)
+	public static void AddServiceModuleConfiguration(this WebApplicationBuilder builder)
 	{
-		Log.Information("{ModuleName} module. Status {Status}", "Service", "Initializing");
-
 		builder.AddJsonConfiguration(
 			filePath: "ServiceModule/ConnectionStrings.json",
 			environmentFilePath:$"ServiceModule/ConnectionStrings.{builder.Environment.EnvironmentName}.json",
 			optional: true,
 			reloadOnChange: false
 		);
-		
+		builder.AddJsonConfigurationFile<RateLimiterConfigurationOptions>();
+		builder.AddJsonConfigurationFile<JwtAuthOptions>();
+		builder.AddCorsFile("ServiceModule/Cors.json");
+
 		// Required for local run with secrets
 		if (builder.Environment.IsDevelopment())
 		{
 			builder.Configuration
 				.AddUserSecrets<IModuleMarker>(optional: true, reloadOnChange: true);
 		}
+	}
+
+	public static void AddServiceModule(this WebApplicationBuilder builder)
+	{
+		Log.Information("{ModuleName} module. Status {Status}", "Service", "Initializing");
 
 		builder.Services.AddValidatorsFromAssemblyContaining<IModuleMarker>(ServiceLifetime.Singleton, includeInternalTypes: true);
 
-		builder.AddValidatableJsonConfigurationOptions<RateLimiterConfigurationOptions>(
+		builder.AddValidatableConfigurationOptions<RateLimiterConfigurationOptions>(
 			postConfigure: options =>
 			{
 				options.ApiUsageAnonymousConfiguration =
@@ -58,7 +64,7 @@ public static class ModuleDefinition
 			}
 		);
 
-		builder.AddValidatableJsonConfigurationOptions<JwtAuthOptions>();
+		builder.AddValidatableConfigurationOptions<JwtAuthOptions>();
 		
 		builder.Services.AddOpenApiDocumentsFromAssemblyContaining<IModuleMarker>();
 
@@ -96,7 +102,6 @@ public static class ModuleDefinition
 			});
 		});
 
-		builder.AddCorsFile("ServiceModule/Cors.json");
 		builder.Services.AddCorsPolicy(ServiceModuleCorsPolicy.Name);
 
 		var defaultAdminCredentials = Environment.GetEnvironmentVariable("BINACLE_ADMIN_CREDENTIALS");
