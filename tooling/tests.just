@@ -54,6 +54,7 @@ image:
     just test cs_binacle-net-service-module_unit
     just test cs_binacle-net-ui-module_integration
     just test cs_binacle-net_integration
+    just test cs_binacle-net-diagnostics-module_integration
     just test cs_binacle-net-service-module_integration Sqlite
 
 # Every test a site ships - the gems, and the javascript a site bundles
@@ -96,6 +97,7 @@ all:
     just test cs_binacle-net-service-module_unit
     just test cs_binacle-net-ui-module_integration
     just test cs_binacle-net_integration
+    just test cs_binacle-net-diagnostics-module_integration
     just test cs_binacle-net-service-module_integration Sqlite
     just test rb_binacle-docs-versions_unit
     just test rb_binacle-robots_unit
@@ -148,6 +150,9 @@ cs_binacle-net_integration: (_dotnet_test 'api/test/Binacle.Net.IntegrationTests
 
 [private]
 cs_binacle-net-ui-module_integration: (_dotnet_test 'api/test/Binacle.Net.UIModule.IntegrationTests')
+
+[private]
+cs_binacle-net-diagnostics-module_integration: (_dotnet_test 'api/test/Binacle.Net.DiagnosticsModule.IntegrationTests')
 
 # The backend is an argument and not a variable, because just cannot set a module variable from the command
 # line and would ignore it without saying so.

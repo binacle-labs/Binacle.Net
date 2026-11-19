@@ -1,8 +1,8 @@
 ---
 id: api/decisions
-description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, why the instance page renders its presets from a startup snapshot rather than a live provider, why OpenTelemetry's switches, endpoint paths and resource order are what they are, and why telemetry has a meter per module and wraps the service.
-verified: 2026-11-18
-check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must now return no call - the one remaining hit is a comment in Instance.cshtml.cs naming the endpoint this page can go stale against - and note this grep never saw the demo's v4 call, which reaches the image through the bundle rather than the module's source; D6 against the absence of api/src/Binacle.Net.UIModule/_js/instance.js and of an instance entry in that module's webpack.config.js, against InstanceOptions.EnabledFeatures filtering on FeatureValue rather than on a name list, and against Binacle.Net.Kernel.csproj referencing Binacle.Packing neither directly nor through what it references; the BinOption-to-InstancePresetBin projection must live in api/src/Binacle.Net/ExtensionMethods/BinPresetOptionsExtensions.cs and nowhere else; D7 against OtlpExporterExtensions.UseOtlpExporter, which must keep the SDK's UseOtlpExporter when all three Otlp switches are on, against OtlpExporterConfigurationOptions adding /v1/<signal> for HTTP only, against OpenTelemetryConfigurationExtensions.ConfigureResource, where AddEnvironmentVariableDetector must sit after AddHostAndProcess and before AddOptionalAdditionalAttributes, against the health-check map in ModuleDefinition.cs carrying DisableHttpMetrics, against OpenTelemetryMetricsExtensions and OpenTelemetryTracingExtensions passing TelemetryNames.Wildcard to AddMeter and AddSource, and against AddBinacleServices registering PackingLogBinacleService around InstrumentedBinacleService around BinacleService
+description: API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, why the instance page renders its presets from a startup snapshot rather than a live provider, why OpenTelemetry's switches, endpoint paths and resource order are what they are, why telemetry has a meter per module and wraps the service, and why Binacle's own telemetry names are experimental and shaped as they are.
+verified: 2026-11-19
+check: D1 against api/src/Binacle.Net.Kernel/OpenApi/Transformers/RateLimiterResponseOperationTransformer.cs, which must check EnableRateLimitingAttribute and nothing else; against a grep for EnableRateLimitingAttribute and RequireRateLimiting over api/src, which must land only inside Binacle.Net.ServiceModule; and against ApiDocument.Transform for the relative servers entry and the GitHub/Docker Hub description. D2 against a grep for UseHsts over api/src, which must return nothing; D3 against Program.cs, where AddDiagnosticsModule and UseDiagnosticsModule must carry no Feature.IsEnabled guard while the other two modules do; D4 against BindingProblem, which must match JsonEnumValueException before JsonException, and against JsonEnumValueException.GetValidationSummary, whose key must come from the request type rather than the wire path; D5 against a grep for api/v4 over api/src/Binacle.Net.UIModule, which must now return no call - the one remaining hit is a comment in Instance.cshtml.cs naming the endpoint this page can go stale against - and note this grep never saw the demo's v4 call, which reaches the image through the bundle rather than the module's source; D6 against the absence of api/src/Binacle.Net.UIModule/_js/instance.js and of an instance entry in that module's webpack.config.js, against InstanceOptions.EnabledFeatures filtering on FeatureValue rather than on a name list, and against Binacle.Net.Kernel.csproj referencing Binacle.Packing neither directly nor through what it references; the BinOption-to-InstancePresetBin projection must live in api/src/Binacle.Net/ExtensionMethods/BinPresetOptionsExtensions.cs and nowhere else; D7 against OtlpExporterExtensions.UseOtlpExporter, which must keep the SDK's UseOtlpExporter when all three Otlp switches are on, against OtlpExporterConfigurationOptions adding /v1/<signal> for HTTP only, against OpenTelemetryConfigurationExtensions.ConfigureResource, where AddEnvironmentVariableDetector must sit after AddHostAndProcess and before AddOptionalAdditionalAttributes, against the health-check map in ModuleDefinition.cs carrying DisableHttpMetrics, against OpenTelemetryMetricsExtensions and OpenTelemetryTracingExtensions passing TelemetryNames.Wildcard to AddMeter and AddSource, and against AddBinacleServices registering PackingLogBinacleService around InstrumentedBinacleService around BinacleService; the D7 naming entries against the names in api/src/Binacle.Net/Telemetry/PackingMetrics.cs, api/src/Binacle.Net.DiagnosticsModule/Telemetry/PackingLogMetrics.cs and lib/src/Binacle.Lib/Diagnostics.cs
 paths:
   - "api/**"
 ---
@@ -161,16 +161,47 @@ a backend. **Decided (the maintainer, 2026-11-16):** "yes", to a startup warning
 
 **Each module has its own meter and trace source, named after it, and the setup collects `Binacle.Net*`.** One
 meter and one source per component is the .NET convention, and a dashboard can then tell the modules apart. The
-wildcard means a new module, the ServiceModule next, needs no change to the OpenTelemetry setup. Only the shared
+wildcard means a new module needs no change to the OpenTelemetry setup. Only the shared
 parts sit in the Kernel; the Kernel does not reference `Binacle.Packing` (D6), so nothing about packing goes there.
 The maintainer, 2026-11-17: "i can see a folder of telemetry in each module add it and chared to kernel".
 **Decided (the maintainer, 2026-11-17):** "One per module (Recommended)", picked from the two options offered.
 
 **Telemetry wraps `IBinacleService` as a decorator, and the packing log is a second decorator outside it.**
 `BinacleService` then only packs. With the log write inside the timed call, the duration would also count building
-the log entry, which copies every bin, item and result. The cost: the `Send Channel Request` span is no longer a
+the log entry, which copies every bin, item and result. The cost: the `queue packing_log` span is no longer a
 child of the operation span, and each decorator repeats every method signature. The maintainer, 2026-11-17: "the
 code is a mess i expected a clean separation". **Decided (the maintainer, 2026-11-17):** "go with two decorators".
+
+**Binacle's own names follow OpenTelemetry's naming rules, and are experimental in 3.x.** No Binacle-named
+metric or span had reached a production user: the spans ran only in Development before 3.2.0, and the metrics
+are new in it. A rename costs nothing now; once shipped it breaks someone's dashboard or alert. Experimental
+says a minor release may still change one. OpenTelemetry has no field for it that a backend reads, so the docs
+and the changelog are the marking. **Decided (the maintainer, 2026-11-19):** "yes do all proposal scope is
+everything service module too... but... what will provide value and according to conventions.... yes we will
+mark excperimental". That covers each change below.
+
+- **Every duration is in seconds.** The maintainer's reason: one unit, so a dashboard puts
+  `http.server.request.duration` and Binacle's own durations on one panel and in one query.
+- **`binacle.packing.operation.items`, not `.size`.** In OpenTelemetry's names `size` is bytes, as in
+  `http.server.request.body.size`. The value is a count of items.
+- **One `binacle.packing_log.processed` counter with `error.type`, plus `queue.size` and `queue.capacity`.** It
+  replaces `dropped_entries` and `queued_entries`, and copies the shape of OpenTelemetry's own log processor
+  metrics. One counter split by `error.type` gives the failure rate in one query. That shape is still
+  "development" in OpenTelemetry, so it is a pattern to copy, not a standard.
+- **A stopped packing log counts as `already_shutdown`.** The maintainer, 2026-11-19: "use the exception's full
+  type name for write failures... When the processor stops, complete the channel, count what's left as
+  already_shutdown, and count later writes the same way, as OTel's log processor does."
+- **A failure sets `error.type`**, the OpenTelemetry attribute for it, on the metric and the span.
+- **Attribute values are fixed lowercase lists, and per-request numbers go on spans only.** Each distinct value
+  on a metric is one more series to store.
+- **Span names are short, lowercase and fixed, such as `pack single_bin`.** The endpoint spans, such as
+  `Pack Custom Bin: v4`, are gone: the HTTP server span already carries the route and the version.
+- **`deployment.environment.name` on the resource**, the semantic-conventions attribute, so a dashboard can split
+  production from development.
+- **The `Binacle.Lib` source has no version.** Its assembly is not stamped, so it would always say `1.0.0.0`, and
+  `service.version` already names the release. **Decided (the maintainer, 2026-11-19):** "No version".
+- **Npgsql's spans and metrics are collected.** The maintainer, 2026-11-17: "not now lets adress later", then
+  "scope is everything service module too" on 2026-11-19.
 
 **What would change this.** The .NET SDK reading `OTEL_TRACES_EXPORTER` and kin (opentelemetry-dotnet #1453)
 would make the `Otlp` switches redundant with a standard variable.

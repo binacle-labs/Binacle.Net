@@ -2,7 +2,7 @@
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
 verified: 2026-11-19
-check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
+check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs; the scopes table matches the three Diagnostics.cs files (Binacle.Net, this module, Binacle.Lib) and each Create call's version
 also_update:
   - api/configuration
 paths:
@@ -254,9 +254,6 @@ Every meter and trace source named `Binacle.Net*` is always on, added in code th
 (`$api/kernel`, Telemetry). That covers the API's `Binacle.Net` source and meter (`$api/service`, Telemetry) and
 this module's `Binacle.Net.DiagnosticsModule` meter. Tested in
 `api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/ModuleTelemetryWildcardTests.cs`.
-Each carries `Metadata.Version` as its scope version. `IMeterFactory` caches by name, version and tags, so every
-`Create` of one meter must pass the same version. The `Binacle.Lib` source has no version: its assembly is not
-stamped, and the resource's `service.version` already names the release.
 Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
 by segment). The map also disables the request metrics for that path (see the health-check list above). `/_debug` is traced.
 `Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
@@ -270,6 +267,48 @@ The span names and tags are in `$lib/processors#diagnostics`.
 `Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
 3.2.0, removed in 4.0.0). They are no longer in the shipped JSON. The top-level `AdditionalAttributes` covers
 every signal. When OpenTelemetry is on, a startup warning names each one that has values.
+
+### Binacle's own names
+
+**Every name Binacle makes up is experimental in 3.x:** each `binacle.*` metric and attribute, each span name on
+the `Binacle.Net` and `Binacle.Lib` sources, and the scope names. A minor release may change one, and the
+changelog says so when it does. Nothing in code marks them. OpenTelemetry has no field for it that a backend
+reads, so the docs and the changelog are the marking. The built-in names - `http.*`, `aspnetcore.*`, `dotnet.*`,
+`kestrel.*`, `db.*` and Npgsql's own - follow OpenTelemetry's and .NET's stability, not Binacle's.
+
+**Scopes:**
+
+| Scope | Meter | Trace source | Version | Collected |
+|---|---|---|---|---|
+| `Binacle.Net` | yes | yes | `Metadata.Version` | always, through the wildcard |
+| `Binacle.Net.DiagnosticsModule` | yes | no | `Metadata.Version` | always, through the wildcard |
+| `Binacle.Lib` | no | yes | none | only when `Tracing.AdditionalSources` lists it |
+
+`Metadata.Version` is also the resource's `service.version`. `IMeterFactory` caches by name, version and tags, so
+every `Create` of one meter must pass the same version. The `Binacle.Lib` source has no version: its assembly is
+not stamped, so it would always say `1.0.0.0`. The ServiceModule has no meter or source of its own
+(`$api/modules/service`, Telemetry).
+
+**Where each name is listed:**
+
+| Names | Doc |
+|---|---|
+| `binacle.packing.*` metrics and attributes with their values; the `{operation} {mode}`, `create response` and `queue packing_log` spans | `$api/service`, Telemetry |
+| `binacle.packing_log.*` metrics and their `error.type` values | Packing logs, below |
+| `Binacle.Lib` spans and `binacle.lib.processor` | `$lib/processors#diagnostics` |
+| resource attributes | the resource list above |
+| `error.type`, the scope prefix and wildcard, the seconds buckets | `$api/kernel`, Telemetry |
+
+**A new name follows the same rules** (why: `$api/decisions#D7`):
+
+- A duration is in seconds, with `HistogramBuckets.Seconds` as bucket advice.
+- Lowercase and dotted, under `binacle.`. `_` joins words inside one segment: `packing_log`, `single_bin`.
+- A metric name is plural only when its unit is an annotation such as `{result}`. That is OpenTelemetry's rule.
+- A failure sets `error.type` on the metric and the span: the exception's full type name, or a short fixed word
+  where there is no exception, such as `queue_full`.
+- Attribute values come from fixed lowercase lists. A per-request number, such as a bin or item count, goes on the
+  span only, never on a metric, so the number of metric series stays small.
+- Built-in names are not renamed or wrapped.
 
 ## Packing logs
 
