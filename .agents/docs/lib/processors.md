@@ -1,7 +1,7 @@
 ---
 id: lib/processors
 description: IAlgorithmProcessor, IBinProcessor, and IMultiAlgorithmBinProcessor — their factories and which algorithms each execution path uses
-verified: 2026-10-02
+verified: 2026-11-19
 check: Interface names and full Process() signatures, cancellation token included, match lib/src/Binacle.Lib/Abstractions/; the algorithm sets match AlgorithmProcessorFactory.Create and BinProcessorFactory.CreateMultiAlgorithm; the result-selection table matches which selector methods BinacleService actually calls; a grep for the three Parallel* types shows no factory returning one; each takes maxDegreeOfParallelism and no other knob, defaulting to ParallelLimits.Degree
 also_update:
   - api/service
@@ -112,16 +112,26 @@ WFD is left out of the multi-bin path. Why is in `$lib/decisions#D1`.
 
 ## Diagnostics
 
-All active processors start an OpenTelemetry activity via `Diagnostics.ActivitySource` (`lib/src/Binacle.Lib/Diagnostics.cs`).
-If you add a new processor, follow the same pattern:
+Every processor starts a span on `Diagnostics.ActivitySource` (`Binacle.Lib`, `lib/src/Binacle.Lib/Diagnostics.cs`)
+through `StartProcessorActivity`, which sets `binacle.lib.processor` (`loop` or `parallel`) and
+`binacle.packing.operation` (`fit` or `pack`). A new processor does the same:
 
 ```csharp
-using var activity = Diagnostics.ActivitySource.StartActivity("Process <Something>: Loop");
-activity?.SetTag("Operation", parameters.Operation);
+using var activity = Diagnostics.ActivitySource
+	.StartProcessorActivity("process bins", DiagnosticsTags.Loop, parameters.Operation);
 ```
 
-Activity names used by existing processors: `"Process Algorithms: Loop"`, `"Process Bins: Loop"`,
-`"Process Multi Algorithm Bins: Loop"`.
+| Span | Started by |
+|---|---|
+| `process algorithms` | `LoopAlgorithmProcessor`, `ParallelAlgorithmProcessor` |
+| `process bins` | `LoopBinProcessor`, `ParallelBinProcessor` |
+| `process multi_algorithm_bins` | `LoopMultiAlgorithmBinProcessor`, `ParallelMultiAlgorithmBinProcessor` |
+| `build result` | `OperationResultBuilder`, once per result. Tags `binacle.packing.result.algorithm` and `.status` |
+
+Tags are set only when a listener sampled the span, so with no listener the hot path builds nothing.
+`DiagnosticsTags` holds the lib's own copy of the API's values; `api/test/Binacle.Net.UnitTests/Tests/LibTracingTagTests.cs`
+fails if they drift. The spans are tested in `lib/test/Binacle.Lib.UnitTests/Tests/TracingTests.cs`.
+The API does not collect this source unless told to (`$api/modules/diagnostics`, OpenTelemetry).
 
 ## Result Selection
 

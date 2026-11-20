@@ -1,8 +1,8 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-11-16
-check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs
+verified: 2026-11-21
+check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs; the scopes table matches the three Diagnostics.cs files (Binacle.Net, this module, Binacle.Lib) and each Create call's version
 also_update:
   - api/configuration
 paths:
@@ -44,7 +44,7 @@ Exporters: OTLP and/or Azure Monitor — each enabled independently via config.
 
 **Packing logs** — conditional on `PackingLogsConfigurationOptions.Enabled`.
 When enabled: registers a channel-based log processor for algorithm operation logs.
-`BinacleService` writes to this channel via `IOptionalDependency<Channel<...>>` — it's a no-op when disabled.
+`PackingLogBinacleService` writes to this channel via `IOptionalDependency<Channel<...>>` — it's a no-op when disabled.
 
 **Health checks** — always registered. Includes the `SystemHealthCheck` class, registered under the
 name `"System"` with tag `"Core"` (failure status `Unhealthy`). Use the name `"System"` — not the class
@@ -63,10 +63,31 @@ In order:
 The rest is inside `if (HealthChecks.Enabled)` — **with health checks disabled, which is the default, none of
 this is wired at all** and the path 404s:
 
-- `HealthChecksProtectionMiddleware` — restricts health endpoint access by caller address (`RestrictedIPs`)
+- `HealthChecksProtectionMiddleware` — restricts health endpoint access by caller address (`RestrictedIPs`), by
+  key (`AccessKey`, sent in the `X-Health-Key` header), or both. See the table below.
 - Maps `/_health` (configurable path) with full JSON response via `UIResponseWriter`
 - Health status codes: `Healthy/Degraded → 200`, `Unhealthy → 503`
 - The `RestrictedChecks` allow-list is applied as the map's `Predicate`
+- `.DisableHttpMetrics()` on the map, so probes are not counted in the ASP.NET Core request metrics
+
+### Who gets past the health check
+
+The endpoint is open when neither `AccessKey` nor `RestrictedIPs` is set. Otherwise, in order:
+
+| Server key | `X-Health-Key` sent | Result |
+|---|---|---|
+| set | one value, matching | allowed |
+| set | wrong, empty, or more than one value | 403, even from an allowed address |
+| set | missing | the address check decides |
+| not set | anything | header ignored, the address check decides |
+
+The address check passes only when the caller is in `RestrictedIPs`, so with a key set and the list empty, only
+the key gets in. Every refusal is the same bare 403.
+
+The key is hashed once at startup and compared in fixed time, so neither timing nor length gives it away. The
+validator requires at least `MinimumAccessKeyLength` characters, printable ASCII with no spaces: header values
+are trimmed and Kestrel refuses non-ASCII, so any other key could never match. The wrong-key warning logs the
+address, never the key. Health requests are filtered out of traces, so the header never reaches a span.
 
 This module registers two `InstanceOptions` entries, each with the path it answers on. `DebugEndpoint` is added
 in the builder phase behind `DEBUG_ENDPOINT`, the same way `SWAGGER_UI` and `SCALAR_UI` do in `Program.cs`.
@@ -136,6 +157,19 @@ Property: `Application: Binacle.Net`.
 
 Override logging by creating `Serilog.Production.json` at `/app/Config_Files/DiagnosticsModule/`.
 
+**To OpenTelemetry:** `writeToProviders: true` hands every Serilog event to the OTel logger provider, so
+Serilog's levels decide first. Each record carries the template's values and the Serilog properties as
+attributes, plus the trace and span id. `IncludeFormattedMessage` is set in `OpenTelemetryLoggingExtensions`;
+without it the body is the raw template, `pack single_bin completed in {OperationDurationMs}ms`. Seen in the
+Aspire dashboard, 2026-11-19.
+
+The body is Serilog's own rendering, which quotes string values: `Now listening on: "https://localhost:7194"`.
+Serilog has no setting for it. The console drops the quotes because its template uses `{Message:lj}`.
+
+**The packing timed line** - `{operation} {mode} completed in {OperationDurationMs}ms` - is Debug, so it is off
+at the default level. `Override: Binacle.Net.Telemetry → Debug` brings it back. `OperationDurationMs` stays in
+milliseconds: it is a log value, not a metric, and changing it breaks anyone grepping the file.
+
 ## Health checks
 
 Default: **disabled**. Default path: `/_health`.
@@ -191,13 +225,37 @@ Config file: `Config_Files/DiagnosticsModule/OpenTelemetry.json`.
 
 Top-level fields:
 - `ServiceNamespace` — service namespace label (default: `"binacle"`).
-- `ServiceInstanceId` — unique instance ID (default: `"1"`).
+- `ServiceInstanceId` — unique instance ID (default: `null`, so the SDK generates a new one each start).
 - `AdditionalAttributes` — key-value attributes attached to all telemetry.
+
+The resource always carries `host.name`, `process.pid` and `deployment.environment.name`, the host environment
+lowercased (`production`, `development`). Who wins, lowest first:
+
+1. Binacle's values: `service.name` `"Binacle.Net"`, `ServiceNamespace`, `ServiceInstanceId`, `host.name`,
+   `process.pid`, `deployment.environment.name`.
+2. `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME`. The SDK reads them before the code runs, so
+   `ConfigureResource` reads them again with `AddEnvironmentVariableDetector()` after step 1. Without that they
+   lose to step 1. They also beat the `ServiceInstanceId` key. `OTEL_SERVICE_NAME` beats a `service.name` inside
+   `OTEL_RESOURCE_ATTRIBUTES`.
+3. The top-level `AdditionalAttributes`.
+
+The detector reads `IConfiguration`, so the tests feed it in-memory values instead of real environment variables.
 
 OTLP exporter (`Otlp`):
 - `Enabled` (bool, default false)
-- `Endpoint` (string, e.g. `http://localhost:4317`)
+- `Endpoint` (string, e.g. `http://localhost:4317`). With `Enabled`, it must be an absolute `http` or `https` URL.
+  The module reads these options while registering services, before `ValidateOnStart` runs, so it calls
+  `OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid` first. Without that, `new Uri()` throws a raw error.
 - `Protocol` — `"grpc"` (default) or `"http/protobuf"`. The older `"httpProtobuf"` is still accepted. Anything else fails validation at startup.
+- `Metrics`, `Tracing`, `Logging` (bool, default true) — per-signal OTLP switches. Azure Monitor ignores them.
+  - All three on: `UseOtlpExporter`. It also reads the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` variables.
+  - Any off: `AddOtlpExporter` for each signal still on. The per-signal variables are then not read.
+  - All three off: a startup warning, nothing sent over OTLP.
+
+With `Endpoint` set and `http/protobuf`, each signal goes to `/v1/metrics`, `/v1/traces` or `/v1/logs` after any
+path already on the endpoint (`http://host:4318/smth/` gives `/smth/v1/traces`). gRPC uses the endpoint as given.
+With no `Endpoint` in config, the SDK reads `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL` itself,
+and `Protocol` from config is not used.
 
 The recommended way to configure OTLP is via the standard OpenTelemetry .NET SDK env vars
 (e.g. `OTEL_EXPORTER_OTLP_ENDPOINT`). See the [OTLP exporter docs](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md#environment-variables).
@@ -208,8 +266,69 @@ Azure Monitor exporter (`AzureMonitor`):
 - `EnableLiveMetrics` (bool, default false)
 - `SamplingRatio` (float, default 1 = 100%)
 
-Each signal group (`Metrics`, `Tracing`, `Logging`) also accepts `AdditionalAttributes` and a list
-of additional meters/sources to include.
+Azure Monitor maps only the `service.*` and `k8s.*` resource attributes onto its records (exporter 1.8.3).
+`deployment.environment.name`, `host.name` and `process.pid` reach it only through its `_OTELRESOURCE_` metric,
+which `OTEL_DOTNET_AZURE_MONITOR_ENABLE_RESOURCE_METRICS` turns on.
+
+Every meter and trace source named `Binacle.Net*` is always on, added in code through `TelemetryNames.Wildcard`
+(`$api/kernel`, Telemetry). That covers the API's `Binacle.Net` source and meter (`$api/service`, Telemetry) and
+this module's `Binacle.Net.DiagnosticsModule` meter. Tested in
+`api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/ModuleTelemetryWildcardTests.cs`.
+Requests to the health-check path are left out of traces when health checks are on (`HealthChecks:Path`, matched
+by segment). The map also disables the request metrics for that path (see the health-check list above). `/_debug` is traced.
+`Metrics.AdditionalMeters` and `Tracing.AdditionalSources` list extra meters and sources to include.
+
+**`Binacle.Lib` spans are off by default.** The lib's source is not `Binacle.Net*`, so the wildcard misses it. That
+is on purpose: there is one span per processor call and one `build result` per result, so a smallest-bin run over
+50 bins with 3 algorithms sends about 150 spans for one request. Turn them on with
+`Tracing.AdditionalSources: ["Binacle.Lib"]`. `OpenTelemetry.Development.json` does, so they show in dev.
+The span names and tags are in `$lib/processors#diagnostics`.
+
+`Metrics`, `Tracing` and `Logging` each still bind `AdditionalAttributes`, marked `[Obsolete]` (deprecated in
+3.2.0, removed in 4.0.0). They are no longer in the shipped JSON. The top-level `AdditionalAttributes` covers
+every signal. When OpenTelemetry is on, a startup warning names each one that has values.
+
+### Binacle's own names
+
+**Every name Binacle makes up is experimental in 3.x:** each `binacle.*` metric and attribute, each span name on
+the `Binacle.Net` and `Binacle.Lib` sources, and the scope names. A minor release may change one, and the
+changelog says so when it does. Nothing in code marks them. OpenTelemetry has no field for it that a backend
+reads, so the docs and the changelog are the marking. The built-in names - `http.*`, `aspnetcore.*`, `dotnet.*`,
+`kestrel.*`, `db.*` and Npgsql's own - follow OpenTelemetry's and .NET's stability, not Binacle's.
+
+**Scopes:**
+
+| Scope | Meter | Trace source | Version | Collected |
+|---|---|---|---|---|
+| `Binacle.Net` | yes | yes | `Metadata.Version` | always, through the wildcard |
+| `Binacle.Net.DiagnosticsModule` | yes | no | `Metadata.Version` | always, through the wildcard |
+| `Binacle.Lib` | no | yes | none | only when `Tracing.AdditionalSources` lists it |
+
+`Metadata.Version` is also the resource's `service.version`. `IMeterFactory` caches by name, version and tags, so
+every `Create` of one meter must pass the same version. The `Binacle.Lib` source has no version: its assembly is
+not stamped, so it would always say `1.0.0.0`. The ServiceModule has no meter or source of its own
+(`$api/modules/service`, Telemetry).
+
+**Where each name is listed:**
+
+| Names | Doc |
+|---|---|
+| `binacle.packing.*` metrics and attributes with their values; the `{operation} {mode}`, `create response` and `queue packing_log` spans | `$api/service`, Telemetry |
+| `binacle.packing_log.*` metrics and their `error.type` values | Packing logs, below |
+| `Binacle.Lib` spans and `binacle.lib.processor` | `$lib/processors#diagnostics` |
+| resource attributes | the resource list above |
+| `error.type`, the scope prefix and wildcard, the seconds buckets | `$api/kernel`, Telemetry |
+
+**A new name follows the same rules** (why: `$api/decisions#D7`):
+
+- A duration is in seconds, with `HistogramBuckets.Seconds` as bucket advice.
+- Lowercase and dotted, under `binacle.`. `_` joins words inside one segment: `packing_log`, `single_bin`.
+- A metric name is plural only when its unit is an annotation such as `{result}`. That is OpenTelemetry's rule.
+- A failure sets `error.type` on the metric and the span: the exception's full type name, or a short fixed word
+  where there is no exception, such as `queue_full`.
+- Attribute values come from fixed lowercase lists. A per-request number, such as a bin or item count, goes on the
+  span only, never on a metric, so the number of metric series stays small.
+- Built-in names are not renamed or wrapped.
 
 ## Packing logs
 
@@ -238,6 +357,25 @@ Registration: `AddOptionsBasedPackingLogProcessor()` — no arguments — in Dia
 `AddLogProcessor<AlgorithmOperationLogChannelRequest, PackingLogEntry>` wants, resolving
 `IOptions<PackingLogsConfigurationOptions>` inside each so the config is read from DI rather than passed in.
 Gated by `PackingLogs.Enabled`.
+
+Both factories resolve `PackingLogMetrics` (`Telemetry/PackingLogMetrics.cs`, a singleton), whose instruments are
+on the `Binacle.Net.DiagnosticsModule` meter (`Telemetry/Diagnostics.cs`):
+- `binacle.packing_log.processed` (counter, `{entry}`) - one per entry, by `error.type`:
+  - none when written - the options' `OnWritten` hook;
+  - `queue_full` when dropped - the `itemDropped` callback of `Channel.CreateBounded`, so only with `ChannelLimit`
+    set. `DropWrite` reports success to the writer, so without the count a full queue loses entries unseen;
+  - the exception's full type name when the write threw - the `OnWriteFailed` hook;
+  - `already_shutdown` when the processor has stopped - the `OnDiscarded` hook for what was not written, and
+    `RefusalCountingChannel` (`Telemetry/`) for each later write the completed channel refuses. The factory
+    returns the channel wrapped in it. The app writes with `TryWrite`, so a refused write is not logged.
+    A normal host stop writes the queue first, for up to 5 seconds, so only what is left then counts. A
+    processor stopped by too many failed writes counts its whole queue.
+- `binacle.packing_log.queue.size` (observable up-down counter, `{entry}`) - `channel.Reader.Count`. The
+  unbounded channel is built with `SingleReader = false`, because a single-reader unbounded channel cannot count.
+- `binacle.packing_log.queue.capacity` (observable up-down counter, `{entry}`) - `ChannelLimit`, only when the
+  queue is bounded.
+
+Tested in `api/test/Binacle.Net.DiagnosticsModule.UnitTests/Tests/PackingLogMetricsTests.cs`.
 
 ### Config
 

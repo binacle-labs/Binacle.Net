@@ -5,6 +5,7 @@ using Binacle.Net.v3.Contracts;
 using Binacle.Net.Services;
 using Binacle.Net.v3.ExtensionMethods;
 using OpenApiExamples.ExtensionMethods;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.v3.Endpoints.Fit;
 
@@ -49,8 +50,6 @@ internal class ByCustom: IGroupedEndpoint<ApiV3EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Fit by Custom: v3");
-		
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			var operationResults = await binacleService.MultipleBinsAsync(
@@ -61,7 +60,7 @@ internal class ByCustom: IGroupedEndpoint<ApiV3EndpointGroup>
 				cancellationToken
 			);
 
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					FitResponse.Create(

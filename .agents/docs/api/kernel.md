@@ -1,7 +1,7 @@
 ---
 id: api/kernel
 description: Binacle.Net.Kernel — shared patterns used by all API projects and modules
-verified: 2026-09-29
+verified: 2026-11-20
 check: IApiMarker and the registration helpers match api/src/Binacle.Net.Kernel/; the endpoint interface and convention tables match Endpoints/EndpointDefinitions.cs, Endpoints/EndpointConventions.cs and the registrar in Endpoints/ExtensionMethods/; both AddHealthCheck overloads still live in HealthChecks/ExtensionMethods/HealthCheckServiceCollectionExtensions.cs and grep for `AddHealthChecks()` across api/src still hits only DiagnosticsModule/ModuleDefinition.cs; Serialization/ still holds JsonStringNullableEnumConverter.cs (the factory, the internal NullableEnumConverter<T>, the internal EnumValueReader) and JsonEnumValueException.cs, and OpenApi/Transformers/EnumStringsSchemaTransformer.cs still matches on JsonStringEnumConverter and JsonStringNullableEnumConverter and only lists member names for the second; every section here names a type that still exists under Kernel/, and every folder under Kernel/ has a section
 also_update:
   - api/endpoints
@@ -87,8 +87,17 @@ Registered as open generic in `Program.cs`:
 services.AddTransient(typeof(IOptionalDependency<>), typeof(OptionalDependency<>));
 ```
 
-Used by `BinacleService` to optionally write to the packing log channel without failing if DiagnosticsModule
+Used by `PackingLogBinacleService` to optionally write to the packing log channel without failing if DiagnosticsModule
 packing logs are disabled.
+
+## Decorate
+
+`services.Decorate<TService, TDecorator>()` (`Dependencies/ExtensionMethods`, namespace `Binacle.Net`) replaces the
+last non-keyed registration of `TService` with `TDecorator` wrapped around it, and keeps its lifetime. The
+decorator takes the inner service as a constructor argument and its other arguments from DI. Each call adds an
+outer layer. It throws when `TService` is not registered. The container does not dispose the inner instance.
+
+Tested in `api/test/Binacle.Net.Kernel.UnitTests/Dependencies/Tests/DecorateTests.cs`.
 
 ## Feature.Manager
 
@@ -186,11 +195,16 @@ Base interface for strongly-typed config classes loaded from JSON files.
 Provides: `FilePath`, `SectionName`, `Optional`, `ReloadOnChange`, and `GetEnvironmentFilePath(env)`.
 Config is loaded relative to `Config_Files/` (set as base path in `Program.cs`).
 
-Register a validated options class with `services.AddValidatableJsonConfigurationOptions<TOptions>()`
-(`Configuration/ExtensionsMethods/ConfigurationExtensions.cs`): it adds the JSON file + env override + env vars,
-binds the section, and runs FluentValidation at startup (`ValidateFluently().ValidateOnStart()`). Used in
-`Program.cs` for `BinPresetOptions` and `ForwardedHeadersConfigurationOptions`, and by each module's
-`ModuleDefinition`. CORS does not use it - see below.
+Register a validated options class with two calls on the builder
+(`Configuration/ExtensionsMethods/ConfigurationExtensions.cs`):
+
+- `AddJsonConfigurationFile<TOptions>()` adds the JSON file and its `{Environment}` variant.
+- `AddValidatableConfigurationOptions<TOptions>()` binds the section and runs FluentValidation at startup
+  (`ValidateFluently().ValidateOnStart()`). An optional `postConfigure` runs after binding.
+
+Neither adds environment variables. Where those come in is in `$api/configuration`. Used in `Program.cs` for
+`BinPresetOptions` and `ForwardedHeadersConfigurationOptions`, and by DiagnosticsModule and ServiceModule: the
+file in `AddXModuleConfiguration`, the binding in `AddXModule`. CORS uses neither - see below.
 
 ## Cors
 
@@ -267,9 +281,26 @@ Timed operations (in `Kernel/Logging`):
 
 - `logger.BeginTimedOperation("template", args)` → returns an `IDisposable`; on dispose it logs
   `"{template} completed in {OperationDurationMs}ms"`. Default level Information.
-- `logger.BeginTimedActivityOperation("message")` → same, and also starts an `Activity` (tracing span) named
-  `message` on `Binacle.Net.Diagnostics.ActivitySource`. One `using` gives both a timed log and a span.
+- `logger.BeginTimedActivityOperation("message", activitySource)` → same, and also starts an `Activity` (tracing
+  span) named `message` on the given source. One `using` gives both a timed log and a span. Its `Activity`
+  property is that span, or `null` when nothing listens. The Kernel has no source of its own: each module passes
+  its own (Telemetry, below).
 - `logger.EnrichState(...)` — wraps a dictionary / string set into a `BeginScope` for structured-log enrichment.
+
+## Telemetry
+
+`Kernel/Telemetry/` holds what every module shares. Nothing in it knows about packing.
+
+- `TelemetryNames.Prefix` is `Binacle.Net`. Each module names its own meter and trace source with it: `Binacle.Net`
+  for the API, `Binacle.Net.DiagnosticsModule`, and later `Binacle.Net.ServiceModule`.
+- `TelemetryNames.Wildcard` (`Binacle.Net*`) is what the DiagnosticsModule passes to `AddMeter` and `AddSource`,
+  so a new module's meter or source is collected without a change to the OpenTelemetry setup.
+- `TelemetryNames.ErrorType` is `error.type`, the OpenTelemetry tag for a failed operation.
+  `TelemetryNames.ErrorTypeOf(exception)` is its value: the exception's full type name.
+- `HistogramBuckets.Seconds` - bucket advice for a duration in seconds, 0.001 to 10. The SDK's default buckets are
+  sized for milliseconds.
+- `activity.RecordError(exception)` - sets the status to `Error` with the message, sets `error.type`, and adds the
+  exception as an event. Does nothing on a `null` activity.
 
 ## Logs (generic pipeline)
 
@@ -281,9 +312,17 @@ reference to `Binacle.CompactNotation` — a feature plugs in its own request an
 - `LogsProcessor<TRequest, TLog>` (`Logs/Services`, `where TRequest : ILogEntryConvertible<TLog>`) — a generic
   `BackgroundService`. Drains a `Channel<TRequest>`, calls `request.ToLogEntry(timeProvider.GetUtcNow())`,
   JSON-serialises the entry, and appends one line to a dated file. Knows nothing about any feature's types.
+  It reads with `TryRead` outside the `try`, so one exception loses at most one entry and a cancelled read loses
+  none.
+  When it stops it completes the channel, so later writes are refused. On host shutdown it then writes what is
+  queued, until the `DrainDeadline` constant (5 seconds) passes on its `TimeProvider`. Writes never take
+  `stoppingToken`, so the write in progress at a stop finishes. After too many consecutive failures it skips the
+  drain. Either way it calls `OnDiscarded` once for each entry not written: still queued, or cut off by the
+  deadline.
 - `LogsProcessorOptions<TChannelRequest>` (`Logs/Models`) — `Path` / `FileNameFormat` / `DateFormat` +
-  `MaxConsecutiveAllowedExceptions` (default 10) and `RetentionDays` (nullable, default null). The type param
-  only keys the DI registration.
+  `MaxConsecutiveAllowedExceptions` (default 10), `RetentionDays` (nullable, default null), and three optional
+  hooks, each called once per entry: `OnWritten`, `OnWriteFailed` (with the exception), and `OnDiscarded`. They let
+  a feature count entries without the Kernel knowing its metrics. The type param only keys the DI registration.
 - `LogsRetentionProcessor<TRequest>` (`Logs/Services`) — a second `BackgroundService` that deletes files past
   `RetentionDays`. It runs its own loop and never touches the write channel, so a slow sweep cannot stall
   logging. `RetentionDays` null means it does nothing: these logs are an archive, so deletion is opt-in.
@@ -296,7 +335,7 @@ reference to `Binacle.CompactNotation` — a feature plugs in its own request an
 The concrete packing feature (the request/entry types and their registration) lives in DiagnosticsModule — see
 `$api/modules/diagnostics`.
 
-`BinacleService` is the live producer: it injects `IOptionalDependency<Channel<AlgorithmOperationLogChannelRequest>>`
+`PackingLogBinacleService` (`$api/service`, Telemetry) is the live producer: it injects `IOptionalDependency<Channel<AlgorithmOperationLogChannelRequest>>`
 and writes via `WriteToChannelAsync(...)`, which **no-ops when the channel isn't registered** (i.e. when the
 DiagnosticsModule packing-log feature is off).
 

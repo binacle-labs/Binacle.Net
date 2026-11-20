@@ -7,7 +7,8 @@ internal class PackingLogsConfigurationOptions : IConfigurationOptions
 	public static string FilePath => "DiagnosticsModule/PackingLogs.json";
 	public static string SectionName => "PackingLogs";
 	public static bool Optional => false;
-	public static bool ReloadOnChange => true;
+	// False because the processor and its channel are built once at startup. An edit needs a restart.
+	public static bool ReloadOnChange => false;
 	public static string GetEnvironmentFilePath(string environment) => $"DiagnosticsModule/PackingLogs.{environment}.json";
 
 	public bool Enabled { get; set; }

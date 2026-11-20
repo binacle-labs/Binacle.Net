@@ -11,12 +11,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace Binacle.Net.ServiceModule.Infrastructure.Providers;
 
 internal class NpgsqlInfrastructureProvider : IInfrastructureProvider
 {
 	private static readonly string[] ServiceTags = ["Service"];
+
+	internal const string TelemetryName = "Npgsql";
 
 	public string ConnectionStringName => "Postgres";
 
@@ -41,5 +45,10 @@ internal class NpgsqlInfrastructureProvider : IInfrastructureProvider
 		);
 
 		builder.Services.AddStartupTask<EnsureRequiredNpgsqlTablesExistStartupTask>();
+
+		// Does nothing unless OpenTelemetry is on.
+		builder.Services
+			.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddSource(TelemetryName))
+			.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddMeter(TelemetryName));
 	}
 }

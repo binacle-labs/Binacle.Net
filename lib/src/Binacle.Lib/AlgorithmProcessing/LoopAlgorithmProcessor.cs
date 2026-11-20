@@ -26,8 +26,7 @@ public class LoopAlgorithmProcessor: IAlgorithmProcessor
         where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
     {
         using var activity = Diagnostics.ActivitySource
-            .StartActivity($"Process Algorithms: Loop");
-        activity?.SetTag("Operation", parameters.Operation);
+            .StartProcessorActivity("process algorithms", DiagnosticsTags.Loop, parameters.Operation);
         var results = new Dictionary<string, OperationResult>(this.supportedAlgorithms.Length);
 
         for (var i = 0; i < this.supportedAlgorithms.Length; i++)

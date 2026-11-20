@@ -51,4 +51,4 @@ OpenTelemetry enables distributed tracing, metrics collection,
 and logging to provide comprehensive insights into your application's performance.
 
 To integrate and configure OpenTelemetry for these features,
-visit the [OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry.md %}) page.
+visit the [OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}) page.

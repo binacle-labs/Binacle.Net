@@ -1,8 +1,8 @@
 ---
 title: Health Checks
 description: >-
-  Turn on health checks in Binacle.Net, restrict them by IP, and wire them to a load balancer or Prometheus. IP
-  matching changed in v3.0.0.
+  Turn on health checks in Binacle.Net, restrict them by IP or by key, and wire them to a load balancer or
+  Prometheus. IP matching changed in v3.0.0.
 nav:
   parent: Diagnostics Module
   order: 2
@@ -33,7 +33,8 @@ Health checks are configured via the `HealthChecks.json` file.
     "Enabled": false,
     "Path": "/_health",
     "RestrictedIPs": [],
-    "RestrictedChecks": []
+    "RestrictedChecks": [],
+    "AccessKey": null
   }
 }
 ```
@@ -53,6 +54,8 @@ For more information on overriding configurations, refer to the
 - `Path` (_string_): The endpoint path that health checks respond to (default: `/_health`).
 - `RestrictedIPs` (_array_): Which callers may query the endpoint. Empty means everyone.
 - `RestrictedChecks` (_array_): Which checks run. Empty means all of them.
+- `AccessKey` (_string_): A key that lets a request in from any address, sent in the `X-Health-Key` header.
+  Empty means no key. See [Access Key](#access-key).
 
 ## 🔒 Restricting Access
 By default, health checks are publicly accessible.
@@ -126,6 +129,45 @@ The list is compared against the address the request came from, which is your **
 forwarded headers resolve the real caller. Behind a proxy, load balancer or CDN, enable
 [Forwarded Headers]({% vlink /configuration/core/forwarded-headers.md %}) as well, or the list can never match
 your monitoring system.
+
+## 🔑 Access Key {#access-key}
+`RestrictedIPs` only works when your monitor has a fixed address. When it does not, such as a probe on a home
+connection, give it a key instead. A request that sends the key gets in from any address.
+
+Set the key with an environment variable, so it stays out of your config files:
+
+```bash
+HealthChecks__AccessKey=<your-key>
+```
+
+Generate one with:
+
+```bash
+openssl rand -hex 32
+```
+
+Then send it in the `X-Health-Key` header:
+
+```bash
+curl -H "X-Health-Key: <your-key>" https://<your-host>/_health
+```
+
+### How the key and the list work together
+
+| `AccessKey` | `RestrictedIPs` | Who gets in |
+|---|---|---|
+| not set | empty | everyone |
+| not set | set | callers on the list |
+| set | empty | only requests with the key |
+| set | set | requests with the key, or callers on the list |
+
+- **A wrong key is refused**, even from an address on the list. So is an empty key, or the header sent twice.
+- **With no key set, the header is ignored.** Sending it changes nothing.
+- **The key must be at least 32 characters**, printable ASCII with no spaces. Anything else fails startup.
+- **Changing the key needs a restart.** `HealthChecks.json` is not reloaded while the app runs.
+
+> **Use HTTPS.** Over plain HTTP the key travels in the clear, and anyone on the path can read it.
+{: .block-warning}
 
 ## 🛠️ Built-in Checks
 Binacle.Net comes with these health checks:
