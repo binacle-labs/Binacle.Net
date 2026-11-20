@@ -25,5 +25,15 @@ internal class HealthCheckConfigurationOptionsValidator : AbstractValidator<Heal
 				"of the block. Write each part in plain decimal with no leading zeros. Address ranges " +
 				"(1.2.3.4-1.2.3.9) are no longer supported."
 			);
+		RuleFor(x => x.AccessKey)
+			.Cascade(CascadeMode.Stop)
+			.MinimumLength(MinimumAccessKeyLength)
+			.WithMessage($"'{{PropertyName}}' must be at least {MinimumAccessKeyLength} characters long.")
+			// Header values are trimmed and Kestrel refuses non-ASCII, so such a key could never match.
+			.Must(key => key!.All(c => c > ' ' && c < '\x7f'))
+			.WithMessage("'{PropertyName}' may contain only printable ASCII characters, with no spaces.")
+			.When(x => !string.IsNullOrEmpty(x.AccessKey));
 	}
+
+	internal const int MinimumAccessKeyLength = 32;
 }

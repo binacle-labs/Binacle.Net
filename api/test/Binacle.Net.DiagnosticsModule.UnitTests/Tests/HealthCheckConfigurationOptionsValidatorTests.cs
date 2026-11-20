@@ -94,4 +94,29 @@ public class HealthCheckConfigurationOptionsValidatorTests
 		message.ShouldContain("prefix length");
 	}
 
+	private static HealthCheckConfigurationOptions OptionsWithKey(string? accessKey)
+		=> new() { Enabled = true, Path = "/_health", AccessKey = accessKey };
+
+	[Theory]
+	[InlineData(null)]
+	[InlineData("")]
+	[InlineData("0123456789abcdef0123456789abcdef")]
+	[InlineData("A1b2-C3d4_E5f6.G7h8~I9j0+K1l2/M3n4=")]
+	public void A_Missing_Or_Usable_Access_Key_Is_Accepted(string? accessKey)
+	{
+		this.validator.Validate(OptionsWithKey(accessKey)).IsValid.ShouldBeTrue();
+	}
+
+	[Theory]
+	[InlineData("too-short")]
+	[InlineData("0123456789abcdef 0123456789abcdef")]
+	[InlineData(" 0123456789abcdef0123456789abcdef")]
+	[InlineData("0123456789abcdef0123456789abcdef\u00e9")]
+	public void An_Access_Key_That_Is_Short_Or_Cannot_Travel_In_A_Header_Fails_Validation(string accessKey)
+	{
+		var result = this.validator.Validate(OptionsWithKey(accessKey));
+
+		result.IsValid.ShouldBeFalse();
+		result.Errors.Count.ShouldBe(1);
+	}
 }

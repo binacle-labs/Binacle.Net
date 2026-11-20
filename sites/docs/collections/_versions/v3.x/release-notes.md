@@ -64,6 +64,13 @@ Release notes for the **v3.x** line, newest release first. Every release in this
   wins over them. With Azure Monitor, `OTEL_SERVICE_NAME` also changes the role name.
 - **Health-check requests no longer appear in traces or in the HTTP request metrics.** Each probe made a span and
   counted as a request, which buried real traffic under probes. The health checks themselves are unchanged.
+- **Health checks can now be opened with a key as well as by address.** Set `AccessKey` in `HealthChecks.json`,
+  or `HealthChecks__AccessKey` in the environment, and send it in the `X-Health-Key` header. A probe whose address
+  changes, such as one on a home connection, then gets in from anywhere. With `RestrictedIPs` set too, either one
+  lets a request in. A wrong key is refused even from an allowed address. With a key set and `RestrictedIPs`
+  empty, only the key gets in. With no key set the header is ignored, so an existing config behaves as before.
+  The key must be at least 32 printable ASCII characters with no spaces, or startup fails. Send it over HTTPS
+  only. See [Health Checks]({% vlink /configuration/diagnostics-module/health-checks.md %}#access-key).
 - **Binacle now sends its own metrics.** On the `Binacle.Net` meter, `binacle.packing.operation.duration` is the
   time spent packing, in seconds. `binacle.packing.operation.items` is the number of items in an operation,
   counting quantity. `binacle.packing.results` counts the results returned, by algorithm and status, so it shows

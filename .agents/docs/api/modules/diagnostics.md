@@ -1,7 +1,7 @@
 ---
 id: api/modules/diagnostics
 description: DiagnosticsModule — always-on logging, OpenTelemetry, health checks, and packing logs
-verified: 2026-11-20
+verified: 2026-11-21
 check: The Add/Use lists match ModuleDefinition.cs top to bottom, including what each branch is gated on; the InstanceOptions entries this module adds match its AddFeature calls; every config key matches its Configuration/Models/ class and its shipped JSON; the packing-log registration signature matches ExtensionMethods/LogProcessorServiceCollectionExtensions.cs; the scopes table matches the three Diagnostics.cs files (Binacle.Net, this module, Binacle.Lib) and each Create call's version
 also_update:
   - api/configuration
@@ -63,11 +63,31 @@ In order:
 The rest is inside `if (HealthChecks.Enabled)` — **with health checks disabled, which is the default, none of
 this is wired at all** and the path 404s:
 
-- `HealthChecksProtectionMiddleware` — restricts health endpoint access by caller address (`RestrictedIPs`)
+- `HealthChecksProtectionMiddleware` — restricts health endpoint access by caller address (`RestrictedIPs`), by
+  key (`AccessKey`, sent in the `X-Health-Key` header), or both. See the table below.
 - Maps `/_health` (configurable path) with full JSON response via `UIResponseWriter`
 - Health status codes: `Healthy/Degraded → 200`, `Unhealthy → 503`
 - The `RestrictedChecks` allow-list is applied as the map's `Predicate`
 - `.DisableHttpMetrics()` on the map, so probes are not counted in the ASP.NET Core request metrics
+
+### Who gets past the health check
+
+The endpoint is open when neither `AccessKey` nor `RestrictedIPs` is set. Otherwise, in order:
+
+| Server key | `X-Health-Key` sent | Result |
+|---|---|---|
+| set | one value, matching | allowed |
+| set | wrong, empty, or more than one value | 403, even from an allowed address |
+| set | missing | the address check decides |
+| not set | anything | header ignored, the address check decides |
+
+The address check passes only when the caller is in `RestrictedIPs`, so with a key set and the list empty, only
+the key gets in. Every refusal is the same bare 403.
+
+The key is hashed once at startup and compared in fixed time, so neither timing nor length gives it away. The
+validator requires at least `MinimumAccessKeyLength` characters, printable ASCII with no spaces: header values
+are trimmed and Kestrel refuses non-ASCII, so any other key could never match. The wrong-key warning logs the
+address, never the key. Health requests are filtered out of traces, so the header never reaches a span.
 
 This module registers two `InstanceOptions` entries, each with the path it answers on. `DebugEndpoint` is added
 in the builder phase behind `DEBUG_ENDPOINT`, the same way `SWAGGER_UI` and `SCALAR_UI` do in `Program.cs`.

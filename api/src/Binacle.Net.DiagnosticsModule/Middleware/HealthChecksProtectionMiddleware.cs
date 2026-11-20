@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using Binacle.Net.Kernel.Network;
 
@@ -9,10 +12,14 @@ namespace Binacle.Net.DiagnosticsModule.Middleware;
 
 internal class HealthChecksProtectionMiddleware
 {
+	internal const string AccessKeyHeader = "X-Health-Key";
+
 	private readonly RequestDelegate next;
 	private readonly ILogger<HealthChecksProtectionMiddleware> logger;
 	private readonly IOptions<HealthCheckConfigurationOptions> options;
 	private readonly HealthCheckAllowList allowList;
+	// Hashed so the fixed-time compare also hides the key's length.
+	private readonly byte[]? accessKeyHash;
 
 	public HealthChecksProtectionMiddleware(
 		RequestDelegate next,
@@ -25,6 +32,15 @@ internal class HealthChecksProtectionMiddleware
 		this.options = options;
 		// Built once, because HealthChecks.json is not reloaded.
 		this.allowList = this.BuildAllowList(options.Value.RestrictedIPs);
+		this.accessKeyHash = string.IsNullOrEmpty(options.Value.AccessKey)
+			? null
+			: SHA256.HashData(Encoding.UTF8.GetBytes(options.Value.AccessKey));
+	}
+
+	private bool AccessKeyMatches(string? sent)
+	{
+		var sentHash = SHA256.HashData(Encoding.UTF8.GetBytes(sent ?? string.Empty));
+		return CryptographicOperations.FixedTimeEquals(sentHash, this.accessKeyHash);
 	}
 
 	internal HealthCheckAllowList BuildAllowList(string?[]? entries)
@@ -76,31 +92,60 @@ internal class HealthChecksProtectionMiddleware
 			return;
 		}
 
-		if (this.allowList.RestrictsNobody)
+		if (!this.IsAllowed(context))
 		{
-			await next(context);
-			return;
-		}
-
-		// Behind a proxy this is the caller only once the forwarded headers middleware has resolved it; without
-		// that it is the proxy, and no operator address will ever match.
-		var remoteIp = context.Connection.RemoteIpAddress;
-
-		if (remoteIp is null)
-		{
-			logger.LogWarning("Health check request from unknown remote IP");
-			context.Response.StatusCode = StatusCodes.Status403Forbidden;
-			return;
-		}
-
-		if (!this.allowList.Allows(remoteIp))
-		{
-			logger.LogWarning("Health check request from {RemoteIp} is not allowed", remoteIp);
 			context.Response.StatusCode = StatusCodes.Status403Forbidden;
 			return;
 		}
 
 		await next(context);
+	}
+
+	private bool IsAllowed(HttpContext context)
+	{
+		if (this.accessKeyHash is null && this.allowList.RestrictsNobody)
+		{
+			return true;
+		}
+
+		// With no key configured the header is ignored.
+		if (this.accessKeyHash is not null && context.Request.Headers.TryGetValue(AccessKeyHeader, out var sentKey))
+		{
+			return this.KeyAllows(sentKey, context.Connection.RemoteIpAddress);
+		}
+
+		return this.AddressAllows(context.Connection.RemoteIpAddress);
+	}
+
+	// A wrong key is refused even from an allowed address.
+	private bool KeyAllows(StringValues sentKey, IPAddress? remoteIp)
+	{
+		if (sentKey.Count == 1 && this.AccessKeyMatches(sentKey[0]))
+		{
+			return true;
+		}
+
+		logger.LogWarning("Health check request from {RemoteIp} sent a wrong access key", remoteIp);
+		return false;
+	}
+
+	// Behind a proxy this is the caller only once the forwarded headers middleware has resolved it; without
+	// that it is the proxy, and no operator address will ever match.
+	private bool AddressAllows(IPAddress? remoteIp)
+	{
+		if (remoteIp is null)
+		{
+			logger.LogWarning("Health check request from unknown remote IP");
+			return false;
+		}
+
+		if (!this.allowList.Allows(remoteIp))
+		{
+			logger.LogWarning("Health check request from {RemoteIp} is not allowed", remoteIp);
+			return false;
+		}
+
+		return true;
 	}
 
 	// The parsed RestrictedIPs. Nested rather than file-scoped: CS9051 forbids a file-local type in a member
