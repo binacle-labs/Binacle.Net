@@ -1,8 +1,8 @@
 ---
 id: api/modules/service
 description: ServiceModule — JWT auth, rate limiting, account/subscription management. Three projects using clean architecture.
-verified: 2026-09-29
-check: Routes, config file names, connection string name, the project reference direction in the three csproj files, every domain enum's values (AccountRole, AccountStatus, SubscriptionType, SubscriptionStatus), the entity base classes, the list endpoints' paging parameters, and the token endpoint's account-state codes match ServiceModule source
+verified: 2026-11-19
+check: Routes, config file names, connection string name, the project reference direction in the three csproj files, every domain enum's values (AccountRole, AccountStatus, SubscriptionType, SubscriptionStatus), the entity base classes, the list endpoints' paging parameters, the token endpoint's account-state codes, and the Telemetry section's names match ServiceModule source and the tests in its `Telemetry/` test folder
 also_update:
   - api/configuration
 paths:
@@ -149,6 +149,32 @@ Each provider registers its own `IAccountRepository`, `ISubscriptionRepository`,
 > `InMemoryAccountRepository` / `InMemorySubscriptionRepository` exist, but there is **no InMemory provider** in
 > `Setup._infrastructureProviders` (Azure Storage, Npgsql, SQLite only), so it cannot be selected by config.
 
+## Telemetry
+
+The module has no meter or trace source of its own. What it does already shows in what ASP.NET Core sends, collected
+by `AddAspNetCoreInstrumentation()` in the DiagnosticsModule (`$api/modules/diagnostics`):
+
+| Metric | Meter | Shows |
+|---|---|---|
+| `aspnetcore.rate_limiting.requests` | `Microsoft.AspNetCore.RateLimiting` | every lease. A rejection has `aspnetcore.rate_limiting.result` = `endpoint_limiter` and the policy, `ApiUsage` or `AuthToken` |
+| `aspnetcore.authentication.authenticate.duration` | `Microsoft.AspNetCore.Authentication` | each bearer check, `aspnetcore.authentication.result` = `success`, `failure` or `none` |
+| `aspnetcore.authorization.attempts` | `Microsoft.AspNetCore.Authorization` | each policy check, such as `Admin` |
+| `http.server.request.duration` | `Microsoft.AspNetCore.Hosting` | the token endpoint's 200, 401, 403 and 429, by `http.route` |
+
+**No metric says why a login failed.** It would tell an attacker which half of the credentials was wrong.
+
+**Per backend:**
+
+- **Postgres.** `NpgsqlInfrastructureProvider` adds Npgsql's built-in trace source and meter, both `Npgsql`, with
+  `ConfigureOpenTelemetryTracerProvider` and `ConfigureOpenTelemetryMeterProvider`. Nothing happens unless
+  OpenTelemetry is on. One span per command, carrying `db.query.text` and no password; metrics
+  `db.client.operation.duration`, `db.client.connection.*` and Npgsql's own `*.npgsql.*` ones. The names are
+  Npgsql's.
+- **SQLite.** Nothing. `Microsoft.Data.Sqlite` has no instrumentation.
+- **Azure Storage.** Off for OTLP. Azure SDK spans need both `Azure.*` in `Tracing.AdditionalSources` and the
+  experimental switch: env var `AZURE_EXPERIMENTAL_ENABLE_ACTIVITY_SOURCE=true`, or the AppContext switch
+  `Azure.Experimental.EnableActivitySource` (Azure.Core 1.62.0). The Azure Monitor exporter turns on both itself.
+
 ## Config files
 
 | File | Required | What it configures |
@@ -171,4 +197,5 @@ See `$api/v4/add-endpoint` for the template — ServiceModule endpoints use `IGr
 `api/test/Binacle.Net.ServiceModule.IntegrationTests` (run with `just test cs_binacle-net-service-module_integration
 [Sqlite|Postgres|AzureStorage]`) — covers the auth token endpoint and the Admin account and subscription
 endpoints, including the two list endpoints and the subscription Get, and `Endpoints/CorsTests.cs` for the
-`ServiceApi` policy.
+`ServiceApi` policy. `Telemetry/` proves the rate-limit and authentication metrics arrive, and on Postgres that
+the Npgsql spans carry no password.

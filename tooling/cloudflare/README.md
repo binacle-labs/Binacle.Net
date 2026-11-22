@@ -14,6 +14,7 @@ for the site chosen at dispatch; it is manual, and it tags the commit it publish
 | `assets.directory` | The built site to upload - `artifacts/docs`, `artifacts/demo` or `artifacts/www`. Relative to **this file**, and it has to match the `destination` in that site's `_config.yml` |
 | `assets.not_found_handling` | `404-page`, which wants `404.html` in the site root. That is why each site's `pages/404.html` carries `permalink: /404.html` |
 | `preview_urls` | Off. A deploy is meant to be the site, not a second copy of it on another URL |
+| `workers_dev` | Off, for the same reason. It has to be set here: left out, every `wrangler deploy` turns the `*.workers.dev` URL back on, and turning it off in the dashboard lasts only until the next deploy |
 | `observability` | On. Request metadata, 404s and exceptions - the only way to see a dead inbound link, because the link check runs offline against the built folder and cannot know what anyone typed |
 
 ## ⚠️ The Worker name is set once

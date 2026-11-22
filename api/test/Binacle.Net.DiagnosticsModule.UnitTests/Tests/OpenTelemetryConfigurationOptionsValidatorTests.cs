@@ -1,5 +1,6 @@
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using Binacle.Net.DiagnosticsModule.Configuration.Validators;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Exporter;
 
 namespace Binacle.Net.DiagnosticsModule.UnitTests;
@@ -11,10 +12,15 @@ public class OpenTelemetryConfigurationOptionsValidatorTests
 {
 	private readonly OpenTelemetryConfigurationOptionsValidator validator = new();
 
-	private static OpenTelemetryConfigurationOptions OptionsWith(string? protocol = null, float samplingRatio = 1.0f)
+	private static OpenTelemetryConfigurationOptions OptionsWith(
+		string? protocol = null,
+		float samplingRatio = 1.0f,
+		string? endpoint = null,
+		bool otlpEnabled = true
+	)
 		=> new()
 		{
-			Otlp = new OtlpExporterConfigurationOptions { Protocol = protocol },
+			Otlp = new OtlpExporterConfigurationOptions { Protocol = protocol, Endpoint = endpoint, Enabled = otlpEnabled },
 			AzureMonitor = new AzureMonitorConfigurationOptions { SamplingRatio = samplingRatio }
 		};
 
@@ -66,5 +72,52 @@ public class OpenTelemetryConfigurationOptionsValidatorTests
 	public void A_sampling_ratio_outside_the_range_fails_validation(float samplingRatio)
 	{
 		this.validator.Validate(OptionsWith(samplingRatio: samplingRatio)).IsValid.ShouldBeFalse();
+	}
+
+	[Theory]
+	[InlineData(null)] // unset falls back to the OTEL_EXPORTER_OTLP_* variables
+	[InlineData("")]
+	[InlineData("http://localhost:4317")]
+	[InlineData("https://collector.example.com:4318/smth/")]
+	public void A_supported_otlp_endpoint_is_accepted(string? endpoint)
+	{
+		this.validator.Validate(OptionsWith(endpoint: endpoint)).IsValid.ShouldBeTrue();
+	}
+
+	[Theory]
+	[InlineData("localhost:4317")] // parses as a URI with the scheme "localhost"
+	[InlineData("collector:4317")]
+	[InlineData("/v1/traces")]
+	[InlineData("ftp://localhost:4317")]
+	[InlineData("not a url")]
+	[InlineData(" ")]
+	public void An_unsupported_otlp_endpoint_fails_validation(string endpoint)
+	{
+		this.validator.Validate(OptionsWith(endpoint: endpoint)).IsValid.ShouldBeFalse();
+	}
+
+	[Fact]
+	public void An_unsupported_otlp_endpoint_is_accepted_when_otlp_is_off()
+	{
+		this.validator.Validate(OptionsWith(endpoint: "localhost:4317", otlpEnabled: false)).IsValid.ShouldBeTrue();
+	}
+
+	// The module reads these options before ValidateOnStart runs, and new Uri() would throw first.
+	[Fact]
+	public void ThrowIfInvalid_names_the_bad_endpoint()
+	{
+		var exception = Should.Throw<OptionsValidationException>(() =>
+			OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid(OptionsWith(endpoint: "localhost:4317"))
+		);
+
+		exception.Message.ShouldContain("Otlp.Endpoint");
+	}
+
+	[Fact]
+	public void ThrowIfInvalid_does_not_throw_on_valid_options()
+	{
+		Should.NotThrow(() =>
+			OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid(OptionsWith(endpoint: "http://localhost:4317"))
+		);
 	}
 }

@@ -3,6 +3,8 @@
   "compatibility_date": "2026-08-20",
   // Off: a deploy is meant to be the site, not a second copy of it on a second URL.
   "preview_urls": false,
+  // Off, and it has to be here: a deploy turns the workers.dev URL back on, whatever the dashboard says.
+  "workers_dev": false,
   // Request metadata, 404s and exceptions. The only way to see a dead inbound link - the link
   // check runs offline and cannot know what anyone typed.
   "observability": {

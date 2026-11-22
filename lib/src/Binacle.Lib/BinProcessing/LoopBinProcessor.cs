@@ -24,8 +24,7 @@ public class LoopBinProcessor : IBinProcessor
 		where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
 	{
 		using var activity = Diagnostics.ActivitySource
-			.StartActivity($"Process Bins: Loop");
-		activity?.SetTag("Operation", parameters.Operation);
+			.StartProcessorActivity("process bins", DiagnosticsTags.Loop, parameters.Operation);
 		var results = new Dictionary<string, OperationResult>(bins.Count);
 
 		for (var i = 0; i < bins.Count; i++)

@@ -26,8 +26,7 @@ public class LoopMultiAlgorithmBinProcessor : IMultiAlgorithmBinProcessor
 		where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
 	{
 		using var activity = Diagnostics.ActivitySource
-			.StartActivity($"Process Multi Algorithm Bins: Loop");
-		activity?.SetTag("Operation", parameters.Operation);
+			.StartProcessorActivity("process multi_algorithm_bins", DiagnosticsTags.Loop, parameters.Operation);
 		var results = new Dictionary<string, OperationResult>(bins.Count);
 
 		for (var i = 0; i < bins.Count; i++)

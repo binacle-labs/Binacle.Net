@@ -92,6 +92,7 @@ just test cs_binacle-net-ui-module_unit
 just test cs_binacle-net-service-module_unit
 just test cs_binacle-net_integration
 just test cs_binacle-net-ui-module_integration
+just test cs_binacle-net-diagnostics-module_integration
 just test cs_binacle-net-service-module_integration [Sqlite|Postgres|AzureStorage]  # no arg falls back to SQLite
 
 # TypeScript

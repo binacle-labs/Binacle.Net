@@ -33,29 +33,51 @@ public static class Program
 		// Ommited by Slim builder
 		builder.WebHost.UseQuic(); //HTTP 3 support
 
+		var configFilesPath = $"{Directory.GetCurrentDirectory()}/Config_Files";
+		var appSettingsFile = "appsettings.json";
+		var appSettingsEnvironmentFile = $"appsettings.{builder.Environment.EnvironmentName}.json";
+
+		// Built before any module file loads, so a module that is off loads none of its files.
+		var featureConfiguration = new ConfigurationBuilder()
+			.SetBasePath(configFilesPath)
+			.AddJsonFile(appSettingsFile, optional: true)
+			.AddJsonFile(appSettingsEnvironmentFile, optional: true)
+			.AddEnvironmentVariables()
+			.AddCommandLine(args)
+			.Build();
+
+		Feature.Manager = new FeatureManagerConfiguration()
+			.ReadFrom.Configuration(featureConfiguration)
+			.ReadFrom.EnvironmentVariables()
+			.CreateManager();
+
 		builder.Configuration
-			.SetBasePath($"{Directory.GetCurrentDirectory()}/Config_Files");
+			.SetBasePath(configFilesPath);
 
-		builder.Configuration.AddEnvironmentVariables();
-
+		// Every JSON file first. The last source with a key wins.
 		builder.AddJsonConfiguration(
-			filePath: "appsettings.json",
-			environmentFilePath: $"appsettings.{builder.Environment.EnvironmentName}.json",
+			filePath: appSettingsFile,
+			environmentFilePath: appSettingsEnvironmentFile,
 			optional: true,
 			reloadOnChange: true
 		);
+		builder.AddJsonConfigurationFile<BinPresetOptions>();
+		builder.AddCorsFile("Cors.json");
+		builder.AddJsonConfigurationFile<ForwardedHeadersConfigurationOptions>();
+		builder.AddDiagnosticsModuleConfiguration();
+
+		if (Feature.IsEnabled("SERVICE_MODULE"))
+		{
+			builder.AddServiceModuleConfiguration();
+		}
+
+		builder.Configuration.AddEnvironmentVariables();
+		builder.Configuration.AddCommandLine(args);
 
 		Log.Information("{ModuleName} module. Status {Status}", "Core", "Initializing");
 
-		builder.AddValidatableJsonConfigurationOptions<BinPresetOptions>();
-		builder.AddCorsFile("Cors.json");
-		builder.AddValidatableJsonConfigurationOptions<ForwardedHeadersConfigurationOptions>();
-
-		// Feature Management
-		Feature.Manager = new FeatureManagerConfiguration()
-			.ReadFrom.Configuration(builder.Configuration)
-			.ReadFrom.EnvironmentVariables()
-			.CreateManager();
+		builder.AddValidatableConfigurationOptions<BinPresetOptions>();
+		builder.AddValidatableConfigurationOptions<ForwardedHeadersConfigurationOptions>();
 
 		builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>(
 			ServiceLifetime.Singleton,

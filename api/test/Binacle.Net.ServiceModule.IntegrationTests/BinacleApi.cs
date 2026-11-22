@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Binacle.Net.ServiceModule.Domain;
 using Binacle.Net.ServiceModule.Domain.Accounts.Models;
@@ -15,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 [assembly: AssemblyFixture(typeof(BinacleApi))]
 
@@ -27,6 +30,9 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>, IAsyncLifeti
 	public AccountCredentials ExistingAccountCredentials { get; private set; } = null!;
 	public readonly Guid NonExistentId;
 	public const string AllowedCorsOrigin = "https://allowed.example.com";
+
+	public ExportedItems<Activity> Spans { get; } = new();
+	public ExportedItems<MetricSnapshot> Metrics { get; } = new();
 
 	public BinacleApi()
 	{
@@ -78,6 +84,10 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>, IAsyncLifeti
 
 		builder.ConfigureTestServices(services =>
 		{
+			// A bare pipeline, so the tests see what the ServiceModule adds to any pipeline.
+			services.AddOpenTelemetry()
+				.WithTracing(tracing => tracing.AddInMemoryExporter(this.Spans))
+				.WithMetrics(meters => meters.AddInMemoryExporter(this.Metrics));
 			services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
 			services.Configure<ServiceModuleOptions>(options =>
 			{
@@ -126,6 +136,11 @@ public sealed class BinacleApi : WebApplicationFactory<IApiMarker>, IAsyncLifeti
 
 	public HttpClient Client { get; init; }
 	public JsonSerializerOptions JsonSerializerOptions { get; init; }
+
+	public void FlushMetrics()
+	{
+		this.Services.GetRequiredService<MeterProvider>().ForceFlush();
+	}
 
 	public async ValueTask InitializeAsync()
 	{

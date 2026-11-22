@@ -21,7 +21,6 @@ public static class CorsExtensions
 
 		builder.Configuration.AddJsonFile(filePath, optional: true, reloadOnChange: false);
 		builder.Configuration.AddJsonFile(environmentFilePath, optional: true, reloadOnChange: false);
-		builder.Configuration.AddEnvironmentVariables();
 
 		return builder;
 	}

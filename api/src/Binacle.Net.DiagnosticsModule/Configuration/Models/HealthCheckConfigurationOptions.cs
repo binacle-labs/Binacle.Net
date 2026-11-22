@@ -18,5 +18,6 @@ internal class HealthCheckConfigurationOptions : IConfigurationOptions
 	public string? Path { get; set; }
 	public string[]? RestrictedIPs { get; set; }
 	public string[]? RestrictedChecks { get; set; }
+	public string? AccessKey { get; set; }
 }
 

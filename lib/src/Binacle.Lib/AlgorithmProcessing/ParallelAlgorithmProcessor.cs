@@ -37,8 +37,7 @@ public class ParallelAlgorithmProcessor: IAlgorithmProcessor
         where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
     {
         using var activity = Diagnostics.ActivitySource
-            .StartActivity($"Process Algorithms: Parallel");
-        activity?.SetTag("Operation", parameters.Operation);
+            .StartProcessorActivity("process algorithms", DiagnosticsTags.Parallel, parameters.Operation);
         var results = new ConcurrentDictionary<string, OperationResult>(this.concurrencyLevel, this.supportedAlgorithms.Length);
 
         var parallelOptions = new ParallelOptions

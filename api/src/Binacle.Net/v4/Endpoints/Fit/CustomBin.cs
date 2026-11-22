@@ -5,6 +5,7 @@ using Binacle.Net.Services;
 using Binacle.Net.v4.Contracts;
 using Binacle.Net.v4.Contracts.Fit;
 using OpenApiExamples.ExtensionMethods;
+using Binacle.Net.Telemetry;
 
 namespace Binacle.Net.v4.Endpoints.Fit;
 
@@ -50,8 +51,6 @@ internal class CustomBin : IGroupedEndpoint<ApiV4EndpointGroup>
 		CancellationToken cancellationToken = default
 	)
 	{
-		using var activity = Diagnostics.ActivitySource.StartActivity("Fit Custom Bin: v4");
-		
 		return await bindingResult.ValidateAsync(async request =>
 		{
 			var algorithm = request.Parameters.GetAlgorithm();
@@ -77,7 +76,7 @@ internal class CustomBin : IGroupedEndpoint<ApiV4EndpointGroup>
 				);
 			}
 			
-			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("Create Response"))
+			using (var responseActivity = Diagnostics.ActivitySource.StartActivity("create response"))
 			{
 				return Results.Ok(
 					FitBinResponse.From(

@@ -7,6 +7,8 @@ public class TimedActivityOperation : TimedOperation
 {
 	private readonly Activity? activity;
 
+	public Activity? Activity => this.activity;
+
 	public TimedActivityOperation(ILogger logger, LogLevel logLevel, string message, ActivitySource activitySource)
 		:base(logger, logLevel, message, null)
 	{

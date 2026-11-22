@@ -1,4 +1,5 @@
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
+using Binacle.Net.DiagnosticsModule.Configuration.Validators;
 using Binacle.Net.DiagnosticsModule.ExtensionMethods;
 using Binacle.Net.DiagnosticsModule.Middleware;
 using Binacle.Net.DiagnosticsModule.Services;
@@ -14,10 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
 
@@ -44,17 +41,22 @@ public static class ModuleDefinition
 			.CreateBootstrapLogger();
 	}
 	
-	public static void AddDiagnosticsModule(this WebApplicationBuilder builder)
+	public static void AddDiagnosticsModuleConfiguration(this WebApplicationBuilder builder)
 	{
-		Log.Information("{ModuleName} module. Status {Status}", "Diagnostics", "Initializing");
-
-		// Logging
 		builder.AddJsonConfiguration(
 			filePath: "DiagnosticsModule/Serilog.json",
 			environmentFilePath: $"DiagnosticsModule/Serilog.{builder.Environment.EnvironmentName}.json",
 			optional: false,
 			reloadOnChange: true
 		);
+		builder.AddJsonConfigurationFile<OpenTelemetryConfigurationOptions>();
+		builder.AddJsonConfigurationFile<PackingLogsConfigurationOptions>();
+		builder.AddJsonConfigurationFile<HealthCheckConfigurationOptions>();
+	}
+
+	public static void AddDiagnosticsModule(this WebApplicationBuilder builder)
+	{
+		Log.Information("{ModuleName} module. Status {Status}", "Diagnostics", "Initializing");
 
 		// overwrite default logger
 		builder.Host.UseSerilog((context, services, loggerConfiguration) =>
@@ -68,71 +70,28 @@ public static class ModuleDefinition
 			includeInternalTypes: true);
 
 		// Open Telemetry
-		builder.AddValidatableJsonConfigurationOptions<OpenTelemetryConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<OpenTelemetryConfigurationOptions>();
 
 		var openTelemetryOptions = builder.Configuration.GetConfigurationOptions<OpenTelemetryConfigurationOptions>();
 
 		if (openTelemetryOptions?.IsEnabled() ?? false)
 		{
+			OpenTelemetryConfigurationOptionsValidator.ThrowIfInvalid(openTelemetryOptions);
 			Log.Information("OpenTelemetry is enabled.");
-			var openTelemetryBuilder = builder.Services
+
+			builder.Services
 				.AddOpenTelemetry()
-				.ConfigureResource(resourceBuilder =>
-				{
-					resourceBuilder.AddService(
-						serviceName: "Binacle.Net",
-						serviceVersion: Metadata.Version,
-						serviceNamespace: openTelemetryOptions.ServiceNamespace,
-						serviceInstanceId: openTelemetryOptions.ServiceInstanceId
-					)
-					.AddOptionalAdditionalAttributes(openTelemetryOptions);
-				})
-				.WithMetrics(meterBuilder =>
-				{
-					meterBuilder
-						.ConfigureResource(config =>
-							config.AddOptionalAdditionalAttributes(openTelemetryOptions.Metrics)
-						)
-						.AddRuntimeInstrumentation()
-						.AddAspNetCoreInstrumentation()
-						.AddMeters(openTelemetryOptions.Metrics.AdditionalMeters);
-				})
-				.WithTracing(traceBuilder =>
-				{
-					traceBuilder
-						.ConfigureResource(config =>
-							config.AddOptionalAdditionalAttributes(openTelemetryOptions.Tracing)
-						)
-						.AddAspNetCoreInstrumentation(options =>
-							options.ConfigureAspNetCoreInstrumentation(openTelemetryOptions.Tracing)
-						)
-						.AddHttpClientInstrumentation(options =>
-							options.ConfigureHttpClientInstrumentation(openTelemetryOptions.Tracing)
-						)
-						.AddSources(openTelemetryOptions.Tracing.AdditionalSources);
-				})
-				.WithLogging(logBuilder =>
-				{
-					logBuilder.ConfigureResource(config =>
-						config.AddOptionalAdditionalAttributes(openTelemetryOptions.Logging)
-					);
-				});
-
-			if (openTelemetryOptions.Otlp.Enabled)
-			{
-				Log.Information("Using {Provider} with OpenTelemetry.", "Otlp Exporter");
-				openTelemetryBuilder.UseOtlpExporter(openTelemetryOptions.Otlp);
-			}
-
-			if (openTelemetryOptions.AzureMonitor.Enabled)
-			{
-				Log.Information("Using {Provider} with OpenTelemetry.", "Azure Monitor");
-				openTelemetryBuilder.UseAzureMonitor(openTelemetryOptions.AzureMonitor);
-			}
+				.WithLogger(Log.Logger)
+				.ConfigureResource(openTelemetryOptions, builder.Environment.EnvironmentName)
+				.WithMetrics(openTelemetryOptions.Metrics)
+				.WithTracing(openTelemetryOptions.Tracing)
+				.WithLogging(openTelemetryOptions.Logging)
+				.UseOtlpExporter(openTelemetryOptions.Otlp)
+				.UseAzureMonitor(openTelemetryOptions.AzureMonitor);
 		}
 
 		// Packing Logs
-		builder.AddValidatableJsonConfigurationOptions<PackingLogsConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<PackingLogsConfigurationOptions>();
 
 		var packingLogsOptionsIsEnabled = builder.Configuration
 			.GetSection(PackingLogsConfigurationOptions.SectionName)
@@ -145,7 +104,7 @@ public static class ModuleDefinition
 		}
 
 		// Health Checks
-		builder.AddValidatableJsonConfigurationOptions<HealthCheckConfigurationOptions>();
+		builder.AddValidatableConfigurationOptions<HealthCheckConfigurationOptions>();
 
 		// Add health checks
 		builder.Services
@@ -225,7 +184,8 @@ public static class ModuleDefinition
 
 						return healthChecksOptions.Value.RestrictedChecks.Contains(check.Name);
 					}
-				});
+				})
+				.DisableHttpMetrics();
 		}
 	}
 }

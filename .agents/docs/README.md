@@ -31,6 +31,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `api/src/Binacle.Net.ServiceModule.Infrastructure` | Infrastructure layer for ServiceModule — DB providers |
 | `api/src/Binacle.Net.UIModule` | Optional: Razor Pages demo host — packing demo and ViPaq decoder |
 | `api/test/Binacle.Net.IntegrationTests` | HTTP tests for v3 and v4 endpoints |
+| `api/test/Binacle.Net.DiagnosticsModule.IntegrationTests` | What the OpenTelemetry pipeline exports, with OpenTelemetry, health checks and packing logs on |
 | `api/test/Binacle.Net.ServiceModule.IntegrationTests` | Tests for auth and rate limiting (ServiceModule only) |
 | `api/test/Binacle.Net.UIModule.IntegrationTests` | Page routes and rendered markup, with the demo on and off (UIModule only) |
 | `api/test/*.UnitTests` | One unit suite per source project — `Binacle.Net`, `Kernel`, `DiagnosticsModule`, `ServiceModule`, `UIModule`. `Kernel.UnitTests` is split by feature folder |

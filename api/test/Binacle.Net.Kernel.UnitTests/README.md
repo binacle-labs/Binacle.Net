@@ -6,6 +6,7 @@ module, so a feature's tests stay next to that feature and nothing reaches acros
 | Folder | Covers |
 |---|---|
 | `Cors/` | `CorsPolicyOptionsValidator` - which origin spellings a browser can match, and which it silently cannot - and the `Cors` section extensions that read a policy file |
+| `Dependencies/` | `Decorate` - the order decorators wrap in, and that a registration keeps its lifetime |
 | `Instance/` | `InstanceOptions` - what a running instance reports about itself |
 | `Logs/` | `LogsProcessor` and `LogsRetentionProcessor` - what reaches disk, and what retention will and will not delete |
 | `Network/` | `IPEntry` - how a configured IP entry is read, and what each spelling admits |

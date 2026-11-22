@@ -53,6 +53,7 @@ Once running, the API serves under `/api/v3` and `/api/v4`. With the UIs enabled
 | Project | Run with | Covers |
 |---|---|---|
 | [`test/Binacle.Net.IntegrationTests`](test/Binacle.Net.IntegrationTests) | `just test cs_binacle-net_integration` | HTTP tests for v3 and v4 endpoints |
+| [`test/Binacle.Net.DiagnosticsModule.IntegrationTests`](test/Binacle.Net.DiagnosticsModule.IntegrationTests) | `just test cs_binacle-net-diagnostics-module_integration` | What OpenTelemetry exports |
 | `test/Binacle.Net.ServiceModule.IntegrationTests` | `just test cs_binacle-net-service-module_integration` | Auth and rate limiting |
 | [`test/Binacle.Net.UIModule.IntegrationTests`](test/Binacle.Net.UIModule.IntegrationTests) | `just test cs_binacle-net-ui-module_integration` | The pages, with the module on and off |
 | `test/Binacle.Net.UnitTests` | `just test cs_binacle-net_unit` | Presets, forwarded headers, request converters |

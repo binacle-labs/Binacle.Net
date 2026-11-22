@@ -30,8 +30,7 @@ public class ParallelMultiAlgorithmBinProcessor : IMultiAlgorithmBinProcessor
 		where TItem : class, IWithID, IWithReadOnlyDimensions, IWithQuantity
 	{
 		using var activity = Diagnostics.ActivitySource
-			.StartActivity($"Process Multi Algorithm Bins: Parallel");
-		activity?.SetTag("Operation", parameters.Operation);
+			.StartProcessorActivity("process multi_algorithm_bins", DiagnosticsTags.Parallel, parameters.Operation);
 
 		// One bin per thread, and the bin count is only known here, so the default cap resolves here too. The inner algorithm race has its own.
 		var degree = this.maxDegreeOfParallelism ?? ParallelLimits.Degree(bins.Count);

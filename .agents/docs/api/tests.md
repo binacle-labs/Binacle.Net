@@ -12,13 +12,14 @@ paths:
 
 # API Tests
 
-Eight projects under `api/test/` — three integration suites, which this doc is about, and five unit suites:
+The projects under `api/test/` — the integration suites, which this doc is about, and the unit suites:
 
 | Project | Covers | Run |
 |---|---|---|
 | `Binacle.Net.IntegrationTests` | v3 + v4 HTTP endpoints (fit, pack, presets), and the CORS policy | `just test cs_binacle-net_integration` |
 | `Binacle.Net.ServiceModule.IntegrationTests` | auth token, admin account/subscription (ServiceModule on), rate limiting both ways | `just test cs_binacle-net-service-module_integration` |
 | `Binacle.Net.UIModule.IntegrationTests` | which routes answer with a web page, with the demo on and off | `just test cs_binacle-net-ui-module_integration` |
+| `Binacle.Net.DiagnosticsModule.IntegrationTests` | what the OpenTelemetry pipeline exports: resource, health-check filter, span tree, metric names, scope versions, log trace ids | `just test cs_binacle-net-diagnostics-module_integration` |
 | `Binacle.Net.UnitTests` | `Binacle.Net`'s own options validators, and the forwarded-headers middleware over the options they produce | `just test cs_binacle-net_unit` |
 | `Binacle.Net.Kernel.UnitTests` | Kernel features, one folder each (`Cors/`, `Instance/`, `Logs/`, `Network/`, `OpenApi/`, `Paths/`, `Serialization/`) | `just test cs_binacle-net-kernel_unit` |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | health check allow-list, the three middlewares including `/_debug`, config validators | `just test cs_binacle-net-diagnostics-module_unit` |

@@ -41,6 +41,7 @@ Tests  (all xUnit v3, all OutputType Exe)
    IntegrationTests                → Binacle.Net, Binacle.Packing, Binacle.Data
    Kernel.UnitTests                → Kernel
    DiagnosticsModule.UnitTests     → DiagnosticsModule
+   DiagnosticsModule.IntegrationTests → Binacle.Net
    ServiceModule.UnitTests         → ServiceModule
    ServiceModule.IntegrationTests  → ServiceModule, Binacle.Net
    UIModule.UnitTests              → UIModule
@@ -62,6 +63,7 @@ Tests  (all xUnit v3, all OutputType Exe)
 | `Binacle.Net.IntegrationTests` | xUnit exe | Binacle.Net, Packing, Binacle.Data | Binacle.Net | v3/v4 HTTP tests |
 | `Binacle.Net.Kernel.UnitTests` | xUnit exe | Kernel | Kernel | Kernel units |
 | `Binacle.Net.DiagnosticsModule.UnitTests` | xUnit exe | DiagnosticsModule | DiagnosticsModule | log/telemetry units |
+| `Binacle.Net.DiagnosticsModule.IntegrationTests` | xUnit exe | Binacle.Net | — | what the OpenTelemetry pipeline exports |
 | `Binacle.Net.ServiceModule.UnitTests` | xUnit exe | ServiceModule | ServiceModule, Infrastructure | auth/accounts units |
 | `Binacle.Net.ServiceModule.IntegrationTests` | xUnit exe | ServiceModule, Binacle.Net | Binacle.Net, ServiceModule, Domain, Infrastructure | auth + rate-limit tests |
 | `Binacle.Net.UIModule.UnitTests` | xUnit exe | UIModule | UIModule | page models, applet list, error page |
