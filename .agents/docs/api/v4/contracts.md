@@ -112,7 +112,7 @@ missing from the results is skipped rather than faked.
 
 The mappers live in `api/src/Binacle.Net/v4/ExtensionMethods/FittingMapperExtensions.cs` and
 `PackingMapperExtensions.cs`. They are called by `FitBinResponse.From` / `PackBinResponse.From`, which the
-endpoint handlers invoke inside a `"Create Response"` activity.
+endpoint handlers invoke inside a `"create response"` activity.
 
 `BinResponseBase.From<T>(parameters, operationResult)` populates the common fields: `Bin` via `Bin.From`,
 `AlgorithmUsed` from `result.AlgorithmInfo.Algorithm.ToFastString()`, `PackedItems` via `PackedBox.From`,

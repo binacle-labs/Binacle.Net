@@ -38,17 +38,15 @@ internal class OperationResultBuilder<TBin, TItem>
 	}
 
 	internal OperationResult EarlyExit(EarlyExitReason reason)
-	{
-		var result = this.Complete();
-		result.Status = OperationResultStatus.EarlyExit;
-		result.EarlyExitReason = reason;
-		return result;
-	}
-	
+		=> this.Build(reason);
+
 	internal OperationResult Complete()
+		=> this.Build(null);
+
+	private OperationResult Build(EarlyExitReason? earlyExitReason)
 	{
 		using var activity = Diagnostics.ActivitySource
-			.StartActivity("Build Operation Result");
+			.StartActivity("build result");
 		
 		var packedItemsListSize = this.packedItems?.Count() ?? 0;
 		var unpackedItemsListSize = this.unpackedItems?.Count() ?? 0;
@@ -129,6 +127,18 @@ internal class OperationResultBuilder<TBin, TItem>
 		else if (packedItemsCount > 0)
 		{
 			result.Status = OperationResultStatus.PartiallyPacked;
+		}
+
+		if (earlyExitReason is not null)
+		{
+			result.Status = OperationResultStatus.EarlyExit;
+			result.EarlyExitReason = earlyExitReason.Value;
+		}
+
+		if (activity is not null)
+		{
+			activity.SetTag(DiagnosticsTags.ResultAlgorithm, DiagnosticsTags.ToTag(this.algorithmInfo.Algorithm));
+			activity.SetTag(DiagnosticsTags.ResultStatus, DiagnosticsTags.ToTag(result.Status));
 		}
 
 		return result;

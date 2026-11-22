@@ -15,12 +15,17 @@ public class LogsProcessorTests : IDisposable
 	private readonly LogsHost host = new();
 
 	// The channel is typed, so good and failing requests have to be one type.
-	private sealed record Request(string Name, bool Throws = false) : ILogEntryConvertible<Entry>
+	// OnConvert runs on the processor's thread, so a test can hold a write in flight.
+	private sealed record Request(string Name, bool Throws = false, Action? OnConvert = null)
+		: ILogEntryConvertible<Entry>
 	{
 		public Entry ToLogEntry(DateTimeOffset timestamp)
-			=> this.Throws
+		{
+			this.OnConvert?.Invoke();
+			return this.Throws
 				? throw new InvalidOperationException("this request cannot become a log entry")
 				: new Entry(this.Name, timestamp);
+		}
 	}
 
 	private sealed record Entry(string Name, DateTimeOffset Timestamp);
@@ -183,6 +188,157 @@ public class LogsProcessorTests : IDisposable
 		);
 
 		this.host.LogFiles().ShouldBeEmpty();
+	}
+
+	[Fact]
+	public async Task Each_entry_calls_written_or_failed_once()
+	{
+		var written = 0;
+		var failed = new List<Exception>();
+		var options = new LogsProcessorOptions<Request>
+		{
+			Path = LogsHost.LogsFolder,
+			FileNameFormat = "packing-{0}.ndjson",
+			DateFormat = "yyyy-MM-dd",
+			OnWritten = () => written++,
+			OnWriteFailed = failed.Add,
+		};
+
+		await this.Drain(
+			options,
+			At(Now),
+			true,
+			new Request("first"),
+			new Request("bad", Throws: true),
+			new Request("second")
+		);
+
+		written.ShouldBe(2);
+		failed.ShouldHaveSingleItem().ShouldBeOfType<InvalidOperationException>();
+	}
+
+	// The channel is left open, so only the processor can complete it.
+	[Fact]
+	public async Task A_stopped_processor_completes_the_channel_and_discards_what_is_left()
+	{
+		var failed = 0;
+		var discarded = 0;
+		var options = new LogsProcessorOptions<Request>
+		{
+			Path = LogsHost.LogsFolder,
+			FileNameFormat = "packing-{0}.ndjson",
+			DateFormat = "yyyy-MM-dd",
+			MaxConsecutiveAllowedExceptions = 2,
+			OnWriteFailed = _ => failed++,
+			OnDiscarded = () => discarded++,
+		};
+		var channel = Channel.CreateUnbounded<Request>();
+		channel.Writer.TryWrite(new Request("bad", Throws: true));
+		channel.Writer.TryWrite(new Request("worse", Throws: true));
+		channel.Writer.TryWrite(new Request("left"));
+		channel.Writer.TryWrite(new Request("also left"));
+
+		var processor = new LogsProcessor<Request, Entry>(
+			channel,
+			this.host,
+			At(Now),
+			options,
+			NullLogger<LogsProcessor<Request, Entry>>.Instance
+		);
+		await processor.StartAsync(CancellationToken.None);
+		await processor.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(10));
+
+		failed.ShouldBe(2);
+		discarded.ShouldBe(2);
+		channel.Writer.TryWrite(new Request("too late")).ShouldBeFalse();
+		channel.Reader.Completion.IsCompleted.ShouldBeTrue();
+	}
+
+	private sealed class Counts
+	{
+		public int Written;
+		public int Failed;
+		public int Discarded;
+	}
+
+	private static LogsProcessorOptions<Request> Counting(Counts counts) => new()
+	{
+		Path = LogsHost.LogsFolder,
+		FileNameFormat = "packing-{0}.ndjson",
+		DateFormat = "yyyy-MM-dd",
+		OnWritten = () => Interlocked.Increment(ref counts.Written),
+		OnWriteFailed = _ => Interlocked.Increment(ref counts.Failed),
+		OnDiscarded = () => Interlocked.Increment(ref counts.Discarded),
+	};
+
+	// Starts the processor on an open channel, holds the first request in flight, and queues the rest behind it.
+	// Returns once the first request is being written.
+	private async Task<(LogsProcessor<Request, Entry> Processor, Channel<Request> Channel, SemaphoreSlim Release)>
+		HoldInFlight(LogsProcessorOptions<Request> options, TimeProvider timeProvider, params string[] queued)
+	{
+		var started = new SemaphoreSlim(0);
+		var release = new SemaphoreSlim(0);
+		var channel = Channel.CreateUnbounded<Request>();
+		var processor = new LogsProcessor<Request, Entry>(
+			channel,
+			this.host,
+			timeProvider,
+			options,
+			NullLogger<LogsProcessor<Request, Entry>>.Instance
+		);
+		await processor.StartAsync(CancellationToken.None);
+
+		channel.Writer.TryWrite(new Request("in flight", OnConvert: () =>
+		{
+			started.Release();
+			release.Wait();
+		}));
+		foreach (var name in queued)
+		{
+			channel.Writer.TryWrite(new Request(name));
+		}
+
+		(await started.WaitAsync(TimeSpan.FromSeconds(10))).ShouldBeTrue();
+		return (processor, channel, release);
+	}
+
+	[Fact]
+	public async Task A_normal_stop_finishes_the_write_in_flight_and_writes_what_is_queued()
+	{
+		var counts = new Counts();
+		var (processor, channel, release) = await this.HoldInFlight(
+			Counting(counts), At(Now), "queued", "also queued");
+
+		var stop = processor.StopAsync(CancellationToken.None);
+		release.Release();
+		await stop.WaitAsync(TimeSpan.FromSeconds(10));
+
+		this.LinesIn("packing-2026-08-31.ndjson")
+			.Select(line => JsonSerializer.Deserialize<Entry>(line)!.Name)
+			.ShouldBe(["in flight", "queued", "also queued"]);
+		counts.Written.ShouldBe(3);
+		counts.Failed.ShouldBe(0);
+		counts.Discarded.ShouldBe(0);
+		channel.Writer.TryWrite(new Request("too late")).ShouldBeFalse();
+	}
+
+	// The deadline runs on the processor's TimeProvider, so advancing the fake clock passes it.
+	[Fact]
+	public async Task What_the_stop_deadline_leaves_is_discarded_not_failed()
+	{
+		var counts = new Counts();
+		var timeProvider = At(Now);
+		var (processor, _, release) = await this.HoldInFlight(
+			Counting(counts), timeProvider, "queued", "also queued");
+
+		var stop = processor.StopAsync(CancellationToken.None);
+		timeProvider.Advance(TimeSpan.FromSeconds(5));
+		release.Release();
+		await stop.WaitAsync(TimeSpan.FromSeconds(10));
+
+		counts.Written.ShouldBe(0);
+		counts.Failed.ShouldBe(0);
+		counts.Discarded.ShouldBe(3);
 	}
 
 	// A file where the directory should be. Nothing can be written after that, but the process must come up.

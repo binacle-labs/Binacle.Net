@@ -7,7 +7,8 @@ internal class OpenTelemetryConfigurationOptions : IConfigurationOptions, IOpenT
 	public static string FilePath => "DiagnosticsModule/OpenTelemetry.json";
 	public static string SectionName => "OpenTelemetry";
 	public static bool Optional => false;
-	public static bool ReloadOnChange => true;
+	// False because the exporters are built once at startup. An edit needs a restart.
+	public static bool ReloadOnChange => false;
 	public static string GetEnvironmentFilePath(string environment) => $"DiagnosticsModule/OpenTelemetry.{environment}.json";
 	
 	public string? ServiceNamespace { get; set; }

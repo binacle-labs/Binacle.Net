@@ -132,6 +132,7 @@ fileContentTests:
     expectedContents:
       - '"Enabled"\s*:\s*false'
       - '"RestrictedIPs"\s*:\s*\[\]'
+      - '"AccessKey"\s*:\s*null'
   - name: AllowedHosts is the wildcard default
     path: /app/Config_Files/appsettings.json
     expectedContents: ['"AllowedHosts"\s*:\s*"\*"']

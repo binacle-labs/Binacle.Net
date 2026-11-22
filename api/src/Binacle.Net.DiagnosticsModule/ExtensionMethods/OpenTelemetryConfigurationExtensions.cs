@@ -1,111 +1,96 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Binacle.Net.DiagnosticsModule.Configuration.Models;
 using OpenTelemetry;
-using OpenTelemetry.Instrumentation.AspNetCore;
-using OpenTelemetry.Instrumentation.Http;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Serilog;
 
 namespace Binacle.Net.DiagnosticsModule.ExtensionMethods;
 
 internal static class OpenTelemetryConfigurationExtensions
 {
-	public static MeterProviderBuilder AddMeters(
-		this MeterProviderBuilder meterProviderBuilder,
-		string[]? additionalMeters
+	public static BinacleOpenTelemetryBuilder WithLogger(this OpenTelemetryBuilder builder, ILogger logger)
+	{
+		return new BinacleOpenTelemetryBuilder(builder, logger);
+	}
+
+	public static BinacleOpenTelemetryBuilder ConfigureResource(
+		this BinacleOpenTelemetryBuilder builder,
+		OpenTelemetryConfigurationOptions options,
+		string environmentName
 	)
 	{
-		if (additionalMeters?.Length > 0)
+		builder.Builder.ConfigureResource(resource => resource
+			.AddService(
+				serviceName: "Binacle.Net",
+				serviceVersion: Metadata.Version,
+				serviceNamespace: options.ServiceNamespace,
+				serviceInstanceId: options.ServiceInstanceId
+			)
+			.AddHostAndProcess()
+			.AddDeploymentEnvironment(environmentName)
+			// Read again so OTEL_RESOURCE_ATTRIBUTES and OTEL_SERVICE_NAME beat the values above.
+			.AddEnvironmentVariableDetector()
+			.AddOptionalAdditionalAttributes(options)
+		);
+
+		return builder;
+	}
+
+	public static ResourceBuilder AddHostAndProcess(this ResourceBuilder builder)
+	{
+		var attributes = new Dictionary<string, object>
 		{
-			foreach (var meter in additionalMeters)
-			{
-				meterProviderBuilder.AddMeter(meter);
-			}
-		}
+			["host.name"] = Environment.MachineName,
+			["process.pid"] = Environment.ProcessId
+		};
 
-		return meterProviderBuilder;
+		return builder.AddAttributes(attributes);
 	}
 
-	public static TracerProviderBuilder AddSources(
-		this TracerProviderBuilder tracerProviderBuilder,
-		string[]? additionalSources
-	)
+	public static ResourceBuilder AddDeploymentEnvironment(this ResourceBuilder builder, string environmentName)
 	{
-		if (additionalSources?.Length > 0)
+		var attributes = new Dictionary<string, object>
 		{
-			foreach (var source in additionalSources)
-			{
-				tracerProviderBuilder.AddSource(source);
-			}
-		}
+			["deployment.environment.name"] = environmentName.ToLowerInvariant()
+		};
 
-		return tracerProviderBuilder;
+		return builder.AddAttributes(attributes);
 	}
 
-	public static void ConfigureAspNetCoreInstrumentation(
-		this AspNetCoreTraceInstrumentationOptions options,
-		OpenTelemetryTracingConfigurationOptions tracingConfigurationOptions
-	)
-	{
-		// Empty on purpose. ModuleDefinition already calls this, so the seam exists and is wired; adding the
-		// first setting is then an edit here rather than a change at the call site.
-	}
-
-	public static void ConfigureHttpClientInstrumentation(
-		this HttpClientTraceInstrumentationOptions options,
-		OpenTelemetryTracingConfigurationOptions tracingConfigurationOptions
-	)
-	{
-		// Empty on purpose. ModuleDefinition already calls this, so the seam exists and is wired; adding the
-		// first setting is then an edit here rather than a change at the call site.
-	}
-
-	public static void UseOtlpExporter(
-		this OpenTelemetryBuilder builder,
-		OtlpExporterConfigurationOptions otlp
-	)
-	{
-		if (!string.IsNullOrEmpty(otlp.Endpoint))
-		{
-			builder.UseOtlpExporter(
-				otlp.GetOtlpExportProtocol(),
-				new Uri(otlp.Endpoint)
-			);
-			return;
-		}
-
-		// Expected config to be passed through environemnt variables
-		builder.UseOtlpExporter();
-	}
-
-	public static void UseAzureMonitor(
-		this OpenTelemetryBuilder builder,
-		AzureMonitorConfigurationOptions options
-	)
-	{
-		builder.UseAzureMonitor(azureMonitorOptions =>
-		{
-			if (!string.IsNullOrEmpty(options.ConnectionString))
-			{
-				azureMonitorOptions.ConnectionString = options.ConnectionString;
-			}
-			azureMonitorOptions.SamplingRatio = options.SamplingRatio;
-			azureMonitorOptions.EnableLiveMetrics = options.EnableLiveMetrics;
-		});
-	}
-
-	public static ResourceBuilder AddOptionalAdditionalAttributes<T>(
+	public static ResourceBuilder AddOptionalAdditionalAttributes(
 		this ResourceBuilder builder,
-		T model
+		IOpenTelemetryAttributes model
 	)
-		where T : IOpenTelemetryAttributes
 	{
-		if (model.AdditionalAttributes?.Count > 0)
+		if (HasAttributes(model))
 		{
-			builder.AddAttributes(model.AdditionalAttributes);
+			builder.AddAttributes(model.AdditionalAttributes!);
 		}
 
 		return builder;
+	}
+
+	public static void WarnIfDeprecatedAttributes(
+		this BinacleOpenTelemetryBuilder builder,
+		IOpenTelemetryAttributes signal,
+		string signalName
+	)
+	{
+		if (!HasAttributes(signal))
+		{
+			return;
+		}
+
+		var sectionName = OpenTelemetryConfigurationOptions.SectionName;
+
+		builder.Logger.Warning(
+			"{Setting:l} is deprecated and will be removed in 4.0.0. Move its values to {Replacement:l}, which applies to every signal.",
+			$"{sectionName}:{signalName}:AdditionalAttributes",
+			$"{sectionName}:AdditionalAttributes"
+		);
+	}
+
+	private static bool HasAttributes(IOpenTelemetryAttributes model)
+	{
+		return model.AdditionalAttributes?.Count > 0;
 	}
 }

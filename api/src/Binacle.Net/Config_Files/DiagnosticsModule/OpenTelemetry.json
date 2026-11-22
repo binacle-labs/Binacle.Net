@@ -1,14 +1,17 @@
 {
 	"OpenTelemetry" : {
 		"ServiceNamespace": "binacle",
-		"ServiceInstanceId": "1",
+		"ServiceInstanceId": null,
 		"AdditionalAttributes": {
 			
 		},
 		"Otlp": {
 			"Enabled" : false,
 			"Endpoint" : null,
-			"Protocol" : "grpc"
+			"Protocol" : "grpc",
+			"Metrics" : true,
+			"Tracing" : true,
+			"Logging" : true
 		},
 		"AzureMonitor": {
 			"Enabled" : false,
@@ -19,23 +22,12 @@
 		"Metrics": {
 			"AdditionalMeters": [
 
-			],
-			"AdditionalAttributes": {
-				
-			}
+			]
 		},
 		"Tracing": {
 			"AdditionalSources": [
 				
-			],
-			"AdditionalAttributes": {
-
-			}
-		},
-		"Logging": {
-			"AdditionalAttributes": {
-
-			}
+			]
 		}
 	}
 }

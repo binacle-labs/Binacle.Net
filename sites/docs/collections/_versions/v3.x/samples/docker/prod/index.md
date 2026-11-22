@@ -67,7 +67,7 @@ Uncomment the `OpenTelemetry.Production.json` mount and edit the endpoint. The c
 service at the bottom of `docker-compose.yml` is the quickest thing to point it at while you are setting it up;
 replace it with your real collector. Azure Monitor is the other exporter, in the same file.
 
-See [OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry.md %}) for every setting.
+See [OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}) for every setting.
 
 ## 💾 It is not stateless
 

@@ -160,6 +160,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test cs_binacle-net_integration
 
+      - name: Test - Binacle.Net.DiagnosticsModule.IntegrationTests
+        if: ${{ !cancelled() }}
+        run: just test cs_binacle-net-diagnostics-module_integration
+
       # A step per backend, not a matrix. The backend is the recipe's argument, so a typo is rejected
       # instead of reporting green for a backend nobody exercised.
       - name: Test - Binacle.Net.ServiceModule.IntegrationTests [Sqlite]

@@ -3,6 +3,7 @@
 		"Enabled": false,
 		"Path": "/_health",
 		"RestrictedIPs": [],
-		"RestrictedChecks": []
+		"RestrictedChecks": [],
+		"AccessKey": null
 	}
 }
