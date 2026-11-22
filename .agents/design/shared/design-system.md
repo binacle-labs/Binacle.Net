@@ -1,8 +1,8 @@
 ---
 id: shared/design-system
 description: Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo.
-verified: 2026-11-08
-check: DS1 against the build:css script in each site's package.json and the UI module's, which runs sass with --pkg-importer=node on that surface's own main.scss. DS2 to DS5 against shared/packages/design-system - its README, the folders, no @import and no "as *" in any .scss of the repo outside vendored lib/, every @media in range syntax naming a tiers. variable. DS6 against abstracts/_tiers.scss, and against every tier above desktop being used by a block that more than the docs site loads. DS7 against base/_tokens.scss, one @font-face per family, and fonts/, one woff2 each. DS8 against .field__input[aria-invalid] in components/field, a border colour and no background. DS9 against components/callout, a left edge and a label in --info, --warn or --error. DS10 against the two theme blocks in base/_tokens.scss, each setting its own --accent. DS11 against every var(--accent) in the package, each a background or a border. DS12 against a search for border-radius and box-shadow, and for --radius and --shadow, which must not exist. DS13 against a search of sites/, shared/ and the UI module for fonts.googleapis and fonts.gstatic, which must find nothing. DS14 against the --size- tokens and a search for a font-size given as a number outside them. DS15 against a search of every stylesheet for min-width and max-width, which must find none, and a search for mobile-only, tablet-only and desktop-only. DS16 against --step and --band-pad in base/_tokens.scss and their use in layout/. DS17 against every querySelector, closest and getElementsByClassName in the TypeScript of shared/packages, sites/*/_js and the UI module, none taking a class but an is- state.
+verified: 2026-11-22
+check: DS1 against the build:css script in each site's package.json and the UI module's, which runs sass with --pkg-importer=node on that surface's own main.scss. DS2 to DS5 against shared/packages/design-system - its README, the folders, no @import and no "as *" in any .scss of the repo outside vendored lib/, every @media in range syntax naming a tiers. variable. DS6 against abstracts/_tiers.scss, and against every tier above desktop being used by a block that more than the docs site loads. DS7 against base/_tokens.scss, one @font-face per family, and fonts/, one woff2 each. DS8 against .field__input[aria-invalid] in components/field, a border colour and no background. DS9 against components/callout, a left edge and a label in --info, --warn or --error. DS10 against the two theme blocks in base/_tokens.scss, each setting its own --accent. DS11 against every var(--accent) in the package, each a background or a border. DS12 against a search for border-radius and box-shadow, and for --radius and --shadow, which must not exist. DS13 against a search of sites/, shared/ and the UI module for fonts.googleapis and fonts.gstatic, which must find nothing. DS14 against the --size- tokens and a search for a font-size given as a number outside them. DS15 against a search of every stylesheet for min-width and max-width, which must find none, and a search for mobile-only, tablet-only and desktop-only. DS16 against --step and --band-pad in base/_tokens.scss and their use in layout/. DS17 against every querySelector, closest and getElementsByClassName in the TypeScript of shared/packages, sites/*/_js and the UI module, none taking a class but an is- state. DS18 against components/tabs/tabs.ts and its test - aria-controls, aria-labelledby, the roving tabindex, the arrow, Home and End keys - and against every role="tablist" in sites/ carrying an aria-label, and every role="tab" in sites/ and the UI module carrying no id or aria-controls of its own.
 paths:
   - "shared/packages/design-system/**"
 ---
@@ -106,6 +106,20 @@ all my life sto data it is".
 The class that styles and the hook a script looks for are never the same, so renaming a class to fix a look
 cannot break a script without an error. A hook is named for its component, like its class: `data-code-block`,
 `data-pack-view-stage`. The one class a script reads is an `is-` state it sets itself (DS5).
+
+### DS18 - tabs follow the ARIA tabs pattern, and the script makes the ids
+
+**Decided (the maintainer, 2026-11-22):** asked whether the ids that link a tab to its panel come from the
+script or the markup: "script for now but... if it turns out later that markup is better for accessibility we
+switch".
+
+The pattern is the W3C ARIA Authoring Practices *Tabs*: each tab names its panel in `aria-controls` and the
+panel names its tab in `aria-labelledby`; only the selected tab is a Tab stop; the arrows move and wrap, Home
+and End go to the ends; the row names what it chooses between in `aria-label`, since nothing on the page
+labels it; a tab is shown as soon as it takes focus, since a panel shows at once. The script makes
+the ids, as Radix UI, Headless UI and Bootstrap do, so a page writes none by hand. The tabs need the script to
+switch at all, so ids from markup would add nothing without it. An id the markup does give is kept, so the
+switch he left open needs no script change.
 
 ## Pending
 

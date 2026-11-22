@@ -96,7 +96,7 @@ Below are two methods for overriding the presets file in a Docker environment:
 4. Run the following Docker command to mount the updated presets file:
 
 <div class="tabs" data-tabs="" markdown="block">
-<div class="tabs__list" role="tablist" markdown="0">
+<div class="tabs__list" role="tablist" aria-label="Operating system" markdown="0">
   <button type="button" class="tabs__tab" role="tab" aria-selected="true">Linux and macOS</button>
   <button type="button" class="tabs__tab" role="tab" aria-selected="false">Windows</button>
 </div>
