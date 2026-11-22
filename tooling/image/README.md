@@ -18,9 +18,9 @@ handed to shellcheck. A `.sh` file is both.
 | `verify-attestations.sh` | The SPDX SBOM package count and the SLSA provenance builder |
 | `verify-metadata.sh` | The OCI labels, then what the container reports from a throwaway run |
 | `dockerhub-overview.sh` | Renders `.github/dockerhub-overview.md` for a version and prints it. Refuses a prerelease |
-
-The two compose files the stacks read, `image.full.yml` and `image.local.yml`, sit one level up at the
-tooling root.
+| `local.yml` | The image on its own, SQLite. The `volume` and `bind` stacks, which differ only in where `/app/data` goes |
+| `full.yml` | The `full` stack. Declares nothing itself: it includes `local.yml` and `../serve.services.yml` |
+| `full.override.yml` | What the `full` stack changes on the app: Postgres ahead of SQLite, telemetry to the dashboard, and the wait on the services. `full.yml` merges it onto `local.yml` |
 
 ## 🚀 How you run one
 
@@ -47,5 +47,9 @@ because the package is public.
 
 **The stack name is positional.** `just image up -d` reads `-d` as the stack name and is rejected; write
 `just image up full -d`.
+
+**A relative path in these compose files is read from this folder.** That is why `stack.sh` writes the
+folders it mounts as `../data` and `../azurite`, so they stay in `tooling/`. A `BINACLE_DATA_DIR` you set
+yourself is read from here too.
 
 **They must pass `shellcheck` clean.** `just check scripts` covers this folder.

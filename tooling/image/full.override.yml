@@ -1,0 +1,34 @@
+# What the full stack changes on top of local.yml's binacle-net. Read only through full.yml, which lists it
+# under its include.
+
+configs:
+  open_telemetry_production:
+    content: |
+      {
+        "OpenTelemetry" : {
+          "Otlp": {
+            "Enabled": true,
+            "Endpoint": "http://aspire-dashboard:18889"
+          }
+        }
+      }
+
+services:
+  binacle-net:
+    depends_on:
+      azurite:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      aspire-dashboard:
+        condition: service_started
+    configs:
+      - source: open_telemetry_production
+        target: /app/Config_Files/DiagnosticsModule/OpenTelemetry.Production.json
+    environment:
+      # Providers are tried in order (AzureStorage, Postgres, Sqlite), first with a connection string wins.
+      # local.yml sets SQLite; this line puts Postgres ahead of it. Uncomment the next one for Azurite,
+      # then recreate binacle-net. Hostnames are compose service names, not localhost.
+      - POSTGRES_CONNECTION_STRING=Host=postgres;Port=5432;Database=binacle_net;Username=appuser;Password=Pl3@s3UseASt0ngP@ssw0rdN0tL!k3Th!s0n3
+      # - AZURESTORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1
+      - OTEL_EXPORTER_OTLP_HEADERS=x-otlp-api-key=local-dev-not-a-real-api-key

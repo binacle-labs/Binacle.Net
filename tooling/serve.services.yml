@@ -7,7 +7,7 @@ name: binacle-net-services
 #   down   just serve services-down          # keeps the database
 #   wipe   just serve services-down -v       # drops binacle-net-postgres, the shared database
 #
-# image.full.yml includes this file, so `just image up full` runs the same postgres on the same volume. The
+# image/full.yml includes this file, so `just image up full` runs the same postgres on the same volume. The
 # `-v` above wipes that one database for both.
 #
 # `up` creates ./azurite and opens it first: docker would otherwise create that bind source itself, as root,
@@ -66,7 +66,7 @@ services:
       - POSTGRES_USER=appuser
       - POSTGRES_PASSWORD=Pl3@s3UseASt0ngP@ssw0rdN0tL!k3Th!s0n3
       - POSTGRES_DB=binacle_net
-    # image.full.yml waits on this. Its app creates tables in a startup task, so service_started would let it
+    # image/full.yml waits on this. Its app creates tables in a startup task, so service_started would let it
     # race the first boot and crash.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U appuser -d binacle_net"]

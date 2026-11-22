@@ -12,8 +12,9 @@ name: binacle-net-volume
 #          rm -rf ./tooling/data                              # the bind stack's folder
 #   read   docker run --rm -v binacle-net-data:/data -v "$PWD/out:/out" alpine cp -a /data/. /out/
 #
-# BINACLE_DATA_DIR is the switch and `just image up bind` sets it. Set it yourself to bind elsewhere - it must
-# start with ./ or / or compose reads it as a volume name and refuses to start. Unset is the named volume.
+# BINACLE_DATA_DIR is the switch and `just image up bind` sets it. Set it yourself to bind elsewhere - a
+# relative path is read from this folder, and it must start with ./, ../ or / or compose reads it as a volume
+# name and refuses to start. Unset is the named volume.
 #
 # Log in as admin@binacle.net / B1n4cl3Adm!n, seeded on first start by a startup task.
 

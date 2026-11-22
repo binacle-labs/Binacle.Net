@@ -78,7 +78,7 @@ measure against, not a sizing recommendation; the manifest says so.
   `.dcproj` (SDK `Microsoft.Docker.Sdk`). **No `.env`** — no sample has one. `JwtAuth.json` is required only with `SERVICE_MODULE=True`;
   `OpenTelemetry.Production.json` only when shipping OTel.
 - Published samples bind config files read-only and use the pinned image tag (see below). The local build pipeline
-  (`tooling/image.full.yml`, fed by `just build image`) instead uses `binacle-net:local` and injects config via
+  (`tooling/image/full.yml`, fed by `just build image`) instead uses `binacle-net:local` and injects config via
   compose `configs:` — see `$build-topology`.
 
 ## The image tag is pinned {#image-pin}

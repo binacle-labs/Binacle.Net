@@ -11,14 +11,14 @@ shift 2
 # The one table. It is the only place an unknown name is rejected - a typo would otherwise fall through to
 # a compose default and report success for a stack nobody started.
 #
-# Four columns, `-` for none. Paths are relative to tooling/, because compose resolves a relative bind source
-# against the compose file's own directory.
+# Four columns, `-` for none. Paths are relative to tooling/image/, because compose resolves a relative bind
+# source against the compose file's own directory.
 #
 #   stack     compose file      project name         /app/data   other folders it bind-mounts
 case "$name" in
-    full)   read -r file project data dirs <<<"image.full.yml  binacle-net-full   -       ./azurite" ;;
-    volume) read -r file project data dirs <<<"image.local.yml binacle-net-volume -       -" ;;
-    bind)   read -r file project data dirs <<<"image.local.yml binacle-net-bind   ./data  -" ;;
+    full)   read -r file project data dirs <<<"full.yml  binacle-net-full   -       ../azurite" ;;
+    volume) read -r file project data dirs <<<"local.yml binacle-net-volume -       -" ;;
+    bind)   read -r file project data dirs <<<"local.yml binacle-net-bind   ../data -" ;;
     *) echo "Unknown stack '${name}'. Use full, volume or bind." >&2; exit 1 ;;
 esac
 
@@ -50,11 +50,11 @@ require_image() {
 if [[ "$action" = "up" ]]; then
     require_image
     # Same value compose mounts, so the folder prepared is the one it uses.
-    ( cd tooling
+    ( cd tooling/image
       [[ "$data" = "-" ]] || ensure_writable "${BINACLE_DATA_DIR}"
       [[ "$dirs" = "-" ]] || ensure_writable "$dirs" )
 fi
 
 # -p is not optional: `volume` and `bind` come out of one file, so without it `up bind` recreates the
 # `volume` container and reads its data as an empty database.
-docker compose -f "tooling/$file" -p "$project" "$action" "$@"
+docker compose -f "tooling/image/$file" -p "$project" "$action" "$@"

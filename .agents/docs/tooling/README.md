@@ -1,7 +1,7 @@
 ---
 id: tooling
 description: "tooling/ — every task the repo can run, called by CI and by hand alike: the test, coverage, openapi, agents, regen, changelog, serve, build, check, image, smoke and ci modules for just, the bench and measure modules, the wrangler configs, the local compose stacks, and emulator state"
-verified: 2026-10-02
+verified: 2026-11-22
 check: "Script list, tooling/agents/ holds generate-index.py and indexes.toml and the agents module calls the script, tests.just recipes and its four group recipes and the three runners in tooling/tests/, coverage.just recipes, openapi.just, agents.just, regen.just, changelog.just and the two changelog.*.sh beside it, bench.just, measure.just, serve.just, build.just (the API publish/image pair and the three site builds), check.just and its lychee.toml, image.just as a door onto tooling/image/*.sh (the stack script and the four verify checks, whose certificate identity must match SECURITY.md) and smoke.just recipes, ci.just recipes and the tooling/ci/*.sh files they call, and the compose stack/file/service table match tooling/"
 also_update:
   - commands
@@ -51,25 +51,26 @@ them all), `bundle install` for all three jekyll sites, for `ruby/` and for `sit
 
 ## Local Docker Compose
 
-**Three files, each named after the module that runs it.** `serve.services.yml` brings up what the app talks
+**Each file sits with the module that runs it.** `serve.services.yml` brings up what the app talks
 to and no binacle-net at all, so it belongs to `serve`, alongside `just serve api` (and it is what the
-Postgres/AzureStorage tests need). The two `image.*.yml` files follow `just build image` and answer a
+Postgres/AzureStorage tests need). The three under `image/` follow `just build image` and answer a
 different question — does the shipped image work — so they are the `image` module's stacks, and that is why
 only they check for `binacle-net:local`. The five under `smoke/` answer a narrower question again — does it
 work *as configured* — and are driven entirely by `just smoke`, never by hand.
 
-**Three stacks come out of two image files.** `volume` and `bind` are one container differing only in where
-`/app/data` goes, so `image.local.yml` serves both and `_compose` picks with `-p` and `BINACLE_DATA_DIR` out
-of the `_stack` table.
-`image.full.yml` `include:`s that file and `serve.services.yml`, then overrides the app's storage and
-telemetry — so postgres, azurite and the dashboard are declared once, in `serve`.
+**Three stacks come out of the image files.** `volume` and `bind` are one container differing only in where
+`/app/data` goes, so `image/local.yml` serves both and `stack.sh` picks with `-p` and `BINACLE_DATA_DIR` out
+of its table.
+`image/full.yml` `include:`s that file and `serve.services.yml`, and merges `image/full.override.yml` onto
+the app for its storage and telemetry — so postgres, azurite and the dashboard are declared once, in
+`serve`, and the app once, in `image/local.yml`.
 
 | File | Module | Command | Project name | Runs |
 |---|---|---|---|---|
 | `serve.services.yml` | `serve` | `just serve services-up` | `binacle-net-services` | **Backing services only** — `aspire-dashboard`, `azurite`, `postgres`. No API. The only place those three are declared |
-| `image.full.yml` | `image` | `just image up full` | `binacle-net-full` | **Full** — `include:`s the other two files and overrides the app's storage and telemetry, so it is about twenty lines. Local image + `azurite` + `postgres` + `aspire-dashboard`, all modules on; injects `OpenTelemetry.Production.json` on top of the `JwtAuth.json` it inherits. All three storage backends run; Postgres wins on provider order, swap by moving the comment. The `image` module's default |
-| `image.local.yml` | `image` | `just image up volume` | `binacle-net-volume` | **Simple** — the local image alone, ServiceModule on SQLite, data in the named volume `binacle-net-data` |
-| `image.local.yml` | `image` | `just image up bind` | `binacle-net-bind` | **Simple** — the same file, with `BINACLE_DATA_DIR` set by the recipe so `/app/data` is a bind at `tooling/data`. Compose then drops the volume declaration, so this stack leaves none behind |
+| `image/full.yml` | `image` | `just image up full` | `binacle-net-full` | **Full** — `include:`s the other two files and declares nothing itself; the app's storage and telemetry are in `full.override.yml` beside it, merged under the include. Local image + `azurite` + `postgres` + `aspire-dashboard`, all modules on; injects `OpenTelemetry.Production.json` on top of the `JwtAuth.json` it inherits. All three storage backends run; Postgres wins on provider order, swap by moving the comment. The `image` module's default |
+| `image/local.yml` | `image` | `just image up volume` | `binacle-net-volume` | **Simple** — the local image alone, ServiceModule on SQLite, data in the named volume `binacle-net-data` |
+| `image/local.yml` | `image` | `just image up bind` | `binacle-net-bind` | **Simple** — the same file, with `BINACLE_DATA_DIR` set by the recipe so `/app/data` is a bind at `tooling/data`, written `../data` because the file reads paths from `tooling/image/`. Compose then drops the volume declaration, so this stack leaves none behind |
 | `smoke/<profile>.yml` | `smoke` | `just smoke up <profile>` | `binacle-smoke-<profile>` | **Throwaway stacks** — `minimal`, `quickstart`, `prod`, `service`, `full`, one per smoke profile, and each name is also a `samples/docker/` folder. Storage is a named volume dropped on teardown, so they need no `_prepare`. They take the image from `$BINACLE_IMAGE` (default `binacle-net:local`); `service`/`full` inline `JwtAuth.json` and raise `RateLimiter__ApiUsageAnonymous` so a second run inside the hour does not go red on 429s; `prod` mounts its own `Presets.json` so reading it back proves the config-mount path |
 
 Each file carries its own `name:` as a fallback, but `stack.sh` passes `-p` — two stacks share one file, so
@@ -93,10 +94,13 @@ Four behaviours the shape above rests on. They were **run, not reasoned**. Do no
   b.yml` resolves every path against the **first** file instead. Same two files, same `./azurite` source, two
   different answers. **This retires the subfolder trap**: the 2026-08-07 attempt to move these files into a
   subfolder was reverted because the shared azurite bind silently stopped being shared — that was an `-f`
-  failure, and `include:` does not have it. A subfolder is safe now; it is simply not used, because flat
-  beside the `.just` files reads better.
-- **An including file overrides an included service key by key.** Everything it does not name carries through,
-  which is why `image.full.yml` is twenty lines rather than a second copy of the app. An included `name:` is
+  failure, and `include:` does not have it. The image files sit in `tooling/image/` (since 2026-11-22), and
+  `serve.services.yml`, included from there, still binds `tooling/azurite`.
+- **An including file cannot change an included service.** Compose 2.40.3 refuses it: `services.binacle-net
+  conflicts with imported resource` (tested 2026-11-22). The change goes in an override file listed under the
+  include, `path: [local.yml, full.override.yml]`, which merges key by key the way `-f` does; everything the
+  override does not name carries through, so it is not a second copy of the app. The merge reads every
+  relative path from the first file's folder, which is why the two sit side by side. An included `name:` is
   ignored in favour of the including file's.
 - **`${BINACLE_DATA_DIR:-app_data}:/app/data/` is what switches a named volume for a bind.** Unset gives
   `type: volume`; `./data` gives `type: bind` at the resolved absolute path **and drops the top-level
@@ -120,7 +124,7 @@ image, which is what the module is for.
   got the 2026-08-07 attempt reverted.
 - **Have `image/stack.sh` call a recipe in `serve.just`, or the reverse.** The `mkdir` and `chmod` lines are
   copied on purpose.
-- **Let `image.local.yml` default `BINACLE_DATA_DIR` to a path.** The recipe sets it for `bind` and unsets it
+- **Let `image/local.yml` default `BINACLE_DATA_DIR` to a path.** The recipe sets it for `bind` and unsets it
   for the other two. Inside the file, unset must stay the named volume — otherwise a bare `docker compose -f`
   run starts leaving container-owned folders in the repo, and one of those fails the next `docker build`.
 - **Drop `-p`** and rely on the file's own `name:`. Two paragraphs up for why.

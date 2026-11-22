@@ -16,7 +16,7 @@
 # The stacks run binacle-net:local and check for it first. `verify` reads a published image off Docker Hub,
 # or off GHCR for a prerelease, and `dockerhub-overview` only renders text, so neither needs a local build.
 #
-# Two files, three stacks: `volume` and `bind` share tooling/image.local.yml and differ only in where
+# Three stacks: `volume` and `bind` share tooling/image/local.yml and differ only in where
 # /app/data goes. `full` also brings up serve's services - same postgres, same volume, same port - so it and
 # `just serve services-up` cannot run at once. The stack table is in stack.sh.
 

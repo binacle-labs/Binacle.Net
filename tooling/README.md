@@ -177,10 +177,11 @@ just image down [name] [-v]      # -v drops the named volumes, postgres included
 Extra arguments go straight through to `docker compose`. The name is positional, so pass it whenever you pass
 a flag - `just image up -d` reads `-d` as the stack name and is rejected.
 
-Two files, three stacks. `volume` and `bind` are one container differing only in where `/app/data` goes, so
-they share `image.local.yml`; `stack.sh` gives each its own project name and sets `BINACLE_DATA_DIR` for
-`bind` alone. `full` is `image.full.yml`, which `include:`s that file and `serve.services.yml` and overrides
-the app's storage and telemetry - about twenty lines, and nothing declared twice. It publishes the same 5432
+Three stacks, from the compose files in `image/`. `volume` and `bind` are one container differing only in
+where `/app/data` goes, so they share `image/local.yml`; `stack.sh` gives each its own project name and sets
+`BINACLE_DATA_DIR` for `bind` alone. `full` is `image/full.yml`, which `include:`s that file and
+`serve.services.yml`, and merges `image/full.override.yml` onto the app for its storage and telemetry -
+nothing declared twice. It publishes the same 5432
 as `serve services-up`, so those two cannot run at once.
 
 All three check `binacle-net:local` exists first and point you at `just build image` if it does not. Without
