@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.2.0] - 2026-11-22
 
 ### ⚙️ Core Changes
 - **The command line now beats environment variables and config files.** Before, a config file beat it, so `--OpenTelemetry:Otlp:Enabled=true` lost to a `false` in `OpenTelemetry.json`. Environment variables still beat every config file.  

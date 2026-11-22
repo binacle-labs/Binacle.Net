@@ -25,7 +25,7 @@ Release notes for the **v3.x** line, newest release first. Every release in this
 
 ## v3.2.0
 
-*Released DATE - [release on GitHub](https://github.com/binacle-labs/Binacle.Net/releases/tag/v3.2.0)*
+*Released 22 November 2026 - [release on GitHub](https://github.com/binacle-labs/Binacle.Net/releases/tag/v3.2.0)*
 
 ### ⚙️ Core Changes
 - **The command line now beats environment variables and config files.** Before, a config file beat it, so
