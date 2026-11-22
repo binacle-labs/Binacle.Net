@@ -37,7 +37,7 @@ Release notes for the **v3.x** line, newest release first. Every release in this
   `Otlp.Logging` are new keys, each `true` by default, so an existing config sends the same as before. A signal
   turned off is not exported over OTLP at all. Azure Monitor ignores these keys and still gets all three. With all
   three off, OTLP sends nothing and a warning is logged at startup. See
-  [Open Telemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}).
+  [OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}).
 - **With any of the three off, the per-signal `OTEL_EXPORTER_OTLP_<SIGNAL>_*` environment variables are not
   read.** The signals still on share the one endpoint from `Otlp.Endpoint` or `OTEL_EXPORTER_OTLP_ENDPOINT`. With
   all three on they work as before.

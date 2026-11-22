@@ -152,7 +152,10 @@ columns stack. A change of density - gutters, tap targets - happens inside a tie
 The tier names live in the Sass and nowhere in the markup: no `.mobile-only`, no `s12` / `m6` column classes
 under any name. The markup stays plain and the stylesheet responds.
 
-A docs table stays a table on a phone: it is reference, read across a row. `components/table/` says so.
+A docs table stays a table on a phone: it is reference, read across a row. `components/table/` says so. Code
+in it breaks only at its name parts - the `<wbr>` that `codeWrap.ts` adds after `.`, `_` and `=` - never inside
+a word, so a column is never squeezed to one letter. A table that still cannot fit scrolls in its own
+`doc__table-scroll` box; the page never scrolls sideways.
 
 ### DS16 - space is one step
 

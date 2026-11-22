@@ -5,7 +5,7 @@ description: >-
   The resource attributes every Binacle.Net trace, metric and log record carries, which setting wins when two
   set the same one, and how to name the server yourself.
 nav:
-  parent: Open Telemetry
+  parent: OpenTelemetry
   order: 1
   icon: 🖥️
 ---
@@ -53,9 +53,9 @@ OTEL_RESOURCE_ATTRIBUTES=host.name=my-server
 }
 ```
 
-## ☁️ Azure Monitor
+## ☁️ Azure Monitor {#azure-monitor}
 
 Azure Monitor maps only the `service.*` and `k8s.*` attributes onto its records. `host.name`, `process.pid` and
 `deployment.environment.name` reach it only through its `_OTELRESOURCE_` metric, which the
 `OTEL_DOTNET_AZURE_MONITOR_ENABLE_RESOURCE_METRICS` environment variable turns on. See
-[Open Telemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}).
+[OpenTelemetry]({% vlink /configuration/diagnostics-module/open-telemetry/index.md %}).

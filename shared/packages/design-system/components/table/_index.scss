@@ -102,6 +102,13 @@
     vertical-align: baseline;
   }
 
+  // A setting name in a header is spelled as the code spells it, at the header's size.
+  th code {
+    font-size: inherit;
+    font-weight: inherit;
+    text-transform: none;
+  }
+
   // A row name in the first column carries the row's line too.
   tbody th {
     @media (width >= tiers.$tablet) {
@@ -224,10 +231,17 @@
     td::before {
       display: none;
     }
-
-    // A short value in a mono cell stays whole; the column widens for it.
-    .mono {
-      overflow-wrap: break-word;
-    }
   }
+
+  // Code breaks only at its name parts, so a column widens to its longest part instead of shrinking to one
+  // letter.
+  :is(code, .mono) {
+    overflow-wrap: break-word;
+  }
+}
+
+// A table wider than a phone scrolls in its own box, so the page never scrolls sideways.
+.doc__table-scroll {
+  overflow-x: auto;
+  scrollbar-color: var(--rule) transparent;
 }

@@ -1,5 +1,5 @@
 ---
-title: Open Telemetry
+title: OpenTelemetry
 description: >-
   Push traces, metrics and logs from Binacle.Net to Grafana, Jaeger, Prometheus or Azure Application Insights.
   The OpenTelemetry.json settings, the exporters, and the stability of Binacle's own names.
@@ -141,9 +141,8 @@ You can retrieve your connection string from the Azure Portal under the "Instrum
 section of your Application Insights instance.
 
 Azure Monitor always gets all three signals; the OTLP `Metrics`, `Tracing` and `Logging` switches do not apply
-to it. It maps only the `service.*` and `k8s.*` resource attributes onto its records. `host.name`, `process.pid`
-and `deployment.environment.name` reach it only through its `_OTELRESOURCE_` metric, which the
-`OTEL_DOTNET_AZURE_MONITOR_ENABLE_RESOURCE_METRICS` environment variable turns on.
+to it. Which resource attributes it shows is on the
+[Resource]({% vlink /configuration/diagnostics-module/open-telemetry/resource.md %}#azure-monitor) page.
 
 ## 📡 What Binacle Sends
 

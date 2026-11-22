@@ -188,6 +188,7 @@ module Binacle
               add_class(table, 'table doc__table')
               table['data-table'] = ''
               table.css('td').each { |cell| add_class(cell, 'mono') if all_mono?(cell) }
+              table.wrap('<div class="doc__table-scroll"></div>')
             end
           end
 

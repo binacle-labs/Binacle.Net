@@ -111,8 +111,8 @@ title loses its version, and the pager disappears.
 **`doc_body` runs on the rendered page**, so kramdown's heading ids are already made and the markdown stays as
 it is. `sites/docs/_layouts/page.html` pipes every page through it except the home page. It:
 
-- names each top-level block with the design system's `doc__` classes, tables as `table doc__table`, and a
-  table cell holding only code as `mono`;
+- names each top-level block with the design system's `doc__` classes, tables as `table doc__table` inside a
+  `doc__table-scroll` box, and a table cell holding only code as `mono`;
 - turns a quote marked `{: .block-warning }` or another kind, or opening with a GitHub `[!NOTE]` line, into a
   `callout` of that kind;
 - rewraps every code block as a `code-block` with a head: the language, or the `data-name` the markdown gives,

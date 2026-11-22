@@ -79,20 +79,17 @@ than being quietly ignored.
 
 Four changes, and the first one narrows lists that already exist.
 
-**1. `/` is now a prefix length.** It was read as an address mask, which made `192.168.1.0/24` cover nearly the
-whole IPv4 range. It now means what it means everywhere else: 256 addresses. **Existing CIDR entries are much
-narrower than they were** - check that the hosts you expect are still inside them, or you will lock yourself
-out.
-
-**2. IPv4 callers now match inside a container.** The server listens on a dual-mode socket, so an IPv4 caller
-arrives as an IPv4-mapped IPv6 address. Those are unmapped before matching now. Previously no IPv4 entry could
-match one, which made the list unusable in a container.
-
-**3. The `start-end` range form is gone.** `192.168.1.0-192.168.1.255` now fails startup validation. Write it
-as `192.168.1.0/24`. A range that does not line up with a CIDR boundary has to be split into several entries,
-or widened to the enclosing subnet.
-
-**4. Entries are read exactly as written.** See below.
+1. **`/` is now a prefix length.** It was read as an address mask, which made `192.168.1.0/24` cover nearly the
+   whole IPv4 range. It now means what it means everywhere else: 256 addresses. **Existing CIDR entries are much
+   narrower than they were** - check that the hosts you expect are still inside them, or you will lock yourself
+   out.
+2. **IPv4 callers now match inside a container.** The server listens on a dual-mode socket, so an IPv4 caller
+   arrives as an IPv4-mapped IPv6 address. Those are unmapped before matching now. Previously no IPv4 entry could
+   match one, which made the list unusable in a container.
+3. **The `start-end` range form is gone.** `192.168.1.0-192.168.1.255` now fails startup validation. Write it
+   as `192.168.1.0/24`. A range that does not line up with a CIDR boundary has to be split into several entries,
+   or widened to the enclosing subnet.
+4. **Entries are read exactly as written.** See below.
 
 ### How an entry is read {#entry-format}
 

@@ -166,6 +166,12 @@ RSpec.describe Binacle::Docs::Markup::DocBody do
       expect(table.key?('data-table')).to be(true)
     end
 
+    it 'puts a table in a box that scrolls when the table is too wide' do
+      html = body('<table><tr><td>a</td></tr></table>')
+
+      expect(html.at_css('div.doc__table-scroll > table.doc__table')).not_to be_nil
+    end
+
     it 'gives a cell the mono class when all it holds is mono code' do
       cells = body(%(<table><tr><td><a href="#a"><code class="mono">GET</code></a></td><td><code class="mono">0</code> is valid</td><td>text</td></tr></table>)).css('td')
 

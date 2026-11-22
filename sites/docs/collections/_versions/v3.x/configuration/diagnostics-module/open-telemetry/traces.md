@@ -5,7 +5,7 @@ description: >-
   The spans Binacle.Net sends for each fit and pack request, their attributes, and the packing library's own
   spans and how to turn them on.
 nav:
-  parent: Open Telemetry
+  parent: OpenTelemetry
   order: 3
   icon: 🎯
 ---
@@ -23,10 +23,21 @@ One fit or pack request makes these spans on the `Binacle.Net` source, under the
 
 The HTTP request span already carries the route, so the endpoints add no span of their own.
 
-The `{operation} {mode}` span carries `binacle.packing.operation`, `binacle.packing.mode`,
-`binacle.packing.request.algorithm`, `binacle.packing.bin.count`, `binacle.packing.item.count` and
-`binacle.packing.item.quantity`. For a single result it also carries `binacle.packing.result.algorithm` and
-`binacle.packing.result.status`. The values are the ones on the
+The `{operation} {mode}` span carries:
+
+- `binacle.packing.operation`
+- `binacle.packing.mode`
+- `binacle.packing.request.algorithm`
+- `binacle.packing.bin.count`
+- `binacle.packing.item.count`
+- `binacle.packing.item.quantity`
+
+For a single result it also carries:
+
+- `binacle.packing.result.algorithm`
+- `binacle.packing.result.status`
+
+The values are the ones on the
 [Metrics]({% vlink /configuration/diagnostics-module/open-telemetry/metrics.md %}) page.
 
 A failed operation marks its span as an error, records the exception, and sets `error.type`.
@@ -58,7 +69,3 @@ smallest-bin request over 50 bins with 3 algorithms sends about 150 spans. Turn 
   }
 }
 ```
-
-## 🩺 Health Checks
-
-With health checks on, requests to the health-check path make no span. Added in 3.2.0.

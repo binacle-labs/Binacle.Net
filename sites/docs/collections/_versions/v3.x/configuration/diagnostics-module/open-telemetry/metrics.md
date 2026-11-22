@@ -5,7 +5,7 @@ description: >-
   The metrics Binacle.Net sends on its own meters - packing time, items, results and the packing log queue -
   with their units, attributes and values.
 nav:
-  parent: Open Telemetry
+  parent: OpenTelemetry
   order: 2
   icon: 📈
 ---
@@ -58,8 +58,3 @@ With [packing logs]({% vlink /configuration/diagnostics-module/packing-logs.md %
 - the exception's full type name - lost because the write failed.
 - `already_shutdown` - not written because the packing log had stopped. After too many failed writes in a row the
   packing log stops and takes no more entries.
-
-## 🩺 Health Checks
-
-Requests to the health-check path are not counted in the HTTP request metrics, such as
-`http.server.request.duration`. Added in 3.2.0.
