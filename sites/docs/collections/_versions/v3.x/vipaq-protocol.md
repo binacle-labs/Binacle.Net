@@ -134,14 +134,11 @@ read in a hex dump. Neither is required - the header bit says which was used.
 Each of the three sections - bin dimensions, item dimensions, item coordinates - is stored at one width, chosen
 independently:
 
-<table markdown="0">
-  <thead><tr><th>Code</th><th class="table__number">Bytes per integer</th><th class="table__number">Largest value</th></tr></thead>
-  <tbody>
-    <tr><td class="mono">0</td><td class="mono table__number">1</td><td class="mono table__number">255</td></tr>
-    <tr><td class="mono">1</td><td class="mono table__number">2</td><td class="mono table__number">65,535</td></tr>
-    <tr><td class="mono">2, 3</td><td class="table__number table__off">reserved</td><td class="table__number table__off">a decoder rejects these</td></tr>
-  </tbody>
-</table>
+| Code | Bytes per integer | Largest value |
+|---|--:|--:|
+| `0`{:.mono} | `1`{:.mono} | `255`{:.mono} |
+| `1`{:.mono} | `2`{:.mono} | `65,535`{:.mono} |
+| `2, 3`{:.mono} | *reserved*{:.table__off} | *a decoder rejects these*{:.table__off} |
 
 Widths are fixed per section, not per value: every item shares one dimensions width and one coordinates width.
 An encoder picks the smallest width that holds the largest value in the section.

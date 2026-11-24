@@ -140,7 +140,20 @@ to nothing fails the build rather than writing a link to a 404.
 - A code block with `data-call` on it, `{: data-call="POST /path" }` or `{: data-call="200" }` in the markdown,
   shows that in its head in place of the language. `data-name` shows a file or field name there instead, and
   `data-wrap=""` wraps one long string. In a `}` inside an attribute, write `\}`.
-- A table cell that holds only code marked `{:.mono}` takes the class `mono` too.
+- A list marked `{: .doors }` becomes links to pages. Each item is `[Title](link) - text`; anything else stops the
+  build. The heading above it names the list.
+- In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
+- A numbered list marked `{: .steps }` becomes the steps. Indent what belongs to a step by three spaces.
+- Code blocks in a row, each with `{: data-tab="Windows" }`, become tabs. The first also carries
+  `data-tabs="Operating system"`, what they choose between. A `data-tab` with no `data-tabs` before it stops the
+  build.
+- A paragraph that is one call, `` `GET /path` ``, marked `{: .http-line }`, shows the method as a badge. Anything
+  else stops the build.
+- A code block with `{: data-fold="Response" }` starts closed, under that text.
+- A table marked `{: .result-list aria-label="The response" }` becomes result rows with a fill bar. Its columns are
+  the bin, its size, the fill as a bare number, the result and the items. A row that does not fit stops the build.
+- A table cell that holds only code marked `{:.mono}` takes the class `mono` too. A right-aligned column (`--:`)
+  holds numbers. A cell that is only `*text*{:.table__off}` is greyed out.
 - A code block after a paragraph that starts *Request Example* or *Response Example* names the call or the
   status in its head. Every response is shown as a 200.
 

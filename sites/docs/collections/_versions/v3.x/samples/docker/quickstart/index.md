@@ -49,7 +49,7 @@ This launches the Binacle.Net API with:
 To change bin configurations:
 1. Open `Presets.json` in your editor.
 2. Edit the bin definitions.
-3. Restart to apply:<br>
+3. Restart to apply:
     ```bash
     docker compose down
     docker compose up

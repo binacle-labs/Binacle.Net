@@ -57,9 +57,9 @@ For more information on overriding configurations, refer to the
 - `FileName` (_string_): Log file name. `{0}` represents the date, and it is required.
 - `DateFormat` (_string_): Defines the format for `{0}` in FileName (e.g., `yyyyMMdd`).
 - `ChannelLimit` (_integer_): Maximum queue size for logs:
-    - `0` = Unlimited <br>
+    - `0` = Unlimited \
       Limited only by available system memory.
-    - `> 0` = Limits the log queue size. <br>
+    - `> 0` = Limits the log queue size. \
       If requests come in and the log writter can't keep up causing the
       queue to exceed this limit, then the newest logs will be dropped to prevent system overload.
 - `RetentionDays` (_integer?_): Delete log files older than this many days. See below.

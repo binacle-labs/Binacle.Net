@@ -52,7 +52,7 @@ There is no browsable documentation in this setup. Use the [API]({% vlink /api/i
 To change bin configurations:
 1. Open `Presets.json` in your editor.
 2. Edit the bin definitions.
-3. Restart to apply:<br>
+3. Restart to apply:
     ```bash
     docker compose down
     docker compose up

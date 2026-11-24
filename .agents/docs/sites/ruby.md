@@ -1,7 +1,7 @@
 ---
 id: sites/ruby
 description: sites/ruby/ - the two gems only the Binacle sites read, binacle-robots and binacle-docs. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
-verified: 2026-11-08
+verified: 2026-11-25
 check: The two gems in sites/ruby/Gemfile match the folders; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
 also_update:
   - ruby
@@ -115,11 +115,24 @@ title loses its version, and the pager disappears.
 it is. `sites/docs/_layouts/page.html` pipes every page through it except the home page. It:
 
 - names each top-level block with the design system's `doc__` classes, tables as `table doc__table` inside a
-  `doc__table-scroll` box, and a table cell holding only code as `mono`;
+  `doc__table-scroll` box, a table cell holding only code as `mono`, a right-aligned one as `table__number`, and one that
+  is only emphasis marked `table__off` as `table__off`;
 - turns a quote marked `{: .block-warning }` or another kind, or opening with a GitHub `[!NOTE]` line, into a
   `callout` of that kind;
 - rewraps every code block as a `code-block` with a head: the language, or the `data-name` the markdown gives,
   or the call in `data-call`. `data-wrap` makes one long line wrap. Only JSON keeps Rouge's token colours;
+- turns a list marked `{: .doors }` into a `doors` nav, labelled by the heading above it. An item that is not
+  `[Title](link) - text` stops the build;
+- in a list marked `{: .labelled-list }`, makes the item that opens in bold the `labelled-list__cost`, the bold its
+  label;
+- adds `doc__steps` to a numbered list marked `{: .steps }`;
+- turns code blocks in a row marked `data-tab` into `tabs`, labelled by the first one's `data-tabs`. A stray or
+  unnamed tab stops the build;
+- turns a paragraph marked `{: .http-line }` into an `http-line`, a badge and a path. One that is not a call stops
+  the build;
+- puts a code block marked `data-fold` in a closed `disclosure`, under that text;
+- turns a table marked `{: .result-list }` into a `result-list`, one `result-row` per row. A row without its five
+  columns, or with a fill that is not a number, stops the build;
 - names an example's head after the call: the method and path from the paragraph above a *Request Example*,
   `200` over a *Response Example*, and every JSON block after it up to the next heading;
 - drops an opening emoji, and a rule straight before a section heading or at the end, since a section draws

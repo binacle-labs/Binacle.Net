@@ -39,6 +39,8 @@ module Binacle
           }.freeze
           LANGUAGE_LABELS = { 'yml' => 'yaml' }.freeze
           CALL = /\A(GET|POST|PUT|DELETE) (\S+)\z/
+          FILL = /\A\d+(\.\d+)?\z/
+          DOOR_DASH = /\A\s+-\s+/
           ALERT = /\A\s*\[!(\w+)\]\s*/
 
           def initialize(html)
@@ -49,10 +51,17 @@ module Binacle
             drop_opening_emoji
             drop_rules_before_sections
             name_callouts
+            name_tabs
+            name_folds
             name_code_blocks
             name_example_heads
+            name_http_lines
+            name_result_lists
             name_tables
             name_nested_lists
+            name_doors
+            name_labelled_lists
+            name_steps
             name_blocks
             @fragment.to_html
           end
@@ -93,6 +102,50 @@ module Binacle
 
             first.inner_html = marker.post_match
             marker[1]
+          end
+
+          # Code blocks in a row, each named in data-tab, become tabs. The first says what they choose between, in
+          # data-tabs.
+          def name_tabs
+            @fragment.css('[data-tabs]').each do |first|
+              blocks = [first]
+              while (following = blocks.last.next_element)&.key?('data-tab') && !following.key?('data-tabs')
+                blocks << following
+              end
+              first.replace(tabs(first['data-tabs'], blocks))
+              blocks.drop(1).each(&:remove)
+            end
+
+            stray = @fragment.at_css('[data-tab]')
+            raise ArgumentError, "no data-tabs before the tab #{stray['data-tab']}" if stray
+          end
+
+          def tabs(label, blocks)
+            names = blocks.map { |block| block['data-tab'] }
+            raise ArgumentError, "a tab with no data-tab, in #{label}" unless names.all?
+
+            box = Nokogiri::HTML5.fragment('<div class="tabs" data-tabs=""><div class="tabs__list" role="tablist"></div></div>').first_element_child
+            list = box.first_element_child
+            list['aria-label'] = label
+            blocks.each_with_index do |block, index|
+              list.add_child(%(<button type="button" class="tabs__tab" role="tab" aria-selected="#{index.zero?}"></button>))
+              list.last_element_child.content = names[index]
+              box.add_child(%(<div class="tabs__panel" role="tabpanel"#{' hidden=""' unless index.zero?}></div>))
+              copy = block.dup
+              copy.remove_attribute('data-tab')
+              copy.remove_attribute('data-tabs')
+              box.last_element_child.add_child(copy)
+            end
+            box
+          end
+
+          # A code block with data-fold starts closed, under that text.
+          def name_folds
+            @fragment.css('[data-fold]').each do |block|
+              fold = block.wrap('<details class="disclosure"></details>').parent
+              fold.prepend_child('<summary class="disclosure__summary label"></summary>')
+              fold.first_element_child.content = block.remove_attribute('data-fold').value
+            end
           end
 
           def name_code_blocks
@@ -183,13 +236,70 @@ module Binacle
             %(<p class="http-line code-block__http-line">#{inner}</p>)
           end
 
+          # After the example heads, which read the call from its code.
+          def name_http_lines
+            @fragment.css('p.http-line:not(.code-block__http-line)').each do |line|
+              call = line.text.strip.match(CALL)
+              raise ArgumentError, "an http-line is `METHOD /path`, not: #{line.text.strip}" unless call
+
+              add_class(line, 'http-line--small')
+              line.inner_html = '<span class="http-line__badge"></span><span></span>'
+              line.element_children.zip(call.captures) { |part, text| part.content = text }
+            end
+          end
+
+          # A table marked result-list has five columns: the bin, its size, how full it is, the result and the items.
+          def name_result_lists
+            @fragment.css('table.result-list').each do |table|
+              rows = table.css('tbody tr').map { |row| result_row(row.css('td').map { |cell| cell.inner_html.strip }) }
+              list = Nokogiri::HTML5.fragment('<ul class="result-list result-list--full"></ul>').first_element_child
+              list['aria-label'] = table['aria-label'] if table['aria-label']
+              list.inner_html = rows.join("\n")
+              table.replace(list)
+            end
+          end
+
+          def result_row(cells)
+            unless cells.size == 5 && cells[2].match?(FILL)
+              raise ArgumentError, "a result-list row is bin, size, fill, result, items, not: #{cells.join(' | ')}"
+            end
+
+            bin, size, fill, result, items = cells
+            <<~HTML.chomp
+              <li class="result-list__item"><div class="result-row result-row--static">
+                <span class="result-row__title">#{bin} &middot; <span class="mono">#{size}</span></span>
+                <span class="result-row__fill"><span class="result-row__fill-track"><span class="result-row__fill-line" style="width:#{fill}%"></span></span><span class="result-row__fill-number">#{fill}%</span></span>
+                <span class="result-row__meta"><span>#{result}</span><span>#{items}</span></span>
+              </div></li>
+            HTML
+          end
+
           def name_tables
             @fragment.css('table').each do |table|
               add_class(table, 'table doc__table')
               table['data-table'] = ''
               table.css('td').each { |cell| add_class(cell, 'mono') if all_mono?(cell) }
+              table.css('th, td').each { |cell| align_number(cell) }
+              table.css('td').each { |cell| grey_out(cell) }
               table.wrap('<div class="doc__table-scroll"></div>')
             end
+          end
+
+          # A class, so a right-aligned column goes left once the table stacks on a phone.
+          def align_number(cell)
+            return unless cell['style']&.match?(/\Atext-align:\s*right;?\z/)
+
+            cell.remove_attribute('style')
+            add_class(cell, 'table__number')
+          end
+
+          # A cell that is only emphasis marked table__off is greyed out whole, and not italic.
+          def grey_out(cell)
+            mark = cell.at_css('> em.table__off')
+            return unless mark && cell.text.strip == mark.text
+
+            add_class(cell, 'table__off')
+            mark.replace(mark.children)
           end
 
           # Such a cell takes the code's size too, or its row stands taller than the code in it.
@@ -200,6 +310,50 @@ module Binacle
 
           def name_nested_lists
             @fragment.css('li > ul, li > ol').each { |list| add_class(list, 'doc__list--nested') }
+          end
+
+          # A list marked doors becomes links to pages, named by the heading above it.
+          def name_doors
+            @fragment.css('ul.doors').each do |list|
+              heading = list.previous_element
+              links = list.css('> li').map { |item| door(item) }
+              list.name = 'nav'
+              list['class'] = 'doors doors--full'
+              list['aria-label'] = heading.text.strip if heading&.name&.match?(/\Ah[2-6]\z/)
+              list.inner_html = links.join
+            end
+          end
+
+          def door(item)
+            link = item.at_css('> a:first-child')
+            text = item.inner_html.strip.delete_prefix(link.to_s)
+            unless link && text.match?(DOOR_DASH)
+              raise ArgumentError, "a doors item is written [Title](link) - text, not: #{item.text.strip}"
+            end
+
+            title = link.inner_html
+            link['class'] = 'doors__link'
+            link.inner_html = %(<h3 class="doors__title">#{title}</h3><p class="doors__text">#{text.sub(DOOR_DASH, '')}</p>)
+            link.to_html
+          end
+
+          # In a list marked labelled-list, the item that opens in bold is the cost, and the bold is its label.
+          def name_labelled_lists
+            @fragment.css('ul.labelled-list > li').each do |item|
+              add_class(item, 'labelled-list__item')
+              label = item.children.first
+              next unless label&.name == 'strong'
+
+              add_class(item, 'labelled-list__cost')
+              label.name = 'span'
+              label['class'] = 'label'
+              text = label.next_sibling
+              text.content = text.content.lstrip if text&.text?
+            end
+          end
+
+          def name_steps
+            @fragment.css('ol.steps').each { |list| add_class(list, 'doc__steps') }
           end
 
           def name_blocks

@@ -95,13 +95,6 @@ Below are two methods for overriding the presets file in a Docker environment:
 3. Open your terminal and navigate to the directory containing your modified Presets.json file.
 4. Run the following Docker command to mount the updated presets file:
 
-<div class="tabs" data-tabs="" markdown="block">
-<div class="tabs__list" role="tablist" aria-label="Operating system" markdown="0">
-  <button type="button" class="tabs__tab" role="tab" aria-selected="true">Linux and macOS</button>
-  <button type="button" class="tabs__tab" role="tab" aria-selected="false">Windows</button>
-</div>
-<div class="tabs__panel" role="tabpanel" markdown="block">
-
 ```bash
 docker run --name binacle-net \
   -p 8080:8080 \
@@ -109,9 +102,7 @@ docker run --name binacle-net \
   -v $(pwd)/Presets.json:/app/Config_Files/Presets.json:ro \
   binacle/binacle-net:{{ page.version_tag }}
 ```
-
-</div>
-<div class="tabs__panel" role="tabpanel" hidden="" markdown="block">
+{: data-tabs="Operating system" data-tab="Linux and macOS" }
 
 ```cmd
 docker run --name binacle-net ^
@@ -120,9 +111,7 @@ docker run --name binacle-net ^
   -v %cd%\Presets.json:/app/Config_Files/Presets.json:ro ^
   binacle/binacle-net:{{ page.version_tag }}
 ```
-
-</div>
-</div>
+{: data-tab="Windows" }
 
 > Since we are using a bind mount for a single file, the full path must be provided.
 {: .block-note}
