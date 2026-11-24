@@ -38,7 +38,7 @@ Both work in raw bytes (no base64). They are **async** because the codec uses th
 
 `src/headerNotation.ts` mirrors C# `HeaderNotation` — the header's text form for the test vectors,
 `v{N}_{raw|comp}_{row|col}_{binW}_{itemDimW}_{itemCoordW}` (e.g. `v1_comp_col_16_8_16`). The **geometry** text
-notation (`"LxWxH (X,Y,Z) [Q]"`) is **not** here — it lives in the shared `binacle-compact-notation` package (the
+notation (`"LxWxH (X,Y,Z) [Q]"`) is **not** here — it lives in the shared `@binacle/compact-notation` package (the
 TS mirror of C# `Binacle.CompactNotation`), which both the vector parser and the interop generator import.
 
 ## Identical to C# (by design)

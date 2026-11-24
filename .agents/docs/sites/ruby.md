@@ -17,7 +17,10 @@ what that does not.
 
 **They are the gems that name the product.** The generic gems are in `ruby/`, and the rules they all follow -
 one entry file, everything else under `lib/<gem>/`, `frozen_string_literal` on every file - are in `$ruby`.
-These two sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots` and `Binacle::Docs`.
+These two sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots` and `Binacle::Docs`. In `Binacle::Docs` the
+folders are modules, `Versions` and `Markup`, with `Pager` beside them; a dash in a gem's name is a nested module,
+as the RubyGems naming guide has it. **`binacle-docs` is the one gem that depends on Nokogiri**, for `doc_body`;
+the generic `jekyll-filters` does not, so only `docs` has Nokogiri in its lock.
 
 **A site loads them the same two ways it loads the generic ones**, but its `Gemfile` path is
 `../ruby/<gem>`, one level shorter.

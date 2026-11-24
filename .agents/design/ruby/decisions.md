@@ -1,8 +1,8 @@
 ---
 id: ruby/decisions
-description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator.
+description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins.
 verified: 2026-11-09
-check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter
+check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs
 paths:
   - "ruby/**"
   - "sites/ruby/**"
@@ -118,3 +118,16 @@ Bootstrap agree, so a separator setting would only enable markup nobody should e
 **A page declares its structured data type as `structured_data: type:`, not `schema:` or `seo:`**, because a
 key is named after what it produces and `seo:` produces nothing. `sites/docs` sets `default_type: WebPage`;
 without it, 118 pages get no node at all.
+
+### R8 — the docs markup filter is a gem of the docs site, not generic, not in a theme gem, not in `_plugins`
+
+The maintainer, 2026-11-06: "i dont like that we pout site specific classes into ruby gems that are generic".
+`doc_body` and `doc_sections` write the docs' own classes and phrases, and had been in `jekyll-filters`, which every
+site loads, so every site carried Nokogiri. They are in `binacle-docs`, the one gem that depends on it.
+
+**A theme gem cannot hold them.** Jekyll loads plugins only from the gems a theme names as dependencies, so the
+filter cannot live in the design system's gem. **The site's `_plugins/` folder is Jekyll's place for one site's own
+code, and was not chosen:** it has no specs and no coverage, which every gem here has.
+
+**`doc_body`'s class list must match the design system's Sass.** That is level 4 using level 3 names, which the
+levels rule allows. A class renamed in the Sass breaks a docs style with no error.

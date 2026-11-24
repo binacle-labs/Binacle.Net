@@ -40,7 +40,7 @@
   }
 
   // Below 1200 the header stays at the top, so the sidebar sticks below it.
-  @media (tiers.$wide <= width < tiers.$widest) {
+  @media (tiers.$wide <= width < tiers.$docs-widest) {
     top: 61px;
     max-height: calc(100vh - 61px);
   }

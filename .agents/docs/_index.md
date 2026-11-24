@@ -134,7 +134,7 @@ table of [README.md](README.md).
 
 ```yaml
 - file: packages/README.md
-  description: "The TypeScript npm workspaces - where each package lives, and the two generic ones under packages/, cookies and theme-switcher, in full."
+  description: "The TypeScript npm workspaces - where each package lives and what decides it, how they are named, the skeleton each one has, and the two generic ones under packages/, cookies and theme-switcher, in full."
   paths: ["packages/**"]
 - file: packages/dependencies.md
   description: "TypeScript packages dependency tree - the npm workspaces and which package imports (and declares) which."

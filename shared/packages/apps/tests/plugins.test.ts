@@ -51,12 +51,12 @@ describe("packingDemoPlugin", () => {
 });
 
 describe("protocolDecoderPlugin", () => {
-	test("registers the three components the vipaq page uses", () => {
+	test("registers the four components the vipaq page uses", () => {
 		const {alpine, data} = fakeAlpine();
 
 		protocolDecoderPlugin(alpine);
 
-		expect(data.sort()).toEqual(["errors_dialog", "pack_view", "protocol_decoder_app"]);
+		expect(data.sort()).toEqual(["errors_dialog", "pack_view", "protocol_decoder_app", "samples_panel"]);
 	});
 
 	// The decoder page has no form, so it carries none of the field machinery.

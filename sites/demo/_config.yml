@@ -174,8 +174,8 @@ jekyll_tidy:
 ################################################################
 webmanifest:
   name: "Binacle.Net Demo"
-  theme_color: "#3c5d8b"
-  background_color: "#101010"
+  theme_color: "#efece4"
+  background_color: "#efece4"
   icons:
     - { src: /android-chrome-192x192.png, sizes: 192x192, type: image/png }
     - { src: /android-chrome-512x512.png, sizes: 512x512, type: image/png }

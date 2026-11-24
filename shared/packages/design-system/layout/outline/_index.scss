@@ -4,7 +4,7 @@
 .outline {
   display: none;
 
-  @media (width >= tiers.$widest) {
+  @media (width >= tiers.$docs-widest) {
     display: block;
   }
 }
@@ -49,13 +49,13 @@
 }
 
 .outline--ruled {
-  @media (width >= tiers.$widest) {
+  @media (width >= tiers.$docs-widest) {
     border-left: 1px solid var(--rule);
   }
 }
 
 .outline--hidden {
-  @media (width >= tiers.$widest) {
+  @media (width >= tiers.$docs-widest) {
     display: none;
   }
 }

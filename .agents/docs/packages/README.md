@@ -1,8 +1,8 @@
 ---
 id: packages
-description: The TypeScript npm workspaces - where each package lives, and the two generic ones under packages/, cookies and theme-switcher, in full.
-verified: 2026-11-09
-check: The package table matches the workspaces globs in the root package.json and each package.json name; packages/ holds only cookies and theme-switcher; theme-switcher's only importer is the design system; the head bundle reaches it through @binacle/design-system/theme-init; the jsdom and https notes match each jest.config.js; the test aliases match tooling/tests.just
+description: The TypeScript npm workspaces - where each package lives and what decides it, how they are named, the skeleton each one has, and the two generic ones under packages/, cookies and theme-switcher, in full.
+verified: 2026-11-25
+check: The package table matches the workspaces globs in the root package.json and each package.json name; packages/ holds only cookies and theme-switcher; theme-switcher's only importer is the design system; the head bundle reaches it through @binacle/design-system/theme-init; the jsdom and https notes match each jest.config.js; the test aliases match tooling/tests.just; every package has the skeleton below, and index.ts holds only exports; the sideEffects flag is on every package.json but apps; the design system's exports map has the three names below; the root jest.config.js collects src, components and layout
 also_update:
   - shared/apps
   - api/api-client
@@ -33,6 +33,83 @@ the slice they belong to and take the `@binacle/` scope:
 | `@binacle/vipaq` | `vipaq/packages/` | `$vipaq` |
 
 Which imports which is `$packages/dependencies`.
+
+## Where a package lives
+
+**By slice.** A package that belongs to a slice sits in `<slice>/packages/<name>/`, beside the slice's C# in
+`src/` and its tools in `tools/`. `shared/` is a slice too, for what several slices read: compact notation's C#
+and TypeScript sit side by side there, with the design system and the apps. The root `packages/` and `ruby/`
+hold generic code only.
+
+**What a piece of code knows decides where it goes, not its language. A level may use the levels below it, never
+one above.**
+
+| Level | Knows | Holds |
+|---|---|---|
+| 1 - generic | nothing about Binacle | the `jekyll-*` gems, `theme-switcher`, `cookies` |
+| 2 - API and data | the API or the shared formats, not the look | the two clients, compact notation, ViPaq |
+| 3 - brand | the look, not the API | tokens, fonts, the mark, every site component, the 3D view |
+| 4 - apps and sites | anything | the apps, each site and the UI module, the docs markup filter, the robots.txt body |
+
+**To place a new file, ask what it imports and what words it holds.** A gem that writes `doc__text` knows the
+docs, so it is level 4 whatever language it is in. A generic part that a site component needs, as the theme
+switcher is for the theme button, stays at level 1 and the component uses it. Why the split is by level is
+`$packages/decisions`.
+
+## Names
+
+- **A package outside the root `packages/` is `@binacle/<folder name>`**: `api/packages/api-client/` is
+  `@binacle/api-client`. The root two have no scope, `cookies` and `theme-switcher`.
+- **A site is `@binacle/sites-<folder name>`**, `@binacle/sites-www` for `sites/www/`. The UI module is
+  `@binacle/api-ui-module`.
+- **The Cloudflare project names are not the npm names.** `tooling/cloudflare/*.wrangler.jsonc` keeps its own.
+  Renaming one there makes a new project to deploy to, so only a site's `name` line and `package-lock.json`
+  hold its npm name.
+- **A test's jest name is the npm name without the `@`, and the `/` as a `-`**: `binacle-apps`, run as
+  `ts_binacle-apps_unit`. The two generic packages stay bare, `ts_cookies_unit`. The runner names its report
+  files after the jest name, and a `/` would make a folder.
+
+## Inside a package
+
+Every package has the same skeleton:
+
+- `package.json` - the name, `private: true`, `main: index.ts`. `sideEffects: false` is set on every package
+  but `@binacle/apps`.
+- `README.md` - what it is, who uses it.
+- `LICENSE` - only where the licence differs from the repository's. The generic two are MIT; compact notation
+  and ViPaq are Apache-2.0.
+- `index.ts` - the public surface, at the package root and never `src/index.ts`. It re-exports and holds no code.
+- `src/` - the code, one file per part. The design system keeps its code in its Sass groups instead.
+- `tests/` - mirrors the code, jest on jsdom.
+- `tsconfig.json` and `jest.config.js`.
+
+A package may add a folder of its own: `spec/` for a client's OpenAPI document, `tools/` for a generator. File
+names are camelCase, as every TypeScript file here is. A folder that is a BEM block is kebab-case, because the
+block's Sass name is.
+
+## The design system's entry names
+
+The `exports` field of `@binacle/design-system` has three names. `.` is `index.scss` under the `sass` condition
+and `index.ts` under `default`, so one name serves both. `./theme-init` is the pre-paint script. `./*` is any
+part by its path, so `pkg:@binacle/design-system/components/drawer` and a TypeScript import both resolve without
+a line per part. A site compiles its Sass with `--pkg-importer=node` and reads the markup through the package's
+Jekyll theme gem, `$shared/design-system`.
+
+## Moving or renaming a package
+
+A package's path or name is written in more places than its own folder:
+
+- the root `package.json` workspaces and `package-lock.json`, and each host's `package.json` dependencies and
+  its `build:css` and `watch:css`;
+- the root `jest.config.js` projects, the recipe in `tooling/tests.just`, and the steps in
+  `.github/workflows/shared-image-tests.yml` and `shared-site-tests.yml`;
+- `tooling/regen.just`, `tooling/openapi.just`, `gulpfile.js` and `NOTICE`;
+- each host's webpack chunk rules, and each site's `Gemfile` and `_config.yml` `theme:`;
+- the READMEs that list packages. A gem also sits in `ruby/Gemfile` or `sites/ruby/Gemfile`, the gem test
+  runner, `sonar-analysis.yml` and the rbproj.
+
+**After a move, `npm install` can leave the old folder in `package-lock.json` as an `extraneous` entry.** Remove
+it by hand.
 
 ## cookies
 
@@ -109,4 +186,5 @@ image served over plain http.
 
 **Every TypeScript workspace's tests run through the root `jest.config.js`**, with `--selectProjects`, and
 the coverage settings live only there: in multi-project mode jest ignores a project's own
-`collectCoverageFrom`.
+`collectCoverageFrom`. It collects `src/`, `components/` and `layout/`, because the design system keeps its code
+in its Sass groups; a group that gains a `.ts` needs a line of its own.

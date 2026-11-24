@@ -17,7 +17,8 @@ chosen**:
 
 - **`lang`** is `cs`, `ts` or `rb`.
 - **`project`** is the assembly or package name, lowercased, dots turned to dashes, with `UnitTests` /
-  `IntegrationTests` stripped. `Binacle.Net.Kernel.UnitTests` gives `binacle-net-kernel`. Nothing is
+  `IntegrationTests` stripped. `Binacle.Net.Kernel.UnitTests` gives `binacle-net-kernel`; the npm package
+  `@binacle/apps` gives `binacle-apps`, and the unscoped `cookies` stays `cookies`. Nothing is
   shortened - the segment has to name a real assembly, package or gem.
 - **`kind`** is `unit` or `integration`, spelled out.
 - **`_` separates the three segments, `-` belongs inside a name.** That is what makes

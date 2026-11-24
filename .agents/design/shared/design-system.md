@@ -1,8 +1,8 @@
 ---
 id: shared/design-system
-description: Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo.
+description: Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo. Also why the 3D view is here and a site loads only what it calls, the one copy of the mark, one folder per block, and why the shared markup is a Jekyll theme gem.
 verified: 2026-11-22
-check: DS1 against the build:css script in each site's package.json and the UI module's, which runs sass with --pkg-importer=node on that surface's own main.scss. DS2 to DS5 against shared/packages/design-system - its README, the folders, no @import and no "as *" in any .scss of the repo outside vendored lib/, every @media in range syntax naming a tiers. variable. DS6 against abstracts/_tiers.scss, and against every tier above desktop being used by a block that more than the docs site loads. DS7 against base/_tokens.scss, one @font-face per family, and fonts/, one woff2 each. DS8 against .field__input[aria-invalid] in components/field, a border colour and no background. DS9 against components/callout, a left edge and a label in --info, --warn or --error. DS10 against the two theme blocks in base/_tokens.scss, each setting its own --accent. DS11 against every var(--accent) in the package, each a background or a border. DS12 against a search for border-radius and box-shadow, and for --radius and --shadow, which must not exist. DS13 against a search of sites/, shared/ and the UI module for fonts.googleapis and fonts.gstatic, which must find nothing. DS14 against the --size- tokens and a search for a font-size given as a number outside them. DS15 against a search of every stylesheet for min-width and max-width, which must find none, and a search for mobile-only, tablet-only and desktop-only. DS16 against --step and --band-pad in base/_tokens.scss and their use in layout/. DS17 against every querySelector, closest and getElementsByClassName in the TypeScript of shared/packages, sites/*/_js and the UI module, none taking a class but an is- state. DS18 against components/tabs/tabs.ts and its test - aria-controls, aria-labelledby, the roving tabindex, the arrow, Home and End keys - and against every role="tablist" in sites/ carrying an aria-label, and every role="tab" in sites/ and the UI module carrying no id or aria-controls of its own.
+check: DS1 against the build:css script in each site's package.json and the UI module's, which runs sass with --pkg-importer=node on that surface's own main.scss. DS2 to DS5 against shared/packages/design-system - its README, the folders, no @import and no "as *" in any .scss of the repo outside vendored lib/, every @media in range syntax naming a tiers. variable. DS6 against abstracts/_tiers.scss, where a boundary only docs reaches starts $docs- and every other is used by more than the docs site. DS7 against base/_tokens.scss, one @font-face per family, and fonts/, one woff2 each. DS8 against .field__input[aria-invalid] in components/field, a border colour and no background. DS9 against components/callout, a left edge and a label in --info, --warn or --error. DS10 against the two theme blocks in base/_tokens.scss, each setting its own --accent. DS11 against every var(--accent) in the package, each a background or a border. DS12 against a search for border-radius and box-shadow, and for --radius and --shadow, which must not exist. DS13 against a search of sites/, shared/ and the UI module for fonts.googleapis and fonts.gstatic, which must find nothing. DS14 against the --size- tokens and a search for a font-size given as a number outside them. DS15 against a search of every stylesheet for min-width and max-width, which must find none, and a search for mobile-only, tablet-only and desktop-only. DS16 against --step and --band-pad in base/_tokens.scss and their use in layout/. DS17 against every querySelector, closest and getElementsByClassName in the TypeScript of shared/packages, sites/*/_js and the UI module, none taking a class but an is- state. DS18 against components/tabs/tabs.ts and its test - aria-controls, aria-labelledby, the roving tabindex, the arrow, Home and End keys - and against every role="tablist" in sites/ carrying an aria-label, and every role="tab" in sites/ and the UI module carrying no id or aria-controls of its own. DS19 against the module and moduleResolution in each site's tsconfig.json and the UI module's, esnext and bundler, and against components/pack-view holding the drawing code while the Alpine wrapper is in shared/packages/apps. DS20 against shared/packages/design-system/mark/mark.svg being the only copy and gulpfile.js copying it. DS21 against each component folder holding its Sass beside its .ts, and layout/ and components/ holding the scripts. DS22 against shared/packages/design-system/binacle-design-system.gemspec shipping _includes only, and against theme: in the _config.yml of www and demo.
 paths:
   - "shared/packages/design-system/**"
 ---
@@ -20,7 +20,10 @@ The values themselves are in `base/_tokens.scss` and `abstracts/`.
 **Decided (the maintainer, 2026-10-31):** asked whether to build the CSS once and copy it to every surface, or
 have each surface build from the shared partials: "lets ttry B".
 
-Each surface's `build:css` runs `sass` on its own `main.scss`, which names the parts it uses. His reasons, given
+Each surface's `build:css` runs `sass` on its own `main.scss`, which names the parts it uses, through the `pkg:`
+importer: `@use 'pkg:@binacle/design-system/components/drawer'` finds the part through `node_modules`, as Node finds a
+package. The importer is the Sass team's and needs Dart Sass 1.71 or later, and the script passes
+`--pkg-importer=node`. It replaced `--load-path` to a folder at the repo root. His reasons, given
 2026-10-27: "css size optimize / sites required unique styles to them / sites conflict at a style and need other
 ways to resolve it". A surface carries only the CSS it uses, and a rule only one site needs stays in that site.
 
@@ -71,8 +74,10 @@ added: the agent's (2026-10-31), and the package follows it.
 own: "lets go with 1 and we see if it is only for docs then prepend a docs only ... if it turns we need them
 for other sites they get bumped into normal tiers".
 
-So a width only `docs` uses would take a `docs` name, and one a second site uses is a tier in
-`abstracts/_tiers.scss`. Every boundary there today reaches more than one site.
+So a width only `docs` uses takes a `docs` name, and one a second site uses is a plain tier. Both sit in
+`abstracts/_tiers.scss`. 1200 is the docs site's own - its sidebar, outline, section box and the parts of the header
+only it shows. **Decided (the maintainer, 2026-11-25):** asked `docs-widest`, `docs-outline` or keep `$widest`:
+"docs-widest".
 
 ### DS7 - one font file per face
 
@@ -120,6 +125,19 @@ labels it; a tab is shown as soon as it takes focus, since a panel shows at once
 the ids, as Radix UI, Headless UI and Bootstrap do, so a page writes none by hand. The tabs need the script to
 switch at all, so ids from markup would add nothing without it. An id the markup does give is kept, so the
 switch he left open needs no script change.
+
+### DS19 - the 3D view is part of the design system, and a site loads only what it calls
+
+**Decided (the maintainer, 2026-11-08):** "ok 4d view is part of the design system... and yes the idea is sites only
+load what they need from the design system... id expect www and docs not to load threejs".
+
+The drawing code is in `components/pack-view/`, beside its Sass: the view, the colours, the palette, the camera fit,
+the prints, the positions and the coordinate and dimension types. It imports only three. The Alpine wrapper stays in
+`@binacle/apps`, which is level 4. **The agent read his answer as ES modules** (2026-11-08): only they let webpack
+drop what a site does not call, so every site and the UI module compile as `module: esnext` with
+`moduleResolution: bundler`. Built as CommonJS, every site would carry the view and all of three.js.
+three's deep imports end in `.js`: under that resolution its types resolve only with the extension, and the jest stubs
+match both spellings.
 
 ## Pending
 
@@ -176,3 +194,27 @@ a word, so a column is never squeezed to one letter. A table that still cannot f
 The space between bands, sections and blocks is a multiple of `--step`, so they line up from page to page.
 A small gap inside a component is its own. The page width, the gutter and the two reading measures - prose
 and marketing - are one token each.
+
+### DS20 - the mark has one copy, here
+
+**Leaning yes (the maintainer, 2026-11-07):** on the agent's split, "for now we go as you suggest". `mark/mark.svg`
+is the logo, and `gulpfile.js` copies it to each target as `media/logo/binacle-logo.svg`, the address the sites ask
+for. The favicons and the logo's PNG sizes stay in `assets/`, because each site serves them at fixed addresses from
+its root. A second copy of the SVG would drift from the first.
+
+### DS21 - one folder per block holds its Sass, its script and its markup
+
+A component's look, behaviour and shared markup used to be three copies kept in step by hand, with the script
+building markup out of the Sass class names. A block's folder now holds `_index.scss` and its `.ts`, and its markup
+is in `_includes/components/`. A script sits with the block it works on: `navFade.ts` in `layout/site-header/`,
+`stickySidebar.ts` in `layout/sidebar/`, and `codeWrap.ts` in `components/code-block/` though it also wraps the
+`command` words. The groups stay DS2's.
+
+### DS22 - the shared markup is a Jekyll theme gem, and the UI module writes it again
+
+A Jekyll site shares `_includes` through a theme gem, which is Jekyll's own way. A site names it as `theme:` in
+`_config.yml` and loads it from a path in its `Gemfile`. A file of the same name in the site wins, so a site can
+override one include. A site has one theme, so all shared markup is in this gem. The gem ships `_includes/` only:
+Jekyll loads plugins only from gems a theme names as dependencies, so Ruby code cannot live here. The UI module
+cannot read Liquid, so its copy of the markup is Razor partials. `docs` has no include to share, because
+`binacle-docs` writes its markup.

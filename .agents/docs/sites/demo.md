@@ -60,7 +60,7 @@ Webpack bundles from `sites/demo/_js/` and npm packages into `sites/demo/js/`:
 | Bundle | What it is |
 |---|---|
 | `main.js` | Site-wide: the design system's theme button, menu drawer, code wrap, copy buttons and lightbox |
-| `everyday_items.js`, `packing_demo.js`, `protocol_decoder.js` | One per demo page. Each starts Alpine with its app's plugin; the decoder's also holds the *Samples* drawer |
+| `everyday_items.js`, `packing_demo.js`, `protocol_decoder.js` | One per demo page. Each starts Alpine with its app's plugin, and nothing else |
 | `binacle-net-ui.js` | `@binacle/apps`, the API client and the design system's 3D view, in one chunk. Why it keeps that name is `$shared/apps` |
 | `binacle-vipaq.js` | `vipaq/packages/vipaq`, the TypeScript ViPaq decoder |
 | `three.js` | Three.js on its own, by far the largest - demo pages only |

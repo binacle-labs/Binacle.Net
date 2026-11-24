@@ -79,10 +79,10 @@ The webpack entries are `main`, `packing_demo` and `protocol_decoder`. The chunk
 `sites/demo/webpack.config.js`; both compile the same package source, so there is one implementation and only
 the config is duplicated.
 
-**The request fold is this host's, not the package's.** `_js/packing_demo.js` registers a second Alpine
+**The request fold is this host's; the formatter behind it is the package's.** `_js/packing_demo.js` registers a second Alpine
 component, `request_fold`, beside the plugin: it turns the demo's `lastRequest` - method, path, body, set by
-`packing_demo_app` on every valid submit - into a `curl` command against `window.location.origin`, one element
-per line so a wrapped line hangs under its start. `Pages/Packing.cshtml` puts it under the results: a `Request`
+`packing_demo_app` on every valid submit - into a `curl` command against `window.location.origin`. The package's
+`curlCommand` formats it, one element per line so a wrapped line hangs under its start. `Pages/Packing.cshtml` puts it under the results: a `Request`
 fold, hidden until a call has gone out, holding the command in a code block with the design system's Copy
 button. The demo site has none; the reasoning is `$packages/decisions#P3`.
 

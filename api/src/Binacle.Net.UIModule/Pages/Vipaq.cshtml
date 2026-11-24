@@ -4,7 +4,7 @@
 	this.ViewData["Title"] = Model.Applet.Title;
 }
 
-@* `samples_panel` is registered in _js/protocol_decoder.js and nests under the decoder's scope, so it reads
+@* `samples_panel` is registered by the decoder plugin and nests under the decoder's scope, so it reads
    `samples` and can add one. *@
 <div x-data="protocol_decoder_app">
 	<section class="band" x-data="samples_panel">

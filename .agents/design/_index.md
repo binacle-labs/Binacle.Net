@@ -25,7 +25,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: api/decisions.md
-  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, why the instance page renders its presets from a startup snapshot rather than a live provider, why OpenTelemetry's switches, endpoint paths and resource order are what they are, and why telemetry has a meter per module and wraps the service."
+  description: "API decisions ledger — why a module-off document carries no `429` and what guarantees it, what the generated documents are a document of, why the API sends no HSTS header, why the DiagnosticsModule alone is registered unconditionally, why an unknown enum answers with the same error a missing one does, why the shipped image calls the experimental v4 API, why the instance page renders its presets from a startup snapshot rather than a live provider, why OpenTelemetry's switches, endpoint paths and resource order are what they are, why telemetry has a meter per module and wraps the service, and why Binacle's own telemetry names are experimental and shaped as they are."
   paths: ["api/**"]
 - file: api/findings.md
   description: "API findings — the scratch-test evidence behind the OpenTelemetry decisions (exporter switching, endpoint paths, env vars, resource order)."
@@ -200,15 +200,15 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: packages/decisions.md
-  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request."
-  paths: ["api/packages/api-client/**", "shared/packages/apps/**"]
+  description: "Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request. Also why a package sits with its slice, why theme-switcher and cookies stay generic, what @binacle/apps holds, and the levels that decide where code goes."
+  paths: ["packages/**", "shared/packages/**", "api/packages/api-client/**", "shared/packages/apps/**"]
 ```
 
 ## Ruby
 
 ```yaml
 - file: ruby/decisions.md
-  description: "Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator."
+  description: "Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins."
   paths: ["ruby/**", "sites/ruby/**"]
 ```
 
@@ -216,7 +216,7 @@ decisions (why) and the findings (measured evidence). Permanent and citable; rea
 
 ```yaml
 - file: shared/design-system.md
-  description: "Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo."
+  description: "Why the design system is built and looks the way it is - each surface builds its own CSS, the Sass conventions, the tiers, colour, type, lines and space, how a script finds an element. What a later change would otherwise undo. Also why the 3D view is here and a site loads only what it calls, the one copy of the mark, one folder per block, and why the shared markup is a Jekyll theme gem."
   paths: ["shared/packages/design-system/**"]
 ```
 

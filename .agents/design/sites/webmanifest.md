@@ -1,8 +1,8 @@
 ---
 id: sites/webmanifest
 description: Why the three sites ship a web app manifest rather than dropping the two android icons, where its colours come from, and why the UI module gets neither.
-verified: 2026-09-29
-check: the theme_color in each site's webmanifest block against the dark --primary and --bg in that site's own sass; the android-chrome ignore line in gulpfile.js for the uimodule target; no site holding a pages/site.webmanifest of its own
+verified: 2026-11-25
+check: both colours in each site's webmanifest block against the light --paper in the design system's base/_tokens.scss; the android-chrome ignore line in gulpfile.js for the uimodule target; no site holding a pages/site.webmanifest of its own
 paths:
   - "sites/**"
   - "gulpfile.js"
@@ -17,7 +17,7 @@ and there was no manifest. The choice was write one or stop copying them.
 **Written, 24 Aug 2026.** The files are made, shipped and already paid for in image size; deleting them
 throws away work that is done, and a manifest is what makes a site installable.
 
-## Every value traces to something, and two of them to a stylesheet
+## Every value traces to something, and the colours to a stylesheet
 
 `name` is the block's own `name:` where a site sets one and `title` otherwise. The demo sets
 `name: "Binacle.Net Demo"`, so it is not a second thing called "Binacle.Net". `description` is the site description. `start_url` is the
@@ -27,15 +27,17 @@ site root through `relative_url`.
 config carries a shorter name. Inventing one is inventing a brand string, so the key is left out and the
 name is truncated instead.
 
-**`theme_color` is measured per site, and it is not the same on all three.** It colours the browser bar, so
-it is the colour at the top of that site's page: `#3c5d8b`, the dark `--primary`, on demo and docs, which
-run a primary-coloured header bar; `#101010` on www, whose header sits on the page background.
-`background_color` is `#101010` everywhere - the dark `--bg` - because that is the splash behind the icon.
+**Both colours are the light theme's `--paper`, `#efece4`, on all three sites.** `theme_color` is the bar over an
+installed site and `background_color` the splash behind its icon. Every header sits on the page background, so
+one colour fits both. **Decided (the maintainer, 2026-11-25):** asked `light`, `dark` or `keep`: "light".
 
-**Those two hexes now exist twice**, in `_sass` and in the `webmanifest:` block of `_config.yml`. A manifest
-is JSON served to a browser and cannot read CSS, so there is no way to hold them once. **They are a pair:
-change a theme colour and change the manifest in the same commit**, or the splash and the browser bar stop
-matching the page. Nothing fails when they drift.
+**One theme is always off.** A manifest holds one set of colours and the sites have two themes, so on a phone in
+dark mode the bar and the splash are light. Light is the theme the tokens start from; dark overrides it.
+
+**That hex now exists twice**, in `base/_tokens.scss` and in the `webmanifest:` block of each `_config.yml`. A
+manifest is JSON served to a browser and cannot read CSS, so there is no way to hold it once. **They are a pair:
+change the light `--paper` and change the manifests in the same commit**, or the splash and the bar stop matching
+the page. Nothing fails when they drift.
 
 ## It is generated, not written
 

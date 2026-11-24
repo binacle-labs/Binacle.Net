@@ -301,7 +301,7 @@ is the only option when the shared thing needs its own runner or service contain
 | `setup-just` | nearly every job, and the site-building jobs through `build-jekyll-site` | The `just` install and the `^1.45` range, once |
 | `setup-dotnet` | `shared-image-tests`, `sonar-analysis`, `pull-request`, the release `build` job | SDK plus the NuGet package cache. Takes the SDK version as an input |
 | `setup-node` | `shared-image-tests`, `shared-site-tests`, `sonar-analysis`, `pull-request`, `release-docker-image`, `build-jekyll-site` | Node and the npm cache. It does not install packages |
-| `setup-ruby` | `build-jekyll-site`, `shared-site-tests`, `sonar-analysis` | Ruby and the gems. Takes the Gemfile directory as an input — `ruby/` for the gem specs, the site's own directory for a build |
+| `setup-ruby` | `build-jekyll-site`, `shared-site-tests`, `sonar-analysis` | Ruby and the gems. Takes the Gemfile directory as an input — `ruby/` and `sites/ruby/` for the gem specs, one step each, the site's own directory for a build |
 | `install-container-structure-test` | `shared-smoke-image` | Calls `tooling/ci/install-container-structure-test.sh` - the binary, curled and pinned by version and SHA-256 |
 | `install-hurl` | `shared-smoke-image` | The same. Its script carries the `libxml2` note that explains the caller's runner pin |
 | `install-lychee` | `deploy-site`, and `pull-request`'s `site-build` job | The same. The musl build, so it links nothing from the runner |

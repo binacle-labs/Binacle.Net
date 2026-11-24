@@ -26,16 +26,16 @@ they would not, the comment says why the line is there - the reason in one short
 media query cannot read a custom property", not the story of how that was found. No step numbers, no dates, no
 names of plans.
 
-**The long reasoning goes in `.agents/design/`** - not the root `design/` folder, which holds the Sass. That layer exists for exactly this - why it was built this way, and what
-proved it. Background, the options that were rejected, task history, "keep this in step with X", and anything
-that reads like a briefing goes there, not above the line.
+**The long reasoning goes in `.agents/design/`.** That layer exists for exactly this - why it was built this
+way, and what proved it. Background, the options that were rejected, task history, "keep this in step with X",
+and anything that reads like a briefing goes there, not above the line.
 
 **Never both.** A fact written in a comment and in a doc will disagree within a release. If the comment and
 the design record would say the same thing, the comment is the copy that goes.
 
 **Write them thin.** Cut the connective grammar first: "This is required because it throws due to X and Y"
 is "without this it throws". Cut the restatement of the line below it. Cut the essay - if the reasoning is
-worth keeping it goes in `design/`.
+worth keeping it goes in `.agents/design/`.
 
 A table of widths, a byte layout, a measured number - those stay. A reader cannot recover them.
 

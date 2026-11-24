@@ -23,7 +23,7 @@
 
   // Any link target clears the header that stays at the top below 1200.
   [id] {
-    @media (width < tiers.$widest) {
+    @media (width < tiers.$docs-widest) {
       scroll-margin-top: calc(var(--hit) + var(--step) * 2);
     }
   }

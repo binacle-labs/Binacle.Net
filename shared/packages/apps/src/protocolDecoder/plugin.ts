@@ -3,10 +3,12 @@ import {loggerPlugin} from "../components/logger/logger";
 import {packViewPlugin} from "../components/packView";
 import {errorsDialogPlugin} from "../components/errorsDialog/errorsDialog";
 import {protocolDecoderAppPlugin} from "./protocolDecoder";
+import {samplesPanelPlugin} from "./samplesPanel";
 
 export function protocolDecoderPlugin(Alpine: AlpineType) {
 	Alpine.plugin(loggerPlugin);
 	Alpine.plugin(packViewPlugin);
 	Alpine.plugin(protocolDecoderAppPlugin);
+	Alpine.plugin(samplesPanelPlugin);
 	Alpine.plugin(errorsDialogPlugin);
 }

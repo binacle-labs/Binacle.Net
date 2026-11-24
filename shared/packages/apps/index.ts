@@ -4,5 +4,6 @@
 /// <reference path="./src/types/alpine.d.ts" />
 
 export {everydayItemsPlugin} from "./src/everydayItems/plugin";
+export {curlCommand} from "./src/packingDemo/curlCommand";
 export {packingDemoPlugin} from "./src/packingDemo/plugin";
 export {protocolDecoderPlugin} from "./src/protocolDecoder/plugin";

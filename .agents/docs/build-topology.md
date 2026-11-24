@@ -140,10 +140,12 @@ webpack together under a single Ctrl-C), and its only scripts are the asset-copy
 
 `gulpfile.js` copies shared `assets/` (images, js, css, fonts, and the vendored `LICENSE`/`NOTICE` files) into
 the docs, demo and www sites and the UI module's `wwwroot/`. Each target also gets the fonts and the mark from
-`shared/packages/design-system`. `sites/admin` gets no copy. One `IGNORE` block holds what each target skips, with
-the reason beside it — only docs takes `lib/`, which now holds swagger-ui alone. Each of the four runs its own webpack build —
-see docs site (`$sites/docs`), demo site (`$sites/demo`), marketing site (`$sites/www`) and the UI module
-(`$api/modules/ui`).
+`shared/packages/design-system`. The mark is that package's `mark/mark.svg`, copied to `media/logo/binacle-logo.svg`,
+the address the sites ask for; `assets/` holds no second copy. The favicons and the logo's PNG sizes stay in
+`assets/`, because each site serves them at fixed addresses from its root. `sites/admin` gets no copy. One `IGNORE`
+block holds what each target skips, with the reason beside it — only docs takes `lib/`, which now holds swagger-ui
+alone. Each of the four runs its own webpack build — see docs site (`$sites/docs`), demo site (`$sites/demo`),
+marketing site (`$sites/www`) and the UI module (`$api/modules/ui`).
 
 **To re-measure that `IGNORE` block**, grep each target for `lib/<name>` outside its own `lib/` folder; what
 nothing references is what can be skipped. The copy is one-way and never deletes, so a target that stopped

@@ -1,9 +1,11 @@
 ---
 id: packages/decisions
-description: Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request.
+description: Packages decisions ledger - why the v4 client is hand-written rather than generated, why the 3D view owns its own internals instead of sharing a utils folder, and why the request fold is the UI module's and the component only hands over the request. Also why a package sits with its slice, why theme-switcher and cookies stay generic, what @binacle/apps holds, and the levels that decide where code goes.
 verified: 2026-11-10
-check: P1 against api/packages/api-client - no generator in its devDependencies, spec/v4.json present and byte-identical to the docs site's copy of the current version, tests/contract.test.ts still validating fixtures against it with ajv, and src/client.ts still the only routes the apps call; against tooling/openapi.just, where check-all-copies must diff that copy and sync-all-copies must write it, and against .github/workflows, where only shared-image-tests.yml runs check-all-copies and nothing runs sync-all-copies. P2 against shared/packages/apps/src - no utils/ or core/ folder - and shared/packages/design-system/index.ts, which exports createPackView and the 3D view's types and nothing else from components/pack-view/; no file under shared/packages/apps/src imports a path inside it. P3 against shared/packages/apps/src/packingDemo/packingDemo.ts, which sets lastRequest with a relative path and formats nothing, against api/src/Binacle.Net.UIModule/_js/packing_demo.js, which registers request_fold, holds the curl formatting and reads window.location.origin, and against Pages/Packing.cshtml, which puts the fold under the results. P4 against shared/packages/apps/src/protocolDecoder/sampleData.ts, five entries, tests/protocolDecoder/sampleData.test.ts, which reads vipaq/data/packed/demo-samples, holds each entry to its packed bin and checks each fills three quarters of it, and the Samples drawer in sites/demo/pages/vipaq.html and the UI module's Pages/Vipaq.cshtml
+check: P1 against api/packages/api-client - no generator in its devDependencies, spec/v4.json present and byte-identical to the docs site's copy of the current version, tests/contract.test.ts still validating fixtures against it with ajv, and src/client.ts still the only routes the apps call; against tooling/openapi.just, where check-all-copies must diff that copy and sync-all-copies must write it, and against .github/workflows, where only shared-image-tests.yml runs check-all-copies and nothing runs sync-all-copies. P2 against shared/packages/apps/src - no utils/ or core/ folder - and shared/packages/design-system/index.ts, which exports createPackView and the 3D view's types and nothing else from components/pack-view/; no file under shared/packages/apps/src imports a path inside it. P3 against shared/packages/apps/src/packingDemo/packingDemo.ts, which sets lastRequest with a relative path and formats nothing, against api/src/Binacle.Net.UIModule/_js/packing_demo.js, which registers request_fold and passes window.location.origin to curlCommand, against src/packingDemo/curlCommand.ts, which reads no window, and against Pages/Packing.cshtml, which puts the fold under the results. P4 against shared/packages/apps/src/protocolDecoder/sampleData.ts, five entries, tests/protocolDecoder/sampleData.test.ts, which reads vipaq/data/packed/demo-samples, holds each entry to its packed bin and checks each fills three quarters of it, and the Samples drawer in sites/demo/pages/vipaq.html and the UI module's Pages/Vipaq.cshtml; P5 against the folder of every package.json - packages/ holds only cookies and theme-switcher, ruby/ only jekyll-* gems, and the root workspaces list names every package folder; P6 against git grep -niE 'binacle|__' packages/theme-switcher/src, which finds nothing, and cookies being its own folder; P7 against shared/packages/apps/src, which holds app folders, components, shared and types and nothing else; P8 against the level table in the packages doc and the imports of each package; P9 against shared/packages/apps/package.json, which has no sideEffects, and against the errors dialog importing @binacle/api-client; P10 against api/packages/api-client/src/response.ts and api/packages/service-client/src/response.ts, two files, and no package that holds both
 paths:
+  - "packages/**"
+  - "shared/packages/**"
   - "api/packages/api-client/**"
   - "shared/packages/apps/**"
 ---
@@ -59,9 +61,9 @@ the package should not reach into the documentation site to find one.
 
 **Decided (the maintainer, 2026-09-14):** "we will only do it for UiModule". The packing page inside the
 image shows the call it just made; the demo site does not. `packing_demo_app` exposes `lastRequest` - method,
-path, body - and formats nothing. The formatting and the host live in `_js/packing_demo.js`, the module's own
-entry, as a second Alpine component, `request_fold`, that the page nests under the demo's scope. The package
-reads `lastRequest` itself in one place: the API answers an unfit item by id only, so its size comes from
+path, body - and formats nothing. `_js/packing_demo.js`, the module's own entry, registers a second Alpine
+component, `request_fold`, that the page nests under the demo's scope. It gives the host to `curlCommand`, the
+package's formatter, which only this host calls. The package reads `lastRequest` itself in one place: the API answers an unfit item by id only, so its size comes from
 what was sent.
 
 **A fold under the results.** `Pages/Packing.cshtml` puts a `Request` fold under the results, hidden until a
@@ -75,7 +77,7 @@ the fold.
 
 - **One `curl` command, not raw HTTP and not a language snippet.** The fold is checked by pasting what it
   prints into a terminal, and `curl` is what the Docker Hub quick start already hands a reader. The
-  formatting is in the module's entry.
+  formatting is `curlCommand`, in the package.
 - **The host is `window.location.origin`.** The module always calls the API it is served from -
   `ModuleDefinition.cs` sets `ApiBaseUrl` to empty - so the page's own origin is the only host that is true,
   and it is one the reader can call. `lastRequest.path` stays relative for the same reason: which host
@@ -87,13 +89,13 @@ the fold.
 - **Request only.** The 3D view and the result list already show the response; a second copy of it would
   double the fold for nothing.
 
-**What the module's half costs.** `_js/packing_demo.js` has no test harness - the package's jest does not
-reach it. The formatter started as a few lines checked once by `bash -n` and by eye. It has since grown: it
-wraps the command word by word and weights the JSON. The rule here was that it moves into a tested file when
-it grows; that has not happened yet.
+**Why the formatter is in the package and the fold is not.** The package's jest does not reach the module's
+`_js/`. The formatter started there as a few lines checked by eye, and grew: it wraps the command word by word and
+weights the JSON. So it is `src/packingDemo/curlCommand.ts`, a function of the request and the origin, with a test.
+It reads no `window`, and a host that does not call it does not bundle it.
 
-**What would change this.** The demo site wanting the fold after all - then the formatting moves into the
-package as a method on the component, and the origin becomes an option the host passes in.
+**What would change this.** The demo site wanting the fold after all - then it registers the same small component
+and calls the same function.
 
 ### P4 - the decoder's samples are packed demo examples, held to the packed data by a test
 
@@ -124,6 +126,48 @@ generator would need the same list. If five stops being enough, the list moves t
 packed data.
 
 **The chips were also rejected** - too big and in the wrong place. The drawer takes no space until opened.
+
+### P5 - a package sits with its slice, and the root folders hold generic code only
+
+**Decided (the maintainer, 2026-11-07):** "the rule now is packages /ruby for those not having a home or are not
+part of a feature", and "compact notation is a feature small but a feature...shared feature". Earlier: "its by
+slice so it has to stickto vipaq", "the idea is for each slice to hold relatied thiungs togeter". On what the root
+folders hold: "the idea is yes", then "ruby at root conmtinues to hold generic struff jeykyll- / root packjages
+cookies themeswitcher". His idea: "evetryhing binacle must not go in packages or ruby / but in shared or in a
+slice/ruby /slice/pakcages".
+
+A package of a slice is `<slice>/packages/<name>/`. `shared/` is a slice too. **`design-system` and `apps` are in
+it.** Asked `shared` or `sites`, told `apps` is read by `sites/demo` and the UI module: "shared" (the maintainer,
+2026-11-07). `design-system` follows for the same reason: three sites read it, and the UI module does too.
+
+**Not a top-level folder, for now. Decided (the maintainer, 2026-11-07):** "we go shared for now / it seems its at
+the threshold of becoming a root folder but maybe not yet lets keep an eye on it". The design system's README says
+what would give it one.
+
+**The gems only the sites read are in `sites/ruby/`. Decided (the maintainer, 2026-11-07):** "sites get
+binacle-docs and binacle-robots which is only used by them". Asked whether it has its own bundle or shares
+`ruby/Gemfile`: "own" (the maintainer, 2026-11-08), so it has its own `Gemfile` and lock, which is Bundler's
+convention.
+
+### P6 - `theme-switcher` stays generic and its own package, and `cookies` is separate from it
+
+**Decided (the maintainer, 2026-11-07):** "themeswotcher is generioc and should cold generic componet used but the
+disign system". On js-cookie: "leave js cookie outside separate from theme-swiotchet", and asked `js-cookie` or
+`cookies`: "cookies".
+
+Nothing in `theme-switcher` names a Binacle class, attribute value or site; the storage key, the attribute and
+the button's class all come from options, and a new option is how a site asks for something different. The design
+system's theme button uses it, so the generic part stays at level 1 and the component uses it. Both packages are
+MIT, and the AGPL design system may use them.
+
+### P7 - `@binacle/apps` holds apps only, and the apps sit straight under `src/`
+
+**Decided (the maintainer, 2026-11-08):** "if the packge does hgold anything other that apps we need to rename the
+package". Asked about the `apps/src/apps/` stutter: "ok drop". The package's name already says what it holds, and
+`components/` stays apart from `shared/`, so a reusable Alpine component and a helper do not mix.
+
+**The app folders keep their names** (agent, 2026-11-08). `packingDemo` is the page called *Custom Sizes*; renaming
+the folder changes no URL and no `x-data` name, so it is not worth it on its own.
 
 ## Pending
 
@@ -156,3 +200,48 @@ dependency graph was invisible. A folder keeps a barrel only where it is that fo
 **The cost, paid once and worth knowing:** about 50 file moves and every import rewritten, with no behaviour
 change. The test suite was the whole safety net - 348 tests passed before and after with no assertion edited.
 A restructure of this kind that needs an assertion changed has moved something wrong.
+
+### P8 - code is placed by what it knows, not by its language
+
+**Leaning yes (the maintainer, 2026-11-07):** "i feel the general direction you have it", and the trial came first:
+"iwant to do it before but also test it too". His concern, 2026-11-07: "there is no clear separation sometimes
+and... in the meantime there is separation when it shouldnt". The levels themselves are the agent's (2026-11-07),
+and are in the packages doc.
+
+**Splitting by language made two faults.** One thing sat in three places: the drawer's look in `design/`, its
+behaviour in `packages/`, its markup copied into each site, with the TypeScript building markup out of the Sass
+class names and the three kept in step by hand. And one folder took anything of its language: `doc_body` wrote the
+docs' own classes inside a generic gem every site loads, and the package called the UI module's implementation
+held the apps, the 3D view and *Everyday Items* alike. A level asks what the code imports and what words it holds,
+so a component's Sass, behaviour and markup are one folder, and a gem that writes `doc__text` is the docs' whatever
+its language.
+
+**The `jekyll-*` gems stay apart from the components.** Sitemap, page meta, structured data, GTM, breadcrumbs, the
+manifest, resource tags and filters are site plumbing, not components, and they are level 1.
+
+### P9 - three things about what `@binacle/apps` holds
+
+**It has no `"sideEffects": false`.** A cold build with and without the flag: webpack already leaves *Everyday
+Items* out of the UI module, and with the flag it skips the package's `index.ts`, so the chunk splits into many
+modules where it was one. It grew a little on the demo and the UI module, and nothing was dropped. Builds keep a
+webpack disk cache, so a warm one can hide a cost like this until `node_modules/.cache/webpack` is deleted.
+
+***Everyday Items* stays in the package though only `demo` uses it.** It shares the helpers and the view wrapper,
+and the sites have no test setup. It moves into `sites/demo/` only if `demo` gets one.
+
+**The errors dialog is in the package and not the design system.** It imports `@binacle/api-client`, so it knows
+the API, and the design system may not.
+
+### P10 - the two API clients stay two
+
+`@binacle/api-client` and `@binacle/service-client` each have a short response reader, written alike. They serve
+different APIs and different readers, and one is experimental. A package shared between them is the split by
+language that P8 removes elsewhere.
+
+### P11 - the same skeleton in every package
+
+So a reader who knows one package knows all. `index.ts` is at the root and `src/index.ts` is not used, because most
+packages already did it that way. File names are camelCase, as every TypeScript file here is, and a folder that is
+a BEM block is kebab-case because the block's Sass name is. **Tests stay in `tests/`**, as every package already
+has them. Tests beside the code, as Angular and Vite templates have them, would suit a package where one folder
+must hold the whole component, and would change every package. The skeleton itself is in the packages doc.

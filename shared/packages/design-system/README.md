@@ -62,7 +62,8 @@ mixed on: `class="copy-button command__copy"`. Two blocks on one element never s
 `.is-open` alone.
 
 **Media queries use range syntax and the named boundaries:** `(width >= tiers.$desktop)`, never a number.
-`abstracts/_tiers.scss` holds them: `$tablet`, `$desktop`, `$wide`, `$wider`, `$widest`.
+`abstracts/_tiers.scss` holds them: `$tablet`, `$desktop`, `$wide`, `$wider`, `$docs-widest`.
+One only a single site uses starts with that site's name.
 
 ## 🔀 Where it leaves a convention
 

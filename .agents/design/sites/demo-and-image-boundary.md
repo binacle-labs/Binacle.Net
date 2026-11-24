@@ -1,8 +1,8 @@
 ---
 id: sites/demo-and-image-boundary
 description: The two demo tools ship on two hosts from one implementation - what is shared, what diverges freely, and the test that keeps the line where it is
-verified: 2026-11-09
-check: the shared/not-shared table against shared/packages/apps, sites/demo and api/src/Binacle.Net.UIModule; the duplicated pairs - the packing and ViPaq pages, the errors dialog, 3D view and size rows partials, the packing and ViPaq page scripts - diff -w each to keep the list of differences honest
+verified: 2026-11-25
+check: the shared/not-shared table against shared/packages/apps, sites/demo and api/src/Binacle.Net.UIModule; the duplicated pairs - the packing and ViPaq pages, the errors dialog, 3D view and size rows partials - diff -w each to keep the list of differences honest
 paths:
   - "sites/demo/**"
   - "shared/packages/apps/**"
@@ -16,7 +16,7 @@ demo site. There is **one implementation and two hosts**.
 
 | Shared - one source, `shared/packages/apps` | Not shared - diverges freely |
 |---|---|
-| the packing form, the ViPaq decoder, the errors dialog, the wiring of the 3D view | the home page, the navigation, the chrome, the copy, the metadata |
+| the packing form, the ViPaq decoder and its *Samples* drawer, the errors dialog, the wiring of the 3D view | the home page, the navigation, the chrome, the copy, the metadata |
 
 The look, and the 3D view itself, come from `shared/packages/design-system`, which both hosts read the same way.
 *Everyday Items* is in the package too, but only the demo site hosts it.
@@ -40,8 +40,8 @@ costs the image nothing.
 of the decision even when the work looks like site work.
 
 **One live example: the request under the results.** The package keeps the call it just made as `lastRequest` -
-method, path and body - and stops there. The image's own markup and script turn it into a curl command against
-the page's origin, in a *Request* fold. The demo site does not show it. Because the package hands it out as
+method, path and body - and holds `curlCommand`, which formats one. The image's own markup and script show it in a
+*Request* fold, against the page's origin. The demo site does not show it. Because the package hands it out as
 data, the demo site can add it later without touching the package.
 
 ## The two hosts serve different states
@@ -81,8 +81,8 @@ form on one side and they stop being the same page - and the cheapest way out st
 ## The half that is not shared and should be
 
 **The markup exists twice.** `sites/demo/` and `api/src/Binacle.Net.UIModule/` each carry the packing page, the
-ViPaq page and three partials - the errors dialog, the 3D view and the size rows - and the script behind each
-of the two pages. The package underneath is shared and these are not, **which is the shape that breaks
+ViPaq page and three partials - the errors dialog, the 3D view and the size rows. The scripts behind the pages
+only start Alpine with a plugin. The package underneath is shared and these are not, **which is the shape that breaks
 silently**: the package is green, one host renders, the other does not.
 
 **The stylesheets are no longer in it.** Each host's is one `main.scss` that pulls in the design system's

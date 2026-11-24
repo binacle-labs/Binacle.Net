@@ -7,7 +7,7 @@
   border-bottom: 1px solid var(--rule);
 
   &:has(.site-header__where) {
-    @media (width < tiers.$widest) {
+    @media (width < tiers.$docs-widest) {
       position: sticky;
       top: 0;
       z-index: 40;
@@ -61,7 +61,7 @@
 }
 
 .site-header:has(.site-header__where) .container {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     flex-wrap: nowrap;
     column-gap: 12px;
   }
@@ -260,7 +260,7 @@
 .site-header__where {
   display: none;
 
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     flex: 1 1 auto;
     align-items: center;
     gap: 12px;
@@ -278,21 +278,21 @@
   }
 
   // From 1000 the menu is the sidebar, so the name opens nothing.
-  @media (tiers.$wide <= width < tiers.$widest) {
+  @media (tiers.$wide <= width < tiers.$docs-widest) {
     cursor: default;
     pointer-events: none;
   }
 }
 
 .site-header.site-header--past .site-header__where {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     display: flex;
   }
 }
 
 .site-header__where [data-where],
 .site-header__section {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -301,32 +301,32 @@
 }
 
 .site-header__where [data-where] {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     flex: 0 1 auto;
   }
 }
 
 // With a section showing, the page steps back and the section takes the rest of the line.
 .site-header__where:has(.site-header__section:not(:empty)) [data-where] {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     flex: 0 3 auto;
     color: var(--muted);
   }
 }
 
 .site-header__section {
-  @media (width < tiers.$widest) {
+  @media (width < tiers.$docs-widest) {
     flex: 0 1 auto;
   }
 
   &:empty {
-    @media (width < tiers.$widest) {
+    @media (width < tiers.$docs-widest) {
       display: none;
     }
   }
 
   &::before {
-    @media (width < tiers.$widest) {
+    @media (width < tiers.$docs-widest) {
       content: "/";
       margin-right: 12px;
       color: var(--muted);
