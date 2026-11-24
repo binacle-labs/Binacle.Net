@@ -1,0 +1,17 @@
+{%- comment -%} kramdown does not take figure and dialog for blocks, and would wrap them in a paragraph. {%- endcomment -%}
+{%- assign unbroken = include.size | replace: ' ', '&nbsp;' -%}
+{::nomarkdown}
+<figure class="pack-view">
+  <button type="button" class="still" data-lightbox="{{ include.name }}" aria-label="Open the picture larger">
+    {% include drawings/{{ include.name }}.svg %}
+  </button>
+  <figcaption class="pack-view__strip">
+    <span class="dimension-line dimension-line--small dimension-line--strip"><span class="dimension-line__tick"></span><span class="dimension-line__number">{{ include.size }}</span><span class="dimension-line__tick"></span></span>
+    <span>{{ include.text }}</span>
+  </figcaption>
+</figure>
+<dialog class="lightbox" id="{{ include.name }}" aria-label="{{ include.text }}, larger">
+  {% include drawings/{{ include.name }}.svg class="lightbox__still" %}
+  <div class="lightbox__bar"><span>{{ include.larger_text | replace: include.size, unbroken }}</span><button type="button" class="button button--link" data-close>Close</button></div>
+</dialog>
+{:/}

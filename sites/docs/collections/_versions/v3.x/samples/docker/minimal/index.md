@@ -53,10 +53,10 @@ To change bin configurations:
 1. Open `Presets.json` in your editor.
 2. Edit the bin definitions.
 3. Restart to apply:
-    ```bash
-    docker compose down
-    docker compose up
-    ```
+   ```bash
+   docker compose down
+   docker compose up
+   ```
 
 ## 📂 Logs Folder
 A `./data` folder is created for application data, including logs. The `./data` and `./data/logs` directories

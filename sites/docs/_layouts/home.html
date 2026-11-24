@@ -1,0 +1,21 @@
+---
+layout: page
+---
+{%- comment -%} What comes before the first h2 sits beside the picture. The rest goes in the band. {%- endcomment %}
+{% assign body = content | doc_doors %}
+{% assign top = body | split: '<h2' | first %}
+{% assign band = body | remove_first: top %}
+{% assign copy = top | split: '<figure' | first %}
+{% assign picture = top | remove_first: copy %}
+<div class="split hero split--centred">
+  <div class="hero__copy">
+    <h1 class="split__title">{{ page.title }}</h1>
+    <p class="doc__meta label"><span class="doc__value">{{ page.version_label }}</span><span>Docker tag {{ page.version_tag }}</span></p>
+    {{ copy }}
+  </div>
+  {{ picture }}
+</div>
+
+<div class="doc__band">
+  {{ band }}
+</div>

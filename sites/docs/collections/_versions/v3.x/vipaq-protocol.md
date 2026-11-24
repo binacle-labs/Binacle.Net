@@ -33,10 +33,11 @@ This page is the wire format as Binacle.Net {{ page.version_label }} writes and 
 
 A ViPaq blob is a two byte header followed by a body:
 
-<div class="bit-diagram" style="--cols:4" role="img" aria-label="A two byte header, never compressed, then the body, compressed if smaller." markdown="0">
-{% include bit-field.html size="2 B" name="Header" note="Never compressed" %}
-{% include bit-field.html size="varies" name="Body" note="Compressed if smaller" span=3 %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 2 B | `Header` | Never compressed | 1 |
+| varies | `Body` | Compressed if smaller | 3 |
+{: .bit-diagram aria-label="A two byte header, never compressed, then the body, compressed if smaller." }
 
 - The header is **never compressed**. The body is built first, compressed if that makes it smaller, and the
   header is put in front afterwards.
@@ -50,12 +51,13 @@ Two bytes, one job each. Byte 0 says **how to read** the body, byte 1 says **how
 
 ##### Byte 0 - form
 
-<div class="bit-diagram" role="img" aria-label="Byte 0: bits 7 and 6 Version, bit 5 Compressed, bit 4 Layout, bits 3 to 0 reserved." markdown="0">
-{% include bit-field.html size="7-6" name="Version" note="0 for this format" span=2 %}
-{% include bit-field.html size="5" name="Compressed" note="raw or compressed" %}
-{% include bit-field.html size="4" name="Layout" note="rows or columns" %}
-{% include bit-field.html size="3-0" name="reserved" note="always 0" span=4 kind="reserved" %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 7-6 | `Version` | 0 for this format | 2 |
+| 5 | `Compressed` | raw or compressed | 1 |
+| 4 | `Layout` | rows or columns | 1 |
+| 3-0 | `reserved`{:.reserved} | always 0 | 4 |
+{: .bit-diagram aria-label="Byte 0: bits 7 and 6 Version, bit 5 Compressed, bit 4 Layout, bits 3 to 0 reserved." }
 
 | Bits | Field | Values |
 |---|---|---|
@@ -66,12 +68,13 @@ Two bytes, one job each. Byte 0 says **how to read** the body, byte 1 says **how
 
 ##### Byte 1 - integer widths
 
-<div class="bit-diagram" role="img" aria-label="Byte 1: bits 7 and 6 BinDimensionsWidth, 5 and 4 ItemDimensionsWidth, 3 and 2 ItemCoordinatesWidth, 1 and 0 reserved." markdown="0">
-{% include bit-field.html size="7-6" name="BinDimensionsWidth" note="bin L, W, H" span=2 %}
-{% include bit-field.html size="5-4" name="ItemDimensionsWidth" note="item L, W, H" span=2 %}
-{% include bit-field.html size="3-2" name="ItemCoordinatesWidth" note="item X, Y, Z" span=2 %}
-{% include bit-field.html size="1-0" name="reserved" note="always 0" span=2 kind="reserved" %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 7-6 | `BinDimensionsWidth` | bin L, W, H | 2 |
+| 5-4 | `ItemDimensionsWidth` | item L, W, H | 2 |
+| 3-2 | `ItemCoordinatesWidth` | item X, Y, Z | 2 |
+| 1-0 | `reserved`{:.reserved} | always 0 | 2 |
+{: .bit-diagram aria-label="Byte 1: bits 7 and 6 BinDimensionsWidth, 5 and 4 ItemDimensionsWidth, 3 and 2 ItemCoordinatesWidth, 1 and 0 reserved." }
 
 | Bits | Field |
 |---|---|
@@ -87,11 +90,12 @@ obeys them, so two blobs from the same version can differ in both.
 
 The body carries the item count, the bin dimensions, then the items:
 
-<div class="bit-diagram" style="--cols:9" role="img" aria-label="The body: a two byte item count, the bin dimensions, then the items." markdown="0">
-{% include bit-field.html size="2 B" name="Item count" note="uint16" span=2 %}
-{% include bit-field.html size="3 or 6 B" name="Bin L, W, H" note="Bin width" span=3 %}
-{% include bit-field.html size="varies" name="Items" note="Item widths" span=4 %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 2 B | `Item count` | uint16 | 2 |
+| 3 or 6 B | `Bin L, W, H` | Bin width | 3 |
+| varies | `Items` | Item widths | 4 |
+{: .bit-diagram aria-label="The body: a two byte item count, the bin dimensions, then the items." }
 
 - **Item count** is always a 2 byte `uint16`, whatever the width fields say.
 - **Bin dimensions** are Length, Width, Height, in that order.
@@ -103,28 +107,30 @@ The body carries the item count, the bin dimensions, then the items:
 
 Each item is written whole - its three dimensions, then its three coordinates - before the next item.
 
-<div class="bit-diagram" style="--cols:8" role="img" aria-label="Row-major: one item as L, W, H, X, Y, Z in turn, then the next item, and so on." markdown="0">
-{% include bit-field.html size="1 or 2 B" name="L" note="dimension" %}
-{% include bit-field.html size="1 or 2 B" name="W" note="dimension" %}
-{% include bit-field.html size="1 or 2 B" name="H" note="dimension" %}
-{% include bit-field.html size="1 or 2 B" name="X" note="coordinate" %}
-{% include bit-field.html size="1 or 2 B" name="Y" note="coordinate" %}
-{% include bit-field.html size="1 or 2 B" name="Z" note="coordinate" %}
-{% include bit-field.html size="repeats" name="next item" note="same six fields" span=2 kind="more" %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 1 or 2 B | `L` | dimension | 1 |
+| 1 or 2 B | `W` | dimension | 1 |
+| 1 or 2 B | `H` | dimension | 1 |
+| 1 or 2 B | `X` | coordinate | 1 |
+| 1 or 2 B | `Y` | coordinate | 1 |
+| 1 or 2 B | `Z` | coordinate | 1 |
+| repeats | `next item`{:.more} | same six fields | 2 |
+{: .bit-diagram aria-label="Row-major: one item as L, W, H, X, Y, Z in turn, then the next item, and so on." }
 
 ##### Columnar (`Layout = 1`)
 
 Each field is written for every item before moving on to the next field. Six runs, each as long as the item count.
 
-<div class="bit-diagram" style="--cols:6" role="img" aria-label="Columnar: six runs in turn, L, W, H, X, Y, Z, each as long as the item count." markdown="0">
-{% include bit-field.html size="count values" name="L L L ..." note="dimension width" %}
-{% include bit-field.html size="count values" name="W W W ..." note="dimension width" %}
-{% include bit-field.html size="count values" name="H H H ..." note="dimension width" %}
-{% include bit-field.html size="count values" name="X X X ..." note="coordinate width" %}
-{% include bit-field.html size="count values" name="Y Y Y ..." note="coordinate width" %}
-{% include bit-field.html size="count values" name="Z Z Z ..." note="coordinate width" %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| count values | `L L L ...` | dimension width | 1 |
+| count values | `W W W ...` | dimension width | 1 |
+| count values | `H H H ...` | dimension width | 1 |
+| count values | `X X X ...` | coordinate width | 1 |
+| count values | `Y Y Y ...` | coordinate width | 1 |
+| count values | `Z Z Z ...` | coordinate width | 1 |
+{: .bit-diagram aria-label="Columnar: six runs in turn, L, W, H, X, Y, Z, each as long as the item count." }
 
 Columnar puts values of similar size next to each other, which usually compresses better. Row-major is easier to
 read in a hex dump. Neither is required - the header bit says which was used.
@@ -185,14 +191,15 @@ A bin of `10x20x30` holding one item `1x2x3` at `(4,5,6)`.
 Every value fits in a byte, so all three sections use the 1 byte width, and the encoder wrote it row-major and
 uncompressed. Both header bytes are therefore `0x00`:
 
-<div class="bit-diagram" style="--cols:13" role="img" aria-label="The thirteen bytes of the example, grouped: Byte 0, Byte 1, the count, the bin, the item's dimensions and its coordinates." markdown="0">
-{% include bit-field.html size="00" name="Byte 0" note="1 B" %}
-{% include bit-field.html size="00" name="Byte 1" note="1 B" %}
-{% include bit-field.html size="01 00" name="Count" note="1 item" span=2 %}
-{% include bit-field.html size="0A 14 1E" name="Bin" note="10 x 20 x 30" span=3 %}
-{% include bit-field.html size="01 02 03" name="Item" note="1 x 2 x 3" span=3 %}
-{% include bit-field.html size="04 05 06" name="At" note="4, 5, 6" span=3 %}
-</div>
+| Size | Name | Note | Width |
+|---|---|---|---|
+| 00 | `Byte 0` | 1 B | 1 |
+| 00 | `Byte 1` | 1 B | 1 |
+| 01 00 | `Count` | 1 item | 2 |
+| 0A 14 1E | `Bin` | 10 x 20 x 30 | 3 |
+| 01 02 03 | `Item` | 1 x 2 x 3 | 3 |
+| 04 05 06 | `At` | 4, 5, 6 | 3 |
+{: .bit-diagram aria-label="The thirteen bytes of the example, grouped: Byte 0, Byte 1, the count, the bin, the item's dimensions and its coordinates." }
 
 ## 🖥️ Try it
 

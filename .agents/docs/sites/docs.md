@@ -82,7 +82,7 @@ in a `<title>`.
 drops the emoji that opens a heading, a paragraph, a list item or a list item's first link. A page's `nav.icon`
 goes on its title (`_layouts/page.html`) and, on a top-level page, on its sidebar entry (`_includes/menu.html`)
 and the header's menu button (`_includes/header.html`).
-A keycap (`1️⃣`) numbers a menu entry and never goes on a title. The home page, `home: true`, skips `doc_body`
+A keycap (`1️⃣`) numbers a menu entry and never goes on a title. The home page, `layout: home`, skips `doc_body`
 and keeps every emoji it is written with. The design system's `emoji` block tones them down per theme.
 Why: `$sites/decisions#S13`.
 

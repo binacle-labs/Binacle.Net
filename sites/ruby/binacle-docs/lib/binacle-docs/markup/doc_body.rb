@@ -10,6 +10,11 @@ module Binacle
           Converter.new(input.to_s).to_html
         end
 
+        # For a page that keeps its emoji and draws its own blocks.
+        def doc_doors(input)
+          Converter.new(input.to_s).doors_to_html
+        end
+
         # Turns what kramdown and Rouge write into the design's markup. It runs on the rendered page, so the
         # heading ids are already made and the markdown stays as it is.
         class Converter
@@ -40,7 +45,9 @@ module Binacle
           LANGUAGE_LABELS = { 'yml' => 'yaml' }.freeze
           CALL = /\A(GET|POST|PUT|DELETE) (\S+)\z/
           FILL = /\A\d+(\.\d+)?\z/
-          DOOR_DASH = /\A\s+-\s+/
+          WIDTH = /\A[1-9]\d*\z/
+          FIELD_KINDS = %w[reserved more].freeze
+          DOOR_DASH =/\A\s+-\s+/
           ALERT = /\A\s*\[!(\w+)\]\s*/
 
           def initialize(html)
@@ -57,12 +64,18 @@ module Binacle
             name_example_heads
             name_http_lines
             name_result_lists
+            name_bit_diagrams
             name_tables
             name_nested_lists
             name_doors
             name_labelled_lists
             name_steps
             name_blocks
+            @fragment.to_html
+          end
+
+          def doors_to_html
+            name_doors
             @fragment.to_html
           end
 
@@ -274,6 +287,36 @@ module Binacle
             HTML
           end
 
+          # A table marked bit-diagram has four columns: the size, the name in code, the note and the width. A name
+          # marked reserved or more is drawn faint.
+          def name_bit_diagrams
+            @fragment.css('table.bit-diagram').each do |table|
+              raise ArgumentError, 'a bit-diagram needs an aria-label: a screen reader hears only that' unless table['aria-label']
+
+              rows = table.css('tbody tr').map { |row| row.css('td') }
+              fields = rows.map { |cells| bit_field(cells) }
+              box = Nokogiri::HTML5.fragment('<div class="bit-diagram" role="img"></div>').first_element_child
+              box['style'] = "--cols:#{rows.sum { |cells| cells[3].text.to_i }}"
+              box['aria-label'] = table['aria-label']
+              box.inner_html = fields.join("\n")
+              table.replace(box)
+            end
+          end
+
+          def bit_field(cells)
+            name = cells[1]&.at_css('> code')
+            unless cells.size == 4 && name && cells[3].text.strip.match?(WIDTH)
+              raise ArgumentError, "a bit-diagram row is size, `name`, note, width, not: #{cells.map(&:text).join(' | ')}"
+            end
+
+            kind = (name.classes & FIELD_KINDS).map { |mark| " bit-diagram__field--#{mark}" }.join
+            size, note, width = [cells[0], cells[2], cells[3]].map { |cell| cell.inner_html.strip }
+            %(<div class="bit-diagram__field#{kind}" style="--span:#{width}">) +
+              '<span class="dimension-line dimension-line--small dimension-line--cell"><span class="dimension-line__tick"></span>' +
+              %(<span class="dimension-line__number">#{size}</span><span class="dimension-line__tick"></span></span>) +
+              %(<code class="bit-diagram__name">#{name.inner_html}</code><span class="muted">#{note}</span></div>)
+          end
+
           def name_tables
             @fragment.css('table').each do |table|
               add_class(table, 'table doc__table')
@@ -318,7 +361,7 @@ module Binacle
               heading = list.previous_element
               links = list.css('> li').map { |item| door(item) }
               list.name = 'nav'
-              list['class'] = 'doors doors--full'
+              list['class'] = list.classes.include?('doors--grid') ? 'doors doors--grid' : 'doors doors--full'
               list['aria-label'] = heading.text.strip if heading&.name&.match?(/\Ah[2-6]\z/)
               list.inner_html = links.join
             end

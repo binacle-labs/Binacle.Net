@@ -1,8 +1,8 @@
 ---
 id: sites/templates
 description: How the three Jekyll sites name and place their template files - one base layout and wrappers, where a partial sits says how far it reaches, and when a partial takes a generic name. The class names follow BEM; the template files do not have to.
-verified: 2026-11-10
-check: T1 against _layouts/ in sites/www, sites/docs and sites/demo - a default.html with no layout of its own, a page.html with layout default, and the layout default in each _config.yml being page; T2 against each site's _includes/, where the site header and footer are header.html and footer.html at the root with no site- in the name
+verified: 2026-11-25
+check: T1 against _layouts/ in sites/www, sites/docs and sites/demo - a default.html with no layout of its own, a page.html with layout default, and the layout default in each _config.yml being page, and docs' home.html with layout page; T2 against each site's _includes/, where the site header and footer are header.html and footer.html at the root with no site- in the name
 paths:
   - "sites/www/_layouts/**"
   - "sites/www/_includes/**"
@@ -35,6 +35,9 @@ or have 1 consistent pattern". Asked which name is the bare one: "swap", so `def
 | anything else | a wrapper for another page size: `layout: default`, beside `page` |
 
 The names are Jekyll's own, from its theme template. Each site's `_config.yml` sets `page` as the default layout.
+
+**Docs' `home.html` sits inside `page.html`**, not beside it: the home page has every other page's header, menu, pager
+and footer, and only its middle differs. The maintainer, 2026-11-25, told it bends this rule: "home".
 
 **Two docs layouts stand alone** (agent, 2026-11-10): `swagger.html`, the API reference the docs show inside a
 frame, and `redirect.html`. Neither is a page in the site frame, so neither wraps `default`.

@@ -11,7 +11,7 @@ The documentation site, built with [Jekyll](https://jekyllrb.com/). It hosts the
 | `pages/` | `404.html` and `robots.txt`. The landing page is the current line's index |
 | `_data/` | Site data. `versions.yml` is the version list: which one is current, where each renders, what docker tag each pulls |
 | `_redirects` | Old urls and where they went, one per line. Cloudflare reads it from the output root |
-| `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document, `page.html` the wrapper every page gets. `_includes/drawings/` holds the pictures, one SVG each, coloured by the page's CSS; `drawing.html` puts one on a page, `{% include drawing.html name="box" %}`. A page with `home: true` in its front matter brings its own title and skips `doc_body` |
+| `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document, `page.html` the wrapper every page gets, `home.html` the home page's own part inside it: what comes before the first `##` goes beside the picture, the rest in the tinted band. `_includes/drawings/` holds the pictures, one SVG each, coloured by the page's CSS; `drawing.html` puts one on a page, `{% include drawing.html name="box" %}`. `picture.html` puts a 3D picture on a page with its size and words, and a larger view on a click; the words are passed to it |
 | `_sass/` | This site's stylesheets. `main.scss` names what it takes from [`shared/packages/design-system`](../../shared/packages/design-system). The sass command compiles them into `css/` |
 | `_js/` | TypeScript and JavaScript sources. Webpack bundles them into `js/` |
 

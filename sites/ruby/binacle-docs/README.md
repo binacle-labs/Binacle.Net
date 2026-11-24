@@ -1,6 +1,6 @@
 # binacle-docs
 
-One site's gem, on purpose. It holds the Ruby that only `sites/docs` uses: its version scheme, and the two
+One site's gem, on purpose. It holds the Ruby that only `sites/docs` uses: its version scheme, and the
 filters that turn a rendered page into the docs' markup. Nothing here is portable, and nothing here should be
 made portable. The moment these become settings, every site loading the gem carries a vocabulary only one of
 them uses.
@@ -16,6 +16,7 @@ collection folder `_versions`. The filters write the design's class names, such 
 | the generator | decides the url of every file under `_versions/`; stamps `version`, `version_tag`, `title_suffix`, `robots`, `version_urls` and `prev_next`, the page before and after in the menu; fails the build on two files at one url; prints the pages the previous version had that the current one lacks |
 | `{% vlink /path %}` | links to a file inside the current page's version, or inside the version named first |
 | `doc_body` | turns a rendered page into the design's markup |
+| `doc_doors` | turns only the lists marked `doors`, and keeps the emoji |
 | `doc_sections` | lists a page's `h2`s, for an outline |
 
 ## 🚀 Quick start
@@ -141,7 +142,7 @@ to nothing fails the build rather than writing a link to a 404.
   shows that in its head in place of the language. `data-name` shows a file or field name there instead, and
   `data-wrap=""` wraps one long string. In a `}` inside an attribute, write `\}`.
 - A list marked `{: .doors }` becomes links to pages. Each item is `[Title](link) - text`; anything else stops the
-  build. The heading above it names the list.
+  build. The heading above it names the list. `{: .doors .doors--grid }` makes a grid of them.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
 - A numbered list marked `{: .steps }` becomes the steps. Indent what belongs to a step by three spaces.
 - Code blocks in a row, each with `{: data-tab="Windows" }`, become tabs. The first also carries
@@ -152,6 +153,9 @@ to nothing fails the build rather than writing a link to a 404.
 - A code block with `{: data-fold="Response" }` starts closed, under that text.
 - A table marked `{: .result-list aria-label="The response" }` becomes result rows with a fill bar. Its columns are
   the bin, its size, the fill as a bare number, the result and the items. A row that does not fit stops the build.
+- A table marked `{: .bit-diagram aria-label="..." }` becomes a row of boxes. Its columns are the size, the name in
+  code, the note and the width. A name marked `{:.reserved}` or `{:.more}` is drawn faint. A row that does not fit, or no
+  `aria-label`, stops the build.
 - A table cell that holds only code marked `{:.mono}` takes the class `mono` too. A right-aligned column (`--:`)
   holds numbers. A cell that is only `*text*{:.table__off}` is greyed out.
 - A code block after a paragraph that starts *Request Example* or *Response Example* names the call or the

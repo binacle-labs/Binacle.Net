@@ -3,14 +3,14 @@ layout: default
 ---
 {% include header.html %}
 
-{%- comment -%} The home page is written by hand and keeps its emoji. {%- endcomment %}
-{% if page.home %}{% assign body = content %}{% else %}{% assign body = content | doc_body %}{% endif %}
+{%- comment -%} The home layout draws its own body and keeps the emoji. {%- endcomment %}
+{% if page.layout == "home" %}{% assign body = content %}{% else %}{% assign body = content | doc_body %}{% endif %}
 {% assign sections = body | doc_sections %}
 <div class="docs-layout">
     {% include sidebar.html %}
     <div class="drawer-backdrop" data-drawer-close></div>
 
-    <main id="content" class="doc{% if page.home %} doc--home{% endif %}">
+    <main id="content" class="doc{% if page.layout == "home" %} doc--home{% endif %}">
         {% include outdated-notice.html %}
         <nav class="breadcrumbs label" aria-label="Breadcrumb">
             {%- if page.nav.exclude %}
@@ -25,7 +25,7 @@ layout: default
             {%- endfor %}
             {%- endif %}
         </nav>
-        {% if page.home %}
+        {% if page.layout == "home" %}
         {{ body }}
         {% else %}
         {%- comment -%} A keycap numbers a menu entry; it is not a picture of the page. {%- endcomment %}
@@ -52,7 +52,7 @@ layout: default
         {% endif %}
     </main>
 
-    <nav class="outline{% if sections.size > 1 %} outline--ruled{% endif %}{% if page.home %} outline--hidden{% endif %}" aria-label="On this page">
+    <nav class="outline{% if sections.size > 1 %} outline--ruled{% endif %}{% if page.layout == "home" %} outline--hidden{% endif %}" aria-label="On this page">
         {% if sections.size > 1 %}
         <div class="outline__inner">
             <p class="label">On this page</p>

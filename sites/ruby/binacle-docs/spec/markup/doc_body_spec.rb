@@ -229,6 +229,12 @@ RSpec.describe Binacle::Docs::Markup::DocBody do
       expect(body("<p>a</p>#{list}").at_css('nav').key?('aria-label')).to be(false)
     end
 
+    it 'makes a grid of a list marked so' do
+      nav = body(list.sub('"doors"', '"doors doors--grid"')).at_css('nav')
+
+      expect(nav['class']).to eq('doors doors--grid')
+    end
+
     it 'leaves an unmarked list a list' do
       expect(body('<ul><li><a href="/api/">API</a> - text</li></ul>').at_css('nav')).to be_nil
     end
@@ -236,6 +242,17 @@ RSpec.describe Binacle::Docs::Markup::DocBody do
     it 'fails on an item with no link, or no text' do
       expect { body('<ul class="doors"><li>API - text</li></ul>') }.to raise_error(ArgumentError, /API - text/)
       expect { body('<ul class="doors"><li><a href="/api/">API</a></li></ul>') }.to raise_error(ArgumentError, /API/)
+    end
+  end
+
+  describe 'doors alone' do
+    it 'makes the links, and leaves the emoji and the other blocks' do
+      list = '<ul class="doors"><li><a href="/api/">📡 API</a> - text</li></ul>'
+      html = Nokogiri::HTML5.fragment(filter.doc_doors(%(<h2 id="a">🏠 Contents</h2><p>🚀 a</p>#{list})))
+
+      expect(html.at_css('h2').to_html).to eq('<h2 id="a">🏠 Contents</h2>')
+      expect(html.at_css('p').to_html).to eq('<p>🚀 a</p>')
+      expect(html.at_css('nav.doors h3.doors__title').text).to eq('📡 API')
     end
   end
 
@@ -339,6 +356,42 @@ RSpec.describe Binacle::Docs::Markup::DocBody do
     it 'fails on a row short of a column, or a fill that is not a number' do
       expect { body(results(%w[bin_1 a 1])) }.to raise_error(ArgumentError, /bin_1/)
       expect { body(results(['bin_1', 'a', '15%', 'b', 'c'])) }.to raise_error(ArgumentError, /15%/)
+    end
+  end
+
+  describe 'bit diagrams' do
+    def diagram(rows, label: ' aria-label="Byte 0"')
+      cells = rows.map { |row| "<tr>#{row.map { |cell| "<td>#{cell}</td>" }.join}</tr>" }.join
+      %(<table class="bit-diagram"#{label}><thead><tr><th>Size</th></tr></thead><tbody>#{cells}</tbody></table>)
+    end
+
+    let(:version) { ['7-6', '<code>Version</code>', '0 here', '2'] }
+    let(:reserved) { ['5-0', '<code class="language-plaintext highlighter-rouge reserved">reserved</code>', 'always 0', '6'] }
+
+    it 'turns a marked table into boxes, as wide together as their widths' do
+      html = body(diagram([version, reserved]))
+      box = html.at_css('div.bit-diagram[role=img]')
+
+      expect(html.at_css('table')).to be_nil
+      expect(box['aria-label']).to eq('Byte 0')
+      expect(box['style']).to eq('--cols:8')
+      expect(box.css('.bit-diagram__field').map { |field| field['style'] }).to eq(%w[--span:2 --span:6])
+      expect(box.css('.dimension-line__number').map(&:text)).to eq(%w[7-6 5-0])
+      expect(box.css('code.bit-diagram__name').map(&:text)).to eq(%w[Version reserved])
+      expect(box.css('.muted').map(&:text)).to eq(['0 here', 'always 0'])
+    end
+
+    it 'draws a marked name faint' do
+      fields = body(diagram([version, reserved])).css('.bit-diagram__field')
+
+      expect(fields.map { |field| field['class'] }).to eq(['bit-diagram__field', 'bit-diagram__field bit-diagram__field--reserved'])
+    end
+
+    it 'fails on a row short of a column, a name not in code, a width that is not a number, or no label' do
+      expect { body(diagram([%w[a b]])) }.to raise_error(ArgumentError, /a \| b/)
+      expect { body(diagram([%w[a b c 1]])) }.to raise_error(ArgumentError, /a \| b/)
+      expect { body(diagram([version.first(3) + ['wide']])) }.to raise_error(ArgumentError, /wide/)
+      expect { body(diagram([version], label: '')) }.to raise_error(ArgumentError, /aria-label/)
     end
   end
 
