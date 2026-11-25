@@ -22,6 +22,7 @@ module Binacle
         ].freeze
         SPLITS = %w[split--centred split--text-left split--text-right].freeze
         BODIES = %w[band__body--code-left].freeze
+        ONE_LINE = 'prose--one-line'
         COLUMNS = 'columns'
         STATEMENT = 'statement'
         # With no label column, any other band would put its body in the label's place.
@@ -40,6 +41,7 @@ module Binacle
           name_inline_code
           name_labelled_lists
           name_code_blocks
+          name_tables
           name_doors
           place_verdicts
           blocks = @fragment.element_children.to_a
@@ -109,6 +111,29 @@ module Binacle
           %(<button type="button" class="#{classes}" data-copy hidden>Copy</button>)
         end
 
+        # Below 640 a row stacks, and each cell shows its column's name.
+        def name_tables
+          @fragment.css('table:not([class])').each do |table|
+            table['class'] = 'table'
+            table['data-table'] = ''
+            columns = table.css('thead th').each { |cell| cell['scope'] = 'col' }.map { |cell| cell.text.strip }
+            table.css('tbody tr').each do |row|
+              row.css('td').zip(columns) { |cell, column| name_cell(cell, column) }
+            end
+          end
+        end
+
+        # A cell that is only emphasis marked table__off is greyed out whole, and not italic.
+        def name_cell(cell, column)
+          cell['class'] = 'table__text'
+          cell['data-label'] = column if column
+          mark = cell.at_css('> em.table__off')
+          return unless mark && cell.text.strip == mark.text
+
+          add_class(cell, 'table__off')
+          mark.replace(mark.children)
+        end
+
         # A list marked doors becomes links to pages.
         def name_doors
           @fragment.css('ul.doors').each do |list|
@@ -137,8 +162,16 @@ module Binacle
             next unless verdict.name == 'p' && verdict.classes.include?('verdict')
 
             before = verdict.previous_element
-            verdict.parent = before if before && judged?(before)
+            next unless before && judged?(before)
+
+            caption_fit_row(verdict) if before.classes.include?('fit-row')
+            verdict.parent = before
           end
+        end
+
+        def caption_fit_row(verdict)
+          verdict.name = 'figcaption'
+          verdict['class'] = 'fit-row__caption verdict'
         end
 
         # What a verdict may be the last line of.
@@ -164,8 +197,8 @@ module Binacle
 
           body_classes = looks & BODIES
           body_classes += ['split', *split] if split.any?
-          inner, all_words = body(blocks, looks.include?(COLUMNS), split)
-          body_classes << 'prose' if all_words && split.empty?
+          inner, is_prose = body(blocks, looks, split)
+          body_classes << 'prose' if is_prose
 
           in_grid = label || bands.intersect?(ONE_COLUMN)
           <<~HTML
@@ -210,7 +243,7 @@ module Binacle
         end
 
         def known_looks(heading)
-          unknown = heading.classes.difference(BANDS, SPLITS, BODIES, [COLUMNS, STATEMENT])
+          unknown = heading.classes.difference(BANDS, SPLITS, BODIES, [ONE_LINE, COLUMNS, STATEMENT])
           return heading.classes if unknown.empty?
 
           raise ArgumentError, "no section look called #{unknown.join(', ')}, on: #{heading.text.strip}"
@@ -224,31 +257,50 @@ module Binacle
           end
         end
 
-        # The inside of a section, and whether it is words from end to end.
-        def body(blocks, in_columns, split)
-          before, columns, after = in_columns ? part_columns(blocks) : [blocks, [], []]
+        # The inside of a section, and whether the whole of it is one prose box.
+        def body(blocks, looks, split)
+          before, columns, after = looks.include?(COLUMNS) ? part_columns(blocks) : [blocks, [], []]
           if (before + columns + after).any? { |block| block.name == 'hr' }
             raise ArgumentError, "a --- only ends columns, in: #{blocks.first.text.strip}"
           end
 
+          one_line = looks.include?(ONE_LINE)
           all_words = columns.empty? && before.all? { |block| words?(block) }
-          return [join(before), true] if all_words && split.empty?
+          return [join(before), true] if all_words && split.empty? && !one_line
 
+          opening, rest = part_opening(before)
           drawn = columns.empty? ? [] : [columns_html(columns)]
-          [(runs(before, split) + drawn + runs(after, split)).join("\n"), all_words]
+          [[opening_html(opening, split, one_line), *beside(rest, split), *drawn, *runs(after)].join("\n"), false]
         end
 
-        # Every run of words sits in a prose box. The rest stands on its own, but in a split a run of it shares a
-        # box, or each block would take a cell of the grid.
-        def runs(blocks, split)
+        # The heading and the words straight under it.
+        def part_opening(blocks)
+          opening = blocks.take_while { |block| words?(block) }
+          [opening, blocks.drop(opening.size)]
+        end
+
+        # A heading on its own keeps out of the box, for the space the design puts under it.
+        def opening_html(blocks, split, one_line)
+          return join(blocks) if blocks.size == 1 && split.empty?
+
+          blocks.each { |block| add_class(block, 'band__text') if block.name == 'p' } if one_line
+          classes = []
+          classes << ONE_LINE if one_line
+          classes << 'split__text' if split.include?('split--text-right')
+          prose(join(blocks), classes)
+        end
+
+        # In a split all of it shares a box, or each block would take a cell of the grid.
+        def beside(blocks, split)
+          return runs(blocks) if split.empty? || blocks.size < 2
+
+          [%(<div class="band__body">\n#{runs(blocks).join("\n")}\n</div>)]
+        end
+
+        # Every run of words sits in a prose box. The rest stands on its own.
+        def runs(blocks)
           blocks.chunk_while { |one, next_one| words?(one) == words?(next_one) }.map do |run|
-            if words?(run.first)
-              prose(join(run), split)
-            elsif split.any? && run.size > 1
-              %(<div class="band__body">\n#{join(run)}\n</div>)
-            else
-              join(run)
-            end
+            words?(run.first) ? prose(join(run)) : join(run)
           end
         end
 
@@ -280,8 +332,8 @@ module Binacle
           add_class(block, 'labelled-list--small') if block.classes.include?('labelled-list')
         end
 
-        def prose(html, split)
-          %(<div class="prose#{' split__text' if split.include?('split--text-right')}">\n#{html}\n</div>)
+        def prose(html, classes = [])
+          %(<div class="#{['prose', *classes].join(' ')}">\n#{html}\n</div>)
         end
 
         def join(blocks)

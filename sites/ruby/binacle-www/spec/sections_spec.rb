@@ -97,7 +97,7 @@ RSpec.describe Binacle::Www::Sections do
 
     it 'are all in the design system' do
       converter = described_class::Converter
-      looks = [*converter::BANDS, *converter::SPLITS, *converter::BODIES, converter::STATEMENT]
+      looks = [*converter::BANDS, *converter::SPLITS, *converter::BODIES, converter::ONE_LINE, converter::STATEMENT]
 
       expect(looks.reject { |look| sass.match?(/\.#{look}(?![\w-])/) }).to be_empty
     end
@@ -144,6 +144,27 @@ RSpec.describe Binacle::Www::Sections do
 
       expect(html.css('.split > *').map { |block| block['class'] }).to eq(%w[prose band__body])
       expect(html.css('.band__body .band__body > *').map(&:name)).to eq(%w[figure div])
+    end
+
+    it 'boxes the words after a block of a split, inside the box beside' do
+      html = page('<h2 class="split--text-right">A</h2><p>a</p><div class="command"></div><p>b</p>')
+
+      expect(html.css('.split > *').map { |block| block['class'] }).to eq(['prose split__text', 'band__body'])
+      expect(html.css('.band__body .band__body > *').map { |block| block['class'] }).to eq(%w[command prose])
+    end
+
+    it 'leaves a heading on its own out of the box' do
+      html = page('<h2 data-label="L">A</h2><ul class="doors"><li><a href="/b/">B</a> - b</li></ul>')
+
+      expect(html.css('.band__body > *').map { |block| block['class'] }).to eq(%w[band__heading doors])
+    end
+
+    it 'names the one line under a heading' do
+      html = page('<h2 class="band--wide prose--one-line">A</h2><p>a</p><table></table><p>b</p>')
+
+      expect(html.css('.band__body > *').map { |block| block['class'] })
+        .to eq(['prose prose--one-line', 'table', 'prose'])
+      expect(html.css('p').map { |text| text['class'] }).to eq(['band__text', nil])
     end
 
     it 'names the words of a split that has them on the right' do
@@ -271,6 +292,37 @@ RSpec.describe Binacle::Www::Sections do
     end
   end
 
+  describe 'tables' do
+    let(:table) do
+      page('<h2>A</h2><table><thead><tr><th>Yes</th><th>No</th></tr></thead><tbody>' \
+           '<tr><td>a</td><td><em class="table__off">b</em></td></tr>' \
+           '<tr><td>c</td><td><em class="table__off">d</em> e</td></tr></tbody></table>').at_css('table')
+    end
+
+    it 'are the design system\'s' do
+      expect(table['class']).to eq('table')
+      expect(table.key?('data-table')).to be(true)
+      expect(table.css('th').map { |cell| cell['scope'] }).to eq(%w[col col])
+    end
+
+    it 'say the column in every cell' do
+      expect(table.css('td').map { |cell| cell['data-label'] }).to eq(%w[Yes No Yes No])
+      expect(table.css('td').map { |cell| cell.classes.first }.uniq).to eq(%w[table__text])
+    end
+
+    it 'grey out a cell that is only emphasis marked table__off' do
+      expect(table.css('tr:first-child td').last.to_html)
+        .to eq('<td class="table__text table__off" data-label="No">b</td>')
+      expect(table.css('tr:last-child td').last['class']).to eq('table__text')
+    end
+
+    it 'are left alone in an include' do
+      html = page('<h2>A</h2><table class="x"><tbody><tr><td>a</td></tr></tbody></table>')
+
+      expect(html.at_css('td').key?('class')).to be(false)
+    end
+  end
+
   describe 'doors' do
     it 'are links with a title and a text' do
       html = page('<h2>A</h2><ul class="doors"><li><a href="/b/">B</a> - the b</li></ul>')
@@ -301,6 +353,12 @@ RSpec.describe Binacle::Www::Sections do
 
       expect(html.at_css('figure > .verdict').text).to eq('a')
       expect(html.at_css('.exchange > .verdict').text).to eq('b')
+    end
+
+    it 'is the caption of a fit-row' do
+      html = page('<h2>A</h2><figure class="fit-row"></figure><p class="verdict">a</p>')
+
+      expect(html.at_css('figure').inner_html).to eq('<figcaption class="fit-row__caption verdict">a</figcaption>')
     end
 
     it 'stands on its own after anything else' do

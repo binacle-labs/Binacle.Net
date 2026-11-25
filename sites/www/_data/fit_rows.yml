@@ -1,0 +1,11 @@
+# The boxes under each fit-row picture, left to right. `fits` is the verdict of the same request in exchange.yml.
+
+cartons:
+  - { number: 10, fits: false }
+  - { number: 20, fits: true }
+  - { number: 30, fits: true }
+
+lockers:
+  - { number: 8, fits: false }
+  - { number: 19, fits: false }
+  - { number: 41, fits: true }

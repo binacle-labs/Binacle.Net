@@ -1,0 +1,17 @@
+{%- comment -%} kramdown does not take a figure for a block, and would wrap it in a paragraph. {%- endcomment -%}
+{::nomarkdown}
+<figure class="fit-row">
+    <div class="drawing drawing--painted">
+        {% include drawings/{{ include.drawing }}.svg %}
+        <ol class="fit-row__verdicts fit-row__verdicts--{{ include.row }}">
+            {%- for box in site.data.fit_rows[include.row] %}
+            {%- if box.fits %}
+            <li class="fit-row__verdict fit-row__verdict--fits"><span class="fit-row__number">{{ box.number }}</span> AllItems<wbr>Fit</li>
+            {%- else %}
+            <li class="fit-row__verdict"><span class="fit-row__number">{{ box.number }}</span> NotAll<wbr>ItemsFit</li>
+            {%- endif %}
+            {%- endfor %}
+        </ol>
+    </div>
+</figure>
+{:/}

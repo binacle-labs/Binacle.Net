@@ -33,10 +33,11 @@ wins.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, plus `404.md` and `robots.txt`. The home, `cartonization` and `parcel-lockers` are HTML; the rest are markdown, drawn by `www_sections` - `$sites/ruby` |
+| `pages/` | The pages, plus `404.md` and `robots.txt`. The home is HTML; the rest are markdown, drawn by `www_sections` - `$sites/ruby` |
 | `_data/exchange.yml` | Every API request and response the site shows, and the `docker run` command |
+| `_data/fit_rows.yml` | The number and the verdict under each box of a fit-row picture. A new answer in `exchange.yml` may need a new verdict here |
 | `_data/header.yml`, `_data/footer.yml` | The nav and the footer links |
-| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, `picture` and `drawings/`, one SVG per picture |
+| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, `picture`, `fit-row`, the `scope.md` table and `drawings/`, one SVG per picture |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its

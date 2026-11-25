@@ -55,10 +55,13 @@ Every `#` and `##` starts a section. The line under it says how the section look
 - `.band__body--code-left`, in a wide section, puts a short code block under the left column of text.
 - `.statement` is one line at display size and the words under it, with no label. Each sentence of the heading
   is kept whole, and the heading comes out as a paragraph.
+- `.prose--one-line` is for a wide section with one short line under its heading, which then sits below the heading
+  and not beside it.
 - `.columns` makes a column of every `###`. A `---` ends them, with a blank line above it: without one, markdown
   reads the line above as a heading. No `###`, or a `---` anywhere else, stops the build.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
-- A paragraph marked `{: .verdict }` goes into the picture or the request before it.
+- A paragraph marked `{: .verdict }` goes into the picture or the request before it. In a fit-row it is the caption.
+- A table is drawn as the design's. A cell that is only `*text*{: .table__off }` is greyed out.
 - A list marked `{: .doors }` becomes link tiles. An item is `[Title](link) - text`; anything else stops the build.
 - A code block marked `{: data-name="Signature" }` has a head with that name. Without it there is only the copy
   button.
