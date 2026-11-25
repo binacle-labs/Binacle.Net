@@ -1,8 +1,0 @@
-// Several exchanges, one under another.
-
-.exchange-list {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--step) * 2);
-  min-width: 0;
-}

@@ -2,7 +2,7 @@
 id: sites/www-design
 description: Why the www site's templates are shaped the way they are - the traps that bite silently, and the constraints a rewrite would break without noticing.
 verified: 2026-11-26
-check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, the second webpack config in webpack.config.js, and _js/theme-init.ts importing @binacle/design-system/theme-init; W3 against _sass/main.scss and the build:css script in package.json; W4 against theme-switcher in _includes/header.html being defined by main.js; W5 against exchange.html still being an include and every page calling it; W7 against the scope table on the home page and in _includes/scope.md, which the cartonization page includes; W9 against the fit-row__verdicts lists holding the verdicts as text, and the header's img taking site.logo.src; W10 against sites/www/_includes/drawings/, whose SVGs carry no fill attribute outside a mask, and every page pulling its drawing in with an include
+check: W1 against the expand_year call in _includes/footer.html carrying no argument; W2 against the theme-init script tag in _layouts/default.html being in head with no defer or async, the second webpack config in webpack.config.js, and _js/theme-init.ts importing @binacle/design-system/theme-init; W3 against _sass/main.scss and the build:css script in package.json; W4 against theme-switcher in _includes/header.html being defined by main.js; W5 against exchange.html still being an include and every page calling it; W7 against the scope table in _includes/scope.md, which the home and cartonization pages include; W9 against the fit-row__verdicts lists holding the verdicts as text, and the header's img taking site.logo.src; W10 against sites/www/_includes/drawings/, whose SVGs carry no fill attribute outside a mask, and every page pulling its drawing in with an include
 paths:
   - "sites/www/**"
 ---
@@ -67,8 +67,10 @@ would be re-run on one page and go stale on the other three.**
 Every exchange in that file was really run. The JSON is escaped into a plain code block, with no highlighting.
 
 ```liquid
-{% include exchange.html block=site.data.exchange.fit fold=true
-   verdict="The medium locker holds all three items. The small one takes only one of them." %}
+{% include exchange.html block=site.data.exchange.fit fold=true %}
+
+The medium locker holds all three items. The small one takes only one of them.
+{: .verdict }
 ```
 
 ## W6 - every example is v3, and that is a contract question
@@ -82,11 +84,11 @@ the image, so the request carries only the order, **which is the shape a real in
 
 ## W7 - two pieces of copy are load-bearing and one has an expiry
 
-**`pages/index.html`, the coordinates sentence.** The page promises "where every item sits" and a `fit`
+**`pages/index.md`, the coordinates sentence.** The page promises "where every item sits" and a `fit`
 response does not carry coordinates. **Remove the sentence and the page promises something the card does not
 show.**
 
-**The scope table, on `pages/index.html` and in `_includes/scope.md`, and the line over it on both pages**: "works one box at a time", and
+**The scope table in `_includes/scope.md`, and the line over it on the home and cartonization pages**: "works one box at a time", and
 "How do I split an order across boxes?" under what it does not answer. Both become false the day Binacle.Net
 distributes an order across several boxes. **Whoever ships that feature changes them.**
 

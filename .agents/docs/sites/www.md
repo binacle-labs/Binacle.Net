@@ -33,11 +33,11 @@ wins.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, plus `404.md` and `robots.txt`. The home is HTML; the rest are markdown, drawn by `www_sections` - `$sites/ruby` |
+| `pages/` | The pages, plus `404.md` and `robots.txt`. All are markdown, drawn by `www_sections` - `$sites/ruby` |
 | `_data/exchange.yml` | Every API request and response the site shows, and the `docker run` command |
 | `_data/fit_rows.yml` | The number and the verdict under each box of a fit-row picture. A new answer in `exchange.yml` may need a new verdict here |
 | `_data/header.yml`, `_data/footer.yml` | The nav and the footer links |
-| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, `picture`, `fit-row`, the `scope.md` table and `drawings/`, one SVG per picture |
+| `_includes/` | Header, footer, `exchange`, `command`, `picture`, `door-picture`, `fit-row`, the `scope.md` table and `drawings/`, one SVG per picture |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its
@@ -126,8 +126,8 @@ leaves the first running, and detaches the custom domain.
 **The three-step build order is not optional.** Jekyll does not compile the sass (`$sites`), so a clean
 `jekyll build` proves nothing about whether the site has styles. `just build www` does all three steps.
 
-**The exchange card is one card**: the request, the response, and an optional plain-English verdict. With
-`fold=true` the response sits closed behind *Response*. The verdict is what makes it marketing rather than
+**The exchange card is one card**: the request, the response, and an optional plain-English verdict - the paragraph
+marked `{: .verdict }` after the include, which the filter moves into the card. With `fold=true` the response sits closed behind *Response*. The verdict is what makes it marketing rather than
 documentation.
 
 **`sitemap.xml` lists this site's pages and nothing else.** The old `/apps/*` paths are served from here

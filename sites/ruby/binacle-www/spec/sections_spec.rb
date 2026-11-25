@@ -16,12 +16,6 @@ RSpec.describe Binacle::Www::Sections do
   end
 
   describe 'what it leaves alone' do
-    it 'keeps a page that is sections already, byte for byte' do
-      html = "<section class=\"band\"><h2>A</h2>&middot;</section>\n"
-
-      expect(filter.www_sections(html)).to eq(html)
-    end
-
     it 'keeps a page with no heading' do
       expect(filter.www_sections('<p>a</p>')).to eq('<p>a</p>')
     end
@@ -86,7 +80,7 @@ RSpec.describe Binacle::Www::Sections do
   describe 'the looks' do
     let(:sass) do
       root = File.expand_path('../../../../shared/packages/design-system', __dir__)
-      parts = %w[layout/band layout/split components/statement]
+      parts = %w[layout/band layout/split layout/hero components/statement]
       parts.map { |part| File.read(File.join(root, part, '_index.scss')) }.join
     end
 
@@ -98,6 +92,7 @@ RSpec.describe Binacle::Www::Sections do
     it 'are all in the design system' do
       converter = described_class::Converter
       looks = [*converter::BANDS, *converter::SPLITS, *converter::BODIES, converter::ONE_LINE, converter::STATEMENT]
+      looks += ['hero__grid', *converter::HERO_PARTS.grep(/hero/)]
 
       expect(looks.reject { |look| sass.match?(/\.#{look}(?![\w-])/) }).to be_empty
     end
@@ -258,6 +253,51 @@ RSpec.describe Binacle::Www::Sections do
     end
   end
 
+  describe 'heroes' do
+    let(:html) do
+      page('<h1 class="hero">A</h1><p>a</p><p class="muted">b</p><p class="actions">c</p><div class="command"></div>' \
+           '<p class="hero__source">d</p><figure></figure>')
+    end
+
+    it 'have the words and the actions on one side and the picture on the other' do
+      expect(html.at_css('section')['class']).to eq('band hero')
+      expect(html.css('.container.hero__grid--picture-first > *').map { |block| block['class'] })
+        .to eq(%w[hero__copy hero__picture])
+      expect(html.css('.hero__copy > *').map { |block| block['class'] })
+        .to eq(['display-1', 'prose prose--marketing', 'hero__actions', 'hero__source'])
+    end
+
+    it 'keep the words together, and the actions together' do
+      expect(html.css('.prose > *').map(&:text)).to eq(%w[a b])
+      expect(html.css('.hero__actions > *').map { |block| block['class'] }).to eq(%w[actions command])
+    end
+
+    it 'stop with no picture, and on a label' do
+      expect { page('<h1 class="hero">A</h1><p>a</p>') }.to raise_error(ArgumentError, /one picture, on: A/)
+      labelled = '<h1 class="hero" data-label="L">B</h1><figure></figure>'
+      expect { page(labelled) }.to raise_error(ArgumentError, /only band looks, on: B/)
+    end
+  end
+
+  describe 'paths' do
+    let(:list) { '<ol class="path" aria-label="Steps"><li><a href="#b">B</a></li></ol>' }
+
+    it 'are the row of steps after their section' do
+      html = page("<h1>A</h1><p>a</p>#{list}<h2>C</h2>")
+
+      expect(html.element_children.map(&:name)).to eq(%w[section nav section])
+      expect(html.at_css('nav')['aria-label']).to eq('Steps')
+      expect(html.at_css('nav.band.path > .container > ol.path__list').inner_html)
+        .to eq('<li class="path__item"><a href="#b" class="path__link">B</a></li>')
+    end
+
+    it 'stop on an item that is not only a link' do
+      more = '<h1>A</h1><ol class="path"><li><a href="#b">B</a> lost</li></ol>'
+
+      expect { page(more) }.to raise_error(ArgumentError, /B lost/)
+    end
+  end
+
   describe 'code blocks' do
     let(:rouge) do
       '<div class="language-json highlighter-rouge"%s><div class="highlight"><pre class="highlight">' \
@@ -316,6 +356,13 @@ RSpec.describe Binacle::Www::Sections do
       expect(table.css('tr:last-child td').last['class']).to eq('table__text')
     end
 
+    it 'set a cell that is only code as a value' do
+      html = page('<h2>A</h2><table><tbody><tr><td><code>a</code></td><td><code>b</code> c</td></tr></tbody></table>')
+
+      expect(html.css('td').map(&:to_html))
+        .to eq(['<td class="mono">a</td>', '<td class="table__text"><code>b</code> c</td>'])
+    end
+
     it 'are left alone in an include' do
       html = page('<h2>A</h2><table class="x"><tbody><tr><td>a</td></tr></tbody></table>')
 
@@ -329,6 +376,16 @@ RSpec.describe Binacle::Www::Sections do
 
       expect(html.at_css('div.doors > a').to_html).to eq(
         '<a href="/b/" class="doors__link"><h3 class="doors__title">B</h3><p class="doors__text">the b</p></a>'
+      )
+    end
+
+    it 'take the picture written before the link' do
+      html = page('<h2>A</h2><ul class="doors doors--pictured"><li><figure><svg></svg></figure>' \
+                  "\n<a href=\"/b/\">B</a> - the b</li></ul>")
+
+      expect(html.at_css('div.doors--pictured > a.doors__link').inner_html).to eq(
+        '<figure class="doors__picture"><svg></svg></figure>' \
+        '<h3 class="doors__title">B</h3><p class="doors__text">the b</p>'
       )
     end
 

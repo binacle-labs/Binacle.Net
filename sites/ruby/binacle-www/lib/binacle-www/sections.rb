@@ -25,19 +25,18 @@ module Binacle
         ONE_LINE = 'prose--one-line'
         COLUMNS = 'columns'
         STATEMENT = 'statement'
+        HERO = 'hero'
+        # The parts of a hero that are not in its prose box.
+        HERO_PARTS = %w[actions hero__source].freeze
         # With no label column, any other band would put its body in the label's place.
         ONE_COLUMN = %w[band--mirrored band--split band--wide].freeze
         DOOR_DASH = /\A\s+-\s+/
 
         def initialize(html)
-          @html = html
           @fragment = Nokogiri::HTML5.fragment(html)
         end
 
         def to_html
-          # A page written in HTML has its sections already.
-          return @html if @fragment.element_children.any? { |block| block.name == 'section' }
-
           name_inline_code
           name_labelled_lists
           name_code_blocks
@@ -45,13 +44,13 @@ module Binacle
           name_doors
           place_verdicts
           blocks = @fragment.element_children.to_a
-          return @html if blocks.none? { |block| heading?(block) }
+          return @fragment.to_html if blocks.none? { |block| heading?(block) }
 
           unless heading?(blocks.first)
             raise ArgumentError, "a page starts with its heading, not: #{blocks.first.text.strip}"
           end
 
-          blocks.slice_before { |block| heading?(block) }.map { |group| section(group) }.join("\n")
+          blocks.slice_before { |block| heading?(block) }.flat_map { |group| part(group) }.join("\n")
         end
 
         private
@@ -123,15 +122,23 @@ module Binacle
           end
         end
 
-        # A cell that is only emphasis marked table__off is greyed out whole, and not italic.
+        # A cell that is only emphasis marked table__off is greyed out whole, and not italic. One that is only code
+        # is set as the design sets a value.
         def name_cell(cell, column)
           cell['class'] = 'table__text'
           cell['data-label'] = column if column
+          return name_code_cell(cell) if cell.children.one? && cell.children.first.name == 'code'
+
           mark = cell.at_css('> em.table__off')
           return unless mark && cell.text.strip == mark.text
 
           add_class(cell, 'table__off')
           mark.replace(mark.children)
+        end
+
+        def name_code_cell(cell)
+          cell['class'] = 'mono'
+          cell.content = cell.text
         end
 
         # A list marked doors becomes links to pages.
@@ -144,6 +151,8 @@ module Binacle
         end
 
         def door(item)
+          picture = item.at_css('> figure:first-child')&.unlink
+          picture['class'] = 'doors__picture' if picture
           link = item.at_css('> a:first-child')
           text = item.inner_html.strip.delete_prefix(link.to_s)
           unless link && text.match?(DOOR_DASH)
@@ -153,7 +162,8 @@ module Binacle
           title = link.inner_html
           link['class'] = 'doors__link'
           link.inner_html =
-            %(<h3 class="doors__title">#{title}</h3><p class="doors__text">#{text.sub(DOOR_DASH, '')}</p>)
+            %(#{picture&.to_html}<h3 class="doors__title">#{title}</h3>) +
+            %(<p class="doors__text">#{text.sub(DOOR_DASH, '')}</p>)
           link.to_html
         end
 
@@ -179,6 +189,34 @@ module Binacle
           block.name == 'figure' || block.classes.include?('exchange')
         end
 
+        # A section, and the row of steps written in it, which the design puts after it.
+        def part(blocks)
+          paths, blocks = blocks.partition { |block| block.classes.include?('path') }
+          [section(blocks), *paths.map { |list| path(list) }]
+        end
+
+        def path(list)
+          name = list.remove_attribute('aria-label')
+          list['class'] = 'path__list'
+          list.css('> li').each { |item| path_item(item) }
+          <<~HTML
+            <nav class="band path"#{%( aria-label="#{escape(name.value)}") if name}>
+            <div class="container">
+            #{list.to_html}
+            </div>
+            </nav>
+          HTML
+        end
+
+        def path_item(item)
+          link = item.at_css('> a')
+          text = item.text.strip
+          raise ArgumentError, "a path item is only a link, not: #{text}" unless link&.text == text
+
+          item['class'] = 'path__item'
+          link['class'] = 'path__link'
+        end
+
         def section(blocks)
           heading = blocks.first
           looks = known_looks(heading)
@@ -186,6 +224,7 @@ module Binacle
           id = heading.remove_attribute('id')
           heading.remove_attribute('class')
           return statement(blocks, looks, label, id) if looks.include?(STATEMENT)
+          return hero(blocks, looks, label, id) if looks.include?(HERO)
 
           bands = looks & BANDS
           split = looks & SPLITS
@@ -226,10 +265,7 @@ module Binacle
         # The heading at display size, each sentence in a span of its own, and the words under it.
         def statement(blocks, looks, label, id)
           heading, *rest = blocks
-          if label || looks.difference(BANDS, [STATEMENT]).any?
-            raise ArgumentError, "a statement takes only band looks, on: #{heading.text.strip}"
-          end
-
+          only_bands(STATEMENT, heading, looks, label)
           sentences = heading.inner_html.strip.split(/(?<=\.)\s+/).map { |sentence| "<span>#{sentence}</span>" }
           rest.each { |block| add_class(block, 'statement__text') if block.name == 'p' }
           <<~HTML
@@ -242,8 +278,44 @@ module Binacle
           HTML
         end
 
+        # The top of a home page: the words and the actions on one side, the picture on the other.
+        def hero(blocks, looks, label, id)
+          heading, *rest = blocks
+          only_bands(HERO, heading, looks, label)
+          pictures, copy = rest.partition { |block| block.name == 'figure' }
+          raise ArgumentError, "a hero has one picture, on: #{heading.text.strip}" unless pictures.one?
+
+          heading['class'] = 'display-1'
+          add_class(pictures.first, 'hero__picture')
+          <<~HTML
+            #{open_section([*(looks & BANDS), HERO], id)}
+            <div class="container hero__grid hero__grid--picture-first">
+            <div class="hero__copy">
+            #{heading.to_html}
+            #{hero_copy(copy)}
+            </div>
+            #{pictures.first.to_html}
+            </div>
+            </section>
+          HTML
+        end
+
+        def hero_copy(blocks)
+          words = blocks.take_while { |block| words?(block) && !block.classes.intersect?(HERO_PARTS) }
+          source, actions = blocks.drop(words.size).partition { |block| block.classes.include?('hero__source') }
+          parts = [prose(join(words), ['prose--marketing'])]
+          parts << %(<div class="hero__actions">\n#{join(actions)}\n</div>) if actions.any?
+          [*parts, *source.map(&:to_html)].join("\n")
+        end
+
+        def only_bands(look, heading, looks, label)
+          return unless label || looks.difference(BANDS, [look]).any?
+
+          raise ArgumentError, "a #{look} takes only band looks, on: #{heading.text.strip}"
+        end
+
         def known_looks(heading)
-          unknown = heading.classes.difference(BANDS, SPLITS, BODIES, [ONE_LINE, COLUMNS, STATEMENT])
+          unknown = heading.classes.difference(BANDS, SPLITS, BODIES, [ONE_LINE, COLUMNS, STATEMENT, HERO])
           return heading.classes if unknown.empty?
 
           raise ArgumentError, "no section look called #{unknown.join(', ')}, on: #{heading.text.strip}"

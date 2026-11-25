@@ -1,9 +1,18 @@
 {%- comment -%} kramdown does not take a figure for a block, and would wrap it in a paragraph. {%- endcomment -%}
 {::nomarkdown}
 <figure>
+    {%- if include.cropped %}
+    <div class="drawing drawing--painted">
+        <div class="drawing-pair">
+            {% include drawings/{{ include.name }}.svg %}
+            {% include drawings/{{ include.cropped }}.svg %}
+        </div>
+    </div>
+    {%- else %}
     <div class="drawing drawing--painted drawing--{{ include.name }}">
         {% include drawings/{{ include.name }}.svg %}
     </div>
+    {%- endif %}
     {%- if include.caption %}
     <figcaption class="drawing__caption">
         <span class="label">{{ include.caption }}</span>

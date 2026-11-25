@@ -164,11 +164,9 @@ cells carry their column's name, which a phone shows; a docs table scrolls inste
 
 **A section with no label column has no grid** unless its band has one column, or its body would sit in the label's place.
 
-**A page that has a top-level `section` comes through untouched**, so a page still in HTML sits beside one in markdown.
-
 **It needs three kramdown settings in `sites/www/_config.yml`:** `auto_ids: false`, since a heading's id goes on its
 section; `parse_block_html: false`, since with it on kramdown reads the indented HTML inside `exchange.html` and
-`command.html` as code and prints the tags; `smart_quotes` as straight quotes, which the HTML pages use.
+`command.html` as code and prints the tags; `smart_quotes` as straight quotes.
 
 **It is apart from `binacle-docs` on purpose**, though both draw labelled lists. The maintainer, 2026-11-26: "lets go
 separate gem for www and we see if we need to join them later".

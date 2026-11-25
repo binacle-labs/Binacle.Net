@@ -8,7 +8,7 @@ changes when those do.
 
 | Surface | Does |
 |---|---|
-| `www_sections` | turns a page kramdown has rendered into sections. A page written in HTML comes through as it is |
+| `www_sections` | turns a page kramdown has rendered into sections |
 
 ## 🚀 Quick start
 
@@ -57,12 +57,19 @@ Every `#` and `##` starts a section. The line under it says how the section look
   is kept whole, and the heading comes out as a paragraph.
 - `.prose--one-line` is for a wide section with one short line under its heading, which then sits below the heading
   and not beside it.
+- `.hero` is the top of the home page, with no label: the words and the actions on one side, the picture on the
+  other. The actions start at the paragraph marked `{: .actions }`. One marked `{: .hero__source }` is the line under
+  them. It takes one picture.
 - `.columns` makes a column of every `###`. A `---` ends them, with a blank line above it: without one, markdown
   reads the line above as a heading. No `###`, or a `---` anywhere else, stops the build.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
 - A paragraph marked `{: .verdict }` goes into the picture or the request before it. In a fit-row it is the caption.
-- A table is drawn as the design's. A cell that is only `*text*{: .table__off }` is greyed out.
+- A table is drawn as the design's. A cell that is only `*text*{: .table__off }` is greyed out, and one
+  that is only code is set as a value.
 - A list marked `{: .doors }` becomes link tiles. An item is `[Title](link) - text`; anything else stops the build.
+  A picture may come before the link, and the list is then marked `.doors--pictured` too.
+- A numbered list marked `{: .path aria-label="On this page" }` is the row of steps. It comes out after the section it
+  is written in. An item is only a link.
 - A code block marked `{: data-name="Signature" }` has a head with that name. Without it there is only the copy
   button.
 

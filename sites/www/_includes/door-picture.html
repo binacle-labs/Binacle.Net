@@ -1,0 +1,3 @@
+{%- capture drawing %}{% include drawings/{{ include.name }}.svg %}{% endcapture -%}
+{::nomarkdown}<figure><div class="drawing drawing--painted">{{ drawing | strip_newlines }}</div></figure>{:/}
+{%- comment -%} One line and no blank one after it, or kramdown ends the list item here. {%- endcomment -%}
