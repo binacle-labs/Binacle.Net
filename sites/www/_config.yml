@@ -117,15 +117,15 @@ liquid:
 # Markdown Processors
 ################################################################
 kramdown:
-  auto_ids          : true
+  auto_ids          : false
   entity_output     : as_char
   toc_levels        : '1..6'
-  smart_quotes      : lsquo,rsquo,ldquo,rdquo
+  smart_quotes      : apos,apos,quot,quot
   input             : GFM
   hard_wrap         : false
   footnote_nr       : 1
   show_warnings     : false
-  parse_block_html  : true
+  parse_block_html  : false   # or the includes in a markdown page come out as text
 
 ################################################################
 # Plugins
@@ -136,6 +136,7 @@ plugins             :
   - jekyll-gtm
   - jekyll-filters
   - binacle-robots
+  - binacle-www
   - jekyll-multi-sitemap
   - jekyll-resource-tags
   - jekyll-page-meta

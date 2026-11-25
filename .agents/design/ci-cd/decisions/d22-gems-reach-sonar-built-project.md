@@ -2,7 +2,7 @@
 id: ci-cd/decisions/D22
 description: the gems reach Sonar through a built project, and the project type is what decides that
 status: pending
-verified: 2026-11-10
+verified: 2026-11-26
 check: D22 against Binacle.Net.slnx, whose rbproj ProjectType must stay BasedOn C# and not Shared and which must list both rbproj files, against tooling/ci/sonar-analysis.xml, whose ruby coverage path must stay relative to ruby/, and against sites/ruby/ruby.rbproj, whose own SonarQubeSetting path must stay relative to sites/ruby/
 paths:
   - "ruby/ruby.rbproj"
@@ -15,7 +15,7 @@ paths:
 
 `ruby/ruby.rbproj` exists for one reason: to list the gem sources as `Content` so the scanner is offered
 them. `Microsoft.Build.NoTargets`, so it compiles nothing. It excludes `vendor/**`, the bundle CI installs.
-`sites/ruby/ruby.rbproj` does the same for the site gems, `binacle-docs` and `binacle-robots`. Everything
+`sites/ruby/ruby.rbproj` does the same for the site gems, `binacle-docs`, `binacle-robots` and `binacle-www`. Everything
 below holds for both; the measurements were taken on `ruby/`, before the second one existed.
 
 **Without it Sonar saw no Ruby at all.** The run of 2026-08-27 23:08 reported `10 languages detected` and no

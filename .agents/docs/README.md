@@ -1,7 +1,7 @@
 ---
 id: docs
 description: Repo overview and index of agent documentation
-verified: 2026-11-09
+verified: 2026-11-26
 check: The repo layout table matches `ls -d */` at the root plus the subpaths it names; the workflow list matches .github/workflows/; the just module list matches tooling/*.just. The root-directory set itself is deliberately not in `paths:` — see below.
 paths:
   - ".github/workflows/**"
@@ -117,7 +117,7 @@ benchmarks, and build the Docker image.
 - Packages (`$packages`) — TypeScript npm packages
 - Ruby (`$ruby`) — the generic Ruby/Jekyll plugins
 - Sites (`$sites`) — every published site, and what they share
-- Site Gems (`$sites/ruby`) — the two gems only the sites read, `binacle-robots` and `binacle-docs`
+- Site Gems (`$sites/ruby`) — the gems only the sites read, `binacle-robots`, `binacle-docs` and `binacle-www`
 - Docs Site (`$sites/docs`) — the published Jekyll site at `sites/docs/`
 - Demo Site (`$sites/demo`) — the published Jekyll site at `sites/demo/`
 - WWW Site (`$sites/www`) — the published Jekyll site at `sites/www/`

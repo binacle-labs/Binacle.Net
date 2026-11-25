@@ -10,12 +10,12 @@ below.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, plus `404.html` and `robots.txt` |
+| `pages/` | The pages, in markdown or HTML, plus `404.html` and `robots.txt` |
 | `_sass/` | `main.scss`, which names the parts of `@binacle/design-system` this site uses. Compiled by the sass CLI, **not by Jekyll** |
 | `_js/` | The TypeScript source: the parts of `@binacle/design-system` this site calls - the theme button, the menu drawer and the rest - and the pre-paint theme script |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |
 | `_layouts/` | `default.html` is the bare document, `page.html` the header, main and footer around a page |
-| `_includes/` | The header and footer, the exchange, the run command, the trade-off list, and `drawings/`, one SVG per picture |
+| `_includes/` | The header and footer, the exchange, the run command, the trade-off list, the picture, and `drawings/`, one SVG per picture |
 
 ## 🛠️ Building and serving
 
@@ -45,6 +45,10 @@ and skips everything under `assets/` this site does not read: `gulpfile.js` list
 **Some includes are not in `_includes/`.** `_config.yml` sets `theme: binacle-design-system`, a gem the
 `Gemfile` loads from `shared/packages/design-system`, and Jekyll reads its `_includes/` after this site's. The copy
 button comes from there. An include here of the same name wins.
+
+**A markdown page becomes sections.** Each `#` and `##` starts one, and the `{: }` line under it says how the section
+looks. [`binacle-www`](../ruby/binacle-www) does it and holds the list of marks. The picture include is for markdown
+pages only: it carries kramdown's own marks, which an HTML page would show.
 
 **Every code block on the site is a real response.** They live in `_data/exchange.yml`, and that file says how
 to re-run them. A response that looks plausible but is not what the API returns is the one thing this audience

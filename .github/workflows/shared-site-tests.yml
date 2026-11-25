@@ -90,6 +90,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test rb_binacle-robots_unit
 
+      - name: Test - binacle-www
+        if: ${{ !cancelled() }}
+        run: just test rb_binacle-www_unit
+
       - name: Test - jekyll-breadcrumb-trail
         if: ${{ !cancelled() }}
         run: just test rb_jekyll-breadcrumb-trail_unit

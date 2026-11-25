@@ -1,7 +1,7 @@
 ---
 id: sites/www
 description: The published Jekyll marketing site at sites/www/ - its pages, the look it takes from the design system, the exchange data every API sample comes from, and what bites.
-verified: 2026-11-08
+verified: 2026-11-26
 check: The page list and permalinks match sites/www/pages/; _sass/main.scss holds only @use lines into @binacle/design-system and _js/main.ts only calls it; _config.yml has no `sass:` block and sets theme binacle-design-system; _layouts/default.html still calls {% page_meta %} then {% structured_data %}; the structured_data: organization: block in _config.yml is byte-identical to the one in sites/docs and sites/demo; the sitemaps: block still writes one file from pages; _data/exchange.yml still names v3 routes that exist in artifacts/openapi/Binacle.Net_v3.json, and its command still names the major tag; the name in tooling/cloudflare/www.wrangler.jsonc is still binacle-net-www
 paths:
   - "sites/www/**"
@@ -33,10 +33,10 @@ wins.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, plus `404.html` and `robots.txt` |
+| `pages/` | The pages, plus `404.html` and `robots.txt`. `how-it-works` is markdown, drawn by `www_sections` - `$sites/ruby`; the rest are HTML |
 | `_data/exchange.yml` | Every API request and response the site shows, and the `docker run` command |
 | `_data/header.yml`, `_data/footer.yml` | The nav and the footer links |
-| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, and `drawings/`, one SVG per picture |
+| `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, `picture` and `drawings/`, one SVG per picture |
 
 **There is no sitemap file.** `jekyll-multi-sitemap` generates `/sitemap.xml` from the `sitemaps:` block in
 `_config.yml`, and `pages/robots.txt` is `{% robots %}` for the body and `{% sitemap_links %}` for its

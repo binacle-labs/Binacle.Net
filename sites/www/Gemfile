@@ -15,6 +15,7 @@ group :jekyll_plugins do
   gem "jekyll-gtm", path: "../../ruby/jekyll-gtm"
   gem "jekyll-filters", path: "../../ruby/jekyll-filters"
   gem "binacle-robots", path: "../ruby/binacle-robots"
+  gem "binacle-www", path: "../ruby/binacle-www"
   gem "jekyll-multi-sitemap", path: "../../ruby/jekyll-multi-sitemap"
   gem "jekyll-resource-tags", path: "../../ruby/jekyll-resource-tags"
   gem "jekyll-page-meta", path: "../../ruby/jekyll-page-meta"

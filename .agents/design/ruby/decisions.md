@@ -1,7 +1,7 @@
 ---
 id: ruby/decisions
 description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins.
-verified: 2026-11-09
+verified: 2026-11-26
 check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs
 paths:
   - "ruby/**"
@@ -123,7 +123,7 @@ without it, 118 pages get no node at all.
 
 The maintainer, 2026-11-06: "i dont like that we pout site specific classes into ruby gems that are generic".
 `doc_body` and `doc_sections` write the docs' own classes and phrases, and had been in `jekyll-filters`, which every
-site loads, so every site carried Nokogiri. They are in `binacle-docs`, the one gem that depends on it.
+site loads, so every site carried Nokogiri. They are in `binacle-docs`. `binacle-www` depends on it too.
 
 **A theme gem cannot hold them.** Jekyll loads plugins only from the gems a theme names as dependencies, so the
 filter cannot live in the design system's gem. **The site's `_plugins/` folder is Jekyll's place for one site's own

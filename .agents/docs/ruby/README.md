@@ -1,7 +1,7 @@
 ---
 id: ruby
 description: Ruby gems under ruby/ — the generic Jekyll plugins the sites under sites/ load, and which sites load which. The two only the sites read are in sites/ruby/.
-verified: 2026-11-08
+verified: 2026-11-26
 check: Gem list, filter names and tag names match ruby/ source; every gem still has one entry file at lib/<gem>.rb and everything else under lib/<gem>/, one module inside Jekyll, and a frozen_string_literal line on every .rb; jekyll-page-meta still resolves the four page.meta keys in a :low priority generator and all three sites load it; ruby/Gemfile still names every gem under ruby/; the gtm tags still take the id as an argument; docs, demo and www still load jekyll-filters and jekyll-gtm through their Gemfile :jekyll_plugins group and lists them under plugins: in _config.yml; all three sites still generate their sitemaps from a sitemaps: config block and write their Sitemap: lines with {% sitemap_links %}; all three sites render their link, script and prefetch elements with jekyll-resource-tags and none has a links, scripts or prefetch include; each site's _data/includes.yml still holds an icons: list; all three sites load jekyll-webmanifest through both halves, hold a webmanifest: block, write no manifest page of their own, and exclude *.webmanifest from jekyll_tidy; no file under ruby/ requires anything above its own gem folder; the Binacle-named gems are not under ruby/; and every gem test still has a step in shared-site-tests.yml and none in shared-image-tests.yml
 paths:
   - "ruby/**"
@@ -13,7 +13,7 @@ Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` an
 `sites/admin/` also loads `jekyll-filters`, `jekyll-resource-tags` and `jekyll-page-meta`.
 
 **Every gem here names no product**, so any Jekyll site could load it. The two that carry the sites' own words
-and markup, `binacle-robots` and `binacle-docs`, are in `sites/ruby/` - `$sites/ruby`.
+and markup, `binacle-robots`, `binacle-docs` and `binacle-www`, are in `sites/ruby/` - `$sites/ruby`.
 
 | Gem | What it adds | Loaded by |
 |---|---|---|

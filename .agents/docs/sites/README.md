@@ -1,7 +1,7 @@
 ---
 id: sites
 description: Every site lives under sites/, one directory each - three published, one experimental and local only. What they share, and what is per-site.
-verified: 2026-11-08
+verified: 2026-11-26
 check: The directory list matches sites/, admin and ruby included; the three published sites still build through `just build <site>` into artifacts/<site>; the shared list below still matches each site's Gemfile, package.json and webpack.config.js, and none of the three published sites' _config.yml has a `sass:` block
 also_update:
   - commands
@@ -24,7 +24,7 @@ Every site this repo publishes, one directory each.
 | `sites/demo/` | the demo site | `$sites/demo` |
 | `sites/www/` | the marketing site | `$sites/www` |
 | `sites/admin/` | **experimental, local only** - a page over the ServiceModule's admin routes through `binacle-net-service-client`. Nothing builds or deploys it | none |
-| `sites/ruby/` | **not a site** - the gems only these sites read, `binacle-robots` and `binacle-docs` | `$sites/ruby` |
+| `sites/ruby/` | **not a site** - the gems only these sites read, `binacle-robots`, `binacle-docs` and `binacle-www` | `$sites/ruby` |
 
 **All of it is off limits from a coding session.** Each site is written in its own session.
 
@@ -51,8 +51,8 @@ Read this once, then the per-site doc for what differs.
   `jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
   `jekyll-webmanifest` — plus `jekyll-tidy` from rubygems. **`sites/docs` adds two more**,
   `jekyll-breadcrumb-trail` and `binacle-docs`, because it is the only one with a trail to draw and the only
-  one that is versioned. `demo` and `www` also load `binacle-design-system` from `shared/packages/design-system`,
-  as their Jekyll theme. A path gem is `path: "../../ruby/<name>"`, or `"../ruby/<name>"` for the two in
+  one that is versioned. **`sites/www` adds `binacle-www`.** `demo` and `www` also load `binacle-design-system` from `shared/packages/design-system`,
+  as their Jekyll theme. A path gem is `path: "../../ruby/<name>"`, or `"../ruby/<name>"` for the ones in
   `sites/ruby/` - a relative path that counts levels, so it is what a move breaks first.
 - **Deployed by hand, one workflow for all three.** `workflow_dispatch` only, with the site picked at dispatch.
   It builds the site, link checks what it built, and hands that same directory to the host — see `$ci-cd`.

@@ -11,6 +11,13 @@ PATH
     binacle-robots (1.0.0)
       jekyll (>= 4.2)
 
+PATH
+  remote: binacle-www
+  specs:
+    binacle-www (1.0.0)
+      jekyll (>= 4.2)
+      nokogiri (~> 1.12)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -138,6 +145,7 @@ PLATFORMS
 DEPENDENCIES
   binacle-docs!
   binacle-robots!
+  binacle-www!
   rspec (~> 3.0)
   rubocop
   simplecov

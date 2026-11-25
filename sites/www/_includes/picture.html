@@ -1,0 +1,12 @@
+{%- comment -%} kramdown does not take a figure for a block, and would wrap it in a paragraph. {%- endcomment -%}
+{::nomarkdown}
+<figure>
+    <div class="drawing drawing--painted drawing--{{ include.name }}">
+        {% include drawings/{{ include.name }}.svg %}
+    </div>
+    <figcaption class="drawing__caption">
+        <span class="label">{{ include.caption }}</span>
+        <span class="label">{{ include.size }}</span>
+    </figcaption>
+</figure>
+{:/}

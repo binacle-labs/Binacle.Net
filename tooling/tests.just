@@ -70,6 +70,7 @@ sites:
     just test ts_theme-switcher_unit
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
+    just test rb_binacle-www_unit
     just test rb_jekyll-breadcrumb-trail_unit
     just test rb_jekyll-filters_unit
     just test rb_jekyll-gtm_unit
@@ -104,6 +105,7 @@ all:
     just test cs_binacle-net-service-module_integration Sqlite
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
+    just test rb_binacle-www_unit
     just test rb_jekyll-breadcrumb-trail_unit
     just test rb_jekyll-filters_unit
     just test rb_jekyll-gtm_unit
@@ -214,6 +216,9 @@ rb_binacle-docs_unit: (_rspec_test 'sites/ruby/binacle-docs')
 
 [private]
 rb_binacle-robots_unit: (_rspec_test 'sites/ruby/binacle-robots')
+
+[private]
+rb_binacle-www_unit: (_rspec_test 'sites/ruby/binacle-www')
 
 [private]
 rb_jekyll-breadcrumb-trail_unit: (_rspec_test 'ruby/jekyll-breadcrumb-trail')

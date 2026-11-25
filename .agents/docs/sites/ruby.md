@@ -1,8 +1,8 @@
 ---
 id: sites/ruby
-description: sites/ruby/ - the two gems only the Binacle sites read, binacle-robots and binacle-docs. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
-verified: 2026-11-25
-check: The two gems in sites/ruby/Gemfile match the folders; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
+description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs and binacle-www. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
+verified: 2026-11-26
+check: The gems in sites/ruby/Gemfile match the folders; binacle-www registers one filter, www_sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
 also_update:
   - ruby
   - sites/docs
@@ -12,15 +12,15 @@ paths:
 
 # Site gems
 
-`sites/ruby/README.md` says what the two gems are, how to install the bundle and run the specs. This page holds
+`sites/ruby/README.md` says what the gems are, how to install the bundle and run the specs. This page holds
 what that does not.
 
 **They are the gems that name the product.** The generic gems are in `ruby/`, and the rules they all follow -
 one entry file, everything else under `lib/<gem>/`, `frozen_string_literal` on every file - are in `$ruby`.
-These two sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots` and `Binacle::Docs`. In `Binacle::Docs` the
+These sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots`, `Binacle::Docs` and `Binacle::Www`. In `Binacle::Docs` the
 folders are modules, `Versions` and `Markup`, with `Pager` beside them; a dash in a gem's name is a nested module,
-as the RubyGems naming guide has it. **`binacle-docs` is the one gem that depends on Nokogiri**, for `doc_body`;
-the generic `jekyll-filters` does not, so only `docs` has Nokogiri in its lock.
+as the RubyGems naming guide has it. **`binacle-docs` and `binacle-www` depend on Nokogiri**, for `doc_body` and
+`www_sections`; the generic `jekyll-filters` does not, so `demo` has no Nokogiri in its lock.
 
 **A site loads them the same two ways it loads the generic ones**, but its `Gemfile` path is
 `../ruby/<gem>`, one level shorter.
@@ -151,6 +151,23 @@ them with a pattern, not a parser, because kramdown writes every `h2` the same w
 
 Source: `lib/binacle-docs/` - `versions/` (`generator.rb`, `urls.rb`, `pages.rb`, `versioned_file.rb`,
 `vlink_tag.rb`), `pager.rb`, and `markup/` (`doc_body.rb`, `sections.rb`).
+
+## binacle-www
+
+**`sites/www` only.** `www_sections` runs on the rendered page, in `_layouts/page.html`. Every `h1` and `h2` starts a
+section; the kramdown attributes on the heading say how it looks. `sites/ruby/binacle-www/README.md` lists them. A look that is
+not in the filter's list stops the build, and a spec checks the list against the design system's Sass.
+
+**A page that has a top-level `section` comes through untouched**, so a page still in HTML sits beside one in markdown.
+
+**It needs three kramdown settings in `sites/www/_config.yml`:** `auto_ids: false`, since a heading's id goes on its
+section; `parse_block_html: false`, since with it on kramdown reads the indented HTML inside `exchange.html` and
+`command.html` as code and prints the tags; `smart_quotes` as straight quotes, which the HTML pages use.
+
+**It is apart from `binacle-docs` on purpose**, though both draw labelled lists. The maintainer, 2026-11-26: "lets go
+separate gem for www and we see if we need to join them later".
+
+Source: `lib/binacle-www/sections.rb`.
 
 ## The bundle
 

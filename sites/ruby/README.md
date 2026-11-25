@@ -12,13 +12,14 @@ names them under `plugins:` in its `_config.yml`. Drop either line and the plugi
 |---|---|---|
 | [`binacle-docs`](binacle-docs) | Everything Ruby that only `docs` uses: the version scheme - a generator that stamps `title_suffix` and `robots` onto every versioned document, and `{% vlink %}` - and the `doc_body` and `doc_sections` filters that turn a rendered page into the docs' markup | `docs` |
 | [`binacle-robots`](binacle-robots) | The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal preamble, the rights reservation and `User-Agent: *`; the `Sitemap:` lines come from `{% sitemap_links %}` | `www`, `docs`, `demo` |
+| [`binacle-www`](binacle-www) | The `www_sections` filter, which turns a markdown page into the design's sections | `www` |
 
 Each gem has the shape `bundle gem` writes: a `<name>.gemspec`, one entry file at `lib/<name>.rb`, the rest
-under `lib/<name>/`, and the specs in `spec/`. Both are MIT.
+under `lib/<name>/`, and the specs in `spec/`. All are MIT.
 
 ## 🧪 Tests
 
-The two gems share one bundle, `sites/ruby/Gemfile`, apart from the one in `ruby/`. Install it once:
+The gems share one bundle, `sites/ruby/Gemfile`, apart from the one in `ruby/`. Install it once:
 
 ```bash
 cd sites/ruby && bundle install
@@ -30,6 +31,7 @@ Then run a gem's specs from its own folder, or from the repo root:
 cd sites/ruby/binacle-docs && bundle exec rspec
 just test rb_binacle-docs_unit
 just test rb_binacle-robots_unit
+just test rb_binacle-www_unit
 ```
 
 `.rubocop.yml` takes the rules from `ruby/.rubocop.yml`. Nothing runs it; run it by hand from here with
@@ -39,8 +41,9 @@ Adding a gem means one `gemspec path:` line in `sites/ruby/Gemfile` and one reci
 
 ## ⚠️ What will bite you
 
-**`doc_body` writes the design system's class names.** Rename a class in the Sass and this gem has to change
-with it, or the docs lose that style without any error.
+**`doc_body` and `www_sections` write the design system's class names.** Rename a class in the Sass and these gems
+have to change with it, or the site loses that style without any error. The section looks are the exception: a spec
+in `binacle-www` checks them against the Sass.
 
 **The bundle has its own lock.** Raise Jekyll in `ruby/Gemfile.lock` and raise it here too, or the two sets of
 gems are tested against different versions.
