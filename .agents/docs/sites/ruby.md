@@ -158,6 +158,11 @@ Source: `lib/binacle-docs/` - `versions/` (`generator.rb`, `urls.rb`, `pages.rb`
 section; the kramdown attributes on the heading say how it looks. `sites/ruby/binacle-www/README.md` lists them. A look that is
 not in the filter's list stops the build, and a spec checks the list against the design system's Sass.
 
+**It draws code blocks and link tiles too, not the way `binacle-docs` does.** A code block has a head only when the markdown
+names it, and never carries `data-lang`, which would make a bash block wrap at every width. Tiles are a plain `div`.
+
+**A section with no label column has no grid** unless its band has one column, or its body would sit in the label's place.
+
 **A page that has a top-level `section` comes through untouched**, so a page still in HTML sits beside one in markdown.
 
 **It needs three kramdown settings in `sites/www/_config.yml`:** `auto_ids: false`, since a heading's id goes on its

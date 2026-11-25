@@ -33,7 +33,7 @@ wins.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, plus `404.html` and `robots.txt`. `how-it-works` is markdown, drawn by `www_sections` - `$sites/ruby`; the rest are HTML |
+| `pages/` | The pages, plus `404.md` and `robots.txt`. The home, `cartonization` and `parcel-lockers` are HTML; the rest are markdown, drawn by `www_sections` - `$sites/ruby` |
 | `_data/exchange.yml` | Every API request and response the site shows, and the `docker run` command |
 | `_data/header.yml`, `_data/footer.yml` | The nav and the footer links |
 | `_includes/` | Header, footer, `exchange`, `command`, `trade-off`, `picture` and `drawings/`, one SVG per picture |

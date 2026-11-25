@@ -10,7 +10,7 @@ below.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The pages, in markdown or HTML, plus `404.html` and `robots.txt` |
+| `pages/` | The pages, in markdown or HTML, plus `404.md` and `robots.txt` |
 | `_sass/` | `main.scss`, which names the parts of `@binacle/design-system` this site uses. Compiled by the sass CLI, **not by Jekyll** |
 | `_js/` | The TypeScript source: the parts of `@binacle/design-system` this site calls - the theme button, the menu drawer and the rest - and the pre-paint theme script |
 | `_data/` | The header nav, the footer, and `exchange.yml` - every request and response the site shows |

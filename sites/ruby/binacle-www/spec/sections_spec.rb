@@ -63,6 +63,21 @@ RSpec.describe Binacle::Www::Sections do
       expect(page('<h2>A</h2>').at_css('.band__label')).to be_nil
     end
 
+    it 'has the grid only when there is a label, or a band with one column' do
+      expect(page('<h2>A</h2>').at_css('section > div')['class']).to eq('container')
+      expect(page('<h2 class="band--tint">A</h2>').at_css('section > div')['class']).to eq('container')
+      expect(page('<h2 data-label="">A</h2>').at_css('section > div')['class']).to eq('container band__grid')
+      expect(page('<h2 class="band--wide">A</h2>').at_css('section > div')['class']).to eq('container band__grid')
+    end
+
+    it 'puts the label over the heading when it is mirrored' do
+      html = page('<h2 class="band--mirrored split--text-right" data-label="L">A</h2><p>a</p><figure></figure>')
+
+      expect(html.at_css('.band__label')).to be_nil
+      expect(html.css('.prose > *').map(&:text)).to eq(%w[L A a])
+      expect(html.at_css('.prose > p')['class']).to eq('label')
+    end
+
     it 'stops on a page that starts with anything else' do
       expect { page('<p>lost</p><h2>A</h2>') }.to raise_error(ArgumentError, /lost/)
     end
@@ -70,8 +85,9 @@ RSpec.describe Binacle::Www::Sections do
 
   describe 'the looks' do
     let(:sass) do
-      root = File.expand_path('../../../../shared/packages/design-system/layout', __dir__)
-      %w[band split].map { |name| File.read(File.join(root, name, '_index.scss')) }.join
+      root = File.expand_path('../../../../shared/packages/design-system', __dir__)
+      parts = %w[layout/band layout/split components/statement]
+      parts.map { |part| File.read(File.join(root, part, '_index.scss')) }.join
     end
 
     it 'stops on one it does not know, and names it' do
@@ -80,7 +96,8 @@ RSpec.describe Binacle::Www::Sections do
     end
 
     it 'are all in the design system' do
-      looks = described_class::Converter::BANDS + described_class::Converter::SPLITS
+      converter = described_class::Converter
+      looks = [*converter::BANDS, *converter::SPLITS, *converter::BODIES, converter::STATEMENT]
 
       expect(looks.reject { |look| sass.match?(/\.#{look}(?![\w-])/) }).to be_empty
     end
@@ -120,6 +137,26 @@ RSpec.describe Binacle::Www::Sections do
       html = page('<h1 class="split--text-left">A</h1><p>a</p>')
 
       expect(html.css('.band__body > *').map { |block| block['class'] }).to eq(%w[prose])
+    end
+
+    it 'boxes what is beside the words of a split when it is more than one block' do
+      html = page('<h1 class="split--text-left">A</h1><figure></figure><div class="command"></div>')
+
+      expect(html.css('.split > *').map { |block| block['class'] }).to eq(%w[prose band__body])
+      expect(html.css('.band__body .band__body > *').map(&:name)).to eq(%w[figure div])
+    end
+
+    it 'names the words of a split that has them on the right' do
+      html = page('<h2 class="split--text-right">A</h2><p>a</p><figure></figure>')
+
+      expect(html.at_css('.split > div')['class']).to eq('prose split__text')
+    end
+
+    it 'takes the code to the left when the heading says so' do
+      html = page('<h2 class="band--wide band__body--code-left">A</h2><p>a</p><pre><code>b</code></pre>')
+
+      expect(html.at_css('section')['class']).to eq('band band--wide')
+      expect(html.at_css('.band__body')['class']).to eq('band__body band__body--code-left')
     end
 
     it 'leaves an h1 plain when nothing is split' do
@@ -179,6 +216,75 @@ RSpec.describe Binacle::Www::Sections do
       item = page('<h2>A</h2><ul><li><strong>b</strong> c</li></ul>').at_css('li')
 
       expect(item.to_html).to eq('<li><strong>b</strong> c</li>')
+    end
+  end
+
+  describe 'statements' do
+    it 'are the heading at display size, a span for each sentence, and the words under it' do
+      html = page('<h2 class="statement band--deep">A yes. Not a <em>no</em>.</h2><p class="muted">a</p>')
+
+      expect(html.at_css('section')['class'].split).to contain_exactly('band', 'statement', 'band--deep')
+      expect(html.at_css('section > .container > p.display-2').inner_html)
+        .to eq('<span>A yes.</span> <span>Not a <em>no</em>.</span>')
+      expect(html.at_css('section > .container > p:last-child').classes).to contain_exactly('statement__text', 'muted')
+    end
+
+    it 'stop on a label, and on a look that is not a band' do
+      labelled = '<h2 class="statement" data-label="L">A</h2>'
+
+      expect { page(labelled) }.to raise_error(ArgumentError, /only band looks, on: A/)
+      expect { page('<h2 class="statement columns">B</h2>') }.to raise_error(ArgumentError, /only band looks, on: B/)
+    end
+  end
+
+  describe 'code blocks' do
+    let(:rouge) do
+      '<div class="language-json highlighter-rouge"%s><div class="highlight"><pre class="highlight">' \
+        "<code><span class=\"nl\">\"a\"</span>\n&lt;b&gt;\n</code></pre></div></div>"
+    end
+
+    it 'have a head with their name' do
+      block = page("<h2>A</h2>#{format(rouge, ' data-name="Signature"')}").at_css('.band__body > .code-block')
+
+      expect(block.key?('data-code-block')).to be(true)
+      expect(block.at_css('.code-block__head > [data-code-lang]').text).to eq('Signature')
+      expect(block.at_css('.code-block__head > button')['class']).to eq('copy-button')
+    end
+
+    it 'have only the copy button without one' do
+      block = page("<h2>A</h2>#{format(rouge, '')}").at_css('.code-block')
+
+      expect(block.at_css('.code-block__head')).to be_nil
+      expect(block.at_css('> button')['class']).to eq('copy-button code-block__copy')
+    end
+
+    it 'keep the code as plain text, with no line at the end' do
+      code = page("<h2>A</h2>#{format(rouge, '')}").at_css('pre.code-block__pre > code')
+
+      expect(code.to_html).to eq("<code>\"a\"\n&lt;b&gt;</code>")
+    end
+
+    it 'leave the code of an include alone' do
+      html = page('<h2>A</h2><pre class="command__pre"><code id="run">a</code></pre>')
+
+      expect(html.at_css('.code-block')).to be_nil
+    end
+  end
+
+  describe 'doors' do
+    it 'are links with a title and a text' do
+      html = page('<h2>A</h2><ul class="doors"><li><a href="/b/">B</a> - the b</li></ul>')
+
+      expect(html.at_css('div.doors > a').to_html).to eq(
+        '<a href="/b/" class="doors__link"><h3 class="doors__title">B</h3><p class="doors__text">the b</p></a>'
+      )
+    end
+
+    it 'stop on an item written any other way' do
+      no_dash = '<h2>A</h2><ul class="doors"><li><a href="/">B</a> b</li></ul>'
+
+      expect { page('<h2>A</h2><ul class="doors"><li>lost</li></ul>') }.to raise_error(ArgumentError, /lost/)
+      expect { page(no_dash) }.to raise_error(ArgumentError, /B b/)
     end
   end
 

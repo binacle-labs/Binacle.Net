@@ -49,11 +49,19 @@ Every `#` and `##` starts a section. The line under it says how the section look
 
 - `.band--wide` and the other `band--` classes go on the section, and so does the id.
 - `data-label` is the small label beside the section. Left empty, its column stays and is blank.
+- With neither a label nor `band--split`, `band--mirrored` or `band--wide`, the section has no grid. In a
+  `band--mirrored` one the label sits over the heading.
 - `.split--text-left` and the other `split--` classes put the words beside what follows them.
+- `.band__body--code-left`, in a wide section, puts a short code block under the left column of text.
+- `.statement` is one line at display size and the words under it, with no label. Each sentence of the heading
+  is kept whole, and the heading comes out as a paragraph.
 - `.columns` makes a column of every `###`. A `---` ends them, with a blank line above it: without one, markdown
   reads the line above as a heading. No `###`, or a `---` anywhere else, stops the build.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
 - A paragraph marked `{: .verdict }` goes into the picture or the request before it.
+- A list marked `{: .doors }` becomes link tiles. An item is `[Title](link) - text`; anything else stops the build.
+- A code block marked `{: data-name="Signature" }` has a head with that name. Without it there is only the copy
+  button.
 
 A mark on a heading that the filter does not know stops the build and is named. The list is at the top of
 `lib/binacle-www/sections.rb`, and a spec checks each one is in the design system's Sass.

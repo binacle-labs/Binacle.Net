@@ -15,7 +15,7 @@
   "assets": {
     // Relative to this file, matching the `destination` in sites/www/_config.yml so the two are wrong together.
     "directory": "../../artifacts/www",
-    // Wants `404.html` in the site root, which is why pages/404.html has `permalink: /404.html`.
+    // Wants `404.html` in the site root, which is why pages/404.md has `permalink: /404.html`.
     "not_found_handling": "404-page"
   }
 }

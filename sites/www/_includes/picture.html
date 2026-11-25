@@ -4,9 +4,11 @@
     <div class="drawing drawing--painted drawing--{{ include.name }}">
         {% include drawings/{{ include.name }}.svg %}
     </div>
+    {%- if include.caption %}
     <figcaption class="drawing__caption">
         <span class="label">{{ include.caption }}</span>
         <span class="label">{{ include.size }}</span>
     </figcaption>
+    {%- endif %}
 </figure>
 {:/}
