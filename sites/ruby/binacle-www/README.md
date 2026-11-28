@@ -2,7 +2,8 @@
 
 One site's gem, on purpose. It holds the Ruby that only `sites/www` uses: the filter that turns a markdown page
 into the design's sections. It writes the design's class names, such as `band__body` and `columns__column`, so it
-changes when those do.
+changes when those do. The jobs both site gems write the same way come from
+[`binacle-sites-core`](../binacle-sites-core).
 
 ## 📂 What is in it
 
@@ -15,7 +16,8 @@ changes when those do.
 Both lines are needed. Miss the second and Liquid leaves the page as it was, with no sections.
 
 ```ruby
-# Gemfile, inside group :jekyll_plugins
+# Gemfile, binacle-www inside group :jekyll_plugins
+gem "binacle-sites-core", path: "../ruby/binacle-sites-core"   # outside the group; it has no plugin
 gem "binacle-www", path: "../ruby/binacle-www"
 ```
 
@@ -64,9 +66,9 @@ Every `#` and `##` starts a section. The line under it says how the section look
   reads the line above as a heading. No `###`, or a `---` anywhere else, stops the build.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
 - A paragraph marked `{: .verdict }` goes into the picture or the request before it. In a fit-row it is the caption.
-- A table is drawn as the design's. A cell that is only `*text*{: .table__off }` is greyed out, and one
+- A table with no class is drawn as the design's. A cell that is only `*text*{: .table__off }` is greyed out, and one
   that is only code is set as a value.
-- A list marked `{: .doors }` becomes link tiles. An item is `[Title](link) - text`; anything else stops the build.
+- A list marked `{: .doors }` becomes link tiles in a `nav`, named by the nearest heading above it. An item is `[Title](link) - text`; anything else stops the build.
   A picture may come before the link, and the list is then marked `.doors--pictured` too.
 - A numbered list marked `{: .path aria-label="On this page" }` is the row of steps. It comes out after the section it
   is written in. An item is only a link.

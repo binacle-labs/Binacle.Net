@@ -90,6 +90,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test rb_binacle-robots_unit
 
+      - name: Test - binacle-sites-core
+        if: ${{ !cancelled() }}
+        run: just test rb_binacle-sites-core_unit
+
       - name: Test - binacle-www
         if: ${{ !cancelled() }}
         run: just test rb_binacle-www_unit

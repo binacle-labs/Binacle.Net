@@ -1,8 +1,8 @@
 ---
 id: ruby/decisions
-description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins.
-verified: 2026-11-26
-check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs
+description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins, and why the markup both site gems share is one gem of its own, binacle-sites-core.
+verified: 2026-11-28
+check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs; R9 against sites/ruby/binacle-sites-core, whose lib registers no Liquid filter, tag or generator, against the gemspecs of binacle-docs and binacle-www, which must each depend on it, and against sites/docs/Gemfile and sites/www/Gemfile, which must list it by path outside `group :jekyll_plugins`
 paths:
   - "ruby/**"
   - "sites/ruby/**"
@@ -71,8 +71,9 @@ the right trade — a shared gem carrying one site's vocabulary is the thing thi
 ### R4 — the prefix says whether the gem is portable
 
 **`jekyll-` means another site could load it.** `binacle-` means it carries something only this organisation
-wants — `binacle-docs` holds the docs site's version scheme, `binacle-robots` holds a rights reservation.
-A `jekyll-` prefix on either would advertise something nobody else has a use for. The `binacle-` gems sit in
+wants — `binacle-docs` holds the docs site's version scheme, `binacle-robots` holds a rights reservation,
+`binacle-sites-core` holds the markup the site gems share, in the design system's class names.
+A `jekyll-` prefix on any of them would advertise something nobody else has a use for. The `binacle-` gems sit in
 `sites/ruby/`, not `ruby/` (`$sites/ruby`).
 
 Avoid a name already on rubygems: `jekyll-sitemap`, `jekyll-seo-tag`, `jekyll-feed` and `jekyll-breadcrumbs`
@@ -119,11 +120,14 @@ Bootstrap agree, so a separator setting would only enable markup nobody should e
 key is named after what it produces and `seo:` produces nothing. `sites/docs` sets `default_type: WebPage`;
 without it, 118 pages get no node at all.
 
+## Decided
+
 ### R8 — the docs markup filter is a gem of the docs site, not generic, not in a theme gem, not in `_plugins`
 
 The maintainer, 2026-11-06: "i dont like that we pout site specific classes into ruby gems that are generic".
 `doc_body` and `doc_sections` write the docs' own classes and phrases, and had been in `jekyll-filters`, which every
-site loads, so every site carried Nokogiri. They are in `binacle-docs`. `binacle-www` depends on it too.
+site loads, so every site carried Nokogiri. They are in `binacle-docs`. `binacle-www` does not depend on
+`binacle-docs`: it has its own filter, and the two gems share only `binacle-sites-core` (R9).
 
 **A theme gem cannot hold them.** Jekyll loads plugins only from the gems a theme names as dependencies, so the
 filter cannot live in the design system's gem. **The site's `_plugins/` folder is Jekyll's place for one site's own
@@ -131,3 +135,28 @@ code, and was not chosen:** it has no specs and no coverage, which every gem her
 
 **`doc_body`'s class list must match the design system's Sass.** That is level 4 using level 3 names, which the
 levels rule allows. A class renamed in the Sass breaks a docs style with no error.
+
+### R9 — the markup both site gems repeat is one gem of its own, `binacle-sites-core`
+
+`binacle-docs` and `binacle-www` wrote the same markup jobs twice: link tiles, code blocks, tables, labelled lists
+and `add_class`. They are now in `sites/ruby/binacle-sites-core`, a plain Ruby module, `Binacle::SitesCore::Markup`,
+that works on a Nokogiri fragment. Both site gems depend on it in their gemspec, and each site's `Gemfile` lists it
+by path outside `group :jekyll_plugins`, as it has no plugin to load.
+
+**Decided (the maintainer, 2026-11-28):** one shared gem plus a small gem per site, over one gem with a folder per
+site. His answer: "A".
+
+**Decided (the maintainer, 2026-11-28):** the name `binacle-sites-core`, after Ruby's `-core` convention for the base
+gem of a family, as `rspec-core`. His answer: "sites-core".
+
+**Decided (the maintainer, 2026-11-28):** link tiles become a `nav` with a name: "nav". Code blocks share a base:
+"base". Tables share a base: "base".
+
+**What stays in each site gem.** Which `pre` and which tables a site takes is passed in as a selector. The code-only
+table cell is each site's own. Docs keeps the language head, JSON colours, wrap, tabs, folds, `doc__table` and the
+scroll box. Www keeps its sections.
+
+**It registers no Liquid filter, tag or generator.** The site gems call it from their own filters, so it needs no
+`plugins:` line.
+
+**A class set there changes on every site.** The design system's Sass has to know it, as R8 says of `doc_body`.

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'binacle-sites-core'
 require 'nokogiri'
 
 module Binacle
@@ -18,6 +19,8 @@ module Binacle
         # Turns what kramdown and Rouge write into the design's markup. It runs on the rendered page, so the
         # heading ids are already made and the markdown stays as it is.
         class Converter
+          include Binacle::SitesCore::Markup
+
           # A keycap or a picture, with whatever joins to it.
           OPENING_EMOJI = /\A\s*(?:[0-9#*]\u{FE0F}?\u{20E3}|\p{Extended_Pictographic})(?:\u{FE0F}|\u{200D}\p{Extended_Pictographic})*\s*/
           EMOJI_PLACES = 'h2, h3, h4, h5, h6, p, li, li > a:first-child'
@@ -47,7 +50,6 @@ module Binacle
           FILL = /\A\d+(\.\d+)?\z/
           WIDTH = /\A[1-9]\d*\z/
           FIELD_KINDS = %w[reserved more].freeze
-          DOOR_DASH =/\A\s+-\s+/
           ALERT = /\A\s*\[!(\w+)\]\s*/
 
           def initialize(html)
@@ -60,22 +62,22 @@ module Binacle
             name_callouts
             name_tabs
             name_folds
-            name_code_blocks
+            name_docs_code_blocks
             name_example_heads
             name_http_lines
             name_result_lists
             name_bit_diagrams
-            name_tables
+            name_docs_tables
             name_nested_lists
-            name_doors
-            name_labelled_lists
+            name_door_layout
+            name_labelled_lists(@fragment)
             name_steps
             name_blocks
             @fragment.to_html
           end
 
           def doors_to_html
-            name_doors
+            name_door_layout
             @fragment.to_html
           end
 
@@ -161,20 +163,15 @@ module Binacle
             end
           end
 
-          def name_code_blocks
-            @fragment.css('pre').each do |pre|
-              code = pre.at_css('code')
-              next unless code
-
-              outer = pre.ancestors('div.highlighter-rouge').first || pre
+          # The shared block, with the docs' language, JSON colours and wrapping on top.
+          def name_docs_code_blocks
+            name_code_blocks(@fragment, selector: 'pre') do |pre, code, outer|
               # A language Rouge has no lexer for stays on the code element.
               language = [outer, code].filter_map { |element| element['class'].to_s[/language-(\S+)/, 1] }.first
               mark_parts(code, language)
-              code.remove_attribute('class')
               code['data-lang'] = language if language
-              pre['class'] = 'code-block__pre'
               wrap(pre) if outer.key?('data-wrap')
-              outer.replace(%(<div class="code-block" data-code-block>#{head(language, outer)}#{pre.to_html}</div>))
+              head(language, outer)
             end
           end
 
@@ -200,9 +197,7 @@ module Binacle
           def head(language, block)
             call = block['data-call']
             label = block['data-name'] || LANGUAGE_LABELS.fetch(language, language) || 'text'
-            name = call ? http_line(badges(call)) : %(<span class="label" data-code-lang>#{label}</span>)
-            %(<div class="code-block__head">#{name}) +
-              %(<button type="button" class="copy-button" data-copy hidden>Copy</button></div>)
+            code_head(call ? http_line(badges(call)) : code_label(label))
           end
 
           def badges(call)
@@ -317,32 +312,13 @@ module Binacle
               %(<code class="bit-diagram__name">#{name.inner_html}</code><span class="muted">#{note}</span></div>)
           end
 
-          def name_tables
-            @fragment.css('table').each do |table|
-              add_class(table, 'table doc__table')
-              table['data-table'] = ''
-              table.css('td').each { |cell| add_class(cell, 'mono') if all_mono?(cell) }
-              table.css('th, td').each { |cell| align_number(cell) }
-              table.css('td').each { |cell| grey_out(cell) }
-              table.wrap('<div class="doc__table-scroll"></div>')
-            end
-          end
-
-          # A class, so a right-aligned column goes left once the table stacks on a phone.
-          def align_number(cell)
-            return unless cell['style']&.match?(/\Atext-align:\s*right;?\z/)
-
-            cell.remove_attribute('style')
-            add_class(cell, 'table__number')
-          end
-
-          # A cell that is only emphasis marked table__off is greyed out whole, and not italic.
-          def grey_out(cell)
-            mark = cell.at_css('> em.table__off')
-            return unless mark && cell.text.strip == mark.text
-
-            add_class(cell, 'table__off')
-            mark.replace(mark.children)
+          # The shared table, in the docs' class and a box that scrolls.
+          def name_docs_tables
+            name_tables(@fragment, selector: 'table', cell: ->(cell) { add_class(cell, 'mono') if all_mono?(cell) })
+              .each do |table|
+                add_class(table, 'doc__table')
+                table.wrap('<div class="doc__table-scroll"></div>')
+              end
           end
 
           # Such a cell takes the code's size too, or its row stands taller than the code in it.
@@ -355,43 +331,10 @@ module Binacle
             @fragment.css('li > ul, li > ol').each { |list| add_class(list, 'doc__list--nested') }
           end
 
-          # A list marked doors becomes links to pages, named by the heading above it.
-          def name_doors
-            @fragment.css('ul.doors').each do |list|
-              heading = list.previous_element
-              links = list.css('> li').map { |item| door(item) }
-              list.name = 'nav'
-              list['class'] = list.classes.include?('doors--grid') ? 'doors doors--grid' : 'doors doors--full'
-              list['aria-label'] = heading.text.strip if heading&.name&.match?(/\Ah[2-6]\z/)
-              list.inner_html = links.join
-            end
-          end
-
-          def door(item)
-            link = item.at_css('> a:first-child')
-            text = item.inner_html.strip.delete_prefix(link.to_s)
-            unless link && text.match?(DOOR_DASH)
-              raise ArgumentError, "a doors item is written [Title](link) - text, not: #{item.text.strip}"
-            end
-
-            title = link.inner_html
-            link['class'] = 'doors__link'
-            link.inner_html = %(<h3 class="doors__title">#{title}</h3><p class="doors__text">#{text.sub(DOOR_DASH, '')}</p>)
-            link.to_html
-          end
-
-          # In a list marked labelled-list, the item that opens in bold is the cost, and the bold is its label.
-          def name_labelled_lists
-            @fragment.css('ul.labelled-list > li').each do |item|
-              add_class(item, 'labelled-list__item')
-              label = item.children.first
-              next unless label&.name == 'strong'
-
-              add_class(item, 'labelled-list__cost')
-              label.name = 'span'
-              label['class'] = 'label'
-              text = label.next_sibling
-              text.content = text.content.lstrip if text&.text?
+          # The shared tiles, laid out as a grid when asked and full width otherwise.
+          def name_door_layout
+            name_doors(@fragment).each do |nav|
+              nav['class'] = nav.classes.include?('doors--grid') ? 'doors doors--grid' : 'doors doors--full'
             end
           end
 
@@ -404,10 +347,6 @@ module Binacle
               name = BLOCK_CLASSES[element.name]
               add_class(element, name) if name
             end
-          end
-
-          def add_class(element, name)
-            element['class'] = [element['class'], name].compact.join(' ')
           end
         end
       end

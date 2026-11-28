@@ -24,7 +24,7 @@ Every site this repo publishes, one directory each.
 | `sites/demo/` | the demo site | `$sites/demo` |
 | `sites/www/` | the marketing site | `$sites/www` |
 | `sites/admin/` | **experimental, local only** - a page over the ServiceModule's admin routes through `binacle-net-service-client`. Nothing builds or deploys it | none |
-| `sites/ruby/` | **not a site** - the gems only these sites read, `binacle-robots`, `binacle-docs` and `binacle-www` | `$sites/ruby` |
+| `sites/ruby/` | **not a site** - the gems only these sites read, `binacle-robots`, `binacle-docs`, `binacle-sites-core` and `binacle-www` | `$sites/ruby` |
 
 **All of it is off limits from a coding session.** Each site is written in its own session.
 
@@ -51,7 +51,7 @@ Read this once, then the per-site doc for what differs.
   `jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
   `jekyll-webmanifest` — plus `jekyll-tidy` from rubygems. **`sites/docs` adds two more**,
   `jekyll-breadcrumb-trail` and `binacle-docs`, because it is the only one with a trail to draw and the only
-  one that is versioned. **`sites/www` adds `binacle-www`.** `demo` and `www` also load `binacle-design-system` from `shared/packages/design-system`,
+  one that is versioned. **`sites/www` adds `binacle-www`.** `docs` and `www` also list `binacle-sites-core` in their `Gemfile`, outside that group, because the two site gems depend on it and it has no plugin. `demo` and `www` also load `binacle-design-system` from `shared/packages/design-system`,
   as their Jekyll theme. A path gem is `path: "../../ruby/<name>"`, or `"../ruby/<name>"` for the ones in
   `sites/ruby/` - a relative path that counts levels, so it is what a move breaks first.
 - **Deployed by hand, one workflow for all three.** `workflow_dispatch` only, with the site picked at dispatch.

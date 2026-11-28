@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cgi/escape'
+require 'binacle-sites-core'
 require 'nokogiri'
 
 module Binacle
@@ -13,6 +14,8 @@ module Binacle
       # Turns what kramdown writes into the design's sections. Every h1 and h2 starts one, and the attributes on
       # the heading say how the section looks.
       class Converter
+        include Binacle::SitesCore::Markup
+
         HEADINGS = %w[h1 h2].freeze
         WORDS = %w[h1 h2 h3 h4 p ul ol].freeze
         # What a heading may be marked. Anything else is a typo, which would show as a section with no look.
@@ -30,7 +33,6 @@ module Binacle
         HERO_PARTS = %w[actions hero__source].freeze
         # With no label column, any other band would put its body in the label's place.
         ONE_COLUMN = %w[band--mirrored band--split band--wide].freeze
-        DOOR_DASH = /\A\s+-\s+/
 
         def initialize(html)
           @fragment = Nokogiri::HTML5.fragment(html)
@@ -38,10 +40,10 @@ module Binacle
 
         def to_html
           name_inline_code
-          name_labelled_lists
-          name_code_blocks
-          name_tables
-          name_doors
+          name_labelled_lists(@fragment)
+          name_www_code_blocks
+          name_www_tables
+          name_doors(@fragment)
           place_verdicts
           blocks = @fragment.element_children.to_a
           return @fragment.to_html if blocks.none? { |block| heading?(block) }
@@ -64,107 +66,23 @@ module Binacle
           @fragment.css('code.highlighter-rouge').each { |code| code.remove_attribute('class') }
         end
 
-        # In a list marked labelled-list, the item that opens in bold is the cost, and the bold is its label.
-        def name_labelled_lists
-          @fragment.css('ul.labelled-list > li').each do |item|
-            add_class(item, 'labelled-list__item')
-            label = item.children.first
-            next unless label&.name == 'strong'
-
-            add_class(item, 'labelled-list__cost')
-            label.name = 'span'
-            label['class'] = 'label'
-            text = label.next_sibling
-            text.content = text.content.lstrip if text&.text?
-          end
-        end
-
         # kramdown's own code blocks. One in an include has its class already.
-        def name_code_blocks
-          @fragment.css('pre.highlight, pre:not([class])').each do |pre|
-            code = pre.at_css('code')
-            next unless code
-
-            outer = pre.ancestors('div.highlighter-rouge').first || pre
-            code.remove_attribute('class')
-            code.content = code.text.chomp
-            pre['class'] = 'code-block__pre'
-            outer.replace(<<~HTML.chomp)
-              <div class="code-block" data-code-block>
-              #{code_head(outer['data-name'])}
-              #{pre.to_html}
-              </div>
-            HTML
-          end
+        def name_www_code_blocks
+          name_code_blocks(@fragment, selector: 'pre.highlight, pre:not([class])', plain: true)
         end
 
-        # With no name there is no head, and the button floats in the corner.
-        def code_head(name)
-          return copy_button('copy-button code-block__copy') unless name
-
-          %(<div class="code-block__head"><span class="label" data-code-lang>#{escape(name)}</span>) +
-            %(#{copy_button('copy-button')}</div>)
+        # Only a table with no class. One in an include has its own.
+        def name_www_tables
+          name_tables(@fragment, selector: 'table:not([class])', cell: method(:name_cell))
         end
 
-        def copy_button(classes)
-          %(<button type="button" class="#{classes}" data-copy hidden>Copy</button>)
-        end
-
-        # Below 640 a row stacks, and each cell shows its column's name.
-        def name_tables
-          @fragment.css('table:not([class])').each do |table|
-            table['class'] = 'table'
-            table['data-table'] = ''
-            columns = table.css('thead th').each { |cell| cell['scope'] = 'col' }.map { |cell| cell.text.strip }
-            table.css('tbody tr').each do |row|
-              row.css('td').zip(columns) { |cell, column| name_cell(cell, column) }
-            end
-          end
-        end
-
-        # A cell that is only emphasis marked table__off is greyed out whole, and not italic. One that is only code
-        # is set as the design sets a value.
-        def name_cell(cell, column)
+        # A cell that is only code is set as the design sets a value.
+        def name_cell(cell)
           cell['class'] = 'table__text'
-          cell['data-label'] = column if column
-          return name_code_cell(cell) if cell.children.one? && cell.children.first.name == 'code'
+          return unless cell.children.one? && cell.children.first.name == 'code'
 
-          mark = cell.at_css('> em.table__off')
-          return unless mark && cell.text.strip == mark.text
-
-          add_class(cell, 'table__off')
-          mark.replace(mark.children)
-        end
-
-        def name_code_cell(cell)
           cell['class'] = 'mono'
           cell.content = cell.text
-        end
-
-        # A list marked doors becomes links to pages.
-        def name_doors
-          @fragment.css('ul.doors').each do |list|
-            links = list.css('> li').map { |item| door(item) }
-            list.name = 'div'
-            list.inner_html = links.join("\n")
-          end
-        end
-
-        def door(item)
-          picture = item.at_css('> figure:first-child')&.unlink
-          picture['class'] = 'doors__picture' if picture
-          link = item.at_css('> a:first-child')
-          text = item.inner_html.strip.delete_prefix(link.to_s)
-          unless link && text.match?(DOOR_DASH)
-            raise ArgumentError, "a doors item is written [Title](link) - text, not: #{item.text.strip}"
-          end
-
-          title = link.inner_html
-          link['class'] = 'doors__link'
-          link.inner_html =
-            %(#{picture&.to_html}<h3 class="doors__title">#{title}</h3>) +
-            %(<p class="doors__text">#{text.sub(DOOR_DASH, '')}</p>)
-          link.to_html
         end
 
         def place_verdicts
@@ -414,10 +332,6 @@ module Binacle
 
         def escape(text)
           CGI.escapeHTML(text)
-        end
-
-        def add_class(element, name)
-          element['class'] = [element['class'], name].compact.join(' ')
         end
       end
     end

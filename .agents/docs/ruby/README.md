@@ -12,8 +12,9 @@ paths:
 Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` and `sites/www/`. The local-only
 `sites/admin/` also loads `jekyll-filters`, `jekyll-resource-tags` and `jekyll-page-meta`.
 
-**Every gem here names no product**, so any Jekyll site could load it. The two that carry the sites' own words
-and markup, `binacle-robots`, `binacle-docs` and `binacle-www`, are in `sites/ruby/` - `$sites/ruby`.
+**Every gem here names no product**, so any Jekyll site could load it. The ones that carry the sites' own words
+and markup, `binacle-robots`, `binacle-docs`, `binacle-sites-core` and `binacle-www`, are in `sites/ruby/` -
+`$sites/ruby`.
 
 | Gem | What it adds | Loaded by |
 |---|---|---|
@@ -270,7 +271,7 @@ reserved keys, `manifest.rb` builds the members, `json.rb` serialises, `generato
 Each gem has an RSpec suite under `spec/` and declares `rspec` as a development dependency in its gemspec.
 
 **One `Gemfile` covers every gem here, at `ruby/`, and no gem has one of its own.** `sites/ruby/` has a second
-one for its two gems, with its own lock. It names each gem with
+one for its gems, with its own lock. It names each gem with
 `gemspec path:`, which also pulls in that gemspec's development dependencies. `ruby/Gemfile.lock` is
 committed, so every spec run uses the same Jekyll — 4.4.1 — rather than whatever the machine has installed.
 

@@ -2,6 +2,7 @@ PATH
   remote: binacle-docs
   specs:
     binacle-docs (1.0.0)
+      binacle-sites-core
       jekyll (>= 4.2)
       nokogiri (~> 1.12)
 
@@ -12,9 +13,16 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: binacle-sites-core
+  specs:
+    binacle-sites-core (1.0.0)
+      nokogiri (~> 1.12)
+
+PATH
   remote: binacle-www
   specs:
     binacle-www (1.0.0)
+      binacle-sites-core
       jekyll (>= 4.2)
       nokogiri (~> 1.12)
 
@@ -145,6 +153,7 @@ PLATFORMS
 DEPENDENCIES
   binacle-docs!
   binacle-robots!
+  binacle-sites-core!
   binacle-www!
   rspec (~> 3.0)
   rubocop

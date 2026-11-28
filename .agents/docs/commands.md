@@ -108,6 +108,7 @@ just test ts_binacle-design-system_unit
 # Ruby - the gems. `just test sites` and `just test all` run them.
 just test rb_binacle-docs_unit
 just test rb_binacle-robots_unit
+just test rb_binacle-sites-core_unit
 just test rb_binacle-www_unit
 just test rb_jekyll-breadcrumb-trail_unit
 just test rb_jekyll-filters_unit

@@ -13,4 +13,5 @@ gem "rubocop", require: false
 # file, so `bundle exec rspec` works from inside any of them.
 gemspec path: "binacle-docs"
 gemspec path: "binacle-robots"
+gemspec path: "binacle-sites-core"
 gemspec path: "binacle-www"

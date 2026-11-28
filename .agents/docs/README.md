@@ -64,7 +64,7 @@ Built with ASP.NET Core (.NET 10) Minimal APIs. Main code is C#.
 | `sites/demo/` | Jekyll demo site (`$sites/demo`) |
 | `sites/www/` | Jekyll marketing site (`$sites/www`) |
 | `sites/admin/` | Jekyll admin site - experimental, local only, never built or deployed |
-| `sites/ruby/` | Not a site: the two gems only the sites read (`$sites/ruby`) |
+| `sites/ruby/` | Not a site: the gems only the sites read (`$sites/ruby`) |
 | `api/requests/` | HTTP request files for manual testing (subfolders: v3, v4, Service) |
 | `samples/` | Docker and Kubernetes deployment samples (user-facing starting points) |
 | `tooling/` | Every task the repo can run, called by CI and by hand alike — the `just` modules (agents, bench, build, changelog, check, ci, coverage, image, measure, openapi, regen, serve, smoke, tests), the scripts they call, the wrangler configs, local compose, emulator state |
@@ -117,7 +117,8 @@ benchmarks, and build the Docker image.
 - Packages (`$packages`) — TypeScript npm packages
 - Ruby (`$ruby`) — the generic Ruby/Jekyll plugins
 - Sites (`$sites`) — every published site, and what they share
-- Site Gems (`$sites/ruby`) — the gems only the sites read, `binacle-robots`, `binacle-docs` and `binacle-www`
+- Site Gems (`$sites/ruby`) — the gems only the sites read, `binacle-robots`, `binacle-docs`,
+  `binacle-sites-core` and `binacle-www`
 - Docs Site (`$sites/docs`) — the published Jekyll site at `sites/docs/`
 - Demo Site (`$sites/demo`) — the published Jekyll site at `sites/demo/`
 - WWW Site (`$sites/www`) — the published Jekyll site at `sites/www/`

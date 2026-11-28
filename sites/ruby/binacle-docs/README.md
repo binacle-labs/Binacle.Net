@@ -2,7 +2,8 @@
 
 One site's gem, on purpose. It holds the Ruby that only `sites/docs` uses: its version scheme, and the
 filters that turn a rendered page into the docs' markup. Nothing here is portable, and nothing here should be
-made portable. The moment these become settings, every site loading the gem carries a vocabulary only one of
+made portable. The markup jobs `www` writes the same way come from [`binacle-sites-core`](../binacle-sites-core): the
+link tiles, the wrapper of a code block and the base of a table. The moment these become settings, every site loading the gem carries a vocabulary only one of
 them uses.
 
 The version scheme rests on the front matter key `version`, the data path `versions.current`, and the
@@ -25,8 +26,12 @@ Both lines are needed. Miss the second and the build fails on the first `{% vlin
 `Unknown tag 'vlink'`. The generator just never runs, so the stamps go missing without a word.
 
 ```ruby
-# Gemfile, inside group :jekyll_plugins
-gem "binacle-docs", path: "../ruby/binacle-docs"
+# Gemfile
+gem "binacle-sites-core", path: "../ruby/binacle-sites-core"   # outside the group; it has no plugin
+
+group :jekyll_plugins do
+  gem "binacle-docs", path: "../ruby/binacle-docs"
+end
 ```
 
 ```yaml
@@ -142,7 +147,8 @@ to nothing fails the build rather than writing a link to a 404.
   shows that in its head in place of the language. `data-name` shows a file or field name there instead, and
   `data-wrap=""` wraps one long string. In a `}` inside an attribute, write `\}`.
 - A list marked `{: .doors }` becomes links to pages. Each item is `[Title](link) - text`; anything else stops the
-  build. The heading above it names the list. `{: .doors .doors--grid }` makes a grid of them.
+  build. The nearest heading above it names the list. `{: .doors .doors--grid }` makes a grid of them; any other is full width.
+  The links and the label are the shared code's. The grid or full-width class is the docs'.
 - In a list marked `{: .labelled-list }`, an item that opens in bold is the cost, and the bold is its label.
 - A numbered list marked `{: .steps }` becomes the steps. Indent what belongs to a step by three spaces.
 - Code blocks in a row, each with `{: data-tab="Windows" }`, become tabs. The first also carries
@@ -156,6 +162,7 @@ to nothing fails the build rather than writing a link to a 404.
 - A table marked `{: .bit-diagram aria-label="..." }` becomes a row of boxes. Its columns are the size, the name in
   code, the note and the width. A name marked `{:.reserved}` or `{:.more}` is drawn faint. A row that does not fit, or no
   `aria-label`, stops the build.
+- Every table takes the class `doc__table` and a box that scrolls, on top of the shared table.
 - A table cell that holds only code marked `{:.mono}` takes the class `mono` too. A right-aligned column (`--:`)
   holds numbers. A cell that is only `*text*{:.table__off}` is greyed out.
 - A code block after a paragraph that starts *Request Example* or *Response Example* names the call or the

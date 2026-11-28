@@ -52,9 +52,16 @@ PATH
       jekyll (>= 4.2)
 
 PATH
+  remote: ../ruby/binacle-sites-core
+  specs:
+    binacle-sites-core (1.0.0)
+      nokogiri (~> 1.12)
+
+PATH
   remote: ../ruby/binacle-www
   specs:
     binacle-www (1.0.0)
+      binacle-sites-core
       jekyll (>= 4.2)
       nokogiri (~> 1.12)
 
@@ -157,6 +164,7 @@ PLATFORMS
 DEPENDENCIES
   binacle-design-system!
   binacle-robots!
+  binacle-sites-core!
   binacle-www!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)

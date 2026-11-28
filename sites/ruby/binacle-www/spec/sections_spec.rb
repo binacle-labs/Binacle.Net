@@ -325,6 +325,12 @@ RSpec.describe Binacle::Www::Sections do
       expect(code.to_html).to eq("<code>\"a\"\n&lt;b&gt;</code>")
     end
 
+    it 'escape the name' do
+      block = page("<h2>A</h2>#{format(rouge, ' data-name="a &lt;b&gt;"')}").at_css('.code-block')
+
+      expect(block.at_css('[data-code-lang]').inner_html).to eq('a &lt;b&gt;')
+    end
+
     it 'leave the code of an include alone' do
       html = page('<h2>A</h2><pre class="command__pre"><code id="run">a</code></pre>')
 
@@ -374,7 +380,7 @@ RSpec.describe Binacle::Www::Sections do
     it 'are links with a title and a text' do
       html = page('<h2>A</h2><ul class="doors"><li><a href="/b/">B</a> - the b</li></ul>')
 
-      expect(html.at_css('div.doors > a').to_html).to eq(
+      expect(html.at_css('nav.doors > a').to_html).to eq(
         '<a href="/b/" class="doors__link"><h3 class="doors__title">B</h3><p class="doors__text">the b</p></a>'
       )
     end
@@ -383,10 +389,17 @@ RSpec.describe Binacle::Www::Sections do
       html = page('<h2>A</h2><ul class="doors doors--pictured"><li><figure><svg></svg></figure>' \
                   "\n<a href=\"/b/\">B</a> - the b</li></ul>")
 
-      expect(html.at_css('div.doors--pictured > a.doors__link').inner_html).to eq(
+      expect(html.at_css('nav.doors--pictured > a.doors__link').inner_html).to eq(
         '<figure class="doors__picture"><svg></svg></figure>' \
         '<h3 class="doors__title">B</h3><p class="doors__text">the b</p>'
       )
+    end
+
+    it 'are named by the heading above them, and keep the classes the markdown wrote' do
+      nav = page('<h2>A</h2><ul class="doors doors--pictured"><li><a href="/b/">B</a> - the b</li></ul>').at_css('nav')
+
+      expect(nav['aria-label']).to eq('A')
+      expect(nav['class']).to eq('doors doors--pictured')
     end
 
     it 'stop on an item written any other way' do

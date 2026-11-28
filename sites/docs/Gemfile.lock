@@ -50,6 +50,7 @@ PATH
   remote: ../ruby/binacle-docs
   specs:
     binacle-docs (1.0.0)
+      binacle-sites-core
       jekyll (>= 4.2)
       nokogiri (~> 1.12)
 
@@ -58,6 +59,12 @@ PATH
   specs:
     binacle-robots (1.0.0)
       jekyll (>= 4.2)
+
+PATH
+  remote: ../ruby/binacle-sites-core
+  specs:
+    binacle-sites-core (1.0.0)
+      nokogiri (~> 1.12)
 
 GEM
   remote: https://rubygems.org/
@@ -148,6 +155,7 @@ PLATFORMS
 DEPENDENCIES
   binacle-docs!
   binacle-robots!
+  binacle-sites-core!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)
   jekyll-breadcrumb-trail!

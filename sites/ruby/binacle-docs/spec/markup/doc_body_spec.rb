@@ -78,7 +78,7 @@ RSpec.describe Binacle::Docs::Markup::DocBody do
 
       expect(html.at_css('[data-code-block] [data-code-lang]').text).to eq('bash')
       expect(html.at_css('[data-code-block] button[data-copy]')).not_to be_nil
-      expect(html.at_css('pre.code-block__pre code[data-lang=bash]').text).to eq("echo hi\n")
+      expect(html.at_css('pre.code-block__pre code[data-lang=bash]').text).to eq('echo hi')
       expect(html.css('.highlight')).to be_empty
     end
 

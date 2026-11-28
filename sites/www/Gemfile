@@ -8,6 +8,7 @@ gem "webrick"
 gem "kramdown-parser-gfm"
 gem "jekyll-include-cache"
 gem "binacle-design-system", path: "../../shared/packages/design-system"
+gem "binacle-sites-core", path: "../ruby/binacle-sites-core"
 
 # Jekyll compiles no sass on this site - the sass CLI does, from package.json. See README.md.
 group :jekyll_plugins do

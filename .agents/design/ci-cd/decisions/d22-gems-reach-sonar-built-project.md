@@ -15,7 +15,7 @@ paths:
 
 `ruby/ruby.rbproj` exists for one reason: to list the gem sources as `Content` so the scanner is offered
 them. `Microsoft.Build.NoTargets`, so it compiles nothing. It excludes `vendor/**`, the bundle CI installs.
-`sites/ruby/ruby.rbproj` does the same for the site gems, `binacle-docs`, `binacle-robots` and `binacle-www`. Everything
+`sites/ruby/ruby.rbproj` does the same for the site gems, `binacle-docs`, `binacle-robots`, `binacle-sites-core` and `binacle-www`. Everything
 below holds for both; the measurements were taken on `ruby/`, before the second one existed.
 
 **Without it Sonar saw no Ruby at all.** The run of 2026-08-27 23:08 reported `10 languages detected` and no

@@ -1,8 +1,8 @@
 ---
 id: sites/ruby
-description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs and binacle-www. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
-verified: 2026-11-26
-check: The gems in sites/ruby/Gemfile match the folders; binacle-www registers one filter, www_sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
+description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs, binacle-sites-core and binacle-www. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
+verified: 2026-11-28
+check: The gems in sites/ruby/Gemfile match the folders; binacle-sites-core registers no filter, tag or generator, and binacle-docs and binacle-www each depend on it in their gemspec; binacle-www registers one filter, www_sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; docs and www list binacle-sites-core in their Gemfile by path, outside group :jekyll_plugins, and not under plugins:; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
 also_update:
   - ruby
   - sites/docs
@@ -17,13 +17,14 @@ what that does not.
 
 **They are the gems that name the product.** The generic gems are in `ruby/`, and the rules they all follow -
 one entry file, everything else under `lib/<gem>/`, `frozen_string_literal` on every file - are in `$ruby`.
-These sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots`, `Binacle::Docs` and `Binacle::Www`. In `Binacle::Docs` the
+These sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots`, `Binacle::Docs`, `Binacle::SitesCore` and `Binacle::Www`. In `Binacle::Docs` the
 folders are modules, `Versions` and `Markup`, with `Pager` beside them; a dash in a gem's name is a nested module,
-as the RubyGems naming guide has it. **`binacle-docs` and `binacle-www` depend on Nokogiri**, for `doc_body` and
+as the RubyGems naming guide has it. **`binacle-sites-core`, `binacle-docs` and `binacle-www` depend on Nokogiri**, for the shared markup, `doc_body` and
 `www_sections`; the generic `jekyll-filters` does not, so `demo` has no Nokogiri in its lock.
 
 **A site loads them the same two ways it loads the generic ones**, but its `Gemfile` path is
-`../ruby/<gem>`, one level shorter.
+`../ruby/<gem>`, one level shorter. `binacle-sites-core` is the exception: it has no plugin, so a site lists it
+in its `Gemfile` outside `group :jekyll_plugins` and not under `plugins:`.
 
 ## binacle-robots
 
@@ -48,10 +49,29 @@ reach all three sites at once.
 
 Source: `lib/binacle-robots/` - `body.rb` reads the file, `tag.rb` writes it.
 
+## binacle-sites-core
+
+**The markup `binacle-docs` and `binacle-www` write the same way.** A plain Ruby module,
+`Binacle::SitesCore::Markup`, on a Nokogiri fragment. **It registers no Liquid filter, tag or generator**; a site gem
+includes it and calls it from its own filter. `$ruby/decisions#R9` is why it is one gem.
+
+- **Link tiles.** A list marked `doors` becomes a `nav`, named by the nearest heading above it. An item that is not
+  `[Title](link) - text` stops the build.
+- **Code blocks.** The shared wrapper, the copy button and a head named by `data-name`.
+- **Tables.** The `table` class, `scope="col"`, a `data-label` per cell, `table__number` and greyed cells.
+- **Labelled lists**, and `add_class`.
+
+**What a site matches stays in the site.** Which `pre` and which tables are passed as a selector, and the code-only
+table cell is each site's own. Docs and www add their classes on top.
+
+**It writes the design system's class names**, so a class renamed in the Sass breaks every site that uses it.
+
+Source: `lib/binacle-sites-core/markup.rb`.
+
 ## binacle-docs
 
 **`sites/docs` only.** Everything Ruby that only the docs site uses: its version scheme, the page before and
-after each page, and two filters that turn a rendered page into the design system's markup.
+after each page, and two filters that turn a rendered page into the design system's markup, on top of `binacle-sites-core`.
 
 ### The versions
 
@@ -115,17 +135,15 @@ title loses its version, and the pager disappears.
 it is. `sites/docs/_layouts/page.html` pipes every page through it except the home
 page, where `home.html` calls `doc_doors`. It:
 
-- names each top-level block with the design system's `doc__` classes, tables as `table doc__table` inside a
-  `doc__table-scroll` box, a table cell holding only code as `mono`, a right-aligned one as `table__number`, and one that
-  is only emphasis marked `table__off` as `table__off`;
+- names each top-level block with the design system's `doc__` classes, tables as the shared table plus `doc__table`
+  inside a `doc__table-scroll` box, and a table cell holding only code as `mono`;
 - turns a quote marked `{: .block-warning }` or another kind, or opening with a GitHub `[!NOTE]` line, into a
   `callout` of that kind;
-- rewraps every code block as a `code-block` with a head: the language, or the `data-name` the markdown gives,
+- rewraps every code block as the shared `code-block`, with a head: the language, or the `data-name` the markdown gives,
   or the call in `data-call`. `data-wrap` makes one long line wrap. Only JSON keeps Rouge's token colours;
-- turns a list marked `{: .doors }` into a `doors` nav, labelled by the heading above it, a grid with `.doors--grid`. An item that is not
-  `[Title](link) - text` stops the build;
+- turns a list marked `{: .doors }` into the shared `doors` nav, a grid with `.doors--grid`, any other full width;
 - in a list marked `{: .labelled-list }`, makes the item that opens in bold the `labelled-list__cost`, the bold its
-  label;
+  label, as the shared code does;
 - adds `doc__steps` to a numbered list marked `{: .steps }`;
 - turns code blocks in a row marked `data-tab` into `tabs`, labelled by the first one's `data-tabs`. A stray or
   unnamed tab stops the build;
@@ -158,8 +176,8 @@ Source: `lib/binacle-docs/` - `versions/` (`generator.rb`, `urls.rb`, `pages.rb`
 section; the kramdown attributes on the heading say how it looks. `sites/ruby/binacle-www/README.md` lists them. A look that is
 not in the filter's list stops the build, and a spec checks the list against the design system's Sass.
 
-**It draws code blocks, link tiles and tables too, not the way `binacle-docs` does.** A code block has a head only when the markdown
-names it, and never carries `data-lang`, which would make a bash block wrap at every width. Tiles are a plain `div`. A table's
+**It draws code blocks, link tiles and tables too, on the same shared base as `binacle-docs`, with its own choices on top.** A code block has a head only when the markdown
+names it, and never carries `data-lang`, which would make a bash block wrap at every width. Tiles are a `nav` named by the heading above, that keeps the classes the markdown gives it. A table's
 cells carry their column's name, which a phone shows; a docs table scrolls instead.
 
 **A section with no label column has no grid** unless its band has one column, or its body would sit in the label's place.
@@ -168,7 +186,7 @@ cells carry their column's name, which a phone shows; a docs table scrolls inste
 section; `parse_block_html: false`, since with it on kramdown reads the indented HTML inside `exchange.html` and
 `command.html` as code and prints the tags; `smart_quotes` as straight quotes.
 
-**It is apart from `binacle-docs` on purpose**, though both draw labelled lists. The maintainer, 2026-11-26: "lets go
+**It is apart from `binacle-docs` on purpose**, though both draw labelled lists. It does not depend on `binacle-docs`; the two share `binacle-sites-core`. The maintainer, 2026-11-26: "lets go
 separate gem for www and we see if we need to join them later".
 
 Source: `lib/binacle-www/sections.rb`.
@@ -179,6 +197,6 @@ Source: `lib/binacle-www/sections.rb`.
 hold the same Jekyll, or the two sets of gems are tested against different versions. The coverage gems and
 Rubocop are in it too, and `.rubocop.yml` takes its rules from `ruby/.rubocop.yml`.
 
-**The specs run the same way as the generic gems'** - `just test rb_binacle-docs_unit`, one step each in
+**The specs run the same way as the generic gems'** - `just test rb_binacle-docs_unit` and `rb_binacle-sites-core_unit`, one step each in
 `shared-site-tests.yml`, which sets up both bundles. Coverage is merged with theirs - `$ruby`, *Coverage*.
 `sites/ruby/ruby.rbproj` offers the sources to Sonar and holds the report path for this folder.
