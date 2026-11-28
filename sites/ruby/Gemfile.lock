@@ -1,4 +1,12 @@
 PATH
+  remote: binacle-demo
+  specs:
+    binacle-demo (1.0.0)
+      binacle-sites-core
+      jekyll (>= 4.2)
+      nokogiri (~> 1.12)
+
+PATH
   remote: binacle-docs
   specs:
     binacle-docs (1.0.0)
@@ -151,6 +159,7 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
+  binacle-demo!
   binacle-docs!
   binacle-robots!
   binacle-sites-core!

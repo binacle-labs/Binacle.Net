@@ -82,6 +82,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: just test ts_theme-switcher_unit
 
+      - name: Test - binacle-demo
+        if: ${{ !cancelled() }}
+        run: just test rb_binacle-demo_unit
+
       - name: Test - binacle-docs
         if: ${{ !cancelled() }}
         run: just test rb_binacle-docs_unit

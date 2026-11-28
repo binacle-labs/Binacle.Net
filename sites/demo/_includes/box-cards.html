@@ -1,0 +1,9 @@
+<nav class="box-cards" aria-label="Boxes">
+{%- for box in page.boxes %}
+<a class="box-card" href="{{ '/items/' | relative_url }}?box={{ box.name }}">
+<span class="box-card__face drawing drawing--painted">{% include drawings/box-{{ box.name | downcase }}.svg %}</span>
+<strong class="box-card__name">{{ box.name }}</strong>
+<span class="mono">{{ box.size }}</span>
+</a>
+{%- endfor %}
+</nav>

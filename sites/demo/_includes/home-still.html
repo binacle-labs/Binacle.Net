@@ -1,0 +1,13 @@
+<figure class="pack-view">
+<button type="button" class="still" data-lightbox="home-still" aria-label="Open the picture larger">
+{% include drawings/home-still.svg %}
+</button>
+<figcaption class="pack-view__strip">
+<span class="dimension-line dimension-line--small dimension-line--strip"><span class="dimension-line__tick"></span><span class="dimension-line__number">62 x 45 x 36</span><span class="dimension-line__tick"></span></span>
+<span>Sixteen everyday items, the large box</span>
+</figcaption>
+</figure>
+<dialog class="lightbox" id="home-still" aria-label="Sixteen everyday items packed in the large box">
+{% include drawings/home-still.svg class="lightbox__still" %}
+<div class="lightbox__bar"><span>Sixteen everyday items in the large box, 62&nbsp;x&nbsp;45&nbsp;x&nbsp;36&nbsp;cm</span><button type="button" class="button button--link" data-close>Close</button></div>
+</dialog>

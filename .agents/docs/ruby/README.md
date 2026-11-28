@@ -13,7 +13,7 @@ Jekyll plugins for the three published sites — `sites/docs/`, `sites/demo/` an
 `sites/admin/` also loads `jekyll-filters`, `jekyll-resource-tags` and `jekyll-page-meta`.
 
 **Every gem here names no product**, so any Jekyll site could load it. The ones that carry the sites' own words
-and markup, `binacle-robots`, `binacle-docs`, `binacle-sites-core` and `binacle-www`, are in `sites/ruby/` -
+and markup, `binacle-robots`, `binacle-docs`, `binacle-sites-core`, `binacle-www` and `binacle-demo`, are in `sites/ruby/` -
 `$sites/ruby`.
 
 | Gem | What it adds | Loaded by |

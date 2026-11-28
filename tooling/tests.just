@@ -68,6 +68,7 @@ sites:
     just test ts_binacle-design-system_unit
     just test ts_cookies_unit
     just test ts_theme-switcher_unit
+    just test rb_binacle-demo_unit
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
     just test rb_binacle-sites-core_unit
@@ -104,6 +105,7 @@ all:
     just test cs_binacle-net_integration
     just test cs_binacle-net-diagnostics-module_integration
     just test cs_binacle-net-service-module_integration Sqlite
+    just test rb_binacle-demo_unit
     just test rb_binacle-docs_unit
     just test rb_binacle-robots_unit
     just test rb_binacle-sites-core_unit
@@ -212,6 +214,9 @@ ts_theme-switcher_unit: (_jest_test 'theme-switcher')
 ts_binacle-design-system_unit: (_jest_test 'binacle-design-system')
 
 # The Ruby tests. The argument is the gem's folder, from the repo root.
+
+[private]
+rb_binacle-demo_unit: (_rspec_test 'sites/ruby/binacle-demo')
 
 [private]
 rb_binacle-docs_unit: (_rspec_test 'sites/ruby/binacle-docs')

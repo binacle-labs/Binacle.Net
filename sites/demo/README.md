@@ -7,7 +7,7 @@ Its host is <https://demo.binacle.net>.
 
 | Path | What it is |
 |---|---|
-| `pages/` | The whole site - the chooser `index.html`, `items.html`, `packing.html`, `vipaq.html`, `404.html`, `robots.txt` |
+| `pages/` | The whole site - the chooser `index.md`, `items.html`, `packing.html`, `vipaq.html`, `404.html`, `robots.txt` |
 | `_data/` | The header's links, the footer, and the script and style includes |
 | `_layouts/`, `_includes/` | Templates and partials. `default.html` is the bare document and `page.html` the wrapper every page gets |
 | `_includes/drawings/` | The box cards and the home page's packed box, as SVG. A page pulls one in as an include, so its CSS reaches it |
@@ -49,3 +49,7 @@ overrides that for a deploy.
 
 Custom Liquid filters and the Google Tag Manager tags come from the local gems in [`ruby/`](../../ruby),
 wired up through this site's `Gemfile`.
+
+The home page is the one page written in markdown. `demo_sections`, from [`binacle-demo`](../ruby/binacle-demo), builds its
+sections in `_layouts/page.html`, and only for a page whose source is a `.md` file. The top of the home page is a
+`hero` heading in markdown, with the box cards and the picture as includes (`box-cards.html`, `home-still.html`).

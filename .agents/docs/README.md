@@ -118,7 +118,7 @@ benchmarks, and build the Docker image.
 - Ruby (`$ruby`) — the generic Ruby/Jekyll plugins
 - Sites (`$sites`) — every published site, and what they share
 - Site Gems (`$sites/ruby`) — the gems only the sites read, `binacle-robots`, `binacle-docs`,
-  `binacle-sites-core` and `binacle-www`
+  `binacle-sites-core`, `binacle-www` and `binacle-demo`
 - Docs Site (`$sites/docs`) — the published Jekyll site at `sites/docs/`
 - Demo Site (`$sites/demo`) — the published Jekyll site at `sites/demo/`
 - WWW Site (`$sites/www`) — the published Jekyll site at `sites/www/`

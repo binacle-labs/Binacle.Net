@@ -106,6 +106,7 @@ just test ts_theme-switcher_unit
 just test ts_binacle-design-system_unit
 
 # Ruby - the gems. `just test sites` and `just test all` run them.
+just test rb_binacle-demo_unit
 just test rb_binacle-docs_unit
 just test rb_binacle-robots_unit
 just test rb_binacle-sites-core_unit

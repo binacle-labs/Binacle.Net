@@ -1,8 +1,8 @@
 ---
 id: sites/ruby
-description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs, binacle-sites-core and binacle-www. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
+description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs, binacle-sites-core, binacle-www and binacle-demo. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
 verified: 2026-11-28
-check: The gems in sites/ruby/Gemfile match the folders; binacle-sites-core registers no filter, tag or generator, and binacle-docs and binacle-www each depend on it in their gemspec; binacle-www registers one filter, www_sections, and its Converter subclasses Binacle::SitesCore::Sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; docs and www list binacle-sites-core in their Gemfile by path, outside group :jekyll_plugins, and not under plugins:; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
+check: The gems in sites/ruby/Gemfile match the folders; binacle-sites-core registers no filter, tag or generator, and binacle-docs, binacle-www and binacle-demo each depend on it in their gemspec; binacle-demo registers one filter, demo_sections, and its Converter subclasses Binacle::SitesCore::Sections and adds the hero look, and the home page has no nomarkdown block around its top; binacle-www registers one filter, www_sections, and its Converter subclasses Binacle::SitesCore::Sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; docs, www and demo list binacle-sites-core in their Gemfile by path, outside group :jekyll_plugins, and not under plugins:; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
 also_update:
   - ruby
   - sites/docs
@@ -17,10 +17,10 @@ what that does not.
 
 **They are the gems that name the product.** The generic gems are in `ruby/`, and the rules they all follow -
 one entry file, everything else under `lib/<gem>/`, `frozen_string_literal` on every file - are in `$ruby`.
-These sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots`, `Binacle::Docs`, `Binacle::SitesCore` and `Binacle::Www`. In `Binacle::Docs` the
+These sit in `Binacle::` rather than `Jekyll::`: `Binacle::Robots`, `Binacle::Docs`, `Binacle::SitesCore`, `Binacle::Www` and `Binacle::Demo`. In `Binacle::Docs` the
 folders are modules, `Versions` and `Markup`, with `Pager` beside them; a dash in a gem's name is a nested module,
-as the RubyGems naming guide has it. **`binacle-sites-core`, `binacle-docs` and `binacle-www` depend on Nokogiri**, for the shared markup, `doc_body` and
-`www_sections`; the generic `jekyll-filters` does not, so `demo` has no Nokogiri in its lock.
+as the RubyGems naming guide has it. **`binacle-sites-core`, `binacle-docs`, `binacle-www` and `binacle-demo` depend on Nokogiri**, for the shared markup, `doc_body`,
+`www_sections` and `demo_sections`; the generic `jekyll-filters` does not.
 
 **A site loads them the same two ways it loads the generic ones**, but its `Gemfile` path is
 `../ruby/<gem>`, one level shorter. `binacle-sites-core` is the exception: it has no plugin, so a site lists it
@@ -198,12 +198,25 @@ separate gem for www and we see if we need to join them later".
 
 Source: `lib/binacle-www/sections.rb`.
 
+## binacle-demo
+
+**`sites/demo` only.** `demo_sections` runs on the rendered home page, in `_layouts/page.html`, and only for a page
+written in markdown: the other demo pages are HTML and pass through as they are. Its `Converter` subclasses
+`Binacle::SitesCore::Sections` and adds one look, `hero`, the top of the home page. The sentence and the button are
+markdown. The box cards and the picture with its lightbox are Liquid includes. The look takes one `figure`, with the
+`dialog` that opens it, and no other look and no label. The tile list is named by its heading, as on every site.
+
+**It needs the same three kramdown settings as `binacle-www`** in `sites/demo/_config.yml`. The home page is the only
+markdown page, so they change no other.
+
+Source: `lib/binacle-demo/sections.rb`.
+
 ## The bundle
 
 **`sites/ruby/Gemfile` is a second bundle**, apart from `ruby/Gemfile`, with its own lock. Both locks have to
 hold the same Jekyll, or the two sets of gems are tested against different versions. The coverage gems and
 Rubocop are in it too, and `.rubocop.yml` takes its rules from `ruby/.rubocop.yml`.
 
-**The specs run the same way as the generic gems'** - `just test rb_binacle-docs_unit` and `rb_binacle-sites-core_unit`, one step each in
+**The specs run the same way as the generic gems'** - `just test rb_binacle-docs_unit`, `rb_binacle-demo_unit` and `rb_binacle-sites-core_unit`, one step each in
 `shared-site-tests.yml`, which sets up both bundles. Coverage is merged with theirs - `$ruby`, *Coverage*.
 `sites/ruby/ruby.rbproj` offers the sources to Sonar and holds the report path for this folder.

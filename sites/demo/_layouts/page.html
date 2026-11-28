@@ -4,7 +4,12 @@ layout: default
 {% include header.html %}
 
 <main id="content">
+    {%- assign source_ext = page.path | split: '.' | last %}
+    {%- if source_ext == 'md' %}
+    {{ content | demo_sections }}
+    {%- else %}
     {{ content }}
+    {%- endif %}
 </main>
 
 {% include footer.html %}

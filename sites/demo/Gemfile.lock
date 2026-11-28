@@ -46,10 +46,24 @@ PATH
     binacle-design-system (1.0.0)
 
 PATH
+  remote: ../ruby/binacle-demo
+  specs:
+    binacle-demo (1.0.0)
+      binacle-sites-core
+      jekyll (>= 4.2)
+      nokogiri (~> 1.12)
+
+PATH
   remote: ../ruby/binacle-robots
   specs:
     binacle-robots (1.0.0)
       jekyll (>= 4.2)
+
+PATH
+  remote: ../ruby/binacle-sites-core
+  specs:
+    binacle-sites-core (1.0.0)
+      nokogiri (~> 1.12)
 
 GEM
   remote: https://rubygems.org/
@@ -114,9 +128,12 @@ GEM
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     mercenary (0.4.0)
+    nokogiri (1.19.7-x86_64-linux-gnu)
+      racc (~> 1.4)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     public_suffix (7.0.5)
+    racc (1.8.1)
     rake (13.3.1)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
@@ -135,8 +152,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  binacle-demo!
   binacle-design-system!
   binacle-robots!
+  binacle-sites-core!
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.4.1)
   jekyll-filters!

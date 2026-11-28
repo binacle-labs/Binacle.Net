@@ -35,7 +35,7 @@ wins.
 
 | Page | Route | What it is |
 |---|---|---|
-| `pages/index.html` | `/` | Pick a box: three box cards, each opening *Everyday Items* with `?box=` set, and tiles to the other two demos |
+| `pages/index.md` | `/` | Pick a box: three box cards, each opening *Everyday Items* with `?box=` set, and tiles to the other two demos |
 | `pages/items.html` | `/items/` | *Everyday Items* - pick a box, add things, see where each lands |
 | `pages/packing.html` | `/packing/` | *Custom Sizes* - your own bins and items, and the algorithm |
 | `pages/vipaq.html` | `/vipaq/` | The ViPaq decoder |
@@ -82,7 +82,7 @@ list, so arriving at a demo costs no download. Both halves read the one list, so
 
 ## Plugins
 
-Nine, in `_config.yml` order: `jekyll-tidy`, `jekyll-gtm`, `jekyll-filters`, `binacle-robots`,
+Ten, in `_config.yml` order: `jekyll-tidy`, `jekyll-gtm`, `jekyll-filters`, `binacle-robots`, `binacle-demo`,
 `jekyll-multi-sitemap`, `jekyll-resource-tags`, `jekyll-page-meta`, `jekyll-structured-data`,
 `jekyll-webmanifest`. The two the docs site loads and this one does not are `jekyll-breadcrumb-trail` and
 `binacle-docs` - a flat site has no trail and no versions. `binacle-robots` is one of the site gems,
