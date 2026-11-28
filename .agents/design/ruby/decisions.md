@@ -2,7 +2,7 @@
 id: ruby/decisions
 description: Ruby gem decisions ledger — why one computation feeds every gem, the one key whose generator order is load-bearing, how a gem's config names are chosen, what the gem name says about portability, why a portable gem may not name the product, and what decides a tag against a generator. Also why the docs markup filter is in binacle-docs and not in a generic gem, a theme gem or the site's _plugins, and why the markup both site gems share is one gem of its own, binacle-sites-core.
 verified: 2026-11-28
-check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs; R9 against sites/ruby/binacle-sites-core, whose lib registers no Liquid filter, tag or generator, against the gemspecs of binacle-docs and binacle-www, which must each depend on it, and against sites/docs/Gemfile and sites/www/Gemfile, which must list it by path outside `group :jekyll_plugins`
+check: R1 against the one place each key in the table is written, where a second writer is a bug; R2 against `priority :high` in sites/ruby/binacle-docs/lib/binacle-docs/versions/generator.rb and `priority :low` in jekyll-page-meta/generator.rb; R5 by grepping every `ruby/jekyll-*` for the product and for its subject matter; R8 against sites/ruby/binacle-docs/lib/binacle-docs/markup/doc_body.rb, its only home, jekyll-filters having no nokogiri in its gemspec, no ruby/jekyll-* gem naming a docs class, and no _plugins folder in sites/docs; R9 against sites/ruby/binacle-sites-core, whose lib registers no Liquid filter, tag or generator and holds the Sections class that Converter in binacle-www subclasses, against the gemspecs of binacle-docs and binacle-www, which must each depend on it, and against sites/docs/Gemfile and sites/www/Gemfile, which must list it by path outside `group :jekyll_plugins`
 paths:
   - "ruby/**"
   - "sites/ruby/**"
@@ -140,7 +140,8 @@ levels rule allows. A class renamed in the Sass breaks a docs style with no erro
 
 `binacle-docs` and `binacle-www` wrote the same markup jobs twice: link tiles, code blocks, tables, labelled lists
 and `add_class`. They are now in `sites/ruby/binacle-sites-core`, a plain Ruby module, `Binacle::SitesCore::Markup`,
-that works on a Nokogiri fragment. Both site gems depend on it in their gemspec, and each site's `Gemfile` lists it
+that works on a Nokogiri fragment. The section builder is there too, as a class, `Binacle::SitesCore::Sections`,
+which a site gem subclasses for its own looks and parts. Both site gems depend on it in their gemspec, and each site's `Gemfile` lists it
 by path outside `group :jekyll_plugins`, as it has no plugin to load.
 
 **Decided (the maintainer, 2026-11-28):** one shared gem plus a small gem per site, over one gem with a folder per
@@ -152,11 +153,19 @@ gem of a family, as `rspec-core`. His answer: "sites-core".
 **Decided (the maintainer, 2026-11-28):** link tiles become a `nav` with a name: "nav". Code blocks share a base:
 "base". Tables share a base: "base".
 
+**Decided (the maintainer, 2026-11-28):** the section builder moves into the shared gem. He was offered two ways: move
+it into `binacle-sites-core`, shared by `binacle-www` and a later demo gem, or copy about 140 lines of it into the demo
+gem. His answer: "move". A class to subclass was picked over a module with hooks, as a site overrides a few methods and
+keeps the rest.
+
 **What stays in each site gem.** Which `pre` and which tables a site takes is passed in as a selector. The code-only
 table cell is each site's own. Docs keeps the language head, JSON colours, wrap, tabs, folds, `doc__table` and the
-scroll box. Www keeps its sections.
+scroll box. Www keeps the hero, the statement, columns, the row of steps and the verdicts, as a subclass of the shared builder, and its own list of looks.
 
 **It registers no Liquid filter, tag or generator.** The site gems call it from their own filters, so it needs no
 `plugins:` line.
+
+**The list of looks a heading may carry is per site.** The shared class knows the band, split and body looks; a site
+adds its own, and a mark in neither list stops the build.
 
 **A class set there changes on every site.** The design system's Sass has to know it, as R8 says of `doc_body`.

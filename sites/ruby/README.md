@@ -13,8 +13,8 @@ the group and is not named under `plugins:`.
 |---|---|---|
 | [`binacle-docs`](binacle-docs) | Everything Ruby that only `docs` uses: the version scheme - a generator that stamps `title_suffix` and `robots` onto every versioned document, and `{% vlink %}` - and the `doc_body` and `doc_sections` filters that turn a rendered page into the docs' markup. It uses `binacle-sites-core` for the tiles, the code block wrapper and the table base | `docs` |
 | [`binacle-robots`](binacle-robots) | The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal preamble, the rights reservation and `User-Agent: *`; the `Sitemap:` lines come from `{% sitemap_links %}` | `www`, `docs`, `demo` |
-| [`binacle-sites-core`](binacle-sites-core) | The markup jobs the site gems write the same way, as plain Ruby they call: link tiles, code blocks, tables and a few smaller jobs. It has no filter or tag of its own | `www`, `docs` |
-| [`binacle-www`](binacle-www) | The `www_sections` filter, which turns a markdown page into the design's sections. It uses `binacle-sites-core` for the shared markup | `www` |
+| [`binacle-sites-core`](binacle-sites-core) | The markup the site gems share, as plain Ruby they call: link tiles, code blocks, tables, and a section builder a site gem subclasses. It has no filter or tag of its own | `www`, `docs` |
+| [`binacle-www`](binacle-www) | The `www_sections` filter, which turns a markdown page into the design's sections. Its converter extends the section builder in `binacle-sites-core` with the home page's looks | `www` |
 
 Each gem has the shape `bundle gem` writes: a `<name>.gemspec`, one entry file at `lib/<name>.rb`, the rest
 under `lib/<name>/`, and the specs in `spec/`. All are MIT.
@@ -45,7 +45,7 @@ Adding a gem means one `gemspec path:` line in `sites/ruby/Gemfile` and one reci
 
 **`doc_body` and `www_sections` write the design system's class names.** Rename a class in the Sass and these gems
 have to change with it, or the site loses that style without any error. The section looks are the exception: a spec
-in `binacle-www` checks them against the Sass.
+in `binacle-sites-core` and one in `binacle-www` check them against the Sass.
 
 **The bundle has its own lock.** Raise Jekyll in `ruby/Gemfile.lock` and raise it here too, or the two sets of
 gems are tested against different versions.

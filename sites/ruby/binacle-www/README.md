@@ -2,8 +2,8 @@
 
 One site's gem, on purpose. It holds the Ruby that only `sites/www` uses: the filter that turns a markdown page
 into the design's sections. It writes the design's class names, such as `band__body` and `columns__column`, so it
-changes when those do. The jobs both site gems write the same way come from
-[`binacle-sites-core`](../binacle-sites-core).
+changes when those do. The jobs the site gems share come from [`binacle-sites-core`](../binacle-sites-core): its
+section builder, which `Converter` extends with the looks and parts below.
 
 ## 📂 What is in it
 
@@ -42,23 +42,17 @@ kramdown:
 
 ## 🧱 The markdown
 
-Every `#` and `##` starts a section. The line under it says how the section looks:
+Every `#` and `##` starts a section. The line under it says how the section looks. The `band--`, `split--`,
+`band__body--code-left` and `prose--one-line` looks, and the label, are explained in
+[`binacle-sites-core`](../binacle-sites-core). These are this site's own:
 
 ```markdown
 ## The three algorithms
 {: .band--wide .columns #algorithms data-label="Algorithms" }
 ```
 
-- `.band--wide` and the other `band--` classes go on the section, and so does the id.
-- `data-label` is the small label beside the section. Left empty, its column stays and is blank.
-- With neither a label nor `band--split`, `band--mirrored` or `band--wide`, the section has no grid. In a
-  `band--mirrored` one the label sits over the heading.
-- `.split--text-left` and the other `split--` classes put the words beside what follows them.
-- `.band__body--code-left`, in a wide section, puts a short code block under the left column of text.
 - `.statement` is one line at display size and the words under it, with no label. Each sentence of the heading
   is kept whole, and the heading comes out as a paragraph.
-- `.prose--one-line` is for a wide section with one short line under its heading, which then sits below the heading
-  and not beside it.
 - `.hero` is the top of the home page, with no label: the words and the actions on one side, the picture on the
   other. The actions start at the paragraph marked `{: .actions }`. One marked `{: .hero__source }` is the line under
   them. It takes one picture.
@@ -75,11 +69,8 @@ Every `#` and `##` starts a section. The line under it says how the section look
 - A code block marked `{: data-name="Signature" }` has a head with that name. Without it there is only the copy
   button.
 
-A mark on a heading that the filter does not know stops the build and is named. The list is at the top of
-`lib/binacle-www/sections.rb`, and a spec checks each one is in the design system's Sass.
-
-Words get the design's reading width by themselves. A page that starts with anything but a heading stops the
-build.
+A mark on a heading that neither this gem nor `binacle-sites-core` knows stops the build and is named. This gem's
+list is `site_looks` in `lib/binacle-www/sections.rb`, and a spec checks each one is in the design system's Sass.
 
 ## 🧪 Tests
 

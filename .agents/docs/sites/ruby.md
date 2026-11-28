@@ -2,7 +2,7 @@
 id: sites/ruby
 description: sites/ruby/ - the gems only the Binacle sites read, binacle-robots, binacle-docs, binacle-sites-core and binacle-www. What each stamps and writes, what fails the build, and how their bundle differs from ruby/.
 verified: 2026-11-28
-check: The gems in sites/ruby/Gemfile match the folders; binacle-sites-core registers no filter, tag or generator, and binacle-docs and binacle-www each depend on it in their gemspec; binacle-www registers one filter, www_sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; docs and www list binacle-sites-core in their Gemfile by path, outside group :jekyll_plugins, and not under plugins:; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
+check: The gems in sites/ruby/Gemfile match the folders; binacle-sites-core registers no filter, tag or generator, and binacle-docs and binacle-www each depend on it in their gemspec; binacle-www registers one filter, www_sections, and its Converter subclasses Binacle::SitesCore::Sections; binacle-robots registers one robots tag and its spec still pins the content signals commented out; binacle-docs registers vlink, doc_body, doc_doors and doc_sections, and its generator still runs at priority :high and stamps version, version_tag, version_label, version_urls, prev_next, title_suffix and robots, the url on each versions list entry, and the three redirect keys; www, docs and demo load binacle-robots and only docs loads binacle-docs, each through its Gemfile with path ../ruby/<gem> and its plugins list; docs and www list binacle-sites-core in their Gemfile by path, outside group :jekyll_plugins, and not under plugins:; sites/ruby/ruby.rbproj still carries the ruby coverage report path; both locks hold the same Jekyll
 also_update:
   - ruby
   - sites/docs
@@ -51,10 +51,15 @@ Source: `lib/binacle-robots/` - `body.rb` reads the file, `tag.rb` writes it.
 
 ## binacle-sites-core
 
-**The markup `binacle-docs` and `binacle-www` write the same way.** A plain Ruby module,
-`Binacle::SitesCore::Markup`, on a Nokogiri fragment. **It registers no Liquid filter, tag or generator**; a site gem
-includes it and calls it from its own filter. `$ruby/decisions#R9` is why it is one gem.
+**What the site gems share.** The markup module `Binacle::SitesCore::Markup`, on a Nokogiri fragment, and the
+section builder `Binacle::SitesCore::Sections`, a class a site gem subclasses. **It registers no Liquid filter, tag
+or generator**; a site gem calls it from its own filter. `$ruby/decisions#R9` is why it is one gem.
 
+- **Sections.** Every `h1` and `h2` starts a section; the kramdown attributes on the heading say how it looks. The
+  shared class knows the band, split and body looks, the label column and the prose boxes. A site overrides
+  `site_looks` for the looks it adds, `site_section` for a section built its own way, `prepare` for work on the
+  page first, `part` for what follows a section, and `divide` with `draw_columns` for a part inside it. A look
+  neither the class nor the site lists stops the build and is named.
 - **Link tiles.** A list marked `doors` becomes a `nav`, named by the nearest heading above it. An item that is not
   `[Title](link) - text` stops the build.
 - **Code blocks.** The shared wrapper, the copy button and a head named by `data-name`.
@@ -66,7 +71,7 @@ table cell is each site's own. Docs and www add their classes on top.
 
 **It writes the design system's class names**, so a class renamed in the Sass breaks every site that uses it.
 
-Source: `lib/binacle-sites-core/markup.rb`.
+Source: `lib/binacle-sites-core/` - `markup.rb`, `sections.rb`.
 
 ## binacle-docs
 
@@ -173,11 +178,13 @@ Source: `lib/binacle-docs/` - `versions/` (`generator.rb`, `urls.rb`, `pages.rb`
 ## binacle-www
 
 **`sites/www` only.** `www_sections` runs on the rendered page, in `_layouts/page.html`. Every `h1` and `h2` starts a
-section; the kramdown attributes on the heading say how it looks. `sites/ruby/binacle-www/README.md` lists them. A look that is
-not in the filter's list stops the build, and a spec checks the list against the design system's Sass.
+section; the kramdown attributes on the heading say how it looks. `sites/ruby/binacle-www/README.md` lists them. Its
+`Converter` subclasses `Binacle::SitesCore::Sections` and adds the looks `hero`, `statement` and `columns`, the row of
+steps and the verdicts. A look in neither list stops the build, and a spec in each gem checks its list against the
+design system's Sass.
 
 **It draws code blocks, link tiles and tables too, on the same shared base as `binacle-docs`, with its own choices on top.** A code block has a head only when the markdown
-names it, and never carries `data-lang`, which would make a bash block wrap at every width. Tiles are a `nav` named by the heading above, that keeps the classes the markdown gives it. A table's
+names it, and never carries `data-lang`, which would make a bash block wrap at every width. Tiles are a `nav` named by the nearest heading above, that keeps the classes the markdown gives it. A table's
 cells carry their column's name, which a phone shows; a docs table scrolls instead.
 
 **A section with no label column has no grid** unless its band has one column, or its body would sit in the label's place.
