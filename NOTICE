@@ -1,6 +1,6 @@
 Binacle.Net
 
-Copyright (c) 2023-2026 Chris Mavrommatis. All rights reserved.
+Copyright (c) 2023-2026 Chris Mavrommatis.
 
 This product carries more than one license. Which one applies depends on which part of
 the work you are using. Every part that is not the code is named below; anything not
@@ -36,10 +36,14 @@ documentation.
     vipaq/PROTOCOL.md                     vipaq/test-vectors
   Each directory carries its own LICENSE file; vipaq/PROTOCOL.md carries an SPDX header.
 
-- The Ruby gems are licensed under the MIT License
-  Every gem under ruby/ and sites/ruby/. They are Jekyll plugins; the ones in ruby/ are
-  built to be used by any site.
-  Each gem carries its own LICENSE file.
+- The API client is licensed under the Apache License 2.0 (Apache-2.0)
+  api/packages/api-client, the TypeScript client for the public API. It goes inside other
+  people's applications, so it carries no copyleft. It carries its own LICENSE file.
+
+- The generic Ruby gems are licensed under the MIT License
+  Every gem under ruby/. They are Jekyll plugins built to be used by any site.
+  Each one carries its own LICENSE file. The gems under sites/ruby/ are the Binacle sites'
+  own code and are not covered by this entry; the code license applies to them.
 
 - The sample deployments and the build tooling are licensed under the MIT License
   samples/, the versioned sample folders under sites/docs/collections/_versions/, and
@@ -50,6 +54,10 @@ documentation.
   The theme switcher custom element used by the sites and the browser UI. It is a generic
   widget with nothing in it specific to packing, so it carries no copyleft. It carries its
   own LICENSE file.
+
+- packages/cookies is licensed under the MIT License
+  It is adapted from js-cookie v3.0.5, which is MIT, and it keeps that license. It carries
+  the upstream LICENSE file.
 
 - shared/src/Binacle.FluxResults is licensed under the MIT License
   It came from the retired FluxResults NuGet package, which was MIT under the same
@@ -151,6 +159,20 @@ Microsoft.Testing.Extensions.CodeCoverage
   Build and test tooling only - it is not part of any published image.
 
 --------------------------------------------------------------------------------
+SIL Open Font License 1.1 Components
+--------------------------------------------------------------------------------
+
+Shipped in the browser UI and the websites. Each font's license text sits next to it.
+
+Familjen Grotesk
+  Copyright 2021 The Familjen Grotesk Project Authors
+  https://github.com/Familjen-Sthlm/Familjen-Grotesk
+
+Martian Mono
+  Copyright 2021 The Martian Mono Project Authors
+  https://github.com/evilmartians/mono
+
+--------------------------------------------------------------------------------
 MIT License Components
 --------------------------------------------------------------------------------
 
@@ -175,10 +197,19 @@ js-cookie                         https://github.com/js-cookie/js-cookie
                                   Vendored and modified from v3.0.5 in packages/cookies, which
                                   carries the upstream LICENSE. The others above ship unmodified.
 
+Test data, not shipped:
+
+OR-Library container-loading data   https://people.brunel.ac.uk/~mastjjb/jeb/orlib/thpackinfo.html
+                                  Copyright (c) 2010 J E Beasley. Kept as published in
+                                  shared/data/or-library, which carries the upstream LICENSE.
+                                  shared/data/bischoff-suite is converted from it.
+
 Build, test and documentation tooling, not shipped:
 
-BenchmarkDotNet, Bogus, ConsoleTables, Jest, Gulp, webpack, ts-loader,
-concurrently, Jekyll and its Ruby gems.
+BenchmarkDotNet, Bogus, ConsoleTables, Jest, ts-node, Ajv, Gulp, webpack, ts-loader,
+Sass, concurrently, Jekyll. Jekyll's own Ruby dependencies are build-only too; most are
+MIT, the rest carry the Ruby, BSD or Apache-2.0 license, and each site's Gemfile.lock
+lists them.
 
 ================================================================================
 

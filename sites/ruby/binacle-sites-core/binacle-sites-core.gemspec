@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name = 'binacle-sites-core'
   spec.version = '1.0.0'
   spec.authors = ['Chris Mavrommatis']
-  spec.licenses = ['MIT']
+  spec.licenses = ['AGPL-3.0-only']
   spec.summary = 'The markup jobs the Binacle site gems share - plain Ruby the site gems call, with no plugin of its own'
   spec.files = Dir['lib/**/*.rb'] + ['LICENSE']
   spec.require_paths = ['lib']

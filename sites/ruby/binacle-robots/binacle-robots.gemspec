@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name = 'binacle-robots'
   spec.version = '1.0.0'
   spec.authors = ['Chris Mavrommatis']
-  spec.licenses = ['MIT']
+  spec.licenses = ['AGPL-3.0-only']
   spec.summary = "One organisation's robots.txt body, so its sites cannot keep different copies of it"
   spec.files = Dir['lib/**/*'] + ['LICENSE']
   spec.require_paths = ['lib']

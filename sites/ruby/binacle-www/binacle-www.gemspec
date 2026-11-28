@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name = 'binacle-www'
   spec.version = '1.0.0'
   spec.authors = ['Chris Mavrommatis']
-  spec.licenses = ['MIT']
+  spec.licenses = ['AGPL-3.0-only']
   spec.summary = "The marketing site's own plugin - the filter that turns a markdown page into its sections"
   spec.files = Dir['lib/**/*.rb'] + ['LICENSE']
   spec.require_paths = ['lib']

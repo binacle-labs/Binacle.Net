@@ -4,7 +4,7 @@
   "description": "Hand-written TypeScript client for the Binacle.Net v4 API",
   "main": "index.ts",
   "types": "index.ts",
-  "license": "AGPL-3.0-only",
+  "license": "Apache-2.0",
   "private": true,
   "sideEffects": false,
   "scripts": {

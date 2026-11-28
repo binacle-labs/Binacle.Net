@@ -2,15 +2,14 @@
 
 One organisation's `robots.txt` body, held once so its sites cannot drift apart. `{% robots %}` writes it.
 
-**This gem is not portable and is not meant to be.** What it carries is a rights reservation under Article 4
-of EU directive 2019/790 and a set of content signals - a legal statement belonging to one publisher, not a
-feature another site would want. The name says so, which is the point of the name.
+**This gem is not portable and is not meant to be.** What it carries is a content-signals policy - a legal
+statement belonging to one publisher, not a feature another site would want. The name says so, which is the point of the name.
 
 ## 📂 What is in it
 
 | Surface | Does |
 |---|---|
-| `{% robots %}` | writes the body: the content-signal preamble, the rights reservation, and `User-Agent: *` |
+| `{% robots %}` | writes the body: the content-signal preamble and `User-Agent: *` |
 | `lib/binacle-robots/robots.txt` | the text itself, as text |
 
 It writes no `Sitemap:` lines and knows nothing about sitemaps. Those come from whatever writes them, on the

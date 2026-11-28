@@ -13,17 +13,14 @@ RSpec.describe Binacle::Robots::RobotsTag do
     expect(Binacle::Robots::Body.text).not_to end_with("\n")
   end
 
-  it 'substitutes nothing - the text is a rights reservation, not a template' do
+  it 'substitutes nothing - the text is a legal statement, not a template' do
     expect(Binacle::Robots::Body.text).not_to match(/\{[%{]/)
   end
 
   describe 'the lines that carry the legal meaning' do
-    it 'reserves rights under the directive, in these words' do
-      expect(built).to include(
-        '# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF',
-        '# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT',
-        '# AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET.'
-      )
+    # The content is CC BY 4.0, which allows any reuse, so a reservation of rights would not hold.
+    it 'reserves no rights under the EU directive' do
+      expect(built).not_to include('ARTICLE 4')
     end
 
     it 'defines all three signals, because a signal left undefined grants nothing and restricts nothing' do

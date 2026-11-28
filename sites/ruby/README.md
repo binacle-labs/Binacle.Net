@@ -13,12 +13,12 @@ the group and is not named under `plugins:`.
 |---|---|---|
 | [`binacle-demo`](binacle-demo) | The `demo_sections` filter, which turns the demo's markdown home page into the design's sections. Its converter extends the section builder in `binacle-sites-core` and adds the hero look for the top of the home page | `demo` |
 | [`binacle-docs`](binacle-docs) | Everything Ruby that only `docs` uses: the version scheme - a generator that stamps `title_suffix` and `robots` onto every versioned document, and `{% vlink %}` - and the `doc_body` and `doc_sections` filters that turn a rendered page into the docs' markup. It uses `binacle-sites-core` for the tiles, the code block wrapper and the table base | `docs` |
-| [`binacle-robots`](binacle-robots) | The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal preamble, the rights reservation and `User-Agent: *`; the `Sitemap:` lines come from `{% sitemap_links %}` | `www`, `docs`, `demo` |
+| [`binacle-robots`](binacle-robots) | The body of `robots.txt`, held once instead of three times. `{% robots %}` writes the content-signal preamble and `User-Agent: *`; the `Sitemap:` lines come from `{% sitemap_links %}` | `www`, `docs`, `demo` |
 | [`binacle-sites-core`](binacle-sites-core) | The markup the site gems share, as plain Ruby they call: link tiles, code blocks, tables, and a section builder a site gem subclasses. It has no filter or tag of its own | `www`, `docs`, `demo` |
 | [`binacle-www`](binacle-www) | The `www_sections` filter, which turns a markdown page into the design's sections. Its converter extends the section builder in `binacle-sites-core` with the home page's looks | `www` |
 
 Each gem has the shape `bundle gem` writes: a `<name>.gemspec`, one entry file at `lib/<name>.rb`, the rest
-under `lib/<name>/`, and the specs in `spec/`. All are MIT.
+under `lib/<name>/`, and the specs in `spec/`. All are AGPL-3.0-only, the code license.
 
 ## 🧪 Tests
 

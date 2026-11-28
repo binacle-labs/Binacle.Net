@@ -111,7 +111,7 @@ shared/tools/Binacle.OrLibrary.Converter   exe tool
    `Binacle.CompactNotation` and `Binacle.ViPaq` are Apache-2.0 so a third party can read the two data formats
    without taking on the code licence, and both `ProjectReference` this project. An Apache grant over a library
    that cannot be built without a copyleft dependency is not usable, so the leaf moved with them.
-   **`Binacle.Packing` referencing it is unaffected** - Apache-2.0 into GPL-3.0 is the permitted direction, and
+   **`Binacle.Packing` referencing it is unaffected** - Apache-2.0 into AGPL-3.0 is the permitted direction, and
    the combined binary is still conveyed under the code licence.
 
 9. **The obvious name for it, `Binacle.Results`, does not compile.** Inside `Binacle.Net.ServiceModule` the

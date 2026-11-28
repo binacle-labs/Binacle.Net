@@ -2,6 +2,7 @@
   "name": "@binacle/sites-demo",
   "version": "1.0.0",
   "description": "This is the website for Binacle.Net",
+  "private": true,
   "scripts": {
     "build": "npm run build:css && npm run build:js",
     "build:css": "sass --pkg-importer=node --no-source-map --style=compressed _sass/main.scss:css/main.css",

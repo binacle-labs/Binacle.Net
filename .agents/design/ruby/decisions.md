@@ -71,7 +71,7 @@ the right trade — a shared gem carrying one site's vocabulary is the thing thi
 ### R4 — the prefix says whether the gem is portable
 
 **`jekyll-` means another site could load it.** `binacle-` means it carries something only this organisation
-wants — `binacle-docs` holds the docs site's version scheme, `binacle-robots` holds a rights reservation,
+wants — `binacle-docs` holds the docs site's version scheme, `binacle-robots` holds one publisher's content-signals policy,
 `binacle-sites-core` holds the markup the site gems share, in the design system's class names.
 A `jekyll-` prefix on any of them would advertise something nobody else has a use for. The `binacle-` gems sit in
 `sites/ruby/`, not `ruby/` (`$sites/ruby`).

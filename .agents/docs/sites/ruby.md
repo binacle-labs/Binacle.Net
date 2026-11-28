@@ -29,7 +29,8 @@ in its `Gemfile` outside `group :jekyll_plugins` and not under `plugins:`.
 ## binacle-robots
 
 **All three published sites load it.** `{% robots %}` writes the `robots.txt` body - the content-signal
-preamble, the Article 4 rights reservation under EU directive 2019/790, and `User-Agent: *`.
+preamble and `User-Agent: *`. It makes no reservation of rights under EU directive 2019/790: the content is
+CC BY 4.0, which allows any reuse, so one would not hold.
 
 **It was worth a gem for what the text is, not for its size.** Three hand-kept copies of a legal statement
 drift, and the copy that drifts is the one that stops saying what was meant. Nobody would notice until they
